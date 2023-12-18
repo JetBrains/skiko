@@ -1,64 +1,10 @@
 package org.jetbrains.skiko
 
-import org.w3c.dom.events.*
+import org.w3c.dom.events.KeyboardEvent
+import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.events.WheelEvent
 
-private val SPECIAL_KEYS = setOf(
-    "Unidentified",
-    "Alt",
-    "AltGraph",
-    "Backspace",
-    "CapsLock",
-    "Control",
-    "Fn",
-    "FnLock",
-    "Hyper",
-    "Meta",
-    "NumLock",
-    "ScrollLock",
-    "Shift",
-    "Super",
-    "Symbol",
-    "SymbolLock",
-    "F1",
-    "F2",
-    "F3",
-    "F4",
-    "F5",
-    "F6",
-    "F7",
-    "F8",
-    "F9",
-    "F10",
-    "F11",
-    "F12",
-    "F13",
-    "F14",
-    "F15",
-    "F16",
-    "F17",
-    "F18",
-    "F19",
-    "F20",
-    "F21",
-    "F22",
-    "ArrowLeft",
-    "ArrowUp",
-    "ArrowRight",
-    "ArrowDown",
-    "Help",
-    "Home",
-    "Delete",
-    "End",
-    "PageUp",
-    "PageDown",
-    "Escape",
-    "Clear",
-    "Clear"
-)
-
-internal expect fun getEventTimestamp(e: UIEvent): Long
-
-fun toSkikoEvent(
+internal fun toSkikoEvent(
     event: MouseEvent,
     kind: SkikoPointerEventKind
 ): SkikoPointerEvent {
@@ -74,7 +20,7 @@ fun toSkikoEvent(
     )
 }
 
-fun toSkikoDragEvent(
+internal fun toSkikoDragEvent(
     event: MouseEvent
 ): SkikoPointerEvent {
     return SkikoPointerEvent(
@@ -89,7 +35,7 @@ fun toSkikoDragEvent(
     )
 }
 
-fun toSkikoTypeEvent(
+internal fun toSkikoTypeEvent(
     character: String,
     event: KeyboardEvent?,
 ): SkikoInputEvent? {
@@ -114,7 +60,7 @@ fun toSkikoTypeEvent(
 }
 
 
-fun toSkikoEvent(
+internal fun toSkikoEvent(
     event: KeyboardEvent,
     kind: SkikoKeyboardEventKind
 ): SkikoKeyboardEvent {
@@ -127,7 +73,7 @@ fun toSkikoEvent(
     )
 }
 
-fun toSkikoScrollEvent(
+internal fun toSkikoScrollEvent(
     event: WheelEvent,
 ): SkikoPointerEvent {
     return SkikoPointerEvent(
@@ -217,7 +163,7 @@ private fun toSkikoKey(event: KeyboardEvent): Int {
             key == SkikoKey.KEY_LEFT_SHIFT.platformKeyCode ||
             key == SkikoKey.KEY_LEFT_META.platformKeyCode
         )
-        key = key.or(0x80000000.toInt())
+            key = key.or(0x80000000.toInt())
     }
     return key
 }

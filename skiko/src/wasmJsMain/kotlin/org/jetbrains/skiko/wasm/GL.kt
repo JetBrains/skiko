@@ -2,7 +2,7 @@
 package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skia.impl.NativePointer
-import org.w3c.dom.HTMLCanvasElement
+import org.jetbrains.skiko.w3c.HTMLCanvasElement
 import kotlin.js.*
 
 internal external object GL : GLInterface {
@@ -11,6 +11,6 @@ internal external object GL : GLInterface {
 }
 
 private external interface GLInterface {
-    fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer;
+    fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer
     fun makeContextCurrent(contextPointer: NativePointer): Boolean;
 }

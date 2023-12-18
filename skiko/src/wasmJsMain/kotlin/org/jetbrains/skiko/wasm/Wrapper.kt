@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skia.impl.NativePointer
-import org.w3c.dom.HTMLCanvasElement
+import org.jetbrains.skiko.w3c.HTMLCanvasElement
 
 @JsFun(
 """() => {

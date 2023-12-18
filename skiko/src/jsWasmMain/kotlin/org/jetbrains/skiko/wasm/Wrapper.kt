@@ -1,9 +1,7 @@
 package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skia.impl.NativePointer
-import org.w3c.dom.HTMLCanvasElement
-import kotlin.js.*
-
+import org.jetbrains.skiko.w3c.HTMLCanvasElement
 
 internal external interface ContextAttributes {
     val alpha: Int?

@@ -1,6 +1,6 @@
 package org.jetbrains.skia
 
-import kotlinx.browser.window
+import org.jetbrains.skiko.w3c.window
 
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
