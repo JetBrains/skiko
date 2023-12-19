@@ -1,4 +1,4 @@
-package org.jetbrains.skia
+package org.jetbrains.skiko
 
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar

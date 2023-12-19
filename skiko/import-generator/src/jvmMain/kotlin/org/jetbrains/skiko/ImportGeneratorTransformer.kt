@@ -1,4 +1,4 @@
-package org.jetbrains.skia
+package org.jetbrains.skiko
 
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFunction

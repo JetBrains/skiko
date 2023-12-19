@@ -1,13 +1,13 @@
-package org.jetbrains.skia
+package org.jetbrains.skiko
 
 import org.jetbrains.kotlin.compiler.plugin.*
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.skia.ImportGeneratorConfigurationKeys.PATH
-import org.jetbrains.skia.ImportGeneratorConfigurationKeys.PREFIX
+import org.jetbrains.skiko.ImportGeneratorConfigurationKeys.PATH
+import org.jetbrains.skiko.ImportGeneratorConfigurationKeys.PREFIX
 
 @OptIn(ExperimentalCompilerApi::class)
 class ImportGeneratorCommandLineProcessor : CommandLineProcessor {
-    override val pluginId = "org.jetbrains.skia.import.generator"
+    override val pluginId = "org.jetbrains.skiko.imports.generator"
     override val pluginOptions = listOf(PATH_OPTION, PREFIX_OPTION)
 
     override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) =

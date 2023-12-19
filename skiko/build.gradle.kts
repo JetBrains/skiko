@@ -1,9 +1,7 @@
-import Build_gradle.ImportGeneratorCompilerPluginSupportPlugin.Companion.wasmImports
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.plugin.*
 import tasks.configuration.*
 
 plugins {
@@ -14,8 +12,8 @@ plugins {
     id("org.gradle.crypto.checksum") version "1.4.0"
 }
 
-apply<ImportGeneratorCompilerPluginSupportPlugin>()
-apply<ImportGeneratorForTestCompilerPluginSupportPlugin>()
+apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
+apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
 
 val coroutinesVersion = "1.8.0-RC"
 val atomicfuVersion = "0.23.1"
@@ -29,6 +27,7 @@ val targetArch = skiko.targetArch
 val skikoProjectContext = SkikoProjectContext(
     project = project,
     skiko = skiko,
+    kotlin = kotlin,
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
     },
@@ -107,21 +106,6 @@ kotlin {
             val main by compilations.getting
             val test by compilations.getting
 
-            main.compileTaskProvider.configure {
-                outputs.file(setupMjs)
-            }
-
-            test.compileTaskProvider.configure {
-                outputs.file(skikoTestMjs)
-            }
-
-            listOf(main, test).forEach {
-                it.configurations.pluginConfiguration.resolutionStrategy.dependencySubstitution {
-                    substitute(module("${SkikoArtifacts.groupId}:$IMPORT_GENERATOR"))
-                        .using(project(":import-generator"))
-                }
-            }
-
             val linkWasmTasks = skikoProjectContext.createWasmLinkTasks()
             project.tasks.named<Copy>(test.processResourcesTaskName) {
                 from(linkWasmTasks.linkWasm!!) {
@@ -135,6 +119,8 @@ kotlin {
                 from(skikoTestMjs)
                 dependsOn(test.compileTaskProvider)
             }
+
+            setupImportsGeneratorPlugin()
         }
     }
 
@@ -584,44 +570,3 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configur
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
     kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
 }
-
-abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
-    val compilationName: String,
-    val outputFileProvider: (Project) -> File,
-    val prefixFileProvider: (Project) -> File
-) : KotlinCompilerPluginSupportPlugin {
-    override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
-        val project = kotlinCompilation.target.project
-
-        val outputFile = outputFileProvider(project)
-        val prefixFile = prefixFileProvider(project)
-
-        return project.provider {
-            listOf(
-                SubpluginOption("import-generator-path", outputFile.normalize().absolutePath),
-                SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath)
-            )
-        }
-    }
-
-    override fun getCompilerPluginId() = "org.jetbrains.skia.import.generator"
-
-    override fun getPluginArtifact(): SubpluginArtifact =
-        SubpluginArtifact(SkikoArtifacts.groupId, IMPORT_GENERATOR)
-
-    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
-        return kotlinCompilation.platformType == KotlinPlatformType.wasm && kotlinCompilation.name == compilationName
-    }
-}
-
-class ImportGeneratorCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
-    MAIN_COMPILATION_NAME,
-    { it.setupMjs },
-    { it.projectDir.resolve("src/jsWasmMain/resources/pre-setup.mjs") }
-)
-
-class ImportGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
-    TEST_COMPILATION_NAME,
-    { it.skikoTestMjs },
-    { it.projectDir.resolve("src/jsWasmMain/resources/pre-skiko-test.mjs") }
-)
