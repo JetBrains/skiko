@@ -2,20 +2,29 @@ package tasks.configuration
 
 import Arch
 import CompileSkikoCppTask
+import IMPORT_GENERATOR
 import LinkSkikoWasmTask
 import OS
 import SkikoProjectContext
 import compilerForTarget
 import linkerForTarget
+import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
+import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
 import projectDirs
 import registerOrGetSkiaDirProvider
+import setupMjs
+import skikoTestMjs
 import supportJs
 import supportWasm
+import java.io.File
 
 data class LinkWasmTasks(
     val linkWasm: TaskProvider<LinkSkikoWasmTask>?,
@@ -56,7 +65,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         )
     }
 
-    val configureCommon: LinkSkikoWasmTask.(outputES6: Boolean) -> Unit = { outputES6 ->
+    val configureCommon: LinkSkikoWasmTask.(outputES6: Boolean, prefixPath: String) -> Unit = { outputES6, prefixPath ->
         val osArch = OS.Wasm to Arch.Wasm
 
         dependsOn(compileWasm)
@@ -74,7 +83,6 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
             include("**/*.o")
         }
 
-        val jsFileExtension = if (outputES6) "mjs" else "js"
         val wasmFileName = if (outputES6) {
             "skikomjs.wasm"
         } else {
@@ -91,7 +99,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         skikoJsPrefix.from(
             // the order matters
             project.layout.projectDirectory.file("src/jsWasmMain/resources/skikoCallbacks.js"),
-            project.layout.projectDirectory.file("src/jsWasmMain/resources/setup.$jsFileExtension")
+            project.layout.projectDirectory.file(prefixPath)
         )
 
         @OptIn(kotlin.ExperimentalStdlibApi::class)
@@ -147,12 +155,15 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
     }
 
     val linkWasmWithES6 by tasks.registering(LinkSkikoWasmTask::class) {
-        configureCommon(true)
+        val wasmJsTarget = kotlin.wasmJs()
+        val main by wasmJsTarget.compilations
+        dependsOn(main.compileTaskProvider)
+        configureCommon(true, setupMjs.normalize().absolutePath)
     }
 
     val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
         dependsOn(linkWasmWithES6)
-        configureCommon(false)
+        configureCommon(false, "src/jsWasmMain/resources/setup.js")
     }
 
     // skikoWasmJar is used by task name
@@ -178,4 +189,68 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
     }
 
     return LinkWasmTasks(linkWasm, linkWasmWithES6)
+}
+
+abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
+    val compilationName: String,
+    val outputFileProvider: (Project) -> File,
+    val prefixFileProvider: (Project) -> File
+) : KotlinCompilerPluginSupportPlugin {
+    override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
+        val project = kotlinCompilation.target.project
+
+        val outputFile = outputFileProvider(project)
+        val prefixFile = prefixFileProvider(project)
+
+        return project.provider {
+            listOf(
+                SubpluginOption("import-generator-path", outputFile.normalize().absolutePath),
+                SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath)
+            )
+        }
+    }
+
+    override fun getCompilerPluginId() = "org.jetbrains.skiko.imports.generator"
+
+    override fun getPluginArtifact(): SubpluginArtifact =
+        SubpluginArtifact(SkikoArtifacts.groupId, IMPORT_GENERATOR)
+
+    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
+        return kotlinCompilation.platformType == KotlinPlatformType.wasm
+                && kotlinCompilation.name == compilationName
+    }
+}
+
+class WasmImportsGeneratorCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
+    KotlinCompilation.MAIN_COMPILATION_NAME,
+    { it.setupMjs },
+    { it.projectDir.resolve("src/jsWasmMain/resources/pre-setup.mjs") }
+)
+
+class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
+    KotlinCompilation.TEST_COMPILATION_NAME,
+    { it.skikoTestMjs },
+    { it.projectDir.resolve("src/jsWasmMain/resources/pre-skiko-test.mjs") }
+)
+
+fun KotlinWasmJsTargetDsl.setupImportsGeneratorPlugin() {
+    val main by compilations.getting
+    val test by compilations.getting
+
+    main.compileTaskProvider.configure {
+        outputs.file(project.setupMjs)
+    }
+
+    test.compileTaskProvider.configure {
+        outputs.file(project.skikoTestMjs)
+    }
+
+    listOf(main, test).forEach {
+        // By default, it will try to use the same version as kotlin, because we use version=null in getPluginArtifact.
+        // But we don't publish the artifact, therefore we substitute it for project dependency.
+        it.configurations.pluginConfiguration.resolutionStrategy.dependencySubstitution {
+            substitute(module("${SkikoArtifacts.groupId}:$IMPORT_GENERATOR"))
+                .using(project(":import-generator"))
+        }
+    }
 }

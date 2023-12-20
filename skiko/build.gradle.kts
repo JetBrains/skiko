@@ -12,6 +12,9 @@ plugins {
     id("org.gradle.crypto.checksum") version "1.4.0"
 }
 
+apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
+apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
+
 val coroutinesVersion = "1.8.0-RC"
 val atomicfuVersion = "0.23.1"
 
@@ -24,6 +27,7 @@ val targetArch = skiko.targetArch
 val skikoProjectContext = SkikoProjectContext(
     project = project,
     skiko = skiko,
+    kotlin = kotlin,
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
     },
@@ -99,7 +103,9 @@ kotlin {
             }
             generateVersion(OS.Wasm, Arch.Wasm, skiko)
 
+            val main by compilations.getting
             val test by compilations.getting
+
             val linkWasmTasks = skikoProjectContext.createWasmLinkTasks()
             project.tasks.named<Copy>(test.processResourcesTaskName) {
                 from(linkWasmTasks.linkWasm!!) {
@@ -109,7 +115,12 @@ kotlin {
                 from(linkWasmTasks.linkWasmWithES6!!) {
                     include("*.mjs")
                 }
+
+                from(skikoTestMjs)
+                dependsOn(test.compileTaskProvider)
             }
+
+            setupImportsGeneratorPlugin()
         }
     }
 
@@ -224,6 +235,10 @@ kotlin {
                     }
                     val wasmJsTest by getting {
                         dependsOn(jsWasmTest)
+
+                        dependencies {
+                            implementation(kotlin("test-wasm-js"))
+                        }
                     }
                 }
             }
