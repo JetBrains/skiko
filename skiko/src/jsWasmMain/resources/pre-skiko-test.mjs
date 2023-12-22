@@ -1,0 +1,1 @@
+import { loadedWasm } from "./skiko.mjs";
