@@ -37,7 +37,7 @@ internal fun toSkikoDragEvent(
     )
 }
 
-fun toSkikoEvent(
+internal fun toSkikoEvent(
     event: TouchEvent,
     kind: SkikoPointerEventKind,
     offsetX: Double,

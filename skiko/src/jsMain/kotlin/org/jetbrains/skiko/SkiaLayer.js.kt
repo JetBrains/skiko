@@ -23,19 +23,16 @@ internal actual fun SkiaLayer.bindCanvasEventsToSkikoView(
         }
         skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.DOWN, offsetX, offsetY))
     })
-
     htmlCanvas.addEventListener("touchmove", { event ->
         event.preventDefault()
         event as TouchEvent
         skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.MOVE, offsetX, offsetY))
     })
-
     htmlCanvas.addEventListener("touchend", { event ->
         event.preventDefault()
         event as TouchEvent
         skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.UP, offsetX, offsetY))
     })
-
     htmlCanvas.addEventListener("touchcancel", { event ->
         event.preventDefault()
         event as TouchEvent
