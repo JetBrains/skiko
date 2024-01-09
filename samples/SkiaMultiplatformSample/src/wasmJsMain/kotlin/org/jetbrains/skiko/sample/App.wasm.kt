@@ -11,7 +11,7 @@ fun main() {
 
 internal fun runApp() {
     val skiaLayer = SkiaLayer()
-    skiaLayer.onContentScaleChanged = { scale -> println(scale) }
+    // onContentScaleChanged = { scale -> println(scale) }
     val game = JsClocks(skiaLayer)
     skiaLayer.skikoView = GenericSkikoView(skiaLayer, game)
     val canvas = document.getElementById("SkikoTarget") as HTMLCanvasElement
