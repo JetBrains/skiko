@@ -28,7 +28,7 @@ const int BuffersCount = 2;
 class DirectXDevice
 {
 public:
-    HWND window;
+    HWND hWnd; // Handle of native view.
     GrD3DBackendContext backendContext;
     gr_cp<ID3D12Device> device;
     gr_cp<IDXGISwapChain3> swapChain;
@@ -62,6 +62,22 @@ public:
         gr_cp<IDXGIFactory4> swapChainFactory4;
         gr_cp<IDXGISwapChain1> swapChain1;
         CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
+        HRESULT result = CreateSwapChainForComposition(swapChainFactory4.get(), width, height, &swapChain1);
+        if (FAILED(result)) {
+            /*
+             * It's just a fallback path that added for compatibility.
+             * In this case transparency won't be supported.
+             */
+            swapChain1.reset(nullptr);
+            CreateSwapChainForHwnd(swapChainFactory4.get(), width, height, &swapChain1);
+        }
+        swapChainFactory4->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
+        swapChain1->QueryInterface(IID_PPV_ARGS(&swapChain));
+        swapChainFactory4.reset(nullptr);
+    }
+
+private:
+    HRESULT CreateSwapChainForComposition(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, IDXGISwapChain1 **swapChain1) {
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = width;
         swapChainDesc.Height = height;
@@ -73,18 +89,37 @@ public:
         swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_PREMULTIPLIED;
-        swapChainFactory4->CreateSwapChainForComposition(queue.get(), &swapChainDesc, nullptr, &swapChain1);
+        HRESULT result = swapChainFactory4->CreateSwapChainForComposition(queue.get(), &swapChainDesc, nullptr, swapChain1);
+        if (FAILED(result)) { return result; }
 
-        DCompositionCreateDevice(0, IID_PPV_ARGS(&dcDevice));
-        dcDevice->CreateTargetForHwnd(window, true, &dcTarget);
-        dcDevice->CreateVisual(&dcVisual);
-        dcVisual->SetContent(swapChain1.get());
-        dcTarget->SetRoot(dcVisual.get());
-        dcDevice->Commit();
+        result = DCompositionCreateDevice(0, IID_PPV_ARGS(&dcDevice));
+        if (FAILED(result)) { return result; }
+        result = dcDevice->CreateTargetForHwnd(hWnd, true, &dcTarget);
+        if (FAILED(result)) { return result; }
+        result = dcDevice->CreateVisual(&dcVisual);
+        if (FAILED(result)) { return result; }
+        result = dcVisual->SetContent(*swapChain1);
+        if (FAILED(result)) { return result; }
+        result = dcTarget->SetRoot(dcVisual.get());
+        if (FAILED(result)) { return result; }
+        result = dcDevice->Commit();
+        if (FAILED(result)) { return result; }
 
-        swapChainFactory4->MakeWindowAssociation(window, DXGI_MWA_NO_ALT_ENTER);
-        swapChain1->QueryInterface(IID_PPV_ARGS(&swapChain));
-        swapChainFactory4.reset(nullptr);
+        return S_OK;
+    }
+
+    HRESULT CreateSwapChainForHwnd(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, IDXGISwapChain1 **swapChain1) {
+        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+        swapChainDesc.Width = width;
+        swapChainDesc.Height = height;
+        swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        swapChainDesc.SampleDesc.Count = 1;
+        swapChainDesc.SampleDesc.Quality = 0;
+        swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        swapChainDesc.BufferCount = BuffersCount;
+        swapChainDesc.Scaling = DXGI_SCALING_NONE;
+        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        return swapChainFactory4->CreateSwapChainForHwnd(queue.get(), hWnd, &swapChainDesc, nullptr, nullptr, swapChain1);
     }
 };
 
@@ -314,7 +349,7 @@ extern "C"
 
         d3dDevice->device = device;
         d3dDevice->queue = queue;
-        d3dDevice->window = hWnd;
+        d3dDevice->hWnd = hWnd;
 
         if (transparency) {
             const LONG style = GetWindowLong(hWnd, GWL_EXSTYLE);
