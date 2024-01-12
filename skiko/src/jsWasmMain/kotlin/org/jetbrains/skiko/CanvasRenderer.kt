@@ -16,9 +16,9 @@ import org.jetbrains.skiko.wasm.createWebGLContext
 internal abstract class CanvasRenderer(
     private val htmlCanvas: HTMLCanvasElement
 ) {
-    private val contextPointer = createWebGLContext(htmlCanvas)
+    internal val contextPointer = createWebGLContext(htmlCanvas)
     private val context: DirectContext
-    private var surface: Surface? = null
+    internal var surface: Surface? = null
     private var renderTarget: BackendRenderTarget? = null
 
     /**

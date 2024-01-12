@@ -12,7 +12,7 @@ import kotlin.math.PI
 
 abstract class Clocks(private val layer: SkiaLayer): SkikoView {
     private val cursorManager = CursorManager()
-    private val withFps = true
+    private val withFps = false
     private val fpsCounter = FPSCounter()
     private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
     private var frame = 0

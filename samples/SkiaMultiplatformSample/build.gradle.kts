@@ -23,7 +23,7 @@ repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 
-     // mavenLocal()
+      mavenLocal()
 }
 
 val osName = System.getProperty("os.name")
@@ -117,6 +117,7 @@ kotlin {
             }
         }
         binaries.executable()
+        applyBinaryen()
     }
 
     sourceSets {
