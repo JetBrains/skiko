@@ -16,12 +16,18 @@ internal external object window {
     val navigator: Navigator
     val performance: Performance
 
+    val matchMedia: ((String) -> MediaQueryList)?
+
     fun requestAnimationFrame(block: (Double) -> Unit)
     fun open(url: String?, target: String?)
 }
 
 internal external interface Performance {
     fun now(): Double
+}
+
+internal external interface MediaQueryList {
+    val matches: Boolean
 }
 
 internal external interface Navigator {

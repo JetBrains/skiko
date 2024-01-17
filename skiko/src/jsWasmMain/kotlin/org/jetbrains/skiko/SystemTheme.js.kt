@@ -1,5 +1,12 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skiko.w3c.window
+
 actual val currentSystemTheme: SystemTheme
-    // TODO: getting actual OS/browser system theme
-    get() = SystemTheme.UNKNOWN
+    get() = when(val matchMedia = window.matchMedia) {
+        null -> SystemTheme.UNKNOWN
+        else -> when(matchMedia("(prefers-color-scheme: dark)").matches) {
+            true -> SystemTheme.DARK
+            else -> SystemTheme.LIGHT
+        }
+    }
