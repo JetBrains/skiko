@@ -2,16 +2,43 @@ package org.jetbrains.skiko
 
 import kotlinx.browser.window
 import org.jetbrains.skiko.w3c.HTMLCanvasElement
+import org.w3c.dom.TouchEvent
 
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.events.UIEvent
 import org.w3c.dom.events.WheelEvent
 
 internal actual fun SkiaLayer.bindCanvasEventsToSkikoView(
     canvas: HTMLCanvasElement
 ) {
     val htmlCanvas = canvas as org.w3c.dom.HTMLCanvasElement
-
+    var offsetX = 0.0
+    var offsetY = 0.0
+    htmlCanvas.addEventListener("touchstart", { event ->
+        event.preventDefault()
+        event as TouchEvent
+        htmlCanvas.getBoundingClientRect().apply {
+            offsetX = left
+            offsetY = top
+        }
+        skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.DOWN, offsetX, offsetY))
+    })
+    htmlCanvas.addEventListener("touchmove", { event ->
+        event.preventDefault()
+        event as TouchEvent
+        skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.MOVE, offsetX, offsetY))
+    })
+    htmlCanvas.addEventListener("touchend", { event ->
+        event.preventDefault()
+        event as TouchEvent
+        skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.UP, offsetX, offsetY))
+    })
+    htmlCanvas.addEventListener("touchcancel", { event ->
+        event.preventDefault()
+        event as TouchEvent
+        skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.UP, offsetX, offsetY))
+    })
     htmlCanvas.addEventListener("mousedown", { event ->
         event as MouseEvent
         isPointerPressed = true
@@ -55,7 +82,7 @@ actual typealias SkikoGesturePlatformEvent = Any
 actual typealias SkikoPlatformInputEvent = KeyboardEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
 //  MouseEvent is base class of PointerEvent
-actual typealias SkikoPlatformPointerEvent = MouseEvent
+actual typealias SkikoPlatformPointerEvent = UIEvent
 
 internal actual fun SkiaLayer.setOnChangeScaleNotifier() {
     state?.initCanvas(desiredWidth, desiredHeight, contentScale, this.pixelGeometry)

@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import org.w3c.dom.TouchEvent
+import org.w3c.dom.asList
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.events.WheelEvent
@@ -31,6 +33,38 @@ internal fun toSkikoDragEvent(
         modifiers = toSkikoModifiers(event),
         kind = SkikoPointerEventKind.DRAG,
         timestamp = getEventTimestamp(event),
+        platform = event
+    )
+}
+
+internal fun toSkikoEvent(
+    event: TouchEvent,
+    kind: SkikoPointerEventKind,
+    offsetX: Double,
+    offsetY: Double
+): SkikoPointerEvent {
+    val touches = event.changedTouches.asList()
+    val pointers = touches.map { touch ->
+        val x = touch.clientX.toDouble() - offsetX
+        val y = touch.clientY.toDouble() - offsetY
+        val force = touch.asDynamic().force as Double
+
+        SkikoPointer(
+            x = x,
+            y = y,
+            pressed = kind in listOf(SkikoPointerEventKind.DOWN, SkikoPointerEventKind.MOVE),
+            device = SkikoPointerDevice.TOUCH,
+            id = touch.identifier.toLong(),
+            pressure = force
+        )
+    }
+
+    return SkikoPointerEvent(
+        x = pointers.centroidX,
+        y = pointers.centroidY,
+        kind = kind,
+        timestamp = (currentNanoTime() / 1E6).toLong(),
+        pointers = pointers,
         platform = event
     )
 }
