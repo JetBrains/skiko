@@ -84,10 +84,14 @@ internal class Direct3DRedrawer(
     }
 
     private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
-        if (!isDisposed) {
-            contextHandler.draw()
-            swap(device, withVsync)
+        if (isDisposed) {
+            return
         }
+        if (layer.width <= 0 || layer.height <= 0) {
+            return
+        }
+        contextHandler.draw()
+        swap(device, withVsync)
     }
 
     fun makeContext() = DirectContext(
