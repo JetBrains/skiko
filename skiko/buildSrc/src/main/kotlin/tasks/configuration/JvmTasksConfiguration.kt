@@ -10,6 +10,7 @@ import SkiaBuildType
 import SkikoProjectContext
 import compilerForTarget
 import dynamicLibExt
+import hostArch
 import hostOs
 import joinToTitleCamelCase
 import linkerForTarget
@@ -337,13 +338,16 @@ private val Arch.darwinSignClientName: String
 
 fun SkikoProjectContext.createDownloadCodeSignClientDarwinTask(
     targetOs: OS,
-    targetArch: Arch
-) = project.registerSkikoTask<de.undercouch.gradle.tasks.download.Download>("downloadCodeSignClient", targetOs, targetArch) {
-    val fileUrl = "https://codesign-distribution.labs.jb.gg/${targetArch.darwinSignClientName}"
+    hostArch: Arch
+) = project.registerSkikoTask<de.undercouch.gradle.tasks.download.Download>("downloadCodeSignClient", targetOs, hostArch) {
+    val fileUrl = "https://codesign-distribution.labs.jb.gg/${hostArch.darwinSignClientName}"
 
     src(fileUrl)
     dest(project.layout.buildDirectory)
     overwrite(false)
+
+    // only Teamcity agents have access to download the codesign-client executable file
+     enabled = this@createDownloadCodeSignClientDarwinTask.skiko.isTeamcityCIBuild
 }
 
 fun SkikoProjectContext.maybeSignOrSealTask(
@@ -354,7 +358,7 @@ fun SkikoProjectContext.maybeSignOrSealTask(
     dependsOn(linkJvmBindings)
 
     if (targetOs.isMacOs) {
-        val downloadCodesignClientTask = "downloadCodeSignClient" + joinToTitleCamelCase(targetOs.id, targetArch.id)
+        val downloadCodesignClientTask = "downloadCodeSignClient" + joinToTitleCamelCase(targetOs.id, hostArch.id)
         dependsOn(project.tasks.getByName(downloadCodesignClientTask))
     }
 
@@ -376,8 +380,8 @@ fun SkikoProjectContext.maybeSignOrSealTask(
         }
     }
 
-    if (hostOs == OS.MacOS) {
-        codesignClient.set(project.layout.buildDirectory.file(targetArch.darwinSignClientName))
+    if (hostOs == OS.MacOS && this@maybeSignOrSealTask.skiko.isTeamcityCIBuild) {
+        codesignClient.set(project.layout.buildDirectory.file(hostArch.darwinSignClientName))
     }
     signHost.set(skiko.signHost)
     signUser.set(skiko.signUser)
@@ -404,7 +408,7 @@ fun SkikoProjectContext.createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: Tas
     val linkBindings =
         createLinkJvmBindings(os, arch, skiaBindingsDir, compileBindings, objcCompile)
     if (os.isMacOs) {
-        createDownloadCodeSignClientDarwinTask(os, arch)
+        createDownloadCodeSignClientDarwinTask(os, hostArch)
     }
     val maybeSign = maybeSignOrSealTask(os, arch, linkBindings)
     val nativeLib = maybeSign.map { it.outputFiles.get().single() }

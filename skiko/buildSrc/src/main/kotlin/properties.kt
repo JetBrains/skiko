@@ -116,7 +116,7 @@ fun targetId(os: OS, arch: Arch) = "${os.id}-${arch.id}"
 val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
 
 class SkikoProperties(private val myProject: Project) {
-    val isCIBuild: Boolean
+    val isTeamcityCIBuild: Boolean
         get() = myProject.hasProperty("teamcity")
 
     val planeDeployVersion: String = myProject.property("deploy.version") as String
