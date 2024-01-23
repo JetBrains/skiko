@@ -348,6 +348,11 @@ fun SkikoProjectContext.createDownloadCodeSignClientDarwinTask(
 
     // only Teamcity agents have access to download the codesign-client executable file
      enabled = this@createDownloadCodeSignClientDarwinTask.skiko.isTeamcityCIBuild
+
+    doLast {
+        val downloadedFile = project.layout.buildDirectory.get().asFile.resolve(hostArch.darwinSignClientName)
+         downloadedFile.setExecutable(true)
+    }
 }
 
 fun SkikoProjectContext.maybeSignOrSealTask(
