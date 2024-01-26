@@ -517,7 +517,7 @@ publishing {
 }
 
 val mavenCentral = MavenCentralProperties(project)
-if (skiko.isCIBuild || mavenCentral.signArtifacts) {
+if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
     signing {
         sign(publishing.publications)
         useInMemoryPgpKeys(mavenCentral.signArtifactsKey.get(), mavenCentral.signArtifactsPassword.get())
