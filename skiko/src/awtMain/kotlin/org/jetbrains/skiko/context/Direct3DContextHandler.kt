@@ -41,34 +41,38 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
         }
         return false
     }
-    private var isD3DInited = false
 
     override fun initCanvas() {
+        val context = context ?: return
         val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
-        val surfaceProps = SurfaceProps(pixelGeometry = layer.pixelGeometry)
+        val width = (layer.width * scale).toInt()
+        val height = (layer.height * scale).toInt()
 
-        if (isSizeChanged(w, h) || isSurfacesNull()) {
+        if (width <= 0 || height <= 0) {
+            return
+        }
+
+        if (isSizeChanged(width, height) || isSurfacesNull()) {
             disposeCanvas()
-            context?.flush()
-            
-            if (!isD3DInited) {
-                directXRedrawer.initSwapChain(w, h)
-            } else {
-                directXRedrawer.resizeBuffers(w, h)
-            }
-            
+            context.flush()
+
+            val justInitialized = directXRedrawer.changeSize(width, height)
             try {
-                for (bufferIndex in 0..bufferCount - 1) {
-                    surfaces[bufferIndex] = directXRedrawer.makeSurface(getPtr(context!!), w, h, surfaceProps, bufferIndex)
+                val surfaceProps = SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                for (bufferIndex in 0 until bufferCount) {
+                    surfaces[bufferIndex] = directXRedrawer.makeSurface(
+                        context = getPtr(context),
+                        width = width,
+                        height = height,
+                        surfaceProps = surfaceProps,
+                        index = bufferIndex
+                    )
                 }
             } finally {
-                Reference.reachabilityFence(context!!)
+                Reference.reachabilityFence(context)
             }
 
-            if (!isD3DInited) {
-                isD3DInited = true
+            if (justInitialized) {
                 directXRedrawer.initFence()
             }
         }
@@ -77,14 +81,13 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
     }
 
     override fun flush() {
+        val context = context ?: return
+        val surface = surface ?: return
         try {
-            flush(
-                getPtr(context!!),
-                getPtr(surface!!)
-            )
+            flush(getPtr(context), getPtr(surface))
         } finally {
-            Reference.reachabilityFence(context!!)
-            Reference.reachabilityFence(surface!!)
+            Reference.reachabilityFence(context)
+            Reference.reachabilityFence(surface)
         }
     }
 
