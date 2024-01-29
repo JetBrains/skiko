@@ -54,7 +54,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
             context?.flush()
             
             if (!isD3DInited) {
-                directXRedrawer.initSwapChain()
+                directXRedrawer.initSwapChain(w, h)
             } else {
                 directXRedrawer.resizeBuffers(w, h)
             }
