@@ -19,6 +19,7 @@ internal class Direct3DRedrawer(
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var drawLock = Any()
+    private var isSwapChainInitialized = false
 
     private var device: Long = 0L
         get() {
@@ -84,10 +85,11 @@ internal class Direct3DRedrawer(
     }
 
     private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
-        if (!isDisposed) {
-            contextHandler.draw()
-            swap(device, withVsync)
+        if (isDisposed) {
+            return
         }
+        contextHandler.draw()
+        swap(withVsync)
     }
 
     fun makeContext() = DirectContext(
@@ -100,10 +102,25 @@ internal class Direct3DRedrawer(
         }
     }
 
-    fun resizeBuffers(width: Int, height: Int) = resizeBuffers(device, width, height)
+    fun changeSize(width: Int, height: Int): Boolean {
+        return if (!isSwapChainInitialized) {
+            initSwapChain(device, width, height)
+            isSwapChainInitialized = true
+            true
+        } else {
+            resizeBuffers(device, width, height)
+            false
+        }
+    }
+
+    private fun swap(withVsync: Boolean) {
+        if (!isSwapChainInitialized) {
+            return
+        }
+        swap(device, withVsync)
+    }
 
     fun getBufferIndex() = getBufferIndex(device)
-    fun initSwapChain() = initSwapChain(device)
     fun initFence() = initFence(device)
 
     // Called from native code
@@ -117,7 +134,7 @@ internal class Direct3DRedrawer(
     private external fun swap(device: Long, isVsyncEnabled: Boolean)
     private external fun disposeDevice(device: Long)
     private external fun getBufferIndex(device: Long): Int
-    private external fun initSwapChain(device: Long)
+    private external fun initSwapChain(device: Long, width: Int, height: Int)
     private external fun initFence(device: Long)
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long

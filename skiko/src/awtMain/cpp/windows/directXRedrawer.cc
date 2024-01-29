@@ -58,12 +58,7 @@ public:
         device.reset(nullptr);
     }
 
-    void initSwapChain() {
-        RECT windowRect;
-        GetClientRect(window, &windowRect);
-        UINT width = windowRect.right - windowRect.left;
-        UINT height = windowRect.bottom - windowRect.top;
-
+    void initSwapChain(UINT width, UINT height) {
         gr_cp<IDXGIFactory4> swapChainFactory4;
         gr_cp<IDXGISwapChain1> swapChain1;
         CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
@@ -330,12 +325,12 @@ extern "C"
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initSwapChain(
-        JNIEnv *env, jobject redrawer, jlong devicePtr)
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
         __try
         {
             DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-            d3dDevice->initSwapChain();
+            d3dDevice->initSwapChain((UINT) width, (UINT) height);
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {
             auto code = GetExceptionCode();
