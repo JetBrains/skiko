@@ -101,7 +101,6 @@ actual open class SkiaLayer {
         }.apply { initCanvas(desiredWidth, desiredHeight, contentScale, pixelGeometry) }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
         // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
-        bindCanvasEventsToSkikoView(htmlCanvas)
     }
 
     internal actual fun draw(canvas: Canvas) {
@@ -115,5 +114,4 @@ actual open class SkiaLayer {
 }
 
 
-internal expect fun SkiaLayer.bindCanvasEventsToSkikoView(canvas: HTMLCanvasElement)
 internal expect fun SkiaLayer.setOnChangeScaleNotifier()
