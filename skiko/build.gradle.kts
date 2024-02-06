@@ -15,8 +15,9 @@ plugins {
 apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
 apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
 
-val coroutinesVersion = "1.8.0-RC"
-val atomicfuVersion = "0.23.1"
+val coroutinesVersion = "1.7.3"
+val coroutinesForWebVersion = "1.8.0-RC2" // TODO: remove this (https://youtrack.jetbrains.com/issue/COMPOSE-939)
+val atomicfuVersion = "0.23.2"
 
 val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
@@ -210,12 +211,16 @@ kotlin {
             if (supportJs || supportWasm) {
                 val jsWasmMain by creating {
                     dependsOn(nativeJsMain)
+                    dependencies {
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesForWebVersion")
+                    }
                 }
 
                 val jsWasmTest by creating {
                     dependsOn(nativeJsTest)
                     dependencies {
                         implementation(kotlin("test"))
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesForWebVersion")
                     }
                 }
 
