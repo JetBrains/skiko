@@ -209,7 +209,7 @@ extern "C"
         return true;
     }
 
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemTheme_1awtKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemThemeHelper_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
     {
         int systemTheme = 0;
 
