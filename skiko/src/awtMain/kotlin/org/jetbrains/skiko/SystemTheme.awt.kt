@@ -1,10 +1,13 @@
 package org.jetbrains.skiko
 
 actual val currentSystemTheme: SystemTheme
-    get() = when (getCurrentSystemTheme()) {
-        0 -> SystemTheme.LIGHT
-        1 -> SystemTheme.DARK
-        else -> SystemTheme.UNKNOWN
+    get() {
+        Library.load()
+        return when (getCurrentSystemTheme()) {
+            0 -> SystemTheme.LIGHT
+            1 -> SystemTheme.DARK
+            else -> SystemTheme.UNKNOWN
+        }
     }
 
 // Common
