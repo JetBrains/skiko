@@ -60,23 +60,17 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
     companion object {
         @JvmStatic
         fun makeLTRB(l: Int, t: Int, r: Int, b: Int): IRect {
-            require(l <= r) { "IRect::makeLTRB expected l <= r, got $l > $r" }
-            require(t <= b) { "IRect::makeLTRB expected t <= b, got $t > $b" }
             return IRect(l, t, r, b)
         }
 
         @JvmStatic
         fun makeXYWH(l: Int, t: Int, w: Int, h: Int): IRect {
-            require(w >= 0) { "IRect::makeXYWH expected w >= 0, got: $w" }
-            require(h >= 0) { "IRect::makeXYWH expected h >= 0, got: $h" }
-            return if (w >= 0 && h >= 0) IRect(l, t, l + w, t + h) else throw IllegalArgumentException()
+            return IRect(l, t, l + w, t + h)
         }
 
         @JvmStatic
         fun makeWH(w: Int, h: Int): IRect {
-            require(w >= 0) { "IRect::makeWH expected w >= 0, got: $w" }
-            require(h >= 0) { "IRect::makeWH expected h >= 0, got: $h" }
-            return if (w >= 0 && h >= 0) IRect(0, 0, w, h) else throw IllegalArgumentException()
+            return IRect(0, 0, w, h)
         }
     }
 }
