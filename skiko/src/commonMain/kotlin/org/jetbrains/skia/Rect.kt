@@ -88,15 +88,11 @@ open class Rect constructor(val left: Float, val top: Float, val right: Float, v
     companion object {
         @JvmStatic
         fun makeLTRB(l: Float, t: Float, r: Float, b: Float): Rect {
-            require(l <= r) { "Rect::makeLTRB expected l <= r, got $l > $r" }
-            require(t <= b) { "Rect::makeLTRB expected t <= b, got $t > $b" }
             return Rect(l, t, r, b)
         }
 
         @JvmStatic
         fun makeWH(w: Float, h: Float): Rect {
-            require(w >= 0) { "Rect::makeWH expected w >= 0, got: $w" }
-            require(h >= 0) { "Rect::makeWH expected h >= 0, got: $h" }
             return Rect(0f, 0f, w, h)
         }
 
@@ -107,8 +103,6 @@ open class Rect constructor(val left: Float, val top: Float, val right: Float, v
 
         @JvmStatic
         fun makeXYWH(l: Float, t: Float, w: Float, h: Float): Rect {
-            require(w >= 0) { "Rect::makeXYWH expected w >= 0, got: $w" }
-            require(h >= 0) { "Rect::makeXYWH expected h >= 0, got: $h" }
             return Rect(l, t, l + w, t + h)
         }
 
