@@ -142,6 +142,14 @@ class TextStyleTest {
     }
 
     @Test
+    fun textStyleMetricsContainsMeaningfulValues() {
+        TextStyle().use { textStyle ->
+            val metrics = textStyle.fontMetrics
+            assertFalse(metrics.ascent == 0f && metrics.descent == 0f && metrics.leading == 0f)
+        }
+    }
+
+    @Test
     fun textStyleNotContainNaNValues() {
         TextStyle().use { textStyle ->
             textStyle.height = 32f
