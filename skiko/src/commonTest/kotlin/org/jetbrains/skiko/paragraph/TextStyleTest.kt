@@ -132,11 +132,20 @@ class TextStyleTest {
         }
     }
 
+    @Test
     fun textStyleBaselineTest() {
         TextStyle().use { textStyle ->
             assertEquals(0.0f, textStyle.baselineShift)
             textStyle.baselineShift = 4f
             assertEquals(4f, textStyle.baselineShift)
+        }
+    }
+
+    @Test
+    fun textStyleNotContainNaNValues() {
+        TextStyle().use { textStyle ->
+            textStyle.height = 32f
+            assertTrue(!textStyle.fontMetrics.ascent.isNaN())
         }
     }
 
