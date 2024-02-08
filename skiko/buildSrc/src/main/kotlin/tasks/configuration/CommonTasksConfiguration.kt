@@ -1,10 +1,18 @@
 package tasks.configuration
 
+import Arch
 import OS
 import SkiaBuildType
+import SkikoProperties
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.get
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
+import registerSkikoTask
 import supportAndroid
 import supportWasm
+import toTitleCase
 import java.io.File
 
 fun skiaHeadersDirs(skiaDir: File): List<File> =
@@ -133,5 +141,47 @@ fun Project.configureSignAndPublishDependencies() {
                 }
             }
         }
+    }
+}
+
+fun KotlinTarget.generateVersion(
+    targetOs: OS,
+    targetArch: Arch,
+    skikoProperties: SkikoProperties
+) {
+    val targetName = this.name
+    val isArm64Simulator = isIosSimArm64()
+    val generatedDir = project.layout.buildDirectory.dir("generated/$targetName")
+    val generateVersionTask = project.registerSkikoTask<DefaultTask>(
+        "generateVersion${toTitleCase(platformType.name)}".withSuffix(isIosSim = isArm64Simulator),
+        targetOs,
+        targetArch
+    ) {
+        inputs.property("buildType", skikoProperties.buildType.id)
+        outputs.dir(generatedDir)
+        doFirst {
+            val outDir = generatedDir.get().asFile
+            outDir.deleteRecursively()
+            outDir.mkdirs()
+            val out = "$outDir/Version.kt"
+
+            val target = "${targetOs.id}-${targetArch.id}"
+            val skiaTag = project.property("dependencies.skia.$target") as String
+            File(out).writeText(
+                """
+                package org.jetbrains.skiko
+                object Version {
+                val skiko = "${skikoProperties.deployVersion}"
+                val skia = "$skiaTag"
+                }
+                """.trimIndent()
+            )
+        }
+    }
+
+    val compilation = compilations["main"] ?: error("Could not find 'main' compilation for target '$this'")
+    compilation.compileKotlinTaskProvider.configure {
+        dependsOn(generateVersionTask)
+        (this as KotlinCompileTool).source(generatedDir.get().asFile)
     }
 }
