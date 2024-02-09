@@ -18,7 +18,6 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
             fbFormat: Int
         ): BackendRenderTarget {
             Stats.onNativeCall()
-            loadOpenGLLibrary()
             val ptr =_nMakeGL(width, height, sampleCnt, stencilBits, fbId, fbFormat)
             if (ptr == NullPointer) throw RenderException("Can't create OpenGL BackendRenderTarget")
             return BackendRenderTarget(ptr)
