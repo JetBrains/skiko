@@ -54,7 +54,7 @@ extern "C" {
         return wglGetCurrentContext();
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_OpenGLLibraryKt_loadOpenGLLibraryWindows(JNIEnv *env, jobject obj) {
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_OpenGLLibrary_1jvmKt_loadOpenGLLibraryWindows(JNIEnv *env, jobject obj) {
         OpenGL32Library = LoadLibrary("opengl32.dll");
         if (OpenGL32Library == nullptr) {
             auto code = GetLastError();

@@ -4,6 +4,8 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skiko.RenderException
+import org.jetbrains.skiko.loadOpenGLLibrary
 
 class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -16,16 +18,10 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
             fbFormat: Int
         ): BackendRenderTarget {
             Stats.onNativeCall()
-            return BackendRenderTarget(
-                _nMakeGL(
-                    width,
-                    height,
-                    sampleCnt,
-                    stencilBits,
-                    fbId,
-                    fbFormat
-                )
-            )
+            loadOpenGLLibrary()
+            val ptr =_nMakeGL(width, height, sampleCnt, stencilBits, fbId, fbFormat)
+            if (ptr == NullPointer) throw RenderException("Can't create OpenGL BackendRenderTarget")
+            return BackendRenderTarget(ptr)
         }
 
         fun makeMetal(width: Int, height: Int, texturePtr: NativePointer): BackendRenderTarget {
