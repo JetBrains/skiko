@@ -2,12 +2,17 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.RenderException
+import org.jetbrains.skiko.loadOpenGLLibrary
 
 class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
-            return DirectContext(_nMakeGL())
+            loadOpenGLLibrary()
+            val ptr = _nMakeGL()
+            if (ptr == NullPointer) throw RenderException("Can't create OpenGL DirectContext")
+            return DirectContext(ptr)
         }
 
         fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
