@@ -47,9 +47,13 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
 
     fun setFontFamilies(families: Array<String>): StrutStyle {
-        Stats.onNativeCall()
-        interopScope {
-            StrutStyle_nSetFontFamilies(_ptr, toInterop(families), families.size)
+        try {
+            Stats.onNativeCall()
+            interopScope {
+                StrutStyle_nSetFontFamilies(_ptr, toInterop(families), families.size)
+            }
+        } finally {
+            reachabilityBarrier(this)
         }
         return this
     }
@@ -69,8 +73,12 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
     
     fun setFontStyle(style: FontStyle): StrutStyle {
-        Stats.onNativeCall()
-        _nSetFontStyle(_ptr, style._value)
+        try {
+            Stats.onNativeCall()
+            _nSetFontStyle(_ptr, style._value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -86,8 +94,13 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
 
     fun setFontSize(value: Float): StrutStyle {
-        Stats.onNativeCall()
-        _nSetFontSize(_ptr, value)
+        check(!value.isNaN())
+        try {
+            Stats.onNativeCall()
+            _nSetFontSize(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -103,8 +116,13 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
     
     fun setHeight(value: Float): StrutStyle {
-        Stats.onNativeCall()
-        StrutStyle_nSetHeight(_ptr, value)
+        check(!value.isNaN())
+        try {
+            Stats.onNativeCall()
+            StrutStyle_nSetHeight(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -120,8 +138,13 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
     
     fun setLeading(value: Float): StrutStyle {
-        Stats.onNativeCall()
-        _nSetLeading(_ptr, value)
+        check(!value.isNaN())
+        try {
+            Stats.onNativeCall()
+            _nSetLeading(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -137,8 +160,12 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
     
     fun setEnabled(value: Boolean): StrutStyle {
-        Stats.onNativeCall()
-        StrutStyle_nSetEnabled(_ptr, value)
+        try {
+            Stats.onNativeCall()
+            StrutStyle_nSetEnabled(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -154,8 +181,12 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
     
     fun setHeightForced(value: Boolean): StrutStyle {
-        Stats.onNativeCall()
-        _nSetHeightForced(_ptr, value)
+        try {
+            Stats.onNativeCall()
+            _nSetHeightForced(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -171,8 +202,12 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
     
     fun setHeightOverridden(value: Boolean): StrutStyle {
-        Stats.onNativeCall()
-        _nSetHeightOverridden(_ptr, value)
+        try {
+            Stats.onNativeCall()
+            _nSetHeightOverridden(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -188,8 +223,12 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
 
     fun setHalfLeading(value: Boolean): StrutStyle {
-        Stats.onNativeCall()
-        _nSetHalfLeading(_ptr, value)
+        try {
+            Stats.onNativeCall()
+            _nSetHalfLeading(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
