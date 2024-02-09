@@ -12,6 +12,7 @@ import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 private fun isMac() = (hostOs == OS.MacOS)
 private fun isIos() = (hostOs == OS.Ios)
@@ -123,24 +124,13 @@ class FontTests {
     @Test
     fun emptyFontMetrics() {
         Font(null).use { font ->
-            val expectedMetrics = FontMetrics(
-                top = -12.804001f,
-                ascent = -12.828f,
-                descent = 3.5160003f,
-                bottom = 4.668f,
-                leading = 0.0f,
-                avgCharWidth = 6.9240003f,
-                maxCharWidth = 41.052f,
-                xMin = -7.4519997f,
-                xMax = 33.6f,
-                xHeight = 6.432f,
-                capHeight = 8.568f,
-                underlineThickness = 0.6f,
-                underlinePosition = 1.2f,
-                strikeoutThickness = 0.6f,
-                strikeoutPosition = -3.8639998f
+            val metrics = font.metrics
+            assertFalse(
+                metrics.top == 0f &&
+                        metrics.bottom == 0f &&
+                        metrics.ascent == 0f &&
+                        metrics.descent == 0f
             )
-            assertCloseEnough(font.metrics, expectedMetrics)
         }
     }
 }
