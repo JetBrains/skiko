@@ -428,7 +428,7 @@ private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nMakeFromEncoded")
-private external fun _nMakeFromEncoded(bytes: InteropPointer, encodedLength: Int): NativePointer
+internal external fun _nMakeFromEncoded(bytes: InteropPointer, encodedLength: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nEncodeToData")
