@@ -802,6 +802,7 @@ $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode.Companion///Pointing
 $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-transformable-node/index.html
 $dokka.location:org.jetbrains.skia////PointingToDeclaration/skiko/org.jetbrains.skia/index.html
 $dokka.location:org.jetbrains.skia//LANG/#/PointingToDeclaration/skiko/org.jetbrains.skia/-l-a-n-g.html
+$dokka.location:org.jetbrains.skia//makeFromEncoded/org.jetbrains.skia.Image.Companion#[Error type: Unresolved type for NSData]/PointingToDeclaration/skiko/org.jetbrains.skia/make-from-encoded.html
 $dokka.location:org.jetbrains.skia//makeFromFile/org.jetbrains.skia.Typeface.Companion#kotlin.String#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file.html
 $dokka.location:org.jetbrains.skia//makeFromFileName/org.jetbrains.skia.Data.Companion#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file-name.html
 $dokka.location:org.jetbrains.skia//toIPoint/#kotlin.Long/PointingToDeclaration/skiko/org.jetbrains.skia/to-i-point.html
