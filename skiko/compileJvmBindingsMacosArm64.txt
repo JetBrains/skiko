@@ -1,0 +1,205 @@
+> Task :compileJvmBindingsMacosArm64
+Performing non-incremental compilation: first build or clean build
+Compiler args: '../skiko/skiko/build/tmp/compileJvmBindingsMacosArm64/common-args.txt'
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/Surface.cc':
+  > ../skiko/skiko/src/jvmMain/cpp/common/Surface.cc:218:14: error: no member named 'flushAndSubmit' in 'SkSurface'
+  >     surface->flushAndSubmit(syncCpu);
+  >     ~~~~~~~  ^
+  > ../skiko/skiko/src/jvmMain/cpp/common/Surface.cc:224:14: error: no member named 'flush' in 'SkSurface'
+  >     surface->flush();
+  >     ~~~~~~~  ^
+  > 2 errors generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/FontMgr.cc':
+  > ../skiko/skiko/src/jvmMain/cpp/common/FontMgr.cc:71:38: error: no member named 'RefDefault' in 'SkFontMgr'
+  >     SkFontMgr* instance = SkFontMgr::RefDefault().release();
+  >                           ~~~~~~~~~~~^
+  > 1
+  >  error generated.
+
+Compiling '../skiko/skiko/src/commonMain/cpp/common/shaper/FontRunIterator.cc':
+  > In file included from ../skiko/skiko/src/commonMain/cpp/common/shaper/FontRunIterator.cc:2:
+  > ../skiko/skiko/src/commonMain/cpp/common/include/FontRunIterator.hh:32:32: error: no member named 'refTypefaceOrDefault' in 'SkFont'
+  >         fFont.setTypeface(font.refTypefaceOrDefault());
+  >                           ~~~~ ^
+  > ../skiko/skiko/src/commonMain/cpp/common/include/FontRunIterator.hh:48:32: error: no member named 'refTypefaceOrDefault' in 'SkFont'
+  >                           font.refTypefaceOrDefault()->fontStyle(),
+  >                           ~~~~ ^
+  > 2
+  >  errors generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/PictureRecorder.cc':
+  > In file included from ../skiko/skiko/src/jvmMain/cpp/common/PictureRecorder.cc:3:
+  > In file included from ../skiko/skiko/src/jvmMain/cpp/common/interop.hh:6:
+  > In file included from ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/codec/SkCodec.h:12:
+  > In file included from ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/core/SkImageInfo.h:14:
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/core/SkRefCnt.h
+  > :
+  > 151:12: error: member access into incomplete type 'SkPicture'
+  >         obj->unref();
+  >            ^
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/core/SkRefCnt.h:256:9: note: in instantiation of function template specialization 'SkSafeUnref<SkPicture>' requested here
+  >         SkSafeUnref(fPtr);
+  >         ^
+  > ../skiko/skiko/src/jvmMain/cpp/common/PictureRecorder.cc:40:36: note: in instantiation of member function 'sk_sp<SkPicture>::~sk_sp' requested here
+  >     SkPicture* picture = instance->finishRecordingAsPicture().release();
+  >                                    ^
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/core/SkDrawable.h:23:7: note: forward declaration of 'SkPicture'
+  > class SkPicture;
+  >       ^
+  > 1 error generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/shaper/FontMgrRunIterator.cc':
+  > In file included from ../skiko/skiko/src/jvmMain/cpp/common/shaper/FontMgrRunIterator.cc:4:
+  > ../skiko/skiko/src/commonMain/cpp/common/include/FontRunIterator.hh:32:32: error: no member named 'refTypefaceOrDefault' in 'SkFont'
+  >         fFont.setTypeface(font.refTypefaceOrDefault());
+  >                           ~~~~ ^
+  > ../skiko/skiko/src/commonMain/cpp/common/include/FontRunIterator.hh:48:32: error: no member named 'refTypefaceOrDefault' in 'SkFont'
+  >                           font.refTypefaceOrDefault()->fontStyle(),
+  >                           ~~~~ ^
+  > ../skiko/skiko/src/jvmMain/cpp/common/shaper/FontMgrRunIterator.cc:13:20: error: no member named 'RefDefault' in 'SkFontMgr'
+  >       ? SkFontMgr::RefDefault()
+  >         ~~~~~~~~~~~^
+  > 3 errors generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/Font.cc':
+  > ../skiko/skiko/src/jvmMain/cpp/common/Font.cc:164:38: error: no member named 'refTypefaceOrDefault' in 'SkFont'
+  >     SkTypeface* typeface = instance->refTypefaceOrDefault().release();
+  >                            ~~~~~~~~  ^
+  > 1 error generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/render.cc':
+  > ../skiko/skiko/src/jvmMain/cpp/common/render.cc:19:5: error: unknown type name 'GrGLFramebufferInfo'
+  >     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
+  >     ^
+  > ../skiko/skiko/src/jvmMain/cpp/common/render.cc:25:53: error: no member named 'MakeGL' in 'GrDirectContext'
+  >     return reinterpret_cast<jlong>(GrDirectContext::MakeGL().release());
+  >                                    ~~~~~~~~~~~~~~~~~^
+  > ../skiko/skiko/src/jvmMain/cpp/common/render.cc:35:38: error: no matching constructor for initialization of 'GrBackendRenderTarget'
+  >     GrBackendRenderTarget* obj = new GrBackendRenderTarget(width, height, sampleCnt, mtlInfo);
+  >                                      ^                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/gpu/GrBackendSurface.h:334:5: note: candidate constructor not viable: requires 3 arguments, but 4 were provided
+  >     GrBackendRenderTarget(int width,
+  >     ^
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/gpu/GrBackendSurface.h:345:5: note: candidate constructor not viable: requires 5 arguments, but 4 were provided
+  >     GrBackendRenderTarget(int width,
+  >     ^
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/gpu/GrBackendSurface.h:353:5: note: candidate constructor not viable: requires single argument 'that', but 4 arguments were provided
+  >     GrBackendRenderTarget(const GrBackendRenderTarget& that);
+  >     ^
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/gpu/GrBackendSurface.h:417:5: note: candidate constructor template not viable: requires 7 arguments, but 4 were provided
+  >     GrBackendRenderTarget(int width,
+  >     ^
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/gpu/GrBackendSurface.h:331:
+  > 5: note: candidate constructor not viable: requires 0 arguments, but 4 were provided
+  >     GrBackendRenderTarget();
+  >     ^
+  > 3 errors generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/shaper/IcuBidiRunIterator.cc':
+  > ../skiko/skiko/src/jvmMain/cpp/common/shaper/IcuBidiRunIterator.cc:8:67: error: no member named 'MakeIcuBiDiRunIterator' in 'SkShaper'; did you mean 'MakeBiDiRunIterator'?
+  >     std::unique_ptr<SkShaper::BiDiRunIterator> instance(SkShaper::MakeIcuBiDiRunIterator(text->c_str(), text->size(), bidiLevel & 0xFF));
+  >                                                         ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+  >                                                                   MakeBiDiRunIterator
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/modules/skshaper/include/SkShaper.h:137:5: note: 'MakeBiDiRunIterator' declared here
+  >     MakeBiDiRunIterator(const char* utf8, size_t utf8Bytes, uint8_t bidiLevel);
+  >     ^
+  > 1 error generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/shaper/Shaper.cc':
+  > In file included from ../skiko/skiko/src/jvmMain/cpp/common/shaper/Shaper.cc:5:
+  > ../skiko/skiko/src/commonMain/cpp/common/include/FontRunIterator.hh:32:32: error: no member named 'refTypefaceOrDefault' in 'SkFont'
+  >         fFont.setTypeface(font.refTypefaceOrDefault());
+  >                           ~~~~ ^
+  > ../skiko/skiko/src/commonMain/cpp/common/include/FontRunIterator.hh:48:32: error: no member named 'refTypefaceOrDefault' in 'SkFont'
+  >                           font.refTypefaceOrDefault()->fontStyle(),
+  >                           ~~~~ ^
+  > ../skiko/skiko/src/jvmMain/cpp/common/shaper/Shaper.cc:87:20: error: no member named 'RefDefault' in 'SkFontMgr'
+  >         SkFontMgr::RefDefault(),
+  >         ~~~~~~~~~~~^
+  > ../skiko/skiko/src/jvmMain/cpp/common/shaper/Shaper.cc:134:20: error: no member named 'RefDefault' in 'SkFontMgr'
+  >         SkFontMgr::RefDefault(),
+  >         ~~~~~~~~~~~^
+  > 4 errors generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/BackendRenderTarget.cc':
+  > ../skiko/skiko/src/jvmMain/cpp/common/BackendRenderTarget.cc:17:5: error: unknown type name 'GrGLFramebufferInfo'
+  >     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
+  >     ^
+  > 1 error generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/DirectContext.cc':
+  > ../skiko/skiko/src/jvmMain/cpp/common/DirectContext.cc:7:53: error: no member named 'MakeGL' in 'GrDirectContext'
+  >     return reinterpret_cast<jlong>(GrDirectContext::MakeGL().release());
+  >                                    ~~~~~~~~~~~~~~~~~^
+  > ../skiko/skiko/src/jvmMain/cpp/common/DirectContext.cc:51:21: error: cannot initialize a parameter of type 'GrSyncCpu' with an lvalue of type 'jboolean' (aka 'unsigned char')
+  >     context->submit(syncCpu);
+  >                     ^~~~~~~
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/gpu/GrDirectContext.h:509:27: 
+  > note: passing argument to parameter 'sync' here
+  >     bool submit(GrSyncCpu sync = GrSyncCpu::kNo);
+  >                           ^
+  > 2
+  >  error
+  > s generated.
+
+Compiling '../skiko/skiko/src/jvmMain/cpp/common/Typeface.cc':
+  > ../skiko/skiko/src/jvmMain/cpp/common/Typeface.cc:73:48: error: no member named 'MakeDefault' in 'SkTypeface'
+  >     return reinterpret_cast<jlong>(SkTypeface::MakeDefault().release());
+  >                                    ~~~~~~~~~~~~^
+  > ../skiko/skiko/src/jvmMain/cpp/common/Typeface.cc:80:46: error: no member named 'MakeFromName' in 'SkTypeface'
+  >     sk_sp<SkTypeface> instance = SkTypeface::MakeFromName(name.c_str(), style);
+  >                                  ~~~~~~~~~~~~^
+  > ../skiko/skiko/src/jvmMain/cpp/common/Typeface.cc:87:46: error: no member named 'MakeFromFile' in 'SkTypeface'
+  >     sk_sp<SkTypeface> instance = SkTypeface::MakeFromFile(path.c_str(), index);
+  >                                  ~~~~~~~~~~~~^
+  > In file included from ../skiko/skiko/src/jvmMain/cpp/common/Typeface.cc:5:
+  > In file included from ../skiko/skiko/src/jvmMain/cpp/common/interop.hh:6:
+  > In file included from ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/codec/SkCodec.h:17:
+  > In file included from ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/core/SkSpan.h:12:
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/private/base/SkSpan_impl.h:79:46:
+  >  
+  > error: no matching function for call to 'data'
+  >     constexpr SkSpan(Container&& c) : SkSpan(std::data(c), std::size(c)) { }
+  >                                              ^~~~~~~~~
+  > ../skiko/skiko/src/jvmMain/cpp/common/Typeface.cc:95:76: note: in instantiation of function template specialization 'SkSpan<const SkCodecs::Decoder>::SkSpan<int &>' requested here
+  >     sk_sp<SkTypeface> instance = SkTypeface::MakeFromData(sk_ref_sp(data), index);
+  >                                                                            ^
+  > /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/data.h:27:6: note: candidate template ignored: substitution failure [with _Cont = int]: member reference base type 'int' is not a structure or union
+  > auto data(_Cont& __c)
+  >      ^
+  > /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/data.h:34:6
+  > :
+  >  
+  > note: candidate template ignored: substitution failure [with _Cont = int]: member reference base type 'const int' is not a structure or union
+  > auto data(const _Cont& __c)
+  >      ^
+  > /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/data.h:41:16: note: candidate template ignored: could not match '_Tp[_Sz]' against 'int'
+  > constexpr _Tp* data(_Tp (&__array)[_Sz]) noexcept { return __array; }
+  >                ^
+  > /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/data.h:45:22: note: candidate template ignored: could not match 'initializer_list<_Ep>' against 'int'
+  > constexpr const _Ep* data(initializer_list<_Ep> __il) noexcept { return __il.begin(); }
+  >                      ^
+  > In file included from ../skiko/skiko/src/jvmMain/cpp/common/Typeface.cc:5:
+  > In file included from ../skiko/skiko/src/jvmMain/cpp/common/interop.hh
+  > :6:
+  > In file included from ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/codec/SkCodec.h:17
+  > :
+  > In file included from ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/core/SkSpan.h:12:
+  > ../skiko/skiko/dependencies/skia/m122-6726cd3-1/Skia-m122-6726cd3-1-macos-Release-arm64/include/private/base/SkSpan_impl.h:79:60: error: no matching function for call to 'size'
+  >     constexpr SkSpan(Container&& c) : SkSpan(std::data(c), std::size(c)) { }
+  >                                                            ^~~~~~~~~
+  > /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/size.h:28:16: note: candidate template ignored: substitution failure [with _Cont = int]: member reference base type 'const int' is not a structure or union
+  > constexpr auto size(const _Cont& __c)
+  >                ^
+  > /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/size.h:35:18: note: candidate template ignored: could not match '_Tp[_Sz]' against 'int'
+  > constexpr size_t size(const _Tp (&)[_Sz]) noexcept { return _Sz; }
+  >                  ^
+  > ../skiko/skiko/src/jvmMain/cpp/common/Typeface.cc:95:46: error: no member named 'MakeFromData' in 'SkTypeface'
+  >     sk_sp<SkTypeface> instance = SkTypeface::MakeFromData(sk_ref_sp(data), index);
+  >                                  ~~~~~~~~~~~~^
+  > 6 errors generated.
+
+> Task :compileJvmBindingsMacosArm64 FAILED
+5 actionable tasks: 1 executed, 4 up-to-date
