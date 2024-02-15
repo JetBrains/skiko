@@ -49,15 +49,22 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     }
 
     fun addPlaceholder(style: PlaceholderStyle): ParagraphBuilder {
-        Stats.onNativeCall()
-        _nAddPlaceholder(
-            _ptr,
-            style.width,
-            style.height,
-            style.alignment.ordinal,
-            style.baselineMode.ordinal,
-            style.baseline
-        )
+        check(!style.width.isNaN())
+        check(!style.height.isNaN())
+        check(!style.baseline.isNaN())
+        try {
+            Stats.onNativeCall()
+            _nAddPlaceholder(
+                _ptr,
+                style.width,
+                style.height,
+                style.alignment.ordinal,
+                style.baselineMode.ordinal,
+                style.baseline
+            )
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 

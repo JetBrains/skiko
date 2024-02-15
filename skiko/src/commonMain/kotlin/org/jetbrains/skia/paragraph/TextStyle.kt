@@ -54,8 +54,12 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setColor(color: Int): TextStyle {
-        Stats.onNativeCall()
-        _nSetColor(_ptr, color)
+        try {
+            Stats.onNativeCall()
+            _nSetColor(_ptr, color)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -125,17 +129,21 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setDecorationStyle(d: DecorationStyle): TextStyle {
-        Stats.onNativeCall()
-        _nSetDecorationStyle(
-            _ptr,
-            d._underline,
-            d._overline,
-            d._lineThrough,
-            d._gaps,
-            d.color,
-            d._lineStyle.ordinal,
-            d.thicknessMultiplier
-        )
+        try {
+            Stats.onNativeCall()
+            _nSetDecorationStyle(
+                _ptr,
+                d._underline,
+                d._overline,
+                d._lineThrough,
+                d._gaps,
+                d.color,
+                d._lineStyle.ordinal,
+                d.thicknessMultiplier
+            )
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -151,8 +159,12 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setFontStyle(s: FontStyle): TextStyle {
-        Stats.onNativeCall()
-        TextStyle_nSetFontStyle(_ptr, s._value)
+        try {
+            Stats.onNativeCall()
+            TextStyle_nSetFontStyle(_ptr, s._value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -167,8 +179,12 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun addShadow(s: Shadow): TextStyle {
-        Stats.onNativeCall()
-        _nAddShadow(_ptr, s.color, s.offsetX, s.offsetY, s.blurSigma)
+        try {
+            Stats.onNativeCall()
+            _nAddShadow(_ptr, s.color, s.offsetX, s.offsetY, s.blurSigma)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -178,17 +194,21 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     }
 
     fun clearShadows(): TextStyle {
-        Stats.onNativeCall()
-        _nClearShadows(_ptr)
+        try {
+            Stats.onNativeCall()
+            _nClearShadows(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
     val fontFeatures: Array<FontFeature>
         get() = try {
             Stats.onNativeCall()
-
             val size = _nGetFontFeaturesSize(_ptr)
             withResult(IntArray(size * 2)) {
+                Stats.onNativeCall()
                 _nGetFontFeatures(_ptr, it)
             }.let {
                 FontFeature.fromInteropEncodedBy2Ints(it)
@@ -198,9 +218,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun addFontFeature(f: FontFeature): TextStyle {
-        Stats.onNativeCall()
-        interopScope {
-            _nAddFontFeature(_ptr, toInterop(f.tag), f.value)
+        try {
+            Stats.onNativeCall()
+            interopScope {
+                _nAddFontFeature(_ptr, toInterop(f.tag), f.value)
+            }
+        } finally {
+            reachabilityBarrier(this)
         }
         return this
     }
@@ -211,8 +235,12 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     }
 
     fun clearFontFeatures(): TextStyle {
-        Stats.onNativeCall()
-        _nClearFontFeatures(_ptr)
+        try {
+            Stats.onNativeCall()
+            _nClearFontFeatures(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -228,8 +256,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setFontSize(size: Float): TextStyle {
-        Stats.onNativeCall()
-        TextStyle_nSetFontSize(_ptr, size)
+        check(!size.isNaN())
+        try {
+            Stats.onNativeCall()
+            TextStyle_nSetFontSize(_ptr, size)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -271,8 +304,22 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setHeight(height: Float?): TextStyle {
-        Stats.onNativeCall()
-        if (height == null) TextStyle_nSetHeight(_ptr, false, 0f) else TextStyle_nSetHeight(_ptr, true, height)
+        if (height == null) {
+            try {
+                Stats.onNativeCall()
+                TextStyle_nSetHeight(_ptr, false, 0f)
+            } finally {
+                reachabilityBarrier(this)
+            }
+        } else {
+            check(!height.isNaN())
+            try {
+                Stats.onNativeCall()
+                TextStyle_nSetHeight(_ptr, true, height)
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
         return this
     }
 
@@ -288,8 +335,12 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setHalfLeading(value: Boolean): TextStyle {
-        Stats.onNativeCall()
-        TextStyle_nSetHalfLeading(_ptr, value)
+        try {
+            Stats.onNativeCall()
+            TextStyle_nSetHalfLeading(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -305,8 +356,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setLetterSpacing(letterSpacing: Float): TextStyle {
-        Stats.onNativeCall()
-        _nSetLetterSpacing(_ptr, letterSpacing)
+        check(!letterSpacing.isNaN())
+        try {
+            Stats.onNativeCall()
+            _nSetLetterSpacing(_ptr, letterSpacing)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -322,8 +378,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setBaselineShift(baselineShift: Float): TextStyle {
-        Stats.onNativeCall()
-        TextStyle_nSetBaselineShift(_ptr, baselineShift)
+        check(!baselineShift.isNaN())
+        try {
+            Stats.onNativeCall()
+            TextStyle_nSetBaselineShift(_ptr, baselineShift)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -339,8 +400,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setWordSpacing(wordSpacing: Float): TextStyle {
-        Stats.onNativeCall()
-        _nSetWordSpacing(_ptr, wordSpacing)
+        check(!wordSpacing.isNaN())
+        try {
+            Stats.onNativeCall()
+            _nSetWordSpacing(_ptr, wordSpacing)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -384,9 +450,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setLocale(locale: String?): TextStyle {
-        Stats.onNativeCall()
-        interopScope {
-            _nSetLocale(_ptr, toInterop(locale))
+        try {
+            Stats.onNativeCall()
+            interopScope {
+                _nSetLocale(_ptr, toInterop(locale))
+            }
+        } finally {
+            reachabilityBarrier(this)
         }
         return this
     }
@@ -394,7 +464,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var baselineMode: BaselineMode
         get() = try {
             Stats.onNativeCall()
-            BaselineMode.values().get(_nGetBaselineMode(_ptr))
+            BaselineMode.entries[_nGetBaselineMode(_ptr)]
         } finally {
             reachabilityBarrier(this)
         }
@@ -403,8 +473,12 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setBaselineMode(baseline: BaselineMode): TextStyle {
-        Stats.onNativeCall()
-        _nSetBaselineMode(_ptr, baseline.ordinal)
+        try {
+            Stats.onNativeCall()
+            _nSetBaselineMode(_ptr, baseline.ordinal)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 

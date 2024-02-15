@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <jni.h>
 
 template<typename T>
