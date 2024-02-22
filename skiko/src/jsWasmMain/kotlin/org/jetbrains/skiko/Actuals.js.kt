@@ -32,3 +32,7 @@ internal actual fun getCursorById(id: PredefinedCursorsId): Cursor =
         PredefinedCursorsId.HAND -> "pointer"
         PredefinedCursorsId.TEXT -> "text"
     }
+
+internal actual fun loadOpenGLLibrary() {
+   // Nothing to do here
+}
