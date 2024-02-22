@@ -43,6 +43,7 @@ enum class KotlinBackend(val id: String) {
     fun isNotJs() = this != JS
 }
 
+// Note: it returns the host OS for web apps too
 expect val hostOs: OS
 
 expect val hostArch: Arch
