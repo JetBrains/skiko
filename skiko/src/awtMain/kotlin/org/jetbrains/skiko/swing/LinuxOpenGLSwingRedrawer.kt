@@ -15,7 +15,12 @@ internal class LinuxOpenGLSwingRedrawer(
 
     private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
-    private val offScreenContextPtr: Long = makeOffScreenContext()
+    private val offScreenContextPtr: Long = makeOffScreenContext().also {
+        if (it == 0L) {
+            throw RenderException("Cannot create OpenGL context")
+        }
+    }
+
 
     private var offScreenBufferPtr: Long = 0L
 
