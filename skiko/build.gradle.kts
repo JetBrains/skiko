@@ -210,17 +210,10 @@ kotlin {
             if (supportJs || supportWasm) {
                 val jsWasmMain by creating {
                     dependsOn(nativeJsMain)
-                    dependencies {
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                    }
                 }
 
                 val jsWasmTest by creating {
                     dependsOn(nativeJsTest)
-                    dependencies {
-                        implementation(kotlin("test"))
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
-                    }
                 }
 
                 if (supportJs) {
