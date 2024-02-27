@@ -252,6 +252,17 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nClipRegion
     canvas->clipRegion(*region, static_cast<SkClipOp>(mode));
 }
 
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nGetLocalClipBounds
+  (KNativePointer canvasPtr, KInteropPointer resultArray) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
+    skija::Rect::copyToInterop(canvas->getLocalClipBounds(), resultArray);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nGetDeviceClipBounds
+  (KNativePointer canvasPtr, KInteropPointer resultArray) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
+    skija::IRect::copyToInterop(canvas->getDeviceClipBounds(), resultArray);
+}
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nConcat
   (KNativePointer ptr, KFloat* matrixArr) {

@@ -284,6 +284,16 @@ namespace skija {
                 });
             }
         }
+
+        void copyToInterop(const SkIRect& rect, KInteropPointer pointer) {
+            KInt* ltrb = reinterpret_cast<KInt*>(pointer);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.left();
+                ltrb[1] = rect.top();
+                ltrb[2] = rect.right();
+                ltrb[3] = rect.bottom();
+            }
+        }
     }
 
     namespace AnimationFrameInfo {

@@ -1085,6 +1085,24 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return clipRegion(r, ClipMode.INTERSECT)
     }
 
+    fun getLocalClipBounds(): Rect {
+        Stats.onNativeCall()
+        try {
+            return Rect.fromInteropPointer { _nGetLocalClipBounds(_ptr, it) }
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
+    fun getDeviceClipBounds(): IRect {
+        Stats.onNativeCall()
+        try {
+            return IRect.fromInteropPointer { _nGetDeviceClipBounds(_ptr, it) }
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
     fun translate(dx: Float, dy: Float): Canvas {
         interopScope {
             Stats.onNativeCall()
@@ -1593,6 +1611,14 @@ private external fun _nClipPath(ptr: NativePointer, nativePath: NativePointer, m
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRegion")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClipRegion")
 private external fun _nClipRegion(ptr: NativePointer, nativeRegion: NativePointer, mode: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalClipBounds")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nGetLocalClipBounds")
+private external fun _nGetLocalClipBounds(ptr: NativePointer, rect: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetDeviceClipBounds")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nGetDeviceClipBounds")
+private external fun _nGetDeviceClipBounds(ptr: NativePointer, rect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nTranslate")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nTranslate")

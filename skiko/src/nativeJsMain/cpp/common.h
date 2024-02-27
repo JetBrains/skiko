@@ -72,6 +72,7 @@ namespace skija {
 
     namespace IRect {
         std::unique_ptr<SkIRect> toSkIRect(KInt* rectInts);
+        void copyToInterop(const SkIRect& rect, KInteropPointer pointer);
     }
 
     namespace FontFeature {

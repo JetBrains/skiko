@@ -227,6 +227,8 @@ namespace skija {
         void onUnload(JNIEnv* env);
         jobject fromSkIRect(JNIEnv* env, const SkIRect& rect);
         std::unique_ptr<SkIRect> toSkIRect(JNIEnv* env, jintArray obj);
+
+        void copyToInterop(JNIEnv* env, const SkIRect& rect, jintArray pointer);
     }
 
     namespace Path {

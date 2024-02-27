@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
+import org.jetbrains.skia.impl.withResult
 import kotlin.jvm.JvmStatic
 
 class IRect internal constructor(val left: Int, val top: Int, val right: Int, val bottom: Int) {
@@ -71,6 +74,11 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
         @JvmStatic
         fun makeWH(w: Int, h: Int): IRect {
             return IRect(0, 0, w, h)
+        }
+
+        internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): IRect {
+            val result = withResult(IntArray(4), block)
+            return IRect(result[0], result[1], result[2], result[3])
         }
     }
 }

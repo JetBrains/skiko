@@ -533,6 +533,17 @@ namespace skija {
                 return result;
             }
         }
+
+        void copyToInterop(JNIEnv* env, const SkIRect& rect, jintArray pointer) {
+            jint* ltrb = pointer == nullptr ? nullptr : env->GetIntArrayElements(pointer, 0);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.left();
+                ltrb[1] = rect.top();
+                ltrb[2] = rect.right();
+                ltrb[3] = rect.bottom();
+                env->ReleaseIntArrayElements(pointer, ltrb, 0);
+            }
+        }
     }
 
     namespace Path {

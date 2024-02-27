@@ -264,6 +264,18 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nClipRegion
     canvas->clipRegion(*region, static_cast<SkClipOp>(mode));
 }
 
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Canvas__1nGetLocalClipBounds
+  (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloatArray resultArray) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
+    skija::Rect::copyToInterop(env, canvas->getLocalClipBounds(), resultArray);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Canvas__1nGetDeviceClipBounds
+  (JNIEnv* env, jclass jclass, jlong canvasPtr, jintArray resultArray) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
+    skija::IRect::copyToInterop(env, canvas->getDeviceClipBounds(), resultArray);
+}
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nConcat
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
