@@ -104,7 +104,7 @@ internal class Direct3DRedrawer(
 
     fun changeSize(width: Int, height: Int): Boolean {
         return if (!isSwapChainInitialized) {
-            initSwapChain(device, width, height)
+            initSwapChain(device, width, height, layer.transparency)
             isSwapChainInitialized = true
             true
         } else {
@@ -134,7 +134,7 @@ internal class Direct3DRedrawer(
     private external fun swap(device: Long, isVsyncEnabled: Boolean)
     private external fun disposeDevice(device: Long)
     private external fun getBufferIndex(device: Long): Int
-    private external fun initSwapChain(device: Long, width: Int, height: Int)
+    private external fun initSwapChain(device: Long, width: Int, height: Int, transparency: Boolean)
     private external fun initFence(device: Long)
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long

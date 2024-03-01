@@ -58,12 +58,15 @@ public:
         device.reset(nullptr);
     }
 
-    void initSwapChain(UINT width, UINT height) {
+    void initSwapChain(UINT width, UINT height, jboolean transparency) {
         gr_cp<IDXGIFactory4> swapChainFactory4;
         gr_cp<IDXGISwapChain1> swapChain1;
         CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
-        HRESULT result = CreateSwapChainForComposition(swapChainFactory4.get(), width, height, &swapChain1);
-        if (FAILED(result)) {
+        HRESULT result = S_OK;
+        if (transparency) {
+            result = CreateSwapChainForComposition(swapChainFactory4.get(), width, height, &swapChain1);
+        }
+        if (!transparency || FAILED(result)) {
             /*
              * It's just a fallback path that added for compatibility.
              * In this case transparency won't be supported.
@@ -360,12 +363,12 @@ extern "C"
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initSwapChain(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height, jboolean transparency)
     {
         __try
         {
             DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-            d3dDevice->initSwapChain((UINT) width, (UINT) height);
+            d3dDevice->initSwapChain((UINT) width, (UINT) height, transparency);
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {
             auto code = GetExceptionCode();
