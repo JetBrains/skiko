@@ -21,8 +21,9 @@ import javax.swing.SwingUtilities.isEventDispatchThread
  */
 @Suppress("unused") // used in Compose Multiplatform
 @ExperimentalSkikoApi
-open class SkiaSwingLayer(
+open class SkiaSwingLayer internal constructor(
     skikoView: SkikoView,
+    private val properties: SkiaLayerProperties,
     analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
 ) : JComponent() {
     internal companion object {
@@ -30,8 +31,6 @@ open class SkiaSwingLayer(
             Library.load()
         }
     }
-
-    private val properties = SkiaLayerProperties()
 
     private var isInitialized = false
 
@@ -72,6 +71,11 @@ open class SkiaSwingLayer(
 
     val renderApi: GraphicsApi
         get() = redrawerManager.renderApi
+
+    constructor(
+        skikoView: SkikoView,
+        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+    ) : this(skikoView, SkiaLayerProperties(), analytics)
 
     init {
         isOpaque = false
