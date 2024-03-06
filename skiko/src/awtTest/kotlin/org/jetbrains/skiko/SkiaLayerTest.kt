@@ -249,6 +249,12 @@ class SkiaLayerTest {
             layer.needRedraw()
             delay(1000)
             assertEquals(0, renderedWidth)
+
+            renderedWidth = -1
+            layer.size = Dimension(40, 40)
+            layer.needRedraw()
+            delay(1000)
+            assertEquals((40 * density).toInt(), renderedWidth)
         } finally {
             layer.dispose()
             window.close()
