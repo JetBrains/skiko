@@ -3,9 +3,9 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    mavenLocal()
 }
 
 var version = "0.0.0-SNAPSHOT"
