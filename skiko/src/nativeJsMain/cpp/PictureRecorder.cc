@@ -20,9 +20,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_PictureRecorder__1nGetFinalizer
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PictureRecorder__1nBeginRecording
-  (KNativePointer ptr, KFloat left, KFloat top, KFloat right, KFloat bottom) {
+  (KNativePointer ptr, KFloat left, KFloat top, KFloat right, KFloat bottom, KNativePointer bbh) {
     SkPictureRecorder* instance = reinterpret_cast<SkPictureRecorder*>((ptr));
-    SkCanvas* canvas = instance->beginRecording(SkRect::MakeLTRB(left, top, right, bottom), nullptr);
+    SkBBHFactory* factory = reinterpret_cast<SkBBHFactory*>(bbh);
+    SkCanvas* canvas = instance->beginRecording(SkRect::MakeLTRB(left, top, right, bottom), factory);
     return reinterpret_cast<KNativePointer>(canvas);
 }
 

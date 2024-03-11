@@ -2,9 +2,10 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -44,9 +45,10 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      *
      * @param bounds the cull rect used when recording this picture. Any drawing the falls outside
      * of this rect is undefined, and may be drawn or it may not.
+     * @param bbh optional acceleration structure
      * @return the canvas.
      */
-    fun beginRecording(bounds: Rect): Canvas {
+    fun beginRecording(bounds: Rect, bbh: BBHFactory? = null): Canvas {
         return try {
             Stats.onNativeCall()
             Canvas(
@@ -55,7 +57,8 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                     bounds.left,
                     bounds.top,
                     bounds.right,
-                    bounds.bottom
+                    bounds.bottom,
+                    getPtr(bbh)
                 ), false, this
             )
         } finally {
@@ -134,7 +137,14 @@ private external fun PictureRecorder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nBeginRecording")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureRecorder__1nBeginRecording")
-private external fun _nBeginRecording(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float): NativePointer
+private external fun _nBeginRecording(
+    ptr: NativePointer,
+    left: Float,
+    top: Float,
+    right: Float,
+    bottom: Float,
+    bbh: NativePointer
+): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas")
