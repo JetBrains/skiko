@@ -849,6 +849,7 @@ $dokka.location:org.jetbrains.skia/ArrayDecoder/ArrayDecoder/#org.jetbrains.skia
 $dokka.location:org.jetbrains.skia/ArrayDecoder/dispose/#/PointingToDeclaration/skiko/org.jetbrains.skia/-array-decoder/dispose.html
 $dokka.location:org.jetbrains.skia/ArrayDecoder/release/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-array-decoder/release.html
 $dokka.location:org.jetbrains.skia/ArrayDecoder/size/#/PointingToDeclaration/skiko/org.jetbrains.skia/-array-decoder/size.html
+$dokka.location:org.jetbrains.skia/BBHFactory///PointingToDeclaration/skiko/org.jetbrains.skia/-b-b-h-factory/index.html
 $dokka.location:org.jetbrains.skia/BackendRenderTarget.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-backend-render-target/-companion/index.html
 $dokka.location:org.jetbrains.skia/BackendRenderTarget.Companion/makeDirect3D/#kotlin.Int#kotlin.Int#org.jetbrains.skia.impl.NativePointer#kotlin.Int#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-backend-render-target/-companion/make-direct3-d.html
 $dokka.location:org.jetbrains.skia/BackendRenderTarget.Companion/makeGL/#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-backend-render-target/-companion/make-g-l.html
@@ -2169,7 +2170,7 @@ $dokka.location:org.jetbrains.skia/Picture/uniqueId/#/PointingToDeclaration/ski
 $dokka.location:org.jetbrains.skia/PictureRecorder.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/-companion/index.html
 $dokka.location:org.jetbrains.skia/PictureRecorder///PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/index.html
 $dokka.location:org.jetbrains.skia/PictureRecorder/PictureRecorder/#/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/-picture-recorder.html
-$dokka.location:org.jetbrains.skia/PictureRecorder/beginRecording/#org.jetbrains.skia.Rect/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/begin-recording.html
+$dokka.location:org.jetbrains.skia/PictureRecorder/beginRecording/#org.jetbrains.skia.Rect#org.jetbrains.skia.BBHFactory?/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/begin-recording.html
 $dokka.location:org.jetbrains.skia/PictureRecorder/finishRecordingAsPicture/#/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/finish-recording-as-picture.html
 $dokka.location:org.jetbrains.skia/PictureRecorder/finishRecordingAsPicture/#org.jetbrains.skia.Rect/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/finish-recording-as-picture.html
 $dokka.location:org.jetbrains.skia/PictureRecorder/recordingCanvas/#/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/recording-canvas.html
@@ -2271,6 +2272,8 @@ $dokka.location:org.jetbrains.skia/RSXform/RSXform/#kotlin.Float#kotlin.Float#ko
 $dokka.location:org.jetbrains.skia/RSXform/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia/-r-s-xform/equals.html
 $dokka.location:org.jetbrains.skia/RSXform/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia/-r-s-xform/hash-code.html
 $dokka.location:org.jetbrains.skia/RSXform/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia/-r-s-xform/to-string.html
+$dokka.location:org.jetbrains.skia/RTreeFactory///PointingToDeclaration/skiko/org.jetbrains.skia/-r-tree-factory/index.html
+$dokka.location:org.jetbrains.skia/RTreeFactory/RTreeFactory/#/PointingToDeclaration/skiko/org.jetbrains.skia/-r-tree-factory/-r-tree-factory.html
 $dokka.location:org.jetbrains.skia/Rect.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-rect/-companion/index.html
 $dokka.location:org.jetbrains.skia/Rect.Companion/makeLTRB/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-rect/-companion/make-l-t-r-b.html
 $dokka.location:org.jetbrains.skia/Rect.Companion/makeWH/#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-rect/-companion/make-w-h.html
