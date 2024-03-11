@@ -8,6 +8,22 @@ import java.lang.System.getProperty
  * Global Skiko properties, which are read from system JDK variables orr from environment variables
  */
 object SkikoProperties {
+    /**
+     * Path where the Skiko binaries (dll/so/dylib, depending on OS) are placed.
+     *
+     * If defined, SKiko doesn't extract binaries from `jar` files to external folder.
+     *
+     * If null (default), it extracts them to `libraryCachePath`
+     */
+    val libraryPath: String? get() = getProperty("skiko.library.path")
+
+    /**
+     * The path where to store data files.
+     *
+     * It is used for extracting the Skiko binaries (if `libraryPath` isn't null) and logging.
+     */
+    val dataPath: String get() = getProperty("skiko.data.path") ?: "${getProperty("user.home")}/.skiko/"
+
     val vsyncEnabled: Boolean get() = getProperty("skiko.vsync.enabled")?.toBoolean() ?: true
 
     /**
