@@ -22,7 +22,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 @Suppress("unused") // used in Compose Multiplatform
 @ExperimentalSkikoApi
 open class SkiaSwingLayer(
-    skikoView: SkikoView,
+    renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
 ) : JComponent() {
     internal companion object {
@@ -40,14 +40,14 @@ open class SkiaSwingLayer(
 
     val clipComponents: MutableList<ClipRectangle> get() = mutableListOf()
 
-    private val skikoViewWithClipping = object : SkikoView by skikoView {
+    private val renderDelegateWithClipping = object : SkikoRenderDelegate by renderDelegate {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val scale = graphicsConfiguration.defaultTransform.scaleX.toFloat()
             // clipping
             for (component in clipComponents) {
                 canvas.clipRectBy(component, scale)
             }
-            skikoView.onRender(canvas, width, height, nanoTime)
+            renderDelegate.onRender(canvas, width, height, nanoTime)
         }
     }
 
@@ -64,7 +64,7 @@ open class SkiaSwingLayer(
 
     private val redrawerManager = RedrawerManager<SwingRedrawer>(properties.renderApi) { renderApi, oldRedrawer ->
         oldRedrawer?.dispose()
-        createSwingRedrawer(swingLayerProperties, skikoViewWithClipping, renderApi, analytics)
+        createSwingRedrawer(swingLayerProperties, renderDelegateWithClipping, renderApi, analytics)
     }
 
     private val redrawer: SwingRedrawer?

@@ -49,7 +49,7 @@ actual open class SkiaLayer {
             if (value) throw IllegalArgumentException("transparency unsupported")
         }
 
-    actual var skikoView: SkikoView? = null
+    actual var renderDelegate: SkikoRenderDelegate? = null
 
     actual fun attachTo(container: Any) {
         when (container) {

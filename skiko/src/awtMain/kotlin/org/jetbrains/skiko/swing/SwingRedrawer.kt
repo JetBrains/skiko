@@ -26,21 +26,21 @@ internal interface SwingRedrawer {
  */
 internal fun createSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
-    skikoView: SkikoView,
+    renderDelegate: SkikoRenderDelegate,
     renderApi: GraphicsApi,
     analytics: SkiaLayerAnalytics,
 ): SwingRedrawer {
     if (renderApi == GraphicsApi.SOFTWARE_COMPAT || renderApi == GraphicsApi.SOFTWARE_FAST) {
         return SoftwareSwingRedrawer(
             swingLayerProperties,
-            skikoView,
+            renderDelegate,
             analytics
         )
     }
     return when (hostOs) {
-        OS.MacOS -> MetalSwingRedrawer(swingLayerProperties, skikoView, analytics)
-        OS.Windows -> Direct3DSwingRedrawer(swingLayerProperties, skikoView, analytics)
-        OS.Linux -> LinuxOpenGLSwingRedrawer(swingLayerProperties, skikoView, analytics)
-        else -> SoftwareSwingRedrawer(swingLayerProperties, skikoView, analytics)
+        OS.MacOS -> MetalSwingRedrawer(swingLayerProperties, renderDelegate, analytics)
+        OS.Windows -> Direct3DSwingRedrawer(swingLayerProperties, renderDelegate, analytics)
+        OS.Linux -> LinuxOpenGLSwingRedrawer(swingLayerProperties, renderDelegate, analytics)
+        else -> SoftwareSwingRedrawer(swingLayerProperties, renderDelegate, analytics)
     }
 }

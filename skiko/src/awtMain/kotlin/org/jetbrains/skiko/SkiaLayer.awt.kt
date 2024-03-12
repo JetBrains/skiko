@@ -219,7 +219,7 @@ actual open class SkiaLayer internal constructor(
     actual val component: Any?
         get() = backedLayer
 
-    actual var skikoView: SkikoView? = null
+    actual var renderDelegate: SkikoRenderDelegate? = null
 
     actual fun attachTo(container: Any) {
         attachTo(container as JComponent)
@@ -230,69 +230,6 @@ actual open class SkiaLayer internal constructor(
     }
 
     private var keyEvent: KeyEvent? = null
-
-    fun addView(view: SkikoView) {
-        skikoView = view
-        addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                skikoView?.onPointerEvent(toSkikoEvent(e))
-            }
-
-            override fun mouseReleased(e: MouseEvent) {
-                skikoView?.onPointerEvent(toSkikoEvent(e))
-            }
-
-            override fun mouseEntered(e: MouseEvent) {
-                skikoView?.onPointerEvent(toSkikoEvent(e))
-            }
-
-            override fun mouseExited(e: MouseEvent) {
-                skikoView?.onPointerEvent(toSkikoEvent(e))
-            }
-        })
-
-        addMouseMotionListener(object : MouseMotionAdapter() {
-            override fun mouseDragged(e: MouseEvent) {
-                skikoView?.onPointerEvent(toSkikoEvent(e))
-            }
-
-            override fun mouseMoved(e: MouseEvent) {
-                skikoView?.onPointerEvent(toSkikoEvent(e))
-            }
-        })
-
-        addMouseWheelListener(object : MouseWheelListener {
-            override fun mouseWheelMoved(e: MouseWheelEvent) {
-                skikoView?.onPointerEvent(toSkikoEvent(e))
-            }
-        })
-
-        addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(e: KeyEvent) {
-                keyEvent = e
-                skikoView?.onKeyboardEvent(toSkikoEvent(e))
-            }
-
-            override fun keyReleased(e: KeyEvent) {
-                keyEvent = e
-                skikoView?.onKeyboardEvent(toSkikoEvent(e))
-            }
-
-            override fun keyTyped(e: KeyEvent) {
-                skikoView?.onInputEvent(toSkikoTypeEvent(e, keyEvent))
-            }
-        })
-
-        addInputMethodListener(object : InputMethodListener {
-            override fun caretPositionChanged(e: InputMethodEvent) {
-                skikoView?.onInputEvent(toSkikoTypeEvent(e, keyEvent))
-            }
-
-            override fun inputMethodTextChanged(e: InputMethodEvent) {
-                skikoView?.onInputEvent(toSkikoTypeEvent(e, keyEvent))
-            }
-        })
-    }
 
     val clipComponents = mutableListOf<ClipRectangle>()
 
@@ -545,7 +482,7 @@ actual open class SkiaLayer internal constructor(
 
         try {
             isRendering = true
-            skikoView?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
+            renderDelegate?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
         } finally {
             isRendering = false
         }

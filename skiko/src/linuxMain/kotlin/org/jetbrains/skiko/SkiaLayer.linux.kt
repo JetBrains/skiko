@@ -31,7 +31,7 @@ actual open class SkiaLayer  {
         TODO("unimplemented")
     }
 
-    actual var skikoView: SkikoView? = null
+    actual var renderDelegate: SkikoRenderDelegate? = null
     actual val pixelGeometry: PixelGeometry
         get() = TODO("Not yet implemented")
 }
