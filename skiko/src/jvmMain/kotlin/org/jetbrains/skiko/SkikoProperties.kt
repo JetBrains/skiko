@@ -15,7 +15,15 @@ object SkikoProperties {
      *
      * If null (default), it extracts them to `libraryCachePath`
      */
-    val libraryPath: String? get() = getProperty("skiko.library.path")
+    var libraryPath: String?
+        get() = getProperty("skiko.library.path")
+        internal set(value) {
+            if (value != null) {
+                System.setProperty("skiko.library.path", value)
+            } else {
+                System.clearProperty("skiko.library.path")
+            }
+        }
 
     /**
      * The path where to store data files.
