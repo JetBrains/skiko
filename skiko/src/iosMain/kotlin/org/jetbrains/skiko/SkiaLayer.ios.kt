@@ -69,9 +69,3 @@ actual open class SkiaLayer {
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
 }
-
-// TODO: do properly
-actual typealias SkikoGesturePlatformEvent = UIEvent
-actual typealias SkikoPlatformInputEvent = UIPress
-actual typealias SkikoPlatformKeyboardEvent = UIPress
-actual typealias SkikoPlatformPointerEvent = UIEvent

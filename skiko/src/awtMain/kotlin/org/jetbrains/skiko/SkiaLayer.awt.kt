@@ -607,9 +607,3 @@ internal fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
         true
     )
 }
-
-// InputEvent is abstract, so we wrap to match modality.
-actual typealias SkikoGesturePlatformEvent = Any
-actual typealias SkikoPlatformInputEvent = Any
-actual typealias SkikoPlatformKeyboardEvent = KeyEvent
-actual typealias SkikoPlatformPointerEvent = MouseEvent
