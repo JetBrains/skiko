@@ -14,9 +14,10 @@ import org.jetbrains.skiko.wasm.createWebGLContext
  * [drawFrame] has to be implemented to perform the actual drawing on [canvas].
  */
 internal abstract class CanvasRenderer(
-    private val htmlCanvas: HTMLCanvasElement
+    private val contextPointer: NativePointer,
+    val width: Int,
+    val height: Int,
 ) {
-    private val contextPointer = createWebGLContext(htmlCanvas)
     private val context: DirectContext
     private var surface: Surface? = null
     private var renderTarget: BackendRenderTarget? = null
@@ -28,35 +29,15 @@ internal abstract class CanvasRenderer(
     protected var canvas: Canvas? = null
         private set
 
-    /**
-     * The current width of [htmlCanvas]
-     */
-    val width: Int
-        get() = htmlCanvas.width
-
-    /**
-     * The current height of [htmlCanvas]
-     */
-    val height: Int
-        get() = htmlCanvas.height
-
     init {
         makeGLContextCurrent(contextPointer)
         context = DirectContext.makeGL()
+        initCanvas()
     }
 
-    /**
-     * Initializes the canvas.
-     *
-     * @param desiredWidth - width in pixels
-     * @param desiredHeight - height in pixels
-     * @param scale - a value to adjust the canvas' size
-     * (https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)
-     */
-    fun initCanvas(desiredWidth: Int, desiredHeight: Int, scale: Float, pixelGeometry: PixelGeometry) {
+    fun initCanvas() {
         disposeCanvas()
-        htmlCanvas.width = (desiredWidth * scale).toInt()
-        htmlCanvas.height = (desiredHeight * scale).toInt()
+
         renderTarget = BackendRenderTarget.makeGL(width, height, 1, 8, 0, 0x8058)
         surface = Surface.makeFromBackendRenderTarget(
             context,
@@ -64,7 +45,7 @@ internal abstract class CanvasRenderer(
             SurfaceOrigin.BOTTOM_LEFT,
             SurfaceColorFormat.RGBA_8888,
             ColorSpace.sRGB,
-            SurfaceProps(pixelGeometry = pixelGeometry)
+            SurfaceProps()
         ) ?: throw RenderException("Cannot create surface")
         canvas = surface!!.canvas
     }
