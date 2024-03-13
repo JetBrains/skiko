@@ -2814,7 +2814,6 @@ $dokka.location:org.jetbrains.skiko/SkiaLayer/height/#/PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skiko/SkiaLayer/isShowing/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/is-showing.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/needRedraw/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/need-redraw.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/nsView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/ns-view.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/onContentScaleChanged/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/on-content-scale-changed.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/pixelGeometry/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/pixel-geometry.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/render-api.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/skikoView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/skiko-view.html
