@@ -3,11 +3,13 @@ package SkiaAwtSample
 import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.*
 import org.jetbrains.skiko.*
+import java.awt.event.MouseEvent
+import java.awt.event.MouseMotionListener
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoView {
+open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoRenderDelegate, MouseMotionListener {
     constructor(layer: SkiaLayer) : this({ layer.contentScale })
 
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
@@ -22,8 +24,8 @@ open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoView {
     }
 
     private var frame = 0
-    private var xpos = 0.0
-    private var ypos = 0.0
+    private var xpos = 0
+    private var ypos = 0
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
 
@@ -108,23 +110,11 @@ open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoView {
         canvas.drawLine(left, top + rectH, left + rectW, top, Paint())
     }
 
-    override fun onPointerEvent(event: SkikoPointerEvent) {
-        when (event.kind) {
-            SkikoPointerEventKind.DOWN,
-            SkikoPointerEventKind.MOVE -> {
-                xpos = event.x
-                ypos = event.y
-            }
-            else -> {}
-        }
-        // TODO: provide example that covers all features of pointer event
+    override fun mouseDragged(e: MouseEvent) {
     }
 
-    override fun onInputEvent(event: SkikoInputEvent) {
-        // TODO: provide example that covers all features of text input event
-    }
-
-    override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
-        // TODO: provide example that covers all features of keyboard event
+    override fun mouseMoved(e: MouseEvent) {
+        xpos = e.x
+        ypos = e.y
     }
 }

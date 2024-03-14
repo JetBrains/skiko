@@ -1,6 +1,6 @@
 package SkiaAwtSample
 
-import org.jetbrains.skiko.GenericSkikoView
+import org.jetbrains.skiko.SkiaLayerRenderDelegate
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -85,7 +85,9 @@ fun swingSkia() = SwingUtilities.invokeLater {
 
 private fun getSkiaPanel(): SkiaPanel {
     return SkiaPanel().apply {
-        layer.addView(GenericSkikoView(layer, ClocksAwt(layer)))
+        val clocks = ClocksAwt(layer)
+        layer.renderDelegate = SkiaLayerRenderDelegate(layer, clocks)
+        layer.addMouseMotionListener(clocks)
         val btnPanelOK = JPanel()
         btnPanelOK.layout = BorderLayout(0, 0)
         btnPanelOK.background = Color.white
