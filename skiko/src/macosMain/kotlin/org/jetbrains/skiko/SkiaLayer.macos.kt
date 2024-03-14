@@ -1,34 +1,21 @@
 package org.jetbrains.skiko
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
-import kotlinx.cinterop.CValue
-import kotlinx.cinterop.COpaquePointer
-import kotlinx.cinterop.convert
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import platform.AppKit.*
-import platform.Foundation.NSAttributedString
-import platform.Foundation.NSMutableAttributedString
-import platform.Foundation.NSMakeRect
-import platform.Foundation.NSMakeRange
-import platform.Foundation.NSRange
-import platform.Foundation.NSRangePointer
-import platform.Foundation.NSPoint
-import platform.Foundation.NSRect
-import platform.Foundation.NSNotFound
 import platform.Foundation.NSNotification
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSSelectorFromString
-import platform.Foundation.addObserver
 import platform.darwin.NSObject
-import platform.CoreGraphics.CGRectMake
 
 /**
  * SkiaLayer implementation for macOS.
  * Supports only [GraphicsApi.METAL]
  */
+@OptIn(BetaInteropApi::class)
 actual open class SkiaLayer {
     fun isShowing(): Boolean {
         return true
@@ -75,6 +62,7 @@ actual open class SkiaLayer {
      * Underlying [NSView]
      */
     lateinit var nsView: NSView
+        private set
 
     actual val component: Any?
         get() = this.nsView
@@ -93,70 +81,50 @@ actual open class SkiaLayer {
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
 
-    /**
-     * @param container - should be an instance of [NSWindow]
-     */
-    actual fun attachTo(container: Any) {
-        attachTo(container as NSWindow)
+    private val nsViewObserver = object : NSObject() {
+        @ObjCAction
+        fun frameDidChange(notification: NSNotification) {
+            redrawer?.syncSize()
+            redrawer?.redrawImmediately()
+        }
+
+        @ObjCAction
+        fun windowDidChangeBackingProperties(notification: NSNotification) {
+            redrawer?.syncSize()
+            redrawer?.redrawImmediately()
+        }
+
+        fun addObserver() {
+            val center = NSNotificationCenter.defaultCenter()
+            center.addObserver(
+                    observer = this,
+                    selector = NSSelectorFromString("frameDidChange:"),
+                    name = NSViewFrameDidChangeNotification,
+                    `object` = nsView,
+                )
+            center.addObserver(
+                observer = this,
+                selector = NSSelectorFromString("windowDidChangeBackingProperties:"),
+                name = NSWindowDidChangeBackingPropertiesNotification,
+                `object` = nsView.window,
+            )
+        }
+
+        fun removeObserver() {
+            val center = NSNotificationCenter.defaultCenter()
+            center.removeObserver(this)
+        }
     }
 
     /**
-     * Initializes the [nsView] then adds it to [window]. Initializes events listeners.
-     * Delegates events processing to [skikoView].
+     * @param container - should be an instance of [NSView]
      */
-    fun attachTo(window: NSWindow) {
-        val (width, height) = window.contentLayoutRect.useContents {
-            this.size.width to this.size.height
-        }
-        nsView = object : NSView(NSMakeRect(0.0, 0.0, width, height)) {
-            private var trackingArea : NSTrackingArea? = null
-            override fun wantsUpdateLayer() = true
-            override fun acceptsFirstResponder() = true
-            override fun viewWillMoveToWindow(newWindow: NSWindow?) {
-                updateTrackingAreas()
-            }
-
-            override fun updateTrackingAreas() {
-                trackingArea?.let { removeTrackingArea(it) }
-                trackingArea = NSTrackingArea(
-                    rect = bounds,
-                    options = NSTrackingActiveAlways or
-                        NSTrackingMouseEnteredAndExited or
-                        NSTrackingMouseMoved or
-                        NSTrackingActiveInKeyWindow or
-                        NSTrackingAssumeInside or
-                        NSTrackingInVisibleRect,
-                    owner = nsView, userInfo = null)
-                nsView.addTrackingArea(trackingArea!!)
-            }
-
-            @ObjCAction
-            open fun onWindowClose(arg: NSObject?) {
-                detach()
-                val center = NSNotificationCenter.defaultCenter()
-                center.removeObserver(nsView)
-            }
-        }
-        val center = NSNotificationCenter.defaultCenter()
-        center.addObserver(nsView, NSSelectorFromString("onWindowClose:"),
-            NSWindowWillCloseNotification!!, window)
-        window.delegate = object : NSObject(), NSWindowDelegateProtocol {
-            override fun windowDidResize(notification: NSNotification) {
-                val (w, h) = window.contentView!!.frame.useContents {
-                    size.width to size.height
-                }
-                nsView.frame = CGRectMake(0.0, 0.0, w, h)
-                redrawer?.syncSize()
-                redrawer?.redrawImmediately()
-            }
-
-            override fun windowDidChangeBackingProperties(notification: NSNotification) {
-                redrawer?.syncSize()
-                redrawer?.redrawImmediately()
-            }
-        }
-        window.contentView!!.addSubview(nsView)
-        window.makeFirstResponder(nsView)
+    actual fun attachTo(container: Any) {
+        check(!this::nsView.isInitialized) { "Already attached to another NSView" }
+        check(container is NSView) { "container should be an instance of NSView" }
+        nsView = container
+        nsView.postsFrameChangedNotifications = true
+        nsViewObserver.addObserver()
         redrawer = createNativeRedrawer(this, renderApi).apply {
             syncSize()
             needRedraw()
@@ -164,6 +132,7 @@ actual open class SkiaLayer {
     }
 
     actual fun detach() {
+        nsViewObserver.removeObserver()
         redrawer?.dispose()
         redrawer = null
     }
