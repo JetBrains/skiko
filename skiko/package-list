@@ -3134,11 +3134,13 @@ $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind/entries/#/PointingToDe
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/value-of.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/values.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/index.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/dataPath/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/data-path.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/fpsEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-enabled.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/fpsLongFramesMillis/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-long-frames-millis.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/fpsLongFramesShow/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-long-frames-show.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/fpsPeriodSeconds/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-period-seconds.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/gpuPriority/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/gpu-priority.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/libraryPath/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/library-path.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/render-api.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/vsyncEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/vsync-enabled.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/vsyncFramelimitFallbackEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/vsync-framelimit-fallback-enabled.html
