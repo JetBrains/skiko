@@ -7,9 +7,6 @@ import java.nio.file.StandardCopyOption
 import java.util.concurrent.atomic.AtomicBoolean
 
 object Library {
-    internal const val SKIKO_LIBRARY_PATH_PROPERTY = "skiko.library.path"
-    internal val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
-    private val skikoLibraryPath = System.getProperty(SKIKO_LIBRARY_PATH_PROPERTY)
     private var copyDir: File? = null
 
     // A native library cannot be loaded in several classloaders, so we have to clone
@@ -80,6 +77,7 @@ object Library {
         }
 
         // First try: system property is set.
+        val skikoLibraryPath = SkikoProperties.libraryPath
         if (skikoLibraryPath != null) {
             val library = File(File(skikoLibraryPath), platformName)
             loadLibraryOrCopy(library)
@@ -107,9 +105,9 @@ object Library {
         )
         val hash = hashResourceStream.use { it.bufferedReader().readLine() }
 
-        val cacheDir = File(File(cacheRoot), hash)
-        cacheDir.mkdirs()
-        val library = unpackIfNeeded(cacheDir, platformName, false)
+        val dataDir = File(File(SkikoProperties.dataPath), hash)
+        dataDir.mkdirs()
+        val library = unpackIfNeeded(dataDir, platformName, false)
         loadLibraryOrCopy(library)
         if (icu != null) {
             if (copyDir != null) {
@@ -117,7 +115,7 @@ object Library {
                 unpackIfNeeded(copyDir!!, icu, true)
             } else {
                 // Normal path where Skiko is loaded only once.
-                unpackIfNeeded(cacheDir, icu, false)
+                unpackIfNeeded(dataDir, icu, false)
             }
         }
     }
