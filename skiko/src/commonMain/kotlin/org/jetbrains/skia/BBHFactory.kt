@@ -24,5 +24,5 @@ class RTreeFactory : BBHFactory {
 private external fun RTreeFactory_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BBHFactory__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BBHFactory_1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BBHFactory__1nGetFinalizer")
 private external fun BBHFactory_nGetFinalizer(): NativePointer
