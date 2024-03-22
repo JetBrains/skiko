@@ -41,7 +41,7 @@ expect open class SkiaLayer {
     /**
      * Current view used for rendering.
      */
-    var skikoView: SkikoView?
+    var renderDelegate: SkikoRenderDelegate?
 
     /**
      * Attach this SkikoView to platform container.

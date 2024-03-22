@@ -21,9 +21,8 @@ plugins {
 repositories {
     google()
     mavenCentral()
+    mavenLocal()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-
-     // mavenLocal()
 }
 
 val osName = System.getProperty("os.name")
@@ -137,18 +136,18 @@ kotlin {
             }
         }
 
-        val jsWasmMain by creating {
+        val webMain by creating {
             dependsOn(commonMain)
             resources.setSrcDirs(resources.srcDirs)
             resources.srcDirs(unzipTask.map { it.destinationDir })
         }
 
         val jsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
 
         val wasmJsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
 
         val darwinMain by creating {

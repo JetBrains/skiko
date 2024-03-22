@@ -56,7 +56,7 @@ actual open class SkiaLayer {
      * An implementation of SkikoView with content rendering and
      * event processing logic.
      */
-    actual var skikoView: SkikoView? = null
+    actual var renderDelegate: SkikoRenderDelegate? = null
 
     /**
      * @param container - should be an instance of [HTMLCanvasElement]
@@ -85,13 +85,13 @@ actual open class SkiaLayer {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
                 val currentNanos = currentTimestamp * 1_000_000
-                skikoView?.onRender(canvas!!, width, height, currentNanos.toLong())
+                renderDelegate?.onRender(canvas!!, width, height, currentNanos.toLong())
             }
         }
     }
 
     internal actual fun draw(canvas: Canvas) {
-        skikoView?.onRender(canvas, state!!.width, state!!.height, currentNanoTime())
+        renderDelegate?.onRender(canvas, state!!.width, state!!.height, currentNanoTime())
     }
 
     actual val pixelGeometry: PixelGeometry

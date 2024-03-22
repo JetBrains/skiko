@@ -1,22 +1,32 @@
 package org.jetbrains.skiko.sample
 
-import org.jetbrains.skia.*
+import android.view.View
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.FontMgr
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.PaintMode
+import org.jetbrains.skia.Rect
 import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.FPSCounter
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkikoRenderDelegate
+import org.jetbrains.skiko.currentSystemTheme
+import org.jetbrains.skiko.hostOs
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.PI
 
-class Clocks(private val layer: SkiaLayer): SkikoView {
+class Clocks(private val skiaLayer: SkiaLayer, view: View): SkikoRenderDelegate {
     private val withFps = true
     private val fpsCounter = FPSCounter()
     private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
     private var frame = 0
-    private var xpos = 0.0
-    private var ypos = 0.0
+    private var xpos = 0.0f
+    private var ypos = 0.0f
     private var xOffset = 0.0
     private var yOffset = 0.0
     private var scale = 1.0
@@ -25,7 +35,14 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
     private val style = ParagraphStyle()
-    private var inputText = ""
+
+    init {
+        view.setOnTouchListener { _, event ->
+            xpos = event.x / skiaLayer.contentScale
+            ypos = event.y / skiaLayer.contentScale
+            true
+        }
+    }
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         if (withFps) fpsCounter.tick()
@@ -92,20 +109,12 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
 
         val renderInfo = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: ${layer.renderApi} ✿ﾟ ${currentSystemTheme}${maybeFps}")
+            .addText("Graphics API: ${skiaLayer.renderApi} ✿ﾟ ${currentSystemTheme}${maybeFps}")
             .popStyle()
             .build()
         renderInfo.layout(Float.POSITIVE_INFINITY)
         renderInfo.paint(canvas, 5f, platformYOffset)
 
-        val input = ParagraphBuilder(style, fontCollection)
-            .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("TextInput: $inputText")
-            .popStyle()
-            .build()
-        input.layout(Float.POSITIVE_INFINITY)
-        input.paint(canvas, 5f, platformYOffset + 20f)
-        
         val frames = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xff9BC730L.toInt()).setFontSize(20f))
             .addText("Frames: ${frame++}\nAngle: $rotate")
@@ -115,117 +124,5 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         frames.paint(canvas, ((xpos - xOffset) / scale).toFloat(), ((ypos - yOffset) / scale).toFloat())
 
         canvas.resetMatrix()
-    }
-
-    private fun reset() {
-        xOffset = 0.0
-        yOffset = 0.0
-        rotate = 0.0
-        scale = 1.0
-    }
-
-    override fun onPointerEvent(event: SkikoPointerEvent) {
-        when (event.kind) {
-            SkikoPointerEventKind.DOWN,
-            SkikoPointerEventKind.MOVE -> {
-                xpos = event.x
-                ypos = event.y
-            }
-            SkikoPointerEventKind.DRAG -> {
-                xOffset += event.x - xpos
-                yOffset += event.y - ypos
-                xpos = event.x
-                ypos = event.y
-            }
-            SkikoPointerEventKind.SCROLL -> {
-                when (event.modifiers) {
-                    SkikoInputModifiers.CONTROL -> {
-                        rotate += if (event.deltaY < 0) -5.0 else 5.0
-                    }
-                    else -> {
-                        if (event.y != 0.0) {
-                            scale *= if (event.deltaY < 0) 0.9 else 1.1
-                        }
-                    }
-                }
-            }
-            else -> {}
-        }
-    }
-
-    override fun onInputEvent(event: SkikoInputEvent) {
-        if (event.input != "\b") {
-            inputText += event.input
-        }
-    }
-
-    override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
-        if (event.kind == SkikoKeyboardEventKind.DOWN) {
-            when (event.key) {
-                SkikoKey.KEY_NUMPAD_ADD -> scale *= 1.1
-                SkikoKey.KEY_I -> {
-                    if (event.modifiers == SkikoInputModifiers.SHIFT) {
-                        scale *= 1.1
-                    }
-                }
-                SkikoKey.KEY_NUMPAD_SUBTRACT -> scale *= 0.9
-                SkikoKey.KEY_O -> {
-                    if (event.modifiers == SkikoInputModifiers.SHIFT) {
-                        scale *= 0.9
-                    }
-                }
-                SkikoKey.KEY_R -> {
-                    if (event.modifiers == SkikoInputModifiers.SHIFT) {
-                        rotate -= 5.0
-                    }
-                }
-                SkikoKey.KEY_L -> {
-                    if (event.modifiers == SkikoInputModifiers.SHIFT) {
-                        rotate += 5.0
-                    }
-                }
-                SkikoKey.KEY_NUMPAD_4,
-                SkikoKey.KEY_LEFT -> xOffset -= 5.0
-                SkikoKey.KEY_NUMPAD_8,
-                SkikoKey.KEY_UP -> yOffset -= 5.0
-                SkikoKey.KEY_NUMPAD_6,
-                SkikoKey.KEY_RIGHT -> xOffset += 5.0
-                SkikoKey.KEY_NUMPAD_2,
-                SkikoKey.KEY_DOWN -> yOffset += 5.0
-                SkikoKey.KEY_SPACE -> { reset() }
-                SkikoKey.KEY_BACKSPACE -> {
-                    if (inputText.isNotEmpty()) {
-                        inputText = inputText.dropLast(1)
-                    }
-                }
-                else -> {}
-            }
-        }
-    }
-
-    override fun onGestureEvent(event: SkikoGestureEvent) {
-        when (event.kind) {
-            SkikoGestureEventKind.TAP -> {
-                xpos = event.x
-                ypos = event.y
-            }
-            SkikoGestureEventKind.DOUBLETAP -> { reset() }
-            SkikoGestureEventKind.PINCH -> {
-                if (event.state == SkikoGestureEventState.STARTED) {
-                    k = scale
-                }
-                scale = k * event.scale
-            }
-            SkikoGestureEventKind.PAN -> {
-                xOffset += event.x - xpos
-                yOffset += event.y - ypos
-                xpos = event.x
-                ypos = event.y
-            }
-            SkikoGestureEventKind.ROTATION -> {
-                rotate = event.rotation * 180.0 / PI
-            }
-            else -> {}
-        }
     }
 }

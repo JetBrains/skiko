@@ -6,7 +6,7 @@ import java.awt.Graphics2D
 
 internal class Direct3DSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
-    private val skikoView: SkikoView,
+    private val renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics
 ) : SwingRedrawerBase(swingLayerProperties, analytics, GraphicsApi.DIRECT3D) {
     companion object {
@@ -73,7 +73,7 @@ internal class Direct3DSwingRedrawer(
 
             val canvas = surface.canvas
             canvas.clear(Color.TRANSPARENT)
-            skikoView.onRender(canvas, width, height, nanoTime)
+            renderDelegate.onRender(canvas, width, height, nanoTime)
             flush(surface, g)
         }
     }

@@ -3,7 +3,7 @@ package org.jetbrains.skiko.swing
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayerAnalytics
-import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.SkikoRenderDelegate
 import org.jetbrains.skiko.autoCloseScope
 import java.awt.Graphics2D
 
@@ -17,7 +17,7 @@ import java.awt.Graphics2D
  */
 internal class SoftwareSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
-    private val skikoView: SkikoView,
+    private val renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics
 ) : SwingRedrawerBase(
     swingLayerProperties,
@@ -48,7 +48,7 @@ internal class SoftwareSwingRedrawer(
 
         val canvas = Canvas(storage, SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)).autoClose()
         canvas.clear(Color.TRANSPARENT)
-        skikoView.onRender(canvas, width, height, nanoTime)
+        renderDelegate.onRender(canvas, width, height, nanoTime)
 
         flush(g)
     }

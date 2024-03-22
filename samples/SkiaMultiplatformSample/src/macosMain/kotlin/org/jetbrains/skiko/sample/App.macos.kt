@@ -1,13 +1,20 @@
 package org.jetbrains.skiko.sample
 
-import platform.AppKit.*
-
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkiaLayerRenderDelegate
+import platform.AppKit.NSApplication
+import platform.AppKit.NSApplicationActivationPolicy
+import platform.AppKit.NSApplicationDelegateProtocol
+import platform.AppKit.NSBackingStoreBuffered
+import platform.AppKit.NSMenu
+import platform.AppKit.NSWindow
+import platform.AppKit.NSWindowStyleMaskClosable
+import platform.AppKit.NSWindowStyleMaskMiniaturizable
+import platform.AppKit.NSWindowStyleMaskResizable
+import platform.AppKit.NSWindowStyleMaskTitled
 import platform.Foundation.NSMakeRect
 import platform.Foundation.NSSelectorFromString
 import platform.darwin.NSObject
-
-fun makeApp(skiaLayer: SkiaLayer) = MacosClocks(skiaLayer)
 
 fun main() {
     val app = NSApplication.sharedApplication()
@@ -30,7 +37,7 @@ fun main() {
                 NSWindowStyleMaskMiniaturizable or
                 NSWindowStyleMaskClosable or
                 NSWindowStyleMaskResizable
-    val window = object: NSWindow(
+    val window = object : NSWindow(
         contentRect = NSMakeRect(0.0, 0.0, 640.0, 480.0),
         styleMask = windowStyle,
         backing = NSBackingStoreBuffered,
@@ -40,8 +47,8 @@ fun main() {
         override fun canBecomeMainWindow() = true
     }
     val skiaLayer = SkiaLayer()
-    skiaLayer.skikoView = GenericSkikoView(skiaLayer, makeApp(skiaLayer))
-    skiaLayer.attachTo(window)
+    val clocks = MacosClocks(skiaLayer, window)
+    skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, clocks)
     window.makeKeyAndOrderFront(app)
     app.run()
 }

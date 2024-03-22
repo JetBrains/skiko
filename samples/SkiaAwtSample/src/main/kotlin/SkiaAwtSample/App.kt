@@ -115,7 +115,8 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         println("Changed renderer for $layer: new value is ${layer.renderApi}")
     }
 
-    skiaLayer.addView(GenericSkikoView(skiaLayer, clocks))
+    skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, clocks)
+    skiaLayer.addMouseMotionListener(clocks)
 
     // Window transparency
     if (System.getProperty("skiko.transparency") == "true") {

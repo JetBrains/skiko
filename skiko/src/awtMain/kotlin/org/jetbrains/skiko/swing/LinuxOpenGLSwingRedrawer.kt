@@ -6,7 +6,7 @@ import java.awt.Graphics2D
 
 internal class LinuxOpenGLSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
-    private val skikoView: SkikoView,
+    private val renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics
 ) : SwingRedrawerBase(swingLayerProperties, analytics, GraphicsApi.OPENGL) {
     init {
@@ -76,7 +76,7 @@ internal class LinuxOpenGLSwingRedrawer(
 
                 val canvas = surface.canvas
                 canvas.clear(Color.TRANSPARENT)
-                skikoView.onRender(canvas, width, height, nanoTime)
+                renderDelegate.onRender(canvas, width, height, nanoTime)
                 flush(surface, g)
                 unbindAndDisposeTexture(texturePtr)
             }

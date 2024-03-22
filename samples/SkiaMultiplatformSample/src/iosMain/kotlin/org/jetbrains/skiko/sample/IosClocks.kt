@@ -2,24 +2,21 @@ package org.jetbrains.skiko.sample
 
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoUIView
-import org.jetbrains.skiko.SkikoInput
+import platform.UIKit.NSLayoutConstraint
+import platform.UIKit.UIViewController
 
-class IosClocks(layer: SkiaLayer) : Clocks(layer) {
-    override var inputText: String = "Hello, IosClocks"
-
-    override fun handleBackspace() {
-        if (inputText.isNotEmpty()) {
-            inputText = inputText.dropLast(1)
-        }
-    }
-
-    override val input: SkikoInput = object : SkikoInput by SkikoInput.Empty {
-        override fun insertText(text: String) {
-            inputText += text
-        }
-
-        override fun deleteBackward() {
-            handleBackspace()
-        }
+class IosClocks(skiaLayer: SkiaLayer) : Clocks(skiaLayer.renderApi) {
+    val viewController: UIViewController
+    init {
+        val view = SkikoUIView(skiaLayer)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        viewController = UIViewController()
+        viewController.view.addSubview(view)
+        NSLayoutConstraint.activateConstraints(listOf(
+            view.topAnchor.constraintEqualToAnchor(viewController.view.topAnchor),
+            view.bottomAnchor.constraintEqualToAnchor(viewController.view.bottomAnchor),
+            view.leadingAnchor.constraintEqualToAnchor(viewController.view.leadingAnchor),
+            view.trailingAnchor.constraintEqualToAnchor(viewController.view.trailingAnchor)
+        ))
     }
 }

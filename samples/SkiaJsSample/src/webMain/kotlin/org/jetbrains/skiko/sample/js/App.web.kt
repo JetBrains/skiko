@@ -3,11 +3,11 @@ package org.jetbrains.skiko.sample.js
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
-import org.jetbrains.skiko.GenericSkikoView
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.SkiaLayerRenderDelegate
+import org.jetbrains.skiko.SkikoRenderDelegate
 
-private class DemoApp: SkikoView {
+private class DemoApp: SkikoRenderDelegate {
     private val paint = Paint()
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
@@ -29,7 +29,7 @@ internal fun runApp() {
         } else {
             BouncingBalls()
         }
-        skiaLayer.skikoView = GenericSkikoView(skiaLayer, app)
+        skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, app)
         skiaLayer.attachTo(canvas)
         skiaLayer.needRedraw()
     }

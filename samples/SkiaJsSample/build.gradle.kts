@@ -72,19 +72,19 @@ kotlin {
             }
         }
 
-        val jsWasmMain by creating {
+        val webMain by creating {
             dependsOn(commonMain)
             resources.setSrcDirs(resources.srcDirs)
             resources.srcDirs(unzipTask.map { it.destinationDir })
         }
 
         val jsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
 
 
         val wasmJsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
     }
 }
