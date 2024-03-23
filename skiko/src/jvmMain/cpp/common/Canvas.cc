@@ -23,6 +23,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nMakeFromB
     return reinterpret_cast<jlong>(canvas);
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetSurface
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkCanvas* instance = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    SkSurface* surface = instance->getSurface();
+    return reinterpret_cast<jlong>(surface);
+}
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoint
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat x, jfloat y, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
