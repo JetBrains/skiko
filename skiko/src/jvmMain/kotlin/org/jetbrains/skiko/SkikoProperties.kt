@@ -29,9 +29,7 @@ object SkikoProperties {
     /**
      * The path where to store data files.
      *
-     * It is used for extracting the Skiko binaries (if `libraryPath` isn't null) and logging.
-     *
-     * TODO: Use $XDG_STATE_HOME (Unix) / ~/Library/Logs (macOS) for logging instead?
+     * It is used for extracting the Skiko binaries (if `libraryPath` isn't null).
      */
     val dataPath: String get() {
         return getProperty("skiko.data.path") ?: when (hostOs) {
@@ -43,6 +41,23 @@ object SkikoProperties {
                     dataHome = "${getProperty("user.home")}/.local/share"
                 }
                 return "${dataHome}/skiko"
+            }
+        }
+    }
+
+    /**
+     * The path where to store log files.
+     */
+    val logPath: String get() {
+        return getProperty("skiko.data.path") ?: when (hostOs) {
+            OS.Windows -> "${getenv("LOCALAPPDATA")}/Skiko"
+            OS.MacOS, OS.Ios -> "${getProperty("user.home")}/Library/Logs/Skiko"
+            else -> {
+                var stateHome = getenv("XDG_STATE_HOME")
+                if (stateHome == null || !stateHome.startsWith('/')) {
+                    stateHome = "${getProperty("user.home")}/.local/state"
+                }
+                return "${stateHome}/skiko"
             }
         }
     }

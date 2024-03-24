@@ -12,7 +12,7 @@ internal class RenderExceptionsHandler {
         fun throwException(message: String) {
             if (output == null) {
                 output = File(
-                    "${SkikoProperties.dataPath}/skiko-render-exception-${ProcessHandle.current().pid()}.log"
+                    "${SkikoProperties.logPath}/skiko-render-exception-${ProcessHandle.current().pid()}.log"
                 )
             }
             val exception = RenderException(message)
