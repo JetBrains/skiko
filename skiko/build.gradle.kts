@@ -478,7 +478,7 @@ publishing {
                 pomNameForPublication[name] = "Skiko JVM Runtime for ${os.name} ${arch.name}"
                 artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)
                 afterEvaluate {
-                    artifact(entry.value.map { it.archiveFile.get() })
+                    artifact(entry.value)
                     artifact(emptySourcesJar)
                 }
                 pom.withXml {
