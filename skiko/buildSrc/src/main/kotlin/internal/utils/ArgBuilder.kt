@@ -134,3 +134,7 @@ internal class VisualCppLinkerArgBuilder : BaseVisualStudioBuildToolsArgBuilder(
         }
     }
 }
+
+internal class WindowsSanitizedPathsArgBuilder: BaseVisualStudioBuildToolsArgBuilder() {
+    override fun newSelfInstance(): ArgBuilder = WindowsSanitizedPathsArgBuilder()
+}

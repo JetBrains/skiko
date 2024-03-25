@@ -32,6 +32,7 @@ abstract class LinkSkikoTask : AbstractSkikoNativeToolTask() {
 
     override fun createArgBuilder(): ArgBuilder =
         if (buildTargetOS.get().isWindows) VisualCppLinkerArgBuilder()
+        else if(hostOs.isWindows && buildTargetOS.get() == OS.Wasm) WindowsSanitizedPathsArgBuilder()
         else super.createArgBuilder()
 
     override fun execute(mode: ToolMode, args: ArgBuilder) {
