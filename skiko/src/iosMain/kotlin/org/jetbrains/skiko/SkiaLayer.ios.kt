@@ -53,25 +53,19 @@ actual open class SkiaLayer {
 
         // GC bug? fixes leak on iOS
         view = null
-        skikoView = null
+        renderDelegate = null
     }
 
-    actual var skikoView: SkikoView? = null
+    actual var renderDelegate: SkikoRenderDelegate? = null
 
     internal actual fun draw(canvas: Canvas) {
         throw UnsupportedOperationException("Don't call it, artifact of wrong abstraction")
     }
 
     internal fun draw(surface: Surface) {
-        skikoView?.onRender(surface.canvas, surface.width, surface.height, getTimeNanos())
+        renderDelegate?.onRender(surface.canvas, surface.width, surface.height, getTimeNanos())
     }
 
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
 }
-
-// TODO: do properly
-actual typealias SkikoGesturePlatformEvent = UIEvent
-actual typealias SkikoPlatformInputEvent = UIPress
-actual typealias SkikoPlatformKeyboardEvent = UIPress
-actual typealias SkikoPlatformPointerEvent = UIEvent

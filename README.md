@@ -55,7 +55,7 @@ Simple example for Kotlin/JVM
 ```kotlin
 fun main() {
     val skiaLayer = SkiaLayer()
-    skiaLayer.skikoView = GenericSkikoView(skiaLayer, object : SkikoView {
+    skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, object : SkikoRenderDelegate {
         val paint = Paint().apply {
             color = Color.RED
         }
@@ -108,8 +108,7 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         window!!.rootViewController = SkikoViewController(
             SkikoUIView(
                 SkiaLayer().apply {
-                    gesturesToListen = SkikoGestureEventKind.values()
-                    skikoView = GenericSkikoView(skiaLayer, object : SkikoView {
+                    renderDelegate = SkiaLayerRenderDelegate(skiaLayer, object : SkikoRenderDelegate {
                       val paint = Paint().apply { color = Color.RED }
                       override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                         canvas.clear(Color.CYAN)

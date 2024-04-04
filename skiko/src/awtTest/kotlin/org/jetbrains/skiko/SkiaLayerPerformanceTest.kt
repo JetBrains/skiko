@@ -52,7 +52,7 @@ class SkiaLayerPerformanceTest {
         init {
             window.setSize(width, height)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.skikoView = object : SkikoView {
+            window.layer.renderDelegate = object : SkikoRenderDelegate {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     scene(canvas, width, height, nanoTime)
                     if (canCollect && frameTimes.size < frameCount) {

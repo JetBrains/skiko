@@ -31,16 +31,10 @@ actual open class SkiaLayer  {
         TODO("unimplemented")
     }
 
-    actual var skikoView: SkikoView? = null
+    actual var renderDelegate: SkikoRenderDelegate? = null
     actual val pixelGeometry: PixelGeometry
         get() = TODO("Not yet implemented")
 }
-
-// TODO: do properly
-actual typealias SkikoGesturePlatformEvent = Any
-actual typealias SkikoPlatformInputEvent = Any
-actual typealias SkikoPlatformKeyboardEvent = Any
-actual typealias SkikoPlatformPointerEvent = Any
 
 actual val currentSystemTheme: SystemTheme
     get() = SystemTheme.UNKNOWN

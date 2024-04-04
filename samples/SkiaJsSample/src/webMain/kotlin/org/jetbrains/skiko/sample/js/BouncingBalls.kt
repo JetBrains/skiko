@@ -4,12 +4,12 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color4f
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PaintMode
-import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.SkikoRenderDelegate
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BouncingBalls: SkikoView {
+class BouncingBalls: SkikoRenderDelegate {
     private data class Circle(var x: Float, var y: Float, var r: Float)
 
     companion object {

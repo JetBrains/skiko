@@ -43,32 +43,6 @@ class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(c
     fun scheduleFrame() {
         frameDispatcher.scheduleFrame()
     }
-
-    internal val gesturesDetector = SkikoGesturesDetector(context, layer)
-
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        layer.skikoView?.onPointerEvent(toSkikoPointerEvent(event, layer.contentScale))
-        return true
-    }
-
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        layer.skikoView?.onKeyboardEvent(
-            toSkikoKeyboardEvent(event, keyCode, SkikoKeyboardEventKind.DOWN)
-        )
-        if (event.unicodeChar != 0) {
-            layer.skikoView?.onInputEvent(
-                toSkikoTypeEvent(event, keyCode)
-            )
-        }
-        return true
-    }
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        layer.skikoView?.onKeyboardEvent(
-            toSkikoKeyboardEvent(event, keyCode, SkikoKeyboardEventKind.UP)
-        )
-        return true
-    }
 }
 
 private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manager: FrameManager) : GLSurfaceView.Renderer {
@@ -93,7 +67,7 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manag
 
     // This method is called from the main thread.
     fun update() {
-        layer.skikoView?.let {
+        layer.renderDelegate?.let {
             val bounds = Rect.makeWH(width.toFloat(), width.toFloat())
             val canvas = pictureRecorder.beginRecording(bounds)
             try {

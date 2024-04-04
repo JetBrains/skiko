@@ -23,6 +23,7 @@ fun swingSkiaResize() = SwingUtilities.invokeLater {
     }
 
     skiaPanel = SkiaSwingPanel(skikoView)
+    skiaPanel.addMouseMotionListener(skikoView)
 
     val leftPanel = JPanel().apply {
         background = Color.CYAN

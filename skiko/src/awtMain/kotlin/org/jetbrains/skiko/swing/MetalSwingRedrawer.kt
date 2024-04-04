@@ -10,7 +10,7 @@ import java.awt.Graphics2D
  *
  * For now, it uses drawing to [java.awt.image.BufferedImage] that cause VRAM <-> RAM memory transfer and so increased CPU usage.
  *
- * Content to draw is provided by [SkikoView].
+ * Content to draw is provided by [SkikoRenderDelegate].
  *
  * For on-screen rendering see [org.jetbrains.skiko.redrawer.MetalRedrawer].
  *
@@ -19,7 +19,7 @@ import java.awt.Graphics2D
  */
 internal class MetalSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
-    private val skikoView: SkikoView,
+    private val renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics
 ) : SwingRedrawerBase(swingLayerProperties, analytics, GraphicsApi.METAL) {
     companion object {
@@ -70,7 +70,7 @@ internal class MetalSwingRedrawer(
 
                 val canvas = surface.canvas
                 canvas.clear(Color.TRANSPARENT)
-                skikoView.onRender(canvas, width, height, nanoTime)
+                renderDelegate.onRender(canvas, width, height, nanoTime)
                 flush(surface, g)
             }
         }

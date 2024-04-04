@@ -3,21 +3,21 @@ package org.jetbrains.skiko.swing
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayerAnalytics
-import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.SkikoRenderDelegate
 import org.jetbrains.skiko.autoCloseScope
 import java.awt.Graphics2D
 
 /**
  * Provides a way to draw on Skia canvas using software rendering without GPU acceleration and then draw it on [java.awt.Graphics2D].
  *
- * Content to draw is provided by [SkikoView].
+ * Content to draw is provided by [SkikoRenderDelegate].
  *
  * @see SwingRedrawerBase
  * @see SwingOffscreenDrawer
  */
 internal class SoftwareSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
-    private val skikoView: SkikoView,
+    private val renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics
 ) : SwingRedrawerBase(
     swingLayerProperties,
@@ -48,7 +48,7 @@ internal class SoftwareSwingRedrawer(
 
         val canvas = Canvas(storage, SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)).autoClose()
         canvas.clear(Color.TRANSPARENT)
-        skikoView.onRender(canvas, width, height, nanoTime)
+        renderDelegate.onRender(canvas, width, height, nanoTime)
 
         flush(g)
     }
