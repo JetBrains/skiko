@@ -81,7 +81,7 @@ class SkiaLayerTest {
             window.setLocation(200, 200)
             window.setSize(400, 600)
             window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
-            window.layer.skikoView = object : SkikoView {
+            window.layer.renderDelegate = object : SkikoRenderDelegate {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     val c1 = counter1
                     val c2 = counter2
@@ -164,7 +164,7 @@ class SkiaLayerTest {
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             val app = RectRenderer(window.layer, 200, 100, Color.RED)
-            window.layer.skikoView = app
+            window.layer.renderDelegate = app
             window.isUndecorated = true
             window.isVisible = true
 
@@ -188,7 +188,7 @@ class SkiaLayerTest {
             window.preferredSize = Dimension(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             val app = RectRenderer(window.layer, 200, 100, Color.RED)
-            window.layer.skikoView = app
+            window.layer.renderDelegate = app
             window.isUndecorated = true
             window.pack()
             window.paint(window.graphics)
@@ -213,7 +213,7 @@ class SkiaLayerTest {
             properties = SkiaLayerProperties(renderApi = renderApi)
         )
         var renderedWidth = -1
-        layer.skikoView = object : SkikoView {
+        layer.renderDelegate = object : SkikoRenderDelegate {
             override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 renderedWidth = width
             }
@@ -268,7 +268,7 @@ class SkiaLayerTest {
             window.setLocation(200, 200)
             window.setSize(40, 20)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.skikoView = RectRenderer(window.layer, 20, 10, Color.RED)
+            window.layer.renderDelegate = RectRenderer(window.layer, 20, 10, Color.RED)
             window.isUndecorated = true
             window.isVisible = true
             delay(1000)
@@ -288,7 +288,7 @@ class SkiaLayerTest {
             setLocation(200, 200)
             setSize(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.skikoView = RectRenderer(layer, 200, 100, color)
+            layer.renderDelegate = RectRenderer(layer, 200, 100, color)
             isUndecorated = true
             isVisible = true
         }
@@ -355,7 +355,7 @@ class SkiaLayerTest {
             window.setLocation(200, 200)
             window.setSize(40, 20)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.skikoView = object : SkikoView {
+            window.layer.renderDelegate = object : SkikoRenderDelegate {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     renderCount++
                 }
@@ -386,7 +386,7 @@ class SkiaLayerTest {
             setLocation(200, 200)
             setSize(40, 20)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.skikoView = if (isAnimated) {
+            layer.renderDelegate = if (isAnimated) {
                 AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
             } else {
                 RectRenderer(layer, 20, 10, Color.RED)
@@ -430,7 +430,7 @@ class SkiaLayerTest {
             setLocation(200, 200)
             setSize(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.skikoView = AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
+            layer.renderDelegate = AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
             isVisible = true
         }
 
@@ -454,7 +454,7 @@ class SkiaLayerTest {
             setSize(400, 200)
             preferredSize = Dimension(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.skikoView = object : SkikoView {
+            layer.renderDelegate = object : SkikoRenderDelegate {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 }
             }
@@ -539,7 +539,7 @@ class SkiaLayerTest {
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             val app = RectRenderer(window.layer, 200, 100, Color.RED)
-            window.layer.skikoView = app
+            window.layer.renderDelegate = app
             window.isUndecorated = true
             window.isVisible = true
 
@@ -591,7 +591,7 @@ class SkiaLayerTest {
             window.setLocation(200, 200)
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.skikoView = object : SkikoView {
+            window.layer.renderDelegate = object : SkikoRenderDelegate {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     drawCount++
 
@@ -623,7 +623,7 @@ class SkiaLayerTest {
         try {
             window.setLocation(200, 200)
             window.setSize(400, 400)
-            window.layer.skikoView = object : SkikoView {
+            window.layer.renderDelegate = object : SkikoRenderDelegate {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     window.dispose()
                     SwingUtilities.invokeLater {
@@ -646,7 +646,7 @@ class SkiaLayerTest {
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             val app = RectRenderer(window.layer, 200, 100, Color.RED)
-            window.layer.skikoView = app
+            window.layer.renderDelegate = app
             window.isUndecorated = true
             window.isVisible = true
 
@@ -680,7 +680,7 @@ class SkiaLayerTest {
             panel.background = Color.GREEN
             contentPane.add(panel, BorderLayout.WEST)
 
-            layer.skikoView = RectRenderer(layer, 100, 100, Color.RED)
+            layer.renderDelegate = RectRenderer(layer, 100, 100, Color.RED)
             contentPane.add(layer, BorderLayout.CENTER)
         })
         try {
@@ -699,13 +699,13 @@ class SkiaLayerTest {
         excludeRenderApis = listOf(GraphicsApi.SOFTWARE_COMPAT)
     ) {
         val renderTimes = mutableListOf<Long>()
-        val renderer = object: SkikoView {
+        val renderer = object: SkikoRenderDelegate {
             override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 renderTimes.add(System.currentTimeMillis())
             }
         }
         val window = UiTestWindow {
-            layer.skikoView = renderer
+            layer.renderDelegate = renderer
             contentPane.add(layer, BorderLayout.CENTER)
         }
         try {
@@ -834,7 +834,7 @@ class SkiaLayerTest {
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             val app = RectRenderer(window.layer, 200, 100, Color.RED)
-            window.layer.skikoView = app
+            window.layer.renderDelegate = app
             window.isUndecorated = true
             window.isVisible = true
 
@@ -868,7 +868,7 @@ class SkiaLayerTest {
 
             val paragraph by lazy { paragraph(window.layer.contentScale * 40, "=-+Нп") }
 
-            window.layer.skikoView = object : SkikoView {
+            window.layer.renderDelegate = object : SkikoRenderDelegate {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     canvas.clear(Color.WHITE.rgb)
                     paragraph.layout(Float.POSITIVE_INFINITY)
@@ -901,7 +901,7 @@ class SkiaLayerTest {
         var rectWidth: Int,
         var rectHeight: Int,
         private val rectColor: Color
-    ) : SkikoView {
+    ) : SkikoRenderDelegate {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val dpi = layer.contentScale
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
@@ -917,7 +917,7 @@ class SkiaLayerTest {
         private val layer: SkiaLayer,
         private val pixelsPerSecond: Double,
         private val size: Double
-    ) : SkikoView {
+    ) : SkikoRenderDelegate {
         private var oldNanoTime = Long.MAX_VALUE
         private var x = 0.0
 
