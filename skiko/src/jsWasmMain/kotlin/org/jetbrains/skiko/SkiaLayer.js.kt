@@ -8,7 +8,7 @@ import org.jetbrains.skiko.wasm.createWebGLContext
 
 /**
  * Provides a way to render the content and to receive the input events.
- * Rendering and events processing should be implemented in [skikoView].
+ * Rendering and events processing should be implemented in [renderDelegate].
  *
  * SkikoLayer needs to be initialized with [HTMLCanvasElement] instance
  * using [attachTo] method.
@@ -53,7 +53,7 @@ actual open class SkiaLayer {
     }
 
     /**
-     * An implementation of SkikoView with content rendering and
+     * An implementation of [SkikoRenderDelegate] with content rendering and
      * event processing logic.
      */
     actual var renderDelegate: SkikoRenderDelegate? = null
@@ -76,7 +76,7 @@ actual open class SkiaLayer {
 
     /**
      * Initializes the [CanvasRenderer] and events listeners.
-     * Delegates rendering and events processing to [skikoView].
+     * Delegates rendering and events processing to [renderDelegate].
      */
     private fun attachTo(htmlCanvas: HTMLCanvasElement) {
         this.htmlCanvas = htmlCanvas

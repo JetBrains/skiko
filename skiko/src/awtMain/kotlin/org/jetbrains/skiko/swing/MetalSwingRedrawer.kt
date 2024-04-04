@@ -10,7 +10,7 @@ import java.awt.Graphics2D
  *
  * For now, it uses drawing to [java.awt.image.BufferedImage] that cause VRAM <-> RAM memory transfer and so increased CPU usage.
  *
- * Content to draw is provided by [SkikoView].
+ * Content to draw is provided by [SkikoRenderDelegate].
  *
  * For on-screen rendering see [org.jetbrains.skiko.redrawer.MetalRedrawer].
  *

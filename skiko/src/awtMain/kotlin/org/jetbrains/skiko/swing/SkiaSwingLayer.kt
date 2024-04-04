@@ -10,7 +10,7 @@ import javax.swing.JComponent
 import javax.swing.SwingUtilities.isEventDispatchThread
 
 /**
- * Swing component that draws content provided by [skikoView] with GPU acceleration using Skia engine.
+ * Swing component that draws content provided by [renderDelegate] with GPU acceleration using Skia engine.
  *
  * Drawn content can be clipped by providing [ClipRectangle] to [clipComponents].
  *

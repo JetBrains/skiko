@@ -10,7 +10,7 @@ import java.awt.Graphics2D
 /**
  * Provides a way to draw on Skia canvas using software rendering without GPU acceleration and then draw it on [java.awt.Graphics2D].
  *
- * Content to draw is provided by [SkikoView].
+ * Content to draw is provided by [SkikoRenderDelegate].
  *
  * @see SwingRedrawerBase
  * @see SwingOffscreenDrawer

@@ -22,7 +22,7 @@ internal interface SwingRedrawer {
 }
 
 /**
- * Creates a [SwingRedrawer] that will draw content provided by [skikoView]
+ * Creates a [SwingRedrawer] that will draw content provided by [renderDelegate]
  */
 internal fun createSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,

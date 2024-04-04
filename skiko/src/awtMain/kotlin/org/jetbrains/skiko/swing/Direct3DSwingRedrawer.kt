@@ -49,7 +49,7 @@ internal class Direct3DSwingRedrawer(
             // Calculate aligned width that is needed for performance optimization,
             // since DirectX uses aligned bytebuffer.
             // So we will have [Surface] with width == [alignedWidth],
-            // but imitate (for SkikoView and Swing) like it has width == [width].
+            // but imitate (for SkikoRenderDelegate and Swing) like it has width == [width].
             val alignedWidth = if (width % widthSizeAlignment != 0) {
                 width + widthSizeAlignment - (width % widthSizeAlignment);
             } else {
