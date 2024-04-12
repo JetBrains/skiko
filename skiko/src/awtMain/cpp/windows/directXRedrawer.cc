@@ -21,9 +21,36 @@
 #include <dxgi1_6.h>
 
 #include <dcomp.h>
-#pragma comment(lib, "dcomp.lib")
 
 const int BuffersCount = 2;
+
+namespace DCompLibrary {
+    static bool isInit = false;
+    static HINSTANCE library = nullptr;
+
+    void load() {
+        if (!isInit) {
+            isInit = true;
+            library = LoadLibrary("dcomp.dll");
+        }
+    }
+
+    HRESULT DCompositionCreateDevice(
+        IDXGIDevice *dxgiDevice,
+        REFIID      iid,
+        void        **dcompositionDevice
+    ) {
+        load();
+
+        if (library != nullptr) {
+            typedef HRESULT(WINAPI * PROC_DCompositionCreateDevice)(IDXGIDevice * dxgiDevice, REFIID iid, void **dcompositionDevice);
+            static auto compositionCreateDevice = (PROC_DCompositionCreateDevice) GetProcAddress(library, "DCompositionCreateDevice");
+            return compositionCreateDevice(dxgiDevice, iid, dcompositionDevice);
+        } else {
+            return E_FAIL;
+        }
+    }
+};
 
 class DirectXDevice
 {
@@ -95,7 +122,7 @@ private:
         HRESULT result = swapChainFactory4->CreateSwapChainForComposition(queue.get(), &swapChainDesc, nullptr, swapChain1);
         if (FAILED(result)) { return result; }
 
-        result = DCompositionCreateDevice(0, IID_PPV_ARGS(&dcDevice));
+        result = DCompLibrary::DCompositionCreateDevice(0, IID_PPV_ARGS(&dcDevice));
         if (FAILED(result)) { return result; }
         result = dcDevice->CreateTargetForHwnd(hWnd, true, &dcTarget);
         if (FAILED(result)) { return result; }
