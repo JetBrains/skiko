@@ -12,6 +12,7 @@
 #include "SkSurface.h"
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
 #include "../common/interop.hh"
+#include "DCompLibrary.h"
 
 #include "d3d/GrD3DTypes.h"
 #include <d3d12sdklayers.h>
@@ -19,9 +20,6 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>
-
-#include <dcomp.h>
-#pragma comment(lib, "dcomp.lib")
 
 const int BuffersCount = 2;
 
@@ -95,7 +93,7 @@ private:
         HRESULT result = swapChainFactory4->CreateSwapChainForComposition(queue.get(), &swapChainDesc, nullptr, swapChain1);
         if (FAILED(result)) { return result; }
 
-        result = DCompositionCreateDevice(0, IID_PPV_ARGS(&dcDevice));
+        result = DCompLibrary::DCompositionCreateDevice(0, IID_PPV_ARGS(&dcDevice));
         if (FAILED(result)) { return result; }
         result = dcDevice->CreateTargetForHwnd(hWnd, true, &dcTarget);
         if (FAILED(result)) { return result; }
