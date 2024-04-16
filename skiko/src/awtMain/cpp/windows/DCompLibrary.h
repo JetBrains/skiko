@@ -8,4 +8,4 @@ namespace DCompLibrary {
         REFIID iid,
         void **dcompositionDevice
     );
-};
+}
