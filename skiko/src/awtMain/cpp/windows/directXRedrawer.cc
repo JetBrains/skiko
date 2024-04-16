@@ -12,7 +12,7 @@
 #include "SkSurface.h"
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
 #include "../common/interop.hh"
-#include "include/DCompLibrary.h"
+#include "DCompLibrary.h"
 
 #include "d3d/GrD3DTypes.h"
 #include <d3d12sdklayers.h>

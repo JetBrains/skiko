@@ -1,6 +1,4 @@
-#pragma once
-
-#include "include/DCompLibrary.h"
+#include "DCompLibrary.h"
 
 namespace DCompLibrary {
     static HINSTANCE getLibrary() {
