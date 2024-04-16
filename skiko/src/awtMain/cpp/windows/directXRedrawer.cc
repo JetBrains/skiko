@@ -12,6 +12,7 @@
 #include "SkSurface.h"
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
 #include "../common/interop.hh"
+#include "DCompLibrary.hh"
 
 #include "d3d/GrD3DTypes.h"
 #include <d3d12sdklayers.h>
@@ -20,37 +21,7 @@
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>
 
-#include <dcomp.h>
-
 const int BuffersCount = 2;
-
-namespace DCompLibrary {
-    static bool isInit = false;
-    static HINSTANCE library = nullptr;
-
-    void load() {
-        if (!isInit) {
-            isInit = true;
-            library = LoadLibrary("dcomp.dll");
-        }
-    }
-
-    HRESULT DCompositionCreateDevice(
-        IDXGIDevice *dxgiDevice,
-        REFIID      iid,
-        void        **dcompositionDevice
-    ) {
-        load();
-
-        if (library != nullptr) {
-            typedef HRESULT(WINAPI * PROC_DCompositionCreateDevice)(IDXGIDevice * dxgiDevice, REFIID iid, void **dcompositionDevice);
-            static auto compositionCreateDevice = (PROC_DCompositionCreateDevice) GetProcAddress(library, "DCompositionCreateDevice");
-            return compositionCreateDevice(dxgiDevice, iid, dcompositionDevice);
-        } else {
-            return E_FAIL;
-        }
-    }
-};
 
 class DirectXDevice
 {
