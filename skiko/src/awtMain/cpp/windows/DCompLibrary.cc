@@ -21,4 +21,4 @@ namespace DCompLibrary {
             return E_FAIL;
         }
     }
-};
+}
