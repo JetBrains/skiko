@@ -3,7 +3,7 @@
 #include "include/DCompLibrary.h"
 
 namespace DCompLibrary {
-    HINSTANCE getLibrary() {
+    static HINSTANCE getLibrary() {
         static HINSTANCE library = LoadLibrary("dcomp.dll");
         return library;
     }
