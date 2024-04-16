@@ -1,6 +1,6 @@
 #pragma once
 
-#include <dcomp.h>
+#include "include/DCompLibrary.h"
 
 namespace DCompLibrary {
     HINSTANCE getLibrary() {
@@ -10,8 +10,8 @@ namespace DCompLibrary {
 
     HRESULT DCompositionCreateDevice(
         IDXGIDevice *dxgiDevice,
-        REFIID      iid,
-        void        **dcompositionDevice
+        REFIID iid,
+        void **dcompositionDevice
     ) {
         HINSTANCE library = getLibrary();
 
