@@ -10,25 +10,39 @@ internal class RenderExceptionsHandler {
         private var output: File? = null
         @JvmStatic
         fun throwException(message: String) {
-            if (output == null) {
-                output = File(
-                    "${SkikoProperties.dataPath}/skiko-render-exception-${ProcessHandle.current().pid()}.log"
-                )
-            }
             val exception = RenderException(message)
+            val systemInfo = systemInfo()
+            Logger.error(exception) { "Render exception\n $systemInfo" }
+
             if (System.getProperty("skiko.win.exception.logger.enabled") == "true") {
-                writeLog(exception)
+                try {
+                    if (output == null) {
+                        output = File(
+                            "${SkikoProperties.dataPath}/skiko-render-exception-${ProcessHandle.current().pid()}.log"
+                        )
+                        output!!.parentFile.mkdirs()
+                    }
+                    output?.appendText("$systemInfo\n")
+                    output?.appendText(exceptionToString(exception))
+                } catch (t: Throwable) {
+                    Logger.error(t) { "Failed to write report" }
+                }
             }
             throw exception
         }
 
-        private fun writeLog(exception: Exception) {
-            val outputBuilder = StringBuilder().apply {
+        private fun systemInfo(): String {
+            return StringBuilder().apply {
                 append("When: ${SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(Date())}\n")
                 append("Skiko version: ${Version.skiko}\n")
                 append("OS: $hostFullName\n")
                 append("CPU: ${getNativeCpuInfo()}\n")
-                append("Graphics adapters:\n${getNativeGraphicsAdapterInfo()}\n")
+                append("Graphics adapters:\n${getNativeGraphicsAdapterInfo()}")
+            }.toString()
+        }
+
+        private fun exceptionToString(exception: Exception): String {
+            return StringBuilder().apply {
                 append("Exception message: ${exception.message}\n")
                 append("Exception stack trace:\n")
                 val stackTrace = exception.stackTrace.filterIndexed { line, _ -> line > 1 }
@@ -36,8 +50,7 @@ internal class RenderExceptionsHandler {
                     append("$line\n")
                 }
                 append("\n\n")
-            }
-            output?.appendText(outputBuilder.toString())
+            }.toString()
         }
     }
 }
