@@ -67,6 +67,8 @@ object SkikoProperties {
         return value?.let(GpuPriority::parseOrNull) ?: GpuPriority.Auto
     }
 
+    val macOsOpenGLEnabled: Boolean get() = getProperty("skiko.macos.opengl.enabled")?.toBoolean() ?: false
+
     internal fun parseRenderApi(text: String?): GraphicsApi {
         when(text) {
             "SOFTWARE_COMPAT" -> return GraphicsApi.SOFTWARE_COMPAT
