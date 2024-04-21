@@ -1,9 +1,11 @@
 package org.jetbrains.skiko
 
 import java.awt.Component
+import java.awt.Frame.MAXIMIZED_BOTH
 import java.awt.Window
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
 /**
@@ -57,6 +59,7 @@ internal class FullscreenAdapter(
 internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
+    fun setMaximized(component: Component, value: Boolean)
     fun disableTitleBar(component: Component, headerHeight: Float)
     fun orderEmojiAndSymbolsPopup()
 }
@@ -71,6 +74,10 @@ internal val platformOperations: PlatformOperations by lazy {
 
                 override fun setFullscreen(component: Component, value: Boolean) {
                     osxSetFullscreenNative(component, value)
+                }
+
+                override fun setMaximized(component: Component, value: Boolean) {
+                    osxSetMaximizedNative(component, value)
                 }
 
                 override fun disableTitleBar(component: Component, headerHeight: Float) {
@@ -96,6 +103,16 @@ internal val platformOperations: PlatformOperations by lazy {
                     device.fullScreenWindow = if (value) window else null
                 }
 
+                override fun setMaximized(component: Component, value: Boolean) {
+                    val window = SwingUtilities.getRoot(component) as JFrame
+
+                    if (value) {
+                        window.extendedState = window.extendedState or MAXIMIZED_BOTH
+                    } else {
+                        window.extendedState = window.extendedState and MAXIMIZED_BOTH.inv()
+                    }
+                }
+
                 override fun disableTitleBar(component: Component, headerHeight: Float) {
                 }
 
@@ -117,6 +134,16 @@ internal val platformOperations: PlatformOperations by lazy {
                     device.fullScreenWindow = if (value) window else null
                 }
 
+                override fun setMaximized(component: Component, value: Boolean) {
+                    val window = SwingUtilities.getRoot(component) as JFrame
+
+                    if (value) {
+                        window.extendedState = window.extendedState or MAXIMIZED_BOTH
+                    } else {
+                        window.extendedState = window.extendedState and MAXIMIZED_BOTH.inv()
+                    }
+                }
+
                 override fun disableTitleBar(component: Component, headerHeight: Float) {
                 }
 
@@ -134,5 +161,6 @@ internal val platformOperations: PlatformOperations by lazy {
 // OSX
 external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)
+external private fun osxSetMaximizedNative(component: Component, value: Boolean)
 external private fun osxDisableTitleBar(component: Component, headerHeight: Float)
 external private fun osxOrderEmojiAndSymbolsPopup()
