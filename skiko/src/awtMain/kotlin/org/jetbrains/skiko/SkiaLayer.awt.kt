@@ -216,9 +216,11 @@ actual open class SkiaLayer internal constructor(
             fullscreenAdapter.fullscreen = value
         }
 
-    fun setMaximized(value: Boolean) {
-        backedLayer.setMaximized(value)
-    }
+    var maximized: Boolean
+        get() = backedLayer.maximized
+        set(value) {
+            backedLayer.maximized = value
+        }
 
     actual val component: Any?
         get() = backedLayer
