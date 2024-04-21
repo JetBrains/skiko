@@ -127,6 +127,10 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun setMaximized(component: Component, value: Boolean) {
                     val window = SwingUtilities.getRoot(component) as JFrame
 
+                    if (isFullscreen(component)) {
+                        setFullscreen(component, false)
+                    }
+
                     if (value) {
                         window.extendedState = window.extendedState or MAXIMIZED_BOTH
                     } else {
@@ -162,6 +166,10 @@ internal val platformOperations: PlatformOperations by lazy {
 
                 override fun setMaximized(component: Component, value: Boolean) {
                     val window = SwingUtilities.getRoot(component) as JFrame
+
+                    if (isFullscreen(component)) {
+                        setFullscreen(component, false)
+                    }
 
                     if (value) {
                         window.extendedState = window.extendedState or MAXIMIZED_BOTH
