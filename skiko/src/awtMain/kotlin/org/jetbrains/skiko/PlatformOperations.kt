@@ -59,6 +59,7 @@ internal class FullscreenAdapter(
 internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
+    fun isMaximized(component: Component): Boolean
     fun setMaximized(component: Component, value: Boolean)
     fun disableTitleBar(component: Component, headerHeight: Float)
     fun orderEmojiAndSymbolsPopup()
@@ -76,8 +77,23 @@ internal val platformOperations: PlatformOperations by lazy {
                     osxSetFullscreenNative(component, value)
                 }
 
+                override fun isMaximized(component: Component): Boolean {
+                    val window = SwingUtilities.getRoot(component) as JFrame
+                    return window.extendedState and MAXIMIZED_BOTH == MAXIMIZED_BOTH
+                }
+
                 override fun setMaximized(component: Component, value: Boolean) {
-                    osxSetMaximizedNative(component, value)
+                    if (isFullscreen(component)) {
+                        osxSetMaximizedNative(component, value)
+                    } else {
+                        val window = SwingUtilities.getRoot(component) as JFrame
+
+                        if (value) {
+                            window.extendedState = window.extendedState or MAXIMIZED_BOTH
+                        } else {
+                            window.extendedState = window.extendedState and MAXIMIZED_BOTH.inv()
+                        }
+                    }
                 }
 
                 override fun disableTitleBar(component: Component, headerHeight: Float) {
@@ -101,6 +117,11 @@ internal val platformOperations: PlatformOperations by lazy {
                     val window = SwingUtilities.getRoot(component) as Window
                     val device = window.graphicsConfiguration.device
                     device.fullScreenWindow = if (value) window else null
+                }
+
+                override fun isMaximized(component: Component): Boolean {
+                    val window = SwingUtilities.getRoot(component) as JFrame
+                    return window.extendedState and MAXIMIZED_BOTH == MAXIMIZED_BOTH
                 }
 
                 override fun setMaximized(component: Component, value: Boolean) {
@@ -132,6 +153,11 @@ internal val platformOperations: PlatformOperations by lazy {
                     val window = SwingUtilities.getRoot(component) as Window
                     val device = window.graphicsConfiguration.device
                     device.fullScreenWindow = if (value) window else null
+                }
+
+                override fun isMaximized(component: Component): Boolean {
+                    val window = SwingUtilities.getRoot(component) as JFrame
+                    return window.extendedState and MAXIMIZED_BOTH == MAXIMIZED_BOTH
                 }
 
                 override fun setMaximized(component: Component, value: Boolean) {
