@@ -347,6 +347,62 @@ class SkiaLayerTest {
     }
 
     @Test
+    fun `window maximized state in componentResized`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            var stateRemainsMaximized = true
+            window.layer.maximized = true
+            window.addComponentListener(object: ComponentAdapter(){
+                override fun componentResized(e: ComponentEvent?) {
+                    if (!window.layer.maximized)
+                        stateRemainsMaximized = false
+                }
+            })
+            window.isVisible = true
+
+            delay(1000)
+            assertEquals(true, stateRemainsMaximized)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `window maximized state in fullscreen`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.fullscreen = true
+            window.isVisible = true
+
+            // Test exiting fullscreen to maximized=true
+            delay(1000)
+            window.layer.maximized = true
+            delay(2000)
+            assertEquals(false, window.layer.fullscreen)
+            assertEquals(true, window.layer.maximized)
+
+            window.layer.fullscreen = true
+
+            // Test exiting fullscreen to maximized=false
+            delay(1000)
+            window.layer.maximized = false
+            delay(2000)
+            assertEquals(false, window.layer.fullscreen)
+            assertEquals(false, window.layer.maximized)
+        } finally {
+            window.close()
+
+            // Delay before starting next test to let the window animation to complete, and allow the next window
+            // to become fullscreen
+            if (hostOs == OS.MacOS) {
+                delay(1000)
+            }
+        }
+    }
+
+    @Test
     fun `should call onRender after init, after resize, and only once after needRedraw`() = uiTest {
         var renderCount = 0
 
