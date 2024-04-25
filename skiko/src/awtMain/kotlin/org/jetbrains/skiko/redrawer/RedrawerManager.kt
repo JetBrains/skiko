@@ -28,9 +28,7 @@ internal class RedrawerManager<R>(
             thrown = false
             try {
                 _renderApi = fallbackRenderApiQueue.removeAt(0)
-                val oldRedrawer = redrawer
-                _redrawer = null
-                _redrawer = redrawerFactory(_renderApi, oldRedrawer)
+                _redrawer = redrawerFactory(_renderApi, redrawer)
             } catch (e: RenderException) {
                 Logger.warn(e) { "Fallback to next API" }
                 thrown = true
