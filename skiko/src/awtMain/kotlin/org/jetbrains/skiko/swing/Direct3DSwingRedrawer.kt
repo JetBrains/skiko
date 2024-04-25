@@ -20,12 +20,6 @@ internal class Direct3DSwingRedrawer(
     }
 
     private val device = createDirectXOffscreenDevice(adapter)
-        get() {
-            if (field == 0L) {
-                throw RenderException("DirectX12 device is not initialized or already disposed")
-            }
-            return field
-        }
 
     private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
