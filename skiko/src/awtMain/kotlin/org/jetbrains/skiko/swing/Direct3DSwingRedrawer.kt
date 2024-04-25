@@ -29,9 +29,13 @@ internal class Direct3DSwingRedrawer(
 
     private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
-    private val context = DirectContext(
-        makeDirectXContext(device)
-    )
+    private val context = if (device == 0L) {
+        throw RenderException("Failed to create DirectX12 device.")
+    } else {
+        DirectContext(
+            makeDirectXContext(device)
+        )
+    }
 
     private var texturePtr: Long = 0
     private var bytesToDraw = ByteArray(0)
