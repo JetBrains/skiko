@@ -30,6 +30,7 @@ internal class RedrawerManager<R>(
                 _renderApi = fallbackRenderApiQueue.removeAt(0)
                 _redrawer = redrawerFactory(_renderApi, redrawer)
             } catch (e: RenderException) {
+                _redrawer = null
                 Logger.warn(e) { "Fallback to next API" }
                 thrown = true
             }
