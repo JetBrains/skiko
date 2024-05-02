@@ -6,10 +6,7 @@ import org.jetbrains.skiko.redrawer.dispatcherToBlockOn
 import java.awt.Canvas
 import java.awt.Component
 import java.awt.Graphics
-import java.awt.KeyboardFocusManager
-import java.awt.event.FocusEvent
 import java.awt.event.InputMethodEvent
-import java.beans.PropertyChangeEvent
 import javax.accessibility.Accessible
 import javax.accessibility.AccessibleContext
 
@@ -29,7 +26,7 @@ internal open class HardwareLayer(
     }
 
     open fun dispose() {
-        resetFocusAccessibleJob?.cancel()
+        nativeAccessibleFocusHelper.dispose()
         nativeDispose()
     }
 
@@ -61,47 +58,18 @@ internal open class HardwareLayer(
     private external fun getWindowHandle(platformInfo: Long): Long
     private external fun getCurrentDPI(platformInfo: Long): Int
 
-    private val _externalAccessible = externalAccessibleFactory?.invoke(this)
-    private var _focusedAccessible: Accessible? = null
-    override fun getAccessibleContext(): AccessibleContext {
-        val res = (_focusedAccessible ?: _externalAccessible)?.accessibleContext
-        return res ?: super.getAccessibleContext()
-    }
+    @Suppress("LeakingThis")
+    private val nativeAccessibleFocusHelper = NativeAccessibleFocusHelper(
+        component = this,
+        externalAccessible = externalAccessibleFactory?.invoke(this)
+    )
 
-    private var resetFocusAccessibleJob: Job? = null
+    override fun getAccessibleContext(): AccessibleContext {
+        return nativeAccessibleFocusHelper.accessibleContext ?: super.getAccessibleContext()
+    }
 
     fun requestNativeFocusOnAccessible(accessible: Accessible?) {
-        _focusedAccessible = accessible
-
-        when (hostOs) {
-            OS.Windows -> requestAccessBridgeFocusOnAccessible()
-            OS.MacOS -> requestMacOSFocusOnAccessible(accessible)
-            else -> {
-                _focusedAccessible = null
-                return
-            }
-        }
-
-        // Listener spawns asynchronous notification post procedure, reading current focus owner
-        // and its accessibility context. This timeout is used to deal with concurrency
-        // TODO Find more reliable procedure
-        resetFocusAccessibleJob?.cancel()
-        resetFocusAccessibleJob = GlobalScope.launch(MainUIDispatcher) {
-            delay(100)
-            _focusedAccessible = null
-        }
-    }
-
-    private fun requestAccessBridgeFocusOnAccessible() {
-        val focusEvent = FocusEvent(this, FocusEvent.FOCUS_GAINED)
-        focusListeners.forEach { it.focusGained(focusEvent) }
-    }
-
-    private fun requestMacOSFocusOnAccessible(accessible: Accessible?) {
-        val focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager()
-        val listeners = focusManager.getPropertyChangeListeners("focusOwner")
-        val event = PropertyChangeEvent(focusManager, "focusOwner", null, accessible)
-        listeners.forEach { it.propertyChange(event) }
+        nativeAccessibleFocusHelper.requestNativeFocusOnAccessible(accessible)
     }
 }
 
@@ -144,7 +112,7 @@ internal fun layerFrameLimiter(
  *
  * JDK's accessibility support (at least for MacOS) builds mapping AccessibleContext -> Accessible.
  * Some [Accessible] are built only when focus is settled and
- * since we have a hack [requestNativeFocusOnAccessible], wrong mapping can be built
+ * since we have a hack [NativeAccessibleFocusHelper.requestNativeFocusOnAccessible], wrong mapping can be built
  * (ComponentAccessibleContext -> SkiaLayer instead of ComponentAccessibleContext -> ComponentAccessible).
  *
  * This method forces JDK's accessibility support to cache mapping ComponentAccessibleContext -> ComponentAccessible,

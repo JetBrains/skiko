@@ -3,9 +3,11 @@ package org.jetbrains.skiko.swing
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.redrawer.RedrawerManager
+import java.awt.Component
 import java.awt.Graphics2D
 import java.awt.GraphicsConfiguration
 import javax.accessibility.Accessible
+import javax.accessibility.AccessibleContext
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
@@ -25,6 +27,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 open class SkiaSwingLayer(
     renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+    externalAccessibleFactory: ((Component) -> Accessible)? = null,
 ) : JPanel() {
     internal companion object {
         init {
@@ -119,7 +122,17 @@ open class SkiaSwingLayer(
         }
     }
 
+    @Suppress("LeakingThis")
+    private val nativeAccessibleFocusHelper = NativeAccessibleFocusHelper(
+        component = this,
+        externalAccessible = externalAccessibleFactory?.invoke(this)
+    )
+
+    override fun getAccessibleContext(): AccessibleContext {
+        return nativeAccessibleFocusHelper.accessibleContext ?: super.getAccessibleContext()
+    }
+
     fun requestNativeFocusOnAccessible(accessible: Accessible?) {
-        // TODO: support accessibility
+        nativeAccessibleFocusHelper.requestNativeFocusOnAccessible(accessible)
     }
 }
