@@ -7,6 +7,7 @@ import java.awt.Graphics2D
 import java.awt.GraphicsConfiguration
 import javax.accessibility.Accessible
 import javax.swing.JComponent
+import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
 /**
@@ -24,7 +25,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 open class SkiaSwingLayer(
     renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
-) : JComponent() {
+) : JPanel() {
     internal companion object {
         init {
             Library.load()
