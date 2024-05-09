@@ -2601,10 +2601,11 @@ $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits/spellCheckingType
 $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits/textContentType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-skiko-u-i-text-input-traits/text-content-type.html
 $dokka.location:org.jetbrains.skiko.swing////PointingToDeclaration/skiko/org.jetbrains.skiko.swing/index.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer///PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/index.html
-$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/SkiaSwingLayer/#org.jetbrains.skiko.SkikoRenderDelegate#org.jetbrains.skiko.SkiaLayerAnalytics/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/-skia-swing-layer.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/SkiaSwingLayer/#org.jetbrains.skiko.SkikoRenderDelegate#org.jetbrains.skiko.SkiaLayerAnalytics#kotlin.Function1[java.awt.Component,javax.accessibility.Accessible]?/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/-skia-swing-layer.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/addNotify/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/add-notify.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/clipComponents/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/clip-components.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/dispose/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/dispose.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/getAccessibleContext/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/get-accessible-context.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/paint/#java.awt.Graphics/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/paint.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/removeNotify/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/remove-notify.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/render-api.html
