@@ -229,8 +229,6 @@ actual open class SkiaLayer internal constructor(
         jComponent.add(this)
     }
 
-    private var keyEvent: KeyEvent? = null
-
     val clipComponents = mutableListOf<ClipRectangle>()
 
     @Volatile
@@ -324,6 +322,16 @@ actual open class SkiaLayer internal constructor(
         } else {
             redrawer?.redrawImmediately()
         }
+    }
+
+    override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
+        super.setBounds(x, y, width, height)
+
+        // To avoid visual artifacts (especially on Windows/DirectX),
+        // redrawing should be performed immediately, without scheduling to "later".
+        // Subscribing to events instead of overriding this method won't help too.
+        redrawer?.syncSize()
+        redrawer?.redrawImmediately()
     }
 
     // Workaround for JBR-5274 and JBR-5305
