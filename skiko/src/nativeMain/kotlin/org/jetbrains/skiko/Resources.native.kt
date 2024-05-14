@@ -1,10 +1,12 @@
 package org.jetbrains.skiko
 
+import kotlinx.cinterop.UnsafeNumber
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
 import platform.posix.*
 
+@OptIn(UnsafeNumber::class)
 actual suspend fun loadBytesFromPath(path: String): ByteArray {
     val file = fopen(path, "r") ?: run {
         val error = strerror(errno)?.toKString() ?: "Unknown error"
@@ -28,7 +30,7 @@ actual suspend fun loadBytesFromPath(path: String): ByteArray {
         throw Error("File '$path' is too long")
     }
 
-    if (size == 0L) {
+    if (size.toLong() == 0L) {
         fclose(file)
         return byteArrayOf()
     }

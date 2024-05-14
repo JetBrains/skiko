@@ -19,6 +19,12 @@ enum class OS(
     val isMacOs
         get() = this == MacOS
 
+    val libExtension
+        get() = when(this) {
+            Windows -> "lib"
+            else -> "a"
+        }
+
     fun idWithSuffix(isIosSim: Boolean = false): String {
         return id + if (isIosSim) "Sim" else ""
     }
