@@ -7,15 +7,10 @@
     sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip libx11-dev
     ```
   * `Windows`
-    1. Download [Visual Studio Build Tools 2019](https://learn.microsoft.com/en-us/visualstudio/releases/2019/history) (search "BuildTools" on the page).
-    2. During the installation, select "Desktop development with C++"
-    3. Add an environment variable SKIKO_VSBT_PATH=C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools
+    1. Download [LLVM](https://github.com/llvm/llvm-project/releases/tag/llvmorg-17.0.1) (search "LLVM-version-x64.exe" on the page).
+    2. Add the "bin" folder into your PATH
     ```
     Control Panel|All Control Panel Items|System|Advanced system settings|Environment variables
-    ```
-    or by running `cmd` as administrator:
-    ```
-    setx /M SKIKO_VSBT_PATH "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools"
     ```
 
 * Install Emscripten
