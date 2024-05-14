@@ -105,7 +105,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
     private val compilerArgsRootDir = taskStateDir.map { it.dir("args") }
 
     override fun createArgBuilder(): ArgBuilder =
-        if (buildTargetOS.get().isWindows) VisualCppCompilerArgBuilder()
+        if (buildTargetOS.get().isWindows) WindowsClangArgBuilder()
         else super.createArgBuilder()
 
     override fun execute(mode: ToolMode, args: ArgBuilder) {
@@ -148,7 +148,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
                 arg("-o", outputFile.absolutePath.replace("\\", "/"))
                 arg(value = sourceFile.absolutePath.replace("\\", "/"))
                 if (compiler.get().startsWith("clang")) {
-                    arg("-MJ", outputFile.absolutePath + ".json")
+                    arg("-MJ", outputFile.absolutePath.replace("\\", "/") + ".json")
                 }
             }
 

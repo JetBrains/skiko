@@ -97,6 +97,12 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                     *skiaPreprocessorFlags(OS.Linux, buildType)
                 ))
             }
+            OS.Windows -> {
+                flags.set(listOf(
+                    *buildType.clangFlags,
+                    *skiaPreprocessorFlags(OS.Windows, buildType)
+                ))
+            }
             else -> throw GradleException("$os not yet supported")
         }
 
@@ -248,6 +254,10 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             OS.MacOS, OS.IOS -> {
                 executable = "libtool"
                 argumentProviders.add { listOf("-static", "-o", staticLib) }
+            }
+            OS.Windows -> {
+                executable = "llvm-lib"
+                argumentProviders.add { listOf("/out:$staticLib") }
             }
             else -> error("Unexpected OS for native bridges linking: $os")
         }

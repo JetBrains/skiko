@@ -88,6 +88,11 @@ internal class DefaultArgBuilder() : AbstractArgBuilder() {
     override fun newSelfInstance(): ArgBuilder = DefaultArgBuilder()
 }
 
+internal class WindowsClangArgBuilder: BaseVisualStudioBuildToolsArgBuilder() {
+    override fun newSelfInstance(): ArgBuilder = WindowsClangArgBuilder()
+
+}
+
 internal class VisualCppCompilerArgBuilder : BaseVisualStudioBuildToolsArgBuilder() {
     private val objectOutputArg = "/Fo"
     private val includeDirArg = "/I"

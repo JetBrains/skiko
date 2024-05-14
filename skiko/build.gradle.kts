@@ -140,6 +140,9 @@ kotlin {
     if (supportNativeIosX64) {
         skikoProjectContext.configureNativeTarget(OS.IOS, Arch.X64, iosX64())
     }
+    if(supportNativeMingwX64) {
+        skikoProjectContext.configureNativeTarget(OS.Windows, Arch.X64, mingwX64())
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -270,6 +273,20 @@ kotlin {
                     }
                     val linuxX64Test by getting {
                         dependsOn(linuxTest)
+                    }
+                }
+                if(supportNativeMingwX64) {
+                    val mingwMain by creating {
+                        dependsOn(nativeMain)
+                    }
+                    val mingwTest by creating {
+                        dependsOn(nativeTest)
+                    }
+                    val mingwX64Main by getting {
+                        dependsOn(mingwMain)
+                    }
+                    val mingwX64Test by getting {
+                        dependsOn(mingwTest)
                     }
                 }
                 if (supportAnyNativeIos || supportNativeMac) {

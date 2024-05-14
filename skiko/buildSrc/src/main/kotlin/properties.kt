@@ -41,7 +41,7 @@ fun compilerForTarget(os: OS, arch: Arch): String =
             Arch.Wasm -> "Unexpected combination: $os & $arch"
         }
         OS.Android -> "clang++"
-        OS.Windows -> "cl.exe"
+        OS.Windows -> "clang++.exe"
         OS.MacOS, OS.IOS -> "clang++"
         OS.Wasm -> "emcc"
     }
