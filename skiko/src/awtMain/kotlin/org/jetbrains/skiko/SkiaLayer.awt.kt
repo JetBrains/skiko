@@ -324,6 +324,8 @@ actual open class SkiaLayer internal constructor(
     }
 
     private fun tryRedrawImmediately() {
+        if (!isShowing) return
+
         // It might be called inside `renderDelegate`,
         // so to avoid recursive call (not supported) just schedule redrawing.
         //
