@@ -310,18 +310,7 @@ actual open class SkiaLayer internal constructor(
     override fun paint(g: java.awt.Graphics) {
         Logger.debug { "Paint called on: $this" }
         checkContentScale()
-
-        // `paint` can be called when we already inside `draw` method.
-        //
-        // For example if we call some AWT function inside renderer.onRender,
-        // such as `jframe.isEnabled = false` on Linux
-        //
-        // To avoid recursive call of `draw` (we don't support recursive calls) we just schedule redrawing.
-        if (isRendering) {
-            redrawer?.needRedraw()
-        } else {
-            redrawer?.redrawImmediately()
-        }
+        tryRedrawImmediately()
     }
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
@@ -331,7 +320,20 @@ actual open class SkiaLayer internal constructor(
         // redrawing should be performed immediately, without scheduling to "later".
         // Subscribing to events instead of overriding this method won't help too.
         redrawer?.syncSize()
-        redrawer?.redrawImmediately()
+        tryRedrawImmediately()
+    }
+
+    private fun tryRedrawImmediately() {
+        // It might be called inside `renderDelegate`,
+        // so to avoid recursive call (not supported) just schedule redrawing.
+        //
+        // For example if we call some AWT function inside renderer.onRender,
+        // such as `jframe.isEnabled = false` on Linux
+        if (isRendering) {
+            redrawer?.needRedraw()
+        } else {
+            redrawer?.redrawImmediately()
+        }
     }
 
     // Workaround for JBR-5274 and JBR-5305
