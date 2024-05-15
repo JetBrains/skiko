@@ -216,10 +216,13 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             "$skiaBinDir/libskunicode.a",
             "$skiaBinDir/libskia.a"
         )
-        OS.Windows -> {
-            configureCinterop("skiko", os, arch, target, targetString, emptyList())
-            mutableListOfLinkerOptions()
-        }
+        OS.Windows -> mutableListOfLinkerOptions(
+            *windowsSdkPaths.libDirs.map { "-L${it.absolutePath}" }.toTypedArray(),
+            "$skiaBinDir/sksg.lib",
+            "$skiaBinDir/skshaper.lib",
+            "$skiaBinDir/skunicode.lib",
+            "$skiaBinDir/skia.lib"
+        )
         else -> mutableListOf()
     }
     if (skiko.includeTestHelpers) {
@@ -267,8 +270,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 argumentProviders.add { listOf("-static", "-o", staticLib) }
             }
             OS.Windows -> {
-                executable = "llvm-lib"
-                argumentProviders.add { listOf("/out:$staticLib") }
+                executable = "llvm-ar"
+                argumentProviders.add { listOf("-crs", staticLib) }
             }
             else -> error("Unexpected OS for native bridges linking: $os")
         }
