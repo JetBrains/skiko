@@ -162,6 +162,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_wa
     DisplayLinkThrottler *throttler = (__bridge DisplayLinkThrottler *) (void *) throttlerPtr;
     NSWindow *window = (__bridge NSWindow *) (void *) windowPtr;
 
+    // CVDisplayLink is conditionally set up on each draw request to track window.screen change to match throttling
+    // with the refresh rate of the actual screen the window is shown on.
     [throttler setupDisplayLinkForWindow:window];
     [throttler waitVSync];
 }
