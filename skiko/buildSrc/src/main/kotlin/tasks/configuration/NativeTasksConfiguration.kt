@@ -216,13 +216,13 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             "$skiaBinDir/libskunicode.a",
             "$skiaBinDir/libskia.a"
         )
-        OS.Windows -> mutableListOfLinkerOptions(
-            *windowsSdkPaths.libDirs.map { "-L${it.absolutePath}" }.toTypedArray(),
-            "$skiaBinDir/sksg.lib",
-            "$skiaBinDir/skshaper.lib",
-            "$skiaBinDir/skunicode.lib",
-            "$skiaBinDir/skia.lib"
-        )
+        OS.Windows -> {
+            val windowsLibs = listOf(
+                *windowsSdkPaths.libDirs.map { "-L\"${it.absolutePath.replace("\\", "/")}\"" }.toTypedArray()
+            )
+            configureCinterop("skiko", os, arch, target, targetString, windowsLibs)
+            mutableListOfLinkerOptions(windowsLibs)
+        }
         else -> mutableListOf()
     }
     if (skiko.includeTestHelpers) {
