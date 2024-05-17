@@ -97,6 +97,12 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                     *skiaPreprocessorFlags(OS.Linux, buildType)
                 ))
             }
+            OS.Windows -> {
+                flags.set(listOf(
+                    *buildType.clangFlags,
+                    *skiaPreprocessorFlags(OS.Windows, buildType)
+                ))
+            }
             else -> throw GradleException("$os not yet supported")
         }
 
@@ -137,28 +143,34 @@ fun configureCinterop(
     }
 }
 
-fun skiaStaticLibraries(skiaDir: String, targetString: String, buildType: SkiaBuildType): List<String> {
+fun skiaStaticLibraries(skiaDir: String, targetString: String, buildType: SkiaBuildType, os: OS, project: Project): List<String> {
     val skiaBinSubdir = "$skiaDir/out/${buildType.id}-$targetString"
+    val libPrefix = if(!os.isWindows) "lib" else ""
+    val ignoreLibs = project.property("skiko.link.ignore.libs.${os.id}")?.toString()
+        ?.split(',') ?: emptyList()
+
     return listOf(
-        "libskresources.a",
-        "libskparagraph.a",
-        "libskia.a",
-        "libicu.a",
-        "libskottie.a",
-        "libsvg.a",
-        "libpng.a",
-        "libwebp_sse41.a",
-        "libsksg.a",
-        "libskunicode.a",
-        "libwebp.a",
-        "libdng_sdk.a",
-        "libpiex.a",
-        "libharfbuzz.a",
-        "libexpat.a",
-        "libzlib.a",
-        "libjpeg.a",
-        "libskshaper.a"
-    ).map {
+        "${libPrefix}skresources.${os.libExtension}",
+        "${libPrefix}skparagraph.${os.libExtension}",
+        "${libPrefix}skia.${os.libExtension}",
+        "${libPrefix}icu.${os.libExtension}",
+        "${libPrefix}skottie.${os.libExtension}",
+        "${libPrefix}svg.${os.libExtension}",
+        "libpng.${os.libExtension}",
+        "libwebp_sse41.${os.libExtension}",
+        "${libPrefix}sksg.${os.libExtension}",
+        "${libPrefix}skunicode.${os.libExtension}",
+        "libwebp.${os.libExtension}",
+        "${libPrefix}dng_sdk.${os.libExtension}",
+        "${libPrefix}piex.${os.libExtension}",
+        "${libPrefix}harfbuzz.${os.libExtension}",
+        "${libPrefix}expat.${os.libExtension}",
+        "${libPrefix}zlib.${os.libExtension}",
+        "libjpeg.${os.libExtension}",
+        "${libPrefix}skshaper.${os.libExtension}",
+    ).filter {
+        lib -> ignoreLibs.all { !lib.contains(it) }
+    }.map {
         "$skiaBinSubdir/$it"
     }
 }
@@ -175,8 +187,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     val unpackedSkia = unzipper.get()
     val skiaDir = unpackedSkia.absolutePath
 
-    val bridgesLibrary = "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
-    val allLibraries = skiaStaticLibraries(skiaDir, targetString, buildType) + bridgesLibrary
+    val bridgesLibrary = "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.${os.libExtension}"
+    val allLibraries = skiaStaticLibraries(skiaDir, targetString, buildType, os, project) + bridgesLibrary
 
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val linkerFlags = when (os) {
@@ -204,6 +216,13 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             "$skiaBinDir/libskunicode.a",
             "$skiaBinDir/libskia.a"
         )
+        OS.Windows -> {
+            val windowsLibs = listOf(
+                *windowsSdkPaths.libDirs.map { "-L\"${it.absolutePath.replace("\\", "/")}\"" }.toTypedArray()
+            )
+            configureCinterop("skiko", os, arch, target, targetString, windowsLibs)
+            mutableListOfLinkerOptions(windowsLibs)
+        }
         else -> mutableListOf()
     }
     if (skiko.includeTestHelpers) {
@@ -238,7 +257,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         }
         inputs.files(objectFiles)
         val outDir = "$buildDir/nativeBridges/static/$targetString"
-        val staticLib = "$outDir/skiko-native-bridges-$targetString.a"
+        val libExt = if(os.isWindows) "lib" else "a"
+        val staticLib = "$outDir/skiko-native-bridges-$targetString.$libExt"
         workingDir = File(outDir)
         when (os) {
             OS.Linux -> {
@@ -248,6 +268,10 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             OS.MacOS, OS.IOS -> {
                 executable = "libtool"
                 argumentProviders.add { listOf("-static", "-o", staticLib) }
+            }
+            OS.Windows -> {
+                executable = "llvm-ar"
+                argumentProviders.add { listOf("-crs", staticLib) }
             }
             else -> error("Unexpected OS for native bridges linking: $os")
         }

@@ -92,6 +92,16 @@ kotlin {
         }
     }
 
+    if(hostOs == "windows") {
+        mingwX64 {
+            binaries {
+                executable {
+                    entryPoint = "org.jetbrains.skiko.sample.main"
+                }
+            }
+        }
+    }
+
     jvm("awt") {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
@@ -158,6 +168,10 @@ kotlin {
             dependsOn(darwinMain)
         }
 
+        val mingwMain by creating {
+            dependsOn(nativeMain)
+        }
+
         if (hostOs == "macos") {
             val macosX64Main by getting {
                 dependsOn(macosMain)
@@ -170,6 +184,11 @@ kotlin {
             }
             val iosSimulatorArm64Main by getting {
                 dependsOn(iosMain)
+            }
+        }
+        if(hostOs == "windows") {
+            val mingwX64Main by getting {
+                dependsOn(mingwMain)
             }
         }
     }
