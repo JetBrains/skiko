@@ -7,9 +7,6 @@
 #import <stdatomic.h>
 
 @interface DisplayLinkThrottler : NSObject
-
-- (void)onVSync;
-
 @end
 
 static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now, const CVTimeStamp *outputTime, CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext) {
@@ -24,6 +21,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     NSScreen *_displayLinkScreen;
     CVDisplayLinkRef _displayLink;
     NSConditionLock *_vsyncConditionLock;
+    BOOL _isSleeping;
 }
 
 - (instancetype)init {
@@ -33,9 +31,32 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
         _displayLinkScreen = nil;
         _displayLink = nil;
         _vsyncConditionLock = [[NSConditionLock alloc] initWithCondition: 1];
+        _isSleeping = NO;
+
+        NSNotificationCenter *notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+
+        [notificationCenter addObserver:self
+                            selector:@selector(systemWillSleep:)
+                            name:NSWorkspaceWillSleepNotification
+                            object:nil];
+
+        [notificationCenter addObserver:self
+                            selector:@selector(systemDidWake:)
+                            name:NSWorkspaceDidWakeNotification
+                            object:nil];
     }
 
     return self;
+}
+
+- (void)systemWillSleep:(NSNotification *)notification {
+    _isSleeping = YES;
+    [self invalidateDisplayLink];
+    [self onVSync];
+}
+
+- (void)systemDidWake:(NSNotification *)notification {
+    _isSleeping = NO;
 }
 
 - (void)onVSync {
@@ -45,7 +66,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 }
 
 - (void)waitVSync {
-    /// If display link construction was corrupted, don't perform any waiting
+    /// If display link is not constructed (due to failure or explicit opt-out), don't perform any waiting
     if (!_displayLink) {
         return;
     }
@@ -65,6 +86,11 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 }
 
 - (void)setupDisplayLinkForWindow:(NSWindow *)window {
+    if (_isSleeping) {
+        /// System is sleeping, don't setup display link
+        return;
+    }
+
     NSScreen *screen = window.screen;
 
     if (!screen) {
