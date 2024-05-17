@@ -7,6 +7,9 @@
 #import <stdatomic.h>
 
 @interface DisplayLinkThrottler : NSObject
+
+- (void)onVSync;
+
 @end
 
 static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now, const CVTimeStamp *outputTime, CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext) {
