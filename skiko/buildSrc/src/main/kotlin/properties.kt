@@ -43,7 +43,7 @@ fun compilerForTarget(os: OS, arch: Arch): String =
         OS.Android -> "clang++"
         OS.Windows -> "cl.exe"
         OS.MacOS, OS.IOS -> "clang++"
-        OS.Wasm -> "emcc"
+        OS.Wasm -> if(hostOs == OS.Windows) "emcc.bat" else "emcc"
     }
 
 fun linkerForTarget(os: OS, arch: Arch): String =
