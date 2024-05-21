@@ -10,7 +10,8 @@ enum class OS(
     Windows("windows", arrayOf()),
     MacOS("macos", arrayOf("-mmacosx-version-min=10.13")),
     Wasm("wasm", arrayOf()),
-    IOS("ios", arrayOf())
+    IOS("ios", arrayOf()),
+    TVOS("tvos", arrayOf())
     ;
 
     val isWindows
@@ -19,8 +20,8 @@ enum class OS(
     val isMacOs
         get() = this == MacOS
 
-    fun idWithSuffix(isIosSim: Boolean = false): String {
-        return id + if (isIosSim) "Sim" else ""
+    fun idWithSuffix(isUikitSim: Boolean = false): String {
+        return id + if (isUikitSim) "Sim" else ""
     }
 }
 
@@ -28,7 +29,7 @@ val OS.isCompatibleWithHost: Boolean
     get() = when (this) {
         OS.Linux -> hostOs == OS.Linux
         OS.Windows -> hostOs == OS.Windows
-        OS.MacOS, OS.IOS -> hostOs == OS.MacOS
+        OS.MacOS, OS.IOS, OS.TVOS -> hostOs == OS.MacOS
         OS.Wasm -> true
         OS.Android -> true
     }
@@ -42,7 +43,7 @@ fun compilerForTarget(os: OS, arch: Arch): String =
         }
         OS.Android -> "clang++"
         OS.Windows -> "cl.exe"
-        OS.MacOS, OS.IOS -> "clang++"
+        OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
         OS.Wasm -> "emcc"
     }
 
@@ -53,7 +54,7 @@ val OS.dynamicLibExt: String
     get() = when (this) {
         OS.Linux, OS.Android -> ".so"
         OS.Windows -> ".dll"
-        OS.MacOS, OS.IOS -> ".dylib"
+        OS.MacOS, OS.IOS, OS.TVOS -> ".dylib"
         OS.Wasm -> ".wasm"
     }
 
@@ -141,9 +142,9 @@ class SkikoProperties(private val myProject: Project) {
         get() = !isRelease
 
     fun skiaReleaseFor(os: OS, arch: Arch, buildType: SkiaBuildType, isIosSim: Boolean = false): String {
-        val target = "${os.idWithSuffix(isIosSim = isIosSim)}-${arch.id}"
+        val target = "${os.idWithSuffix(isUikitSim = isIosSim)}-${arch.id}"
         val tag = myProject.property("dependencies.skia.$target") as String
-        return "${tag}/Skia-${tag}-${os.idWithSuffix(isIosSim = isIosSim)}-${buildType.id}-${arch.id}"
+        return "${tag}/Skia-${tag}-${os.idWithSuffix(isUikitSim = isIosSim)}-${buildType.id}-${arch.id}"
     }
 
     val releaseGithubVersion: String
@@ -208,6 +209,6 @@ object SkikoArtifacts {
     // does not seem possible (at least without adding a dash to a target's tasks),
     // so we're using the default naming pattern instead.
     // See https://youtrack.jetbrains.com/issue/KT-50001.
-    fun nativeArtifactIdFor(os: OS, arch: Arch, isIosSim: Boolean = false) =
-        "skiko-${os.id + if (isIosSim) "simulator" else ""}${arch.id}"
+    fun nativeArtifactIdFor(os: OS, arch: Arch, isUikitSim: Boolean = false) =
+        "skiko-${os.id + if (isUikitSim) "simulator" else ""}${arch.id}"
 }

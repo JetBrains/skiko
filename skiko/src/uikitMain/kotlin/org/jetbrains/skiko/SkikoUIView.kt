@@ -1,21 +1,15 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
-import org.jetbrains.skia.Point
-import org.jetbrains.skia.Rect
-import org.jetbrains.skiko.ios.SkikoUITextInputTraits
-import org.jetbrains.skiko.redrawer.MetalRedrawer
+import org.jetbrains.skiko.redrawer.*
 import platform.CoreGraphics.*
 import platform.Foundation.*
-import platform.Metal.MTLCreateSystemDefaultDevice
-import platform.Metal.MTLDeviceProtocol
-import platform.Metal.MTLPixelFormatBGRA8Unorm
-import platform.QuartzCore.CAMetalLayer
+import platform.Metal.*
+import platform.QuartzCore.*
 import platform.UIKit.*
-import platform.darwin.NSInteger
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.native.ref.WeakReference
+import kotlin.native.ref.*
+
+internal expect fun UIView.skikoInitializeUIView(): Unit
 
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
@@ -37,7 +31,7 @@ class SkikoUIView : UIView {
     private lateinit var _redrawer: MetalRedrawer
 
     init {
-        multipleTouchEnabled = true
+        skikoInitializeUIView()
         opaque = false // For UIKit interop through a "Hole"
 
         _metalLayer.also {

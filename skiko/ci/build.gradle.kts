@@ -23,7 +23,10 @@ val skikoArtifactIds: List<String> =
         SkikoArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
         SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
         SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
-        SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isIosSim = true),
+        SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        SkikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        SkikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        SkikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {

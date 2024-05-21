@@ -38,7 +38,7 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory =
                 GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRedrawer(layer, analytics, properties)
                 else -> LinuxOpenGLRedrawer(layer, analytics, properties)
             }
-            OS.Android, OS.JS, OS.Ios, OS.Unknown -> throw UnsupportedOperationException("The AWT target doesn't support $hostOs")
+            OS.Android, OS.JS, OS.Ios, OS.Tvos, OS.Unknown -> throw UnsupportedOperationException("The awt target doesn't support $hostOs")
         }
     }
 
@@ -51,7 +51,7 @@ internal actual fun URIHandler_openUri(uri: String) {
             URI(uri) // Validate URI for exception behavior consistent with the Desktop.browse() case (throwing URISyntaxException)
             Runtime.getRuntime().exec(arrayOf("xdg-open", URL(uri).toString()))
         }
-        OS.Android, OS.Windows, OS.MacOS, OS.Ios, OS.JS, OS.Unknown -> {
+        OS.Android, OS.Windows, OS.MacOS, OS.Ios, OS.Tvos, OS.JS, OS.Unknown -> {
             throw UnsupportedOperationException("AWT does not support the BROWSE action on this platform")
         }
     }

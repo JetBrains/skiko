@@ -140,6 +140,15 @@ kotlin {
     if (supportNativeIosX64) {
         skikoProjectContext.configureNativeTarget(OS.IOS, Arch.X64, iosX64())
     }
+    if (supportNativeTvosArm64) {
+        skikoProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosArm64())
+    }
+    if (supportNativeTvosSimulatorArm64) {
+        skikoProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosSimulatorArm64())
+    }
+    if (supportNativeTvosX64) {
+        skikoProjectContext.configureNativeTarget(OS.TVOS, Arch.X64, tvosX64())
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -299,35 +308,76 @@ kotlin {
                             dependsOn(macosTest)
                         }
                     }
-                    if (supportAnyNativeIos) {
-                        val iosMain by creating {
+                    if (supportAnyNativeIos || supportAllNativeTvos) {
+                        val uikitMain by creating {
                             dependsOn(darwinMain)
                         }
-                        val iosTest by creating {
+                        val uikitTest by creating {
                             dependsOn(darwinTest)
                         }
-                        if (supportNativeIosArm64) {
-                            val iosArm64Main by getting {
-                                dependsOn(iosMain)
+
+                        if (supportAnyNativeIos) {
+                            val iosMain by creating {
+                                dependsOn(uikitMain)
                             }
-                            val iosArm64Test by getting {
-                                dependsOn(iosTest)
+                            val iosTest by creating {
+                                dependsOn(uikitTest)
+                            }
+                            if (supportNativeIosArm64) {
+                                val iosArm64Main by getting {
+                                    dependsOn(iosMain)
+                                }
+                                val iosArm64Test by getting {
+                                    dependsOn(iosTest)
+                                }
+                            }
+                            if (supportNativeIosSimulatorArm64) {
+                                val iosSimulatorArm64Main by getting {
+                                    dependsOn(iosMain)
+                                }
+                                val iosSimulatorArm64Test by getting {
+                                    dependsOn(iosTest)
+                                }
+                            }
+                            if (supportNativeIosX64) {
+                                val iosX64Main by getting {
+                                    dependsOn(iosMain)
+                                }
+                                val iosX64Test by getting {
+                                    dependsOn(iosTest)
+                                }
                             }
                         }
-                        if (supportNativeIosSimulatorArm64) {
-                            val iosSimulatorArm64Main by getting {
-                                dependsOn(iosMain)
+                        if (supportAnyNativeTvos) {
+                            val tvosMain by creating {
+                                dependsOn(uikitMain)
                             }
-                            val iosSimulatorArm64Test by getting {
-                                dependsOn(iosTest)
+                            val tvosTest by creating {
+                                dependsOn(uikitTest)
                             }
-                        }
-                        if (supportNativeIosX64) {
-                            val iosX64Main by getting {
-                                dependsOn(iosMain)
+                            if (supportNativeTvosArm64) {
+                                val tvosArm64Main by getting {
+                                    dependsOn(tvosMain)
+                                }
+                                val tvosArm64Test by getting {
+                                    dependsOn(tvosTest)
+                                }
                             }
-                            val iosX64Test by getting {
-                                dependsOn(iosTest)
+                            if (supportNativeTvosSimulatorArm64) {
+                                val tvosSimulatorArm64Main by getting {
+                                    dependsOn(tvosMain)
+                                }
+                                val tvosSimulatorArm64Test by getting {
+                                    dependsOn(tvosTest)
+                                }
+                            }
+                            if (supportNativeTvosX64) {
+                                val tvosX64Main by getting {
+                                    dependsOn(tvosMain)
+                                }
+                                val tvosX64Test by getting {
+                                    dependsOn(tvosTest)
+                                }
                             }
                         }
                     }

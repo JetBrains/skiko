@@ -30,10 +30,10 @@ class SkikoProjectContext(
  * (tasks' registration during other task's registration is prohibited)
  */
 fun SkikoProjectContext.registerOrGetSkiaDirProvider(
-    os: OS, arch: Arch, isIosSim: Boolean = false
+    os: OS, arch: Arch, isUikitSim: Boolean = false
 ): Provider<File> = with(this.project) {
-    val taskNameSuffix = joinToTitleCamelCase(buildType.id, os.idWithSuffix(isIosSim = isIosSim), arch.id)
-    val skiaRelease = skiko.skiaReleaseFor(os, arch, buildType, isIosSim)
+    val taskNameSuffix = joinToTitleCamelCase(buildType.id, os.idWithSuffix(isUikitSim = isUikitSim), arch.id)
+    val skiaRelease = skiko.skiaReleaseFor(os, arch, buildType, isUikitSim)
     val downloadSkia = tasks.registerOrGetTask<Download>("downloadSkia$taskNameSuffix") {
         onlyIf { !dest.exists() }
         onlyIfModified(true)
@@ -88,6 +88,21 @@ val Project.supportNativeIosX64: Boolean
 
 val Project.supportAnyNativeIos: Boolean
     get() = supportAllNativeIos || supportNativeIosArm64 || supportNativeIosSimulatorArm64 || supportNativeIosX64
+
+val Project.supportAllNativeTvos: Boolean
+    get() = supportAllNative || findProperty("skiko.native.tvos.enabled") == "true" || isInIdea
+
+val Project.supportNativeTvosArm64: Boolean
+    get() = supportAllNativeTvos || findProperty("skiko.native.tvos.arm64.enabled") == "true" || isInIdea
+
+val Project.supportNativeTvosSimulatorArm64: Boolean
+    get() = supportAllNativeTvos || findProperty("skiko.native.tvos.simulatorArm64.enabled") == "true" || isInIdea
+
+val Project.supportNativeTvosX64: Boolean
+    get() = supportAllNativeTvos || findProperty("skiko.native.tvos.x64.enabled") == "true" || isInIdea
+
+val Project.supportAnyNativeTvos: Boolean
+    get() = supportAllNativeTvos || supportNativeTvosArm64 || supportNativeTvosSimulatorArm64 || supportNativeTvosX64
 
 val Project.supportNativeMac: Boolean
     get() = supportAllNative || findProperty("skiko.native.mac.enabled") == "true" || isInIdea
