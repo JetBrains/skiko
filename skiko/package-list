@@ -2741,6 +2741,7 @@ $dokka.location:org.jetbrains.skiko/OS.Ios///PointingToDeclaration/{"org.jetbrai
 $dokka.location:org.jetbrains.skiko/OS.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-j-s/index.html
 $dokka.location:org.jetbrains.skiko/OS.Linux///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-linux/index.html
 $dokka.location:org.jetbrains.skiko/OS.MacOS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-mac-o-s/index.html
+$dokka.location:org.jetbrains.skiko/OS.Tvos///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-tvos/index.html
 $dokka.location:org.jetbrains.skiko/OS.Unknown///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-unknown/index.html
 $dokka.location:org.jetbrains.skiko/OS.Windows///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-windows/index.html
 $dokka.location:org.jetbrains.skiko/OS///PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/index.html
@@ -2863,11 +2864,6 @@ $dokka.location:org.jetbrains.skiko/SystemTheme///PointingToDeclaration/skiko/o
 $dokka.location:org.jetbrains.skiko/SystemTheme/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/entries.html
 $dokka.location:org.jetbrains.skiko/SystemTheme/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/value-of.html
 $dokka.location:org.jetbrains.skiko/SystemTheme/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/values.html
-$dokka.location:org.jetbrains.skiko/TextActions///PointingToDeclaration/skiko/org.jetbrains.skiko/-text-actions/index.html
-$dokka.location:org.jetbrains.skiko/TextActions/copy/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-text-actions/copy.html
-$dokka.location:org.jetbrains.skiko/TextActions/cut/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-text-actions/cut.html
-$dokka.location:org.jetbrains.skiko/TextActions/paste/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-text-actions/paste.html
-$dokka.location:org.jetbrains.skiko/TextActions/selectAll/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-text-actions/select-all.html
 $dokka.location:org.jetbrains.skiko/URIManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/index.html
 $dokka.location:org.jetbrains.skiko/URIManager/URIManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/-u-r-i-manager.html
 $dokka.location:org.jetbrains.skiko/URIManager/openUri/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/open-uri.html
