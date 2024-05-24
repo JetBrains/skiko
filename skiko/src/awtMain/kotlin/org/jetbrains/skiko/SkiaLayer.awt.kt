@@ -316,16 +316,8 @@ actual open class SkiaLayer internal constructor(
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
 
-        // To avoid visual artifacts on Windows/Direct3D,
-        // redrawing should be performed immediately, without scheduling to "later".
-        // Subscribing to events instead of overriding this method won't help too.
-        //
-        // Please note that calling redraw during layout might break software renderers,
-        // so applying this fix only for Direct3D case.
-        if (renderApi == GraphicsApi.DIRECT3D) {
-            redrawer?.syncSize()
-            tryRedrawImmediately()
-        }
+        redrawer?.syncSize()
+        tryRedrawImmediately()
     }
 
     private fun tryRedrawImmediately() {
@@ -335,6 +327,7 @@ actual open class SkiaLayer internal constructor(
         // so to avoid recursive call (not supported) just schedule redrawing.
         //
         // For example if we call some AWT function inside renderer.onRender,
+
         // such as `jframe.isEnabled = false` on Linux
         if (isRendering) {
             redrawer?.needRedraw()
