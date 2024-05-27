@@ -55,6 +55,39 @@
 
 @end
 
+@interface MTLCommandQueueCache : NSObject
+@property (strong, nonatomic) NSMapTable<id<MTLDevice>, id<MTLCommandQueue>> *commandQueueMap;
+@end
+
+@implementation MTLCommandQueueCache
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _commandQueueMap = [NSMapTable strongToStrongObjectsMapTable];  // Retains both keys and values
+    }
+    return self;
+}
+
+- (id<MTLCommandQueue>)commandQueueForDevice:(id<MTLDevice>)device {
+    id<MTLCommandQueue> commandQueue = [_commandQueueMap objectForKey:device];
+    if (!commandQueue) {
+        commandQueue = [device newCommandQueue];
+        [_commandQueueMap setObject:commandQueue forKey:device];
+    }
+    return commandQueue;
+}
+
++ (instancetype)sharedCache {
+    static MTLCommandQueueCache *cache = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        cache = [MTLCommandQueueCache new];
+    });
+    return cache;
+}
+
+@end
+
 /// Linked from skiko/src/jvmMain/cpp/common/impl/Library.cc
 /// clang treats extern symbol declarations as C in Objective-C++(.mm) and doesn't mangle them
 extern JavaVM *jvm;
@@ -103,7 +136,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         [container addSublayer: layer];
         layer.javaRef = env->NewGlobalRef(redrawer);
 
-        id<MTLCommandQueue> fQueue = [adapter newCommandQueue];
+        id<MTLCommandQueue> fQueue = [MTLCommandQueueCache.sharedCache commandQueueForDevice:adapter];
 
         device.container = container;
         device.layer = layer;
