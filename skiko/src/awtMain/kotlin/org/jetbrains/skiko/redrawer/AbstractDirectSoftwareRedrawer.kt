@@ -27,6 +27,10 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         }
     }
 
+    override fun onChangeBounds() {
+        // Do nothing because calling redraw during layout might break software renderers
+    }
+
     protected var device = 0L
 
     override fun needRedraw() {

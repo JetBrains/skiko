@@ -19,6 +19,7 @@ internal abstract class AWTRedrawer(
     private var deviceAnalytics: DeviceAnalytics? = null
     protected var isDisposed = false
         private set
+    private var isRendering = false
 
     init {
         rendererAnalytics.init()
@@ -27,6 +28,28 @@ internal abstract class AWTRedrawer(
     override fun dispose() {
         require(!isDisposed) { "$javaClass is disposed" }
         isDisposed = true
+    }
+
+    internal fun tryRedrawImmediately() {
+        if (!layer.isShowing) return
+
+        // It might be called inside `renderDelegate`,
+        // so to avoid recursive call (not supported) just schedule redrawing.
+        //
+        // For example if we call some AWT function inside renderer.onRender,
+        // such as `jframe.isEnabled = false` on Linux
+        if (isRendering) {
+            needRedraw()
+        } else {
+            redrawImmediately()
+        }
+    }
+
+    open fun onChangeBounds() {
+        syncSize()
+
+        // To avoid visual artifacts, redrawing should be performed immediately, without scheduling to "later".
+        tryRedrawImmediately()
     }
 
     /**
@@ -51,7 +74,12 @@ internal abstract class AWTRedrawer(
 
     protected fun update(nanoTime: Long) {
         require(!isDisposed) { "$javaClass is disposed" }
-        layer.update(nanoTime)
+        try {
+            isRendering = true
+            layer.update(nanoTime)
+        } finally {
+            isRendering = false
+        }
     }
 
     protected inline fun inDrawScope(body: () -> Unit) {

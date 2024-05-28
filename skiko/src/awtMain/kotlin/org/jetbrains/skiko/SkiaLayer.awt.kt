@@ -4,6 +4,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.redrawer.AWTRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
@@ -167,7 +168,6 @@ actual open class SkiaLayer internal constructor(
     }
 
     private var isInited = false
-    private var isRendering = false
 
     private fun checkShowing() {
         val wasShowing = isShowingCached
@@ -234,14 +234,17 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    private val redrawerManager = RedrawerManager<Redrawer>(properties.renderApi) { renderApi, oldRedrawer ->
+    private val redrawerManager = RedrawerManager<AWTRedrawer>(properties.renderApi) { renderApi, oldRedrawer ->
         oldRedrawer?.dispose()
-        val newRedrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
-        newRedrawer.syncSize()
-        newRedrawer
+        createRedrawer(renderApi)
     }
 
-    internal val redrawer: Redrawer?
+    private fun createRedrawer(renderApi: GraphicsApi): AWTRedrawer =
+        renderFactory.createRedrawer(this, renderApi, analytics, properties).also {
+            it.syncSize()
+        } as AWTRedrawer
+
+    internal val redrawer: AWTRedrawer?
         get() = redrawerManager.redrawer
 
     actual var renderApi: GraphicsApi
@@ -310,37 +313,12 @@ actual open class SkiaLayer internal constructor(
     override fun paint(g: java.awt.Graphics) {
         Logger.debug { "Paint called on: $this" }
         checkContentScale()
-        tryRedrawImmediately()
+        redrawer?.tryRedrawImmediately()
     }
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
-
-        // To avoid visual artifacts on Windows/Direct3D,
-        // redrawing should be performed immediately, without scheduling to "later".
-        // Subscribing to events instead of overriding this method won't help too.
-        //
-        // Please note that calling redraw during layout might break software renderers,
-        // so applying this fix only for Direct3D case.
-        if (renderApi == GraphicsApi.DIRECT3D) {
-            redrawer?.syncSize()
-            tryRedrawImmediately()
-        }
-    }
-
-    private fun tryRedrawImmediately() {
-        if (!isShowing) return
-
-        // It might be called inside `renderDelegate`,
-        // so to avoid recursive call (not supported) just schedule redrawing.
-        //
-        // For example if we call some AWT function inside renderer.onRender,
-        // such as `jframe.isEnabled = false` on Linux
-        if (isRendering) {
-            redrawer?.needRedraw()
-        } else {
-            redrawer?.redrawImmediately()
-        }
+        redrawer?.onChangeBounds()
     }
 
     // Workaround for JBR-5274 and JBR-5305
@@ -497,12 +475,7 @@ actual open class SkiaLayer internal constructor(
             canvas.clipRectBy(component, contentScale)
         }
 
-        try {
-            isRendering = true
-            renderDelegate?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
-        } finally {
-            isRendering = false
-        }
+        renderDelegate?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
 
         // we can dispose layer during onRender
         // or even dispose it and pack it again
