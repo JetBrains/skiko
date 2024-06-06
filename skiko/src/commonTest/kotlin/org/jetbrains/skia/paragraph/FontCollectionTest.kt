@@ -31,6 +31,22 @@ class FontCollectionTest {
     }
 
     @Test
+    fun testChinese() = runTest {
+        val fm = TypefaceFontProvider()
+        val notoSansSC = Typeface.makeFromResource("./fonts/NotoSansSC-Regular.ttf", 0)
+        fm.registerTypeface(notoSansSC)
+
+        FontCollection().use {
+            it.setAssetFontManager(fm)
+            val df = it.defaultFallback(27700, FontStyle.NORMAL, null)
+            println("DF = $df\n")
+
+            val glyphs = notoSansSC.getStringGlyphs("水")
+            println("Glyphs = ${glyphs.joinToString()}\n")
+        }
+    }
+
+    @Test
     fun fontCollectionTest() = runTest {
         val fm = TypefaceFontProvider()
         val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf", 0)

@@ -71,3 +71,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nDefault
     SkFontMgr* instance = SkFontMgr::RefDefault().release();
     return reinterpret_cast<jlong>(instance);
 }
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nWrapper
+(JNIEnv* env, jclass jclass) {
+    FontMgrWrapper* instance = new FontMgrWrapper();
+    return reinterpret_cast<jlong>(instance);
+}

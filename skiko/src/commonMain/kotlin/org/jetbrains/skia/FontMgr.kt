@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.paragraph.TypefaceFontProvider
 
 open class FontMgr : RefCnt {
     companion object {
@@ -10,6 +11,12 @@ open class FontMgr : RefCnt {
         }
 
         val default = FontMgr(_nDefault(), false)
+
+        val empty = FontMgr(_nEmpty(), false)
+
+        fun makeWrapper(fallback: TypefaceFontProvider): FontMgr {
+            return FontMgr(_nWrapper(fallback._ptr), false)
+        }
     }
 
     val familiesCount: Int
@@ -198,3 +205,11 @@ private external fun _nMakeFromData(ptr: NativePointer, dataPtr: NativePointer, 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nDefault")
 private external fun _nDefault(): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nWrapper")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nWrapper")
+private external fun _nWrapper(fallbackPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nEmpty")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nEmpty")
+private external fun _nEmpty(): NativePointer
+
