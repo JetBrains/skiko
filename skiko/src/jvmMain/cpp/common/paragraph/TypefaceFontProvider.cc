@@ -17,10 +17,11 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFont
   (JNIEnv* env, jclass jclass, jlong ptr, jlong typefacePtr, jstring aliasStr) {
     TypefaceFontProvider* instance = reinterpret_cast<TypefaceFontProvider*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
-    if (aliasStr == nullptr)
-        instance->registerTypeface(sk_ref_sp(typeface));
-    else
-        instance->registerTypeface(sk_ref_sp(typeface), skString(env, aliasStr));
+    if (aliasStr == nullptr) {
+        return instance->registerTypeface(sk_ref_sp(typeface));
+    } else {
+        return instance->registerTypeface(sk_ref_sp(typeface), skString(env, aliasStr));
+    }
 }
 
 

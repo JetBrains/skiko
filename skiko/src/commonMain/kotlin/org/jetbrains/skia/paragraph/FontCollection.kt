@@ -106,6 +106,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             reachabilityBarrier(this)
         }
     }
+
     fun defaultFallback(unicode: Int, style: FontStyle, locale: String?): Typeface? {
         return try {
             Stats.onNativeCall()
