@@ -14,7 +14,7 @@ import org.jetbrains.skia.impl.interopScope
 
 class TypefaceFontProvider private constructor(
     ptr: NativePointer,
-    private val isFallbackProvider: Boolean
+    internal val isFallbackProvider: Boolean
 ) : FontMgr(ptr) {
 
     constructor(): this(TypefaceFontProvider_nMake(), false)

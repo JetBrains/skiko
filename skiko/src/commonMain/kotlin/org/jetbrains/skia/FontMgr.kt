@@ -13,6 +13,9 @@ open class FontMgr : RefCnt {
         val default = FontMgr(_nDefault(), false)
 
         fun defaultWithFallbackFontProvider(fallback: TypefaceFontProvider): FontMgr {
+            require(fallback.isFallbackProvider) {
+                "fallback is required to be configured as a fallback provider. See TypefaceFontProvider.createAsFallbackProvider"
+            }
             return FontMgr(_nDefaultWithFallbackFontProvider(fallback._ptr), false)
         }
     }
