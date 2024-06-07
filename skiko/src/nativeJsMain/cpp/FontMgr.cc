@@ -3,7 +3,7 @@
 #include "SkTypeface.h"
 #include "SkFontMgr.h"
 #include "common.h"
-#include "FontMgrWrapper.hh"
+#include "FontMgrWithFallbackWrapper.hh"
 
 SKIKO_EXPORT KInt org_jetbrains_skia_FontMgr__1nGetFamiliesCount
   (KNativePointer ptr) {
@@ -82,7 +82,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nEmpty
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nDefaultWithFallbackFontProvider(KNativePointer fallbackFontProviderPtr) {
-    ExtendedTypefaceFontProvider* fallback = reinterpret_cast<ExtendedTypefaceFontProvider*>((fallbackFontProviderPtr));
-    FontMgrWrapper* instance = new FontMgrWrapper(sk_ref_sp(fallback));
+    TypefaceFontProviderWithFallback* fallback = reinterpret_cast<TypefaceFontProviderWithFallback*>((fallbackFontProviderPtr));
+    FontMgrWithFallbackWrapper* instance = new FontMgrWithFallbackWrapper(sk_ref_sp(fallback));
     return reinterpret_cast<KNativePointer>(instance);
 }

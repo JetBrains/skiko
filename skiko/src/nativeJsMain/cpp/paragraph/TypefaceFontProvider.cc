@@ -1,7 +1,7 @@
 #include <iostream>
 #include "TypefaceFontProvider.h"
 #include "SkTypeface.h"
-#include "FontMgrWrapper.hh"
+#include "FontMgrWithFallbackWrapper.hh"
 using namespace skia::textlayout;
 #include "common.h"
 
@@ -13,7 +13,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_TypefaceFontProvider__1
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMakeAsFallbackProvider
   () {
-    ExtendedTypefaceFontProvider* instance = new ExtendedTypefaceFontProvider();
+    TypefaceFontProviderWithFallback* instance = new TypefaceFontProviderWithFallback();
     return reinterpret_cast<KNativePointer>(instance);
 }
 
@@ -30,7 +30,7 @@ SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterT
 
 SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypefaceForFallback
   (KNativePointer ptr, KNativePointer typefacePtr, KInteropPointer aliasStr) {
-    ExtendedTypefaceFontProvider* instance = reinterpret_cast<ExtendedTypefaceFontProvider*>((ptr));
+    TypefaceFontProviderWithFallback* instance = reinterpret_cast<TypefaceFontProviderWithFallback*>((ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>((typefacePtr));
     if (aliasStr == nullptr) {
         return instance->registerTypeface(sk_ref_sp(typeface));
