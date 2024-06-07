@@ -11,7 +11,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_TypefaceFontProvider__1
     return reinterpret_cast<KNativePointer>(instance);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMakeExtended
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMakeAsFallbackProvider
   () {
     ExtendedTypefaceFontProvider* instance = new ExtendedTypefaceFontProvider();
     return reinterpret_cast<KNativePointer>(instance);
@@ -28,7 +28,7 @@ SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterT
     }
 }
 
-SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypefaceExtended
+SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypefaceForFallback
   (KNativePointer ptr, KNativePointer typefacePtr, KInteropPointer aliasStr) {
     ExtendedTypefaceFontProvider* instance = reinterpret_cast<ExtendedTypefaceFontProvider*>((ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>((typefacePtr));

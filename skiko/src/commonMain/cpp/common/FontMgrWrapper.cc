@@ -1,5 +1,4 @@
 #include "FontMgrWrapper.hh"
-#include <stdexcept>
 
 FontMgrWrapper::FontMgrWrapper(sk_sp<ExtendedTypefaceFontProvider> fallbackTypefaceFontProvider)
     : fallbackFontProvider(std::move(fallbackTypefaceFontProvider)) {

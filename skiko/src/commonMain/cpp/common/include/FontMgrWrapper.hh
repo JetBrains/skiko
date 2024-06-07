@@ -1,13 +1,12 @@
 #ifndef FONT_MGR_WRAPPER_H
 #define FONT_MGR_WRAPPER_H
 
-// #include <iostream>
 #include "SkData.h"
 #include "SkStream.h"
 #include "SkTypeface.h"
 #include "SkFontMgr.h"
 #include "TypefaceFontProvider.h"
-#include "common.h"
+// #include "common.h"
 
 using namespace skia::textlayout;
 

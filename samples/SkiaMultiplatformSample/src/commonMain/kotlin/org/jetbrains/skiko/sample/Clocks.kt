@@ -1,7 +1,14 @@
 package org.jetbrains.skiko.sample
 
-import org.jetbrains.skia.*
-import org.jetbrains.skia.paragraph.*
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.FontMgr
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.PaintMode
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.paragraph.FontCollection
+import org.jetbrains.skia.paragraph.ParagraphBuilder
+import org.jetbrains.skia.paragraph.ParagraphStyle
+import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.FPSCounter
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.OS
@@ -25,9 +32,9 @@ abstract class Clocks(private val renderApi: GraphicsApi): SkikoRenderDelegate {
     var yOffset = 0.0
     var scale = 1.0
     var rotate = 0.0
-//        .setDefaultFontManager(FontMgr.default)
-//        .setEnableFallback(false)
 
+    private val fontCollection = FontCollection()
+        .setDefaultFontManager(FontMgr.default)
     private val style = ParagraphStyle()
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
@@ -35,42 +42,80 @@ abstract class Clocks(private val renderApi: GraphicsApi): SkikoRenderDelegate {
         canvas.translate(xOffset.toFloat(), yOffset.toFloat())
         canvas.scale(scale.toFloat(), scale.toFloat())
         canvas.rotate(rotate.toFloat(), (width / 2).toFloat(), (height / 2).toFloat())
+        val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
+        val watchStroke = Paint().apply {
+               color = 0xFF000000.toInt()
+               mode = PaintMode.STROKE
+               strokeWidth = 1f
+        }
+        val watchStrokeAA = Paint().apply {
+          color = 0xFF000000.toInt()
+          mode = PaintMode.STROKE
+          strokeWidth = 1f
+        }
+        val watchFillHover = Paint().apply { color = 0xFFE4FF01.toInt() }
+        for (x in 0 .. width - 50 step 50) {
+            for (y in 30 + platformYOffset.toInt() .. height - 50 step 50) {
+                val hover =
+                    (xpos - xOffset) / scale > x &&
+                    (xpos - xOffset) / scale < x + 50 &&
+                    (ypos - yOffset) / scale > y &&
+                    (ypos - yOffset) / scale < y + 50
+                val fill = if (hover) watchFillHover else watchFill
+                val stroke = if (x > width / 2) watchStrokeAA else watchStroke
+                canvas.drawOval(Rect.makeXYWH(x + 5f, y + 5f, 40f, 40f), fill)
+                canvas.drawOval(Rect.makeXYWH(x + 5f, y + 5f, 40f, 40f), stroke)
+                var angle = 0f
+                while (angle < 2f * PI) {
+                    canvas.drawLine(
+                            (x + 25 - 17 * sin(angle)),
+                            (y + 25 + 17 * cos(angle)),
+                            (x + 25 - 20 * sin(angle)),
+                            (y + 25 + 20 * cos(angle)),
+                            stroke
+                    )
+                    angle += (2.0 * PI / 12.0).toFloat()
+                }
+                val time = (nanoTime / 1E6) % 60000 +
+                        (x.toFloat() / width * 5000).toLong() +
+                        (y.toFloat() / width * 5000).toLong()
 
-        style.textStyle = TextStyle().apply {
-//            this.fontFamilies = arrayOf("nssc", "Noto Color Emoji", "emoji")
-//            this.fontFamilies = arrayOf("nssc")
-            this.fontSize = 16.0f
-        }.setColor(0xFF000000.toInt())
+                val angle1 = (time.toFloat() / 5000 * 2f * PI).toFloat()
+                canvas.drawLine(
+                        x + 25f,
+                        y + 25f,
+                        x + 25f - 15f * sin(angle1),
+                        y + 25f + 15 * cos(angle1),
+                        stroke)
+
+                val angle2 = (time / 60000 * 2f * PI).toFloat()
+                canvas.drawLine(
+                        x + 25f,
+                        y + 25f,
+                        x + 25f - 10f * sin(angle2),
+                        y + 25f + 10f * cos(angle2),
+                        stroke)
+            }
+        }
+
+        val maybeFps = if (withFps) " ${fpsCounter.average}FPS " else ""
 
         val renderInfo = ParagraphBuilder(style, fontCollection)
-//            .pushStyle(TextStyle().apply {
-//                this.fontFamilies = arrayOf("nssc", "Noto Color Emoji", "emoji")
-//                this.fontSize = 32.0f
-//            }.setColor(0xFF000000.toInt()))
-            .addText("\uD83D\uDCE1 Antenna - 天线\n")
-            .addText("⁉\uFE0F 〰\uFE0F ⁉\uFE0F\n")
-            .addText("\uD83D\uDE32 \uD83E\uDD14 \uD83D\uDCA1\n")
-            .addText("\uD83C\uDF0D Earth - 地球\n")
-            .addText("\uD83D\uDE80 Space rocket - 太空火箭\n")
-            .addText("\uD83C\uDF14 Moon - 月亮\n")
-            .addText("\uD83D\uDCAB Stars - 星星\n")
-            .addText("\uD83C\uDF0C Galaxy - 星系\n")
-            .addText("\uD83D\uDEF8 UFO - 飞碟\n")
-            .addText("\uD83D\uDC7D Alien - 外星人\n")
-            .addText("\uD83D\uDC4B \uD83E\uDD1D \uD83C\uDF7B \n")
-
-//            .popStyle()
+            .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
+            .addText("Graphics API: $renderApi ✿ﾟ ${currentSystemTheme}${maybeFps}")
+            .popStyle()
             .build()
         renderInfo.layout(Float.POSITIVE_INFINITY)
         renderInfo.paint(canvas, 5f, platformYOffset)
 
-//        println("Reset\n")
-        canvas.resetMatrix()
-    }
+        val frames = ParagraphBuilder(style, fontCollection)
+            .pushStyle(TextStyle().setColor(0xff9BC730L.toInt()).setFontSize(20f))
+            .addText("Frames: ${frame++}\nAngle: $rotate")
+            .popStyle()
+            .build()
+        frames.layout(Float.POSITIVE_INFINITY)
+        frames.paint(canvas, ((xpos - xOffset) / scale).toFloat(), ((ypos - yOffset) / scale).toFloat())
 
-    companion object {
-        val fontCollection = FontCollection()
-//            .setDefaultFontManager(FontMgr.wrapper)
-//            .setEnableFallback(false)
+        canvas.resetMatrix()
     }
 }
