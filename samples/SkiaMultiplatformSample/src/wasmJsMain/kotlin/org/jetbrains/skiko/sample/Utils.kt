@@ -1,7 +1,10 @@
 package org.jetbrains.skiko.sample
 
+import kotlinx.browser.window
+import kotlinx.coroutines.await
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
+import org.w3c.fetch.Response
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -10,21 +13,7 @@ import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
 import kotlin.wasm.unsafe.withScopedMemoryAllocator
 
 suspend fun loadRes(url: String): ArrayBuffer {
-    return suspendCoroutine { continuation ->
-        val req = XMLHttpRequest()
-        req.open("GET", url, true)
-        req.responseType = "arraybuffer".toJsString().unsafeCast()
-
-        req.onload = { _ ->
-            val arrayBuffer = req.response
-            if (arrayBuffer is ArrayBuffer) {
-                continuation.resume(arrayBuffer)
-            } else {
-                continuation.resumeWithException(MissingResourceException(url))
-            }
-        }
-        req.send("")
-    }
+    return window.fetch(url).await<Response>().arrayBuffer().await()
 }
 
 private class MissingResourceException(url: String): Exception("GET $url failed")

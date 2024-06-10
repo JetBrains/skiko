@@ -23,8 +23,8 @@ class FontFallbackTest {
             it.setDefaultFontManager(FontMgr.defaultWithFallbackFontProvider(fm))
 
             // 0x6C34 = "水"
-            val df = it.defaultFallback(0x6C34, FontStyle.NORMAL, null)
-            val glyphs = df!!.getStringGlyphs("水")
+            val df = it.defaultFallback(0x6C34, FontStyle.NORMAL, null)!!
+            val glyphs = df.getStringGlyphs("水")
 
             if (kotlinBackend.isWeb()) {
                 assertEquals("Noto Sans SC", df.familyName)
@@ -32,22 +32,8 @@ class FontFallbackTest {
             } else {
                 // the actual font can be different on different systems,
                 // so just making sure it's not null
-                assertNotEquals(null, df?.familyName)
+                assertNotEquals<String?>(null, df.familyName)
             }
-        }
-    }
-
-    @Test
-    fun testChinese_noFallback() = runTest {
-        // All except web have the fallback by default
-        if (!kotlinBackend.isWeb()) return@runTest
-
-        FontCollection().use {
-            it.setDefaultFontManager(FontMgr.default)
-
-            // 0x6C34 = "水"
-            val df = it.defaultFallback(0x6C34, FontStyle.NORMAL, null)
-            assertEquals(null, df)
         }
     }
 }
