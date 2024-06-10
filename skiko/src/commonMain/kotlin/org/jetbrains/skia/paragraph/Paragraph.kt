@@ -229,7 +229,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
      * `from` and `to` are ignored by skia
      * and change applies to the whole paragraph text
      */
-    fun updateForegroundPaint(from: Int, to: Int, paint: Paint?): Paragraph {
+    fun updateForegroundPaint(from: Int, to: Int, paint: Paint): Paragraph {
         return try {
             if (_text != null) {
                 Stats.onNativeCall()
@@ -253,7 +253,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
      * `from` and `to` are ignored by skia
      * and change applies to the whole paragraph text
      */
-    fun updateBackgroundPaint(from: Int, to: Int, paint: Paint?): Paragraph {
+    fun updateBackgroundPaint(from: Int, to: Int, paint: Paint): Paragraph {
         return try {
             if (_text != null) {
                 Stats.onNativeCall()
