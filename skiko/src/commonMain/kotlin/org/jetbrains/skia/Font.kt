@@ -148,16 +148,25 @@ class Font : Managed {
         }
 
     /**
-     * @return  true if font and glyph metrics are requested to be linearly scalable
+     * Returns true if font and glyph metrics are requested to be linearly scalable.
+     *
+     * @return  true if font and glyph metrics are requested to be linearly scalable.
      */
-    fun areMetricsLinear(): Boolean {
-        return try {
+    var isMetricsLinear: Boolean
+        get() = try {
             Stats.onNativeCall()
             _nAreMetricsLinear(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
-    }
+        set(value) {
+            try {
+                Stats.onNativeCall()
+                _nSetMetricsLinear(_ptr, value)
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
 
     /**
      * Returns true if bold is approximated by increasing the stroke width when creating glyph
