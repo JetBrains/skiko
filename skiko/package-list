@@ -225,9 +225,9 @@ $dokka.location:org.jetbrains.skia.paragraph/Paragraph/paint/#org.jetbrains.skia
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/rectsForPlaceholders/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/rects-for-placeholders.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/unresolvedGlyphsCount/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/unresolved-glyphs-count.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/updateAlignment/#org.jetbrains.skia.paragraph.Alignment/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/update-alignment.html
-$dokka.location:org.jetbrains.skia.paragraph/Paragraph/updateBackgroundPaint/#kotlin.Int#kotlin.Int#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/update-background-paint.html
+$dokka.location:org.jetbrains.skia.paragraph/Paragraph/updateBackgroundPaint/#kotlin.Int#kotlin.Int#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/update-background-paint.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/updateFontSize/#kotlin.Int#kotlin.Int#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/update-font-size.html
-$dokka.location:org.jetbrains.skia.paragraph/Paragraph/updateForegroundPaint/#kotlin.Int#kotlin.Int#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/update-foreground-paint.html
+$dokka.location:org.jetbrains.skia.paragraph/Paragraph/updateForegroundPaint/#kotlin.Int#kotlin.Int#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/update-foreground-paint.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphBuilder.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-builder/-companion/index.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphBuilder///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-builder/index.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphBuilder/ParagraphBuilder/#org.jetbrains.skia.paragraph.ParagraphStyle?#org.jetbrains.skia.paragraph.FontCollection?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-builder/-paragraph-builder.html
