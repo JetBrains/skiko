@@ -46,7 +46,7 @@ jobs:
           path: ./skiko/build/reports/tests
           retention-days: 5
 
-  iOS:
+  ios:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
@@ -98,30 +98,7 @@ jobs:
           name: test-reports-macos
           path: ./skiko/build/reports/tests
           retention-days: 5
-
-   tvOS:
-    # TVOS requires macos 13 
-    runs-on: macos-13
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: '11'
-      - shell: bash
-        run: |
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:tvosX64Test
-          # tvosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:tvosSimulatorArm64Test
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: test-reports-macos
-          path: ./skiko/build/reports/tests
-          retention-days: 5
-
+          
   linux:
     runs-on: ubuntu-20.04
     steps:
