@@ -152,17 +152,17 @@ class Font : Managed {
      *
      * @return  true if font and glyph metrics are requested to be linearly scalable.
      */
-    var isMetricsLinear: Boolean
+    var isLinearMetrics: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nAreMetricsLinear(_ptr)
+            _nIsLinearMetrics(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
         set(value) {
             try {
                 Stats.onNativeCall()
-                _nSetMetricsLinear(_ptr, value)
+                _nSetLinearMetrics(_ptr, value)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -649,9 +649,9 @@ private external fun _nAreBitmapsEmbedded(ptr: NativePointer): Boolean
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nIsSubpixel")
 private external fun _nIsSubpixel(ptr: NativePointer): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_Font__1nAreMetricsLinear")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nAreMetricsLinear")
-private external fun _nAreMetricsLinear(ptr: NativePointer): Boolean
+@ExternalSymbolName("org_jetbrains_skia_Font__1nIsLinearMetrics")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nIsLinearMetrics")
+private external fun _nIsLinearMetrics(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsEmboldened")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nIsEmboldened")
@@ -673,9 +673,9 @@ private external fun _nSetBitmapsEmbedded(ptr: NativePointer, value: Boolean)
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetSubpixel")
 private external fun _nSetSubpixel(ptr: NativePointer, value: Boolean)
 
-@ExternalSymbolName("org_jetbrains_skia_Font__1nSetMetricsLinear")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetMetricsLinear")
-private external fun _nSetMetricsLinear(ptr: NativePointer, value: Boolean)
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetLinearMetrics")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetLinearMetrics")
+private external fun _nSetLinearMetrics(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetEmboldened")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetEmboldened")
