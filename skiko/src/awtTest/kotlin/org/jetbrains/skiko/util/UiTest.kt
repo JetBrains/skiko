@@ -44,7 +44,6 @@ internal class UiTestScope(
     private val scope: CoroutineScope,
     val renderApi: GraphicsApi
 ) : CoroutineScope by scope {
-    @OptIn(ExperimentalSkikoApi::class)
     fun UiTestWindow(
         properties: SkiaLayerProperties = SkiaLayerProperties(),
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
