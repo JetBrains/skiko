@@ -2,7 +2,7 @@ package org.jetbrains.skiko
 
 
 /**
- * SkiaLayerProperties is a data class that represents the rendering configuration for a SkiaLayer.
+ * SkiaLayerProperties is a class that represents the rendering configuration for a SkiaLayer.
  *
  * @property isVsyncEnabled Specifies whether vertical synchronization (VSync) is enabled.
  * Default value is [SkikoProperties.vsyncEnabled]. Setting this to true is a hint toward underlying implementation
