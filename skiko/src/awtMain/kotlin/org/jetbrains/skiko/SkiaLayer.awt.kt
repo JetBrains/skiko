@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
 
+@OptIn(ExperimentalSkikoApi::class)
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
     private val properties: SkiaLayerProperties,
@@ -66,6 +67,20 @@ actual open class SkiaLayer internal constructor(
             isVsyncFramelimitFallbackEnabled,
             renderApi
         ),
+        RenderFactory.Default,
+        analytics,
+        pixelGeometry
+    )
+
+    @ExperimentalSkikoApi
+    constructor(
+        externalAccessibleFactory: ((Component) -> Accessible)? = null,
+        properties: SkiaLayerProperties,
+        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+        pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+    ) : this(
+        externalAccessibleFactory,
+        properties,
         RenderFactory.Default,
         analytics,
         pixelGeometry
