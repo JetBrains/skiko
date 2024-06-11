@@ -72,7 +72,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Font__1nIsSubpixel
     return instance->isSubpixel();
 }
 
-SKIKO_EXPORT KBoolean org_jetbrains_skia_Font__1nAreMetricsLinear
+SKIKO_EXPORT KBoolean org_jetbrains_skia_Font__1nIsLinearMetrics
   (KNativePointer ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     return instance->isLinearMetrics();
@@ -108,7 +108,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nSetSubpixel
     instance->setSubpixel(value);
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_Font__1nSetMetricsLinear
+SKIKO_EXPORT void org_jetbrains_skia_Font__1nSetLinearMetrics
   (KNativePointer ptr, KBoolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     instance->setLinearMetrics(value);
