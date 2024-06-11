@@ -9,10 +9,7 @@ import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.kotlinBackend
 import org.jetbrains.skiko.tests.runTest
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
+import kotlin.test.*
 
 private fun isMac() = (hostOs == OS.MacOS)
 private fun isIos() = (hostOs == OS.Ios)
@@ -20,11 +17,12 @@ private fun isLinux() = (hostOs == OS.Linux)
 private fun isWindows() = (hostOs == OS.Windows)
 private fun isJs() = (kotlinBackend == KotlinBackend.JS)
 private val COARSE_EPSILON = 2.4f
+private const val jbMonoPath = "./fonts/JetBrainsMono-Regular.ttf"
 
 class FontTests {
     @Test
     fun fontTest() = runTest {
-        val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf")
+        val jbMono = Typeface.makeFromResource(jbMonoPath)
         Font(jbMono).use { font ->
             assertEquals(12f, font.size)
             // TODO: we have to use bigger epsilon because of MacOS and definitely need to investigate what would be a better solution
@@ -118,6 +116,16 @@ class FontTests {
 
 //            assertEquals(Rect(1f, -12f, 21f, 0f), font.measureText("ЕЁЫ"))
 
+        }
+    }
+
+    @Test
+    fun fontLinearMetricsTest() = runTest {
+        val jbMono = Typeface.makeFromResource(jbMonoPath)
+        Font(jbMono).use { font ->
+            assertFalse(font.isLinearMetrics)
+            font.isLinearMetrics = true
+            assertTrue(font.isLinearMetrics)
         }
     }
 
