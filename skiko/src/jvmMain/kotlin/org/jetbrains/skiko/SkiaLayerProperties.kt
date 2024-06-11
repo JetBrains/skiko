@@ -20,4 +20,25 @@ class SkiaLayerProperties(
     val isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
     val renderApi: GraphicsApi = SkikoProperties.renderApi,
     val adapterPriority: GpuPriority = SkikoProperties.gpuPriority,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+
+        val rhs = other as? SkiaLayerProperties ?: return false
+
+        if (isVsyncEnabled != rhs.isVsyncEnabled) return false
+        if (isVsyncFramelimitFallbackEnabled != rhs.isVsyncFramelimitFallbackEnabled) return false
+        if (renderApi != rhs.renderApi) return false
+        if (adapterPriority != rhs.adapterPriority) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = isVsyncEnabled.hashCode()
+        result = 31 * result + isVsyncFramelimitFallbackEnabled.hashCode()
+        result = 31 * result + renderApi.hashCode()
+        result = 31 * result + adapterPriority.hashCode()
+        return result
+    }
+}
