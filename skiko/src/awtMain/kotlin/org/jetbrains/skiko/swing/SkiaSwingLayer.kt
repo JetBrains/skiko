@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
  *
  * But if no interop with Swing is needed, it is better to use [SkiaLayer] instead.
  */
+
 @Suppress("unused") // used in Compose Multiplatform
 @ExperimentalSkikoApi
 open class SkiaSwingLayer(
