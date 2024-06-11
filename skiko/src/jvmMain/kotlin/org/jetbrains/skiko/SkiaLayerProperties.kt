@@ -34,6 +34,20 @@ class SkiaLayerProperties(
         return true
     }
 
+    fun copy(
+        isVsyncEnabled: Boolean = this.isVsyncEnabled,
+        isVsyncFramelimitFallbackEnabled: Boolean = this.isVsyncFramelimitFallbackEnabled,
+        renderApi: GraphicsApi = this.renderApi,
+        adapterPriority: GpuPriority = this.adapterPriority,
+    ): SkiaLayerProperties {
+        return SkiaLayerProperties(
+            isVsyncEnabled = isVsyncEnabled,
+            isVsyncFramelimitFallbackEnabled = isVsyncFramelimitFallbackEnabled,
+            renderApi = renderApi,
+            adapterPriority = adapterPriority,
+        )
+    }
+
     override fun hashCode(): Int {
         var result = isVsyncEnabled.hashCode()
         result = 31 * result + isVsyncFramelimitFallbackEnabled.hashCode()
