@@ -1343,7 +1343,6 @@ $dokka.location:org.jetbrains.skia/Font/Font/#org.jetbrains.skia.Typeface?#kotli
 $dokka.location:org.jetbrains.skia/Font/Font/#org.jetbrains.skia.Typeface?#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-font/-font.html
 $dokka.location:org.jetbrains.skia/Font/Font/#org.jetbrains.skia.Typeface?/PointingToDeclaration/skiko/org.jetbrains.skia/-font/-font.html
 $dokka.location:org.jetbrains.skia/Font/areBitmapsEmbedded/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/are-bitmaps-embedded.html
-$dokka.location:org.jetbrains.skia/Font/areMetricsLinear/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/are-metrics-linear.html
 $dokka.location:org.jetbrains.skia/Font/edging/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/edging.html
 $dokka.location:org.jetbrains.skia/Font/getBounds/#kotlin.ShortArray?#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia/-font/get-bounds.html
 $dokka.location:org.jetbrains.skia/Font/getBounds/#kotlin.ShortArray?/PointingToDeclaration/skiko/org.jetbrains.skia/-font/get-bounds.html
@@ -1362,6 +1361,7 @@ $dokka.location:org.jetbrains.skia/Font/hinting/#/PointingToDeclaration/skiko/o
 $dokka.location:org.jetbrains.skia/Font/isAutoHintingForced/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/is-auto-hinting-forced.html
 $dokka.location:org.jetbrains.skia/Font/isBaselineSnapped/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/is-baseline-snapped.html
 $dokka.location:org.jetbrains.skia/Font/isEmboldened/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/is-emboldened.html
+$dokka.location:org.jetbrains.skia/Font/isLinearMetrics/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/is-linear-metrics.html
 $dokka.location:org.jetbrains.skia/Font/isSubpixel/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/is-subpixel.html
 $dokka.location:org.jetbrains.skia/Font/makeWithSize/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-font/make-with-size.html
 $dokka.location:org.jetbrains.skia/Font/measureText/#kotlin.String?#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia/-font/measure-text.html
