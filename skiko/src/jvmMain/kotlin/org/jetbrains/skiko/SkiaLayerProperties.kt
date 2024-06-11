@@ -15,7 +15,7 @@ package org.jetbrains.skiko
  * @property adapterPriority Specifies the GPU that will be selected for rendering.
  * Default value is [SkikoProperties.gpuPriority].
  */
-internal data class SkiaLayerProperties(
+class SkiaLayerProperties(
     val isVsyncEnabled: Boolean = SkikoProperties.vsyncEnabled,
     val isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
     val renderApi: GraphicsApi = SkikoProperties.renderApi,

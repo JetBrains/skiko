@@ -73,20 +73,12 @@ actual open class SkiaLayer internal constructor(
 
     constructor(
         externalAccessibleFactory: ((Component) -> Accessible)? = null,
-        isVsyncEnabled: Boolean = SkikoProperties.vsyncEnabled,
-        isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
-        renderApi: GraphicsApi = SkikoProperties.renderApi,
-        gpuPriority: GpuPriority = SkikoProperties.gpuPriority,
+        properties: SkiaLayerProperties,
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
         pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
     ) : this(
         externalAccessibleFactory,
-        SkiaLayerProperties(
-            isVsyncEnabled,
-            isVsyncFramelimitFallbackEnabled,
-            renderApi,
-            gpuPriority
-        ),
+        properties,
         RenderFactory.Default,
         analytics,
         pixelGeometry
