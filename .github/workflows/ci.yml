@@ -46,7 +46,7 @@ jobs:
           path: ./skiko/build/reports/tests
           retention-days: 5
 
-  ios:
+  iOS:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
@@ -99,7 +99,7 @@ jobs:
           path: ./skiko/build/reports/tests
           retention-days: 5
 
-   tvos:
+  tvOS:
     # TVOS requires macos 13 
     runs-on: macos-13
     # Steps represent a sequence of tasks that will be executed as part of the job
