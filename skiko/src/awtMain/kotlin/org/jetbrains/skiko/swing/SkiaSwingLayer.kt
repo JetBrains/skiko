@@ -128,7 +128,7 @@ open class SkiaSwingLayer(
         externalAccessible = externalAccessibleFactory?.invoke(this)
     )
 
-    override fun getAccessibleContext(): AccessibleContext {
+    override fun getAccessibleContext(): AccessibleContext? {
         return nativeAccessibleFocusHelper.accessibleContext ?: super.getAccessibleContext()
     }
 
