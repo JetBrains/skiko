@@ -2805,6 +2805,15 @@ $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.RendererAnalytics/init/#/
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/index.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics/device/#kotlin.String#org.jetbrains.skiko.OS#org.jetbrains.skiko.GraphicsApi#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/device.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics/renderer/#kotlin.String#org.jetbrains.skiko.OS#org.jetbrains.skiko.GraphicsApi/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/renderer.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/index.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/SkiaLayerProperties/#kotlin.Boolean#kotlin.Boolean#org.jetbrains.skiko.GraphicsApi#org.jetbrains.skiko.GpuPriority/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/-skia-layer-properties.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/adapterPriority/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/adapter-priority.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/copy/#kotlin.Boolean#kotlin.Boolean#org.jetbrains.skiko.GraphicsApi#org.jetbrains.skiko.GpuPriority/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/copy.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/equals.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/hash-code.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/isVsyncEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/is-vsync-enabled.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/isVsyncFramelimitFallbackEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/is-vsync-framelimit-fallback-enabled.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/render-api.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerRenderDelegate///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-render-delegate/index.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerRenderDelegate/SkiaLayerRenderDelegate/#org.jetbrains.skiko.SkiaLayer#org.jetbrains.skiko.SkikoRenderDelegate/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-render-delegate/-skia-layer-render-delegate.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerRenderDelegate/layer/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-render-delegate/layer.html
