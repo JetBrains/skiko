@@ -15,6 +15,7 @@ private fun isMac() = (hostOs == OS.MacOS)
 private fun isIos() = (hostOs == OS.Ios)
 private fun isLinux() = (hostOs == OS.Linux)
 private fun isWindows() = (hostOs == OS.Windows)
+private fun isTvos() = (hostOs == OS.Tvos)
 private fun isJs() = (kotlinBackend == KotlinBackend.JS)
 private val COARSE_EPSILON = 2.4f
 private const val jbMonoPath = "./fonts/JetBrainsMono-Regular.ttf"
@@ -91,6 +92,8 @@ class FontTests {
 
             assertEquals(if (isLinux() || isJs()) 26 else 24, firstGlyphPath.pointsCount)
 
+            //FontMetrics(_top=-11.64, _ascent=-11.64, _descent=3.24, _bottom=3.24, _leading=0.0, _avgCharWidth=29.46, _maxCharWidth=29.46, _xMin=-20.88, _xMax=8.58, _xHeight=6.6, _capHeight=8.64, _underlineThickness=0.54, _underlinePosition=1.44, _strikeoutThickness=0.54, _strikeoutPosition=-3.9), eps=0.01
+            //FontMetrics(_top=-11.64, _ascent=-11.64, _descent=3.2400002, _bottom=3.2400002, _leading=0.0, _avgCharWidth=7.2, _maxCharWidth=29.460001, _xMin=-20.880001, _xMax=8.58, _xHeight=6.6000004, _capHeight=8.64, _underlineThickness=0.54, _underlinePosition=1.4399999, _strikeoutThickness=0.54, _strikeoutPosition=-3.8999999)
             assertCloseEnough(FontMetrics(
                 top = -11.64f,
                 ascent = -11.64f,
@@ -99,7 +102,7 @@ class FontTests {
                 leading = 0f,
                 avgCharWidth = when {
                     isJs() -> 7.2f
-                    isIos() || isMac() -> 29.460001f
+                    isIos() || isMac() || isTvos() -> 29.460001f
                     isWindows() -> 0f
                     else -> 7.2f
                 },

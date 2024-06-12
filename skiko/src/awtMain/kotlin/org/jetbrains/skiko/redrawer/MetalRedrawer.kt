@@ -72,7 +72,7 @@ internal class MetalRedrawer(
         }
         _device = initDevice
         contextHandler = MetalContextHandler(layer, initDevice, adapter)
-        setVSyncEnabled(initDevice.ptr, properties.isVsyncEnabled)
+        setDisplaySyncEnabled(initDevice.ptr, properties.isVsyncEnabled)
     }
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
@@ -190,5 +190,13 @@ internal class MetalRedrawer(
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
-    private external fun setVSyncEnabled(device: Long, enabled: Boolean)
+
+    /**
+     * Set this value to true to synchronize the presentation of the layer’s contents with the display’s refresh,
+     * also known as vsync or vertical sync. If false, the layer presents new content more quickly,
+     * but possibly with brief visual artifacts (screen tearing).
+     *
+     * @note see https://developer.apple.com/documentation/quartzcore/cametallayer/2887087-displaysyncenabled
+     */
+    private external fun setDisplaySyncEnabled(device: Long, enabled: Boolean)
 }

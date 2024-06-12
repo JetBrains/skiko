@@ -71,6 +71,19 @@ actual open class SkiaLayer internal constructor(
         pixelGeometry
     )
 
+    constructor(
+        externalAccessibleFactory: ((Component) -> Accessible)? = null,
+        properties: SkiaLayerProperties,
+        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+        pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+    ) : this(
+        externalAccessibleFactory,
+        properties,
+        RenderFactory.Default,
+        analytics,
+        pixelGeometry
+    )
+
     val canvas: java.awt.Canvas
         get() = backedLayer
 

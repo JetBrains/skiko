@@ -37,9 +37,9 @@ class BreakIteratorTests {
     @SkipJsTarget
     @SkipWasmTarget
     fun breakIteratorCloneTest() {
-        // Wasm and iOS builds of Skia do not include required data to implement those iterators,
+        // Wasm, iOS, and tvOS builds of Skia do not include required data to implement those iterators,
         // see `third_party/externals/icu/flutter/README.md`.
-        if (hostOs == OS.Ios)
+        if (hostOs == OS.Ios || hostOs == OS.Tvos)
             return
 
         if (isDebugModeOnJvm)
