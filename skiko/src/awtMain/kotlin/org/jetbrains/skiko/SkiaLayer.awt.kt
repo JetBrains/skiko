@@ -335,15 +335,13 @@ actual open class SkiaLayer internal constructor(
         //
         // Please note that calling redraw during layout might break software renderers,
         // so applying this fix only for Direct3D case.
-        if (renderApi == GraphicsApi.DIRECT3D) {
+        if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
             redrawer?.syncSize()
             tryRedrawImmediately()
         }
     }
 
     private fun tryRedrawImmediately() {
-        if (!isShowing) return
-
         // It might be called inside `renderDelegate`,
         // so to avoid recursive call (not supported) just schedule redrawing.
         //
