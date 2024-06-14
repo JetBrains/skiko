@@ -18,7 +18,7 @@ internal class RenderExceptionsHandler {
                 try {
                     if (output == null) {
                         output = File(
-                            "${SkikoProperties.dataPath}/skiko-render-exception-${ProcessHandle.current().pid()}.log"
+                            "${SkikoProperties.logPath}/skiko-render-exception-${ProcessHandle.current().pid()}.log"
                         )
                         output!!.parentFile.mkdirs()
                     }
