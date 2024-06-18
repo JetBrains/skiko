@@ -81,7 +81,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nEmpty
 }
 
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nDefaultWithFallbackFontProvider(KNativePointer fallbackFontProviderPtr) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgrWithFallback__1nDefaultWithFallbackFontProvider(KNativePointer fallbackFontProviderPtr) {
     TypefaceFontProviderWithFallback* fallback = reinterpret_cast<TypefaceFontProviderWithFallback*>((fallbackFontProviderPtr));
     FontMgrWithFallbackWrapper* instance = new FontMgrWithFallbackWrapper(sk_ref_sp(fallback));
     return reinterpret_cast<KNativePointer>(instance);

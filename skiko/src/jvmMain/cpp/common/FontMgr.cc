@@ -73,7 +73,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nDefault
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nDefaultWithFallbackFontProvider
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrWithFallbackKt__1nDefaultWithFallbackFontProvider
 (JNIEnv* env, jclass jclass, jlong fallbackPtr) {
     TypefaceFontProviderWithFallback* fallback = reinterpret_cast<TypefaceFontProviderWithFallback*>((fallbackPtr));
     FontMgrWithFallbackWrapper* instance = new FontMgrWithFallbackWrapper(sk_ref_sp(fallback));

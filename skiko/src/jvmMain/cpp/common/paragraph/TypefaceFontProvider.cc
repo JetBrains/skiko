@@ -25,13 +25,13 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFont
 }
 
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderKt_TypefaceFontProvider_1nMakeAsFallbackProvider
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallbackKt__1nMakeAsFallbackProvider
   (JNIEnv* env, jclass jclass) {
     TypefaceFontProviderWithFallback* instance = new TypefaceFontProviderWithFallback();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderKt__1nRegisterTypefaceForFallback
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallbackKt__1nRegisterTypefaceForFallback
   (JNIEnv* env, jclass jclass, jlong ptr, jlong typefacePtr, jstring aliasStr) {
     TypefaceFontProviderWithFallback* instance = reinterpret_cast<TypefaceFontProviderWithFallback*>((ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>((typefacePtr));

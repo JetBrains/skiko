@@ -11,13 +11,6 @@ open class FontMgr : RefCnt {
         }
 
         val default = FontMgr(_nDefault(), false)
-
-        fun defaultWithFallbackFontProvider(fallback: TypefaceFontProvider): FontMgr {
-            require(fallback.isFallbackProvider) {
-                "fallback is required to be configured as a fallback provider. See TypefaceFontProvider.createAsFallbackProvider"
-            }
-            return FontMgr(_nDefaultWithFallbackFontProvider(fallback._ptr), false)
-        }
     }
 
     val familiesCount: Int
@@ -206,6 +199,3 @@ private external fun _nMakeFromData(ptr: NativePointer, dataPtr: NativePointer, 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nDefault")
 private external fun _nDefault(): NativePointer
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefaultWithFallbackFontProvider")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nDefaultWithFallbackFontProvider")
-private external fun _nDefaultWithFallbackFontProvider(fallbackPtr: NativePointer): NativePointer

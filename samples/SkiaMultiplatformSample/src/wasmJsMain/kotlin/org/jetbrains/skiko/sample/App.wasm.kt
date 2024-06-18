@@ -4,9 +4,9 @@ import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Data
-import org.jetbrains.skia.FontMgr
+import org.jetbrains.skia.FontMgrWithFallback
 import org.jetbrains.skia.Typeface
-import org.jetbrains.skia.paragraph.TypefaceFontProvider
+import org.jetbrains.skia.paragraph.TypefaceFontProviderWithFallback
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerRenderDelegate
 import org.w3c.dom.HTMLCanvasElement
@@ -43,11 +43,11 @@ internal fun runEmojiStoryApp() {
         val notoEmojiTypeface = Typeface.makeFromData(Data.makeFromBytes(notoEmojisBytes))
         val notoSansSCTypeface = Typeface.makeFromData(Data.makeFromBytes(notoSansSCBytes))
 
-        val tfp = TypefaceFontProvider.createAsFallbackProvider().apply {
+        val tfp = TypefaceFontProviderWithFallback().apply {
             registerTypeface(notoEmojiTypeface)
             registerTypeface(notoSansSCTypeface)
         }
-        EmojiStory.fontCollection.setDefaultFontManager(FontMgr.defaultWithFallbackFontProvider(tfp))
+        EmojiStory.fontCollection.setDefaultFontManager(FontMgrWithFallback(tfp))
 
         skiaLayer.needRedraw()
     }
