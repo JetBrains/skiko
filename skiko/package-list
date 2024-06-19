@@ -425,6 +425,10 @@ $dokka.location:org.jetbrains.skia.paragraph/TypefaceFontProvider.Companion///Po
 $dokka.location:org.jetbrains.skia.paragraph/TypefaceFontProvider///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-typeface-font-provider/index.html
 $dokka.location:org.jetbrains.skia.paragraph/TypefaceFontProvider/TypefaceFontProvider/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-typeface-font-provider/-typeface-font-provider.html
 $dokka.location:org.jetbrains.skia.paragraph/TypefaceFontProvider/registerTypeface/#org.jetbrains.skia.Typeface?#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-typeface-font-provider/register-typeface.html
+$dokka.location:org.jetbrains.skia.paragraph/TypefaceFontProviderWithFallback.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-typeface-font-provider-with-fallback/-companion/index.html
+$dokka.location:org.jetbrains.skia.paragraph/TypefaceFontProviderWithFallback///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-typeface-font-provider-with-fallback/index.html
+$dokka.location:org.jetbrains.skia.paragraph/TypefaceFontProviderWithFallback/TypefaceFontProviderWithFallback/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-typeface-font-provider-with-fallback/-typeface-font-provider-with-fallback.html
+$dokka.location:org.jetbrains.skia.paragraph/TypefaceFontProviderWithFallback/registerTypeface/#org.jetbrains.skia.Typeface?#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-typeface-font-provider-with-fallback/register-typeface.html
 $dokka.location:org.jetbrains.skia.shaper////PointingToDeclaration/skiko/org.jetbrains.skia.shaper/index.html
 $dokka.location:org.jetbrains.skia.shaper/BidiRun///PointingToDeclaration/skiko/org.jetbrains.skia.shaper/-bidi-run/index.html
 $dokka.location:org.jetbrains.skia.shaper/BidiRun/BidiRun/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.shaper/-bidi-run/-bidi-run.html
@@ -1465,6 +1469,8 @@ $dokka.location:org.jetbrains.skia/FontMgr/matchFamiliesStyleCharacter/#kotlin.A
 $dokka.location:org.jetbrains.skia/FontMgr/matchFamily/#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/match-family.html
 $dokka.location:org.jetbrains.skia/FontMgr/matchFamilyStyle/#kotlin.String?#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/match-family-style.html
 $dokka.location:org.jetbrains.skia/FontMgr/matchFamilyStyleCharacter/#kotlin.String?#org.jetbrains.skia.FontStyle#kotlin.Array[kotlin.String]?#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/match-family-style-character.html
+$dokka.location:org.jetbrains.skia/FontMgrWithFallback///PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr-with-fallback/index.html
+$dokka.location:org.jetbrains.skia/FontMgrWithFallback/FontMgrWithFallback/#org.jetbrains.skia.paragraph.TypefaceFontProviderWithFallback/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr-with-fallback/-font-mgr-with-fallback.html
 $dokka.location:org.jetbrains.skia/FontSlant.ITALIC///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-slant/-i-t-a-l-i-c/index.html
 $dokka.location:org.jetbrains.skia/FontSlant.OBLIQUE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-slant/-o-b-l-i-q-u-e/index.html
 $dokka.location:org.jetbrains.skia/FontSlant.UPRIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-slant/-u-p-r-i-g-h-t/index.html
@@ -2725,11 +2731,12 @@ $dokka.location:org.jetbrains.skiko/GraphicsApi/values/#/PointingToDeclaration/
 $dokka.location:org.jetbrains.skiko/KotlinBackend.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-j-s/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend.JVM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-j-v-m/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend.Native///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-native/index.html
-$dokka.location:org.jetbrains.skiko/KotlinBackend.WASM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-w-a-s-m/index.html
+$dokka.location:org.jetbrains.skiko/KotlinBackend.Wasm///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-wasm/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend///PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/entries.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/id/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/id.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/isNotJs/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/is-not-js.html
+$dokka.location:org.jetbrains.skiko/KotlinBackend/isWeb/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/is-web.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/value-of.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/values.html
 $dokka.location:org.jetbrains.skiko/Library///PointingToDeclaration/skiko/org.jetbrains.skiko/-library/index.html
