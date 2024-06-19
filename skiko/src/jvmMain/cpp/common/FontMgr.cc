@@ -4,6 +4,7 @@
 #include "SkData.h"
 #include "SkTypeface.h"
 #include "SkFontMgr.h"
+#include "FontMgrWithFallbackWrapper.hh"
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontMgrKt__1nGetFamiliesCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
@@ -69,5 +70,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeFrom
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nDefault
   (JNIEnv* env, jclass jclass) {
     SkFontMgr* instance = SkFontMgr::RefDefault().release();
+    return reinterpret_cast<jlong>(instance);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrWithFallbackKt__1nDefaultWithFallbackFontProvider
+(JNIEnv* env, jclass jclass, jlong fallbackPtr) {
+    TypefaceFontProviderWithFallback* fallback = reinterpret_cast<TypefaceFontProviderWithFallback*>((fallbackPtr));
+    FontMgrWithFallbackWrapper* instance = new FontMgrWithFallbackWrapper(sk_ref_sp(fallback));
     return reinterpret_cast<jlong>(instance);
 }

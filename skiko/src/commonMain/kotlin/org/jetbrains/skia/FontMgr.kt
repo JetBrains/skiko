@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.paragraph.TypefaceFontProvider
 
 open class FontMgr : RefCnt {
     companion object {

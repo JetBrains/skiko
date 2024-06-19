@@ -6,8 +6,11 @@ import javax.swing.*
 
 fun main() {
     val skiaLayer = SkiaLayer()
-    val clocks = AwtClocks(skiaLayer)
-    skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, clocks)
+    val app = run {
+        //EmojiStory()
+        AwtClocks(skiaLayer)
+    }
+    skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, app)
     SwingUtilities.invokeLater {
         val window = JFrame("Skiko example").apply {
             defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE

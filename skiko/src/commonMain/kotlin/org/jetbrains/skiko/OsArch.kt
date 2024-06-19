@@ -38,10 +38,11 @@ enum class KotlinBackend(val id: String) {
     JVM("jvm"),
     JS("js"),
     Native("native"),
-    WASM("wasm"),
+    Wasm("wasm"),
     ;
 
     fun isNotJs() = this != JS
+    fun isWeb() = this == JS || this == Wasm || this.id == "wasm"
 }
 
 // Note: it returns the host OS for web apps too
