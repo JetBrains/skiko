@@ -12,7 +12,7 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
 
-open class TypefaceFontProvider private constructor(
+open class TypefaceFontProvider internal constructor(
     ptr: NativePointer
 ) : FontMgr(ptr) {
 

@@ -11,7 +11,7 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 
 class TypefaceFontProviderWithFallback private constructor(
     ptr: NativePointer,
-) : FontMgr(ptr) {
+) : TypefaceFontProvider(ptr) {
 
     constructor() : this(_nMakeAsFallbackProvider())
 
@@ -21,7 +21,7 @@ class TypefaceFontProviderWithFallback private constructor(
         }
     }
 
-    fun registerTypeface(typeface: Typeface?, alias: String? = null): TypefaceFontProviderWithFallback {
+    override fun registerTypeface(typeface: Typeface?, alias: String?): TypefaceFontProviderWithFallback {
         return try {
             Stats.onNativeCall()
             interopScope {
