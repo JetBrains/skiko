@@ -26,17 +26,17 @@ jobs:
 
       - shell: bash
         name: 'Compile and run AWT tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:awtTest
+        run: ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:awtTest
 
       - shell: bash
         name: 'Compile and run macOS x64 tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:macosX64Test
+        run: ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:macosX64Test
 
       - shell: bash
         name: 'Publish to Maven Local, check AWT sample'
         run: |
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaAwtSample:installDist
+          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
+          ./gradlew --no-daemon --stacktrace --info :SkiaAwtSample:installDist
 
       - uses: actions/upload-artifact@v3
         name: 'Save test results as artifact'
