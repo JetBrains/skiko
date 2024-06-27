@@ -211,7 +211,7 @@ jobs:
 
       - shell: bash
         name: 'Compile and run AWT tests'
-        run: ./gradlew --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
+        run: ./gradlew --no-daemon --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
 
       - shell: bash
         name: 'Publish to Maven Local, check AWT sample'
