@@ -26,6 +26,8 @@ jobs:
 
       - shell: bash
         name: 'Compile and run AWT tests'
+        env:
+          GRADLE_OPTS: '-Dorg.gradle.daemon=false'
         run: ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:awtTest
 
       - shell: bash
