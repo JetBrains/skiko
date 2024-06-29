@@ -38,13 +38,13 @@ i.e. something like this
     }
 
     val osArch = System.getProperty("os.arch")
-    var targetArch = when (osArch) {
+    val targetArch = when (osArch) {
         "x86_64", "amd64" -> "x64"
         "aarch64" -> "arm64"
         else -> error("Unsupported arch: $osArch")
     }
 
-    val version = "0.7.9" // or any more recent version
+    val version = "0.8.9" // or any more recent version
     val target = "${targetOs}-${targetArch}"
     dependencies {
         implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
