@@ -1,8 +1,5 @@
 package org.jetbrains.skiko.windows
 
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import org.jetbrains.skiko.hostOs
 
 /**
@@ -21,6 +18,18 @@ object JumpList {
      * Wraps a single Jump List building transaction.
      */
     fun build(block: JumpListBuilder.() -> Unit) = when {
+        hostOs.isWindows -> JumpListBuilder().use { builder ->
+            builder.initialize()
+            block(builder)
+            builder.commit()
+        }
+        else -> error("Jump List is only supported on Windows")
+    }
+
+    /**
+     * Wraps a single Jump List building transaction.
+     */
+    suspend fun buildAsync(block: suspend JumpListBuilder.() -> Unit) = when {
         hostOs.isWindows -> JumpListBuilder().use { builder ->
             builder.initialize()
             block(builder)
