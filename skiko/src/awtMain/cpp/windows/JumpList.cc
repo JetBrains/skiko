@@ -195,6 +195,9 @@ jobject createJumpListInteropItemObject(JNIEnv* env, IShellLinkW *psl)
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1init(JNIEnv* env, jobject obj) {
+        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
+        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.", 0L);
+
         ComPtr<ICustomDestinationList> pcdl;
         THROW_IF_FAILED(
             CoCreateInstance(CLSID_DestinationList, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pcdl)),
@@ -294,6 +297,9 @@ extern "C"
     JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1getRemovedItems(
         JNIEnv* env, jobject obj, jlong ptr)
     {
+        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
+        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.", NULL);
+
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
             throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
@@ -328,12 +334,16 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1commit(
         JNIEnv* env, jobject obj, jlong ptr)
     {
+        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
+        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.",);
+
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
             throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
             return;
         }
-        THROW_IF_FAILED(pcdl->CommitList(), "Failed to CommitList.",);
+
+        THROW_IF_FAILED(pcdl->CommitList(), "Failed to commit the Jump List.",);
     }
 }
 

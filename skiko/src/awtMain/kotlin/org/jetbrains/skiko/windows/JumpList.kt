@@ -51,7 +51,7 @@ class JumpListItemAttributes {
 data class JumpListItemIcon(val path: String, val index: Int) {
     companion object {
         internal fun fromParts(path: String?, num: Int): JumpListItemIcon? {
-            if (path.isNullOrBlank()) return null
+            if (path.isNullOrEmpty()) return null
             return JumpListItemIcon(path, num)
         }
     }
