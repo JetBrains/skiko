@@ -192,6 +192,32 @@ jobject createJumpListInteropItemObject(JNIEnv* env, IShellLinkW *psl)
     return NULL;
 }
 
+bool createObjectArray(JNIEnv* env, jobjectArray jobjArray, IObjectArray **ppoa) {
+    jsize jobjArraySize = env->GetArrayLength(jobjArray);
+    if (0 == jobjArraySize) {
+        return false;
+    }
+
+    ComPtr<IObjectCollection> poc;
+    THROW_IF_FAILED(
+        CoCreateInstance(CLSID_EnumerableObjectCollection, NULL, CLSCTX_INPROC, IID_PPV_ARGS(&poc)),
+        "Failed to create an instance of EnumerableObjectCollection.", false
+    );
+
+    for (jsize i = 0; i < jobjArraySize; i++) {
+        jobject obj = env->GetObjectArrayElement(jobjArray, i);
+
+        ComPtr<IShellLinkW> psl;
+        createShellLinkFromInteropObject(env, obj, &psl);
+
+        THROW_IF_FAILED(poc->AddObject(psl.Get()), "Failed to add a shell link to the collection.", false);
+    }
+
+    THROW_IF_FAILED(poc->QueryInterface(IID_PPV_ARGS(ppoa)), "Failed to create an object array.", false);
+
+    return true;
+}
+
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1init(JNIEnv* env, jobject obj) {
@@ -265,8 +291,8 @@ extern "C"
         return itemsArray;
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTask(
-        JNIEnv* env, jobject obj, jlong ptr, jobject task)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTasks(
+        JNIEnv* env, jobject obj, jlong ptr, jobjectArray tasks)
     {
         CoInitializeWrapper initialize(COINIT_MULTITHREADED);
         THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.",);
@@ -283,13 +309,10 @@ extern "C"
             "Failed to create an instance of EnumerableObjectCollection.",
         );
 
-        ComPtr<IShellLinkW> psl;
-        createShellLinkFromInteropObject(env, task, &psl);
-
-        THROW_IF_FAILED(poc->AddObject(psl.Get()), "Failed to add a shell link to the collection.",);
-
         ComPtr<IObjectArray> poa;
-        THROW_IF_FAILED(poc->QueryInterface(IID_PPV_ARGS(&poa)), "Failed to cast the collection to an array.",);
+        if (!createObjectArray(env, tasks, &poa)) {
+            return;
+        }
 
         THROW_IF_FAILED(pcdl->AddUserTasks(poa.Get()), "Failed to add user tasks.",);
     }
@@ -306,28 +329,10 @@ extern "C"
             return;
         }
 
-        jsize itemsArraySize = env->GetArrayLength(itemsArray);
-        if (0 == itemsArraySize) {
+        ComPtr<IObjectArray> poa;
+        if (!createObjectArray(env, itemsArray, &poa)) {
             return;
         }
-
-        ComPtr<IObjectCollection> poc;
-        THROW_IF_FAILED(
-            CoCreateInstance(CLSID_EnumerableObjectCollection, NULL, CLSCTX_INPROC, IID_PPV_ARGS(&poc)),
-            "Failed to create an instance of EnumerableObjectCollection.",
-        );
-
-        for (jsize i = 0; i < itemsArraySize; i++) {
-            jobject obj = env->GetObjectArrayElement(itemsArray, i);
-
-            ComPtr<IShellLinkW> psl;
-            createShellLinkFromInteropObject(env, obj, &psl);
-
-            THROW_IF_FAILED(poc->AddObject(psl.Get()), "Failed to add a shell link to the collection.",);
-        }
-
-        ComPtr<IObjectArray> poa;
-        THROW_IF_FAILED(poc->QueryInterface(IID_PPV_ARGS(&poa)), "Failed to cast the collection to an array.",);
 
         std::wstring strCategory = toStdString(env, category);
 
