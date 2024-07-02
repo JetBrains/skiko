@@ -75,3 +75,19 @@ void throwJavaRenderExceptionByErrorCode(JNIEnv *env, const char *function, DWOR
     static jmethodID method = env->GetStaticMethodID(cls, "throwException", "(Ljava/lang/String;)V");
     env->CallStaticVoidMethod(cls, method, env->NewStringUTF(fullMsg));
 }
+
+
+void throwJavaRuntimeExceptionByErrorCodeWithContext(JNIEnv *env, const char * function, DWORD code, const char * context) {
+    char fullMsg[1024];
+    char *msg = 0;
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK,
+        NULL, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL
+    );
+    int result = snprintf(fullMsg, sizeof(fullMsg) - 1,
+        "Native exception in [%s], code %lu: %s\nContext: %s", function, code, msg, context);
+    LocalFree(msg);
+
+    static jclass cls = (jclass) env->NewGlobalRef(env->FindClass("java/lang/RuntimeException"));
+    env->ThrowNew(cls, fullMsg);
+}
