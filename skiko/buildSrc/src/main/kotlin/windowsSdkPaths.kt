@@ -2,6 +2,7 @@ import org.gradle.api.invocation.Gradle
 import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.*
 import org.gradle.nativeplatform.platform.internal.NativePlatformInternal
+import org.gradle.nativeplatform.toolchain.internal.EmptySystemLibraries
 import org.gradle.nativeplatform.toolchain.internal.SystemLibraries
 import org.gradle.nativeplatform.toolchain.internal.msvcpp.*
 import org.gradle.util.internal.VersionNumber
@@ -28,7 +29,8 @@ fun findWindowsSdkPaths(gradle: Gradle, arch: Arch): WindowsSdkPaths {
     val visualCpp = finder.findVisualCpp()
     val windowsSdk = finder.findWindowsSdk()
     val ucrt = finder.findUcrt()
-    val systemLibraries = listOf(visualCpp, windowsSdk, ucrt)
+    val winrt = finder.findWinrt()
+    val systemLibraries = listOf(visualCpp, windowsSdk, ucrt, winrt)
     return WindowsSdkPaths(
         compiler = visualCpp.compilerExecutable.fixPathFor(arch),
         linker = visualCpp.linkerExecutable.fixPathFor(arch),
@@ -93,6 +95,15 @@ private class GradleWindowsComponentFinderWrapper(
             )
         return ucrtComponent.getCRuntime(hostPlatform)
             ?: error("UCRT component for host platform '$hostPlatform' is null")
+    }
+
+    fun findWinrt(): SystemLibraries {
+        // Gradle doesn't have a Locator for WinRT, so we take the UCRT one and fix the path
+        return object : EmptySystemLibraries() {
+            override fun getIncludeDirs(): List<File> {
+                return findUcrt().includeDirs.map { File(it.path.replace("ucrt", "winrt")) }
+            }
+        }
     }
 
     private fun <T : Any> List<T>.chooseComponentByPreferredVersion(
