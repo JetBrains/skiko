@@ -313,6 +313,8 @@ fun SkikoProjectContext.createLinkJvmBindings(
                         "Advapi32.lib",
                         "gdi32.lib",
                         "Dwmapi.lib",
+                        "ole32.lib",
+                        "Propsys.lib",
                         "shcore.lib",
                         "user32.lib",
                     )

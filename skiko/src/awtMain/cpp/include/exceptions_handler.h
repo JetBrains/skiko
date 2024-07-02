@@ -7,4 +7,6 @@
 void throwJavaRenderExceptionByExceptionCode(JNIEnv *env, const char * function, DWORD code);
 void throwJavaRenderExceptionByErrorCode(JNIEnv *env, const char * function, DWORD code);
 
+void throwJavaRuntimeExceptionByErrorCodeWithContext(JNIEnv *env, const char * function, DWORD code, const char * context);
+
 #endif
