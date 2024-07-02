@@ -4,6 +4,7 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.*
 import org.gradle.nativeplatform.platform.internal.NativePlatformInternal
 import org.gradle.nativeplatform.toolchain.internal.SystemLibraries
 import org.gradle.nativeplatform.toolchain.internal.msvcpp.*
+import org.gradle.util.internal.VersionNumber
 import java.io.File
 import kotlin.math.abs
 
@@ -12,6 +13,7 @@ data class WindowsSdkPaths(
     val linker: File,
     val includeDirs: Collection<File>,
     val libDirs: Collection<File>,
+    val toolchainVersion: VersionNumber,
 )
 
 private const val ENV_SKIKO_VSBT_PATH = "SKIKO_VSBT_PATH"
@@ -32,6 +34,7 @@ fun findWindowsSdkPaths(gradle: Gradle, arch: Arch): WindowsSdkPaths {
         linker = visualCpp.linkerExecutable.fixPathFor(arch),
         includeDirs = systemLibraries.flatMap { it.includeDirs }.map { it.fixPathFor(arch) },
         libDirs = systemLibraries.flatMap { it.libDirs }.map { it.fixPathFor(arch) },
+        toolchainVersion = visualCpp.implementationVersion,
     )
 }
 
