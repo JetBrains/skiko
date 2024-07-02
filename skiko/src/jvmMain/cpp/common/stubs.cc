@@ -99,9 +99,9 @@ JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTask(
-        JNIEnv *env, jobject obj, jlong ptr, jobject task) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTask");
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTasks(
+        JNIEnv *env, jobject obj, jlong ptr, jobjectArray tasks) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTasks");
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addCategory(

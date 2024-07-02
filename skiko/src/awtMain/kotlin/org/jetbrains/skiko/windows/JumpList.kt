@@ -99,6 +99,11 @@ class JumpListItemIcon(val path: String, val index: Int) {
 class JumpListBuilder internal constructor() : AutoCloseable {
     private var jumpListPointer: Long = 0L
 
+    private var removedItems: List<JumpListItem> = listOf()
+
+    private val userTasks: MutableList<JumpListInteropItem> = mutableListOf()
+    private val categories: MutableMap<String, List<JumpListInteropItem>> = mutableMapOf()
+  
     /**
      * Starts the Jump List building transaction.
      */
@@ -121,15 +126,19 @@ class JumpListBuilder internal constructor() : AutoCloseable {
     }
 
     /**
-     * Creates a new list and returns a list of items the user has chosen to remove from the Jump List.
-     *
-     * @return Items the user has removed from the Jump List.
+     * Creates a new list.
      */
-    fun beginList(): List<JumpListItem> {
+    fun beginList() {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
-        val interopItems = jumpList_beginList(jumpListPointer)
-        return interopItems.map { it.fromInterop() }
+        jumpList_beginList(jumpListPointer).let { interopItems ->
+            removedItems = interopItems.map { it.fromInterop() }
+        }
     }
+
+    /**
+     * Returns a list of items the user has chosen to remove from their Jump List.
+     */
+    fun getRemovedItems(): List<JumpListItem> = removedItems
 
     /**
      * Adds a task to the Jump List. Tasks always appear in the canonical "Tasks" category
@@ -137,7 +146,7 @@ class JumpListBuilder internal constructor() : AutoCloseable {
      */
     fun addUserTask(task: JumpListItem) {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
-        jumpList_addUserTask(jumpListPointer, task.toInterop())
+        userTasks.add(task.toInterop())
     }
 
     /**
@@ -146,19 +155,25 @@ class JumpListBuilder internal constructor() : AutoCloseable {
      *
      * Make sure to exclude removed items returned by the [beginList] call as they may not be
      * re-added to the list during the same list-building transaction.
-     * [addCategory] will fail if an attempt to add an item in the removed list is made.
      */
     fun addCategory(category: String, items: List<JumpListItem>) {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
-        val interopItems = items.map { it.toInterop() }.toTypedArray()
-        jumpList_addCategory(jumpListPointer, category, interopItems)
+        items.map { it.toInterop() }.let { interopItems ->
+            categories.merge(category, interopItems) { existing, new -> existing + new }
+        }
     }
 
     /**
      * Finalises the Jump List building transaction by committing the list.
+     *
+     * @throws java.lang.RuntimeException An attempt to add an item in the removed list was made (see [addCategory])
      */
     fun commit() {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
+        jumpList_addUserTasks(jumpListPointer, userTasks.toTypedArray())
+        categories.forEach { (name, items) ->
+            jumpList_addCategory(jumpListPointer, name, items.toTypedArray())
+        }
         jumpList_commit(jumpListPointer)
     }
 
@@ -177,7 +192,7 @@ class JumpListBuilder internal constructor() : AutoCloseable {
 
     private external fun jumpList_setAppID(ptr: Long, appID: String)
     private external fun jumpList_beginList(ptr: Long): Array<JumpListInteropItem>
-    private external fun jumpList_addUserTask(ptr: Long, task: JumpListInteropItem)
+    private external fun jumpList_addUserTasks(ptr: Long, tasks: Array<JumpListInteropItem>)
     private external fun jumpList_addCategory(ptr: Long, category: String, itemsArray: Array<JumpListInteropItem>)
 
     private external fun jumpList_commit(ptr: Long)
