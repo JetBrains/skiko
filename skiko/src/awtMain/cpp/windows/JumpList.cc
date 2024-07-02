@@ -45,6 +45,9 @@ namespace org::jetbrains::skiko::windows {
     }
 }
 
+/**
+ * Convenience wrapper for CoInitialize / CoUninitialize calls.
+ */
 class CoInitializeWrapper {
     HRESULT _hr;
 public:
@@ -61,6 +64,9 @@ public:
     }
 };
 
+/**
+ * Convenience wrapper for PROPVARIANTs that need to be cleared.
+ */
 class PropVariantWrapper {
     PROPVARIANT _propvar;
     HRESULT _hr;
@@ -82,6 +88,9 @@ public:
     }
 };
 
+/**
+ * Creates a CLSID_ShellLink to insert into the Jump List.
+ */
 void createShellLink(
     JNIEnv* env,
     const std::wstring& title,
@@ -96,6 +105,7 @@ void createShellLink(
         "Failed to create a shell link.",
     );
 
+    // Use current executable for the shell link. Can contain a verbatim (\\?\) path so MAX_PATH might not be sufficient.
     WCHAR szAppPath[1024];
     if (0 == GetModuleFileNameW(NULL, szAppPath, ARRAYSIZE(szAppPath))) {
         THROW_IF_FAILED(HRESULT_FROM_WIN32(GetLastError()), "Failed to get current module's path.",);
@@ -113,6 +123,8 @@ void createShellLink(
         THROW_IF_FAILED(psl->SetIconLocation(iconPath.c_str(), iconNum), "Failed to set shell link's icon.",);
     }
 
+    // The title property is required on Jump List items provided as an IShellLink instance.
+    // This value is used as the display name in the Jump List.
     ComPtr<IPropertyStore> pps;
     THROW_IF_FAILED(psl->QueryInterface(IID_PPV_ARGS(&pps)), "Failed to cast shell link to IPropertyStore.",);
 
@@ -272,6 +284,10 @@ extern "C"
 
         std::wstring strCategory = toStdString(env, category);
 
+        // Items listed in the removed list may not be re-added to the Jump List during this
+        // list-building transaction.  They should not be re-added to the Jump List until
+        // the user has used the item again.  The AppendCategory call will fail if
+        // an attempt to add an item in the removed list is made.
         THROW_IF_FAILED(pcdl->AppendCategory(strCategory.c_str(), poa.Get()), "Failed to append category.",);
     }
 

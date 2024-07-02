@@ -9,11 +9,17 @@ import org.jetbrains.skiko.hostOs
  * Provides access to Windows Jump List features
  */
 object JumpList {
+    /**
+     * Returns a value that indicates whether Jump Lists are supported.
+     */
     fun isSupported(): Boolean = when {
         hostOs.isWindows -> true
         else -> false
     }
 
+    /**
+     * Wraps a single Jump List building transaction.
+     */
     fun build(block: JumpListBuilder.() -> Unit) = when {
         hostOs.isWindows -> JumpListBuilder().use { builder ->
             builder.initialize()
@@ -24,15 +30,24 @@ object JumpList {
     }
 }
 
+/**
+ * Represents an item in the Jump List.
+ */
 data class JumpListItem(val title: String, val arguments: String) {
     var attributes: JumpListItemAttributes? = null
 }
 
+/**
+ * Represents optional attributes that can be added to a Jump List item.
+ */
 class JumpListItemAttributes {
     var description: String? = null
     var icon: JumpListItemIcon? = null
 }
 
+/**
+ * Represents an icon that can be assigned to a Jump List item.
+ */
 data class JumpListItemIcon(val path: String, val index: Int) {
     companion object {
         internal fun fromParts(path: String?, num: Int): JumpListItemIcon? {
@@ -42,37 +57,66 @@ data class JumpListItemIcon(val path: String, val index: Int) {
     }
 }
 
+/**
+ * Provides functions to build the Jump List.
+ *
+ * This is a wrapper for ICustomDestinationList Windows COM interface.
+ */
 class JumpListBuilder internal constructor() : AutoCloseable {
     private var jumpListPointer: Long = 0L
 
+    /**
+     * Starts the Jump List building transaction.
+     */
     internal fun initialize() {
         jumpListPointer = jumpList_init().also { ptr ->
             check(ptr != 0L) { "Failed to initialize Windows jump list" }
         }
     }
 
+    /**
+     * Adds a task to the Jump List. Tasks always appear in the canonical "Tasks" category
+     * that is displayed at the bottom of the Jump List, after all other categories.
+     */
     fun addUserTask(task: JumpListItem) {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
         jumpList_addUserTask(jumpListPointer, task.toInterop())
     }
 
+    /**
+     * Adds a category to the Jump List. If there are more categories, they will appear
+     * from top to bottom in the order they are appended.
+     *
+     * Make sure to exclude items returned by the [getRemovedItems] call as they may not be
+     * re-added to the list during the same list-building transaction.
+     * [addCategory] will fail if an attempt to add an item in the removed list is made.
+     */
     fun addCategory(category: String, items: List<JumpListItem>) {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
         val interopItems = items.map { it.toInterop() }.toTypedArray()
         jumpList_addCategory(jumpListPointer, category, interopItems)
     }
 
+    /**
+     * Returns a list of items the user has chosen to remove from their Jump List.
+     */
     fun getRemovedItems(): List<JumpListItem> {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
         val interopItems = jumpList_getRemovedItems(jumpListPointer)
         return interopItems.map { it.fromInterop() }
     }
 
+    /**
+     * Finalises the Jump List building transaction by committing the list.
+     */
     internal fun commit() {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
         jumpList_commit(jumpListPointer)
     }
 
+    /**
+     * Frees the Jump List's native resources.
+     */
     override fun close() {
         if (jumpListPointer != 0L) {
             jumpList_dispose(jumpListPointer)
