@@ -33,8 +33,26 @@ object JumpList {
 /**
  * Represents an item in the Jump List.
  */
-data class JumpListItem(val title: String, val arguments: String) {
+class JumpListItem(val title: String, val arguments: String) {
     var attributes: JumpListItemAttributes? = null
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as JumpListItem
+
+        if (title != other.title) return false
+        if (arguments != other.arguments) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = title.hashCode()
+        result = 31 * result + arguments.hashCode()
+        return result
+    }
 }
 
 /**
@@ -47,8 +65,11 @@ class JumpListItemAttributes {
 
 /**
  * Represents an icon that can be assigned to a Jump List item.
+ *
+ * @param path A path to the file containing the icon.
+ * @param index An index of the icon in the specified file.
  */
-data class JumpListItemIcon(val path: String, val index: Int) {
+class JumpListItemIcon(val path: String, val index: Int) {
     companion object {
         internal fun fromParts(path: String?, num: Int): JumpListItemIcon? {
             if (path.isNullOrEmpty()) return null
@@ -133,11 +154,11 @@ class JumpListBuilder internal constructor() : AutoCloseable {
 
     private external fun jumpList_commit(ptr: Long)
 
-    private data class JumpListInteropItem(val title: String,
-                                           val arguments: String,
-                                           val description: String?,
-                                           val iconPath: String?,
-                                           val iconNum: Int)
+    private class JumpListInteropItem(val title: String,
+                                      val arguments: String,
+                                      val description: String?,
+                                      val iconPath: String?,
+                                      val iconNum: Int)
 
     private fun JumpListItem.toInterop() = JumpListInteropItem(
         title, arguments, attributes?.description, attributes?.icon?.path, attributes?.icon?.index ?: 0
