@@ -23,6 +23,28 @@ using ComPtr = Microsoft::WRL::ComPtr<T>;
         }                                                                                           \
     } while ((void)0, 0)
 
+namespace org::jetbrains::skiko::windows {
+    namespace JumpListInteropItem {
+        jclass cls;
+        jmethodID init;
+        jmethodID getTitle;
+        jmethodID getArguments;
+        jmethodID getDescription;
+        jmethodID getIconPath;
+        jmethodID getIconNum;
+    }
+
+    void ensure(JNIEnv* env) {
+        static jclass _cls = JumpListInteropItem::cls = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/windows/JumpListBuilder$JumpListInteropItem"));
+        static jmethodID _init = JumpListInteropItem::init = env->GetMethodID(_cls, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
+        static jmethodID _getTitle = JumpListInteropItem::getTitle = env->GetMethodID(_cls, "getTitle", "()Ljava/lang/String;");
+        static jmethodID _getArguments = JumpListInteropItem::getArguments = env->GetMethodID(_cls, "getArguments", "()Ljava/lang/String;");
+        static jmethodID _getDescription = JumpListInteropItem::getDescription = env->GetMethodID(_cls, "getDescription", "()Ljava/lang/String;");
+        static jmethodID _getIconPath = JumpListInteropItem::getIconPath = env->GetMethodID(_cls, "getIconPath", "()Ljava/lang/String;");
+        static jmethodID _getIconNum = JumpListInteropItem::getIconNum = env->GetMethodID(_cls, "getIconNum", "()I");
+    }
+}
+
 class CoInitializeWrapper {
     HRESULT _hr;
 public:
@@ -60,7 +82,14 @@ public:
     }
 };
 
-void createShellLink(JNIEnv* env, PCWSTR pszArguments, PCWSTR pszTitle, IShellLinkW **ppsl) {
+void createShellLink(
+    JNIEnv* env,
+    const std::wstring& title,
+    const std::wstring& arguments,
+    const std::optional<std::wstring>& description,
+    const std::optional<std::pair<std::wstring, int>>& icon,
+    IShellLinkW **ppsl)
+{
     ComPtr<IShellLinkW> psl;
     THROW_IF_FAILED(
         CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&psl)),
@@ -73,16 +102,21 @@ void createShellLink(JNIEnv* env, PCWSTR pszArguments, PCWSTR pszTitle, IShellLi
     }
 
     THROW_IF_FAILED(psl->SetPath(szAppPath), "Failed to set shell link's path.",);
-    THROW_IF_FAILED(psl->SetArguments(pszArguments), "Failed to set shell link's arguments.",);
-    THROW_IF_FAILED(
-        psl->SetDescription((pszTitle + std::wstring(L" (") + pszArguments + L")").c_str()),
-        "Failed to set shell link's description.",
-    );
+    THROW_IF_FAILED(psl->SetArguments(arguments.c_str()), "Failed to set shell link's arguments.",);
+
+    if (description.has_value()) {
+        THROW_IF_FAILED(psl->SetDescription(description.value().c_str()), "Failed to set shell link's description.",);
+    }
+
+    if (icon.has_value()) {
+        const auto& [iconPath, iconNum] = icon.value();
+        THROW_IF_FAILED(psl->SetIconLocation(iconPath.c_str(), iconNum), "Failed to set shell link's icon.",);
+    }
 
     ComPtr<IPropertyStore> pps;
     THROW_IF_FAILED(psl->QueryInterface(IID_PPV_ARGS(&pps)), "Failed to cast shell link to IPropertyStore.",);
 
-    PropVariantWrapper propvar(pszTitle);
+    PropVariantWrapper propvar(title.c_str());
     THROW_IF_FAILED(propvar, "Failed to create a PropVariant.",);
 
     THROW_IF_FAILED(pps->SetValue(PKEY_Title, propvar), "Failed to set shell link's title.",);
@@ -91,51 +125,59 @@ void createShellLink(JNIEnv* env, PCWSTR pszArguments, PCWSTR pszTitle, IShellLi
     THROW_IF_FAILED(psl->QueryInterface(IID_PPV_ARGS(ppsl)), "Failed to return the shell link.",);
 }
 
-std::optional<std::pair<std::wstring, std::wstring>> getShellLinkTitleAndArguments(IShellLinkW *psl) {
-    WCHAR szTitle[INFOTIPSIZE], szArguments[INFOTIPSIZE];
+void createShellLinkFromInteropObject(JNIEnv* env, jobject obj, IShellLinkW **ppsl) {
+    org::jetbrains::skiko::windows::ensure(env);
+
+    std::wstring title = toStdString(env, (jstring) env->CallObjectMethod(obj, org::jetbrains::skiko::windows::JumpListInteropItem::getTitle));
+    std::wstring arguments = toStdString(env, (jstring) env->CallObjectMethod(obj, org::jetbrains::skiko::windows::JumpListInteropItem::getArguments));
+
+    jstring jDescription = (jstring) env->CallObjectMethod(obj, org::jetbrains::skiko::windows::JumpListInteropItem::getDescription);
+    jstring jIconPath = (jstring) env->CallObjectMethod(obj, org::jetbrains::skiko::windows::JumpListInteropItem::getIconPath);
+    int jIconNum = (int) env->CallIntMethod(obj, org::jetbrains::skiko::windows::JumpListInteropItem::getIconNum);
+
+    std::optional<std::wstring> description =
+        env->IsSameObject(jDescription, NULL) ? std::nullopt : std::make_optional(toStdString(env, jDescription));
+    std::optional<std::pair<std::wstring, int>> icon =
+        env->IsSameObject(jIconPath, NULL) ? std::nullopt : std::make_optional(std::make_pair(toStdString(env, jIconPath), jIconNum));
+
+    return createShellLink(env, title, arguments, description, icon, ppsl);
+}
+
+jobject createJumpListInteropItemObject(JNIEnv* env, IShellLinkW *psl)
+{
+    org::jetbrains::skiko::windows::ensure(env);
+
     ComPtr<IPropertyStore> propStore;
     if (SUCCEEDED(psl->QueryInterface(IID_PPV_ARGS(&propStore)))) {
         PROPVARIANT propvar;
         if (SUCCEEDED(propStore->GetValue(PKEY_Title, &propvar))) {
             PropVariantWrapper propvarWrapper(propvar);
+            WCHAR szTitle[512];
             if (SUCCEEDED(PropVariantToString(propvar, szTitle, ARRAYSIZE(szTitle)))) {
+                WCHAR szArguments[1024];
                 if (SUCCEEDED(psl->GetArguments(szArguments, ARRAYSIZE(szArguments)))) {
-                    return std::make_pair<std::wstring, std::wstring>(szTitle, szArguments);
+                    WCHAR szIconPath[512];
+                    int numIcon;
+                    if (SUCCEEDED(psl->GetIconLocation(szIconPath, ARRAYSIZE(szIconPath), &numIcon))) {
+                        WCHAR szDescription[1024];
+                        if (SUCCEEDED(psl->GetDescription(szDescription, ARRAYSIZE(szDescription)))) {
+                            return env->NewObject(
+                                org::jetbrains::skiko::windows::JumpListInteropItem::cls,
+                                org::jetbrains::skiko::windows::JumpListInteropItem::init,
+                                env->NewString(reinterpret_cast<const jchar*>(szTitle), wcsnlen_s(szTitle, ARRAYSIZE(szTitle))),
+                                env->NewString(reinterpret_cast<const jchar*>(szArguments), wcsnlen_s(szArguments, ARRAYSIZE(szArguments))),
+                                env->NewString(reinterpret_cast<const jchar*>(szDescription), wcsnlen_s(szDescription, ARRAYSIZE(szDescription))),
+                                env->NewString(reinterpret_cast<const jchar*>(szIconPath), wcsnlen_s(szIconPath, ARRAYSIZE(szIconPath))),
+                                numIcon
+                            );
+                        }
+                    }
                 }
             }
         }
     }
-    return std::nullopt;
-}
 
-namespace org::jetbrains::skiko::windows::JumpListItem {
-    jclass cls;
-    jmethodID init;
-    jmethodID getTitle;
-    jmethodID getArguments;
-
-    void ensure(JNIEnv* env) {
-        static jclass _cls = cls = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/windows/JumpListItem"));
-        static jmethodID _init = init = env->GetMethodID(_cls, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
-        static jmethodID _getTitle = getTitle = env->GetMethodID(_cls, "getTitle", "()Ljava/lang/String;");
-        static jmethodID _getArguments = getArguments = env->GetMethodID(_cls, "getArguments", "()Ljava/lang/String;");
-    }
-}
-
-jobject createJumpListItemJObject(JNIEnv* env, const std::wstring& title, const std::wstring& arguments) {
-    org::jetbrains::skiko::windows::JumpListItem::ensure(env);
-    return env->NewObject(
-        org::jetbrains::skiko::windows::JumpListItem::cls, org::jetbrains::skiko::windows::JumpListItem::init,
-        env->NewString(reinterpret_cast<const jchar*>(title.c_str()), title.size()),
-        env->NewString(reinterpret_cast<const jchar*>(arguments.c_str()), arguments.size())
-    );
-}
-
-std::pair<std::wstring, std::wstring> getJumpListItemJObjectTitleAndArguments(JNIEnv* env, jobject obj) {
-    org::jetbrains::skiko::windows::JumpListItem::ensure(env);
-    std::wstring title = toStdString(env, (jstring) env->CallObjectMethod(obj, org::jetbrains::skiko::windows::JumpListItem::getTitle));
-    std::wstring arguments = toStdString(env, (jstring) env->CallObjectMethod(obj, org::jetbrains::skiko::windows::JumpListItem::getArguments));
-    return std::make_pair(title, arguments);
+    return NULL;
 }
 
 extern "C"
@@ -165,7 +207,7 @@ extern "C"
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTask(
-        JNIEnv* env, jobject obj, jlong ptr, jstring taskName, jstring taskExecArg)
+        JNIEnv* env, jobject obj, jlong ptr, jobject task)
     {
         CoInitializeWrapper initialize(COINIT_MULTITHREADED);
         THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.",);
@@ -176,19 +218,16 @@ extern "C"
             return;
         }
 
-        std::wstring strTaskName = toStdString(env, taskName);
-        std::wstring strTaskExecArg = toStdString(env, taskExecArg);
-
         ComPtr<IObjectCollection> poc;
         THROW_IF_FAILED(
             CoCreateInstance(CLSID_EnumerableObjectCollection, NULL, CLSCTX_INPROC, IID_PPV_ARGS(&poc)),
-            "Failed to create an instance of an object collection.",
+            "Failed to create an instance of EnumerableObjectCollection.",
         );
 
         ComPtr<IShellLinkW> psl;
-        createShellLink(env, strTaskExecArg.c_str(), strTaskName.c_str(), &psl);
+        createShellLinkFromInteropObject(env, task, &psl);
 
-        THROW_IF_FAILED(poc->AddObject(psl.Get()), "Failed to add the shell link to the collection.",);
+        THROW_IF_FAILED(poc->AddObject(psl.Get()), "Failed to add a shell link to the collection.",);
 
         ComPtr<IObjectArray> poa;
         THROW_IF_FAILED(poc->QueryInterface(IID_PPV_ARGS(&poa)), "Failed to cast the collection to an array.",);
@@ -220,12 +259,12 @@ extern "C"
         );
 
         for (jsize i = 0; i < itemsArraySize; i++) {
-            auto [title, arguments] = getJumpListItemJObjectTitleAndArguments(env, env->GetObjectArrayElement(itemsArray, i));
+            jobject obj = env->GetObjectArrayElement(itemsArray, i);
 
             ComPtr<IShellLinkW> psl;
-            createShellLink(env, arguments.c_str(), title.c_str(), &psl);
+            createShellLinkFromInteropObject(env, obj, &psl);
 
-            THROW_IF_FAILED(poc->AddObject(psl.Get()), "Failed to add an item to the category.",);
+            THROW_IF_FAILED(poc->AddObject(psl.Get()), "Failed to add a shell link to the collection.",);
         }
 
         ComPtr<IObjectArray> poa;
@@ -254,16 +293,15 @@ extern "C"
         UINT cItems;
         THROW_IF_FAILED(poaRemoved->GetCount(&cItems), "Failed to get removed destinations count.", NULL);
 
-        org::jetbrains::skiko::windows::JumpListItem::ensure(env);
-        jobjectArray itemsArray = env->NewObjectArray(cItems, org::jetbrains::skiko::windows::JumpListItem::cls, NULL);
+        org::jetbrains::skiko::windows::ensure(env);
+        jobjectArray itemsArray = env->NewObjectArray(cItems, org::jetbrains::skiko::windows::JumpListInteropItem::cls, NULL);
 
         for (UINT i = 0; i < cItems; i++) {
             ComPtr<IShellLinkW> pslRemoved;
             if (SUCCEEDED(poaRemoved->GetAt(i, IID_PPV_ARGS(&pslRemoved)))) {
-                auto optional = getShellLinkTitleAndArguments(pslRemoved.Get());
-                if (optional.has_value()) {
-                    auto [title, arguments] = optional.value();
-                    env->SetObjectArrayElement(itemsArray, i, createJumpListItemJObject(env, title, arguments));
+                jobject interopItem = createJumpListInteropItemObject(env, pslRemoved.Get());
+                if (interopItem != NULL) {
+                    env->SetObjectArrayElement(itemsArray, i, interopItem);
                 }
             }
         }

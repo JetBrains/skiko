@@ -90,7 +90,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTask(
-        JNIEnv *env, jobject obj, jlong ptr, jstring taskName, jstring taskExecArg) {
+        JNIEnv *env, jobject obj, jlong ptr, jobject task) {
     skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTask");
 }
 
