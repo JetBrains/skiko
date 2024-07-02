@@ -16,24 +16,28 @@ object JumpList {
 
     /**
      * Wraps a single Jump List building transaction.
+     *
+     * The transaction starts with a call to [JumpListBuilder.beginList] and is finalised
+     * by a call to [JumpListBuilder.commit].
      */
     fun build(block: JumpListBuilder.() -> Unit) = when {
         hostOs.isWindows -> JumpListBuilder().use { builder ->
             builder.initialize()
             block(builder)
-            builder.commit()
         }
         else -> error("Jump List is only supported on Windows")
     }
 
     /**
      * Wraps a single Jump List building transaction.
+     *
+     * The transaction starts with a call to [JumpListBuilder.beginList] and is finalised
+     * by a call to [JumpListBuilder.commit].
      */
     suspend fun buildAsync(block: suspend JumpListBuilder.() -> Unit) = when {
         hostOs.isWindows -> JumpListBuilder().use { builder ->
             builder.initialize()
             block(builder)
-            builder.commit()
         }
         else -> error("Jump List is only supported on Windows")
     }
@@ -105,6 +109,29 @@ class JumpListBuilder internal constructor() : AutoCloseable {
     }
 
     /**
+     * Specifies an optional AppUserModelID for the Jump List.
+     *
+     * This function must be called if the application has an explicit AppUserModelID.
+     *
+     * @throws java.lang.RuntimeException [setAppID] must be called before [beginList]
+     */
+    fun setAppID(appID: String) {
+        check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
+        jumpList_setAppID(jumpListPointer, appID)
+    }
+
+    /**
+     * Creates a new list and returns a list of items the user has chosen to remove from the Jump List.
+     *
+     * @return Items the user has removed from the Jump List.
+     */
+    fun beginList(): List<JumpListItem> {
+        check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
+        val interopItems = jumpList_beginList(jumpListPointer)
+        return interopItems.map { it.fromInterop() }
+    }
+
+    /**
      * Adds a task to the Jump List. Tasks always appear in the canonical "Tasks" category
      * that is displayed at the bottom of the Jump List, after all other categories.
      */
@@ -117,7 +144,7 @@ class JumpListBuilder internal constructor() : AutoCloseable {
      * Adds a category to the Jump List. If there are more categories, they will appear
      * from top to bottom in the order they are appended.
      *
-     * Make sure to exclude items returned by the [getRemovedItems] call as they may not be
+     * Make sure to exclude removed items returned by the [beginList] call as they may not be
      * re-added to the list during the same list-building transaction.
      * [addCategory] will fail if an attempt to add an item in the removed list is made.
      */
@@ -128,18 +155,9 @@ class JumpListBuilder internal constructor() : AutoCloseable {
     }
 
     /**
-     * Returns a list of items the user has chosen to remove from their Jump List.
-     */
-    fun getRemovedItems(): List<JumpListItem> {
-        check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
-        val interopItems = jumpList_getRemovedItems(jumpListPointer)
-        return interopItems.map { it.fromInterop() }
-    }
-
-    /**
      * Finalises the Jump List building transaction by committing the list.
      */
-    internal fun commit() {
+    fun commit() {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
         jumpList_commit(jumpListPointer)
     }
@@ -157,9 +175,10 @@ class JumpListBuilder internal constructor() : AutoCloseable {
     private external fun jumpList_init(): Long
     private external fun jumpList_dispose(ptr: Long)
 
+    private external fun jumpList_setAppID(ptr: Long, appID: String)
+    private external fun jumpList_beginList(ptr: Long): Array<JumpListInteropItem>
     private external fun jumpList_addUserTask(ptr: Long, task: JumpListInteropItem)
     private external fun jumpList_addCategory(ptr: Long, category: String, itemsArray: Array<JumpListInteropItem>)
-    private external fun jumpList_getRemovedItems(ptr: Long): Array<JumpListInteropItem>
 
     private external fun jumpList_commit(ptr: Long)
 

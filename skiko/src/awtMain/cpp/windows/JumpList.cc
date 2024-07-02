@@ -204,13 +204,6 @@ extern "C"
             "Failed to create CLSID_DestinationList.", 0L
         );
 
-        UINT uMaxSlots;
-        ComPtr<IObjectArray> poaRemoved;
-        THROW_IF_FAILED(
-            pcdl->BeginList(&uMaxSlots, IID_PPV_ARGS(&poaRemoved)),
-            "Failed to BeginList.", 0L
-        );
-
         return toJavaPointer(pcdl.Detach());
     }
 
@@ -219,6 +212,57 @@ extern "C"
     {
         ComPtr<ICustomDestinationList> pcdl;
         pcdl.Attach(fromJavaPointer<ICustomDestinationList*>(ptr));
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1setAppID(JNIEnv *env, jobject obj, jlong ptr, jstring appID) {
+        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
+        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.",);
+
+        ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
+        if (pcdl.Get() == NULL) {
+            throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
+            return;
+        }
+
+        std::wstring strAppID = toStdString(env, appID);
+
+        THROW_IF_FAILED(pcdl->SetAppID(strAppID.c_str()), "Failed to set AppUserModelID for the Jump List.",);
+    }
+
+    JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1beginList(JNIEnv *env, jobject obj, jlong ptr) {
+        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
+        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.", NULL);
+
+        ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
+        if (pcdl.Get() == NULL) {
+            throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
+            return NULL;
+        }
+
+        UINT uMaxSlots;
+        ComPtr<IObjectArray> poaRemoved;
+        THROW_IF_FAILED(
+            pcdl->BeginList(&uMaxSlots, IID_PPV_ARGS(&poaRemoved)),
+            "Failed to BeginList.", NULL
+        );
+
+        UINT cItems;
+        THROW_IF_FAILED(poaRemoved->GetCount(&cItems), "Failed to get removed destinations count.", NULL);
+
+        org::jetbrains::skiko::windows::ensure(env);
+        jobjectArray itemsArray = env->NewObjectArray(cItems, org::jetbrains::skiko::windows::JumpListInteropItem::cls, NULL);
+
+        for (UINT i = 0; i < cItems; i++) {
+            ComPtr<IShellLinkW> pslRemoved;
+            if (SUCCEEDED(poaRemoved->GetAt(i, IID_PPV_ARGS(&pslRemoved)))) {
+                jobject interopItem = createJumpListInteropItemObject(env, pslRemoved.Get());
+                if (interopItem != NULL) {
+                    env->SetObjectArrayElement(itemsArray, i, interopItem);
+                }
+            }
+        }
+
+        return itemsArray;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTask(
@@ -292,43 +336,6 @@ extern "C"
         // the user has used the item again.  The AppendCategory call will fail if
         // an attempt to add an item in the removed list is made.
         THROW_IF_FAILED(pcdl->AppendCategory(strCategory.c_str(), poa.Get()), "Failed to append category.",);
-    }
-
-    JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1getRemovedItems(
-        JNIEnv* env, jobject obj, jlong ptr)
-    {
-        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
-        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.", NULL);
-
-        ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
-        if (pcdl.Get() == NULL) {
-            throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
-            return NULL;
-        }
-
-        ComPtr<IObjectArray> poaRemoved;
-        THROW_IF_FAILED(
-            pcdl->GetRemovedDestinations(IID_PPV_ARGS(&poaRemoved)),
-            "Failed to get removed destinations.", NULL
-        );
-
-        UINT cItems;
-        THROW_IF_FAILED(poaRemoved->GetCount(&cItems), "Failed to get removed destinations count.", NULL);
-
-        org::jetbrains::skiko::windows::ensure(env);
-        jobjectArray itemsArray = env->NewObjectArray(cItems, org::jetbrains::skiko::windows::JumpListInteropItem::cls, NULL);
-
-        for (UINT i = 0; i < cItems; i++) {
-            ComPtr<IShellLinkW> pslRemoved;
-            if (SUCCEEDED(poaRemoved->GetAt(i, IID_PPV_ARGS(&pslRemoved)))) {
-                jobject interopItem = createJumpListInteropItemObject(env, pslRemoved.Get());
-                if (interopItem != NULL) {
-                    env->SetObjectArrayElement(itemsArray, i, interopItem);
-                }
-            }
-        }
-
-        return itemsArray;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1commit(
