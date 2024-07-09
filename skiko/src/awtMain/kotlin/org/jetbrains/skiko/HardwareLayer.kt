@@ -40,6 +40,10 @@ internal open class HardwareLayer(
     val contentHandle: Long
         get() = useDrawingSurfacePlatformInfo(::getContentHandle)
 
+    /**
+     * On macOS accessing this property returns an owning raw pointer to the NSWindow.
+     * Failure to pass this pointer to consuming APIs will result in a memory leak.
+     */
     val windowHandle: Long
         get() = useDrawingSurfacePlatformInfo(::getWindowHandle)
 

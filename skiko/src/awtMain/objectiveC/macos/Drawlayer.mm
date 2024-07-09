@@ -362,7 +362,14 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(J
 {
     @autoreleasepool {
         LayerHandler *layer = findByObject(env, component);
-        return (jlong) (__bridge void*) layer.window;
+
+        NSWindow *window = layer.window;
+
+        if (window) {
+            return (jlong) (__bridge_retained void*) window;
+        } else {
+            return 0;
+        }
     }
 }
 

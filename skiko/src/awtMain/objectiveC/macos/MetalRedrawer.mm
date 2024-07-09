@@ -121,6 +121,12 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr)
 {
     @autoreleasepool {
+        NSWindow *window = nil;
+
+        if (windowPtr != 0) {
+            window = (__bridge_transfer NSWindow *) (void *) windowPtr;
+        }
+
         id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
 
         MetalDevice *device = [MetalDevice new];
@@ -154,8 +160,6 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
 
         /// max inflight command buffers count matches swapchain size to avoid overcommitment
         device.inflightSemaphore = dispatch_semaphore_create(device.layer.maximumDrawableCount);
-
-        NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
 
         if (transparency) {
             window.hasShadow = NO;

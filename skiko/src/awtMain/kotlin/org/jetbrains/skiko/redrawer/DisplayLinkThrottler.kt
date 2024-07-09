@@ -7,9 +7,10 @@ internal class DisplayLinkThrottler {
 
     internal fun dispose() = dispose(implPtr)
 
-    /*
+    /**
      * Creates a DisplayLink if needed with refresh rate matching NSScreen of NSWindow passed in [windowPtr].
      * If DisplayLink is already active, blocks until next vsync for physical screen of NSWindow passed in [windowPtr].
+     * This API consumes [windowPtr], calling it transfers the ownership to the function.
      */
     internal fun waitVSync(windowPtr: Long) = waitVSync(implPtr, windowPtr)
 

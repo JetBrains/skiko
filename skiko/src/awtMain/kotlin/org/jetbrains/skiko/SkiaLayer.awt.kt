@@ -212,6 +212,8 @@ actual open class SkiaLayer internal constructor(
     /**
      * Returns the pointer to an OS specific window handle (native resource)
      * which the current [SkiaLayer] is attached.
+     * On macOS accessing this property returns an owning raw pointer to the NSWindow.
+     * Failure to pass this pointer to consuming APIs will result in a memory leak.
      */
     val windowHandle: Long
         get() = backedLayer.windowHandle

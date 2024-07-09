@@ -185,6 +185,9 @@ internal class MetalRedrawer(
         setLayerVisible(device.ptr, isVisible)
     }
 
+    /**
+     * This API consumes [window], calling it transfers the ownership to the function.
+     */
     private external fun createMetalDevice(window: Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
     private external fun disposeDevice(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
