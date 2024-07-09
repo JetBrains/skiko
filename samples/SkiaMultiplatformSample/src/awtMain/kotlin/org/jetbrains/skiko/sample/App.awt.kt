@@ -66,12 +66,13 @@ private fun createWindowsJumpList() {
             addUserTask(JumpListItem("User Task 1", "--user-task-1"))
 
             // Commit the Jump List and finish the transaction
-            runCatching {
-                commit()
-            }.onFailure { e ->
-                println("Couldn't build the Jump List. Please make sure Jump Lists are enabled for the user, " +
-                        "and that the sample is run via a separate executable.")
-                println(e.message)
+            try {
+                commit().onFailure {
+                    println("The Jump List has been committed but appending categories failed. Please make sure Jump Lists are enabled for the user.")
+                }
+            }
+            catch (e: JumpListException) {
+                println("Couldn't build the Jump List, most likely because the sample is run via java.exe. ${e.message}")
             }
         }
     }

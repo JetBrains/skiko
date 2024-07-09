@@ -9,18 +9,17 @@
 #include <optional>
 
 #include "jni_helpers.h"
-#include "exceptions_handler.h"
 
 template <typename T>
 using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-#define THROW_IF_FAILED(action, message, ret)                                                       \
-    do {                                                                                            \
-        HRESULT hr { action };                                                                      \
-        if (FAILED(hr)) {                                                                           \
-            throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, DWORD(hr), message); \
-            return ret;                                                                             \
-        }                                                                                           \
+#define THROW_IF_FAILED(action, message, ret)                               \
+    do {                                                                    \
+        HRESULT hr { action };                                              \
+        if (FAILED(hr)) {                                                   \
+            throwJumpListException(env, __FUNCTION__, DWORD(hr), message);  \
+            return ret;                                                     \
+        }                                                                   \
     } while ((void)0, 0)
 
 namespace org::jetbrains::skiko::windows {
@@ -68,6 +67,24 @@ public:
         return _propvar;
     }
 };
+
+void throwJumpListException(JNIEnv *env, const char * function, DWORD code, const char * context) {
+    char fullMsg[1024];
+    char *msg = 0;
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK,
+        NULL, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL
+    );
+    int result = snprintf(fullMsg, sizeof(fullMsg) - 1,
+        "Native exception in [%s], code %lu: %s\nContext: %s", function, code, msg, context);
+    LocalFree(msg);
+
+    static jclass cls = static_cast<jclass>(env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/windows/JumpListException")));
+    static jmethodID init = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
+
+    jthrowable throwable = (jthrowable) env->NewObject(cls, init, env->NewStringUTF(fullMsg), code);
+    env->Throw(throwable);
+}
 
 /**
  * Creates a CLSID_ShellLink to insert into the Jump List.
@@ -224,7 +241,7 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1setAppID(JNIEnv *env, jobject obj, jlong ptr, jstring appID) {
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
-            throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
+            throwJumpListException(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
             return;
         }
 
@@ -236,7 +253,7 @@ extern "C"
     JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1beginList(JNIEnv *env, jobject obj, jlong ptr) {
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
-            throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
+            throwJumpListException(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
             return NULL;
         }
 
@@ -271,7 +288,7 @@ extern "C"
     {
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
-            throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
+            throwJumpListException(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
             return;
         }
 
@@ -294,7 +311,7 @@ extern "C"
     {
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
-            throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
+            throwJumpListException(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
             return;
         }
 
@@ -317,7 +334,7 @@ extern "C"
     {
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
-            throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
+            throwJumpListException(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
             return;
         }
 

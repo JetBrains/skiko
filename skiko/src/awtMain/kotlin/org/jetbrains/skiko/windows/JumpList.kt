@@ -20,7 +20,7 @@ object JumpList {
      * The transaction starts with a call to [JumpListBuilder.beginList] and is finalised
      * by a call to [JumpListBuilder.commit].
      */
-    fun build(block: JumpListBuilder.() -> Unit) = when {
+    fun <R> build(block: JumpListBuilder.() -> R): R = when {
         hostOs.isWindows -> JumpListBuilder().use { builder ->
             builder.initialize()
             block(builder)
@@ -34,7 +34,7 @@ object JumpList {
      * The transaction starts with a call to [JumpListBuilder.beginList] and is finalised
      * by a call to [JumpListBuilder.commit].
      */
-    suspend fun buildAsync(block: suspend JumpListBuilder.() -> Unit) = when {
+    suspend fun <R> buildAsync(block: suspend JumpListBuilder.() -> R): R = when {
         hostOs.isWindows -> JumpListBuilder().use { builder ->
             builder.initialize()
             block(builder)
@@ -118,7 +118,7 @@ class JumpListBuilder internal constructor() : AutoCloseable {
      *
      * This function must be called if the application has an explicit AppUserModelID.
      *
-     * @throws java.lang.RuntimeException [setAppID] must be called before [beginList]
+     * @throws JumpListException [setAppID] must be called before [beginList]
      */
     fun setAppID(appID: String) {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
@@ -166,15 +166,31 @@ class JumpListBuilder internal constructor() : AutoCloseable {
     /**
      * Finalises the Jump List building transaction by committing the list.
      *
-     * @throws java.lang.RuntimeException An attempt to add an item in the removed list was made (see [addCategory])
+     * @return [Result.success] if the list has been committed successfully. [Result.failure] if there was
+     * a recoverable error when committing the list. In the latter case, the list was still committed, but
+     * might lack some or all categories.
+     *
+     * @throws JumpListException An attempt to add an item in the removed list was made (see [addCategory])
      */
-    fun commit() {
+    fun commit(): Result<Unit> {
         check(jumpListPointer != 0L) { "The jump list pointer is invalid" }
         jumpList_addUserTasks(jumpListPointer, userTasks.toTypedArray())
-        categories.forEach { (name, items) ->
-            jumpList_addCategory(jumpListPointer, name, items.toTypedArray())
+        val result = try {
+            categories.forEach { (name, items) ->
+                jumpList_addCategory(jumpListPointer, name, items.toTypedArray())
+            }
+            Result.success(Unit)
+        }
+        catch (e: JumpListException) {
+            // According to the documentation, in case if AppendCategory fails with E_ACCESSDENIED,
+            // the application should continue to update tasks and call CommitList.
+            if (e.code != -2147024891) {
+                throw e
+            }
+            Result.failure(e)
         }
         jumpList_commit(jumpListPointer)
+        return result
     }
 
     /**
@@ -218,3 +234,5 @@ class JumpListBuilder internal constructor() : AutoCloseable {
             }
         }
 }
+
+class JumpListException(message: String, val code: Int) : RuntimeException(message)
