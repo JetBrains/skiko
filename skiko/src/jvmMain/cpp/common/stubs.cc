@@ -91,7 +91,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1setAppID(JNIEnv *env, jobject obj, jlong ptr, jstring appID) {
     skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1setAppID");
-    return 0;
 }
 
 JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1beginList(JNIEnv *env, jobject obj, jlong ptr) {

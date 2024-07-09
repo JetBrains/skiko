@@ -46,25 +46,6 @@ namespace org::jetbrains::skiko::windows {
 }
 
 /**
- * Convenience wrapper for CoInitialize / CoUninitialize calls.
- */
-class CoInitializeWrapper {
-    HRESULT _hr;
-public:
-    CoInitializeWrapper(COINIT flags) {
-        _hr = CoInitializeEx(NULL, flags);
-    }
-    ~CoInitializeWrapper() {
-        if (SUCCEEDED(_hr)) {
-            CoUninitialize();
-        }
-    }
-    operator HRESULT() {
-        return _hr;
-    }
-};
-
-/**
  * Convenience wrapper for PROPVARIANTs that need to be cleared.
  */
 class PropVariantWrapper {
@@ -221,8 +202,7 @@ bool createObjectArray(JNIEnv* env, jobjectArray jobjArray, IObjectArray **ppoa)
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1init(JNIEnv* env, jobject obj) {
-        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
-        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.", 0L);
+        THROW_IF_FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED), "Failed to initialize COM apartment.", 0L);
 
         ComPtr<ICustomDestinationList> pcdl;
         THROW_IF_FAILED(
@@ -236,14 +216,12 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1dispose(
         JNIEnv* env, jobject obj, jlong ptr)
     {
-        ComPtr<ICustomDestinationList> pcdl;
-        pcdl.Attach(fromJavaPointer<ICustomDestinationList*>(ptr));
+        ICustomDestinationList* pcdl = fromJavaPointer<ICustomDestinationList*>(ptr);
+        pcdl->Release();
+        CoUninitialize();
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1setAppID(JNIEnv *env, jobject obj, jlong ptr, jstring appID) {
-        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
-        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.",);
-
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
             throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
@@ -256,9 +234,6 @@ extern "C"
     }
 
     JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1beginList(JNIEnv *env, jobject obj, jlong ptr) {
-        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
-        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.", NULL);
-
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
             throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
@@ -294,9 +269,6 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTasks(
         JNIEnv* env, jobject obj, jlong ptr, jobjectArray tasks)
     {
-        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
-        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.",);
-
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
             throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
@@ -320,9 +292,6 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addCategory(
         JNIEnv* env, jobject obj, jlong ptr, jstring category, jobjectArray itemsArray)
     {
-        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
-        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.",);
-
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
             throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
@@ -346,9 +315,6 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1commit(
         JNIEnv* env, jobject obj, jlong ptr)
     {
-        CoInitializeWrapper initialize(COINIT_MULTITHREADED);
-        THROW_IF_FAILED(initialize, "Failed to initialize COM apartment.",);
-
         ComPtr<ICustomDestinationList> pcdl { fromJavaPointer<ICustomDestinationList*>(ptr) };
         if (pcdl.Get() == NULL) {
             throwJavaRuntimeExceptionByErrorCodeWithContext(env, __FUNCTION__, E_POINTER, "Native pointer is null.");
