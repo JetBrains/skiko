@@ -24,6 +24,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.withType
+import org.gradle.util.internal.VersionNumber
 import projectDirs
 import registerOrGetSkiaDirProvider
 import registerSkikoTask
@@ -295,6 +296,16 @@ fun SkikoProjectContext.createLinkJvmBindings(
                         "/ignore:4217"
                     )
                 )
+                // workaround for VS Build Tools 2022 (17.2+) change
+                // https://developercommunity.visualstudio.com/t/-imp-std-init-once-complete-unresolved-external-sy/1684365#T-N10041864
+                if (windowsSdkPaths.toolchainVersion >= VersionNumber.parse("14.32")) {
+                    addAll(
+                        arrayOf(
+                            "/ALTERNATENAME:__imp___std_init_once_begin_initialize=__imp_InitOnceBeginInitialize",
+                            "/ALTERNATENAME:__imp___std_init_once_complete=__imp_InitOnceComplete"
+                        )
+                    )
+                }
                 addAll(
                     arrayOf(
                         "/NOLOGO",
@@ -302,6 +313,8 @@ fun SkikoProjectContext.createLinkJvmBindings(
                         "Advapi32.lib",
                         "gdi32.lib",
                         "Dwmapi.lib",
+                        "ole32.lib",
+                        "Propsys.lib",
                         "shcore.lib",
                         "user32.lib",
                     )

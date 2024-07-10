@@ -79,6 +79,38 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initFe
         JNIEnv *env, jobject redrawer, jlong devicePtr) {
     skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initFence");
 }
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1init(JNIEnv *env, jobject obj) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1init");
+    return 0;
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1dispose(JNIEnv *env, jobject obj, jlong ptr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1dispose");
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1setAppID(JNIEnv *env, jobject obj, jlong ptr, jstring appID) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1setAppID");
+}
+
+JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1beginList(JNIEnv *env, jobject obj, jlong ptr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1beginList");
+    return 0;
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTasks(
+        JNIEnv *env, jobject obj, jlong ptr, jobjectArray tasks) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addUserTasks");
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addCategory(
+        JNIEnv *env, jobject obj, jlong ptr, jstring category, jobjectArray itemsArray) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1addCategory");
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1commit(JNIEnv *env, jobject obj, jlong ptr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1commit");
+}
 #endif
 
 
