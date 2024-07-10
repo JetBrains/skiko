@@ -178,6 +178,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 }
 
 - (void)invalidateDisplayLink {
+    // Assumed to be run inside _lock, except for dealloc
     if (_displayLink) {
         CVDisplayLinkStop(_displayLink);
         CVDisplayLinkRelease(_displayLink);
@@ -186,6 +187,8 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 }
 
 - (void)createDisplayLink {
+    // Assumed to be run inside _lock
+
     [self invalidateDisplayLink];
 
     if (_currentScreenID < 0) {
