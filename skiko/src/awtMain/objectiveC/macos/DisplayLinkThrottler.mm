@@ -123,9 +123,9 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     } else {
         if (_displayLink) {
             // if display link is present, check if it's for the correct screen, avoid conversion shenanigans
-            int64_t currentScreenID = _currentScreenID;
+            int64_t displayLinkScreenID = _displayLinkScreenID;
 
-            if (_displayLinkScreenID != currentScreenID) {
+            if (displayLinkScreenID != currentScreenID) {
                 [self createDisplayLink];
             }
         } else {
@@ -183,6 +183,8 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
         CVDisplayLinkStop(_displayLink);
         CVDisplayLinkRelease(_displayLink);
         _displayLink = nil;
+
+        NSLog(@"DisplayLinkThrottler: Display link invalidated for screen %lld", _displayLinkScreenID);
     }
 }
 
@@ -224,6 +226,8 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     }
 
     _displayLinkScreenID = _currentScreenID;
+
+    NSLog(@"DisplayLinkThrottler: Display link created for screen %lld", _displayLinkScreenID);
 }
 
 - (void)dealloc {
