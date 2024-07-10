@@ -68,6 +68,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
         _window = window;
         _displayLink = nil;
         _vsyncConditionLock = [[NSConditionLock alloc] initWithCondition: 1];
+        _lock = [NSLock new];
         _isSleeping = NO;
 
         NSNotificationCenter *notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
