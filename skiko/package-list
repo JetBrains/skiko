@@ -2618,6 +2618,38 @@ $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/renderApi/#/PointingToD
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/requestNativeFocusOnAccessible/#javax.accessibility.Accessible?/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/request-native-focus-on-accessible.html
 $dokka.location:org.jetbrains.skiko.wasm////PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/index.html
 $dokka.location:org.jetbrains.skiko.wasm//onWasmReady/#kotlin.Function0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/on-wasm-ready.html
+$dokka.location:org.jetbrains.skiko.windows////PointingToDeclaration/skiko/org.jetbrains.skiko.windows/index.html
+$dokka.location:org.jetbrains.skiko.windows/JumpList///PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list/index.html
+$dokka.location:org.jetbrains.skiko.windows/JumpList/build/#kotlin.Function1[org.jetbrains.skiko.windows.JumpListBuilder,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list/build.html
+$dokka.location:org.jetbrains.skiko.windows/JumpList/buildAsync/#kotlin.coroutines.SuspendFunction1[org.jetbrains.skiko.windows.JumpListBuilder,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list/build-async.html
+$dokka.location:org.jetbrains.skiko.windows/JumpList/isSupported/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list/is-supported.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListBuilder///PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-builder/index.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListBuilder/addCategory/#kotlin.String#kotlin.collections.List[org.jetbrains.skiko.windows.JumpListItem]/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-builder/add-category.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListBuilder/addUserTask/#org.jetbrains.skiko.windows.JumpListItem/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-builder/add-user-task.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListBuilder/beginList/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-builder/begin-list.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListBuilder/close/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-builder/close.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListBuilder/commit/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-builder/commit.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListBuilder/getRemovedItems/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-builder/get-removed-items.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListBuilder/setAppID/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-builder/set-app-i-d.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListException///PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-exception/index.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListException/JumpListException/#kotlin.String#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-exception/-jump-list-exception.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListException/code/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-exception/code.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItem///PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item/index.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItem/JumpListItem/#kotlin.String#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item/-jump-list-item.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItem/arguments/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item/arguments.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItem/attributes/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item/attributes.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItem/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item/equals.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItem/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item/hash-code.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItem/title/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item/title.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItemAttributes///PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item-attributes/index.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItemAttributes/JumpListItemAttributes/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item-attributes/-jump-list-item-attributes.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItemAttributes/description/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item-attributes/description.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItemAttributes/icon/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item-attributes/icon.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItemIcon.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item-icon/-companion/index.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItemIcon///PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item-icon/index.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItemIcon/JumpListItemIcon/#kotlin.String#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item-icon/-jump-list-item-icon.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItemIcon/index/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item-icon/--index--.html
+$dokka.location:org.jetbrains.skiko.windows/JumpListItemIcon/path/#/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list-item-icon/path.html
 $dokka.location:org.jetbrains.skiko////PointingToDeclaration/skiko/org.jetbrains.skiko/index.html
 $dokka.location:org.jetbrains.skiko//MainUIDispatcher/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-main-u-i-dispatcher.html
 $dokka.location:org.jetbrains.skiko//available/#kotlin.Array[kotlin.Pair[org.jetbrains.skiko.OS,org.jetbrains.skiko.OSVersion]]/PointingToDeclaration/skiko/org.jetbrains.skiko/available.html
@@ -2899,4 +2931,5 @@ org.jetbrains.skiko
 org.jetbrains.skiko.ios
 org.jetbrains.skiko.swing
 org.jetbrains.skiko.wasm
+org.jetbrains.skiko.windows
 
