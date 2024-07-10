@@ -60,7 +60,7 @@ internal class MetalRedrawer(
         }
 
     private val adapter = chooseMetalAdapter(properties.adapterPriority)
-    private val displayLinkThrottler = DisplayLinkThrottler()
+    private val displayLinkThrottler = DisplayLinkThrottler(layer.windowHandle)
 
     private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
     @Volatile private var isWindowOccluded = false
@@ -159,7 +159,7 @@ internal class MetalRedrawer(
             // Wait for vsync because:
             // - macOS drops the second/next drawables if they are sent in the same vsync
             // - it makes frames consistent and limits FPS
-            displayLinkThrottler.waitVSync(windowPtr = layer.windowHandle)
+            displayLinkThrottler.waitVSync()
 
             autoreleasepool {
                 contextHandler.draw()
