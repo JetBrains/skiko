@@ -78,6 +78,15 @@ class FontMgrTest {
                 assertEquals(jbMono, styleSet.matchStyle(FontStyle.ITALIC))
             }
 
+            /*
+            when `TypefaceFontProvider` is used
+            `matchFamilyStyle` always returns null,
+            even if we have an appropriate styles in styleSet returned by `matchFamily`
+            It should be fixed in skia at some point
+             */
+            assertNull(fontManager.matchFamilyStyle(null, FontStyle.NORMAL))
+            assertNull(fontManager.matchFamilyStyle("JetBrains Mono", FontStyle.NORMAL))
+
             assertNull(fontManager.matchFamilyStyle("JetBrains Mono", FontStyle.BOLD))
             assertNull(fontManager.matchFamilyStyle("Interface", FontStyle.NORMAL))
 
