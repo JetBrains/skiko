@@ -141,12 +141,6 @@ class SkikoProperties(private val myProject: Project) {
     val includeTestHelpers: Boolean
         get() = !isRelease
 
-    fun skiaReleaseFor(os: OS, arch: Arch, buildType: SkiaBuildType, isIosSim: Boolean = false): String {
-        val target = "${os.idWithSuffix(isUikitSim = isIosSim)}-${arch.id}"
-        val tag = myProject.property("dependencies.skia.$target") as String
-        return "${tag}/Skia-${tag}-${os.idWithSuffix(isUikitSim = isIosSim)}-${buildType.id}-${arch.id}"
-    }
-
     val releaseGithubVersion: String
         get() = (myProject.property("release.github.version") as String)
 
@@ -162,7 +156,7 @@ class SkikoProperties(private val myProject: Project) {
                 System.getenv()["SKIA_DIR"]
                 ?: System.getProperty("skia.dir")
                 ?: myProject.findProperty("skia.dir")?.toString()
-            )?.let { File(it) }?.takeIf { it.isDirectory }
+            )?.let { File(it) }
 
     val composeRepoUrl: String
         get() = System.getenv("COMPOSE_REPO_URL") ?: "https://maven.pkg.jetbrains.space/public/p/compose/dev"

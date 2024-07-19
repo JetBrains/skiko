@@ -1,10 +1,11 @@
-import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 
@@ -31,32 +32,25 @@ class SkikoProjectContext(
  */
 fun SkikoProjectContext.registerOrGetSkiaDirProvider(
     os: OS, arch: Arch, isUikitSim: Boolean = false
-): Provider<File> = with(this.project) {
+): Provider<File> {
     val taskNameSuffix = joinToTitleCamelCase(buildType.id, os.idWithSuffix(isUikitSim = isUikitSim), arch.id)
-    val skiaRelease = skiko.skiaReleaseFor(os, arch, buildType, isUikitSim)
-    val downloadSkia = tasks.registerOrGetTask<Download>("downloadSkia$taskNameSuffix") {
-        onlyIf { !dest.exists() }
-        onlyIfModified(true)
-        val skiaUrl = "https://github.com/JetBrains/skia-pack/releases/download/$skiaRelease.zip"
-        inputs.property("skia.url", skiaUrl)
-        src(skiaUrl)
-        dest(skiko.dependenciesDir.resolve("skia/$skiaRelease.zip"))
-    }.map { it.dest.absoluteFile }
 
-    return if (skiko.skiaDir != null) {
-        tasks.registerOrGetTask<DefaultTask>("skiaDir$taskNameSuffix") {
+    val skiaDir = skiko.skiaDir
+    return if (skiaDir != null) {
+        if (!skiaDir.isDirectory) {
+            throw(GradleException("\"skiko.skiaDir\" property was explicitely set to ${skiaDir} which is not a directory"))
+        }
+        project.tasks.registerOrGetTask<DefaultTask>("skiaDir$taskNameSuffix") {
             // dummy task to simplify usage of the resulting provider (see `else` branch)
             // if a file provider is not created from a task provider,
             // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
             // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
             enabled = false
-        }.map { skiko.skiaDir!!.absoluteFile }
+        }.map {
+            skiaDir.absoluteFile
+        }
     } else {
-        tasks.registerOrGetTask<Copy>("unzipSkia$taskNameSuffix") {
-            dependsOn(downloadSkia)
-            from(downloadSkia.map { zipTree(it) })
-            into(skiko.dependenciesDir.resolve("skia/$skiaRelease"))
-        }.map { it.destinationDir.absoluteFile }
+        project.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
     }
 }
 
