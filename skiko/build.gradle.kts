@@ -1,10 +1,10 @@
-import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
 import kotlin.collections.HashMap
+import declareSkiaTasks
 
 plugins {
     kotlin("multiplatform")
@@ -12,47 +12,6 @@ plugins {
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.4.0"
-}
-
-fun createDownloadTasks() {
-    val basicConfigs = listOf("android", "ios", "iosSim", "linux", "macos", "tvos", "tvosSim", "wasm", "windows")
-
-    basicConfigs.forEach { config ->
-        (if (config == "wasm") listOf("wasm") else listOf("arm64", "x64")).forEach { arch ->
-            val taskNameSuffix = joinToTitleCamelCase(config, arch)
-            val target = "$config-$arch"
-            val skiaReleaseTag = project.property("dependencies.skia.$target") as String
-
-            val skiaBaseUrl = "https://github.com/JetBrains/skia-pack/releases/download/$skiaReleaseTag"
-
-            val artifactId = "Skia-${skiaReleaseTag}-${config}-$buildType-${arch}"
-
-            val downloadSkiaTask = tasks.register<Download>("downloadSkia$buildType$taskNameSuffix") {
-                group = "Skia Binaries"
-
-                val skiaUrl = "$skiaBaseUrl/$artifactId.zip"
-                description = "downloads $skiaUrl"
-
-                onlyIfModified(true)
-                src(skiaUrl)
-                dest(skiko.dependenciesDir.resolve(
-                "skia/$skiaReleaseTag/Skia-$skiaReleaseTag-$config-Release-${arch}.zip")
-                )
-            }
-
-            tasks.register<Copy>("unzipSkia$buildType$taskNameSuffix") {
-                group = "Skia Binaries"
-
-                val outputDir = skiko.dependenciesDir.resolve("skia/$skiaReleaseTag/$artifactId")
-                description = "unzips to $outputDir"
-
-                dependsOn(downloadSkiaTask)
-                from(zipTree(downloadSkiaTask.get().dest))
-
-                into(outputDir)
-            }
-        }
-    }
 }
 
 apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
@@ -89,7 +48,7 @@ repositories {
 }
 
 kotlin {
-    createDownloadTasks()
+    skikoProjectContext.declareSkiaTasks()
 
     if (supportAwt) {
         jvm("awt") {
