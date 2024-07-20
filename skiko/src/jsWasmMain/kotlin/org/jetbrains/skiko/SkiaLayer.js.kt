@@ -66,7 +66,8 @@ actual open class SkiaLayer {
     }
 
     actual fun detach() {
-        // TODO: when switch to the frame dispatcher - stop it here.
+        state?.disposeCanvas()
+        state = null
     }
 
     actual val component: Any?
@@ -85,7 +86,10 @@ actual open class SkiaLayer {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
                 val currentNanos = currentTimestamp * 1_000_000
-                renderDelegate?.onRender(canvas!!, width, height, currentNanos.toLong())
+                val canvasCapture = canvas
+                canvasCapture?.run {
+                    renderDelegate?.onRender(canvasCapture, width, height, currentNanos.toLong())
+                }
             }
         }
     }

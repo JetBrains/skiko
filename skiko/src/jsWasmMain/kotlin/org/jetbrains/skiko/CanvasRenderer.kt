@@ -4,7 +4,6 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.w3c.HTMLCanvasElement
 import org.jetbrains.skiko.w3c.window
-import org.jetbrains.skiko.wasm.createWebGLContext
 
 /**
  * CanvasRenderer takes an [HTMLCanvasElement] instance and initializes
@@ -36,8 +35,6 @@ internal abstract class CanvasRenderer(
     }
 
     fun initCanvas() {
-        disposeCanvas()
-
         renderTarget = BackendRenderTarget.makeGL(width, height, 1, 8, 0, 0x8058)
         surface = Surface.makeFromBackendRenderTarget(
             context,
@@ -50,11 +47,13 @@ internal abstract class CanvasRenderer(
         canvas = surface!!.canvas
     }
 
-    private fun disposeCanvas() {
+    fun disposeCanvas() {
         surface?.close()
         surface = null
         renderTarget?.close()
         renderTarget = null
+        canvas = null
+        context.abandon()
     }
 
     /**
