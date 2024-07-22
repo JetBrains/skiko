@@ -153,14 +153,10 @@ class SkikoProperties(private val myProject: Project) {
 
     // todo: make compatible with the configuration cache
     val skiaDir: File?
-        get() = (
-                System.getenv()["SKIA_DIR"]
-                ?: System.getProperty("skia.dir")
-                ?: myProject.findProperty("skia.dir")?.toString()
-                )?.let { skiaDirProp ->
+        get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir") ?: myProject.findProperty("skia.dir")
+            ?.toString())?.let { skiaDirProp ->
                 val file = File(skiaDirProp)
-                if (!file.isDirectory)
-                    throw (GradleException("\"skiko.skiaDir\" property was explicitly set to ${skiaDirProp} which is not resolved as a directory"))
+                if (!file.isDirectory) throw (GradleException("\"skiko.skiaDir\" property was explicitly set to ${skiaDirProp} which is not resolved as a directory"))
                 file
             }
 
