@@ -1,6 +1,5 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
@@ -81,9 +80,6 @@ fun SkikoProjectContext.registerOrGetSkiaDirProvider(
 
     val skiaDir = skiko.skiaDir
     return if (skiaDir != null) {
-        if (!skiaDir.isDirectory) {
-            throw(GradleException("\"skiko.skiaDir\" property was explicitely set to ${skiaDir} which is not a directory"))
-        }
         project.tasks.registerOrGetTask<DefaultTask>("skiaDir$taskNameSuffix") {
             // dummy task to simplify usage of the resulting provider (see `else` branch)
             // if a file provider is not created from a task provider,

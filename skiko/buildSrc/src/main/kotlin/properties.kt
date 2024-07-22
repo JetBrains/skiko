@@ -1,3 +1,4 @@
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import java.io.File
 
@@ -156,7 +157,12 @@ class SkikoProperties(private val myProject: Project) {
                 System.getenv()["SKIA_DIR"]
                 ?: System.getProperty("skia.dir")
                 ?: myProject.findProperty("skia.dir")?.toString()
-            )?.let { File(it) }
+                )?.let { skiaDirProp ->
+                val file = File(skiaDirProp)
+                if (!file.isDirectory)
+                    throw (GradleException("\"skiko.skiaDir\" property was explicitly set to ${skiaDirProp} which is not resolved as a directory"))
+                file
+            }
 
     val composeRepoUrl: String
         get() = System.getenv("COMPOSE_REPO_URL") ?: "https://maven.pkg.jetbrains.space/public/p/compose/dev"
