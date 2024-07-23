@@ -3,6 +3,8 @@ import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
+import kotlin.collections.HashMap
+import declareSkiaTasks
 
 plugins {
     kotlin("multiplatform")
@@ -46,6 +48,8 @@ repositories {
 }
 
 kotlin {
+    skikoProjectContext.declareSkiaTasks()
+
     if (supportAwt) {
         jvm("awt") {
             compilations.all {

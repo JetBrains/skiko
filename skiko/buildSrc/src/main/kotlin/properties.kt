@@ -1,3 +1,4 @@
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import java.io.File
 
@@ -141,12 +142,6 @@ class SkikoProperties(private val myProject: Project) {
     val includeTestHelpers: Boolean
         get() = !isRelease
 
-    fun skiaReleaseFor(os: OS, arch: Arch, buildType: SkiaBuildType, isIosSim: Boolean = false): String {
-        val target = "${os.idWithSuffix(isUikitSim = isIosSim)}-${arch.id}"
-        val tag = myProject.property("dependencies.skia.$target") as String
-        return "${tag}/Skia-${tag}-${os.idWithSuffix(isUikitSim = isIosSim)}-${buildType.id}-${arch.id}"
-    }
-
     val releaseGithubVersion: String
         get() = (myProject.property("release.github.version") as String)
 
@@ -158,11 +153,12 @@ class SkikoProperties(private val myProject: Project) {
 
     // todo: make compatible with the configuration cache
     val skiaDir: File?
-        get() = (
-                System.getenv()["SKIA_DIR"]
-                ?: System.getProperty("skia.dir")
-                ?: myProject.findProperty("skia.dir")?.toString()
-            )?.let { File(it) }?.takeIf { it.isDirectory }
+        get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir") ?: myProject.findProperty("skia.dir")
+            ?.toString())?.let { skiaDirProp ->
+                val file = File(skiaDirProp)
+                if (!file.isDirectory) throw (GradleException("\"skiko.skiaDir\" property was explicitly set to ${skiaDirProp} which is not resolved as a directory"))
+                file
+            }
 
     val composeRepoUrl: String
         get() = System.getenv("COMPOSE_REPO_URL") ?: "https://maven.pkg.jetbrains.space/public/p/compose/dev"
