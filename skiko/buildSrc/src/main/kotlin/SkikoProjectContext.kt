@@ -34,7 +34,8 @@ fun SkikoProjectContext.declareSkiaTasks() {
         (if (config == "wasm") listOf("wasm") else listOf("arm64", "x64")).forEach { arch ->
             val taskNameSuffix = joinToTitleCamelCase(config, arch)
             val target = "$config-$arch"
-            val skiaReleaseTag = project.property("dependencies.skia.$target") as String
+
+            val skiaReleaseTag = project.skiaVersion(target)
 
             val skiaBaseUrl = "https://github.com/JetBrains/skia-pack/releases/download/$skiaReleaseTag"
 
@@ -152,3 +153,13 @@ val Project.supportWasm: Boolean
 
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || supportWasm || isInIdea
+
+fun Project.skiaVersion(target: String): String {
+    val platformSpecificVersion = "dependencies.skia.$target"
+
+    return if (hasProperty(platformSpecificVersion)) {
+        property(platformSpecificVersion) as String
+    } else {
+        property("dependencies.skia") as String
+    }
+}
