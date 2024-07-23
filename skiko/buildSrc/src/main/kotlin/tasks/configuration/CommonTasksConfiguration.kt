@@ -14,6 +14,7 @@ import supportAndroid
 import supportWasm
 import toTitleCase
 import java.io.File
+import skiaVersion
 
 fun skiaHeadersDirs(skiaDir: File): List<File> =
     listOf(
@@ -177,7 +178,8 @@ fun KotlinTarget.generateVersion(
             val out = "$outDir/Version.kt"
 
             val target = "${targetOs.id}-${targetArch.id}"
-            val skiaTag = project.property("dependencies.skia.$target") as String
+            val skiaTag = project.skiaVersion(target)
+
             File(out).writeText(
                 """
                 package org.jetbrains.skiko
