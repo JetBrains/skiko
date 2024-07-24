@@ -34,6 +34,14 @@ object SkikoProperties {
 
     val vsyncEnabled: Boolean get() = getProperty("skiko.vsync.enabled")?.toBoolean() ?: true
 
+    val frameBuffering: FrameBuffering get() {
+        return when (getProperty("skiko.buffering")) {
+            "DOUBLE" -> FrameBuffering.DOUBLE
+            "TRIPLE" -> FrameBuffering.TRIPLE
+            else -> FrameBuffering.DEFAULT
+        }
+    }
+
     /**
      * If vsync is enabled, but platform can't support it (Software renderer, Linux with uninstalled drivers),
      * we enable frame limit by the display refresh rate.
