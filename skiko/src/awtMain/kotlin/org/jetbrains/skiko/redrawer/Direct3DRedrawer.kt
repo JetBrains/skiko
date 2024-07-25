@@ -68,11 +68,11 @@ internal class Direct3DRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() {
+    override fun redrawImmediately(waitForVsync: Boolean) {
         check(!isDisposed) { "Direct3DRedrawer is disposed" }
         inDrawScope {
             update(System.nanoTime())
-            drawAndSwap(withVsync = false)
+            drawAndSwap(withVsync = waitForVsync)
         }
     }
 

@@ -61,7 +61,7 @@ internal class WindowsOpenGLRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() {
+    override fun redrawImmediately(waitForVsync: Boolean) {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         inDrawScope {
             update(System.nanoTime())
@@ -69,6 +69,9 @@ internal class WindowsOpenGLRedrawer(
             contextHandler.draw()
             swapBuffers()
             OpenGLApi.instance.glFinish()
+            if (waitForVsync) {
+                dwmFlush()
+            }
         }
     }
 

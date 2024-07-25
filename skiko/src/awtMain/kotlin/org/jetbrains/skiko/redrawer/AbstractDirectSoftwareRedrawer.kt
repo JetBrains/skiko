@@ -35,7 +35,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
 
     protected open fun draw() = inDrawScope(contextHandler::draw)
 
-    override fun redrawImmediately() {
+    override fun redrawImmediately(waitForVsync: Boolean) {
         update(System.nanoTime())
         draw()
     }

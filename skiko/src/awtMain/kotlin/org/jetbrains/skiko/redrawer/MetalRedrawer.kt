@@ -109,12 +109,12 @@ internal class MetalRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() {
+    override fun redrawImmediately(waitForVsync: Boolean) {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         inDrawScope {
             update(System.nanoTime())
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw()
+                performDraw(waitForVsync)
             }
         }
     }
