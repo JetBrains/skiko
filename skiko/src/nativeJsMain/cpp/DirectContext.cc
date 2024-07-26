@@ -60,9 +60,23 @@ SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlushDefault
     context->flush(GrFlushInfo());
 }
 
+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlush
+  (KNativePointer ptr, KNativePointer skSurfacePtr) {
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(ptr);
+    SkSurface* skSurface = reinterpret_cast<SkSurface*>(skSurfacePtr);
+    context->flush(skSurface);
+}
+
 GrSyncCpu grSyncCpuFromBool(bool syncCpu) {
     if (syncCpu) return GrSyncCpu::kYes;
     return GrSyncCpu::kNo;
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlushAndSubmit
+  (KNativePointer ptr, KNativePointer skSurfacePtr, KBoolean syncCpu) {
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(ptr);
+    SkSurface* skSurface = reinterpret_cast<SkSurface*>(skSurfacePtr);
+    context->flushAndSubmit(skSurface, grSyncCpuFromBool(syncCpu));
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nSubmit
