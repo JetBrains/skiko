@@ -1,4 +1,6 @@
 #include <jni.h>
+#include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
+#include "ganesh/gl/GrGLBackendSurface.h" // TODO: skia update: check if it's correct
 
 #if SK_BUILD_FOR_LINUX
 #include <stdint.h>
@@ -17,12 +19,13 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeGLRenderTar
     jint fbId, jint fbFormat
 ) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-    GrBackendRenderTarget* obj = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
-    return reinterpret_cast<jlong>(obj);
+    auto obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget* target = new GrBackendRenderTarget(obj);
+    return reinterpret_cast<jlong>(target);
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeGLContextNative(JNIEnv* env, jclass jclass) {
-    return reinterpret_cast<jlong>(GrDirectContext::MakeGL().release());
+    return reinterpret_cast<jlong>(GrDirectContexts::MakeGL().release());
 }
 
 extern void getMetalDeviceAndQueue(void** device, void** queue);
@@ -32,7 +35,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeMetalRender
 #ifdef SK_METAL
     // TODO: create properly.
     GrMtlTextureInfo mtlInfo;
-    GrBackendRenderTarget* obj = new GrBackendRenderTarget(width, height, sampleCnt, mtlInfo);
+    GrBackendRenderTarget* obj = new GrBackendRenderTarget(width, height, mtlInfo);
     return reinterpret_cast<jlong>(obj);
 #else
     return 0;

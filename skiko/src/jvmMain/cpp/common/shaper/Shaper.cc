@@ -1,3 +1,4 @@
+#include "FontMgrDefaultFactory.hh"
 #include <iostream>
 #include <jni.h>
 #include "../interop.hh"
@@ -84,7 +85,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgr::RefDefault(),
+        SkFontMgrSkikoDefault(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation
@@ -131,7 +132,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgr::RefDefault(),
+        SkFontMgrSkikoDefault(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation);

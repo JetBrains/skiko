@@ -1,8 +1,9 @@
 #include "FontMgrWithFallbackWrapper.hh"
+#include "FontMgrDefaultFactory.hh"
 
 FontMgrWithFallbackWrapper::FontMgrWithFallbackWrapper(sk_sp<TypefaceFontProviderWithFallback> fallbackTypefaceFontProvider)
     : fallbackFontProvider(std::move(fallbackTypefaceFontProvider)) {
-    wrappedFntMgr = SkFontMgr::RefDefault();
+    wrappedFntMgr = SkFontMgrSkikoDefault();
 }
 
 int FontMgrWithFallbackWrapper::onCountFamilies() const {

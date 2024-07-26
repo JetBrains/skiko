@@ -58,7 +58,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMe
         GrMtlTextureInfo info;
         info.fTexture.retain((__bridge GrMTLHandle) texture);
         GrBackendRenderTarget *renderTarget = NULL;
-        renderTarget = new GrBackendRenderTarget(texture.width, texture.height, 0, info);
+        renderTarget = new GrBackendRenderTarget(texture.width, texture.height, info);
         return (jlong) renderTarget;
     }
 }

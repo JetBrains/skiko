@@ -1,3 +1,4 @@
+#include "FontMgrDefaultFactory.hh"
 #include <iostream>
 #include <jni.h>
 #include "interop.hh"
@@ -67,9 +68,17 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeFrom
     return reinterpret_cast<jlong>(typeface);
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeFromFile
+  (JNIEnv* env, jclass jclass, jlong ptr, jstring pathStrPtr, jint ttcIndex) {
+  SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
+  SkString path = skString(env, pathStrPtr);
+  SkTypeface* typeface = instance->makeFromFile(path.c_str(), ttcIndex).release();
+  return reinterpret_cast<jlong>(typeface);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nDefault
   (JNIEnv* env, jclass jclass) {
-    SkFontMgr* instance = SkFontMgr::RefDefault().release();
+    SkFontMgr* instance = SkFontMgrSkikoDefault().release();
     return reinterpret_cast<jlong>(instance);
 }
 

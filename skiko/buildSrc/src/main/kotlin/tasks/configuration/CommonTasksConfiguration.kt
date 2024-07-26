@@ -53,15 +53,16 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         "-DSK_GL",
         "-DSK_SHAPER_HARFBUZZ_AVAILABLE",
         "-DSK_UNICODE_AVAILABLE",
+        "-DSK_SHAPER_UNICODE_AVAILABLE",
         "-DSK_SUPPORT_OPENCL=0",
         "-DSK_UNICODE_AVAILABLE",
         "-DU_DISABLE_RENAMING",
         "-DSK_USING_THIRD_PARTY_ICU",
         // For ICU symbols renaming:
-        "-DU_DISABLE_RENAMING=0",
-        "-DU_DISABLE_VERSION_SUFFIX=1",
-        "-DU_HAVE_LIB_SUFFIX=1",
-        "-DU_LIB_SUFFIX_C_NAME=_skiko",
+//        "-DU_DISABLE_RENAMING=0",
+//        "-DU_DISABLE_VERSION_SUFFIX=1",
+//        "-DU_HAVE_LIB_SUFFIX=1",
+//        "-DU_LIB_SUFFIX_C_NAME=_skiko",
         *buildType.flags
     )
 

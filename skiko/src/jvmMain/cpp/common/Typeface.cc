@@ -68,35 +68,6 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1n
     return SkTypeface::Equal(instance, other);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nMakeDefault
-  (JNIEnv* env, jclass jclass) {
-    return reinterpret_cast<jlong>(SkTypeface::MakeDefault().release());
-}
-
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeFromName
-  (JNIEnv* env, jclass jclass, jstring nameStr, jint styleValue) {
-    SkString name = skString(env, nameStr);
-    SkFontStyle style = skija::FontStyle::fromJava(styleValue);
-    sk_sp<SkTypeface> instance = SkTypeface::MakeFromName(name.c_str(), style);
-    return reinterpret_cast<jlong>(instance.release());
-}
-    
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeFromFile
-  (JNIEnv* env, jclass jclass, jstring pathStr, jint index) {
-    SkString path = skString(env, pathStr);
-    sk_sp<SkTypeface> instance = SkTypeface::MakeFromFile(path.c_str(), index);
-    SkTypeface* ptr = instance.release();
-    return reinterpret_cast<jlong>(ptr);
-}
-
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeFromData
-  (JNIEnv* env, jclass jclass, jlong dataPtr, jint index) {
-    SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
-    sk_sp<SkTypeface> instance = SkTypeface::MakeFromData(sk_ref_sp(data), index);
-    SkTypeface* ptr = instance.release();
-    return reinterpret_cast<jlong>(ptr);
-}
-
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeClone
   (JNIEnv* env, jclass jclass, jlong typefacePtr, jintArray variationsArr, jint variationsCount, jint collectionIndex) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));

@@ -155,6 +155,18 @@ open class FontMgr : RefCnt {
             reachabilityBarrier(data)
         }
 
+    fun makeFromFile(path: String, ttcIndex: Int = 0): Typeface? {
+        return try {
+            Stats.onNativeCall()
+            val ptr = interopScope {
+                _nMakeFromFile(_ptr, toInterop(path), ttcIndex)
+            }
+            if (ptr == NullPointer) null else Typeface(ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
     internal constructor(ptr: NativePointer) : super(ptr)
 
     internal constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, allowClose)
@@ -195,6 +207,10 @@ private external fun _nMatchFamilyStyleCharacter(
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromData")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nMakeFromData")
 private external fun _nMakeFromData(ptr: NativePointer, dataPtr: NativePointer, ttcIndex: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromFile")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nMakeFromFile")
+private external fun _nMakeFromFile(ptr: NativePointer, pathPtr: InteropPointer, ttcIndex: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nDefault")

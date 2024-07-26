@@ -12,7 +12,7 @@ class FontMgrTest {
     @Test
     fun fontMgrTest() = runTest {
 
-        TypefaceFontProvider().let { fontManager ->
+        TypefaceFontProvider().let { outerFontManager ->
             val fontManager = TypefaceFontProvider()
 
             val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf")
@@ -78,12 +78,12 @@ class FontMgrTest {
                 assertEquals(jbMono, styleSet.matchStyle(FontStyle.ITALIC))
             }
 
-            assertNull(fontManager.matchFamilyStyle("JetBrains Mono", FontStyle.BOLD))
-            assertNull(fontManager.matchFamilyStyle("Interface", FontStyle.NORMAL))
+            assertNull(outerFontManager.matchFamilyStyle("JetBrains Mono", FontStyle.BOLD))
+            assertNull(outerFontManager.matchFamilyStyle("Interface", FontStyle.NORMAL))
 
             // TODO: it would be definitely beneficial to check the notNull branch as well
             assertNull(
-                fontManager.matchFamilyStyleCharacter("JetBrains Mono", FontStyle.BOLD, arrayOf("en-US"), 65 /* A */)
+                outerFontManager.matchFamilyStyleCharacter("JetBrains Mono", FontStyle.BOLD, arrayOf("en-US"), 65 /* A */)
             )
 
         }

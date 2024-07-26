@@ -1,5 +1,6 @@
 #include <iostream>
 #include <jni.h>
+#include <ganesh/gl/GrGLBackendSurface.h>
 #include "GrBackendSurface.h"
 
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
@@ -15,7 +16,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt__1nMakeGL
   (JNIEnv* env, jclass jclass, jint width, jint height, jint sampleCnt, jint stencilBits, jint fbId, jint fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-    GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
+    auto obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return reinterpret_cast<jlong>(instance);
 }
 

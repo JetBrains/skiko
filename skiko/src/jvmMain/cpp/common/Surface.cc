@@ -212,18 +212,6 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_SurfaceKt_Surface_1nWr
     surface->writePixels(*bitmap, x, y);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_SurfaceKt__1nFlushAndSubmit
-  (JNIEnv* env, jclass jclass, jlong ptr, jboolean syncCpu) {
-    SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
-    surface->flushAndSubmit(syncCpu);
-}
-
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_SurfaceKt_Surface_1nFlush
-  (JNIEnv* env, jclass jclass, jlong ptr) {
-    SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
-    surface->flush();
-}
-
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_SurfaceKt__1nUnique
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));

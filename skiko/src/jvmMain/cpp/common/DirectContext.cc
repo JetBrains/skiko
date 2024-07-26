@@ -1,10 +1,11 @@
 #include <iostream>
 #include <jni.h>
 #include "GrDirectContext.h"
+#include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeGL
   (JNIEnv* env, jclass jclass) {
-    return reinterpret_cast<jlong>(GrDirectContext::MakeGL().release());
+    return reinterpret_cast<jlong>(GrDirectContexts::MakeGL().release());
 }
 
 #ifdef SK_METAL
@@ -39,16 +40,35 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 }
 #endif //SK_DIRECT3D 
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nFlush
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nFlushDefault
   (JNIEnv* env, jclass jclass, jlong ptr) {
+  GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
+  context->flush();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nFlush
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong skSurfacePtr) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
-    context->flush(GrFlushInfo());
+    SkSurface* skSurface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(skSurfacePtr));
+    context->flush(skSurface);
+}
+
+GrSyncCpu grSyncCpuFromBool(bool syncCpu) {
+  if (syncCpu) return GrSyncCpu::kYes;
+  return GrSyncCpu::kNo;
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt__1nFlushAndSubmit
+(JNIEnv* env, jclass jclass, jlong ptr, jlong skSurfacePtr, jboolean syncCpu) {
+   GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
+   SkSurface* skSurface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(skSurfacePtr));
+   context->flushAndSubmit(skSurface, grSyncCpuFromBool(syncCpu));
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt__1nSubmit
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean syncCpu) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
-    context->submit(syncCpu);
+    context->submit(grSyncCpuFromBool(syncCpu));
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt__1nReset

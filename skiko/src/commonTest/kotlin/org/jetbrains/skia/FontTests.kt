@@ -133,6 +133,10 @@ class FontTests {
     }
 
     @Test
+    // Maybe it's a reason why this test fails with m122:
+    // https://github.com/google/skia/blob/main/RELEASE_NOTES.md#milestone-122
+    // SkFont::getTypeface() will no longer return a nullptr to indicate "the default typeface".
+    // If left unspecified, SkFonts will use an empty typeface (e.g. no glyphs).
     fun emptyFontMetrics() {
         Font(null).use { font ->
             val metrics = font.metrics

@@ -46,7 +46,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
         device.drawableHandle = currentDrawable;
         GrMtlTextureInfo info;
         info.fTexture.retain((__bridge GrMTLHandle) currentDrawable.texture);
-        renderTarget = new GrBackendRenderTarget(width, height, 0, info);
+        renderTarget = new GrBackendRenderTarget(width, height, info);
         return (jlong) renderTarget;
     }
 }

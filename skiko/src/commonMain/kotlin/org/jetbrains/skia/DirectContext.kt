@@ -45,7 +45,13 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
     fun flush(): DirectContext {
         Stats.onNativeCall()
-        DirectContext_nFlush(_ptr)
+        DirectContext_nFlushDefault(_ptr)
+        return this
+    }
+
+    fun flush(surface: Surface): DirectContext {
+        Stats.onNativeCall()
+        DirectContext_nFlush(_ptr, surface._ptr)
         return this
     }
 
@@ -84,6 +90,15 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         _nSubmit(_ptr, syncCpu)
     }
 
+    fun flushAndSubmit(surface: Surface, syncCpu: Boolean = false) {
+        try {
+            Stats.onNativeCall()
+            _nFlushAndSubmit(_ptr, surface._ptr, syncCpu)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
     /**
      *
      * Abandons all GPU resources and assumes the underlying backend 3D API context is no longer
@@ -120,7 +135,11 @@ fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlush")
-private external fun DirectContext_nFlush(ptr: NativePointer)
+private external fun DirectContext_nFlush(ptr: NativePointer, surfacePtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlush")
+private external fun DirectContext_nFlushDefault(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGL")
@@ -137,6 +156,10 @@ private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: Native
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nSubmit")
 private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushAndSubmit")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlushAndSubmit")
+private external fun _nFlushAndSubmit(ptr: NativePointer, surfacePtr: NativePointer, syncCpu: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nReset")
