@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include "GrBackendSurface.h"
 #include "common.h"
+#include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
+#include "ganesh/gl/GrGLBackendSurface.h" // TODO: skia update: check if it's correct
 
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     delete rt;
@@ -13,7 +15,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nGetFinaliz
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nMakeGL
   (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-    GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
+    auto obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return instance;
 }
 

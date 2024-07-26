@@ -216,18 +216,6 @@ SKIKO_EXPORT void org_jetbrains_skia_Surface__1nWritePixels
     surface->writePixels(*bitmap, x, y);
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_Surface__1nFlushAndSubmit
-  (KNativePointer ptr, KBoolean syncCpu) {
-    SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
-    surface->flushAndSubmit(syncCpu);
-}
-
-SKIKO_EXPORT void org_jetbrains_skia_Surface__1nFlush
-  (KNativePointer ptr) {
-    SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
-    surface->flush();
-}
-
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Surface__1nUnique
   (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));

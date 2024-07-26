@@ -9,7 +9,7 @@
 #include "ports/SkTypeface_win.h"
 #endif
 
-#if defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)
+#if (defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)) && !defined(SKIKO_WASM)
 #include "ports/SkFontMgr_fontconfig.h"
 #endif
 
@@ -27,7 +27,7 @@ sk_sp<SkFontMgr> SkFontMgrSkikoDefault() {
     return SkFontMgr_New_DirectWrite();
 #endif
 
-#if defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)
+#if (defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)) && !defined(SKIKO_WASM)
     return SkFontMgr_New_FontConfig(nullptr);
 #endif
 

@@ -137,8 +137,8 @@ fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlush")
 private external fun DirectContext_nFlush(ptr: NativePointer, surfacePtr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlush")
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushDefault")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlushDefault")
 private external fun DirectContext_nFlushDefault(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")

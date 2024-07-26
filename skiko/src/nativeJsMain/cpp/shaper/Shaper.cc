@@ -6,6 +6,7 @@
 #include "common.h"
 #include "FontRunIterator.hh"
 #include "TextLineRunHandler.hh"
+#include "FontMgrDefaultFactory.hh"
 
 static void deleteShaper(SkShaper* instance) {
     // std::cout << "Deleting [SkShaper " << instance << "]" << std::endl;
@@ -83,7 +84,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgr::RefDefault(),
+        SkFontMgrSkikoDefault(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation
@@ -130,7 +131,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgr::RefDefault(),
+        SkFontMgrSkikoDefault(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation);

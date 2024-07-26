@@ -4,6 +4,7 @@
 #include "SkFontMgr.h"
 #include "common.h"
 #include "FontMgrWithFallbackWrapper.hh"
+#include "FontMgrDefaultFactory.hh"
 
 SKIKO_EXPORT KInt org_jetbrains_skia_FontMgr__1nGetFamiliesCount
   (KNativePointer ptr) {
@@ -68,9 +69,17 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeFromData
     return reinterpret_cast<KNativePointer>(typeface);
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeFromFile
+  (KNativePointer ptr, KNativePointer pathStrPtr, KInt ttcIndex) {
+    SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(ptr);
+    SkString path = skString(pathStrPtr);
+    SkTypeface* typeface = instance->makeFromFile(path.c_str(), ttcIndex).release();
+    return reinterpret_cast<KNativePointer>(typeface);
+}
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nDefault
   () {
-    SkFontMgr* instance = SkFontMgr::RefDefault().release();
+    SkFontMgr* instance = SkFontMgrSkikoDefault().release();
     return reinterpret_cast<KNativePointer>(instance);
 }
 

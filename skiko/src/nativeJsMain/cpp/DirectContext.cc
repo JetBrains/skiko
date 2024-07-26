@@ -1,6 +1,7 @@
 #include "GrDirectContext.h"
 #include "include/gpu/gl/GrGLInterface.h"
 #include "common.h"
+#include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
 
 #ifdef SK_METAL
 #include "mtl/GrMtlBackendContext.h"
@@ -12,13 +13,13 @@
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
   () {
-    return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL().release());
+    return reinterpret_cast<KNativePointer>(GrDirectContexts::MakeGL().release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGLWithInterface
   (KNativePointer ptr) {
     sk_sp<GrGLInterface> iface = sk_ref_sp(reinterpret_cast<GrGLInterface*>(ptr));
-    return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL(iface).release());
+    return reinterpret_cast<KNativePointer>(GrDirectContexts::MakeGL(iface).release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
@@ -53,16 +54,21 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
 #endif // SK_DIRECT3D
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlush
+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlushDefault
   (KNativePointer ptr) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((ptr));
     context->flush(GrFlushInfo());
 }
 
+GrSyncCpu grSyncCpuFromBool(bool syncCpu) {
+    if (syncCpu) return GrSyncCpu::kYes;
+    return GrSyncCpu::kNo;
+}
+
 SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nSubmit
   (KNativePointer ptr, KBoolean syncCpu) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((ptr));
-    context->submit(syncCpu);
+    context->submit(grSyncCpuFromBool(syncCpu));
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nReset
