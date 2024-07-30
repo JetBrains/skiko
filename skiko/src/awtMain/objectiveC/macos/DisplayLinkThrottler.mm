@@ -184,7 +184,6 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
         CVDisplayLinkRelease(_displayLink);
         _displayLink = nil;
 
-        NSLog(@"DisplayLinkThrottler: Display link invalidated for screen %lld", _displayLinkScreenID);
     }
 }
 
