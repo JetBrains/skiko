@@ -199,3 +199,10 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1n
     float r[4] = {b.left(), b.top(), b.right(), b.bottom()};
     env->SetFloatArrayRegion(res, 0, 4, r);
 }
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeEmptyTypeface
+  (JNIEnv* env, jclass jclass) {
+
+    auto res = SkTypeface::MakeEmpty().release();
+    return reinterpret_cast<jlong>(res);
+}

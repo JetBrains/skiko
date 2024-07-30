@@ -8,6 +8,11 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         init {
             staticLoad()
         }
+
+        fun makeEmpty(): Typeface {
+            Stats.onNativeCall()
+            return Typeface(_nMakeEmptyTypeface())
+        }
     }
 
     /**
@@ -416,6 +421,10 @@ private external fun _nMakeClone(
     variationsCount: Int,
     collectionIndex: Int
 ): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeEmptyTypeface")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeEmptyTypeface")
+private external fun _nMakeEmptyTypeface(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetGlyphsCount")

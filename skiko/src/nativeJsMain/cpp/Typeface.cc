@@ -192,3 +192,10 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetBounds
     bounds[2] = b.right();
     bounds[3] = b.bottom();
 }
+
+SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nMakeEmptyTypeface
+  () {
+
+    auto res = SkTypeface::MakeEmpty().release();
+    return reinterpret_cast<KInteropPointer>(res);
+}

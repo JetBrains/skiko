@@ -18,7 +18,7 @@ private fun isWindows() = (hostOs == OS.Windows)
 private fun isTvos() = (hostOs == OS.Tvos)
 private fun isJs() = (kotlinBackend == KotlinBackend.JS)
 private val COARSE_EPSILON = 2.4f
-private const val jbMonoPath = "./fonts/JetBrainsMono-Regular.ttf"
+internal const val jbMonoPath = "./fonts/JetBrainsMono-Regular.ttf"
 
 class FontTests {
     @Test
@@ -137,8 +137,33 @@ class FontTests {
     // https://github.com/google/skia/blob/main/RELEASE_NOTES.md#milestone-122
     // SkFont::getTypeface() will no longer return a nullptr to indicate "the default typeface".
     // If left unspecified, SkFonts will use an empty typeface (e.g. no glyphs).
-    fun emptyFontMetrics() {
+    fun emptyFontMetricsAreZero() {
+        Font(Typeface.makeEmpty()).use { font ->
+            val metrics = font.metrics
+            assertTrue(
+                metrics.top == 0f &&
+                        metrics.bottom == 0f &&
+                        metrics.ascent == 0f &&
+                        metrics.descent == 0f
+            )
+        }
+
         Font(null).use { font ->
+            val metrics = font.metrics
+            assertTrue(
+                metrics.top == 0f &&
+                        metrics.bottom == 0f &&
+                        metrics.ascent == 0f &&
+                        metrics.descent == 0f
+            )
+        }
+    }
+
+    @Test
+    fun nonEmptyFontMetrics() = runTest {
+        val jbMono = Typeface.makeFromResource(jbMonoPath)
+
+        Font(jbMono).use { font ->
             val metrics = font.metrics
             assertFalse(
                 metrics.top == 0f &&
