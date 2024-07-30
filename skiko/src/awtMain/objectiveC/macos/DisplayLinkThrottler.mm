@@ -125,7 +125,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
             // if display link is present, check if it's for the correct screen, avoid conversion shenanigans
             int64_t displayLinkScreenID = _displayLinkScreenID;
 
-            if (displayLinkScreenID != currentScreenID) {
+            if (displayLinkScreenID != _currentScreenID) {
                 [self createDisplayLink];
             }
         } else {
