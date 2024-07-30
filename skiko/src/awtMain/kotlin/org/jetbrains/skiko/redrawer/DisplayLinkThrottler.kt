@@ -2,8 +2,8 @@ package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skiko.Library
 
-internal class DisplayLinkThrottler {
-    private val implPtr = create()
+internal class DisplayLinkThrottler(windowPtr: Long) {
+    private val implPtr = create(windowPtr)
 
     internal fun dispose() = dispose(implPtr)
 
@@ -11,13 +11,13 @@ internal class DisplayLinkThrottler {
      * Creates a DisplayLink if needed with refresh rate matching NSScreen of NSWindow passed in [windowPtr].
      * If DisplayLink is already active, blocks until next vsync for physical screen of NSWindow passed in [windowPtr].
      */
-    internal fun waitVSync(windowPtr: Long) = waitVSync(implPtr, windowPtr)
+    private external fun create(windowPtr: Long): Long
 
-    private external fun create(): Long
+    fun waitVSync() = waitVSync(implPtr)
 
     private external fun dispose(implPtr: Long)
 
-    private external fun waitVSync(implPtr: Long, windowPtr: Long)
+    private external fun waitVSync(implPtr: Long)
 
     companion object {
         init {
