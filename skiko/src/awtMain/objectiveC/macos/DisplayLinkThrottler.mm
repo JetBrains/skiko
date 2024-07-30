@@ -226,7 +226,6 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     _displayLinkScreenID = _currentScreenID;
 
-    NSLog(@"DisplayLinkThrottler: Display link created for screen %lld", _displayLinkScreenID);
 }
 
 - (void)dealloc {
