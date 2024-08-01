@@ -114,7 +114,7 @@ internal class MetalRedrawer(
         inDrawScope {
             update(System.nanoTime())
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw()
+                performDraw(waitVsync = SkikoProperties.macOSWaitForPreviousFrameVsyncOnRedrawImmediately)
             }
         }
     }

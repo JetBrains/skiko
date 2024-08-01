@@ -72,7 +72,7 @@ internal class Direct3DRedrawer(
         check(!isDisposed) { "Direct3DRedrawer is disposed" }
         inDrawScope {
             update(System.nanoTime())
-            drawAndSwap(withVsync = false)
+            drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
         }
     }
 
