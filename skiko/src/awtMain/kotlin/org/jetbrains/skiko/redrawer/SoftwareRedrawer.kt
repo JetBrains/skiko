@@ -46,7 +46,7 @@ internal class SoftwareRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately(waitForVsync: Boolean) {
+    override fun redrawImmediately() {
         update(System.nanoTime())
         inDrawScope(contextHandler::draw)
     }

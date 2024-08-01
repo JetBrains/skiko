@@ -321,6 +321,7 @@ actual open class SkiaLayer internal constructor(
         redrawer?.syncSize()
     }
 
+
     override fun paint(g: java.awt.Graphics) {
         Logger.debug { "Paint called on: $this" }
         checkContentScale()
@@ -342,16 +343,7 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    val waitForVsyncByDefault: Boolean get() {
-        return when (hostOs) {
-            OS.Windows -> false
-            OS.Linux -> false
-            OS.MacOS -> true
-            else -> true
-        }
-    }
-
-    protected fun tryRedrawImmediately(waitForVsync: Boolean = waitForVsyncByDefault) {
+    private fun tryRedrawImmediately() {
         // It might be called inside `renderDelegate`,
         // so to avoid recursive call (not supported) just schedule redrawing.
         //
@@ -360,7 +352,7 @@ actual open class SkiaLayer internal constructor(
         if (isRendering) {
             redrawer?.needRedraw()
         } else {
-            redrawer?.redrawImmediately(waitForVsync)
+            redrawer?.redrawImmediately()
         }
     }
 
@@ -547,7 +539,7 @@ actual open class SkiaLayer internal constructor(
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
                 redrawerManager.findNextWorkingRenderApi()
-                redrawer?.redrawImmediately(waitForVsync = false)
+                redrawer?.redrawImmediately()
             }
         }
     }

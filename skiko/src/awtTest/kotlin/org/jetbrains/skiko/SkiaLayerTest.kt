@@ -488,7 +488,7 @@ class SkiaLayerTest {
 
                     override fun dispose() = Unit
                     override fun needRedraw() = Unit
-                    override fun redrawImmediately(waitForVsync: Boolean) = layer.inDrawScope(contextHandler::draw)
+                    override fun redrawImmediately() = layer.inDrawScope(contextHandler::draw)
                     override val renderInfo = ""
                 }
             }
@@ -521,7 +521,7 @@ class SkiaLayerTest {
                 ) = object : Redrawer {
                     override fun dispose() = Unit
                     override fun needRedraw() = Unit
-                    override fun redrawImmediately(waitForVsync: Boolean) = layer.inDrawScope {
+                    override fun redrawImmediately() = layer.inDrawScope {
                         throw RenderException()
                     }
                     override val renderInfo = ""

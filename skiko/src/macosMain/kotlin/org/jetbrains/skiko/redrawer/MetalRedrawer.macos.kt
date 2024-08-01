@@ -113,7 +113,7 @@ internal class MacOsMetalRedrawer(
     /**
      * Invokes [draw] right away.
      */
-    override fun redrawImmediately(waitForVsync: Boolean) {
+    override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         draw()
     }

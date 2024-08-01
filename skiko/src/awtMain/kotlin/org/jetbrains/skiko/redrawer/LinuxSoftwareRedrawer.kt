@@ -31,8 +31,8 @@ internal class LinuxSoftwareRedrawer(
         super.draw()
     }
 
-    override fun redrawImmediately(waitForVsync: Boolean) = layer.backedLayer.lockLinuxDrawingSurface {
-        super.redrawImmediately(waitForVsync)
+    override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
+        super.redrawImmediately()
     }
 
     override fun resize(width: Int, height: Int) = layer.backedLayer.lockLinuxDrawingSurface {

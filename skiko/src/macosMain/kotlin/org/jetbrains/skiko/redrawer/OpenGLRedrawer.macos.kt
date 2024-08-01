@@ -67,7 +67,7 @@ internal class MacOsOpenGLRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately(waitForVsync: Boolean) {
+    override fun redrawImmediately() {
         glLayer.setNeedsDisplay()
         skiaLayer.nsView.setNeedsDisplay(true)
     }
