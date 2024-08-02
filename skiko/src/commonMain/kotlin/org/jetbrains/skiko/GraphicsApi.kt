@@ -29,3 +29,17 @@ enum class GpuPriority(val value: String) {
         fun parseOrNull(value: String): GpuPriority? = GpuPriority.values().find { it.value == value }
     }
 }
+
+enum class FrameBuffering {
+    DEFAULT,
+    DOUBLE,
+    TRIPLE
+}
+
+fun FrameBuffering.numberOfBuffers(): Int? {
+    return when (this) {
+        FrameBuffering.DEFAULT -> null
+        FrameBuffering.DOUBLE -> 2
+        FrameBuffering.TRIPLE -> 3
+    }
+}

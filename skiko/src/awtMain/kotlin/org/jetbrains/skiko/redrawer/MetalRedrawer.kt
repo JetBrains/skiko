@@ -67,8 +67,9 @@ internal class MetalRedrawer(
 
     init {
         onDeviceChosen(adapter.name)
+        val numberOfBuffers = properties.frameBuffering.numberOfBuffers() ?: 0 // zero means default for system
         val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
-            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter.ptr, it))
+            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, numberOfBuffers, adapter.ptr, it))
         }
         _device = initDevice
         contextHandler = MetalContextHandler(layer, initDevice, adapter)
@@ -113,7 +114,7 @@ internal class MetalRedrawer(
         inDrawScope {
             update(System.nanoTime())
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw()
+                performDraw(waitVsync = SkikoProperties.macOSWaitForPreviousFrameVsyncOnRedrawImmediately)
             }
         }
     }
@@ -154,13 +155,14 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun performDraw() = synchronized(drawLock) {
+    private fun performDraw(waitVsync: Boolean = true) = synchronized(drawLock) {
         if (!isDisposed) {
-            // Wait for vsync because:
-            // - macOS drops the second/next drawables if they are sent in the same vsync
-            // - it makes frames consistent and limits FPS
-            displayLinkThrottler.waitVSync()
-
+            if (waitVsync) {
+                // Wait for vsync because:
+                // - macOS drops the second/next drawables if they are sent in the same vsync
+                // - it makes frames consistent and limits FPS
+                displayLinkThrottler.waitVSync()
+            }
             autoreleasepool {
                 contextHandler.draw()
             }
@@ -185,7 +187,7 @@ internal class MetalRedrawer(
         setLayerVisible(device.ptr, isVisible)
     }
 
-    private external fun createMetalDevice(window: Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
+    private external fun createMetalDevice(window: Long, transparency: Boolean, frameBuffering: Int, adapter: Long, platformInfo: Long): Long
     private external fun disposeDevice(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)

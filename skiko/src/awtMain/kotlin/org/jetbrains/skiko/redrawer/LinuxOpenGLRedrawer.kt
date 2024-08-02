@@ -84,10 +84,15 @@ internal class LinuxOpenGLRedrawer(
         inDrawScope {
             it.makeCurrent(context)
             contextHandler.draw()
-            it.setSwapInterval(0)
+            val turnOfVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately
+            if (turnOfVsync) {
+                it.setSwapInterval(0)
+            }
             it.swapBuffers()
             OpenGLApi.instance.glFinish()
-            it.setSwapInterval(swapInterval)
+            if (turnOfVsync) {
+                it.setSwapInterval(swapInterval)
+            }
         }
     }
 

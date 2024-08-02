@@ -69,6 +69,9 @@ internal class WindowsOpenGLRedrawer(
             contextHandler.draw()
             swapBuffers()
             OpenGLApi.instance.glFinish()
+            if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
+                dwmFlush()
+            }
         }
     }
 

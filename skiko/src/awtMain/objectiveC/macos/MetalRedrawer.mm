@@ -118,7 +118,7 @@ extern "C"
 {
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr)
+    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint frameBuffering, jlong adapterPtr, jlong platformInfoPtr)
 {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
@@ -133,6 +133,10 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         [container setNeedsDisplayOnBoundsChange: YES];
 
         AWTMetalLayer *layer = [AWTMetalLayer new];
+        if (frameBuffering == 2 || frameBuffering == 3) {
+            layer.maximumDrawableCount = frameBuffering;
+        }
+
         [container addSublayer: layer];
         layer.javaRef = env->NewGlobalRef(redrawer);
 
