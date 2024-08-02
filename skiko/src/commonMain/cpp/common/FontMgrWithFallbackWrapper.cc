@@ -84,3 +84,10 @@ sk_sp<SkTypeface> TypefaceFontProviderWithFallback::fallbackForChar(SkUnichar ch
     }
     return nullptr;
 }
+
+sk_sp<SkFontStyleSet> TypefaceFontProviderWithFallback::onCreateStyleSet(int) const {
+    // override to revert this change made in the parent class: https://skia-review.googlesource.com/c/skia/+/834816
+    // This revert is only for our subtype, for Compose purposes:
+    // we have our own fallback implementation. The original fallback didn't work.
+    return nullptr;
+};

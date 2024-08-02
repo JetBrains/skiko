@@ -226,7 +226,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             // TODO: an ugly hack, Linux linker searches only unresolved symbols.
             "$skiaBinDir/libsksg.a",
             "$skiaBinDir/libskshaper.a",
-            "$skiaBinDir/libskunicode.a",
+            "$skiaBinDir/libskunicode_core.a",
+            "$skiaBinDir/libskunicode_icu.a",
             "$skiaBinDir/libskia.a"
         )
         else -> mutableListOf()
