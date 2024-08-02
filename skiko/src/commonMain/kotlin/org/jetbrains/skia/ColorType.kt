@@ -66,6 +66,11 @@ enum class ColorType {
     BGR_101010X_XR,
 
     /**
+     * Pixel with 10 bits each for blue, green, red, alpha; in 64-bit word, extended range
+     */
+    BGRA_10101010_XR, // kBGRA_10101010_XR_SkColorType, added when updating to m126
+
+    /**
      * pixel with 10 used bits (most significant) followed by 6 unused
      *  bits for red, green, blue, alpha; in 64-bit word
      */
@@ -142,6 +147,7 @@ enum class ColorType {
                 BGRA_1010102 -> 4
                 BGR_101010X -> 4
                 BGR_101010X_XR -> 4
+                BGRA_10101010_XR -> 4
                 RGBA_10x6 -> 8
                 GRAY_8 -> 1
                 RGBA_F16NORM -> 8
@@ -170,6 +176,7 @@ enum class ColorType {
                 BGRA_1010102 -> 2
                 BGR_101010X -> 2
                 BGR_101010X_XR -> 2
+                BGRA_10101010_XR -> 2
                 RGBA_10x6 -> 2
                 GRAY_8 -> 0
                 RGBA_F16NORM -> 3
@@ -204,7 +211,7 @@ enum class ColorType {
                 else if (ColorAlphaType.UNKNOWN == alphaType) null
                 else alphaType
             }
-            RGBA_10x6, ARGB_4444, RGBA_8888, BGRA_8888, RGBA_1010102, BGRA_1010102, RGBA_F16NORM, RGBA_F16, RGBA_F32, R16G16B16A16_UNORM ->
+            RGBA_10x6, ARGB_4444, RGBA_8888, BGRA_8888, RGBA_1010102, BGRA_1010102, RGBA_F16NORM, RGBA_F16, RGBA_F32, R16G16B16A16_UNORM, BGRA_10101010_XR ->
                 if (ColorAlphaType.UNKNOWN == alphaType) null
                 else alphaType
             GRAY_8, R8G8_UNORM, R16G16_UNORM, R16G16_FLOAT, RGB_565, RGB_888X, RGB_101010X, BGR_101010X, BGR_101010X_XR ->

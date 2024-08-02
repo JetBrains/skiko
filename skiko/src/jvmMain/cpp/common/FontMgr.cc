@@ -76,6 +76,16 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeFrom
   return reinterpret_cast<jlong>(typeface);
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nLegacyMakeTypeface
+    (JNIEnv* env, jclass jclass, jlong ptr, jstring familyNameStr, jint fontStyle) {
+
+    SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
+    SkString name = skString(env, familyNameStr);
+
+    SkTypeface* typeface = instance->legacyMakeTypeface(name.c_str(), skija::FontStyle::fromJava(fontStyle)).release();
+    return reinterpret_cast<jlong>(typeface);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nDefault
   (JNIEnv* env, jclass jclass) {
     SkFontMgr* instance = SkFontMgrSkikoDefault().release();

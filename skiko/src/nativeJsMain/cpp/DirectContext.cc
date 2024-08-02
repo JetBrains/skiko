@@ -4,7 +4,8 @@
 #include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
 
 #ifdef SK_METAL
-#include "mtl/GrMtlBackendContext.h"
+#include "ganesh/mtl/GrMtlBackendContext.h"
+#include "ganesh/mtl/GrMtlDirectContext.h"
 #endif
 
 #ifdef SK_DIRECT3D
@@ -30,7 +31,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
     GrMTLHandle queue = reinterpret_cast<GrMTLHandle>((queuePtr));
     backendContext.fDevice.retain(device);
     backendContext.fQueue.retain(queue);
-    sk_sp<GrDirectContext> instance = GrDirectContext::MakeMetal(backendContext);
+    sk_sp<GrDirectContext> instance = GrDirectContexts::MakeMetal(backendContext);
     return reinterpret_cast<KNativePointer>(instance.release());
 #else
     return nullptr;

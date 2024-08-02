@@ -167,6 +167,18 @@ open class FontMgr : RefCnt {
         }
     }
 
+    fun legacyMakeTypeface(name: String, style: FontStyle): Typeface? {
+        return try {
+            Stats.onNativeCall()
+            val ptr = interopScope {
+                _nLegacyMakeTypeface(_ptr, toInterop(name), style._value)
+            }
+            if (ptr == NullPointer) null else Typeface(ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
     internal constructor(ptr: NativePointer) : super(ptr)
 
     internal constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, allowClose)
@@ -215,3 +227,7 @@ private external fun _nMakeFromFile(ptr: NativePointer, pathPtr: InteropPointer,
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nDefault")
 private external fun _nDefault(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nLegacyMakeTypeface")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nLegacyMakeTypeface")
+private external fun _nLegacyMakeTypeface(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer

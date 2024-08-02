@@ -29,11 +29,15 @@ class FontMgrTest {
             assertEquals("Interface", fontManager.getFamilyName(1))
 
             fontManager.makeStyleSet(0)!!.use { styleSet ->
-                assertEquals(0, styleSet.count())
+                // assert was changed after update to m126 due to
+                // https://skia-review.googlesource.com/c/skia/+/834816
+                assertEquals(2, styleSet.count())
             }
 
             fontManager.makeStyleSet(1)!!.use { styleSet ->
-                assertEquals(0, styleSet.count())
+                // assert was changed after update to m126 due to
+                // https://skia-review.googlesource.com/c/skia/+/834816
+                assertEquals(1, styleSet.count())
             }
 
             fontManager.matchFamily("JetBrains Mono").use { styleSet ->

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <jni.h>
 #include "GrDirectContext.h"
-#include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
+#include "ganesh/gl/GrGLDirectContext.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeGL
   (JNIEnv* env, jclass jclass) {
@@ -9,7 +9,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 }
 
 #ifdef SK_METAL
-#include "mtl/GrMtlBackendContext.h"
+#include "ganesh/mtl/GrMtlBackendContext.h"
+#include "ganesh/mtl/GrMtlDirectContext.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeMetal
   (JNIEnv* env, jclass jclass, long devicePtr, long queuePtr) {
@@ -18,7 +19,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
     GrMTLHandle queue = reinterpret_cast<GrMTLHandle>(static_cast<uintptr_t>(queuePtr));
     backendContext.fDevice.retain(device);
     backendContext.fQueue.retain(queue);
-    sk_sp<GrDirectContext> instance = GrDirectContext::MakeMetal(backendContext);
+    sk_sp<GrDirectContext> instance = GrDirectContexts::MakeMetal(backendContext);
     return reinterpret_cast<jlong>(instance.release());
 }
 #endif

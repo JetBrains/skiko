@@ -2,6 +2,10 @@
 #include <jni.h>
 #include <ganesh/gl/GrGLBackendSurface.h>
 #include "GrBackendSurface.h"
+#ifdef SK_METAL
+#include "ganesh/mtl/GrMtlBackendSurface.h"
+#include "ganesh/mtl/GrMtlTypes.h"
+#endif
 
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     // std::cout << "Deleting [GrBackendRenderTarget " << rt << "]" << std::endl;
@@ -27,7 +31,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt
     GrMTLHandle texture = reinterpret_cast<GrMTLHandle>(static_cast<uintptr_t>(texturePtr));
     GrMtlTextureInfo fbInfo;
     fbInfo.fTexture.retain(texture);
-    GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, fbInfo);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, fbInfo);
+    auto instance = new GrBackendRenderTarget(obj);
     return reinterpret_cast<jlong>(instance);
 }
 #endif

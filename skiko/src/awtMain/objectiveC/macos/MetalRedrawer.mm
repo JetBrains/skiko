@@ -10,8 +10,9 @@
 
 #import <GrBackendSurface.h>
 #import <GrDirectContext.h>
-#import <mtl/GrMtlBackendContext.h>
-#import <mtl/GrMtlTypes.h>
+#include "ganesh/mtl/GrMtlBackendContext.h"
+#include "ganesh/mtl/GrMtlDirectContext.h"
+#include "ganesh/mtl/GrMtlTypes.h"
 
 #import "MetalDevice.h"
 

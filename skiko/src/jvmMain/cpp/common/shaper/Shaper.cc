@@ -5,10 +5,12 @@
 #include "interop.hh"
 #include "FontRunIterator.hh"
 #include "SkShaper.h"
+#include "SkShaper_harfbuzz.h"
 #include "SkUnicode.h"
 #include "src/base/SkUTF.h"
 #include "TextLineRunHandler.hh"
 #include "unicode/ubidi.h"
+#include "SkUnicode_icu.h"
 
 static void deleteShaper(SkShaper* instance) {
     // std::cout << "Deleting [SkShaper " << instance << "]" << std::endl;
@@ -39,13 +41,17 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMa
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShapeDontWrapOrReorder
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
-    return reinterpret_cast<jlong>(SkShaper::MakeShapeDontWrapOrReorder(SkUnicode::Make(), sk_ref_sp(fontMgr)).release());
+    // TODO: consider if we need/want to use ICU4X or Libgrapheme (skuincode/include has those implementations too)
+    auto unicode = SkUnicodes::ICU::Make();
+    return reinterpret_cast<jlong>(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr)).release());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeCoreText
   (JNIEnv* env, jclass jclass) {
     #ifdef SK_SHAPER_CORETEXT_AVAILABLE
-        return reinterpret_cast<jlong>(SkShaper::MakeCoreText().release());
+        return 0;
+        // TODO: build skia with `skia_use_fonthost_mac=true` to have SkShaper::MakeCoreText
+        // return reinterpret_cast<jlong>(SkShaper::MakeCoreText().release());
     #else
         return 0;
     #endif

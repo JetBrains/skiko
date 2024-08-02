@@ -2,8 +2,12 @@
 #include <stdint.h>
 #include "GrBackendSurface.h"
 #include "common.h"
-#include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
-#include "ganesh/gl/GrGLBackendSurface.h" // TODO: skia update: check if it's correct
+#include "ganesh/gl/GrGLDirectContext.h"
+#include "ganesh/gl/GrGLBackendSurface.h"
+#ifdef SK_METAL
+#include "ganesh/mtl/GrMtlBackendSurface.h"
+#include "ganesh/mtl/GrMtlTypes.h"
+#endif
 
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     delete rt;
@@ -26,7 +30,8 @@ SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeMetal
     GrMTLHandle texture = reinterpret_cast<GrMTLHandle>((texturePtr));
     GrMtlTextureInfo fbInfo;
     fbInfo.fTexture.retain(texture);
-    GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, fbInfo);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, fbInfo);
+    auto instance = new GrBackendRenderTarget(obj);
     return instance;
 #else
     return 0;

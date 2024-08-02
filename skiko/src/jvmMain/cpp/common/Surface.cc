@@ -8,7 +8,7 @@
 
 #ifdef SK_METAL
 #include "include/gpu/ganesh/mtl/SkSurfaceMetal.h"
-#include "include/gpu/mtl/GrMtlTypes.h"
+#include "include/gpu/ganesh/mtl/GrMtlTypes.h"
 #endif
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRasterDirect

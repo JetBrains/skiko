@@ -77,6 +77,20 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeFromFile
     return reinterpret_cast<KNativePointer>(typeface);
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nLegacyMakeTypeface
+    (KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle) {
+
+    SkFontMgr* instance = reinterpret_cast<SkFontMgr*>((ptr));
+    SkString name = skString(familyNameStr);
+
+    SkTypeface* typeface = instance->legacyMakeTypeface(
+        name.c_str(), skija::FontStyle::fromKotlin(fontStyle)
+    ).release();
+
+    return reinterpret_cast<KNativePointer>(typeface);
+}
+
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nDefault
   () {
     SkFontMgr* instance = SkFontMgrSkikoDefault().release();
