@@ -50,7 +50,7 @@ fun SkikoProjectContext.declareSkiaTasks() {
                 onlyIfModified(true)
                 src(skiaUrl)
                 dest(skiko.dependenciesDir.resolve(
-                    "skia/$skiaReleaseTag/Skia-$skiaReleaseTag-$config-Release-${arch}.zip")
+                    "skia/$skiaReleaseTag/Skia-$skiaReleaseTag-$config-$buildType-${arch}.zip")
                 )
             }
 
