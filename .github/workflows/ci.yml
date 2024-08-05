@@ -38,6 +38,11 @@ jobs:
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
           ./gradlew --stacktrace --info :SkiaAwtSample:installDist
 
+      - shell: bash
+        name: 'Publish Debug to Maven Local'
+        run: |
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal -Pskiko.debug=true
+
       - uses: actions/upload-artifact@v3
         name: 'Save test results as artifact'
         if: always()
