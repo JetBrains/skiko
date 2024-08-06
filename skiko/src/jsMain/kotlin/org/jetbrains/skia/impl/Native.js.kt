@@ -71,10 +71,7 @@ internal actual class InteropScope actual constructor() {
 
     actual fun toInterop(string: String?): InteropPointer {
         return if (string != null) {
-            val data = _malloc(string.length * 4)
-            stringToUTF8(string, data, string.length * 4)
-            elements.add(data)
-            data
+            toInterop(convertToZeroTerminatedString(string))
         } else {
             0
         }

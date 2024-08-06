@@ -24,6 +24,12 @@ class ManagedStringTest {
     }
 
     @Test
+    fun emptyStringTest() {
+        val s = ManagedString("")
+        assertEquals("", s.toString())
+    }
+
+    @Test
     fun canCreateAndReadManagedString() {
         val ms1 = ManagedString("Hello")
         assertEquals("Hello", ms1.toString())
