@@ -25,6 +25,7 @@ actual open class SkiaLayer internal constructor(
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+    private val executeAWTQueueScheduledCommands: () -> Unit
 ) : JPanel() {
 
     internal companion object {
@@ -70,7 +71,8 @@ actual open class SkiaLayer internal constructor(
         ),
         RenderFactory.Default,
         analytics,
-        pixelGeometry
+        pixelGeometry,
+        executeAWTQueueScheduledCommands = {}
     )
 
     constructor(
@@ -83,7 +85,23 @@ actual open class SkiaLayer internal constructor(
         properties,
         RenderFactory.Default,
         analytics,
-        pixelGeometry
+        pixelGeometry,
+        executeAWTQueueScheduledCommands = {}
+    )
+
+    constructor(
+        externalAccessibleFactory: ((Component) -> Accessible)? = null,
+        properties: SkiaLayerProperties,
+        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+        pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+        executeAWTQueueScheduledCommands: () -> Unit
+    ) : this(
+        externalAccessibleFactory,
+        properties,
+        RenderFactory.Default,
+        analytics,
+        pixelGeometry,
+        executeAWTQueueScheduledCommands
     )
 
     val canvas: java.awt.Canvas
@@ -533,6 +551,7 @@ actual open class SkiaLayer internal constructor(
         check(!isDisposed) { "SkiaLayer is disposed" }
         try {
             body()
+            executeAWTQueueScheduledCommands()
         } catch (e: CancellationException) {
             // ignore
         } catch (e: RenderException) {
