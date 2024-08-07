@@ -33,6 +33,9 @@ class ManagedStringTest {
 
         val ms3 = ManagedString("你好!")
         assertEquals("你好!", ms3.toString())
+
+        val msEmpty = ManagedString("")
+        assertEquals("", msEmpty.toString())
     }
 
     @Test
@@ -45,6 +48,9 @@ class ManagedStringTest {
 
         val ms3 = ManagedString("你好").append("，世界")
         assertEquals("你好，世界", ms3.toString())
+
+        val msEmpty = ManagedString("Empty string").append("")
+        assertEquals("Empty string", msEmpty.toString())
     }
 
     @Test
@@ -57,6 +63,9 @@ class ManagedStringTest {
 
         val ms3 = ManagedString("世界").insert(0,"你好，")
         assertEquals("你好，世界", ms3.toString())
+
+        val msEmpty = ManagedString("Empty string").insert(1, "").insert(0, "")
+        assertEquals("Empty string", msEmpty.toString())
     }
 
     @Test
@@ -72,5 +81,8 @@ class ManagedStringTest {
 
         val ms4 = ManagedString("你好，世界!").remove(from = 2, length = 3) // '，' is 1 symbol
         assertEquals("你好!", ms4.toString())
+
+        val msEmpty = ManagedString("World!").remove(from = 2, length = 0)
+        assertEquals("World!", msEmpty.toString())
     }
 }

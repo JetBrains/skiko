@@ -124,30 +124,13 @@ internal actual fun fromWasm(src: NativePointer, result: DoubleArray) {
     }
 }
 
-internal actual fun stringToUTF8(str: String, outPtr: NativePointer, maxBytesToWrite: Int) {
-    if (maxBytesToWrite <= 0) return
-
-    val utf8 = str.encodeToByteArray()
-    val lastIndex = minOf(maxBytesToWrite - 1, utf8.size)
-
-    var index = 0
-    while (index < lastIndex) {
-        skia_memSetByte(outPtr + index, utf8[index])
-        index++
-    }
-    skia_memSetByte(outPtr + index, 0)
-}
-
 internal actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
     private var callbacksInitialized = false
 
     actual fun toInterop(string: String?): InteropPointer {
         return if (string != null) {
-            val data = _malloc(string.length * 4)
-            stringToUTF8(string, data, string.length * 4)
-            elements.add(data)
-            data
+            toInterop(convertToZeroTerminatedString(string))
         } else {
             0
         }

@@ -63,18 +63,13 @@ internal actual fun fromWasm(src: NativePointer, result: DoubleArray) {
     result.asDynamic().set(HEAPF64.subarray(startIndex, startIndex + result.size))
 }
 
-internal actual external fun stringToUTF8(str: String, outPtr: NativePointer, maxBytesToWrite: Int)
-
 internal actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
     private var callbacksInitialized = false
 
     actual fun toInterop(string: String?): InteropPointer {
         return if (string != null) {
-            val data = _malloc(string.length * 4)
-            stringToUTF8(string, data, string.length * 4)
-            elements.add(data)
-            data
+            toInterop(convertToZeroTerminatedString(string))
         } else {
             0
         }

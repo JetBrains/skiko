@@ -64,12 +64,6 @@ internal external fun _malloc(size: Int): NativePointer
 @ModuleImport("./skiko.mjs", "free")
 internal external fun _free(ptr: NativePointer)
 
-private external fun lengthBytesUTF8(str: String): Int
-
-internal expect fun stringToUTF8(str: String, outPtr: NativePointer, maxBytesToWrite: Int)
-
-private external fun UTF8ToString(ptr: NativePointer): String
-
 // Data copying routines.
 internal expect fun toWasm(dest: NativePointer, src: ByteArray)
 internal expect fun toWasm(dest: NativePointer, src: ShortArray)
