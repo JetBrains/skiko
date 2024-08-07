@@ -20,7 +20,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt__1nMakeGL
   (JNIEnv* env, jclass jclass, jint width, jint height, jint sampleCnt, jint stencilBits, jint fbId, jint fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-    auto obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
     GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return reinterpret_cast<jlong>(instance);
 }
@@ -32,7 +32,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt
     GrMtlTextureInfo fbInfo;
     fbInfo.fTexture.retain(texture);
     GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, fbInfo);
-    auto instance = new GrBackendRenderTarget(obj);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return reinterpret_cast<jlong>(instance);
 }
 #endif

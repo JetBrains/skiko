@@ -19,7 +19,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nGetFinaliz
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nMakeGL
   (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-    auto obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
     GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return instance;
 }
@@ -31,7 +31,7 @@ SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeMetal
     GrMtlTextureInfo fbInfo;
     fbInfo.fTexture.retain(texture);
     GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, fbInfo);
-    auto instance = new GrBackendRenderTarget(obj);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return instance;
 #else
     return 0;

@@ -12,7 +12,7 @@
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeGLRenderTargetNative
     (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-    auto obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
     GrBackendRenderTarget* target = new GrBackendRenderTarget(obj);
     return reinterpret_cast<KNativePointer>(target);
 }
@@ -27,7 +27,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalRenderT
     // TODO: create properly.
     GrMtlTextureInfo mtlInfo;
     GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, mtlInfo);
-    auto instance = new GrBackendRenderTarget(obj);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return reinterpret_cast<KNativePointer>(instance);
 #else
     return 0;

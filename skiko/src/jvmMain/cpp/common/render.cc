@@ -25,7 +25,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeGLRenderTar
     jint fbId, jint fbFormat
 ) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-    auto obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
     GrBackendRenderTarget* target = new GrBackendRenderTarget(obj);
     return reinterpret_cast<jlong>(target);
 }
@@ -42,7 +42,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeMetalRender
     // TODO: create properly.
     GrMtlTextureInfo mtlInfo;
     GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, mtlInfo);
-    auto instance = new GrBackendRenderTarget(obj);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return reinterpret_cast<jlong>(instance);
 #else
     return 0;

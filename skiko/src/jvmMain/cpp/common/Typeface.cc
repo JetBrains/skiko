@@ -203,6 +203,6 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1n
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeEmptyTypeface
   (JNIEnv* env, jclass jclass) {
 
-    auto res = SkTypeface::MakeEmpty().release();
+    SkTypeface* res = SkTypeface::MakeEmpty().release();
     return reinterpret_cast<jlong>(res);
 }
