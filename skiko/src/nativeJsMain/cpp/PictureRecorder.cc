@@ -1,4 +1,5 @@
 #include <iostream>
+#include "SkPicture.h"
 #include "SkDrawable.h"
 #include "SkPictureRecorder.h"
 #include "common.h"

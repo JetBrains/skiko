@@ -6,7 +6,7 @@
 
 #ifdef SK_METAL
 #include "include/gpu/ganesh/mtl/SkSurfaceMetal.h"
-#include "include/gpu/mtl/GrMtlTypes.h"
+#include "include/gpu/ganesh/mtl/GrMtlTypes.h"
 #endif
 
 
@@ -214,18 +214,6 @@ SKIKO_EXPORT void org_jetbrains_skia_Surface__1nWritePixels
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
     surface->writePixels(*bitmap, x, y);
-}
-
-SKIKO_EXPORT void org_jetbrains_skia_Surface__1nFlushAndSubmit
-  (KNativePointer ptr, KBoolean syncCpu) {
-    SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
-    surface->flushAndSubmit(syncCpu);
-}
-
-SKIKO_EXPORT void org_jetbrains_skia_Surface__1nFlush
-  (KNativePointer ptr) {
-    SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
-    surface->flush();
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Surface__1nUnique

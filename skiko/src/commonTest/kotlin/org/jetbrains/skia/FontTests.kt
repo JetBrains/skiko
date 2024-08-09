@@ -18,7 +18,7 @@ private fun isWindows() = (hostOs == OS.Windows)
 private fun isTvos() = (hostOs == OS.Tvos)
 private fun isJs() = (kotlinBackend == KotlinBackend.JS)
 private val COARSE_EPSILON = 2.4f
-private const val jbMonoPath = "./fonts/JetBrainsMono-Regular.ttf"
+internal const val jbMonoPath = "./fonts/JetBrainsMono-Regular.ttf"
 
 class FontTests {
     @Test
@@ -133,8 +133,36 @@ class FontTests {
     }
 
     @Test
-    fun emptyFontMetrics() {
+    fun emptyFontMetricsAreZero() {
+        // The behaviour was changed in m122.
+        // https://github.com/google/skia/blob/main/RELEASE_NOTES.md#milestone-122
+        // There is no default font anymore.
+        Font(Typeface.makeEmpty()).use { font ->
+            val metrics = font.metrics
+            assertTrue(
+                metrics.top == 0f &&
+                        metrics.bottom == 0f &&
+                        metrics.ascent == 0f &&
+                        metrics.descent == 0f
+            )
+        }
+
         Font(null).use { font ->
+            val metrics = font.metrics
+            assertTrue(
+                metrics.top == 0f &&
+                        metrics.bottom == 0f &&
+                        metrics.ascent == 0f &&
+                        metrics.descent == 0f
+            )
+        }
+    }
+
+    @Test
+    fun nonEmptyFontMetrics() = runTest {
+        val jbMono = Typeface.makeFromResource(jbMonoPath)
+
+        Font(jbMono).use { font ->
             val metrics = font.metrics
             assertFalse(
                 metrics.top == 0f &&

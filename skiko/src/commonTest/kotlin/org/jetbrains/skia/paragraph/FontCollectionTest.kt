@@ -60,9 +60,17 @@ class FontCollectionTest {
         }
 
         //TODO: commented out assertions seem not to be isolated and are turned off till further investigation
-        assertContentEquals(arrayOf(), fontCollection.findTypefaces(arrayOf("No Such Font"), FontStyle.NORMAL))
+
+        // Note: thanks to https://skia-review.googlesource.com/c/skia/+/834816 there is a fallback,
+        // therefore the result is non-empty array (it used to be empty)
+        assertContentEquals(arrayOf(jbMono), fontCollection.findTypefaces(arrayOf("No Such Font"), FontStyle.NORMAL))
+
         assertContentEquals(arrayOf(jbMono), fontCollection.findTypefaces(arrayOf("JetBrains Mono"), FontStyle.NORMAL))
-        assertContentEquals(arrayOf(), fontCollection.findTypefaces(arrayOf("Inter"), FontStyle.NORMAL))
+
+        // Note: thanks to https://skia-review.googlesource.com/c/skia/+/834816 there is a fallback,
+        // therefore the result is non-empty array (it used to be empty)
+        assertContentEquals(arrayOf(jbMono), fontCollection.findTypefaces(arrayOf("Inter"), FontStyle.NORMAL))
+
         assertContentEquals(arrayOf(inter), fontCollection.findTypefaces(arrayOf("Interface"), FontStyle.NORMAL))
         assertContentEquals(
             arrayOf(jbMono, inter),

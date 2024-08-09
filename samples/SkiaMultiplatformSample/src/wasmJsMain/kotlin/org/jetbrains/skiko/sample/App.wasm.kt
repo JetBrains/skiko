@@ -4,6 +4,7 @@ import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Data
+import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.FontMgrWithFallback
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.paragraph.TypefaceFontProviderWithFallback
@@ -40,8 +41,8 @@ internal fun runEmojiStoryApp() {
     MainScope().launch {
         val notoEmojisBytes = loadRes(notoColorEmoji).toByteArray()
         val notoSansSCBytes = loadRes(notoSancSC).toByteArray()
-        val notoEmojiTypeface = Typeface.makeFromData(Data.makeFromBytes(notoEmojisBytes))
-        val notoSansSCTypeface = Typeface.makeFromData(Data.makeFromBytes(notoSansSCBytes))
+        val notoEmojiTypeface = FontMgr.default.makeFromData(Data.makeFromBytes(notoEmojisBytes))
+        val notoSansSCTypeface = FontMgr.default.makeFromData(Data.makeFromBytes(notoSansSCBytes))
 
         val tfp = TypefaceFontProviderWithFallback().apply {
             registerTypeface(notoEmojiTypeface)

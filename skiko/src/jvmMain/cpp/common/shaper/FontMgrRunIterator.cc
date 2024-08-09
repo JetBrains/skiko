@@ -1,3 +1,4 @@
+#include "FontMgrDefaultFactory.hh"
 #include <jni.h>
 #include "../interop.hh"
 #include "interop.hh"
@@ -10,7 +11,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_FontMgrRunIter
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
     sk_sp<SkFontMgr> fontMgr = fontMgrPtr == nullptr
-      ? SkFontMgr::RefDefault()
+      ? SkFontMgrSkikoDefault()
       : sk_ref_sp(reinterpret_cast<SkFontMgr*>(skija::impl::Native::fromJava(env, fontMgrPtr, skija::FontMgr::cls)));
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(*text);
     if (!graphemeIter) return 0;

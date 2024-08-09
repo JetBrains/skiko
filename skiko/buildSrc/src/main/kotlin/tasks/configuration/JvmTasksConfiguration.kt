@@ -281,7 +281,9 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 // Hack to fix problem with linker not always finding certain declarations.
                 "$skiaBinDir/libsksg.a",
                 "$skiaBinDir/libskia.a",
-                "$skiaBinDir/libskunicode.a"
+                "$skiaBinDir/libskunicode_core.a",
+                "$skiaBinDir/libskunicode_icu.a",
+                "$skiaBinDir/libskshaper.a",
             )
         }
         OS.Windows -> {

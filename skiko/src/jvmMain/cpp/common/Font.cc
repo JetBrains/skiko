@@ -158,13 +158,6 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetTypeface
     return reinterpret_cast<jlong>(typeface);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetTypefaceOrDefault
- (JNIEnv* env, jclass jclass, jlong ptr) {
-    SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    SkTypeface* typeface = instance->refTypefaceOrDefault().release();
-    return reinterpret_cast<jlong>(typeface);
-}
-
 extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt_Font_1nGetSize
  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));

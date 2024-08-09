@@ -262,17 +262,6 @@ class Font : Managed {
         }
 
     /**
-     * @return [Typeface] if set, or the default typeface.
-     */
-    val typefaceOrDefault: Typeface
-        get() = try {
-            Stats.onNativeCall()
-            Typeface(_nGetTypefaceOrDefault(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-
-    /**
      * @return  text size in points
      */
     var size: Float
@@ -704,10 +693,6 @@ private external fun _nSetHinting(ptr: NativePointer, value: Int)
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypeface")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetTypeface")
 private external fun _nGetTypeface(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypefaceOrDefault")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetTypefaceOrDefault")
-private external fun _nGetTypefaceOrDefault(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetScaleX")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetScaleX")

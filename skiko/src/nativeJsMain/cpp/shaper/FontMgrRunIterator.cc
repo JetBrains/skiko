@@ -2,6 +2,7 @@
 #include "SkShaper.h"
 #include "common.h"
 #include "FontRunIterator.hh"
+#include "FontMgrDefaultFactory.hh"
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
@@ -9,7 +10,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
     SkString* text = reinterpret_cast<SkString*>(textPtr);
     SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
     sk_sp<SkFontMgr> fontMgr = fontMgrPtr == nullptr
-      ? SkFontMgr::RefDefault()
+      ? SkFontMgrSkikoDefault()
       : sk_ref_sp(reinterpret_cast<SkFontMgr*>(fontMgrPtr));
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(*text);
     if (!graphemeIter) return nullptr;

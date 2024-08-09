@@ -947,12 +947,7 @@ class Surface : RefCnt {
      * a DirectContext.
      */
     fun flushAndSubmit() {
-        try {
-            Stats.onNativeCall()
-            _nFlushAndSubmit(_ptr, false)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        _context?.flushAndSubmit(this)
     }
 
     /**
@@ -969,21 +964,11 @@ class Surface : RefCnt {
      * @param syncCpu a flag determining if cpu should be synced
      */
     fun flushAndSubmit(syncCpu: Boolean) {
-        try {
-            Stats.onNativeCall()
-            _nFlushAndSubmit(_ptr, syncCpu)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        _context?.flushAndSubmit(this, syncCpu)
     }
 
     fun flush() {
-        try {
-            Stats.onNativeCall()
-            Surface_nFlush(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        _context?.flush(this)
     }
 
     /**
@@ -1036,10 +1021,6 @@ private external fun Surface_nReadPixels(ptr: NativePointer, bitmapPtr: NativePo
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixels")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nWritePixels")
 private external fun Surface_nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nFlush")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nFlush")
-private external fun Surface_nFlush(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirect")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeRasterDirect")
@@ -1175,10 +1156,6 @@ private external fun _nReadPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativeP
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
 private external fun _nWritePixelsFromPixmap(ptr: NativePointer, pixmapPtr: NativePointer, x: Int, y: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nFlushAndSubmit")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nFlushAndSubmit")
-private external fun _nFlushAndSubmit(ptr: NativePointer, syncCpu: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nUnique")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nUnique")

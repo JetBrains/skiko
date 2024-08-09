@@ -29,7 +29,7 @@ public:
         , fApproximateSpaces(approximateSpaces)
         , fApproximatePunctuation(approximatePunctuation)
     {
-        fFont.setTypeface(font.refTypefaceOrDefault());
+        fFont.setTypeface(font.refTypeface());
         fFallbackFont.setTypeface(nullptr);
     }
 
@@ -45,7 +45,7 @@ public:
                           font,
                           std::move(fallbackMgr),
                           nullptr,
-                          font.refTypefaceOrDefault()->fontStyle(),
+                          font.refTypeface()->fontStyle(),
                           nullptr,
                           graphemeIter,
                           approximateSpaces,
