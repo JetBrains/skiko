@@ -27,7 +27,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shape
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakePrimitive
   (JNIEnv* env, jclass jclass) {
-    return reinterpret_cast<jlong>(SkShaper::MakePrimitive().release());
+    return reinterpret_cast<jlong>(SkShapers::Primitive::PrimitiveText().release());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShaperDrivenWrapper

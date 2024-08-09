@@ -25,7 +25,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nGetFinalizer() {
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakePrimitive
   () {
-    return reinterpret_cast<KNativePointer>(SkShaper::MakePrimitive().release());
+    return reinterpret_cast<KNativePointer>(SkShapers::Primitive::PrimitiveText().release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShaperDrivenWrapper
