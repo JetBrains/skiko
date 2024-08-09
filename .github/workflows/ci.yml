@@ -197,6 +197,13 @@ jobs:
           path: skiko/build/out/link/**/*.so
           retention-days: 1
 
+      - name: Archive skia from dependencies
+        uses: actions/upload-artifact@v4
+        with:
+          name: skia-from_dependencies
+          path: skiko/dependencies/skia/**/*.zip
+          retention-days: 1
+
       - shell: bash
         name: 'Publish to Maven Local, check AWT sample'
         env:
