@@ -190,6 +190,13 @@ jobs:
           path: skiko/build/skiko-runtime-for-tests/*.so
           retention-days: 1
 
+      - name: Archive linux .so lib 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: skiko-runtime-release
+          path: skiko/build/out/link/**/*.so
+          retention-days: 1
+
       - shell: bash
         name: 'Publish to Maven Local, check AWT sample'
         env:
