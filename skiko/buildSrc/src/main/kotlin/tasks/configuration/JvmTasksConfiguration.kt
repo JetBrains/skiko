@@ -541,7 +541,7 @@ fun Project.androidJar(askedVersion: String = ""): Provider<File> =
             val platformsDir = androidHome.resolve("platforms")
             val versions = platformsDir.list().orEmpty()
             versions.maxByOrNull { name -> // possible name: "android-32", "android-33-ext4"
-                name.split("-").getOrNull(1)?.toInt() ?: 0
+                name.split("-").getOrNull(1)?.toIntOrNull() ?: 0
             } ?: error(
                 buildString {
                     appendLine("'$platformsDir' does not contain any directories matching expected 'android-NUMBER' format: ${versions}")
