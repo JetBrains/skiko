@@ -83,6 +83,15 @@ Java_org_jetbrains_skia_RuntimeShaderBuilderKt__1nUniformFloat4
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_org_jetbrains_skia_RuntimeShaderBuilderKt__1nUniformFloatArray
+  (JNIEnv* env, jclass jclass, jlong builderPtr, jstring uniformName, jfloatArray uniformFloatArray, jint length) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = jlongToPtr<SkRuntimeShaderBuilder*>(builderPtr);
+    jfloat* floatArray = static_cast<jfloat*>(env->GetPrimitiveArrayCritical(uniformFloatArray, 0));
+    runtimeShaderBuilder->uniform(skString(env, uniformName).c_str()).set(floatArray, length);
+    env->ReleasePrimitiveArrayCritical(uniformFloatArray, floatArray, 0);
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_org_jetbrains_skia_RuntimeShaderBuilderKt__1nUniformFloatMatrix22
   (JNIEnv* env, jclass jclass, jlong builderPtr, jstring uniformName, jfloatArray uniformMatrix22) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = jlongToPtr<SkRuntimeShaderBuilder*>(builderPtr);

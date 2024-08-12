@@ -52,6 +52,22 @@ class RuntimeShaderBuilderTest {
     }
 
     @Test
+    fun customShaderWithFloatArray() = shaderTest {
+        val shaderSksl = """
+            uniform float array[4];
+        
+            half4 main(vec2 coord) {
+                return half4(array[0], array[1], array[2], array[3]);
+            }
+        """.trimIndent()
+
+        val runtimeEffect = RuntimeEffect.makeForShader(shaderSksl)
+        val runtimeShaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        runtimeShaderBuilder.uniform("array", floatArrayOf(0.1f, 0.2f, 0.3f, 0.4f))
+        runtimeShaderBuilder.makeShader()
+    }
+
+    @Test
     fun customShaderWithMatrix() = shaderTest {
         val shaderSksl = """
             uniform shader content;
