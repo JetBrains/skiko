@@ -766,13 +766,20 @@ $dokka.location:org.jetbrains.skia.svg/SVGTag.DEFS///PointingToDeclaration/{"org
 $dokka.location:org.jetbrains.skia.svg/SVGTag.ELLIPSE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-e-l-l-i-p-s-e/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_BLEND///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-b-l-e-n-d/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_COLOR_MATRIX///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-c-o-l-o-r_-m-a-t-r-i-x/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGTag.FE_COMPONENT_TRANSFER///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-c-o-m-p-o-n-e-n-t_-t-r-a-n-s-f-e-r/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_COMPOSITE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-c-o-m-p-o-s-i-t-e/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_DIFFUSE_LIGHTING///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-d-i-f-f-u-s-e_-l-i-g-h-t-i-n-g/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_DISPLACEMENT_MAP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-d-i-s-p-l-a-c-e-m-e-n-t_-m-a-p/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_DISTANT_LIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-d-i-s-t-a-n-t_-l-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_FLOOD///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-f-l-o-o-d/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGTag.FE_FUNC_A///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-f-u-n-c_-a/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGTag.FE_FUNC_B///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-f-u-n-c_-b/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGTag.FE_FUNC_G///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-f-u-n-c_-g/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGTag.FE_FUNC_R///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-f-u-n-c_-r/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_GAUSSIAN_BLUR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-g-a-u-s-s-i-a-n_-b-l-u-r/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_IMAGE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-i-m-a-g-e/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGTag.FE_MERGE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-m-e-r-g-e/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGTag.FE_MERGE_NODE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-m-e-r-g-e_-n-o-d-e/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_MORPHOLOGY///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-m-o-r-p-h-o-l-o-g-y/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_OFFSET///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-o-f-f-s-e-t/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.FE_POINT_LIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-f-e_-p-o-i-n-t_-l-i-g-h-t/index.html
@@ -807,7 +814,6 @@ $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode///PointingToDeclarat
 $dokka.location:org.jetbrains.skia////PointingToDeclaration/skiko/org.jetbrains.skia/index.html
 $dokka.location:org.jetbrains.skia//LANG/#/PointingToDeclaration/skiko/org.jetbrains.skia/-l-a-n-g.html
 $dokka.location:org.jetbrains.skia//makeFromEncoded/org.jetbrains.skia.Image.Companion#[Error type: Unresolved type for NSData]/PointingToDeclaration/skiko/org.jetbrains.skia/make-from-encoded.html
-$dokka.location:org.jetbrains.skia//makeFromFile/org.jetbrains.skia.Typeface.Companion#kotlin.String#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file.html
 $dokka.location:org.jetbrains.skia//makeFromFileName/org.jetbrains.skia.Data.Companion#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file-name.html
 $dokka.location:org.jetbrains.skia//toIPoint/#kotlin.Long/PointingToDeclaration/skiko/org.jetbrains.skia/to-i-point.html
 $dokka.location:org.jetbrains.skia//useContext/org.jetbrains.skia.DirectContext#kotlin.Function1[org.jetbrains.skia.DirectContext,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skia/use-context.html
@@ -1176,6 +1182,7 @@ $dokka.location:org.jetbrains.skia/ColorType.A16_FLOAT///PointingToDeclaration/{
 $dokka.location:org.jetbrains.skia/ColorType.A16_UNORM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-a16_-u-n-o-r-m/index.html
 $dokka.location:org.jetbrains.skia/ColorType.ALPHA_8///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-a-l-p-h-a_8/index.html
 $dokka.location:org.jetbrains.skia/ColorType.ARGB_4444///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-a-r-g-b_4444/index.html
+$dokka.location:org.jetbrains.skia/ColorType.BGRA_10101010_XR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-b-g-r-a_10101010_-x-r/index.html
 $dokka.location:org.jetbrains.skia/ColorType.BGRA_1010102///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-b-g-r-a_1010102/index.html
 $dokka.location:org.jetbrains.skia/ColorType.BGRA_8888///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-b-g-r-a_8888/index.html
 $dokka.location:org.jetbrains.skia/ColorType.BGR_101010X///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-b-g-r_101010-x/index.html
@@ -1188,6 +1195,7 @@ $dokka.location:org.jetbrains.skia/ColorType.R16G16_FLOAT///PointingToDeclaratio
 $dokka.location:org.jetbrains.skia/ColorType.R16G16_UNORM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-r16-g16_-u-n-o-r-m/index.html
 $dokka.location:org.jetbrains.skia/ColorType.R8G8_UNORM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-r8-g8_-u-n-o-r-m/index.html
 $dokka.location:org.jetbrains.skia/ColorType.RGBA_1010102///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-r-g-b-a_1010102/index.html
+$dokka.location:org.jetbrains.skia/ColorType.RGBA_10x6///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-r-g-b-a_10x6/index.html
 $dokka.location:org.jetbrains.skia/ColorType.RGBA_8888///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-r-g-b-a_8888/index.html
 $dokka.location:org.jetbrains.skia/ColorType.RGBA_F16///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-r-g-b-a_-f16/index.html
 $dokka.location:org.jetbrains.skia/ColorType.RGBA_F16NORM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-type/-r-g-b-a_-f16-n-o-r-m/index.html
@@ -1253,6 +1261,8 @@ $dokka.location:org.jetbrains.skia/DirectContext.Companion/makeMetal/#org.jetbra
 $dokka.location:org.jetbrains.skia/DirectContext///PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/index.html
 $dokka.location:org.jetbrains.skia/DirectContext/abandon/#/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/abandon.html
 $dokka.location:org.jetbrains.skia/DirectContext/flush/#/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/flush.html
+$dokka.location:org.jetbrains.skia/DirectContext/flush/#org.jetbrains.skia.Surface/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/flush.html
+$dokka.location:org.jetbrains.skia/DirectContext/flushAndSubmit/#org.jetbrains.skia.Surface#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/flush-and-submit.html
 $dokka.location:org.jetbrains.skia/DirectContext/resetAll/#/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/reset-all.html
 $dokka.location:org.jetbrains.skia/DirectContext/resetGL/#kotlin.Array[org.jetbrains.skia.GLBackendState]/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/reset-g-l.html
 $dokka.location:org.jetbrains.skia/DirectContext/resetGLAll/#/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/reset-g-l-all.html
@@ -1379,7 +1389,6 @@ $dokka.location:org.jetbrains.skia/Font/size/#/PointingToDeclaration/skiko/org.
 $dokka.location:org.jetbrains.skia/Font/skewX/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/skew-x.html
 $dokka.location:org.jetbrains.skia/Font/spacing/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/spacing.html
 $dokka.location:org.jetbrains.skia/Font/typeface/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/typeface.html
-$dokka.location:org.jetbrains.skia/Font/typefaceOrDefault/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/typeface-or-default.html
 $dokka.location:org.jetbrains.skia/FontEdging.ALIAS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-edging/-a-l-i-a-s/index.html
 $dokka.location:org.jetbrains.skia/FontEdging.ANTI_ALIAS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-edging/-a-n-t-i_-a-l-i-a-s/index.html
 $dokka.location:org.jetbrains.skia/FontEdging.SUBPIXEL_ANTI_ALIAS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-edging/-s-u-b-p-i-x-e-l_-a-n-t-i_-a-l-i-a-s/index.html
@@ -1462,7 +1471,9 @@ $dokka.location:org.jetbrains.skia/FontMgr.Companion/default/#/PointingToDeclara
 $dokka.location:org.jetbrains.skia/FontMgr///PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/index.html
 $dokka.location:org.jetbrains.skia/FontMgr/familiesCount/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/families-count.html
 $dokka.location:org.jetbrains.skia/FontMgr/getFamilyName/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/get-family-name.html
+$dokka.location:org.jetbrains.skia/FontMgr/legacyMakeTypeface/#kotlin.String#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/legacy-make-typeface.html
 $dokka.location:org.jetbrains.skia/FontMgr/makeFromData/#org.jetbrains.skia.Data?#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/make-from-data.html
+$dokka.location:org.jetbrains.skia/FontMgr/makeFromFile/#kotlin.String#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/make-from-file.html
 $dokka.location:org.jetbrains.skia/FontMgr/makeStyleSet/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/make-style-set.html
 $dokka.location:org.jetbrains.skia/FontMgr/matchFamiliesStyle/#kotlin.Array[kotlin.String?]#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/match-families-style.html
 $dokka.location:org.jetbrains.skia/FontMgr/matchFamiliesStyleCharacter/#kotlin.Array[kotlin.String?]#org.jetbrains.skia.FontStyle#kotlin.Array[kotlin.String]?#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-font-mgr/match-families-style-character.html
@@ -2552,9 +2563,7 @@ $dokka.location:org.jetbrains.skia/TextLine/textBlob/#/PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skia/TextLine/width/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-line/width.html
 $dokka.location:org.jetbrains.skia/TextLine/xHeight/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-line/x-height.html
 $dokka.location:org.jetbrains.skia/Typeface.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/-companion/index.html
-$dokka.location:org.jetbrains.skia/Typeface.Companion/makeDefault/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/-companion/make-default.html
-$dokka.location:org.jetbrains.skia/Typeface.Companion/makeFromData/#org.jetbrains.skia.Data#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/-companion/make-from-data.html
-$dokka.location:org.jetbrains.skia/Typeface.Companion/makeFromName/#kotlin.String?#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/-companion/make-from-name.html
+$dokka.location:org.jetbrains.skia/Typeface.Companion/makeEmpty/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/-companion/make-empty.html
 $dokka.location:org.jetbrains.skia/Typeface///PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/index.html
 $dokka.location:org.jetbrains.skia/Typeface/bounds/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/bounds.html
 $dokka.location:org.jetbrains.skia/Typeface/familyName/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/family-name.html
