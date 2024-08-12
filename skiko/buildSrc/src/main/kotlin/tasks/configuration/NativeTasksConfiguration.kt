@@ -168,7 +168,8 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String, buildType: SkiaBu
         "libpng.a",
         "libwebp_sse41.a",
         "libsksg.a",
-        "libskunicode.a",
+        "libskunicode_core.a",
+        "libskunicode_icu.a",
         "libwebp.a",
         "libdng_sdk.a",
         "libpiex.a",
@@ -225,7 +226,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             // TODO: an ugly hack, Linux linker searches only unresolved symbols.
             "$skiaBinDir/libsksg.a",
             "$skiaBinDir/libskshaper.a",
-            "$skiaBinDir/libskunicode.a",
+            "$skiaBinDir/libskunicode_core.a",
+            "$skiaBinDir/libskunicode_icu.a",
             "$skiaBinDir/libskia.a"
         )
         else -> mutableListOf()

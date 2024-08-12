@@ -70,37 +70,6 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nEquals
     return SkTypeface::Equal(instance, other);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeDefault
-  (){
-    return reinterpret_cast<KNativePointer>(SkTypeface::MakeDefault().release());
-}
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromName
-  (KInteropPointer nameStr, KInt styleValue) {
-    SkString name = skString(nameStr);
-    SkFontStyle style = skija::FontStyle::fromKotlin(styleValue);
-    sk_sp<SkTypeface> instance = SkTypeface::MakeFromName(name.c_str(), style);
-    return reinterpret_cast<KNativePointer>(instance.release());
-}
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromFile
-  (KInteropPointer pathStr, KInt index) {
-    SkString path = skString(pathStr);
-    sk_sp<SkTypeface> instance = SkTypeface::MakeFromFile(path.c_str(), index);
-    SkTypeface* ptr = instance.release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromData
-  (KNativePointer dataPtr, KInt index) {
-    SkData* data = reinterpret_cast<SkData*>((dataPtr));
-    sk_sp<SkTypeface> instance = SkTypeface::MakeFromData(sk_ref_sp(data), index);
-    SkTypeface* ptr = instance.release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeClone
   (KNativePointer typefacePtr, KInt* variations, KInt variationsCount, KInt collectionIndex) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(typefacePtr);
@@ -222,4 +191,11 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetBounds
     bounds[1] = b.top();
     bounds[2] = b.right();
     bounds[3] = b.bottom();
+}
+
+SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nMakeEmptyTypeface
+  () {
+
+    SkTypeface* res = SkTypeface::MakeEmpty().release();
+    return reinterpret_cast<KInteropPointer>(res);
 }

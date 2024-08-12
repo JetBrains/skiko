@@ -18,6 +18,7 @@ public:
     size_t registerTypeface(sk_sp<SkTypeface> typeface, const SkString& alias);
 
     sk_sp<SkTypeface> fallbackForChar(SkUnichar character) const;
+    sk_sp<SkFontStyleSet> onCreateStyleSet(int) const override;
 
 private:
     std::vector<sk_sp<SkTypeface>> registeredTypefaces;

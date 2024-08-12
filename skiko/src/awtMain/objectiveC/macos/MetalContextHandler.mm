@@ -5,10 +5,12 @@
 
 #import <QuartzCore/CAMetalLayer.h>
 #import <Metal/Metal.h>
-#import <GrDirectContext.h>
-#import <gpu/GrBackendSurface.h>
-#import <mtl/GrMtlBackendContext.h>
-#import <mtl/GrMtlTypes.h>
+#import "GrDirectContext.h"
+#import "gpu/GrBackendSurface.h"
+#import "ganesh/mtl/GrMtlBackendContext.h"
+#import "ganesh/mtl/GrMtlDirectContext.h"
+#import "ganesh/mtl/GrMtlBackendSurface.h"
+#import "ganesh/mtl/GrMtlTypes.h"
 
 #import "MetalDevice.h"
 
@@ -22,7 +24,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
         GrMtlBackendContext backendContext = {};
         backendContext.fDevice.retain((__bridge GrMTLHandle) device.adapter);
         backendContext.fQueue.retain((__bridge GrMTLHandle) device.queue);
-        return (jlong) GrDirectContext::MakeMetal(backendContext).release();
+        return (jlong) GrDirectContexts::MakeMetal(backendContext).release();
     }
 }
 
@@ -46,7 +48,8 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
         device.drawableHandle = currentDrawable;
         GrMtlTextureInfo info;
         info.fTexture.retain((__bridge GrMTLHandle) currentDrawable.texture);
-        renderTarget = new GrBackendRenderTarget(width, height, 0, info);
+        GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, info);
+        renderTarget = new GrBackendRenderTarget(obj);
         return (jlong) renderTarget;
     }
 }

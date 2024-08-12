@@ -12,7 +12,7 @@ import kotlin.math.sin
 open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoRenderDelegate, MouseMotionListener {
     constructor(layer: SkiaLayer) : this({ layer.contentScale })
 
-    private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
+    private val typeface = FontMgr.default.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 13f).apply {
         edging = FontEdging.SUBPIXEL_ANTI_ALIAS
         hinting = FontHinting.SLIGHT

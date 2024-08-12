@@ -2,6 +2,7 @@
 #include <jni.h>
 #include "interop.hh"
 #include "SkDrawable.h"
+#include "SkPicture.h"
 #include "SkPictureRecorder.h"
 
 static void deletePictureRecorder(SkPictureRecorder* pr) {

@@ -30,12 +30,12 @@ class SvgTest {
         dom.setContainerSize(101f, 101f)
         require(dom.root != null)
         val e = dom.root!!
-        require(e.x.unit == SVGLengthUnit.NUMBER)
-        require(e.y.unit == SVGLengthUnit.NUMBER)
-        require(e.width.unit == SVGLengthUnit.NUMBER)
-        require(e.height.unit == SVGLengthUnit.NUMBER)
-        require(e.viewBox == null)
-        require(e.tag == SVGTag.SVG)
+        assertEquals(SVGLengthUnit.NUMBER, e.x.unit)
+        assertEquals(SVGLengthUnit.NUMBER, e.y.unit)
+        assertEquals(SVGLengthUnit.NUMBER, e.width.unit)
+        assertEquals(SVGLengthUnit.NUMBER, e.height.unit)
+        assertEquals(null, e.viewBox)
+        assertEquals(SVGTag.SVG, e.tag)
         e.viewBox = Rect(0f, 1f, 100f, 200f)
         assertCloseEnough(Rect(0f, 1f, 100f, 200f), e.viewBox!!)
         val aspectRatio =

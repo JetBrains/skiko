@@ -1,11 +1,18 @@
 #include <iostream>
 #include "SkShaper.h"
+#include "SkShaper_harfbuzz.h"
 #include "SkUnicode.h"
 #include "src/base/SkUTF.h"
 #include "unicode/ubidi.h"
 #include "common.h"
 #include "FontRunIterator.hh"
 #include "TextLineRunHandler.hh"
+#include "FontMgrDefaultFactory.hh"
+#include "SkUnicode_icu.h"
+
+#ifdef SK_SHAPER_CORETEXT_AVAILABLE
+#include "SkShaper_coretext.h"
+#endif
 
 static void deleteShaper(SkShaper* instance) {
     // std::cout << "Deleting [SkShaper " << instance << "]" << std::endl;
@@ -18,7 +25,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nGetFinalizer() {
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakePrimitive
   () {
-    return reinterpret_cast<KNativePointer>(SkShaper::MakePrimitive().release());
+    return reinterpret_cast<KNativePointer>(SkShapers::Primitive::PrimitiveText().release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShaperDrivenWrapper
@@ -36,12 +43,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWra
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder
   (KNativePointer fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>((fontMgrPtr));
-    return reinterpret_cast<KNativePointer>(SkShaper::MakeShapeDontWrapOrReorder(SkUnicode::Make(), sk_ref_sp(fontMgr)).release());
+    // TODO: consider if we need/want to use ICU4X or Libgrapheme (skuincode/include has those implementations too)
+    sk_sp<SkUnicode> unicode = SkUnicodes::ICU::Make();
+    return reinterpret_cast<KNativePointer>(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr)).release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeCoreText() {
     #ifdef SK_SHAPER_CORETEXT_AVAILABLE
-        return reinterpret_cast<KNativePointer>(SkShaper::MakeCoreText().release());
+         return reinterpret_cast<KNativePointer>(SkShapers::CT::CoreText().release());
     #else
         return nullptr;
     #endif
@@ -83,7 +92,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgr::RefDefault(),
+        SkFontMgrSkikoDefault(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation
@@ -130,7 +139,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgr::RefDefault(),
+        SkFontMgrSkikoDefault(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation);

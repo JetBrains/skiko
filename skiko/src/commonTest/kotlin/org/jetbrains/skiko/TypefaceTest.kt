@@ -13,7 +13,9 @@ class TypefaceTest {
         val inter = Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf")
         val interV = Typeface.makeFromResource("./fonts/Inter-V.ttf")
         val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf")
-        val jbMonoBold = Typeface.makeFromData(Data.makeFromResource("./fonts/JetBrainsMono-Bold.ttf"))
+        val jbMonoBold = FontMgr.default.makeFromData(
+            Data.makeFromResource("./fonts/JetBrainsMono-Bold.ttf")
+        )!!
 
         assertEquals(FontStyle.NORMAL, inter.fontStyle)
         assertFalse(inter.isBold)
@@ -27,7 +29,6 @@ class TypefaceTest {
 
         assertNotEquals(inter.uniqueId, interV.uniqueId)
         assertNotEquals(inter, interV)
-        assertNotNull(Typeface.makeDefault())
 
         assertEquals(394, inter.getUTF32Glyph(83))
         assertEquals(2548, interV.glyphsCount)

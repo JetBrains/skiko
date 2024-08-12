@@ -1,16 +1,24 @@
+#include <ganesh/mtl/GrMtlTypes.h>
+
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
 #include "common.h"
+#include "ganesh/gl/GrGLDirectContext.h"
+#include "ganesh/gl/GrGLBackendSurface.h"
+#ifdef SK_METAL
+#include "ganesh/mtl/GrMtlBackendSurface.h"
+#endif
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeGLRenderTargetNative
     (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-    GrBackendRenderTarget* obj = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
-    return reinterpret_cast<KNativePointer>(obj);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget* target = new GrBackendRenderTarget(obj);
+    return reinterpret_cast<KNativePointer>(target);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeGLContextNative() {
-    return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL().release());
+    return reinterpret_cast<KNativePointer>(GrDirectContexts::MakeGL().release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalRenderTargetNative
@@ -18,8 +26,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalRenderT
 #ifdef SK_METAL
     // TODO: create properly.
     GrMtlTextureInfo mtlInfo;
-    GrBackendRenderTarget* obj = new GrBackendRenderTarget(width, height, sampleCnt, mtlInfo);
-    return reinterpret_cast<KNativePointer>(obj);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, mtlInfo);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
+    return reinterpret_cast<KNativePointer>(instance);
 #else
     return 0;
 #endif

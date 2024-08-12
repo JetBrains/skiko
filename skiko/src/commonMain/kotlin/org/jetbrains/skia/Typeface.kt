@@ -5,44 +5,13 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
-        /**
-         * @return  the default normal typeface, which is never null
-         */
-        fun makeDefault(): Typeface {
-            Stats.onNativeCall()
-            return Typeface(Typeface_nMakeDefault())
-        }
-
-        /**
-         * Creates a new reference to the typeface that most closely matches the
-         * requested name and style. This method allows extended font
-         * face specifiers as in the [FontStyle] type. Will never return null.
-         * @param name   May be null. The name of the font family
-         * @param style  The style of the typeface
-         * @return       reference to the closest-matching typeface
-         */
-        fun makeFromName(name: String?, style: FontStyle): Typeface {
-            Stats.onNativeCall()
-            return interopScope { Typeface(_nMakeFromName(toInterop(name), style._value)) }
-        }
-
-        /**
-         * @return  a new typeface given a Data
-         * @throws IllegalArgumentException  If the data is null, or is not a valid font file
-         */
-        fun makeFromData(data: Data, index: Int = 0): Typeface {
-            return try {
-                Stats.onNativeCall()
-                val ptr = _nMakeFromData(getPtr(data), index)
-                require(ptr != NullPointer) { "Failed to create Typeface from data $data" }
-                Typeface(ptr)
-            } finally {
-                reachabilityBarrier(data)
-            }
-        }
-
         init {
             staticLoad()
+        }
+
+        fun makeEmpty(): Typeface {
+            Stats.onNativeCall()
+            return Typeface(_nMakeEmptyTypeface())
         }
     }
 
@@ -403,10 +372,6 @@ private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nEquals")
 private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeDefault")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeDefault")
-private external fun Typeface_nMakeDefault(): NativePointer
-
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
 private external fun Typeface_nGetUTF32Glyphs(
@@ -448,18 +413,6 @@ private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetVariationAxes")
 private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
 
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeFromName")
-private external fun _nMakeFromName(name: InteropPointer, fontStyle: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromFile")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeFromFile")
-internal external fun _nMakeFromFile(path: InteropPointer, index: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeFromData")
-private external fun _nMakeFromData(dataPtr: NativePointer, index: Int): NativePointer
-
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeClone")
 private external fun _nMakeClone(
@@ -468,6 +421,10 @@ private external fun _nMakeClone(
     variationsCount: Int,
     collectionIndex: Int
 ): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeEmptyTypeface")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeEmptyTypeface")
+private external fun _nMakeEmptyTypeface(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetGlyphsCount")

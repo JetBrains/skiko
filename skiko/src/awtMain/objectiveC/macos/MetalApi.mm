@@ -8,10 +8,12 @@
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
 
-#import <GrBackendSurface.h>
-#import <GrDirectContext.h>
-#import <mtl/GrMtlBackendContext.h>
-#import <mtl/GrMtlTypes.h>
+#import "GrBackendSurface.h"
+#import "GrDirectContext.h"
+#import "ganesh/mtl/GrMtlBackendContext.h"
+#import "ganesh/mtl/GrMtlDirectContext.h"
+#import "ganesh/mtl/GrMtlBackendSurface.h"
+#import "ganesh/mtl/GrMtlTypes.h"
 
 #import "MetalDevice.h"
 

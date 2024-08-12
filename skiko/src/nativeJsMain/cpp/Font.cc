@@ -157,13 +157,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetTypeface
     return reinterpret_cast<KNativePointer>(typeface);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetTypefaceOrDefault
- (KNativePointer ptr) {
-    SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    SkTypeface* typeface = instance->refTypefaceOrDefault().release();
-    return reinterpret_cast<KNativePointer>(typeface);
-}
-
 SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nGetSize
  (KNativePointer ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);

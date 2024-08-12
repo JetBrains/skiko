@@ -2,6 +2,12 @@
 #include <stdint.h>
 #include "GrBackendSurface.h"
 #include "common.h"
+#include "ganesh/gl/GrGLDirectContext.h"
+#include "ganesh/gl/GrGLBackendSurface.h"
+#ifdef SK_METAL
+#include "ganesh/mtl/GrMtlBackendSurface.h"
+#include "ganesh/mtl/GrMtlTypes.h"
+#endif
 
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     delete rt;
@@ -13,7 +19,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nGetFinaliz
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nMakeGL
   (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-    GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return instance;
 }
 
@@ -23,7 +30,8 @@ SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeMetal
     GrMTLHandle texture = reinterpret_cast<GrMTLHandle>((texturePtr));
     GrMtlTextureInfo fbInfo;
     fbInfo.fTexture.retain(texture);
-    GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, fbInfo);
+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, fbInfo);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
     return instance;
 #else
     return 0;
