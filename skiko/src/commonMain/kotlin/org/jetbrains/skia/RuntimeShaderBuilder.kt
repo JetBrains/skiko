@@ -80,6 +80,14 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
         }
     }
 
+    fun uniform(name: String, value: FloatArray) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformFloatArray(_ptr, toInterop(name), toInterop(value), value.size)
+        }
+    }
+
+
     fun uniform(name: String, value: Matrix22) {
         Stats.onNativeCall()
         interopScope {
@@ -176,6 +184,10 @@ private external fun _nUniformFloat3(builderPtr: NativePointer, uniformName: Int
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat4")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat4")
 private external fun _nUniformFloat4(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float, uniformValue3: Float, uniformValue4: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatArray")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatArray")
+private external fun _nUniformFloatArray(builderPtr: NativePointer, uniformName: InteropPointer, uniformFloatArray: InteropPointer, length: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix22")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix22")

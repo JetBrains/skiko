@@ -72,6 +72,12 @@ SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat4
     runtimeShaderBuilder->uniform(skString(uniformName).c_str()) = float4 {uniformValue1, uniformValue2, uniformValue3, uniformValue4};
 }
 
+SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatArray
+  (KNativePointer builderPtr, KInteropPointer uniformName, KFloat* uniformFloatArray, int32_t length) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
+    runtimeShaderBuilder->uniform(skString(uniformName).c_str()).set(uniformFloatArray, length);
+}
+
 SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix22
   (KNativePointer builderPtr, KInteropPointer uniformName, KFloat* uniformMatrix22) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
