@@ -128,6 +128,8 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     )
                 )
             }
+
+            if (buildType == SkiaBuildType.DEBUG) add("-g")
         })
 
         doLast {
