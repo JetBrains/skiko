@@ -98,7 +98,7 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         )
         OS.Wasm -> buildList {
             add("-DSKIKO_WASM")
-            if (buildType == SkiaBuildType.DEBUG) add("-g")
+            // add("-sSUPPORT_LONGJMP=wasm") // TODO(o.karpovich): enable when skia is built with this flag
         }
         OS.Android -> listOf(
             "-DSK_BUILD_FOR_ANDROID"
