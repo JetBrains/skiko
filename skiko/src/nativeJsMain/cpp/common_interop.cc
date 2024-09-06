@@ -340,6 +340,11 @@ namespace skija {
 
 #ifdef __EMSCRIPTEN__
 
+#include <pthread.h>
+#include <stdlib.h>
+#include <emscripten.h>
+#include <emscripten/console.h>
+
 void disposeCallback(KInteropPointer cb) {
     EM_ASM({ _releaseCallback($0) }, cb);
 }
@@ -378,6 +383,65 @@ void callVoidCallback(KInteropPointer cb) {
     }, cb);
 }
 
+typedef struct {
+    KInteropPointer cb;
+} thread_data_t;
+
+void *callVoidCallbackWrapper(void *arg) {
+    emscripten_out("Status 2\n");
+//    thread_data_t* data = (thread_data_t*)arg;
+//    KInteropPointer cb = data->cb;
+//
+//     Call your callback
+//     callVoidCallback(cb);
+//
+//    disposeCallback(cb);
+//
+//    free(data); // Clean up the allocated memory for thread data
+//    emscripten_exit_with_live_runtime();
+//    __builtin_trap();
+//    return NULL;
+
+//emscripten_force_exit(0);
+//	__builtin_trap();
+    pthread_exit((void*) NULL);
+}
+
+SKIKO_EXPORT void skiko_invoke_v(KInteropPointer cb) {
+//    pthread_t thread;
+//    thread_data_t* data = (thread_data_t*)malloc(sizeof(thread_data_t));
+//    data->cb = cb;
+//    emscripten_out("Status 0\n");
+
+    // Create a new thread to execute the callback
+//    if (pthread_create(&thread, NULL, callVoidCallbackWrapper, (void*)data)) {
+//    if (pthread_create(&thread, NULL, callVoidCallbackWrapper, NULL)) {
+//        emscripten_out("Status 1\n");
+//////        // Handle thread creation failure
+//////        free(data); // Free memory if thread creation fails
+//    }
+
+//    emscripten_out("Status 3\n");
+//    emscripten_exit_with_live_runtime();
+
+    // Optionally, detach the thread if you don't want to wait for it to join
+//     pthread_detach(thread);
+}
+
+int main() {
+    emscripten_out("MAIN 0\n");
+
+    pthread_t thread;
+    if (pthread_create(&thread, NULL, callVoidCallbackWrapper, NULL)) {
+            emscripten_out("Status 1\n");
+    //        // Handle thread creation failure
+            //free(data); // Free memory if thread creation fails
+    }
+    emscripten_out("MAIN 1\n");
+
+    emscripten_exit_with_live_runtime();
+    __builtin_trap();
+}
 
 SKIKO_EXPORT KByte skia_memGetByte(KByte* address) { return *address; }
 SKIKO_EXPORT void skia_memSetByte(KByte* address, KByte value) { address[0] = value; }

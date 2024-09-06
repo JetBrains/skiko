@@ -49,3 +49,21 @@ config.files = [
     {pattern: path.resolve(basePath, "kotlin", "**/*.txt"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.json"), included: false, served: true, watched: false},
 ].concat(config.files);
+
+function CrossOriginIsolationMiddlewareFactory(config) {
+    return function crossOriginIsolation(req, res, next) {
+        res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+        res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+        next();
+    };
+}
+
+const CrossOriginIsolationPlugin = {
+    'middleware:cross-origin-isolation': ['factory', CrossOriginIsolationMiddlewareFactory]
+}
+
+config.plugins.push(CrossOriginIsolationPlugin);
+
+config.beforeMiddleware = [
+    'cross-origin-isolation',
+];

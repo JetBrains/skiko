@@ -1,6 +1,10 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.w3c.window
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
@@ -36,3 +40,23 @@ val LANG: String by lazy {
 actual fun defaultLanguageTag(): String = LANG
 
 actual fun compilePattern(regex: String): Pattern = Pattern(regex)
+
+
+suspend fun someFoo(): Int {
+    return suspendCoroutine {
+        val continuation = it
+
+        val callbackPtr = interopScope {
+            virtual {
+                println(":::someFoo ::: callback body\n")
+                continuation.resume(10)
+            }
+        }
+        println(":::someFoo ::: CallbackPtr = $callbackPtr\n")
+        skikoInvokeV(1)
+    }
+}
+
+@ExternalSymbolName("_skiko_invoke_v")
+@ModuleImport("./skiko.mjs", "skiko_invoke_v")
+external fun skikoInvokeV(callback: InteropPointer)

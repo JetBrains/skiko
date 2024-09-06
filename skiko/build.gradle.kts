@@ -118,6 +118,7 @@ kotlin {
 
                 from(linkWasmTasks.linkWasmWithES6!!) {
                     include("*.mjs")
+                    include("*.worker.js")
                 }
 
                 from(skikoTestMjs)

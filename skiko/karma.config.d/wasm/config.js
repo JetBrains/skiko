@@ -50,5 +50,23 @@ const KarmaWebpackOutputPlugin = {
     'framework:webpack-output': ['factory', KarmaWebpackOutputFramework],
 };
 
+function CrossOriginIsolationMiddlewareFactory(config) {
+    return function crossOriginIsolation(req, res, next) {
+        res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+        res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+        next();
+    };
+}
+
+const CrossOriginIsolationPlugin = {
+    'middleware:cross-origin-isolation': ['factory', CrossOriginIsolationMiddlewareFactory]
+}
+
 config.plugins.push(KarmaWebpackOutputPlugin);
+config.plugins.push(CrossOriginIsolationPlugin);
 config.frameworks.push("webpack-output");
+
+config.beforeMiddleware = [
+    'cross-origin-isolation',
+];
+

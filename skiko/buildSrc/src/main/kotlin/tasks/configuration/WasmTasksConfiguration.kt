@@ -62,6 +62,16 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                 add("-fno-rtti")
                 add("-fno-exceptions")
                 if (skiko.isWasmBuildWithProfiling) add("--profiling")
+                add("-pthread")
+
+                add("-s")
+                add("DISABLE_EXCEPTION_CATCHING=0")
+
+                add("-s")
+                add("DISABLE_EXCEPTION_THROWING=0")
+
+//                add("-s")
+//                add("PTHREAD_POOL_SIZE=20")
             }
         )
     }
@@ -111,11 +121,11 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     "-s", "MAX_WEBGL_VERSION=2",
                     "-s", "MIN_WEBGL_VERSION=2",
                     "-s", "OFFSCREEN_FRAMEBUFFER=1",
-                    "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
+//                    "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
                     "--bind",
                     // -O2 saves 800kB for the output file, and ~100kB for transferred size.
                     // -O3 breaks the exports in js/mjs files. skiko.wasm size is the same though
-                    "-O2"
+                    //"-O2"
                 )
             )
             // addAll(listOf("-s", "SUPPORT_LONGJMP=wasm")) // TODO(o.karpovich): enable when skia is built with this flag
@@ -132,6 +142,21 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
             }
 
             if (skiko.isWasmBuildWithProfiling) add("--profiling")
+            add("-pthread")
+//            add("-sPTHREAD_POOL_SIZE=2")
+//            add("-s")
+//            add("PTHREAD_POOL_SIZE=10")
+
+            add("-s")
+            add("DISABLE_EXCEPTION_CATCHING=0")
+
+            add("-s")
+            add("DISABLE_EXCEPTION_THROWING=0")
+
+//            add("-s")
+//            add("PTHREAD_POOL_SIZE=20")
+//
+//            add("--no-asyncify")
         })
 
         doLast {
@@ -149,6 +174,8 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                 val originalContent = jsFile.readText()
                 val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
                     .replace("skikomjs.wasm", "skiko.wasm")
+                    .replace("skikomjs.mjs", "skiko.mjs")
+                    .replace("err(\"Tried to spawn a new thread, but the thread pool is exhausted.\\n\" + \"This might result in a deadlock unless some threads eventually exit or the code explicitly breaks out to the event loop.\\n\" + \"If you want to increase the pool size, use setting `-sPTHREAD_POOL_SIZE=...`.\" + \"\\nIf you want to throw an explicit error instead of the risk of deadlocking in those cases, use setting `-sPTHREAD_POOL_SIZE_STRICT=2`.\");", "//")
                     .replace(isEnvironmentNodeCheckRegex, "if (false) {") // to make webpack erase this part
                 jsFile.writeText(newContent)
 
@@ -189,6 +216,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         }
         from(wasmEsOutDir) {
             include("*.mjs")
+            include("*.worker.js")
         }
 
         archiveBaseName.set("skiko-wasm")
