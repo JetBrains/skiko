@@ -126,7 +126,8 @@ class SkikoProperties(private val myProject: Project) {
     val deployVersion: String
         get() {
             val main = if (isRelease) planeDeployVersion else "$planeDeployVersion-SNAPSHOT"
-            val metadata = if (buildType == SkiaBuildType.DEBUG) "+debug" else ""
+            var metadata = if (buildType == SkiaBuildType.DEBUG) "+debug" else ""
+            metadata += if (isWasmBuildWithProfiling) "+profiling" else ""
             return main + metadata
         }
 
@@ -135,6 +136,9 @@ class SkikoProperties(private val myProject: Project) {
 
     val buildType: SkiaBuildType
         get() = if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
+
+    val isWasmBuildWithProfiling: Boolean
+        get() = myProject.findProperty("skiko.wasm.withProfiling") == "true"
 
     val targetArch: Arch
         get() = myProject.findProperty("skiko.arch")?.toString()?.let(Arch::byName) ?: hostArch

@@ -56,12 +56,13 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
         flags.set(
-            listOf(
-                *skiaPreprocessorFlags(OS.Wasm, buildType),
-                *buildType.clangFlags,
-                "-fno-rtti",
-                "-fno-exceptions",
-            )
+            mutableListOf<String?>().apply {
+                addAll(skiaPreprocessorFlags(OS.Wasm, buildType))
+                addAll(buildType.clangFlags)
+                add("-fno-rtti")
+                add("-fno-exceptions")
+                if (skiko.isWasmBuildWithProfiling) add("--profiling")
+            }
         )
     }
 
@@ -103,7 +104,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         )
 
         @OptIn(kotlin.ExperimentalStdlibApi::class)
-        flags.set(buildList {
+        flags.set(mutableListOf<String?>().apply {
             addAll(
                 listOf(
                     "-l", "GL",
@@ -117,6 +118,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     "-O2"
                 )
             )
+            // addAll(listOf("-s", "SUPPORT_LONGJMP=wasm")) // TODO(o.karpovich): enable when skia is built with this flag (CMP-6628)
             if (outputES6) {
                 addAll(
                     listOf(
@@ -128,6 +130,8 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     )
                 )
             }
+
+            if (skiko.isWasmBuildWithProfiling) add("--profiling")
         })
 
         doLast {
@@ -136,11 +140,16 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
             val jsFiles = outDir.asFile.get().walk()
                 .filter { it.isFile && (it.name.endsWith(".js") || it.name.endsWith(".mjs")) }
 
+            val isEnvironmentNodeCheckRegex = Regex(
+                // spaces are different in release and debug builds
+                """if\s*\(ENVIRONMENT_IS_NODE\)\s*\{"""
+            )
+
             for (jsFile in jsFiles) {
                 val originalContent = jsFile.readText()
                 val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
                     .replace("skikomjs.wasm", "skiko.wasm")
-                    .replace("if(ENVIRONMENT_IS_NODE){", "if (false) {") // to make webpack erase this part
+                    .replace(isEnvironmentNodeCheckRegex, "if (false) {") // to make webpack erase this part
                 jsFile.writeText(newContent)
 
                 if (outputES6) {

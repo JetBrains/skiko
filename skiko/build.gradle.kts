@@ -610,6 +610,8 @@ project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().config
 
 tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
     ?.dependsOn("publishWasmJsPublicationToComposeRepoRepository")
+tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
+    ?.dependsOn("publishWasmJsPublicationToMavenLocal")
 
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
