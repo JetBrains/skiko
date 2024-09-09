@@ -56,7 +56,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
         flags.set(
-            buildList {
+            mutableListOf<String?>().apply {
                 addAll(skiaPreprocessorFlags(OS.Wasm, buildType))
                 addAll(buildType.clangFlags)
                 add("-fno-rtti")
@@ -104,7 +104,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         )
 
         @OptIn(kotlin.ExperimentalStdlibApi::class)
-        flags.set(buildList {
+        flags.set(mutableListOf<String?>().apply {
             addAll(
                 listOf(
                     "-l", "GL",
@@ -118,7 +118,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     "-O2"
                 )
             )
-            // addAll(listOf("-s", "SUPPORT_LONGJMP=wasm")) // TODO(o.karpovich): enable when skia is built with this flag
+            // addAll(listOf("-s", "SUPPORT_LONGJMP=wasm")) // TODO(o.karpovich): enable when skia is built with this flag (CMP-6628)
             if (outputES6) {
                 addAll(
                     listOf(
