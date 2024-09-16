@@ -591,22 +591,21 @@ actual open class SkiaLayer internal constructor(
     }
 
     private fun adjustBackedLayerSize() {
-        backedLayer.setBounds(0, 0, adjustSizeToContentScale(width), adjustSizeToContentScale(height))
-        backedLayer.validate()
+        val isAttached = graphicsConfiguration != null
+        if (isAttached) {
+            backedLayer.setBounds(0, 0, adjustSizeToContentScale(width), adjustSizeToContentScale(height))
+            backedLayer.validate()
+        }
     }
 
     private fun adjustSizeToContentScale(value: Int): Int {
-        return if (isInited) {
-            val scaled = value * contentScale
-            val diff = scaled - scaled.toInt()
-            // We check values close to 0.5 and edit the size to avoid white lines glitch
-            if (diff > 0.4f && diff < 0.6f) {
-                (value + 1f).toInt()
-            } else {
-                value.toFloat().toInt()
-            }
+        val scaled = value * contentScale
+        val diff = scaled - scaled.toInt()
+        // We check values close to 0.5 and edit the size to avoid white lines glitch
+        return if (diff > 0.4f && diff < 0.6f) {
+            (value + 1f).toInt()
         } else {
-            value
+            value.toFloat().toInt()
         }
     }
 
