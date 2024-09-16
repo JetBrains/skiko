@@ -143,6 +143,7 @@ actual open class SkiaLayer internal constructor(
         addPropertyChangeListener("graphicsContextScaleTransform") {
             Logger.debug { "graphicsContextScaleTransform changed for $this" }
             latestReceivedGraphicsContextScaleTransform = it.newValue as AffineTransform
+            adjustBackedLayerSize()
             redrawer?.syncBounds()
             notifyChange(PropertyKind.ContentScale)
 
