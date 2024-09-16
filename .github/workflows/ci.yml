@@ -120,7 +120,7 @@ jobs:
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:tvosX64Test
           # tvosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:tvosSimulatorArm64Test
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-reports-macos

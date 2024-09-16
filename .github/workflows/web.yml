@@ -60,7 +60,7 @@ jobs:
           cd ./skiko
           source ./emsdk/emsdk_env.sh
           ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.js.enabled=true -Pskiko.test.onci=true jsTest
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-reports-wasm
