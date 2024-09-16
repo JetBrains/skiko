@@ -172,6 +172,8 @@ actual open class SkiaLayer internal constructor(
         super.addNotify()
         val window = SwingUtilities.getWindowAncestor(this)
         window.addComponentListener(fullscreenAdapter)
+        adjustBackedLayerSize()
+        redrawer?.syncBounds()
         checkShowing()
         init(isInited)
     }
@@ -324,8 +326,7 @@ actual open class SkiaLayer internal constructor(
         super.setBounds(x, y, width, height)
 
         Logger.debug { "setBounds on $this" }
-        backedLayer.setBounds(0, 0, roundSize(width), roundSize(height))
-        backedLayer.validate()
+        adjustBackedLayerSize()
         redrawer?.syncBounds()
 
         // To avoid visual artifacts on Windows/Direct3D,
@@ -575,16 +576,24 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    private fun roundSize(value: Int): Int {
-        var rounded = value * contentScale
-        val diff = rounded - rounded.toInt()
-        // We check values close to 0.5 and edit the size to avoid white lines glitch
-        if (diff > 0.4f && diff < 0.6f) {
-            rounded = value + 1f
+    private fun adjustBackedLayerSize() {
+        backedLayer.setBounds(0, 0, adjustSizeToContentScale(width), adjustSizeToContentScale(height))
+        backedLayer.validate()
+    }
+
+    private fun adjustSizeToContentScale(value: Int): Int {
+        return if (isInited) {
+            val scaled = value * contentScale
+            val diff = scaled - scaled.toInt()
+            // We check values close to 0.5 and edit the size to avoid white lines glitch
+            if (diff > 0.4f && diff < 0.6f) {
+                (value + 1f).toInt()
+            } else {
+                value.toFloat().toInt()
+            }
         } else {
-            rounded = value.toFloat()
+            value
         }
-        return rounded.toInt()
     }
 
     fun requestNativeFocusOnAccessible(accessible: Accessible?) {
