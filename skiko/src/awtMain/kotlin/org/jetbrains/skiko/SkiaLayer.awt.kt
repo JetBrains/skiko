@@ -18,6 +18,8 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
+import javax.swing.event.AncestorEvent
+import javax.swing.event.AncestorListener
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
@@ -132,6 +134,16 @@ actual open class SkiaLayer internal constructor(
         }
         @Suppress("LeakingThis")
         add(backedLayer)
+
+        addAncestorListener(object : AncestorListener {
+            override fun ancestorAdded(event: AncestorEvent?) = Unit
+
+            override fun ancestorRemoved(event: AncestorEvent?) = Unit
+
+            override fun ancestorMoved(event: AncestorEvent?) {
+                redrawer?.syncBounds()
+            }
+        })
 
         backedLayer.addHierarchyListener {
             if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
@@ -317,6 +329,12 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
+    override fun doLayout() {
+        Logger.debug { "doLayout on $this" }
+        adjustBackedLayerSize()
+        redrawer?.syncBounds()
+    }
+
     override fun paint(g: java.awt.Graphics) {
         Logger.debug { "Paint called on: $this" }
         checkContentScale()
@@ -326,10 +344,6 @@ actual open class SkiaLayer internal constructor(
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
 
-        Logger.debug { "setBounds on $this" }
-        adjustBackedLayerSize()
-        redrawer?.syncBounds()
-
         // To avoid visual artifacts on Windows/Direct3D,
         // redrawing should be performed immediately, without scheduling to "later".
         // Subscribing to events instead of overriding this method won't help too.
@@ -337,6 +351,7 @@ actual open class SkiaLayer internal constructor(
         // Please note that calling redraw during layout might break software renderers,
         // so applying this fix only for Direct3D case.
         if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
+            redrawer?.syncBounds()
             tryRedrawImmediately()
         }
     }
