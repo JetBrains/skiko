@@ -141,7 +141,7 @@ actual open class SkiaLayer internal constructor(
             override fun ancestorRemoved(event: AncestorEvent?) = Unit
 
             override fun ancestorMoved(event: AncestorEvent?) {
-                redrawer?.syncBounds()
+                revalidate()
             }
         })
 
@@ -155,8 +155,7 @@ actual open class SkiaLayer internal constructor(
         addPropertyChangeListener("graphicsContextScaleTransform") {
             Logger.debug { "graphicsContextScaleTransform changed for $this" }
             latestReceivedGraphicsContextScaleTransform = it.newValue as AffineTransform
-            adjustBackedLayerSize()
-            redrawer?.syncBounds()
+            revalidate()
             notifyChange(PropertyKind.ContentScale)
 
             // Workaround for JBR-5259
@@ -329,7 +328,8 @@ actual open class SkiaLayer internal constructor(
 
     override fun doLayout() {
         Logger.debug { "doLayout on $this" }
-        adjustBackedLayerSize()
+        backedLayer.setBounds(0, 0, adjustSizeToContentScale(width), adjustSizeToContentScale(height))
+        backedLayer.validate()
         redrawer?.syncBounds()
     }
 
@@ -587,14 +587,6 @@ actual open class SkiaLayer internal constructor(
             canvas.drawPicture(picture.instance)
             store.setImmutable()
             store
-        }
-    }
-
-    private fun adjustBackedLayerSize() {
-        val isAttached = graphicsConfiguration != null
-        if (isAttached) {
-            backedLayer.setBounds(0, 0, adjustSizeToContentScale(width), adjustSizeToContentScale(height))
-            backedLayer.validate()
         }
     }
 
