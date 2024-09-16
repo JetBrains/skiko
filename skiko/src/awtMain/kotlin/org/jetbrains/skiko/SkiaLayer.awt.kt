@@ -143,7 +143,7 @@ actual open class SkiaLayer internal constructor(
         addPropertyChangeListener("graphicsContextScaleTransform") {
             Logger.debug { "graphicsContextScaleTransform changed for $this" }
             latestReceivedGraphicsContextScaleTransform = it.newValue as AffineTransform
-            redrawer?.syncSize()
+            redrawer?.syncBounds()
             notifyChange(PropertyKind.ContentScale)
 
             // Workaround for JBR-5259
@@ -191,7 +191,7 @@ actual open class SkiaLayer internal constructor(
             redrawer?.setVisible(isShowing)
         }
         if (isShowing) {
-            redrawer?.syncSize()
+            redrawer?.syncBounds()
             repaint()
         }
     }
@@ -252,7 +252,7 @@ actual open class SkiaLayer internal constructor(
     private val redrawerManager = RedrawerManager<Redrawer>(properties.renderApi) { renderApi, oldRedrawer ->
         oldRedrawer?.dispose()
         val newRedrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
-        newRedrawer.syncSize()
+        newRedrawer.syncBounds()
         newRedrawer
     }
 
@@ -314,14 +314,6 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    override fun doLayout() {
-        Logger.debug { "doLayout on $this" }
-        backedLayer.setBounds(0, 0, roundSize(width), roundSize(height))
-        backedLayer.validate()
-        redrawer?.syncSize()
-    }
-
-
     override fun paint(g: java.awt.Graphics) {
         Logger.debug { "Paint called on: $this" }
         checkContentScale()
@@ -331,6 +323,11 @@ actual open class SkiaLayer internal constructor(
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
 
+        Logger.debug { "setBounds on $this" }
+        backedLayer.setBounds(0, 0, roundSize(width), roundSize(height))
+        backedLayer.validate()
+        redrawer?.syncBounds()
+
         // To avoid visual artifacts on Windows/Direct3D,
         // redrawing should be performed immediately, without scheduling to "later".
         // Subscribing to events instead of overriding this method won't help too.
@@ -338,7 +335,6 @@ actual open class SkiaLayer internal constructor(
         // Please note that calling redraw during layout might break software renderers,
         // so applying this fix only for Direct3D case.
         if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
-            redrawer?.syncSize()
             tryRedrawImmediately()
         }
     }

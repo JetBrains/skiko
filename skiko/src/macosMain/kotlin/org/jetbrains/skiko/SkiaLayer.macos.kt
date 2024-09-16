@@ -84,13 +84,13 @@ actual open class SkiaLayer {
     private val nsViewObserver = object : NSObject() {
         @ObjCAction
         fun frameDidChange(notification: NSNotification) {
-            redrawer?.syncSize()
+            redrawer?.syncBounds()
             redrawer?.redrawImmediately()
         }
 
         @ObjCAction
         fun windowDidChangeBackingProperties(notification: NSNotification) {
-            redrawer?.syncSize()
+            redrawer?.syncBounds()
             redrawer?.redrawImmediately()
         }
 
@@ -126,7 +126,7 @@ actual open class SkiaLayer {
         nsView.postsFrameChangedNotifications = true
         nsViewObserver.addObserver()
         redrawer = createNativeRedrawer(this, renderApi).apply {
-            syncSize()
+            syncBounds()
             needRedraw()
         }
     }
