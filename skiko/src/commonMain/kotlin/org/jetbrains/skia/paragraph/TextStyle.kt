@@ -323,6 +323,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
+    @Deprecated("Replaced by topRatio")
     var isHalfLeading: Boolean
         get() = try {
             Stats.onNativeCall()
@@ -334,10 +335,35 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             setHalfLeading(value)
         }
 
+    // Same as topRatio = halfLeading ? 0.5f : -1.0f
+    @Deprecated("Replaced by topRatio")
     fun setHalfLeading(value: Boolean): TextStyle {
         try {
             Stats.onNativeCall()
             TextStyle_nSetHalfLeading(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        return this
+    }
+
+    // [0..1]: the ratio of ascent to ascent+descent
+    // -1: proportional to the ascent/descent
+    var topRatio: Float
+        get() = try {
+            Stats.onNativeCall()
+            TextStyle_nGetTopRatio(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) {
+            setTopRatio(value)
+        }
+
+    fun setTopRatio(topRatio: Float): TextStyle {
+        try {
+            Stats.onNativeCall()
+            TextStyle_nSetTopRatio(_ptr, topRatio)
         } finally {
             reachabilityBarrier(this)
         }
@@ -559,6 +585,14 @@ private external fun TextStyle_nGetHalfLeading(ptr: NativePointer): Boolean
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHalfLeading")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TextStyle__1nSetHalfLeading")
 private external fun TextStyle_nSetHalfLeading(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetTopRatio")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TextStyle__1nGetTopRatio")
+private external fun TextStyle_nGetTopRatio(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetTopRatio")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TextStyle__1nSetTopRatio")
+private external fun TextStyle_nSetTopRatio(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineShift")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineShift")

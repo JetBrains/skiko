@@ -257,6 +257,18 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setHalfLeading(value);
 }
 
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetTopRatio
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    return instance->getTopRatio();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetTopRatio
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat value) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    instance->setTopRatio(value);
+}
+
 extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetBaselineShift
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
