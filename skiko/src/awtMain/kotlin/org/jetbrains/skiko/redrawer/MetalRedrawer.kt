@@ -169,7 +169,7 @@ internal class MetalRedrawer(
         }
     }
 
-    override fun syncBounds() = synchronized(drawLock) {
+    override fun syncSize() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
