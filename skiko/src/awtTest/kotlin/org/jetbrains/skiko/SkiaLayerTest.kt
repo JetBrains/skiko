@@ -293,9 +293,11 @@ class SkiaLayerTest {
             window.isVisible = true
 
             delay(1000)
-            box.setBounds(100, 0, 100, 100)
+            screenshots.assert(window.bounds, "frame1")
 
-            delay(10000)
+            box.setBounds(100, 0, 100, 100)
+            delay(1000)
+            screenshots.assert(window.bounds, "frame2")
         } finally {
             layer.dispose()
             window.close()
