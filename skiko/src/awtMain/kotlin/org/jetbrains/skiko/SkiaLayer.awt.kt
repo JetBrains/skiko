@@ -185,8 +185,6 @@ actual open class SkiaLayer internal constructor(
         super.addNotify()
         val window = SwingUtilities.getWindowAncestor(this)
         window.addComponentListener(fullscreenAdapter)
-        adjustBackedLayerSize()
-        redrawer?.syncBounds()
         checkShowing()
         init(isInited)
     }
