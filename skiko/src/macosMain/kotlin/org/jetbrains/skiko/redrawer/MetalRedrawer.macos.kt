@@ -79,7 +79,7 @@ internal class MacOsMetalRedrawer(
     /**
      * Synchronizes the [metalLayer] size with the size of underlying nsView
      */
-    override fun syncSize() {
+    override fun syncBounds() {
         syncContentScale()
         val osFrame = skiaLayer.nsView.frame
         val (w, h) = osFrame.useContents {

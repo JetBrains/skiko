@@ -18,6 +18,10 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
+import javax.swing.event.AncestorEvent
+import javax.swing.event.AncestorListener
+import kotlin.math.ceil
+import kotlin.math.floor
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
@@ -133,6 +137,16 @@ actual open class SkiaLayer internal constructor(
         @Suppress("LeakingThis")
         add(backedLayer)
 
+        addAncestorListener(object : AncestorListener {
+            override fun ancestorAdded(event: AncestorEvent?) = Unit
+
+            override fun ancestorRemoved(event: AncestorEvent?) = Unit
+
+            override fun ancestorMoved(event: AncestorEvent?) {
+                revalidate()
+            }
+        })
+
         backedLayer.addHierarchyListener {
             if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
                 checkShowing()
@@ -143,7 +157,7 @@ actual open class SkiaLayer internal constructor(
         addPropertyChangeListener("graphicsContextScaleTransform") {
             Logger.debug { "graphicsContextScaleTransform changed for $this" }
             latestReceivedGraphicsContextScaleTransform = it.newValue as AffineTransform
-            redrawer?.syncSize()
+            revalidate()
             notifyChange(PropertyKind.ContentScale)
 
             // Workaround for JBR-5259
@@ -191,7 +205,7 @@ actual open class SkiaLayer internal constructor(
             redrawer?.setVisible(isShowing)
         }
         if (isShowing) {
-            redrawer?.syncSize()
+            redrawer?.syncBounds()
             repaint()
         }
     }
@@ -252,7 +266,7 @@ actual open class SkiaLayer internal constructor(
     private val redrawerManager = RedrawerManager<Redrawer>(properties.renderApi) { renderApi, oldRedrawer ->
         oldRedrawer?.dispose()
         val newRedrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
-        newRedrawer.syncSize()
+        newRedrawer.syncBounds()
         newRedrawer
     }
 
@@ -316,11 +330,15 @@ actual open class SkiaLayer internal constructor(
 
     override fun doLayout() {
         Logger.debug { "doLayout on $this" }
-        backedLayer.setBounds(0, 0, roundSize(width), roundSize(height))
+        backedLayer.setBounds(
+            0,
+            0,
+            adjustSizeToContentScale(contentScale, width),
+            adjustSizeToContentScale(contentScale, height)
+        )
         backedLayer.validate()
-        redrawer?.syncSize()
+        redrawer?.syncBounds()
     }
-
 
     override fun paint(g: java.awt.Graphics) {
         Logger.debug { "Paint called on: $this" }
@@ -338,7 +356,7 @@ actual open class SkiaLayer internal constructor(
         // Please note that calling redraw during layout might break software renderers,
         // so applying this fix only for Direct3D case.
         if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
-            redrawer?.syncSize()
+            redrawer?.syncBounds()
             tryRedrawImmediately()
         }
     }
@@ -579,18 +597,6 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    private fun roundSize(value: Int): Int {
-        var rounded = value * contentScale
-        val diff = rounded - rounded.toInt()
-        // We check values close to 0.5 and edit the size to avoid white lines glitch
-        if (diff > 0.4f && diff < 0.6f) {
-            rounded = value + 1f
-        } else {
-            rounded = value.toFloat()
-        }
-        return rounded.toInt()
-    }
-
     fun requestNativeFocusOnAccessible(accessible: Accessible?) {
         backedLayer.requestNativeFocusOnAccessible(accessible)
     }
@@ -636,4 +642,29 @@ internal fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
         ClipMode.DIFFERENCE,
         true
     )
+}
+
+// TODO Recheck this method validity in 2 cases - full Window content, and a Panel content
+//  issue: https://youtrack.jetbrains.com/issue/CMP-5447/Window-white-line-on-the-bottom-before-resizing
+//  suggestions: https://github.com/JetBrains/skiko/pull/988#discussion_r1763219300
+//  possible issues:
+//  - isn't obvious why 0.4/0.6 is used
+//  - increasing it by one, we avoid 1px white line, but we cut the content by 1px
+//  - it probably doesn't work correctly in a Panel content case - we don't need to adjust in this case
+/**
+ * Increases the value of width/height by one if necessary,
+ * to avoid 1px white line between Canvas and the bounding window.
+ * 1px white line appears when users resizes the window:
+ * - it is resized in Px (125, 126, 127,...)
+ * - the canvas is resized in Points (with 1.25 scale, it will be 100, 100, 101)
+ * during converting Int AWT points to actual screen pixels.
+ */
+private fun adjustSizeToContentScale(contentScale: Float, value: Int): Int {
+    val scaled = value * contentScale
+    val diff = scaled - floor(scaled)
+    return if (diff > 0.4f && diff < 0.6f) {
+        value + 1
+    } else {
+        value
+    }
 }

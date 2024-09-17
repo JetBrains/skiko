@@ -28,6 +28,7 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.*
+import javax.swing.Box
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
 import javax.swing.JPanel
@@ -255,6 +256,48 @@ class SkiaLayerTest {
             layer.needRedraw()
             delay(1000)
             assertEquals((40 * density).toInt(), renderedWidth)
+        } finally {
+            layer.dispose()
+            window.close()
+        }
+    }
+
+    @Test
+    fun `move without redrawing`() = uiTest {
+        val window = JFrame()
+        val layer = SkiaLayer(
+            properties = SkiaLayerProperties(renderApi = renderApi)
+        )
+
+        layer.renderDelegate = object : SkikoRenderDelegate {
+            override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
+                    color = Color.RED.rgb
+                })
+            }
+        }
+        layer.size = Dimension(100, 100)
+        val box = Box.createVerticalBox().apply {
+            add(layer)
+        }
+        box.setBounds(0, 0, 100, 100)
+
+        try {
+            val panel = JLayeredPane()
+            panel.add(box)
+            window.contentPane.add(panel)
+            window.setLocation(200, 200)
+            window.size = Dimension(200, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1000)
+            screenshots.assert(window.bounds, "frame1")
+
+            box.setBounds(100, 0, 100, 100)
+            delay(1000)
+            screenshots.assert(window.bounds, "frame2")
         } finally {
             layer.dispose()
             window.close()
