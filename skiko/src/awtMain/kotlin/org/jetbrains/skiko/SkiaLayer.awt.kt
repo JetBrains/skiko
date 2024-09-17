@@ -137,9 +137,13 @@ actual open class SkiaLayer internal constructor(
         @Suppress("LeakingThis")
         add(backedLayer)
 
-        addHierarchyBoundsListener(object : HierarchyBoundsAdapter() {
-            override fun ancestorMoved(e: HierarchyEvent?) {
-                redrawer?.syncBounds()
+        addAncestorListener(object : AncestorListener {
+            override fun ancestorAdded(event: AncestorEvent?) = Unit
+
+            override fun ancestorRemoved(event: AncestorEvent?) = Unit
+
+            override fun ancestorMoved(event: AncestorEvent?) {
+                revalidate()
             }
         })
 
@@ -153,7 +157,7 @@ actual open class SkiaLayer internal constructor(
         addPropertyChangeListener("graphicsContextScaleTransform") {
             Logger.debug { "graphicsContextScaleTransform changed for $this" }
             latestReceivedGraphicsContextScaleTransform = it.newValue as AffineTransform
-            redrawer?.syncBounds()
+            revalidate()
             notifyChange(PropertyKind.ContentScale)
 
             // Workaround for JBR-5259
