@@ -20,6 +20,8 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
+import kotlin.math.ceil
+import kotlin.math.floor
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
@@ -328,7 +330,12 @@ actual open class SkiaLayer internal constructor(
 
     override fun doLayout() {
         Logger.debug { "doLayout on $this" }
-        backedLayer.setBounds(0, 0, adjustSizeToContentScale(width), adjustSizeToContentScale(height))
+        backedLayer.setBounds(
+            0,
+            0,
+            adjustSizeToContentScale(contentScale, width),
+            adjustSizeToContentScale(contentScale, height)
+        )
         backedLayer.validate()
         redrawer?.syncBounds()
     }
@@ -590,17 +597,6 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    private fun adjustSizeToContentScale(value: Int): Int {
-        val scaled = value * contentScale
-        val diff = scaled - scaled.toInt()
-        // We check values close to 0.5 and edit the size to avoid white lines glitch
-        return if (diff > 0.4f && diff < 0.6f) {
-            (value + 1f).toInt()
-        } else {
-            value.toFloat().toInt()
-        }
-    }
-
     fun requestNativeFocusOnAccessible(accessible: Accessible?) {
         backedLayer.requestNativeFocusOnAccessible(accessible)
     }
@@ -646,4 +642,20 @@ internal fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
         ClipMode.DIFFERENCE,
         true
     )
+}
+
+// TODO Recheck this method validity in 2 cases - full Window content, and a Panel content
+//  https://youtrack.jetbrains.com/issue/CMP-5447/Window-white-line-on-the-bottom-before-resizing
+/**
+ * Change [value] size to avoid rounding errors, when converting AWT Int coordinates to pixels.
+ */
+private fun adjustSizeToContentScale(contentScale: Float, value: Int): Int {
+    val scaled = value * contentScale
+    val diff = scaled - floor(scaled)
+    // We check values close to 0.5 and edit the size to avoid white lines glitch
+    return if (diff > 0.4f && diff < 0.6f) {
+        value + 1
+    } else {
+        value
+    }
 }
