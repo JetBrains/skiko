@@ -645,14 +645,23 @@ internal fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
 }
 
 // TODO Recheck this method validity in 2 cases - full Window content, and a Panel content
-//  https://youtrack.jetbrains.com/issue/CMP-5447/Window-white-line-on-the-bottom-before-resizing
+//  issue: https://youtrack.jetbrains.com/issue/CMP-5447/Window-white-line-on-the-bottom-before-resizing
+//  suggestions: https://github.com/JetBrains/skiko/pull/988#discussion_r1763219300
+//  possible issues:
+//  - isn't obvious why 0.4/0.6 is used
+//  - increasing it by one, we avoid 1px white line, but we cut the content by 1px
+//  - it probably doesn't work correctly in a Panel content case - we don't need to adjust in this case
 /**
- * Change [value] size to avoid rounding errors, when converting AWT Int coordinates to pixels.
+ * Increases the value of width/height by one if necessary,
+ * to avoid 1px white line between Canvas and the bounding window.
+ * 1px white line appears when users resizes the window:
+ * - it is resized in Px (125, 126, 127,...)
+ * - the canvas is resized in Points (with 1.25 scale, it will be 100, 100, 101)
+ * during converting Int AWT points to actual screen pixels.
  */
 private fun adjustSizeToContentScale(contentScale: Float, value: Int): Int {
     val scaled = value * contentScale
     val diff = scaled - floor(scaled)
-    // We check values close to 0.5 and edit the size to avoid white lines glitch
     return if (diff > 0.4f && diff < 0.6f) {
         value + 1
     } else {
