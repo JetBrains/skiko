@@ -144,6 +144,15 @@ class TextStyleTest {
     }
 
     @Test
+    fun textStyleTopRatioTest() {
+        TextStyle().use { textStyle ->
+            assertEquals(-1f, textStyle.topRatio)
+            textStyle.topRatio = 0.42f
+            assertEquals(0.42f, textStyle.topRatio, 0.001f)
+        }
+    }
+
+    @Test
     fun textStyleMetricsContainsMeaningfulValues() = runTest {
         val jbMono = Typeface.makeFromResource(jbMonoPath)
         TextStyle().use { textStyle ->
