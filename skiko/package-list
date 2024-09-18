@@ -344,6 +344,8 @@ $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setHeight/#kotlin.Float/
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setHeightForced/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-height-forced.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setHeightOverridden/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-height-overridden.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setLeading/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-leading.html
+$dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setTopRatio/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-top-ratio.html
+$dokka.location:org.jetbrains.skia.paragraph/StrutStyle/topRatio/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/top-ratio.html
 $dokka.location:org.jetbrains.skia.paragraph/TextBox.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/-companion/index.html
 $dokka.location:org.jetbrains.skia.paragraph/TextBox.Companion/disposeArray/#org.jetbrains.skia.impl.InteropPointer/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/-companion/dispose-array.html
 $dokka.location:org.jetbrains.skia.paragraph/TextBox.Companion/getArrayElement/#org.jetbrains.skia.impl.InteropPointer#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/-companion/get-array-element.html
@@ -402,9 +404,11 @@ $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setHeight/#kotlin.Float?/
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setLetterSpacing/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-letter-spacing.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setLocale/#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-locale.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setPlaceholder/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-placeholder.html
+$dokka.location:org.jetbrains.skia.paragraph/TextStyle/setTopRatio/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-top-ratio.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setTypeface/#org.jetbrains.skia.Typeface?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-typeface.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setWordSpacing/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-word-spacing.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/shadows/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/shadows.html
+$dokka.location:org.jetbrains.skia.paragraph/TextStyle/topRatio/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/top-ratio.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/typeface/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/typeface.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/wordSpacing/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/word-spacing.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyleAttribute.ALL_ATTRIBUTES///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-text-style-attribute/-a-l-l_-a-t-t-r-i-b-u-t-e-s/index.html
