@@ -255,6 +255,18 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetHalfLeading
     instance->setHalfLeading(halfLeading);
 }
 
+SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_TextStyle__1nGetTopRatio
+  (KNativePointer ptr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    return instance->getTopRatio();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetTopRatio
+  (KNativePointer ptr, KFloat topRatio) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    instance->setTopRatio(topRatio);
+}
+
 SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineShift
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);

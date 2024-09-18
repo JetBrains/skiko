@@ -211,6 +211,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         return this
     }
 
+    @Deprecated("Replaced by topRatio")
     var isHalfLeading: Boolean
         get() = try {
             Stats.onNativeCall()
@@ -222,10 +223,35 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
             setHalfLeading(value)
         }
 
+    // Same as topRatio = halfLeading ? 0.5f : -1.0f
+    @Deprecated("Replaced by topRatio")
     fun setHalfLeading(value: Boolean): StrutStyle {
         try {
             Stats.onNativeCall()
             _nSetHalfLeading(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        return this
+    }
+
+    // [0..1]: the ratio of ascent to ascent+descent
+    // -1: proportional to the ascent/descent
+    var topRatio: Float
+        get() = try {
+            Stats.onNativeCall()
+            StrutStyle_nGetTopRatio(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) {
+            setTopRatio(value)
+        }
+
+    fun setTopRatio(topRatio: Float): StrutStyle {
+        try {
+            Stats.onNativeCall()
+            StrutStyle_nSetTopRatio(_ptr, topRatio)
         } finally {
             reachabilityBarrier(this)
         }
@@ -321,3 +347,11 @@ private external fun _nIsHalfLeading(ptr: NativePointer): Boolean
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading")
 private external fun _nSetHalfLeading(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetTopRatio")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nGetTopRatio")
+private external fun StrutStyle_nGetTopRatio(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetTopRatio")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetTopRatio")
+private external fun StrutStyle_nSetTopRatio(ptr: NativePointer, value: Float)

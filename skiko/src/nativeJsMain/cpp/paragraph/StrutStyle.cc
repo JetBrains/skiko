@@ -145,3 +145,15 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
     instance->setHalfLeading(value);
 }
+
+SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_StrutStyle__1nGetTopRatio
+  (KNativePointer ptr) {
+    StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
+    return instance->getTopRatio();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetTopRatio
+  (KNativePointer ptr, KFloat topRatio) {
+    StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
+    instance->setTopRatio(topRatio);
+}
