@@ -4,7 +4,11 @@ import platform.Foundation.NSURL.Companion.URLWithString
 import platform.UIKit.UIApplication
 
 internal actual fun URIHandler_openUri(uri: String) {
-    UIApplication.sharedApplication.openURL(URLWithString(uri)!!)
+    UIApplication.sharedApplication.openURL(
+        url = URLWithString(uri)!!,
+        options = emptyMap<Any?, Any>(),
+        completionHandler = null
+    )
 }
 
 // TODO: not sure if correct.
