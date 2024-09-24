@@ -42,7 +42,7 @@ var hostArch = when (osArch) {
 
 val host = "${hostOs}-${hostArch}"
 
-var version = "0.0.0-SNAPSHOT"
+var version = "24.9.23-SNAPSHOT+debug"
 if (project.hasProperty("skiko.version")) {
     version = project.properties["skiko.version"] as String
 }
@@ -367,6 +367,11 @@ fun KotlinNativeTarget.configureToLaunchFromAppCode() {
 
 fun KotlinNativeTarget.configureToLaunchFromXcode() {
     binaries {
+        this["debugTest"].freeCompilerArgs += listOf(
+            "-linker-option", "-framework", "-linker-option", "Metal",
+            "-linker-option", "-framework", "-linker-option", "CoreText",
+            "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+        )
         executable {
             entryPoint = "org.jetbrains.skiko.sample.main"
             freeCompilerArgs += listOf(
