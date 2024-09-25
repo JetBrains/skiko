@@ -741,6 +741,8 @@ class SkiaLayerTest {
         // SOFTWARE_COMPAT fails because it's just too slow
         excludeRenderApis = listOf(GraphicsApi.SOFTWARE_COMPAT)
     ) {
+        assumeTrue(hostOs == OS.MacOS) // since the test has 'metal' in its name (it is flaky on Windows)
+
         val renderTimes = mutableListOf<Long>()
         val renderer = object: SkikoRenderDelegate {
             override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
