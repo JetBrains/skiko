@@ -27,7 +27,7 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         } finally {
             reachabilityBarrier(this)
         }
-    val rowBytes: NativePointer
+    val rowBytes: Int
         get() = try {
             Stats.onNativeCall()
             PixelRef_nGetRowBytes(_ptr)
@@ -85,7 +85,7 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetRowBytes")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_PixelRef__1nGetRowBytes")
-private external fun PixelRef_nGetRowBytes(ptr: NativePointer): NativePointer
+private external fun PixelRef_nGetRowBytes(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetGenerationId")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_PixelRef__1nGetGenerationId")
