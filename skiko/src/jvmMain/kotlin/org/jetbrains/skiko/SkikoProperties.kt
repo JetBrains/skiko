@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import java.lang.System.getenv
 import java.lang.System.getProperty
 
 // TODO maybe we can get rid of global properties, and pass SkiaLayerProperties to Window -> ComposeWindow -> SkiaLayer
@@ -28,9 +29,38 @@ object SkikoProperties {
     /**
      * The path where to store data files.
      *
-     * It is used for extracting the Skiko binaries (if `libraryPath` isn't null) and logging.
+     * It is used for extracting the Skiko binaries (if `libraryPath` isn't null).
      */
-    val dataPath: String get() = getProperty("skiko.data.path") ?: "${getProperty("user.home")}/.skiko/"
+    val dataPath: String get() {
+        return getProperty("skiko.data.path") ?: when (hostOs) {
+            OS.Windows -> "${getenv("LOCALAPPDATA")}/Skiko"
+            OS.MacOS, OS.Ios -> "${getProperty("user.home")}/Library/Application Support/Skiko"
+            else -> {
+                var dataHome = getenv("XDG_DATA_HOME")
+                if (dataHome == null || !dataHome.startsWith('/')) {
+                    dataHome = "${getProperty("user.home")}/.local/share"
+                }
+                return "${dataHome}/skiko"
+            }
+        }
+    }
+
+    /**
+     * The path where to store log files.
+     */
+    val logPath: String get() {
+        return getProperty("skiko.data.path") ?: when (hostOs) {
+            OS.Windows -> "${getenv("LOCALAPPDATA")}/Skiko"
+            OS.MacOS, OS.Ios -> "${getProperty("user.home")}/Library/Logs/Skiko"
+            else -> {
+                var stateHome = getenv("XDG_STATE_HOME")
+                if (stateHome == null || !stateHome.startsWith('/')) {
+                    stateHome = "${getProperty("user.home")}/.local/state"
+                }
+                return "${stateHome}/skiko"
+            }
+        }
+    }
 
     val vsyncEnabled: Boolean get() = getProperty("skiko.vsync.enabled")?.toBoolean() ?: true
 
@@ -74,7 +104,7 @@ object SkikoProperties {
     val fpsLongFramesMillis: Double? get() = getProperty("skiko.fps.longFrames.millis")?.toDouble()
 
     val renderApi: GraphicsApi get() {
-        val environment = System.getenv("SKIKO_RENDER_API")
+        val environment = getenv("SKIKO_RENDER_API")
         val property = getProperty("skiko.renderApi")
         return parseRenderApi(environment ?: property)
     }
