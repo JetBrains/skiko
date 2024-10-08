@@ -335,6 +335,27 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayerR
     return canvas->saveLayer(&bounds, paint);
 }
 
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayerSaveLayerRec
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong paintPtr, jlong backdropImageFilterPtr, jlong colorSpacePtr, jint saveLayerFlags) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
+    SkImageFilter* backdrop = reinterpret_cast<SkImageFilter*>(backdropImageFilterPtr);
+    SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(colorSpacePtr);
+
+    return canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, paint, backdrop, colorSpace, saveLayerFlags));
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayerSaveLayerRecRect
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jlong paintPtr, jlong backdropImageFilterPtr, jlong colorSpacePtr, jint saveLayerFlags) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    SkRect bounds {left, top, right, bottom};
+    SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
+    SkImageFilter* backdrop = reinterpret_cast<SkImageFilter*>(backdropImageFilterPtr);
+    SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(colorSpacePtr);
+
+    return canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, paint, backdrop, colorSpace, saveLayerFlags));
+}
+
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetSaveCount(JNIEnv* env, jclass jclass, jlong ptr) {
     return reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr))->getSaveCount();
 }
