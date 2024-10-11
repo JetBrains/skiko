@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 ####### Variables you can edit to change build config, or set same environment variables before script execution #######
-SKIA_VERSION="${SKIA_VERSION:="m116-47d3027-1"}" # Version of Skia m###-commit-sha-#. This commit sha will be cloned from repository https://github.com/JetBrains/skia
+SKIA_VERSION="${SKIA_VERSION:="m126-804f26f8a9-1"}" # Version of Skia m###-commit-sha-#. This commit sha will be cloned from repository https://github.com/JetBrains/skia
 SKIA_DEBUG_MODE="${SKIA_DEBUG_MODE:="false"}" # in debug mode Skiko will be published with postix "+debug", for example "0.0.0-SNAPSHOT+debug"
-SKIA_TARGET="${SKIA_TARGET:="iosSim"}" # possible values: "ios", "iosSim", "macos", "windows", "linux", "wasm", "android", "tvos", "tvosSim"
+SKIA_TARGET="${SKIA_TARGET:="macos"}" # possible values: "ios", "iosSim", "macos", "windows", "linux", "wasm", "android", "tvos", "tvosSim"
 # For M1 Mac use "iosSim" to build for simulator, and ios to build for device.
 # For Intel Mac - use "ios" target to build for iOS x64 simulator.
 # For Desktop JVM use "macos", "windows", "linux"
@@ -75,16 +75,13 @@ set -x # print all commands
 cd "$(dirname "$0")"
 SCRIPT_DIR="$(pwd)"
 
-git clone https://github.com/JetBrains/skia-pack.git || echo "skia-pack exists. You can remove it or update by hands with git pull"
-cd skia-pack
-[ -d "skia" ] && echo "skip cript/checkout.py, because directory skia-pack/skia already exists"
-[ ! -d "skia" ] && python3 script/checkout.py --version "$SKIA_VERSION"
+cd "$(pwd)/../../skia-pack"
 for skikoMachine in ${skikoMachines[@]}; do
   python3 script/build.py --target "$SKIA_TARGET" --machine "$skikoMachine" --build-type "$skikoBuildType"
-  python3 script/archive.py --version "$SKIA_VERSION" --target "$SKIA_TARGET" --machine "$skikoMachine" --build-type "$skikoBuildType"
+  # python3 script/archive.py --version "$SKIA_VERSION" --target "$SKIA_TARGET" --machine "$skikoMachine" --build-type "$skikoBuildType"
 done
 cd "$SCRIPT_DIR"
 
 rm -rf build/classes/kotlin/* # We need to drop old cache. We can do it with ./gradlew clean as well, but it tooks longer time to redownload dependencies dir.
 
-./gradlew publishToMavenLocal $SKIKO_TARGET_FLAGS -Pskia.dir="$(pwd)/skia-pack/skia" -Pskiko.debug=$SKIA_DEBUG_MODE
+./gradlew publishToMavenLocal $SKIKO_TARGET_FLAGS -Pskia.dir="$(pwd)/../../skia" -Pskiko.debug=$SKIA_DEBUG_MODE
