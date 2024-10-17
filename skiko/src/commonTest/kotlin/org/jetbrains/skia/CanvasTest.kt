@@ -99,7 +99,7 @@ class CanvasTest {
     fun drawString() = runTest {
         val surface = Surface.makeRasterN32Premul(100, 100)
 
-        val bytes =  Bitmap.makeFromImage(surface.makeImageSnapshot()).readPixels()!!
+        val bytes = Bitmap.makeFromImage(surface.makeImageSnapshot()).readPixels()!!
         assertTrue {
             bytes.isNotEmpty() && bytes.all { it == 0.toByte() }
         }
@@ -114,7 +114,7 @@ class CanvasTest {
             }
         )
 
-        val bytes2 =  Bitmap.makeFromImage(surface.makeImageSnapshot()).readPixels()!!
+        val bytes2 = Bitmap.makeFromImage(surface.makeImageSnapshot()).readPixels()!!
         assertTrue {
             bytes2.isNotEmpty() && bytes2.any { it != 0.toByte() }
         }
@@ -210,7 +210,7 @@ class CanvasTest {
         surface.canvas.drawBlackPixel(1, 1)
 
         surface.assertPixelsMatch(
-            IntArray(16){ index ->
+            IntArray(16) { index ->
                 when (index) {
                     10, 11, 14, 15 -> 0xff000000.toInt()
                     else -> 0xffffffff.toInt()
@@ -233,7 +233,7 @@ class CanvasTest {
     @Test
     fun testRotateXY() {
         val surface = whiteSurface(4, 4)
-        surface.canvas.rotate(deg = 90f, x = 2f, y=2f)
+        surface.canvas.rotate(deg = 90f, x = 2f, y = 2f)
         surface.canvas.drawBlackPixel(0, 0)
 
         surface.assertSingleBlackPixelAt(3, 0)
@@ -247,7 +247,7 @@ class CanvasTest {
         surface.canvas.drawBlackPixel(0, 2)
 
         surface.assertPixelsMatch(
-            IntArray(16){ index ->
+            IntArray(16) { index ->
                 when (index) {
                     // Skewing skews the shape of the pixel itself, so it becomes a parallelogram
                     9 -> 0xff3f3f3f.toInt()
@@ -255,6 +255,56 @@ class CanvasTest {
                     else -> 0xffffffff.toInt()
                 }
             }
+        )
+    }
+
+    @Test
+    fun testSaveLayerRecRect() {
+        val surface = whiteSurface(5, 5)
+
+        surface.canvas.saveLayer(
+            Canvas.SaveLayerRec(
+                bounds = Rect(1f, 1f, 4f, 4f),
+                saveLayerFlags = Canvas.SaveLayerFlags(Canvas.SaveLayerFlagsSet.InitWithPrevious)
+            )
+        )
+
+        val black = Paint().also { it.setARGB(255, 0, 0, 0) }
+        surface.canvas.drawRect(Rect(1f, 1f, 4f, 4f), black)
+
+        surface.canvas.restore()
+
+        surface.assertPixelsMatch(
+            intArrayOf(
+                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE,
+                Color.WHITE, Color.BLACK, Color.BLACK, Color.BLACK, Color.WHITE,
+                Color.WHITE, Color.BLACK, Color.BLACK, Color.BLACK, Color.WHITE,
+                Color.WHITE, Color.BLACK, Color.BLACK, Color.BLACK, Color.WHITE,
+                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE,
+            )
+        )
+    }
+
+
+    @Test
+    fun testSaveLayerRec() {
+        val surface = whiteSurface(5, 5)
+
+        surface.canvas.saveLayer(Canvas.SaveLayerRec(saveLayerFlags = Canvas.SaveLayerFlags(Canvas.SaveLayerFlagsSet.InitWithPrevious)))
+
+        val black = Paint().also { it.setARGB(255, 0, 0, 0) }
+        surface.canvas.drawRect(Rect(1f, 1f, 4f, 4f), black)
+
+        surface.canvas.restore()
+
+        surface.assertPixelsMatch(
+            intArrayOf(
+                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE,
+                Color.WHITE, Color.BLACK, Color.BLACK, Color.BLACK, Color.WHITE,
+                Color.WHITE, Color.BLACK, Color.BLACK, Color.BLACK, Color.WHITE,
+                Color.WHITE, Color.BLACK, Color.BLACK, Color.BLACK, Color.WHITE,
+                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE,
+            )
         )
     }
 
@@ -286,8 +336,8 @@ class CanvasTest {
 
 
     private fun Surface.assertSingleBlackPixelAt(x: Int, y: Int) {
-        val pixArray = IntArray(width * height){ 0xffffffff.toInt() }
-        pixArray[y*width + x] = 0xff000000.toInt()
+        val pixArray = IntArray(width * height) { 0xffffffff.toInt() }
+        pixArray[y * width + x] = 0xff000000.toInt()
 
         assertPixelsMatch(pixArray)
     }
