@@ -1349,6 +1349,36 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         }
     }
 
+    fun saveLayer(layerRec: SaveLayerRec): Int {
+        return try {
+            Stats.onNativeCall()
+            if (layerRec.bounds != null) {
+                _nSaveLayerSaveLayerRecRect(
+                    _ptr,
+                    layerRec.bounds.left,
+                    layerRec.bounds.top,
+                    layerRec.bounds.right,
+                    layerRec.bounds.bottom,
+                    getPtr(layerRec.paint),
+                    getPtr(layerRec.backdrop),
+                    getPtr(layerRec.colorSpace),
+                    layerRec.saveLayerFlags.mask
+                )
+            } else {
+                _nSaveLayerSaveLayerRec(
+                    _ptr,
+                    getPtr(layerRec.paint),
+                    getPtr(layerRec.backdrop),
+                    getPtr(layerRec.colorSpace),
+                    layerRec.saveLayerFlags.mask
+                )
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(layerRec)
+        }
+    }
+
     val saveCount: Int
         get() = try {
             Stats.onNativeCall()
@@ -1367,6 +1397,39 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         _nRestoreToCount(_ptr, saveCount)
         return this
+    }
+
+    class SaveLayerRec(
+        val bounds: Rect? = null,
+        val paint: Paint? = null,
+        val backdrop: ImageFilter? = null,
+        val colorSpace: ColorSpace? = null,
+        val saveLayerFlags: SaveLayerFlags = SaveLayerFlags()
+    )
+
+    enum class SaveLayerFlagsSet(val mask: Int) {
+        PreserveLCDText(1 shl 1),
+        InitWithPrevious(1 shl 2),
+        F16ColorType(1 shl 4)
+    }
+
+    class SaveLayerFlags internal constructor(internal val mask: Int) {
+        constructor(vararg flagsSet: SaveLayerFlagsSet) : this(flagsSet.fold(0) { acc, flag -> acc or flag.mask })
+
+        operator fun contains(flag: SaveLayerFlagsSet): Boolean = (mask and flag.mask) != 0
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
+
+            other as SaveLayerFlags
+
+            return mask == other.mask
+        }
+
+        override fun hashCode(): Int {
+            return mask
+        }
     }
 
     private object _FinalizerHolder {
@@ -1645,6 +1708,29 @@ private external fun _nSaveLayerRect(
     paintPtr: NativePointer
 ): Int
 
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRec")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRec")
+private external fun _nSaveLayerSaveLayerRec(
+    ptr: NativePointer,
+    paintPtr: NativePointer,
+    backdropImageFilterPtr: NativePointer,
+    colorSpacePtr: NativePointer,
+    saveLayerFlags: Int
+): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRecRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRecRect")
+private external fun _nSaveLayerSaveLayerRecRect(
+    ptr: NativePointer,
+    left: Float,
+    top: Float,
+    right: Float,
+    bottom: Float,
+    paintPtr: NativePointer,
+    backdropImageFilterPtr: NativePointer,
+    colorSpacePtr: NativePointer,
+    saveLayerFlags: Int
+): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSaveCount")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nGetSaveCount")
