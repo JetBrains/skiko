@@ -15,6 +15,8 @@ internal class SwingOffscreenDrawer(
 ) {
     @Volatile
     private var volatileImage: VolatileImage? = null
+    private var bufferedImage: BufferedImage? = null
+    private var bufferedImageGraphics: Graphics2D? = null
 
     /**
      * Draws rendered image that is represented by [bytes] on [g].
@@ -56,7 +58,15 @@ internal class SwingOffscreenDrawer(
         dirtyRectangles: List<Rectangle>
     ): BufferedImage {
         val src = ByteBuffer.wrap(bytes)
-        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE)
+        if (bufferedImage == null || bufferedImage?.width != width || bufferedImage?.height != height) {
+            bufferedImage?.flush()
+            bufferedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE)
+            bufferedImageGraphics = bufferedImage?.createGraphics()
+        } else {
+            bufferedImageGraphics?.clearRect(0,0, width, height)
+        }
+        val image = bufferedImage!!
+
         val dstData = (image.raster.dataBuffer as DataBufferInt).data
         val srcData: IntBuffer = src.order(ByteOrder.LITTLE_ENDIAN).asIntBuffer()
         for (rect in dirtyRectangles) {
