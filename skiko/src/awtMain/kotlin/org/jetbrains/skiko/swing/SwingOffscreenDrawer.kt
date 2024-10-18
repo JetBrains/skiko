@@ -59,11 +59,13 @@ internal class SwingOffscreenDrawer(
     ): BufferedImage {
         val src = ByteBuffer.wrap(bytes)
         if (bufferedImage == null || bufferedImage?.width != width || bufferedImage?.height != height) {
+            bufferedImage?.flush()
             bufferedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE)
             bufferedImageGraphics = bufferedImage?.createGraphics()
+        } else {
+            bufferedImageGraphics?.clearRect(0,0, width, height)
         }
         val image = bufferedImage!!
-        bufferedImageGraphics?.clearRect(0,0, width, height)
 
         val dstData = (image.raster.dataBuffer as DataBufferInt).data
         val srcData: IntBuffer = src.order(ByteOrder.LITTLE_ENDIAN).asIntBuffer()
