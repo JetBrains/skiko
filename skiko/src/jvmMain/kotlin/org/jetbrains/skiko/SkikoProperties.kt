@@ -1,6 +1,6 @@
 package org.jetbrains.skiko
 
-import java.lang.System.getProperty
+import java.util.*
 
 // TODO maybe we can get rid of global properties, and pass SkiaLayerProperties to Window -> ComposeWindow -> SkiaLayer
 @Suppress("SameParameterValue")
@@ -88,6 +88,23 @@ object SkikoProperties {
     }
 
     val macOsOpenGLEnabled: Boolean get() = getProperty("skiko.macos.opengl.enabled")?.toBoolean() ?: false
+
+    val resourcePropertiesEnabled: Boolean get() = System.getProperty("skiko.resource.properties.enabled")?.toBoolean() ?: false
+
+    private fun getProperty(key: String): String? {
+        return if (resourcePropertiesEnabled) {
+            classLoaderProperties?.getProperty(key) ?: System.getProperty(key)
+        } else {
+            System.getProperty(key)
+        }
+    }
+
+    private val classLoaderProperties by lazy {
+        val res = SkikoProperties::class.java.classLoader.getResourceAsStream("skiko.properties") ?: return@lazy null
+        val props = Properties()
+        props.load(res)
+        props
+    }
 
     internal fun parseRenderApi(text: String?): GraphicsApi {
         when(text) {
