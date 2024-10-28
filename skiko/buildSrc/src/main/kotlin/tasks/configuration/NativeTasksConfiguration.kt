@@ -39,8 +39,10 @@ fun Project.findXcodeSdkRoot(): String {
         }
     }
 
-    return (project.property("skiko.ci.xcodehome") as? String)?.also {
-        println("findXcodeSdkRoot = $it")
+    return (project.property("skiko.ci.xcodehome") as? String)?.let {
+        val sdkPath = it + "/Platforms"
+        println("findXcodeSdkRoot = $sdkPath")
+        sdkPath
     } ?: error("gradle property `skiko.ci.xcodehome` is not set")
 }
 
