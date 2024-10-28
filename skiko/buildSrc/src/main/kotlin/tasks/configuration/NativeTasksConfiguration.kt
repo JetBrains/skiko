@@ -31,6 +31,16 @@ fun String.withSuffix(isUikitSim: Boolean = false) =
 fun KotlinTarget.isUikitSimulator() =
     name.contains("Simulator", ignoreCase = true) || name == "tvosX64" // x64 tvOS is implicitly a simulator
 
+fun findXcodeSdkRoot(): String {
+    val defaultPath = "/Applications/Xcode.app/Contents/Developer/Platforms"
+    if (File(defaultPath).exists()) {
+        return defaultPath
+    }
+
+    // from buildserver agent parameters:
+    return "/Applications/Xcode-15.3.0.app/Contents/Developer/Platforms"
+}
+
 fun SkikoProjectContext.compileNativeBridgesTask(
     os: OS, arch: Arch, isUikitSim: Boolean
 ): TaskProvider<CompileSkikoCppTask> = with (this.project) {
@@ -52,7 +62,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
 
         when (os) {
             OS.IOS -> {
-                val sdkRoot = "/Applications/Xcode.app/Contents/Developer/Platforms"
+                val sdkRoot = findXcodeSdkRoot()
                 val iphoneOsSdk = "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
                 val iphoneSimSdk = "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
                 val iosArchFlags = when (arch) {
@@ -76,7 +86,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 ))
             }
             OS.TVOS -> {
-                val sdkRoot = "/Applications/Xcode.app/Contents/Developer/Platforms"
+                val sdkRoot = findXcodeSdkRoot()
                 val tvOsSdk = "$sdkRoot/AppleTVOS.platform/Developer/SDKs/AppleTVOS.sdk"
                 val tvSimSdk = "$sdkRoot/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator.sdk"
                 val tvosArchFlags = when (arch) {
