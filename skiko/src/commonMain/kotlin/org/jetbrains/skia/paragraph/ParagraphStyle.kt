@@ -191,6 +191,19 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
 
+    var isApplyRoundingHackEnabled: Boolean
+        get() = try {
+            Stats.onNativeCall()
+            _nGetApplyRoundingHack(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetApplyRoundingHack(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
 
     var textIndent: TextIndent
         get() = try {
@@ -321,6 +334,14 @@ private external fun _nGetHinting(ptr: NativePointer): Int
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetSubpixel")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetSubpixel")
 private external fun _nGetSubpixel(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetApplyRoundingHack")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetApplyRoundingHack")
+private external fun _nGetApplyRoundingHack(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetApplyRoundingHack")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetApplyRoundingHack")
+private external fun _nSetApplyRoundingHack(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent")

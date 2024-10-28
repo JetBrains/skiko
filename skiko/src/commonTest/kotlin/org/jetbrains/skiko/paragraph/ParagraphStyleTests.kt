@@ -55,4 +55,13 @@ class ParagraphStyleTests {
             assertEquals(gloriousRasterSettings, paragraphStyle.fontRastrSettings)
         }
     }
+
+    @Test
+    fun paragraphStyleRoundingHackTests() {
+        ParagraphStyle().use { paragraphStyle ->
+            assertEquals(false, paragraphStyle.isApplyRoundingHackEnabled)
+            paragraphStyle.isApplyRoundingHackEnabled = true
+            assertEquals(true, paragraphStyle.isApplyRoundingHackEnabled)
+        }
+    }
 }
