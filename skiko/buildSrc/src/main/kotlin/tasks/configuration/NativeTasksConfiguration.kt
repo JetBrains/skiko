@@ -34,11 +34,14 @@ fun KotlinTarget.isUikitSimulator() =
 fun Project.findXcodeSdkRoot(): String {
     val defaultPath = "/Applications/Xcode.app/Contents/Developer/Platforms"
     if (File(defaultPath).exists()) {
-        return defaultPath
+        return defaultPath.also {
+            println("findXcodeSdkRoot = $it")
+        }
     }
 
-    return project.property("skiko.ci.xcodehome") as? String
-        ?: error("gradle property `skiko.ci.xcodehome` is not set")
+    return (project.property("skiko.ci.xcodehome") as? String)?.also {
+        println("findXcodeSdkRoot = $it")
+    } ?: error("gradle property `skiko.ci.xcodehome` is not set")
 }
 
 fun SkikoProjectContext.compileNativeBridgesTask(
