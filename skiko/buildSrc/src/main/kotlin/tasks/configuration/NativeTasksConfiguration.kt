@@ -31,14 +31,14 @@ fun String.withSuffix(isUikitSim: Boolean = false) =
 fun KotlinTarget.isUikitSimulator() =
     name.contains("Simulator", ignoreCase = true) || name == "tvosX64" // x64 tvOS is implicitly a simulator
 
-fun findXcodeSdkRoot(): String {
+fun Project.findXcodeSdkRoot(): String {
     val defaultPath = "/Applications/Xcode.app/Contents/Developer/Platforms"
     if (File(defaultPath).exists()) {
         return defaultPath
     }
 
-    // from buildserver agent parameters:
-    return "/Applications/Xcode-15.3.0.app/Contents/Developer/Platforms"
+    return project.property("skiko.ci.xcodehome") as? String
+        ?: error("gradle property `skiko.ci.xcodehome` is not set")
 }
 
 fun SkikoProjectContext.compileNativeBridgesTask(
