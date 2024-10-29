@@ -196,16 +196,22 @@ class ParagraphTest {
                 it.addText("y".repeat(100))
                 it.build()
             }.layout(Float.POSITIVE_INFINITY)
-            assertEquals(1, paragraph.lineNumber)
+            assertEquals(1, paragraph.lineNumber, "Layout in one line with Inf width")
 
             val maxIntrinsicWidth = paragraph.maxIntrinsicWidth
             val isMaxIntrinsicWidthRound = maxIntrinsicWidth == truncate(maxIntrinsicWidth)
             val expectedLines = if (unexpectedWrapsPresent && isMaxIntrinsicWidthRound) 2 else 1
 
             paragraph.layout(ceil(paragraph.maxIntrinsicWidth))
-            assertEquals(expectedLines, paragraph.lineNumber)
+            assertEquals(expectedLines, paragraph.lineNumber, "Layout with ceil(maxIntrinsicWidth) " +
+                                                              "maxIntrinsicWidth: $maxIntrinsicWidth " +
+                                                              "unexpectedWrapsPresent: $unexpectedWrapsPresent " +
+                                                              "isApplyRoundingHackEnabled: $isApplyRoundingHackEnabled")
             paragraph.layout(paragraph.maxIntrinsicWidth)
-            assertEquals(expectedLines, paragraph.lineNumber)
+            assertEquals(expectedLines, paragraph.lineNumber, "Layout with maxIntrinsicWidth " +
+                                                              "maxIntrinsicWidth: $maxIntrinsicWidth " +
+                                                              "unexpectedWrapsPresent: $unexpectedWrapsPresent " +
+                                                              "isApplyRoundingHackEnabled: $isApplyRoundingHackEnabled")
         }
         testWraps(isApplyRoundingHackEnabled = false, unexpectedWrapsPresent = false)
         testWraps(isApplyRoundingHackEnabled = true, unexpectedWrapsPresent = true)
