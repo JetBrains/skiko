@@ -18,7 +18,7 @@ class ParagraphTest {
     private val fontCollection = suspend {
         FontCollection().setDefaultFontManager(TypefaceFontProvider().apply {
             registerTypeface(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), "Inter")
-            registerTypeface(Typeface.makeFromResource("./fonts/JetBrains Mono 2_304/JetBrainsMono-Regular.ttf"), "JetBrains Mono")
+            registerTypeface(Typeface.makeFromResource("./fonts/JetBrainsMono_2_304/JetBrainsMono-Regular.ttf"), "JetBrains Mono")
         })
     }
     private val style = ParagraphStyle().apply {
