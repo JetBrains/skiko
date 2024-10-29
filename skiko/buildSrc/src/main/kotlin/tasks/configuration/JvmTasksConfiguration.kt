@@ -455,6 +455,7 @@ fun SkikoProjectContext.createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: Tas
         val createChecksums2 = createChecksumsTask(os, altArch, nativeLib2)
         nativeFiles.add(nativeLib2)
         nativeFiles.add(createChecksums2.map { it.outputs.files.singleFile })
+        allJvmRuntimeJars[os to altArch] = skikoJvmRuntimeJarTask(os, altArch, commonJar, nativeFiles)
     }
     val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(os, arch, commonJar, nativeFiles)
     allJvmRuntimeJars[os to arch] = skikoJvmRuntimeJar
