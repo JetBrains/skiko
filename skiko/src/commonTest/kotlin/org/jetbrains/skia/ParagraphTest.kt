@@ -6,6 +6,7 @@ import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.*
+import kotlin.math.ceil
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -15,6 +16,7 @@ class ParagraphTest {
     private val fontCollection = suspend {
         FontCollection().setDefaultFontManager(TypefaceFontProvider().apply {
             registerTypeface(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), "Inter")
+            registerTypeface(Typeface.makeFromResource("./fonts/JetBrains Mono 2_304/JetBrainsMono-Regular.ttf"), "JetBrains Mono")
         })
     }
     private val style = ParagraphStyle().apply {
@@ -174,5 +176,32 @@ class ParagraphTest {
                 rect.rect.bottom
             }
         }
+    }
+
+    @Test
+    fun `layout paragraph with its maxIntrinsicWidth shouldn't lead to wraps`() = runTest {
+        suspend fun testWraps(isApplyRoundingHackEnabled: Boolean, unexpectedWrapsPresent: Boolean) {
+            val paragraphStyle = ParagraphStyle().apply {
+                this.isApplyRoundingHackEnabled = isApplyRoundingHackEnabled
+                textStyle = TextStyle().apply {
+                    fontFamilies = arrayOf("JetBrains Mono")
+                    fontSize = 13.0f * 2f
+                }
+            }
+            val paragraph = ParagraphBuilder(paragraphStyle, fontCollection()).use {
+                it.addText("x".repeat(104))
+                it.addText(" ")
+                it.addText("y".repeat(100))
+                it.build()
+            }.layout(Float.POSITIVE_INFINITY)
+            assertEquals(1, paragraph.lineNumber)
+            paragraph.layout(ceil(paragraph.maxIntrinsicWidth))
+            val expectedLines = if (unexpectedWrapsPresent) 2 else 1
+            assertEquals(expectedLines, paragraph.lineNumber)
+            paragraph.layout(paragraph.maxIntrinsicWidth)
+            assertEquals(expectedLines, paragraph.lineNumber)
+        }
+        testWraps(isApplyRoundingHackEnabled = false, unexpectedWrapsPresent = false)
+        testWraps(isApplyRoundingHackEnabled = true, unexpectedWrapsPresent = true)
     }
 }
