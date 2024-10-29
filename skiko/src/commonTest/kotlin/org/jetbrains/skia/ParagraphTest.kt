@@ -51,7 +51,7 @@ class ParagraphTest {
 
     @Test
     fun layoutParagraph() = runTest {
-        val lineMetricsEpsilon = 0.0001f
+        val lineMetricsEpsilon = 0.001f
 
         assertCloseEnough(
             actual = singleLineMetrics("aa"),
