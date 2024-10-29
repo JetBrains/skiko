@@ -201,11 +201,6 @@ class ParagraphTest {
             val maxIntrinsicWidth = paragraph.maxIntrinsicWidth
             val expectedLines = if (unexpectedWrapsPresent) 2 else 1
 
-            paragraph.layout(ceil(paragraph.maxIntrinsicWidth))
-            assertEquals(expectedLines, paragraph.lineNumber, "Layout with ceil(maxIntrinsicWidth) " +
-                                                              "maxIntrinsicWidth: $maxIntrinsicWidth " +
-                                                              "unexpectedWrapsPresent: $unexpectedWrapsPresent " +
-                                                              "isApplyRoundingHackEnabled: $isApplyRoundingHackEnabled")
             paragraph.layout(paragraph.maxIntrinsicWidth)
             assertEquals(expectedLines, paragraph.lineNumber, "Layout with maxIntrinsicWidth " +
                                                               "maxIntrinsicWidth: $maxIntrinsicWidth " +
