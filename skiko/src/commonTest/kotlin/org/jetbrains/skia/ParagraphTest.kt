@@ -7,6 +7,8 @@ import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.*
 import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.truncate
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -195,8 +197,12 @@ class ParagraphTest {
                 it.build()
             }.layout(Float.POSITIVE_INFINITY)
             assertEquals(1, paragraph.lineNumber)
+
+            val maxIntrinsicWidth = paragraph.maxIntrinsicWidth
+            val isMaxIntrinsicWidthRound = maxIntrinsicWidth == truncate(maxIntrinsicWidth)
+            val expectedLines = if (unexpectedWrapsPresent && isMaxIntrinsicWidthRound) 2 else 1
+
             paragraph.layout(ceil(paragraph.maxIntrinsicWidth))
-            val expectedLines = if (unexpectedWrapsPresent) 2 else 1
             assertEquals(expectedLines, paragraph.lineNumber)
             paragraph.layout(paragraph.maxIntrinsicWidth)
             assertEquals(expectedLines, paragraph.lineNumber)
