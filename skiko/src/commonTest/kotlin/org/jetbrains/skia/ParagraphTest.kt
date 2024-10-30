@@ -181,7 +181,7 @@ class ParagraphTest {
     }
 
     @Test
-    fun `layout paragraph with its maxIntrinsicWidth shouldn't lead to wraps`() = runTest {
+    fun layout_paragraph_with_its_maxIntrinsicWidth_shouldnt_lead_to_wraps() = runTest {
         suspend fun testWraps(isApplyRoundingHackEnabled: Boolean, unexpectedWrapsPresent: Boolean) {
             val paragraphStyle = ParagraphStyle().apply {
                 this.isApplyRoundingHackEnabled = isApplyRoundingHackEnabled
