@@ -256,6 +256,7 @@ $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/ellipsis/#/PointingT
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/fontRastrSettings/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/font-rastr-settings.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/height/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/height.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/heightMode/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/height-mode.html
+$dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/isApplyRoundingHackEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/is-apply-rounding-hack-enabled.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/isHintingEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/is-hinting-enabled.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/maxLinesCount/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/max-lines-count.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/strutStyle/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/strut-style.html
