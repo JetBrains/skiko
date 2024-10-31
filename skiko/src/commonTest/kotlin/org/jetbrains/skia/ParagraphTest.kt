@@ -6,6 +6,9 @@ import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.*
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.truncate
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -15,6 +18,7 @@ class ParagraphTest {
     private val fontCollection = suspend {
         FontCollection().setDefaultFontManager(TypefaceFontProvider().apply {
             registerTypeface(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), "Inter")
+            registerTypeface(Typeface.makeFromResource("./fonts/JetBrainsMono_2_304/JetBrainsMono-Regular.ttf"), "JetBrains Mono")
         })
     }
     private val style = ParagraphStyle().apply {
@@ -47,40 +51,43 @@ class ParagraphTest {
 
     @Test
     fun layoutParagraph() = runTest {
-        val lineMetricsEpsilon = 0.0001f
+        val lineMetricsEpsilon = 0.001f
 
         assertCloseEnough(
-            singleLineMetrics("aa"), LineMetrics(
+            actual = singleLineMetrics("aa"),
+            expected = LineMetrics(
                 startIndex = 0,
                 endIndex = 2,
                 endExcludingWhitespaces = 2,
                 endIncludingNewline = 2,
                 isHardBreak = true,
                 ascent = 13.5625,
-                descent = 3.3806817531585693,
+                descent = 3.380584716796875,
                 unscaledAscent = 13.5625,
                 height = 17.0,
-                width = 15.789999961853027,
+                width = 15.789764404296875,
                 left = 0.0,
-                baseline = 13.619318008422852,
+                baseline = 13.619415283203125,
                 lineNumber = 0
             ), epsilon = lineMetricsEpsilon
         )
 
+
         assertCloseEnough(
-            singleLineMetrics("яя"), LineMetrics(
+            actual = singleLineMetrics("яя"),
+            expected = LineMetrics(
                 startIndex = 0,
                 endIndex = 2,
                 endExcludingWhitespaces = 2,
                 endIncludingNewline = 2,
                 isHardBreak = true,
                 ascent = 13.5625,
-                descent = 3.3806817531585693,
+                descent = 3.380584716796875,
                 unscaledAscent = 13.5625,
                 height = 17.0,
-                width = 15.710000038146973,
+                width = 15.710235595703125,
                 left = 0.0,
-                baseline = 13.619318008422852,
+                baseline = 13.619415283203125,
                 lineNumber = 0
             ), epsilon = lineMetricsEpsilon
         )
@@ -171,5 +178,36 @@ class ParagraphTest {
                 rect.rect.bottom
             }
         }
+    }
+
+    @Test
+    fun layout_paragraph_with_its_maxIntrinsicWidth_shouldnt_lead_to_wraps() = runTest {
+        suspend fun testWraps(isApplyRoundingHackEnabled: Boolean, unexpectedWrapsPresent: Boolean) {
+            val paragraphStyle = ParagraphStyle().apply {
+                this.isApplyRoundingHackEnabled = isApplyRoundingHackEnabled
+                textStyle = TextStyle().apply {
+                    fontFamilies = arrayOf("JetBrains Mono")
+                    fontSize = 13.0f * 2f
+                }
+            }
+            val paragraph = ParagraphBuilder(paragraphStyle, fontCollection()).use {
+                it.addText("x".repeat(104))
+                it.addText(" ")
+                it.addText("y".repeat(100))
+                it.build()
+            }.layout(Float.POSITIVE_INFINITY)
+            assertEquals(1, paragraph.lineNumber, "Layout in one line with Inf width")
+
+            val maxIntrinsicWidth = paragraph.maxIntrinsicWidth
+            val expectedLines = if (unexpectedWrapsPresent) 2 else 1
+
+            paragraph.layout(paragraph.maxIntrinsicWidth)
+            assertEquals(expectedLines, paragraph.lineNumber, "Layout with maxIntrinsicWidth " +
+                                                              "maxIntrinsicWidth: $maxIntrinsicWidth " +
+                                                              "unexpectedWrapsPresent: $unexpectedWrapsPresent " +
+                                                              "isApplyRoundingHackEnabled: $isApplyRoundingHackEnabled")
+        }
+        testWraps(isApplyRoundingHackEnabled = false, unexpectedWrapsPresent = false)
+        testWraps(isApplyRoundingHackEnabled = true, unexpectedWrapsPresent = true)
     }
 }

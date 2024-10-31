@@ -19,6 +19,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphSt
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt_ParagraphStyle_1nMake
   (JNIEnv* env, jclass jclass) {
     ParagraphStyle* instance = new ParagraphStyle();
+    instance->setApplyRoundingHack(false);
     return reinterpret_cast<jlong>(instance);
 }
 
@@ -178,6 +179,18 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphSty
   (JNIEnv* env, jclass jclass, jlong ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
     instance->turnHintingOff();
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetApplyRoundingHack
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+    return instance->getApplyRoundingHack();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetApplyRoundingHack
+  (JNIEnv* env, jclass jclass, jlong ptr, jboolean val) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+    instance->setApplyRoundingHack(val);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetTextIndent

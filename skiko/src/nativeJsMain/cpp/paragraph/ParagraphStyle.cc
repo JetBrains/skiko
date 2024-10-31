@@ -16,6 +16,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphStyle__1nGetFi
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphStyle__1nMake
   () {
     ParagraphStyle* instance = new ParagraphStyle();
+    instance->setApplyRoundingHack(false);
     return reinterpret_cast<KNativePointer>(instance);
 }
 
@@ -175,6 +176,18 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_ParagraphStyle__1nGetSubpixel
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
     FontRastrSettings fontRastrSettings = instance->getFontRastrSettings();
     return fontRastrSettings.fSubpixel;
+}
+
+SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_ParagraphStyle__1nGetApplyRoundingHack
+  (KNativePointer  ptr) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
+    return instance->getApplyRoundingHack();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetApplyRoundingHack
+  (KNativePointer  ptr, KBoolean val) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
+    instance->setApplyRoundingHack(val);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent
