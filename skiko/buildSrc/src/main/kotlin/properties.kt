@@ -190,7 +190,7 @@ class SkikoProperties(private val myProject: Project) {
 }
 
 object SkikoArtifacts {
-    val groupId = "org.jetbrains.skiko"
+    val groupId = "dev.vexor.skiko"
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
     val commonArtifactId = "skiko"
     val jvmArtifactId = "skiko-awt"

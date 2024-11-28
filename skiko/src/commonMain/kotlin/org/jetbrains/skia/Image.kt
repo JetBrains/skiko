@@ -138,6 +138,36 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             return Image(ptr)
         }
 
+        fun adoptFromTexture(
+            context: DirectContext,
+            textureId: Int,
+            target: Int,
+            width: Int,
+            height: Int,
+            format: Int,
+            origin: SurfaceOrigin,
+            colorType: ColorType,
+            alphaType: ColorAlphaType,
+            colorSpace: ColorSpace?
+        ): Image {
+            Stats.onNativeCall()
+            val ptr = _nAdoptFromTexture(
+                context._ptr,
+                textureId,
+                target,
+                width,
+                height,
+                format,
+                origin.ordinal,
+                colorType.ordinal,
+                alphaType.ordinal,
+                colorSpace?._ptr ?: NullPointer
+            )
+            require(ptr != NullPointer) { "Failed to Image::makeFromTexture" }
+            return Image(ptr)
+        }
+
+
         init {
             staticLoad()
         }
@@ -425,6 +455,21 @@ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nMakeFromPixmap")
 private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptFromTexture")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nAdoptFromTexture")
+private external fun _nAdoptFromTexture(
+    contextPtr: NativePointer,
+    textureId: Int,
+    target: Int,
+    width: Int,
+    height: Int,
+    format: Int,
+    surfaceOrigin: Int,
+    colorType: Int,
+    alphaType: Int,
+    colorSpacePtr: NativePointer
+): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nMakeFromEncoded")

@@ -101,13 +101,13 @@ internal val Project.isInIdea: Boolean
     }
 
 val Project.supportAndroid: Boolean
-    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
+    get() = false // || isInIdea
 
 val Project.supportAwt: Boolean
     get() = findProperty("skiko.awt.enabled") == "true" || isInIdea
 
 val Project.supportAllNative: Boolean
-    get() = findProperty("skiko.native.enabled") == "true" || isInIdea
+    get() = false
 
 val Project.supportAllNativeIos: Boolean
     get() = supportAllNative || findProperty("skiko.native.ios.enabled") == "true" || isInIdea
@@ -149,10 +149,10 @@ val Project.supportAnyNative: Boolean
     get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
 
 val Project.supportWasm: Boolean
-    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
+    get() = false
 
 val Project.supportJs: Boolean
-    get() = findProperty("skiko.js.enabled") == "true" || supportWasm || isInIdea
+    get() = false
 
 fun Project.skiaVersion(target: String): String {
     val platformSpecificVersion = "dependencies.skia.$target"

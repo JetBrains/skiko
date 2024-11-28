@@ -474,6 +474,17 @@ publishing {
             }
         }
         maven {
+            name = "Vexor"
+            url = uri("https://maven.vexor.dev/releases")
+            credentials(PasswordCredentials::class) {
+                username = properties["user"].toString()
+                password = properties["passkey"].toString()
+            }
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+        maven {
             name = "BuildRepo"
             url = uri("${rootProject.buildDir}/repo")
         }
