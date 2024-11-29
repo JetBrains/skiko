@@ -143,13 +143,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         Skia will assume ownership of the resource and will release it when no longer needed.
         A non-null SkImage is returned if format of backendTexture is recognized and supported.
         Recognized formats vary by GPU backend.
-        @param context         GPU context
-        @param backendTexture  texture residing on GPU
-        @param textureOrigin   origin of backendTexture
-        @param colorType       color type of the resulting image
-        @param alphaType       alpha type of the resulting image
-        @param colorSpace      range of colors; may be nullptr
-        @return                created SkImage, or nullptr
          */
         fun adoptFromTexture(
             context: DirectContext,
@@ -158,8 +151,8 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             width: Int,
             height: Int,
             format: Int,
-            origin: SurfaceOrigin,
-            colorType: ColorType,
+            origin: SurfaceOrigin = SurfaceOrigin.TOP_LEFT,
+            colorType: ColorType = ColorType.RGBA_8888,
         ): Image {
             Stats.onNativeCall()
             val ptr = _nAdoptFromTexture(
@@ -172,7 +165,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
                 origin.ordinal,
                 colorType.ordinal,
             )
-            require(ptr != NullPointer) { "Failed to Image::makeFromTexture" }
+            require(ptr != NullPointer) { "Failed to Image::adoptFromTexture" }
             return Image(ptr)
         }
 
