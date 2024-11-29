@@ -138,6 +138,19 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             return Image(ptr)
         }
 
+
+        /** Creates GPU-backed [org.jetbrains.skia.Image] from backendTexture associated with context.
+        Skia will assume ownership of the resource and will release it when no longer needed.
+        A non-null SkImage is returned if format of backendTexture is recognized and supported.
+        Recognized formats vary by GPU backend.
+        @param context         GPU context
+        @param backendTexture  texture residing on GPU
+        @param textureOrigin   origin of backendTexture
+        @param colorType       color type of the resulting image
+        @param alphaType       alpha type of the resulting image
+        @param colorSpace      range of colors; may be nullptr
+        @return                created SkImage, or nullptr
+         */
         fun adoptFromTexture(
             context: DirectContext,
             textureId: Int,
@@ -147,8 +160,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             format: Int,
             origin: SurfaceOrigin,
             colorType: ColorType,
-            alphaType: ColorAlphaType,
-            colorSpace: ColorSpace?
         ): Image {
             Stats.onNativeCall()
             val ptr = _nAdoptFromTexture(
@@ -160,8 +171,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
                 format,
                 origin.ordinal,
                 colorType.ordinal,
-                alphaType.ordinal,
-                colorSpace?._ptr ?: NullPointer
             )
             require(ptr != NullPointer) { "Failed to Image::makeFromTexture" }
             return Image(ptr)
@@ -467,8 +476,6 @@ private external fun _nAdoptFromTexture(
     format: Int,
     surfaceOrigin: Int,
     colorType: Int,
-    alphaType: Int,
-    colorSpacePtr: NativePointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
