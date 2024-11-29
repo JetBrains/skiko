@@ -34,7 +34,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptFromT
         context,
         backendTexture,
         static_cast<GrSurfaceOrigin>(surfaceOrigin),
-        static_cast<SkColorType>(colorType),
+        static_cast<SkColorType>(colorType)
     );
 
     return reinterpret_cast<jlong>(image.release());
