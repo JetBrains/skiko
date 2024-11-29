@@ -18,9 +18,8 @@
 #include "interop.hh"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptFromTexture
-  (JNIEnv* env, jclass jclass, jlong contextPtr, jint textureId, jint target, jint width, jint height, jint format, jint surfaceOrigin, jint colorType, jint alphaType, jlong colorSpacePtr) {
+  (JNIEnv* env, jclass jclass, jlong contextPtr, jint textureId, jint target, jint width, jint height, jint format, jint surfaceOrigin, jint colorType) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(contextPtr));
-    SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
 
     GrGLTextureInfo textureInfo;
     textureInfo.fID = static_cast<GrGLuint>(textureId);
@@ -28,7 +27,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptFromT
     textureInfo.fFormat = static_cast<GrGLenum>(format);
 
     GrBackendTexture backendTexture = GrBackendTextures::MakeGL(
-        width, height, skgpu::Mipmapped::kNo, textureInfo
+        width, height, skgpu::Mipmapped::kYes, textureInfo
     );
 
     sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
@@ -36,14 +35,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptFromT
         backendTexture,
         static_cast<GrSurfaceOrigin>(surfaceOrigin),
         static_cast<SkColorType>(colorType),
-        static_cast<SkAlphaType>(alphaType),
-        sk_ref_sp(colorSpace)
     );
 
-    if (!image) {
-        env->ThrowNew(java::lang::RuntimeException::cls, "Failed to create image from OpenGL texture");
-        return 0;
-    }
     return reinterpret_cast<jlong>(image.release());
 }
 
