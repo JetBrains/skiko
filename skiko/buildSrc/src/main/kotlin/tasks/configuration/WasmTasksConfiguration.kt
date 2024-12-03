@@ -118,7 +118,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     "-O2"
                 )
             )
-            // addAll(listOf("-s", "SUPPORT_LONGJMP=wasm")) // TODO(o.karpovich): enable when skia is built with this flag (CMP-6628)
+            addAll(listOf("-s", "SUPPORT_LONGJMP=wasm"))
             if (outputES6) {
                 addAll(
                     listOf(
