@@ -5,6 +5,8 @@ import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.useContents
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
@@ -12,6 +14,8 @@ import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MacOsMetalContextHandler
+import platform.AppKit.NSWindowDidChangeOcclusionStateNotification
+import platform.AppKit.NSWindowOcclusionStateVisible
 import platform.CoreGraphics.CGColorCreate
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGContextRef
@@ -26,6 +30,11 @@ import platform.QuartzCore.kCALayerHeightSizable
 import platform.QuartzCore.kCALayerWidthSizable
 import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
+import platform.Foundation.NSNotification
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSOperationQueue
+import platform.darwin.NSObjectProtocol
+import kotlin.concurrent.Volatile
 
 /**
  * Metal [Redrawer] implementation for MacOs.
@@ -43,9 +52,24 @@ internal class MacOsMetalRedrawer(
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
+    private val occlusionObserver: NSObjectProtocol
+    private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
+    @Volatile private var isWindowOccluded = false
 
     init {
         metalLayer.init(skiaLayer, contextHandler, device)
+
+        val window = skiaLayer.nsView.window!!
+        occlusionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+            name = NSWindowDidChangeOcclusionStateNotification,
+            `object` = window,
+            queue = NSOperationQueue.mainQueue,
+            usingBlock = { notification: NSNotification? ->
+                val isOccluded = window.occlusionState and NSWindowOcclusionStateVisible == 0uL
+                isWindowOccluded = isOccluded
+                windowOcclusionStateChannel.trySend(isOccluded)
+            }
+        )
     }
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
@@ -72,6 +96,7 @@ internal class MacOsMetalRedrawer(
     override fun dispose() {
         if (!isDisposed) {
             metalLayer.dispose()
+            NSNotificationCenter.defaultCenter.removeObserver(occlusionObserver)
             isDisposed = true
         }
     }
@@ -115,15 +140,28 @@ internal class MacOsMetalRedrawer(
      */
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        draw()
-    }
-
-    private fun draw() {
-        // TODO: maybe make flush async as in JVM version.
         autoreleasepool {
             if (!isDisposed) {
                 skiaLayer.update(getTimeNanos())
                 contextHandler.draw()
+            }
+        }
+    }
+
+    private suspend fun draw() {
+        autoreleasepool {
+            if (!isDisposed) {
+                skiaLayer.update(getTimeNanos())
+                contextHandler.draw()
+            }
+        }
+
+        // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
+        if (isWindowOccluded) {
+            withTimeoutOrNull(300) {
+                // If the window becomes non-occluded, stop waiting immediately
+                @Suppress("ControlFlowWithEmptyBody")
+                while (windowOcclusionStateChannel.receive()) { }
             }
         }
     }
