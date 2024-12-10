@@ -117,7 +117,12 @@ fun SkikoProjectContext.compileNativeBridgesTask(
             OS.MacOS -> {
                 flags.set(listOf(
                     *buildType.clangFlags,
-                    *skiaPreprocessorFlags(OS.MacOS, buildType)
+                    *skiaPreprocessorFlags(OS.MacOS, buildType),
+                    when(arch) {
+                        Arch.Arm64 -> "-arch arm64"
+                        Arch.X64 -> "-arch x86_64"
+                        else -> error("Unexpected arch: $arch for $os")
+                    }
                 ))
             }
             OS.Linux -> {
