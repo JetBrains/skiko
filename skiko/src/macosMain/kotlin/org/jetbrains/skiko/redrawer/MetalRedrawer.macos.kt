@@ -6,7 +6,6 @@ import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
@@ -158,11 +157,9 @@ internal class MacOsMetalRedrawer(
 
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
         if (isWindowOccluded) {
-            withTimeoutOrNull(300) {
-                // If the window becomes non-occluded, stop waiting immediately
-                @Suppress("ControlFlowWithEmptyBody")
-                while (windowOcclusionStateChannel.receive()) { }
-            }
+            // If the window becomes non-occluded, stop waiting immediately
+            @Suppress("ControlFlowWithEmptyBody")
+            while (windowOcclusionStateChannel.receive()) { }
         }
     }
 

@@ -140,11 +140,9 @@ internal class MetalRedrawer(
 
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
         if (isWindowOccluded) {
-            withTimeoutOrNull(300) {
-                // If the window becomes non-occluded, stop waiting immediately
-                @Suppress("ControlFlowWithEmptyBody")
-                while (windowOcclusionStateChannel.receive()) { }
-            }
+            // If the window becomes non-occluded, stop waiting immediately
+            @Suppress("ControlFlowWithEmptyBody")
+            while (windowOcclusionStateChannel.receive()) { }
         }
     }
 
