@@ -74,7 +74,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                     Arch.Arm64 -> arrayOf(
                         "-target", if (isUikitSim) "arm64-apple-ios-simulator" else "arm64-apple-ios",
                         "-isysroot", if (isUikitSim) iphoneSimSdk else iphoneOsSdk,
-                        if (isUikitSim) "-mios-simulator-version-min=12.0" else "-miphoneos-version-min=12.0"
+                        if (isUikitSim) "-mios-simulator-version-min=12.0" else "-mios-version-min=12.0"
                     )
                     Arch.X64 -> arrayOf(
                         "-target", "x86_64-apple-ios-simulator",
