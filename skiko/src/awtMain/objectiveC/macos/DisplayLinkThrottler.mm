@@ -88,7 +88,14 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
             [weakSelf onScreenDidChange];
         }];
 
-        [self onScreenDidChange];
+        if (NSThread.currentThread.isMainThread) {
+            [self onScreenDidChange];
+        } else {
+            // In case of OpenJDK, EDT thread != NSThread main thread
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self onScreenDidChange];
+            });
+        }
     }
 
     return self;

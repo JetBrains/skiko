@@ -115,6 +115,24 @@ static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawe
     return onOcclusionStateChanged;
 }
 
+
+static void setWindowPropertiesUnsafe(NSWindow* window, jboolean transparency) {
+    if (transparency) {
+        window.hasShadow = NO;
+    }
+}
+
+static void setWindowProperties(NSWindow* window, jboolean transparency) {
+    if (NSThread.currentThread.isMainThread) {
+        setWindowPropertiesUnsafe(window, transparency);
+    } else {
+        // In case of OpenJDK, EDT thread != NSThread main thread
+        dispatch_sync(dispatch_get_main_queue(), ^{
+        setWindowPropertiesUnsafe(window, transparency);
+        });
+    }
+}
+
 extern "C"
 {
 
@@ -161,10 +179,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         device.inflightSemaphore = dispatch_semaphore_create(device.layer.maximumDrawableCount);
 
         NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
-
-        if (transparency) {
-            window.hasShadow = NO;
-        }
+        setWindowProperties(window, transparency);
 
         jmethodID onOcclusionStateChanged = getOnOcclusionStateChangedMethodID(env, redrawer);
         device.occlusionObserver =
