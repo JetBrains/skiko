@@ -127,8 +127,9 @@ static void setWindowProperties(NSWindow* window, jboolean transparency) {
         setWindowPropertiesUnsafe(window, transparency);
     } else {
         // In case of OpenJDK, EDT thread != NSThread main thread
+        __weak NSWindow *weakWindow = window;
         dispatch_sync(dispatch_get_main_queue(), ^{
-        setWindowPropertiesUnsafe(window, transparency);
+            setWindowPropertiesUnsafe(weakWindow, transparency);
         });
     }
 }
