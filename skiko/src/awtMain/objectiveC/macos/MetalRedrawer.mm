@@ -117,6 +117,7 @@ static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawe
 
 
 static void setWindowPropertiesUnsafe(NSWindow* window, jboolean transparency) {
+    if (window == NULL) return;
     if (transparency) {
         window.hasShadow = NO;
     }
