@@ -88,7 +88,25 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
             [weakSelf onScreenDidChange];
         }];
 
-        [self onScreenDidChange];
+        if (NSThread.currentThread.isMainThread) {
+            [self onScreenDidChange];
+        } else {
+            // In case of OpenJDK, EDT thread != NSThread main thread
+            // There is one thing we should keep in mind. Postponing creation of vsync throttler will cause that for sometime there won't be any waiting:
+            //
+            // ```
+            // create window
+            // (10x) schedule render -> render
+            // onScreenDidChange
+            // schedule render -> wait vsync -> render
+            // ```
+            //
+            // It is probably okay, but possible alternative would be to wait for throttler creation. It is difficult, so we can just keep the current code.
+            __weak DisplayLinkThrottler *weakSelf = self;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf onScreenDidChange];
+            });
+        }
     }
 
     return self;
