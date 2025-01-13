@@ -8,6 +8,7 @@ import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
 import java.awt.Component
+import java.awt.Point
 import java.awt.event.*
 import java.awt.geom.AffineTransform
 import java.awt.im.InputMethodRequests
@@ -20,7 +21,6 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
-import kotlin.math.ceil
 import kotlin.math.floor
 
 actual open class SkiaLayer internal constructor(
@@ -138,12 +138,34 @@ actual open class SkiaLayer internal constructor(
         add(backedLayer)
 
         addAncestorListener(object : AncestorListener {
-            override fun ancestorAdded(event: AncestorEvent?) = Unit
 
-            override fun ancestorRemoved(event: AncestorEvent?) = Unit
+            private var positionInWindow: Point? = null
+
+            private val zeroPoint = Point(0, 0)
+
+            private fun computePositionInWindow(): Point? {
+                val window = SwingUtilities.getWindowAncestor(this@SkiaLayer)
+                return if (window == null) {
+                    null
+                } else {
+                    SwingUtilities.convertPoint(this@SkiaLayer, zeroPoint, window)
+                }
+            }
+
+            override fun ancestorAdded(event: AncestorEvent?) {
+                positionInWindow = computePositionInWindow()
+            }
+
+            override fun ancestorRemoved(event: AncestorEvent?) {
+                positionInWindow = null
+            }
 
             override fun ancestorMoved(event: AncestorEvent?) {
-                revalidate()
+                val newPosition = computePositionInWindow()
+                if ((positionInWindow != null) && (positionInWindow != newPosition)) {
+                    revalidate()
+                }
+                positionInWindow = newPosition
             }
         })
 
@@ -189,7 +211,6 @@ actual open class SkiaLayer internal constructor(
         checkShowing()
         init(isInited)
     }
-
 
     actual fun detach() {
         dispose()

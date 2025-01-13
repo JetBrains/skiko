@@ -1,13 +1,9 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.*
+import org.jetbrains.skia.*
 import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.Paint
-import org.jetbrains.skia.Rect
 import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
@@ -24,9 +20,8 @@ import org.junit.Assume.assumeTrue
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
-import java.awt.BorderLayout
+import java.awt.*
 import java.awt.Color
-import java.awt.Dimension
 import java.awt.event.*
 import javax.swing.Box
 import javax.swing.JFrame
@@ -938,6 +933,37 @@ class SkiaLayerTest {
             screenshots.assert(window.bounds)
         } finally {
             window.close()
+        }
+    }
+
+    @Test
+    fun `content not relaid out on window move`() = uiTest {
+        var layoutCount = 0
+
+        val window = UiTestWindow {
+            contentPane.layout = object: BorderLayout() {
+                override fun layoutContainer(parent: Container?) {
+                    super.layoutContainer(parent)
+                    layoutCount++
+                }
+            }
+            contentPane.add(layer)
+        }
+        window.size = Dimension(400, 400)
+        window.isVisible = true
+
+        repeat(20) {
+            window.location = window.location.let {
+                java.awt.Point(it.x + 10, it.y + 10)
+            }
+            delay(50)
+        }
+
+        // Ideally, layoutCount would be just 1, but Swing appears to call layout one extra time, so it ends up being 2.
+        // Compare to 3 just to avoid a false-failure if there's another layout for whatever reason.
+        // What we're interested to validate is that there's no layout occurring on every window move.
+        assert(layoutCount <= 3) {
+            "Layout count: $layoutCount"
         }
     }
 
