@@ -21,14 +21,14 @@ internal actual fun PictureFilterCanvas.doInit(ptr: NativePointer) {
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureFilterCanvas__1nInit")
 internal external fun PictureFilterCanvas_nInit(ptr: NativePointer, onFilter: InteropPointer)
 
-@ExternalSymbolName("org_jetbrains_skia_SkikoPictureFilterCanvas__1nGetOnDrawPicture_picture")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_SkikoPictureFilterCanvas__1nGetOnDrawPicture_picture")
+@ExternalSymbolName("org_jetbrains_skia_PictureFilterCanvas__1nGetOnDrawPicture_picture")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureFilterCanvas__1nGetOnDrawPicture_picture")
 internal external fun PictureFilterCanvas_nGetOnDrawPicture_picture(ptr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_SkikoPictureFilterCanvas__1nGetOnDrawPicture_matrix")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_SkikoPictureFilterCanvas__1nGetOnDrawPicture_matrix")
+@ExternalSymbolName("org_jetbrains_skia_PictureFilterCanvas__1nGetOnDrawPicture_matrix")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureFilterCanvas__1nGetOnDrawPicture_matrix")
 internal external fun PictureFilterCanvas_nGetOnDrawPicture_matrix(ptr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_SkikoPictureFilterCanvas__1nGetOnDrawPicture_paint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_SkikoPictureFilterCanvas__1nGetOnDrawPicture_paint")
+@ExternalSymbolName("org_jetbrains_skia_PictureFilterCanvas__1nGetOnDrawPicture_paint")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureFilterCanvas__1nGetOnDrawPicture_paint")
 internal external fun PictureFilterCanvas_nGetOnDrawPicture_paint(ptr: NativePointer): NativePointer
