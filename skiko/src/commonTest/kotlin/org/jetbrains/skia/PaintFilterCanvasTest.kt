@@ -32,5 +32,7 @@ class PaintFilterCanvasTest {
 
         assertTrue(called)
         assertEquals(Color.RED, pixels.getColor(2, 2))
+
+        surface.close()
     }
 }
