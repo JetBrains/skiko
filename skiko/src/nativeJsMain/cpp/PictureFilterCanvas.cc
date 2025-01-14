@@ -37,31 +37,31 @@ protected:
     }
 };
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_SkikoPictureFilterCanvas__1nMake
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_PictureFilterCanvas__1nMake
   (SkCanvas* canvas) {
     SkikoPictureFilterCanvas* filterCanvas = new SkikoPictureFilterCanvas(canvas);
     return reinterpret_cast<KNativePointer>(filterCanvas);
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_SkikoPictureFilterCanvas__1nInit
+SKIKO_EXPORT void org_jetbrains_skia_PictureFilterCanvas__1nInit
   (KNativePointer canvasPtr, KInteropPointer onDrawPicture) {
     SkikoPictureFilterCanvas* canvas = reinterpret_cast<SkikoPictureFilterCanvas*>(canvasPtr);
     canvas->_onDrawPicture = KBooleanCallback(onDrawPicture);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_SkikoPictureFilterCanvas__1nGetOnDrawPicture_picture
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_PictureFilterCanvas__1nGetOnDrawPicture_picture
   (KNativePointer canvasPtr) {
     SkikoPictureFilterCanvas* canvas = reinterpret_cast<SkikoPictureFilterCanvas*>(canvasPtr);
     return reinterpret_cast<KNativePointer>(const_cast<SkPicture *>(canvas->_onDrawPicture_picture));
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_SkikoPictureFilterCanvas__1nGetOnDrawPicture_matrix
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_PictureFilterCanvas__1nGetOnDrawPicture_matrix
   (KNativePointer canvasPtr) {
     SkikoPictureFilterCanvas* canvas = reinterpret_cast<SkikoPictureFilterCanvas*>(canvasPtr);
     return reinterpret_cast<KNativePointer>(const_cast<SkMatrix *>(canvas->_onDrawPicture_matrix));
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_SkikoPictureFilterCanvas__1nGetOnDrawPicture_paint
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_PictureFilterCanvas__1nGetOnDrawPicture_paint
   (KNativePointer canvasPtr) {
     SkikoPictureFilterCanvas* canvas = reinterpret_cast<SkikoPictureFilterCanvas*>(canvasPtr);
     return reinterpret_cast<KNativePointer>(const_cast<SkPaint *>(canvas->_onDrawPicture_paint));
