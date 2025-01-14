@@ -1974,10 +1974,8 @@ $dokka.location:org.jetbrains.skia/Paint/strokeCap/#/PointingToDeclaration/skik
 $dokka.location:org.jetbrains.skia/Paint/strokeJoin/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/stroke-join.html
 $dokka.location:org.jetbrains.skia/Paint/strokeMiter/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/stroke-miter.html
 $dokka.location:org.jetbrains.skia/Paint/strokeWidth/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/stroke-width.html
-$dokka.location:org.jetbrains.skia/PaintFilterCanvas.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-paint-filter-canvas/-companion/index.html
 $dokka.location:org.jetbrains.skia/PaintFilterCanvas///PointingToDeclaration/skiko/org.jetbrains.skia/-paint-filter-canvas/index.html
 $dokka.location:org.jetbrains.skia/PaintFilterCanvas/PaintFilterCanvas/#org.jetbrains.skia.Canvas#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-filter-canvas/-paint-filter-canvas.html
-$dokka.location:org.jetbrains.skia/PaintFilterCanvas/onFilter/#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-filter-canvas/on-filter.html
 $dokka.location:org.jetbrains.skia/PaintFilterCanvas/onFilter/#org.jetbrains.skia.impl.NativePointer/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-filter-canvas/on-filter.html
 $dokka.location:org.jetbrains.skia/PaintMode.FILL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-mode/-f-i-l-l/index.html
 $dokka.location:org.jetbrains.skia/PaintMode.STROKE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-mode/-s-t-r-o-k-e/index.html
@@ -2210,6 +2208,9 @@ $dokka.location:org.jetbrains.skia/Picture/makeShader/#org.jetbrains.skia.Filter
 $dokka.location:org.jetbrains.skia/Picture/playback/#org.jetbrains.skia.Canvas?#kotlin.Function0[kotlin.Boolean]?/PointingToDeclaration/skiko/org.jetbrains.skia/-picture/playback.html
 $dokka.location:org.jetbrains.skia/Picture/serializeToData/#/PointingToDeclaration/skiko/org.jetbrains.skia/-picture/serialize-to-data.html
 $dokka.location:org.jetbrains.skia/Picture/uniqueId/#/PointingToDeclaration/skiko/org.jetbrains.skia/-picture/unique-id.html
+$dokka.location:org.jetbrains.skia/PictureFilterCanvas///PointingToDeclaration/skiko/org.jetbrains.skia/-picture-filter-canvas/index.html
+$dokka.location:org.jetbrains.skia/PictureFilterCanvas/PictureFilterCanvas/#org.jetbrains.skia.Canvas/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-filter-canvas/-picture-filter-canvas.html
+$dokka.location:org.jetbrains.skia/PictureFilterCanvas/onDrawPicture/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-filter-canvas/on-draw-picture.html
 $dokka.location:org.jetbrains.skia/PictureRecorder.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/-companion/index.html
 $dokka.location:org.jetbrains.skia/PictureRecorder///PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/index.html
 $dokka.location:org.jetbrains.skia/PictureRecorder/PictureRecorder/#/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/-picture-recorder.html
