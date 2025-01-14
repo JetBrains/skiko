@@ -10,6 +10,7 @@
 #include "SkMatrix.h"
 #include "SkM44.h"
 #include "SkPaint.h"
+#include "SkPicture.h"
 #include "SkRefCnt.h"
 #include "SkRect.h"
 #include "SkRRect.h"
@@ -267,6 +268,15 @@ namespace skija {
         void onLoad(JNIEnv* env);
         void onUnload(JNIEnv* env);
         bool onFilter(jobject obj, SkPaint& paint);
+        jobject attach(JNIEnv* env, jobject obj);
+        void detach(jobject obj);
+    }
+
+    namespace PictureFilterCanvas {
+        extern jmethodID onDrawPictureId;
+        void onLoad(JNIEnv* env);
+        void onUnload(JNIEnv* env);
+        bool onDrawPicture(jobject obj, const SkPicture* picture, const SkMatrix* matrix, const SkPaint* paint);
         jobject attach(JNIEnv* env, jobject obj);
         void detach(jobject obj);
     }

@@ -5,14 +5,14 @@
 #include "SkPaintFilterCanvas.h"
 #include "interop.hh"
 
-class SkijaPaintFilterCanvas : public SkPaintFilterCanvas {
+class SkikoPaintFilterCanvas : public SkPaintFilterCanvas {
 public:
-    SkijaPaintFilterCanvas(
+    SkikoPaintFilterCanvas(
         SkCanvas* canvas,
         bool unrollDrawable
     ) : SkPaintFilterCanvas(canvas), unrollDrawable(unrollDrawable) {}
 
-    virtual ~SkijaPaintFilterCanvas() {
+    virtual ~SkikoPaintFilterCanvas() {
         skija::PaintFilterCanvas::detach(jobj);
     }
 
@@ -37,13 +37,13 @@ private:
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintFilterCanvas_1jvmKt_PaintFilterCanvas_1nInit
   (JNIEnv* env, jclass jclass, jobject jobj, jlong canvasPtr) {
-    SkijaPaintFilterCanvas* canvas = reinterpret_cast<SkijaPaintFilterCanvas*>(static_cast<uintptr_t>(canvasPtr));
+    SkikoPaintFilterCanvas* canvas = reinterpret_cast<SkikoPaintFilterCanvas*>(static_cast<uintptr_t>(canvasPtr));
     canvas->jobj = skija::PaintFilterCanvas::attach(env, jobj);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintFilterCanvasKt_PaintFilterCanvas_1nMake
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jboolean unrollDrawable) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
-    SkijaPaintFilterCanvas* filterCanvas = new SkijaPaintFilterCanvas(canvas, unrollDrawable);
+    SkikoPaintFilterCanvas* filterCanvas = new SkikoPaintFilterCanvas(canvas, unrollDrawable);
     return reinterpret_cast<jlong>(filterCanvas);
 }

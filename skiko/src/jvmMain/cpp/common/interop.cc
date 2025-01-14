@@ -653,6 +653,39 @@ namespace skija {
         }
     }
 
+    namespace PictureFilterCanvas {
+        JavaVM* _vm;
+        jmethodID onDrawPictureId;
+
+        void onLoad(JNIEnv* env) {
+            env->GetJavaVM(&_vm);
+            jclass local = env->FindClass("org/jetbrains/skia/PictureFilterCanvas");
+            onDrawPictureId = env->GetMethodID(local, "onDrawPicture", "(JJJ)Z");
+        }
+
+        void onUnload(JNIEnv* env) {
+        }
+
+        bool onDrawPicture(jobject obj, const SkPicture* picture, const SkMatrix* matrix, const SkPaint* paint) {
+            JNIEnv *env;
+            _vm->AttachCurrentThread(AS_JNI_ENV_PTR(&env), NULL);
+            jboolean result = env->CallBooleanMethod(obj, onDrawPictureId, reinterpret_cast<jlong>(picture), reinterpret_cast<jlong>(matrix), reinterpret_cast<jlong>(paint));
+            _vm->DetachCurrentThread();
+            return result;
+        }
+
+        jobject attach(JNIEnv* env, jobject obj) {
+            return env->NewGlobalRef(obj);
+        }
+
+        void detach(jobject obj) {
+            JNIEnv *env;
+            _vm->AttachCurrentThread(AS_JNI_ENV_PTR(&env), NULL);
+            env->DeleteGlobalRef(obj);
+            _vm->DetachCurrentThread();
+        }
+    }
+
     namespace Rect {
         jclass cls;
         jmethodID makeLTRB;
@@ -897,6 +930,7 @@ namespace skija {
         PathSegment::onLoad(env);
         Point::onLoad(env);
         PaintFilterCanvas::onLoad(env);
+        PictureFilterCanvas::onLoad(env);
         Rect::onLoad(env);
         RRect::onLoad(env);
         RSXform::onLoad(env);
@@ -909,6 +943,7 @@ namespace skija {
         RRect::onUnload(env);
         Rect::onUnload(env);
         PaintFilterCanvas::onUnload(env);
+        PictureFilterCanvas::onUnload(env);
         Point::onUnload(env);
         PathSegment::onUnload(env);
         Path::onUnload(env);

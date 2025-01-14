@@ -3,7 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
-class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
+class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     companion object {
         /**
          * Recreates Picture that was serialized into data. Returns constructed Picture
