@@ -1,14 +1,14 @@
 #include <SkNWayCanvas.h>
-#include "RenderNode.h"
-#include "RenderNodeManager.h"
+#include "node/RenderNode.h"
+#include "node/RenderNodeManager.h"
 
 namespace skiko {
 namespace node {
 
 class SkikoPictureFilterCanvas : public SkNWayCanvas {
 public:
-    SkikoPictureFilterCanvas(RenderNodeManager * manager, SkCanvas* canvas) :
-        SkNWayCanvas(canvas->imageInfo().width(), canvas->imageInfo().height()),
+    SkikoPictureFilterCanvas(RenderNodeManager * manager, SkCanvas* canvas)
+      : SkNWayCanvas(canvas->imageInfo().width(), canvas->imageInfo().height()),
         manager(manager) {
         this->addCanvas(canvas);
     }
@@ -24,6 +24,14 @@ protected:
 private:
     RenderNodeManager * manager;
 };
+
+RenderNodeManager::RenderNodeManager(bool measureDrawBounds)
+    : measureDrawBounds(measureDrawBounds) {
+}
+
+bool RenderNodeManager::shouldMeasureDrawBounds() const {
+    return this->measureDrawBounds;
+}
 
 void RenderNodeManager::setLightingInfo(
     const LightGeometry& lightGeometry,
@@ -43,10 +51,6 @@ void RenderNodeManager::registerPlaceholder(SkPicture *picture, RenderNode *rend
 
 void RenderNodeManager::unregisterPlaceholder(SkPicture *picture) {
   this->placeholders.erase(picture->uniqueID());
-}
-
-void RenderNodeManager::drawRenderNode(SkCanvas *canvas, RenderNode *renderNode) {
-    renderNode->drawPlaceholder(canvas);
 }
 
 bool RenderNodeManager::drawPlaceholder(SkCanvas *canvas, const SkPicture *picture) {

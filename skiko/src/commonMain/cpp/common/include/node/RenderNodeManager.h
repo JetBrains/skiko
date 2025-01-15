@@ -11,6 +11,10 @@ class RenderNode;
 
 class RenderNodeManager {
 public:
+    RenderNodeManager(bool measureDrawBounds);
+
+    bool shouldMeasureDrawBounds() const;
+
     void setLightingInfo(
         const LightGeometry& lightGeometry,
         const LightInfo& lightInfo
@@ -21,7 +25,6 @@ public:
     void registerPlaceholder(SkPicture *picture, RenderNode *renderNode);
     void unregisterPlaceholder(SkPicture *picture);
 
-    void drawRenderNode(SkCanvas *canvas, RenderNode *renderNode);
     bool drawPlaceholder(SkCanvas *canvas, const SkPicture* picture);
 
 private:
@@ -30,6 +33,7 @@ private:
 
     LightGeometry lightGeometry;
     LightInfo lightInfo;
+    bool measureDrawBounds;
 };
 
 } // namespace node

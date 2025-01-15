@@ -1,4 +1,6 @@
 #pragma once
+#include <SkCanvas.h>
+#include <SkBBHFactory.h>
 #include <SkM44.h>
 #include <SkPicture.h>
 #include <SkPictureRecorder.h>
@@ -20,7 +22,8 @@ public:
     void drawContent(SkCanvas *canvas);
 private:
     RenderNodeManager *manager;
-    SkPictureRecorder *recorder;
+    SkBBHFactory *bbhFactory;
+    SkPictureRecorder recorder;
     sk_sp<SkPicture> placeholder;
     sk_sp<SkPicture> picture;
     SkM44 matrix;

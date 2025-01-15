@@ -6,18 +6,18 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 
-class RenderNodeManager internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
+class RenderNodeManager internal constructor(ptr: NativePointer) : Managed(ptr, FinalizerPointer) {
     private companion object {
+        private val FinalizerPointer: NativePointer
         init {
             staticLoad()
+            FinalizerPointer = RenderNodeManager_nGetFinalizer()
         }
     }
 
-    private object _FinalizerHolder {
-        val PTR = RenderNodeManager_nGetFinalizer()
-    }
-
-    constructor() : this(RenderNodeManager_nMake()) {
+    constructor(
+        measureDrawBounds: Boolean = false,
+    ) : this(RenderNodeManager_nMake(measureDrawBounds)) {
         Stats.onNativeCall()
     }
 
@@ -31,7 +31,15 @@ class RenderNodeManager internal constructor(ptr: NativePointer) : Managed(ptr, 
     ) {
         try {
             Stats.onNativeCall()
-            _nSetLightingInfo(_ptr, centerX, centerY, centerZ, radius, ambientShadowAlpha, spotShadowAlpha)
+            RenderNodeManager_nSetLightingInfo(
+                ptr = _ptr,
+                centerX = centerX,
+                centerY = centerY,
+                centerZ = centerZ,
+                radius = radius,
+                ambientShadowAlpha = ambientShadowAlpha,
+                spotShadowAlpha = spotShadowAlpha
+            )
         } finally {
             reachabilityBarrier(this)
         }
@@ -50,7 +58,7 @@ class RenderNodeManager internal constructor(ptr: NativePointer) : Managed(ptr, 
         return try {
             Stats.onNativeCall()
             Canvas(
-                ptr = _nCreateRenderNodeCanvas(_ptr, getPtr(canvas)),
+                ptr = RenderNodeManager_nCreateRenderNodeCanvas(_ptr, getPtr(canvas)),
                 managed = true,
                 _owner = this
             )
@@ -60,18 +68,18 @@ class RenderNodeManager internal constructor(ptr: NativePointer) : Managed(ptr, 
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeManager__nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeManager__nMake")
-private external fun RenderNodeManager_nMake(): NativePointer
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_1nMake")
+private external fun RenderNodeManager_nMake(measureDrawBounds: Boolean): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeManager__nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeManager__nGetFinalizer")
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_1nGetFinalizer")
 private external fun RenderNodeManager_nGetFinalizer(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeManager__nSetLightingInfo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeManager__nSetLightingInfo")
-private external fun _nSetLightingInfo(ptr: NativePointer, centerX: Float, centerY: Float, centerZ: Float, radius: Float, ambientShadowAlpha: Float, spotShadowAlpha: Float)
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_1nSetLightingInfo")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_1nSetLightingInfo")
+private external fun RenderNodeManager_nSetLightingInfo(ptr: NativePointer, centerX: Float, centerY: Float, centerZ: Float, radius: Float, ambientShadowAlpha: Float, spotShadowAlpha: Float)
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeManager__nCreateRenderNodeCanvas")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeManager__nCreateRenderNodeCanvas")
-private external fun _nCreateRenderNodeCanvas(ptr: NativePointer, canvas: NativePointer): NativePointer
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_1nCreateRenderNodeCanvas")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeManager_RenderNodeManager_1nCreateRenderNodeCanvas")
+private external fun RenderNodeManager_nCreateRenderNodeCanvas(ptr: NativePointer, canvas: NativePointer): NativePointer
