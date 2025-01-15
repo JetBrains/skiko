@@ -19,7 +19,7 @@ import kotlin.collections.HashSet
 
 abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
     @get:Internal
-    open val srcExtensions: Array<String> = arrayOf("cc")
+    open val srcExtensions: Array<String> = arrayOf("cc", "cpp")
 
     @get:Internal
     open val headerExtensions: Array<String> = arrayOf("h", "hh")
