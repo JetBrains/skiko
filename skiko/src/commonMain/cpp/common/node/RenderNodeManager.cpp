@@ -37,10 +37,6 @@ SkCanvas * RenderNodeManager::createRenderNodeCanvas(SkCanvas *canvas) {
     return new SkikoPictureFilterCanvas(this, canvas);
 }
 
-void RenderNodeManager::releaseRenderNodeCanvas(SkCanvas *canvas) {
-    delete canvas;
-}
-
 void RenderNodeManager::registerPlaceholder(SkPicture *picture, RenderNode *renderNode) {
     this->placeholders[picture->uniqueID()] = renderNode;
 }
