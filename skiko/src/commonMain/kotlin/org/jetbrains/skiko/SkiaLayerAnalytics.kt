@@ -42,6 +42,8 @@ interface SkiaLayerAnalytics {
         fun contextInit() = Unit
         fun beforeFirstFrameRender() = Unit
         fun afterFirstFrameRender() = Unit
+        fun beforeFrameRender() = Unit
+        fun afterFrameRender() = Unit
 
         companion object {
             val Empty = object : DeviceAnalytics {}
