@@ -22,15 +22,11 @@ protected:
     }
 
 private:
-    RenderNodeManager * manager;
+    RenderNodeManager *manager;
 };
 
 RenderNodeManager::RenderNodeManager(bool measureDrawBounds)
     : measureDrawBounds(measureDrawBounds) {
-}
-
-bool RenderNodeManager::shouldMeasureDrawBounds() const {
-    return this->measureDrawBounds;
 }
 
 void RenderNodeManager::setLightingInfo(
@@ -50,7 +46,7 @@ void RenderNodeManager::registerPlaceholder(SkPicture *picture, RenderNode *rend
 }
 
 void RenderNodeManager::unregisterPlaceholder(SkPicture *picture) {
-  this->placeholders.erase(picture->uniqueID());
+    this->placeholders.erase(picture->uniqueID());
 }
 
 bool RenderNodeManager::drawPlaceholder(SkCanvas *canvas, const SkPicture *picture) {

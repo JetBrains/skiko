@@ -3,7 +3,6 @@ package org.jetbrains.skiko.node
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 /**
  * <p>RenderNode is used to build hardware accelerated rendering hierarchies. Each RenderNode
@@ -30,6 +29,23 @@ class RenderNode internal constructor(ptr: NativePointer) : Managed(ptr, Finaliz
     constructor(manager: RenderNodeManager) : this(RenderNode_nMake(getPtr(manager))) {
         Stats.onNativeCall()
     }
+
+    var layerPaint: Paint?
+        get() = try {
+            Stats.onNativeCall()
+            val ptr = RenderNode_nGetLayerPaint(_ptr)
+            if (ptr == NullPointer) null else Paint(ptr, false)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetLayerPaint(_ptr, getPtr(value))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(value)
+        }
+
 
     var bounds: Rect
         get() = try {
@@ -171,36 +187,6 @@ class RenderNode internal constructor(ptr: NativePointer) : Managed(ptr, Finaliz
             reachabilityBarrier(this)
         }
 
-    var blendMode: BlendMode
-        get() = try {
-            Stats.onNativeCall()
-            BlendMode.entries[RenderNode_nGetBlendMode(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetBlendMode(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
-
-    var colorFilter: ColorFilter?
-        get() = try {
-            Stats.onNativeCall()
-            val colorFilterPtr = RenderNode_nGetColorFilter(_ptr)
-            if (colorFilterPtr == NullPointer) null else ColorFilter(colorFilterPtr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetColorFilter(_ptr,getPtr(value))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(value)
-        }
-
     var rotationX: Float
         get() = try {
             Stats.onNativeCall()
@@ -257,26 +243,42 @@ class RenderNode internal constructor(ptr: NativePointer) : Managed(ptr, Finaliz
             reachabilityBarrier(this)
         }
 
-    /**
-     * Gets the current transform matrix.
-     */
-    val matrix: Matrix44
+    fun setClipRect(r: Rect) {
+        Stats.onNativeCall()
+        RenderNode_nSetClipRect(_ptr, r.left, r.top, r.right, r.bottom)
+    }
+
+    fun setClipRRect(r: RRect) {
+        Stats.onNativeCall()
+        interopScope {
+            RenderNode_nSetClipRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size)
+        }
+    }
+
+    fun setClipPath(p: Path?) {
+        try {
+            Stats.onNativeCall()
+            RenderNode_nSetClipPath(_ptr, getPtr(p))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(p)
+        }
+    }
+
+    var clip: Boolean
         get() = try {
             Stats.onNativeCall()
-            Matrix44.fromInteropPointer { RenderNode_nGetMatrix(_ptr, it) }
+            RenderNode_nGetClip(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetClip(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }
 
-    /**
-     * Starts recording a display list for the render node. All
-     * operations performed on the returned canvas are recorded and
-     * stored in this display list.
-     *
-     * [endRecording] must be called when the recording is finished in order to apply
-     * the updated display list.
-     *
-     */
     fun beginRecording(): Canvas {
         return try {
             Stats.onNativeCall()
@@ -290,9 +292,6 @@ class RenderNode internal constructor(ptr: NativePointer) : Managed(ptr, Finaliz
         }
     }
 
-    /**
-     * Ends the recording for this display list.
-     */
     fun endRecording() {
         try {
             Stats.onNativeCall()
@@ -319,6 +318,14 @@ private external fun RenderNode_nMake(manager: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetFinalizer")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNode_RenderNode_1nGetFinalizer")
 private external fun RenderNode_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")
+private external fun RenderNode_nGetLayerPaint(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetLayerPaint")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetLayerPaint")
+private external fun RenderNode_nSetLayerPaint(ptr: NativePointer, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds")
@@ -400,22 +407,6 @@ private external fun RenderNode_nGetSpotShadowColor(ptr: NativePointer): Int
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetSpotShadowColor")
 private external fun RenderNode_nSetSpotShadowColor(ptr: NativePointer, color: Int)
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBlendMode")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBlendMode")
-private external fun RenderNode_nGetBlendMode(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBlendMode")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBlendMode")
-private external fun RenderNode_nSetBlendMode(ptr: NativePointer, mode: Int)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetColorFilter")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetColorFilter")
-private external fun RenderNode_nGetColorFilter(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetColorFilter")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetColorFilter")
-private external fun RenderNode_nSetColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer)
-
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationX")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationX")
 private external fun RenderNode_nGetRotationX(ptr: NativePointer): Float
@@ -448,9 +439,25 @@ private external fun RenderNode_nGetCameraDistance(ptr: NativePointer): Float
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetCameraDistance")
 private external fun RenderNode_nSetCameraDistance(ptr: NativePointer, distance: Float)
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetMatrix")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetMatrix")
-private external fun RenderNode_nGetMatrix(ptr: NativePointer, matrix: InteropPointer)
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect")
+private external fun RenderNode_nSetClipRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect")
+private external fun RenderNode_nSetClipRRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, radii: InteropPointer, radiiSize: Int)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath")
+private external fun RenderNode_nSetClipPath(ptr: NativePointer, pathPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip")
+private external fun RenderNode_nGetClip(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClip")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClip")
+private external fun RenderNode_nSetClip(ptr: NativePointer, clip: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nBeginRecording")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nBeginRecording")

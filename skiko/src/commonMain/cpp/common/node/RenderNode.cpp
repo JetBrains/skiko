@@ -1,3 +1,4 @@
+#include <SkShadowUtils.h>
 #include "node/RenderNode.h"
 #include "node/RenderNodeManager.h"
 
@@ -34,12 +35,17 @@ inline static bool isZero(float value) {
     return fabsf(value) <= NON_ZERO_EPSILON;
 }
 
+static SkColor multiplyAlpha(SkColor color, float alpha) {
+    return SkColorSetA(color, alpha * SkColorGetA(color));
+}
+
 RenderNode::RenderNode(RenderNodeManager *manager)
     : manager(manager),
       bbhFactory(manager->shouldMeasureDrawBounds() ? new SkRTreeFactory() : nullptr),
       recorder(),
       picture(),
       placeholder(),
+      layerPaint(),
       bounds { 0.0f, 0.0f, 0.0f, 0.0f },
       pivot { SK_FloatNaN, SK_FloatNaN },
       alpha(1.0f),
@@ -53,6 +59,9 @@ RenderNode::RenderNode(RenderNodeManager *manager)
       rotationX(0.0f),
       rotationY(0.0f),
       rotationZ(0.0f),
+      clipRect(),
+      clipRRect(),
+      clipPath(),
       clip(false),
       transformMatrix(),
       transformCamera(),
@@ -66,13 +75,17 @@ RenderNode::RenderNode(RenderNodeManager *manager)
 RenderNode::~RenderNode() {
     this->manager->unregisterPlaceholder(this->placeholder.get());
     if (this->bbhFactory) {
-          delete this->bbhFactory;
+        delete this->bbhFactory;
+        this->bbhFactory = nullptr;
     }
+}
+
+void RenderNode::setLayerPaint(const std::optional<SkPaint>& layerPaint) {
+    this->layerPaint = layerPaint;
 }
 
 void RenderNode::setBounds(const SkRect& bounds) {
     this->bounds = bounds;
-    //    this->outlineDirty = true;
     this->matrixDirty = true;
 }
 
@@ -83,7 +96,6 @@ void RenderNode::setPivot(const SkPoint& pivot) {
 
 void RenderNode::setAlpha(float alpha) {
     this->alpha = alpha;
-    // TODO recheck if we need to invalidate something
 }
 
 void RenderNode::setScaleX(float scaleX) {
@@ -108,7 +120,6 @@ void RenderNode::setTranslationY(float translationY) {
 
 void RenderNode::setShadowElevation(float shadowElevation) {
     this->shadowElevation = shadowElevation;
-//    this->outlineDirty = true;
 }
 
 void RenderNode::setAmbientShadowColor(SkColor ambientShadowColor) {
@@ -143,8 +154,26 @@ void RenderNode::setCameraDistance(float cameraDistance) {
     this->matrixDirty = true;
 }
 
+void RenderNode::setClipRect(const std::optional<SkRect>& clipRect) {
+    this->clipRect = clipRect;
+    this->clipRRect.reset();
+    this->clipPath.reset();
+}
+
+void RenderNode::setClipRRect(const std::optional<SkRRect>& clipRRect) {
+    this->clipRect.reset();
+    this->clipRRect = clipRRect;
+    this->clipPath.reset();
+}
+
+void RenderNode::setClipPath(const std::optional<SkPath>& clipPath) {
+    this->clipRect.reset();
+    this->clipRRect.reset();
+    this->clipPath = clipPath;
+}
+
 void RenderNode::setClip(bool clip) {
-  this->clip = clip;
+    this->clip = clip;
 }
 
 const SkMatrix& RenderNode::getMatrix() {
@@ -168,7 +197,6 @@ void RenderNode::drawPlaceholder(SkCanvas *canvas) {
 }
 
 void RenderNode::drawContent(SkCanvas *canvas) {
-    // TODO configureOutline()
     this->updateMatrix();
 
     int restoreCount = canvas->save();
@@ -177,29 +205,28 @@ void RenderNode::drawContent(SkCanvas *canvas) {
         canvas->concat(this->transformMatrix);
     }
 
-//    if (shadowElevation > 0) {
-//        drawShadow(canvas)
-//    }
-//
-//    if (clip) {
-//        canvas.save()
-//        canvas.clipOutline(internalOutline, bounds)
-//    }
-//
-//    val useLayer = requiresLayer()
-//    if (useLayer) {
-//        canvas.saveLayer(
-//            bounds,
-//            SkPaint().apply {
-//                setAlphaf(this@GraphicsLayer.alpha)
-//                imageFilter = this@GraphicsLayer.renderEffect?.asSkiaImageFilter()
-//                colorFilter = this@GraphicsLayer.colorFilter?.asSkiaColorFilter()
-//                blendMode = this@GraphicsLayer.blendMode.toSkia()
-//            }
-//        )
-//    } else {
-//        canvas.save()
-//    }
+    if (this->shadowElevation > 0) {
+        this->drawShadow(canvas);
+    }
+
+    if (this->clip) {
+        canvas->save();
+        if (this->clipRect) {
+            canvas->clipRect(*this->clipRect);
+        } else if (this->clipRRect) {
+            canvas->clipRRect(*this->clipRRect);
+        } else if (this->clipPath) {
+            canvas->clipPath(*this->clipPath);
+        } else {
+            canvas->clipRect(this->bounds);
+        }
+    }
+
+    if (this->layerPaint) {
+        canvas->saveLayer(&this->bounds, &*this->layerPaint);
+    } else {
+        canvas->save();
+    }
 
     canvas->drawPicture(this->picture.get());
     canvas->restoreToCount(restoreCount);
@@ -243,6 +270,38 @@ void RenderNode::updateMatrix() {
     this->matrixIdentity = this->transformMatrix.isIdentity();
 }
 
+void RenderNode::drawShadow(SkCanvas *canvas) {
+    SkPath tmpPath, *path = &tmpPath;
+    if (this->clipRect) {
+        tmpPath.addRect(*this->clipRect);
+    } else if (this->clipRRect) {
+        tmpPath.addRRect(*this->clipRRect);
+    } else if (this->clipPath) {
+        path = &*this->clipPath;
+    } else {
+        return;
+    }
+
+    SkPoint3 zParams{0.0f, 0.0f, this->shadowElevation};
+    auto lightInfo = this->manager->getLightInfo();
+    auto lightGeometry = this->manager->getLightGeometry();
+    float ambientAlpha = lightInfo.ambientShadowAlpha * this->alpha;
+    float spotAlpha = lightInfo.spotShadowAlpha * this->alpha;
+    SkColor ambientColor = multiplyAlpha(this->ambientShadowColor, ambientAlpha);
+    SkColor spotColor = multiplyAlpha(this->spotShadowColor, spotAlpha);
+
+    SkShadowUtils::DrawShadow(
+        canvas,
+        *path,
+        zParams,
+        lightGeometry.center,
+        lightGeometry.radius,
+        ambientColor,
+        spotColor,
+        alpha < 1.0f ? SkShadowFlags::kTransparentOccluder_ShadowFlag : SkShadowFlags::kNone_ShadowFlag
+    );
+}
+
 // Adoption from frameworks/base/libs/hwui/RenderProperties.cpp
 void RenderNode::setCameraLocation(float x, float y, float z) {
     // the camera location is passed in inches, set in pt
@@ -254,4 +313,3 @@ void RenderNode::setCameraLocation(float x, float y, float z) {
 
 } // namespace node
 } // namespace skiko
-

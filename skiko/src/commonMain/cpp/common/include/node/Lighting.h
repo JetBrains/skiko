@@ -1,5 +1,5 @@
 #pragma once
-#include "SkPoint3.h"
+#include <SkPoint3.h>
 
 // Adoption of frameworks/base/libs/hwui/Lighting.h
 

@@ -1,13 +1,18 @@
 #pragma once
+#include <optional>
 #include <SkBBHFactory.h>
 #include <SkCamera.h>
 #include <SkCanvas.h>
 #include <SkColor.h>
 #include <SkMatrix.h>
+#include <SkPaint.h>
+#include <SkPath.h>
 #include <SkPicture.h>
 #include <SkPictureRecorder.h>
 #include <SkPoint.h>
+#include <SkRRect.h>
 #include <SkRect.h>
+#include <SkRefCnt.h>
 
 namespace skiko {
 namespace node {
@@ -19,6 +24,8 @@ public:
     RenderNode(RenderNodeManager *manager);
     ~RenderNode();
 
+    const std::optional<SkPaint>& getLayerPaint() const { return this->layerPaint; }
+    void setLayerPaint(const std::optional<SkPaint>& layerPaint);
     const SkRect& getBounds() const { return this->bounds; }
     void setBounds(const SkRect& bounds);
     const SkPoint& getPivot() const { return this->pivot; }
@@ -39,10 +46,6 @@ public:
     void setAmbientShadowColor(SkColor ambientShadowColor);
     SkColor getSpotShadowColor() const { return this->spotShadowColor; }
     void setSpotShadowColor(SkColor spotShadowColor);
-    // compositingStrategy
-    // blendMode
-    // colorFilter
-    // outline
     float getRotationX() const { return this->rotationX; }
     void setRotationX(float rotationX);
     float getRotationY() const { return this->rotationY; }
@@ -51,9 +54,11 @@ public:
     void setRotationZ(float rotationZ);
     float getCameraDistance() const;
     void setCameraDistance(float cameraDistance);
+    void setClipRect(const std::optional<SkRect>& clipRect);
+    void setClipRRect(const std::optional<SkRRect>& clipRRect);
+    void setClipPath(const std::optional<SkPath>& clipPath);
     bool getClip() const { return this->clip; }
     void setClip(bool clip);
-    // renderEffect
 
     const SkMatrix& getMatrix();
 
@@ -65,6 +70,7 @@ public:
 
 private:
     void updateMatrix();
+    void drawShadow(SkCanvas *canvas);
     void setCameraLocation(float x, float y, float z);
 
     RenderNodeManager *manager;
@@ -74,7 +80,7 @@ private:
     sk_sp<SkPicture> placeholder;
     sk_sp<SkPicture> picture;
 
-    // compositingStrategy
+    std::optional<SkPaint> layerPaint;
     SkRect bounds;
     SkPoint pivot;
     float alpha;
@@ -83,12 +89,11 @@ private:
     float shadowElevation;
     SkColor ambientShadowColor;
     SkColor spotShadowColor;
-    // blendMode
-    // colorFilter
-    // outline
     float rotationX, rotationY, rotationZ;
+    std::optional<SkRect> clipRect;
+    std::optional<SkRRect> clipRRect;
+    std::optional<SkPath> clipPath;
     bool clip;
-    // renderEffect
 
     SkMatrix transformMatrix;
     SkCamera3D transformCamera;

@@ -13,8 +13,10 @@ class RenderNodeManager {
 public:
     RenderNodeManager(bool measureDrawBounds);
 
-    bool shouldMeasureDrawBounds() const;
+    bool shouldMeasureDrawBounds() const { return this->measureDrawBounds; }
 
+    const LightGeometry& getLightGeometry() const { return this->lightGeometry; }
+    const LightInfo& getLightInfo() const { return this->lightInfo; }
     void setLightingInfo(
         const LightGeometry& lightGeometry,
         const LightInfo& lightInfo

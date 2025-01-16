@@ -17,6 +17,20 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeManag
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteRenderNodeManager));
 }
 
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_1nSetLightingInfo
+  (JNIEnv *env, jclass jclass, jlong ptr, jfloat centerX, jfloat centerY, jfloat centerZ, jfloat radius, jfloat ambientShadowAlpha, jfloat spotShadowAlpha) {
+    auto instance = reinterpret_cast<skiko::node::RenderNodeManager *>(ptr);
+    skiko::node::LightGeometry lightGeometry {
+        SkPoint3{centerX, centerY, centerZ},
+        radius
+    };
+    skiko::node::LightInfo lightInfo {
+        ambientShadowAlpha,
+        spotShadowAlpha
+    };
+    instance->setLightingInfo(lightGeometry, lightInfo);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_1nCreateRenderNodeCanvas
   (JNIEnv *env, jclass jclass, jlong ptr, jlong canvasPtr) {
     auto instance = reinterpret_cast<skiko::node::RenderNodeManager *>(ptr);
@@ -24,7 +38,3 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeManag
     SkCanvas *renderNodeCanvas = instance->createRenderNodeCanvas(canvas);
     return reinterpret_cast<jlong>(renderNodeCanvas);
 }
-
-//@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_nSetLightingInfo")
-//@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeManagerKt_RenderNodeManager_nSetLightingInfo")
-//private external fun RenderNodeManager_nSetLightingInfo(ptr: NativePointer, centerX: Float, centerY: Float, centerZ: Float, radius: Float, ambientShadowAlpha: Float, spotShadowAlpha: Float)

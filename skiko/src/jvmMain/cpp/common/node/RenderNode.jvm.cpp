@@ -17,6 +17,20 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_Re
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteRenderNode));
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint
+  (JNIEnv *env, jclass jclass, jlong ptr) {
+    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
+    const std::optional<SkPaint>& layerPaint = instance->getLayerPaint();
+    return reinterpret_cast<jlong>(layerPaint ? &*layerPaint : nullptr);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetLayerPaint
+  (JNIEnv *env, jclass jclass, jlong ptr, jlong paintPtr) {
+    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
+    auto paint = reinterpret_cast<SkPaint *>(paintPtr);
+    instance->setLayerPaint(paint ? std::optional<SkPaint>{*paint} : std::nullopt);
+}
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds
   (JNIEnv *env, jclass jclass, jlong ptr, jfloatArray resultRect) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
@@ -143,31 +157,6 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_Ren
     instance->setSpotShadowColor(static_cast<uint32_t>(color));
 }
 
-//extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBlendMode
-//  (JNIEnv *env, jclass jclass, jlong ptr) {
-//    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-//    return static_cast<jint>(instance->getBlendMode());
-//}
-//
-//extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBlendMode
-//  (JNIEnv *env, jclass jclass, jlong ptr, jint mode) {
-//    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-//    instance->setBlendMode(static_cast<SkBlendMode>(mode));
-//}
-//
-//extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetColorFilter
-//  (JNIEnv *env, jclass jclass, jlong ptr) {
-//    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-//    return reinterpret_cast<jlong>(instance->getColorFilter().release());
-//}
-//
-//extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetColorFilter
-//  (JNIEnv *env, jclass jclass, jlong ptr, jlong colorFilterPtr) {
-//    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-//    SkColorFilter* colorFilter = reinterpret_cast<SkColorFilter*>(static_cast<uintptr_t>(colorFilterPtr));
-//    instance->setColorFilter(sk_ref_sp<SkColorFilter>(colorFilter));
-//}
-
 extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationX
   (JNIEnv *env, jclass jclass, jlong ptr) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
@@ -214,6 +203,37 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_Ren
   (JNIEnv *env, jclass jclass, jlong ptr, jfloat distance) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
     instance->setCameraDistance(distance);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect
+  (JNIEnv *env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom) {
+    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
+    instance->setClipRect(SkRect::MakeLTRB(left, top, right, bottom));
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect
+  (JNIEnv *env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray radii, jint radiiSize) {
+    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
+    instance->setClipRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, radii));
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath
+  (JNIEnv *env, jclass jclass, jlong ptr, jlong pathPtr) {
+    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
+    SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
+    instance->setClipPath(path ? std::optional<SkPath>{*path} : std::nullopt);
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip
+  (JNIEnv *env, jclass jclass, jlong ptr) {
+    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
+    return instance->getClip();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClip
+  (JNIEnv *env, jclass jclass, jlong ptr, jboolean clip) {
+    auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
+    instance->setClip(clip);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nBeginRecording
