@@ -31,30 +31,228 @@ class RenderNode internal constructor(ptr: NativePointer) : Managed(ptr, Finaliz
         Stats.onNativeCall()
     }
 
-    var position: Point
+    var bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            Point.fromInteropPointer { RenderNode_nGetPosition(_ptr, it) }
+            Rect.fromInteropPointer { RenderNode_nGetBounds(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
         set(value) = try {
             Stats.onNativeCall()
-            RenderNode_nSetPosition(_ptr, value.x, value.y)
+            RenderNode_nSetBounds(_ptr, value.left, value.top, value.right, value.bottom)
         } finally {
             reachabilityBarrier(this)
         }
 
-    var size: Point
+    var pivot: Point
         get() = try {
             Stats.onNativeCall()
-            Point.fromInteropPointer { RenderNode_nGetSize(_ptr, it) }
+            Point.fromInteropPointer { RenderNode_nGetPivot(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
         set(value) = try {
             Stats.onNativeCall()
-            RenderNode_nSetSize(_ptr, value.x, value.y)
+            RenderNode_nSetPivot(_ptr, value.x, value.y)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var alpha: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetAlpha(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetAlpha(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var scaleX: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetScaleX(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetScaleX(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var scaleY: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetScaleY(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetScaleY(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var translationX: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetTranslationX(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetTranslationX(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var translationY: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetTranslationY(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetTranslationY(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var shadowElevation: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetShadowElevation(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetShadowElevation(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var ambientShadowColor: Int
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetAmbientShadowColor(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetAmbientShadowColor(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var spotShadowColor: Int
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetSpotShadowColor(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetSpotShadowColor(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var blendMode: BlendMode
+        get() = try {
+            Stats.onNativeCall()
+            BlendMode.entries[RenderNode_nGetBlendMode(_ptr)]
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetBlendMode(_ptr, value.ordinal)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var colorFilter: ColorFilter?
+        get() = try {
+            Stats.onNativeCall()
+            val colorFilterPtr = RenderNode_nGetColorFilter(_ptr)
+            if (colorFilterPtr == NullPointer) null else ColorFilter(colorFilterPtr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetColorFilter(_ptr,getPtr(value))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(value)
+        }
+
+    var rotationX: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetRotationX(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetRotationX(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var rotationY: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetRotationY(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetRotationY(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var rotationZ: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetRotationZ(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetRotationZ(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var cameraDistance: Float
+        get() = try {
+            Stats.onNativeCall()
+            RenderNode_nGetCameraDistance(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            RenderNode_nSetCameraDistance(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }
@@ -122,21 +320,133 @@ private external fun RenderNode_nMake(manager: NativePointer): NativePointer
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNode_RenderNode_1nGetFinalizer")
 private external fun RenderNode_nGetFinalizer(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetPosition")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetPosition")
-private external fun RenderNode_nGetPosition(ptr: NativePointer, result: InteropPointer)
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds")
+private external fun RenderNode_nGetBounds(ptr: NativePointer, result: InteropPointer)
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetPosition")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetPosition")
-private external fun RenderNode_nSetPosition(ptr: NativePointer, x: Float, y: Float)
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBounds")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBounds")
+private external fun RenderNode_nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetSize")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetSize")
-private external fun RenderNode_nGetSize(ptr: NativePointer, result: InteropPointer)
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetPivot")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetPivot")
+private external fun RenderNode_nGetPivot(ptr: NativePointer, result: InteropPointer)
 
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetSize")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetSize")
-private external fun RenderNode_nSetSize(ptr: NativePointer, width: Float, height: Float)
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetPivot")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetPivot")
+private external fun RenderNode_nSetPivot(ptr: NativePointer, x: Float, y: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAlpha")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAlpha")
+private external fun RenderNode_nGetAlpha(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAlpha")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAlpha")
+private external fun RenderNode_nSetAlpha(ptr: NativePointer, alpha: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleX")
+private external fun RenderNode_nGetScaleX(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleX")
+private external fun RenderNode_nSetScaleX(ptr: NativePointer, scaleX: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleY")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleY")
+private external fun RenderNode_nGetScaleY(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleY")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleY")
+private external fun RenderNode_nSetScaleY(ptr: NativePointer, scaleY: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationX")
+private external fun RenderNode_nGetTranslationX(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationX")
+private external fun RenderNode_nSetTranslationX(ptr: NativePointer, translationX: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationY")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationY")
+private external fun RenderNode_nGetTranslationY(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationY")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationY")
+private external fun RenderNode_nSetTranslationY(ptr: NativePointer, translationY: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetShadowElevation")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetShadowElevation")
+private external fun RenderNode_nGetShadowElevation(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetShadowElevation")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetShadowElevation")
+private external fun RenderNode_nSetShadowElevation(ptr: NativePointer, elevation: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAmbientShadowColor")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAmbientShadowColor")
+private external fun RenderNode_nGetAmbientShadowColor(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAmbientShadowColor")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAmbientShadowColor")
+private external fun RenderNode_nSetAmbientShadowColor(ptr: NativePointer, color: Int)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetSpotShadowColor")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetSpotShadowColor")
+private external fun RenderNode_nGetSpotShadowColor(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetSpotShadowColor")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetSpotShadowColor")
+private external fun RenderNode_nSetSpotShadowColor(ptr: NativePointer, color: Int)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBlendMode")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBlendMode")
+private external fun RenderNode_nGetBlendMode(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBlendMode")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBlendMode")
+private external fun RenderNode_nSetBlendMode(ptr: NativePointer, mode: Int)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetColorFilter")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetColorFilter")
+private external fun RenderNode_nGetColorFilter(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetColorFilter")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetColorFilter")
+private external fun RenderNode_nSetColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationX")
+private external fun RenderNode_nGetRotationX(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationX")
+private external fun RenderNode_nSetRotationX(ptr: NativePointer, rotationX: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationY")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationY")
+private external fun RenderNode_nGetRotationY(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationY")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationY")
+private external fun RenderNode_nSetRotationY(ptr: NativePointer, rotationY: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationZ")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationZ")
+private external fun RenderNode_nGetRotationZ(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationZ")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationZ")
+private external fun RenderNode_nSetRotationZ(ptr: NativePointer, rotationZ: Float)
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetCameraDistance")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetCameraDistance")
+private external fun RenderNode_nGetCameraDistance(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetCameraDistance")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetCameraDistance")
+private external fun RenderNode_nSetCameraDistance(ptr: NativePointer, distance: Float)
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetMatrix")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetMatrix")
