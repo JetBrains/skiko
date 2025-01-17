@@ -26,7 +26,7 @@ class RenderNode internal constructor(ptr: NativePointer) : Managed(ptr, Finaliz
         }
     }
 
-    constructor(manager: RenderNodeManager) : this(RenderNode_nMake(getPtr(manager))) {
+    constructor(manager: RenderNodeContext) : this(RenderNode_nMake(getPtr(manager))) {
         Stats.onNativeCall()
     }
 

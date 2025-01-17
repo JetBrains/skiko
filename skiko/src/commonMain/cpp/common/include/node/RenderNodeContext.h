@@ -1,7 +1,4 @@
 #pragma once
-#include <unordered_map>
-#include <SkCanvas.h>
-#include <SkPicture.h>
 #include "Lighting.h"
 
 namespace skiko {
@@ -9,9 +6,9 @@ namespace node {
 
 class RenderNode;
 
-class RenderNodeManager {
+class RenderNodeContext {
 public:
-    RenderNodeManager(bool measureDrawBounds);
+    RenderNodeContext(bool measureDrawBounds);
 
     bool shouldMeasureDrawBounds() const { return this->measureDrawBounds; }
 
@@ -22,17 +19,7 @@ public:
         const LightInfo& lightInfo
     );
 
-    SkCanvas * createRenderNodeCanvas(SkCanvas *canvas);
-
-    void registerPlaceholder(SkPicture *picture, RenderNode *renderNode);
-    void unregisterPlaceholder(SkPicture *picture);
-
-    bool drawPlaceholder(SkCanvas *canvas, const SkPicture* picture);
-
 private:
-    // Picture.uniqueId -> RenderNode
-    std::unordered_map<uint32_t, RenderNode *> placeholders;
-
     LightGeometry lightGeometry;
     LightInfo lightInfo;
     bool measureDrawBounds;

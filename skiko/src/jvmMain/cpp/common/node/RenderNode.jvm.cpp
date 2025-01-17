@@ -7,8 +7,8 @@ static void deleteRenderNode(skiko::node::RenderNode *renderNode) {
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake
-  (JNIEnv *env, jclass jclass, skiko::node::RenderNodeManager *manager) {
-    auto instance = new skiko::node::RenderNode(manager);
+  (JNIEnv *env, jclass jclass, skiko::node::RenderNodeContext *context) {
+    auto instance = new skiko::node::RenderNode(context);
     return reinterpret_cast<jlong>(instance);
 }
 
@@ -138,7 +138,6 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_Ren
     return instance->getAmbientShadowColor();
 }
 
-
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAmbientShadowColor
   (JNIEnv *env, jclass jclass, jlong ptr, jint color) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
@@ -253,5 +252,5 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_Ren
   (JNIEnv *env, jclass jclass, jlong ptr, jlong canvasPtr) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
     auto canvas = reinterpret_cast<SkCanvas *>(canvasPtr);
-    instance->drawPlaceholder(canvas);
+    canvas->drawDrawable(instance);
 }

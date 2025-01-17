@@ -4,10 +4,10 @@
 #include <SkCamera.h>
 #include <SkCanvas.h>
 #include <SkColor.h>
+#include <SkDrawable.h>
 #include <SkMatrix.h>
 #include <SkPaint.h>
 #include <SkPath.h>
-#include <SkPicture.h>
 #include <SkPictureRecorder.h>
 #include <SkPoint.h>
 #include <SkRRect.h>
@@ -17,11 +17,11 @@
 namespace skiko {
 namespace node {
 
-class RenderNodeManager;
+class RenderNodeContext;
 
-class RenderNode {
+class RenderNode : public SkDrawable {
 public:
-    RenderNode(RenderNodeManager *manager);
+    RenderNode(RenderNodeContext *manager);
     ~RenderNode();
 
     const std::optional<SkPaint>& getLayerPaint() const { return this->layerPaint; }
@@ -65,20 +65,19 @@ public:
     SkCanvas * beginRecording();
     void endRecording();
 
-    void drawPlaceholder(SkCanvas *canvas);
-    void drawContent(SkCanvas *canvas);
-
+    // SkDrawable
+    void onDraw(SkCanvas* canvas) override;
+    SkRect onGetBounds() override;
 private:
     void updateMatrix();
     void drawShadow(SkCanvas *canvas);
     void setCameraLocation(float x, float y, float z);
 
-    RenderNodeManager *manager;
+    RenderNodeContext *context;
 
     SkBBHFactory *bbhFactory;
     SkPictureRecorder recorder;
-    sk_sp<SkPicture> placeholder;
-    sk_sp<SkPicture> picture;
+    sk_sp<SkDrawable> contentCache;
 
     std::optional<SkPaint> layerPaint;
     SkRect bounds;

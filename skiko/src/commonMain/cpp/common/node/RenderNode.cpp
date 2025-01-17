@@ -1,6 +1,6 @@
 #include <SkShadowUtils.h>
 #include "node/RenderNode.h"
-#include "node/RenderNodeManager.h"
+#include "node/RenderNodeContext.h"
 
 namespace skiko {
 namespace node {
@@ -39,12 +39,11 @@ static SkColor multiplyAlpha(SkColor color, float alpha) {
     return SkColorSetA(color, alpha * SkColorGetA(color));
 }
 
-RenderNode::RenderNode(RenderNodeManager *manager)
-    : manager(manager),
-      bbhFactory(manager->shouldMeasureDrawBounds() ? new SkRTreeFactory() : nullptr),
+RenderNode::RenderNode(RenderNodeContext *context)
+    : context(context),
+      bbhFactory(context->shouldMeasureDrawBounds() ? new SkRTreeFactory() : nullptr),
       recorder(),
-      picture(),
-      placeholder(),
+      contentCache(),
       layerPaint(),
       bounds { 0.0f, 0.0f, 0.0f, 0.0f },
       pivot { SK_FloatNaN, SK_FloatNaN },
@@ -67,13 +66,10 @@ RenderNode::RenderNode(RenderNodeManager *manager)
       transformCamera(),
       matrixIdentity(true),
       matrixDirty(false) {
-    this->placeholder = SkPicture::MakePlaceholder(PICTURE_BOUNDS);
-    this->manager->registerPlaceholder(this->placeholder.get(), this);
     this->setCameraLocation(0.0f, 0.0f, DEFAULT_CAMERA_DISTANCE);
 }
 
 RenderNode::~RenderNode() {
-    this->manager->unregisterPlaceholder(this->placeholder.get());
     if (this->bbhFactory) {
         delete this->bbhFactory;
         this->bbhFactory = nullptr;
@@ -189,14 +185,10 @@ SkCanvas *RenderNode::beginRecording() {
 }
 
 void RenderNode::endRecording() {
-    this->picture = this->recorder.finishRecordingAsPicture();
+    this->contentCache = this->recorder.finishRecordingAsDrawable();
 }
 
-void RenderNode::drawPlaceholder(SkCanvas *canvas) {
-    canvas->drawPicture(this->placeholder.get());
-}
-
-void RenderNode::drawContent(SkCanvas *canvas) {
+void RenderNode::onDraw(SkCanvas* canvas) {
     this->updateMatrix();
 
     int restoreCount = canvas->save();
@@ -228,8 +220,12 @@ void RenderNode::drawContent(SkCanvas *canvas) {
         canvas->save();
     }
 
-    canvas->drawPicture(this->picture.get());
+    canvas->drawDrawable(this->contentCache.get());
     canvas->restoreToCount(restoreCount);
+}
+
+SkRect RenderNode::onGetBounds() {
+    return this->bounds;
 }
 
 // Adoption from frameworks/base/libs/hwui/RenderProperties.cpp
@@ -283,8 +279,8 @@ void RenderNode::drawShadow(SkCanvas *canvas) {
     }
 
     SkPoint3 zParams{0.0f, 0.0f, this->shadowElevation};
-    auto lightInfo = this->manager->getLightInfo();
-    auto lightGeometry = this->manager->getLightGeometry();
+    auto lightInfo = this->context->getLightInfo();
+    auto lightGeometry = this->context->getLightGeometry();
     float ambientAlpha = lightInfo.ambientShadowAlpha * this->alpha;
     float spotAlpha = lightInfo.spotShadowAlpha * this->alpha;
     SkColor ambientColor = multiplyAlpha(this->ambientShadowColor, ambientAlpha);
