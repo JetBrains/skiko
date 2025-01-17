@@ -1,4 +1,5 @@
 #pragma once
+#include <SkRefCnt.h>
 #include "Lighting.h"
 
 namespace skiko {
@@ -6,7 +7,7 @@ namespace node {
 
 class RenderNode;
 
-class RenderNodeContext {
+class RenderNodeContext : public SkRefCnt {
 public:
     RenderNodeContext(bool measureDrawBounds);
 

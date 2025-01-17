@@ -39,7 +39,7 @@ static SkColor multiplyAlpha(SkColor color, float alpha) {
     return SkColorSetA(color, alpha * SkColorGetA(color));
 }
 
-RenderNode::RenderNode(RenderNodeContext *context)
+RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
     : context(context),
       bbhFactory(context->shouldMeasureDrawBounds() ? new SkRTreeFactory() : nullptr),
       recorder(),

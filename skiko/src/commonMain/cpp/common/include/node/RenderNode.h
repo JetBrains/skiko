@@ -21,7 +21,7 @@ class RenderNodeContext;
 
 class RenderNode : public SkDrawable {
 public:
-    RenderNode(RenderNodeContext *manager);
+    RenderNode(const sk_sp<RenderNodeContext>& context);
     ~RenderNode();
 
     const std::optional<SkPaint>& getLayerPaint() const { return this->layerPaint; }
@@ -73,7 +73,7 @@ private:
     void drawShadow(SkCanvas *canvas);
     void setCameraLocation(float x, float y, float z);
 
-    RenderNodeContext *context;
+    sk_sp<RenderNodeContext> context;
 
     SkBBHFactory *bbhFactory;
     SkPictureRecorder recorder;

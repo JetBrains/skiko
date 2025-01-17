@@ -2,19 +2,10 @@
 #include "../interop.hh"
 #include "node/RenderNodeContext.h"
 
-static void deleteRenderNodeContext(skiko::node::RenderNodeContext *RenderNodeContext) {
-    delete RenderNodeContext;
-}
-
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake
   (JNIEnv *env, jclass jclass, jboolean measureDrawBounds) {
-    auto instance = new skiko::node::RenderNodeContext(measureDrawBounds);
-    return reinterpret_cast<jlong>(instance);
-}
-
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nGetFinalizer
-  (JNIEnv *env, jclass jclass) {
-    return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteRenderNodeContext));
+    auto instance = sk_make_sp<skiko::node::RenderNodeContext>(measureDrawBounds);
+    return reinterpret_cast<jlong>(instance.release());
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nSetLightingInfo

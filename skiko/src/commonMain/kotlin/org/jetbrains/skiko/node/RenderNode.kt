@@ -17,12 +17,10 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  * alone should be changed. RenderNodes can also be transformed without re-recording the display
  * list through the transform properties.</p>
  */
-class RenderNode internal constructor(ptr: NativePointer) : Managed(ptr, FinalizerPointer) {
+class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     private companion object {
-        private val FinalizerPointer: NativePointer
         init {
             staticLoad()
-            FinalizerPointer = RenderNode_nGetFinalizer()
         }
     }
 
@@ -314,10 +312,6 @@ class RenderNode internal constructor(ptr: NativePointer) : Managed(ptr, Finaliz
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake")
 private external fun RenderNode_nMake(manager: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNode_RenderNode_1nGetFinalizer")
-private external fun RenderNode_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")

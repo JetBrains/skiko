@@ -2,19 +2,10 @@
 #include "../interop.hh"
 #include "node/RenderNode.h"
 
-static void deleteRenderNode(skiko::node::RenderNode *renderNode) {
-    delete renderNode;
-}
-
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake
   (JNIEnv *env, jclass jclass, skiko::node::RenderNodeContext *context) {
-    auto instance = new skiko::node::RenderNode(context);
-    return reinterpret_cast<jlong>(instance);
-}
-
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetFinalizer
-  (JNIEnv *env, jclass jclass) {
-    return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteRenderNode));
+    auto instance = sk_make_sp<skiko::node::RenderNode>(context);
+    return reinterpret_cast<jlong>(instance.release());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint
