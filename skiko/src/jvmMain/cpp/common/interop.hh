@@ -272,15 +272,6 @@ namespace skija {
         void detach(jobject obj);
     }
 
-    namespace PictureFilterCanvas {
-        extern jmethodID onDrawPictureId;
-        void onLoad(JNIEnv* env);
-        void onUnload(JNIEnv* env);
-        bool onDrawPicture(jobject obj, const SkPicture* picture, const SkMatrix* matrix, const SkPaint* paint);
-        jobject attach(JNIEnv* env, jobject obj);
-        void detach(jobject obj);
-    }
-
     namespace Rect {
         extern jclass cls;
         extern jmethodID makeLTRB;
