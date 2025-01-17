@@ -1,17 +1,18 @@
 #include <jni.h>
 #include "../interop.hh"
 #include "node/RenderNode.h"
+#include "node/RenderNodeContext.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake
   (JNIEnv *env, jclass jclass, skiko::node::RenderNodeContext *context) {
-    auto instance = sk_make_sp<skiko::node::RenderNode>(context);
+    auto instance = sk_make_sp<skiko::node::RenderNode>(sk_ref_sp(context));
     return reinterpret_cast<jlong>(instance.release());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint
   (JNIEnv *env, jclass jclass, jlong ptr) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-    const std::optional<SkPaint>& layerPaint = instance->getLayerPaint();
+    std::optional<SkPaint>& layerPaint = instance->getLayerPaint();
     return reinterpret_cast<jlong>(layerPaint ? &*layerPaint : nullptr);
 }
 

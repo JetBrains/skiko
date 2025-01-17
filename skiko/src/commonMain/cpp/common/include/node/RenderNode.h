@@ -24,7 +24,7 @@ public:
     RenderNode(const sk_sp<RenderNodeContext>& context);
     ~RenderNode();
 
-    const std::optional<SkPaint>& getLayerPaint() const { return this->layerPaint; }
+    std::optional<SkPaint>& getLayerPaint() { return this->layerPaint; }
     void setLayerPaint(const std::optional<SkPaint>& layerPaint);
     const SkRect& getBounds() const { return this->bounds; }
     void setBounds(const SkRect& bounds);

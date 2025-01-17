@@ -24,7 +24,7 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
         }
     }
 
-    constructor(manager: RenderNodeContext) : this(RenderNode_nMake(getPtr(manager))) {
+    constructor(context: RenderNodeContext) : this(RenderNode_nMake(getPtr(context))) {
         Stats.onNativeCall()
     }
 
@@ -311,7 +311,7 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake")
-private external fun RenderNode_nMake(manager: NativePointer): NativePointer
+private external fun RenderNode_nMake(context: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")

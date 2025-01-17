@@ -6,6 +6,7 @@
 
 namespace skikoMpp {
     namespace skrect {
+        // TODO: Combine with skija::Rect::copyToInterop
         void serializeAs4Floats(const SkRect& rect, float* result);
         std::unique_ptr<SkRect> toSkRect(float* topLeftRightBottom);
     }
