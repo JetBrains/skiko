@@ -60,10 +60,12 @@ internal abstract class AWTRedrawer(
             if (!isFirstFrameRendered) {
                 deviceAnalytics?.beforeFirstFrameRender()
             }
+            deviceAnalytics?.beforeFrameRender()
             layer.inDrawScope(body)
             if (!isFirstFrameRendered && !isDisposed) {
                 deviceAnalytics?.afterFirstFrameRender()
             }
+            deviceAnalytics?.afterFrameRender()
             isFirstFrameRendered = true
         }
     }
