@@ -2875,7 +2875,9 @@ $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.DeviceAnalytics.Companion
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.DeviceAnalytics.Companion/Empty/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/-device-analytics/-companion/-empty.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.DeviceAnalytics///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/-device-analytics/index.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.DeviceAnalytics/afterFirstFrameRender/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/-device-analytics/after-first-frame-render.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.DeviceAnalytics/afterFrameRender/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/-device-analytics/after-frame-render.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.DeviceAnalytics/beforeFirstFrameRender/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/-device-analytics/before-first-frame-render.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.DeviceAnalytics/beforeFrameRender/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/-device-analytics/before-frame-render.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.DeviceAnalytics/contextInit/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/-device-analytics/context-init.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.DeviceAnalytics/init/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/-device-analytics/init.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics.RendererAnalytics.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/-renderer-analytics/-companion/index.html
