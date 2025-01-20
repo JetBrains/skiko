@@ -179,7 +179,7 @@ const SkMatrix& RenderNode::getMatrix() {
 
 SkCanvas *RenderNode::beginRecording() {
     bool measureDrawBounds = !clip || shadowElevation > 0.0f;
-    const SkRect& bounds = measureDrawBounds ? PICTURE_BOUNDS : this->bounds;
+    const SkRect& bounds = measureDrawBounds ? PICTURE_BOUNDS : SkRect::MakeWH(this->bounds.width(), this->bounds.height());
     SkBBHFactory* bbhFactory = measureDrawBounds ? this->bbhFactory : nullptr;
     return this->recorder.beginRecording(bounds, bbhFactory);
 }
@@ -210,12 +210,12 @@ void RenderNode::onDraw(SkCanvas* canvas) {
         } else if (this->clipPath) {
             canvas->clipPath(*this->clipPath);
         } else {
-            canvas->clipRect(this->bounds);
+            canvas->clipRect(SkRect::MakeWH(this->bounds.width(), this->bounds.height()));
         }
     }
 
     if (this->layerPaint) {
-        canvas->saveLayer(&this->bounds, &*this->layerPaint);
+        canvas->saveLayer(SkRect::MakeWH(this->bounds.width(), this->bounds.height()), &*this->layerPaint);
     } else {
         canvas->save();
     }
@@ -294,7 +294,7 @@ void RenderNode::drawShadow(SkCanvas *canvas) {
         lightGeometry.radius,
         ambientColor,
         spotColor,
-        alpha < 1.0f ? SkShadowFlags::kTransparentOccluder_ShadowFlag : SkShadowFlags::kNone_ShadowFlag
+        this->alpha < 1.0f ? SkShadowFlags::kTransparentOccluder_ShadowFlag : SkShadowFlags::kNone_ShadowFlag
     );
 }
 
