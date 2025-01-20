@@ -2208,9 +2208,6 @@ $dokka.location:org.jetbrains.skia/Picture/makeShader/#org.jetbrains.skia.Filter
 $dokka.location:org.jetbrains.skia/Picture/playback/#org.jetbrains.skia.Canvas?#kotlin.Function0[kotlin.Boolean]?/PointingToDeclaration/skiko/org.jetbrains.skia/-picture/playback.html
 $dokka.location:org.jetbrains.skia/Picture/serializeToData/#/PointingToDeclaration/skiko/org.jetbrains.skia/-picture/serialize-to-data.html
 $dokka.location:org.jetbrains.skia/Picture/uniqueId/#/PointingToDeclaration/skiko/org.jetbrains.skia/-picture/unique-id.html
-$dokka.location:org.jetbrains.skia/PictureFilterCanvas///PointingToDeclaration/skiko/org.jetbrains.skia/-picture-filter-canvas/index.html
-$dokka.location:org.jetbrains.skia/PictureFilterCanvas/PictureFilterCanvas/#org.jetbrains.skia.Canvas/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-filter-canvas/-picture-filter-canvas.html
-$dokka.location:org.jetbrains.skia/PictureFilterCanvas/onDrawPicture/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-filter-canvas/on-draw-picture.html
 $dokka.location:org.jetbrains.skia/PictureRecorder.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/-companion/index.html
 $dokka.location:org.jetbrains.skia/PictureRecorder///PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/index.html
 $dokka.location:org.jetbrains.skia/PictureRecorder/PictureRecorder/#/PointingToDeclaration/skiko/org.jetbrains.skia/-picture-recorder/-picture-recorder.html
