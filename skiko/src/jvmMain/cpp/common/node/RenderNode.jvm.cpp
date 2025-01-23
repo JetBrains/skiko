@@ -244,5 +244,5 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_Ren
   (JNIEnv *env, jclass jclass, jlong ptr, jlong canvasPtr) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
     auto canvas = reinterpret_cast<SkCanvas *>(canvasPtr);
-    canvas->drawDrawable(instance);
+    instance->drawInto(canvas);
 }

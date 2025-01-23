@@ -13,6 +13,7 @@
 #include <SkRRect.h>
 #include <SkRect.h>
 #include <SkRefCnt.h>
+#include "Lighting.h"
 
 namespace skiko {
 namespace node {
@@ -65,12 +66,14 @@ public:
     SkCanvas * beginRecording();
     void endRecording();
 
+    void drawInto(SkCanvas *canvas);
+
     // SkDrawable
     void onDraw(SkCanvas* canvas) override;
     SkRect onGetBounds() override;
 private:
     void updateMatrix();
-    void drawShadow(SkCanvas *canvas);
+    void drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo);
     void setCameraLocation(float x, float y, float z);
 
     sk_sp<RenderNodeContext> context;
@@ -94,6 +97,7 @@ private:
     std::optional<SkPath> clipPath;
     bool clip;
 
+    SkMatrix lastDrawMatrix;
     SkMatrix transformMatrix;
     SkCamera3D transformCamera;
     bool matrixIdentity;

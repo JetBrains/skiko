@@ -243,5 +243,5 @@ SKIKO_EXPORT void org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nDrawInto
   (KNativePointer ptr, KNativePointer canvasPtr) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
     auto canvas = reinterpret_cast<SkCanvas *>(canvasPtr);
-    canvas->drawDrawable(instance);
+    instance->drawInto(canvas);
 }

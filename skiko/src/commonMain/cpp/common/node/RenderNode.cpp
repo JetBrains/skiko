@@ -62,6 +62,7 @@ RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
       clipRRect(),
       clipPath(),
       clip(false),
+      lastDrawMatrix(),
       transformMatrix(),
       transformCamera(),
       matrixIdentity(true),
@@ -188,8 +189,15 @@ void RenderNode::endRecording() {
     this->contentCache = this->recorder.finishRecordingAsDrawable();
 }
 
+void RenderNode::drawInto(SkCanvas* canvas) {
+    // Save the current matrix for correct shadow drawing in case of snapshoting RenderNode as SkPicture
+    this->lastDrawMatrix = canvas->getLocalToDevice().asM33();
+    canvas->drawDrawable(this);
+}
+
 void RenderNode::onDraw(SkCanvas* canvas) {
     this->updateMatrix();
+    auto drawMatrix = canvas->getLocalToDevice().asM33();
 
     int restoreCount = canvas->save();
     canvas->translate(this->bounds.left(), this->bounds.top());
@@ -198,7 +206,22 @@ void RenderNode::onDraw(SkCanvas* canvas) {
     }
 
     if (this->shadowElevation > 0) {
-        this->drawShadow(canvas);
+        LightGeometry lightGeometry = this->context->getLightGeometry();
+        const LightInfo& lightInfo = this->context->getLightInfo();
+
+        // Transform light position to current canvas coordinate system
+        SkPoint lightPosition = { lightGeometry.center.fX, lightGeometry.center.fY };
+        SkMatrix invertDrawMatrix;
+        if (!this->lastDrawMatrix.invert(&invertDrawMatrix)) {
+            invertDrawMatrix.setIdentity();
+        }
+        // In case of this->lastDrawMatrix == drawMatrix it will be identity matrix
+        SkMatrix shadowTransformMatrix = invertDrawMatrix * drawMatrix;
+        shadowTransformMatrix.mapPoints(&lightPosition, 1);
+        lightGeometry.center.fX = lightPosition.fX;
+        lightGeometry.center.fX = lightPosition.fX;
+
+        this->drawShadow(canvas, lightGeometry, lightInfo);
     }
 
     if (this->clip) {
@@ -266,7 +289,7 @@ void RenderNode::updateMatrix() {
     this->matrixIdentity = this->transformMatrix.isIdentity();
 }
 
-void RenderNode::drawShadow(SkCanvas *canvas) {
+void RenderNode::drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo) {
     SkPath tmpPath, *path = &tmpPath;
     if (this->clipRect) {
         tmpPath.addRect(*this->clipRect);
@@ -279,8 +302,6 @@ void RenderNode::drawShadow(SkCanvas *canvas) {
     }
 
     SkPoint3 zParams{0.0f, 0.0f, this->shadowElevation};
-    auto lightInfo = this->context->getLightInfo();
-    auto lightGeometry = this->context->getLightGeometry();
     float ambientAlpha = lightInfo.ambientShadowAlpha * this->alpha;
     float spotAlpha = lightInfo.spotShadowAlpha * this->alpha;
     SkColor ambientColor = multiplyAlpha(this->ambientShadowColor, ambientAlpha);
