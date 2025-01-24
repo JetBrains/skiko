@@ -585,17 +585,6 @@ tasks.withType<AbstractTestTask> {
     }
 }
 
-rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
-    val nodeExtension = rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>()
-    nodeExtension.nodeVersion = "16.0.0"
-    // Kotlin/JS has a bug preventing compilation on non-x86 Linux machines,
-    // see https://youtrack.jetbrains.com/issue/KT-48631
-    // It always downloads and uses x86 version, so on those architectures
-    if (hostOs == OS.Linux && hostArch != Arch.X64) {
-        nodeExtension.download = false
-    }
-}
-
 tasks.withType<JavaCompile> {
     // Workaround to configure Java sources on Android (src/androidMain/java)
     targetCompatibility = "1.8"
