@@ -28,6 +28,10 @@ static SkRect UNKNOWN_BOUNDS {
 static const float DEFAULT_CAMERA_DISTANCE = 8.0f;
 static const float NON_ZERO_EPSILON = 0.001f;
 
+// Since "kSkDrawable_Type" isn't really used anywhere outside of serialization, we can use it
+// to identify RenderNode objects without RTTI, like SkRuntimeEffect does (even without adding to original enum).
+static const SkFlattenable::Type kRenderNode_Type = static_cast<SkFlattenable::Type>(0x2d2595b6);
+
 /**
  * Check for floats that are close enough to zero.
  */
@@ -63,8 +67,8 @@ public:
 
 protected:
     void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) override {
-        if (auto renderNode = dynamic_cast<RenderNode *>(drawable)) {
-            dependencies->insert(renderNode);
+        if (drawable->getFlattenableType() == kRenderNode_Type) {
+            dependencies->insert(static_cast<RenderNode *>(drawable));
         } else {
             drawable->draw(this, matrix);
         }
@@ -263,6 +267,10 @@ void RenderNode::endRecording() {
 
 void RenderNode::drawInto(SkCanvas* canvas) {
     canvas->drawDrawable(this);
+}
+
+SkFlattenable::Type RenderNode::getFlattenableType() const {
+    return kRenderNode_Type;
 }
 
 SkRect RenderNode::onGetBounds() {

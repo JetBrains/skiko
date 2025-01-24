@@ -70,6 +70,8 @@ public:
 
     void drawInto(SkCanvas *canvas);
 
+    SkFlattenable::Type getFlattenableType() const override;
+
 protected:
     // SkDrawable
     SkRect onGetBounds() override;
