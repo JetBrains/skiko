@@ -63,7 +63,6 @@ public:
     void setClip(bool clip);
 
     const SkMatrix& getMatrix();
-    int64_t getSnapshotId();
 
     SkCanvas * beginRecording();
     void endRecording();
@@ -82,10 +81,10 @@ protected:
 
 private:
     void updateMatrix();
+    void updateDependencies();
     void updateSnapshot();
+    void invalidateSnapshot(bool disabled = false, bool force = false);
     void drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo);
-    int64_t getContentSnapshotId();
-    bool isContentContainsShadow() const;
     void setCameraLocation(float x, float y, float z);
 
     sk_sp<RenderNodeContext> context;
@@ -93,9 +92,10 @@ private:
     SkBBHFactory *bbhFactory;
     SkPictureRecorder recorder;
     sk_sp<SkDrawable> contentCache;
-    std::set<RenderNode *> contentDependencies;
     sk_sp<SkPicture> contentSnapshot;
-    int64_t contentSnapshotId;
+    bool contentSnapshotDisabled;
+
+    std::set<RenderNode *> dependencies, observers;
 
     std::optional<SkPaint> layerPaint;
     SkRect bounds;

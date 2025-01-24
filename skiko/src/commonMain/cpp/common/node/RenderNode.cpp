@@ -62,13 +62,18 @@ class DependencyTrackerCanvas : public SkNoDrawCanvas {
 public:
     DependencyTrackerCanvas(std::set<RenderNode *> *dependencies)
         : SkNoDrawCanvas(INT_MAX, INT_MAX), dependencies(dependencies) {
+        for (auto renderNode : *dependencies) {
+            renderNode->unref();
+        }
         dependencies->clear();
     }
 
 protected:
     void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) override {
         if (drawable->getFlattenableType() == kRenderNode_Type) {
-            dependencies->insert(static_cast<RenderNode *>(drawable));
+            auto renderNode = static_cast<RenderNode *>(drawable);
+            dependencies->insert(renderNode);
+            renderNode->ref();
         } else {
             drawable->draw(this, matrix);
         }
@@ -84,8 +89,9 @@ RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
       recorder(),
       contentCache(),
       contentSnapshot(),
-      contentSnapshotId(0),
-      contentDependencies(),
+      contentSnapshotDisabled(false),
+      dependencies(),
+      observers(),
       layerPaint(),
       bounds { 0.0f, 0.0f, 0.0f, 0.0f },
       pivot { SK_FloatNaN, SK_FloatNaN },
@@ -116,85 +122,91 @@ RenderNode::~RenderNode() {
         delete this->bbhFactory;
         this->bbhFactory = nullptr;
     }
+    for (auto renderNode : this->dependencies) {
+        renderNode->unref();
+    }
+    for (auto renderNode : this->observers) {
+        renderNode->unref();
+    }
 }
 
 void RenderNode::setLayerPaint(const std::optional<SkPaint>& layerPaint) {
     this->layerPaint = layerPaint;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setBounds(const SkRect& bounds) {
     this->bounds = bounds;
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setPivot(const SkPoint& pivot) {
     this->pivot = pivot;
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setAlpha(float alpha) {
     this->alpha = alpha;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setScaleX(float scaleX) {
     this->scaleX = scaleX;
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setScaleY(float scaleY) {
     this->scaleY = scaleY;
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setTranslationX(float translationX) {
     this->translationX = translationX;
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setTranslationY(float translationY) {
     this->translationY = translationY;
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setShadowElevation(float shadowElevation) {
     this->shadowElevation = shadowElevation;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setAmbientShadowColor(SkColor ambientShadowColor) {
     this->ambientShadowColor = ambientShadowColor;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setSpotShadowColor(SkColor spotShadowColor) {
     this->spotShadowColor = spotShadowColor;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setRotationX(float rotationX) {
     this->rotationX = rotationX;
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setRotationY(float rotationY) {
     this->rotationY = rotationY;
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setRotationZ(float rotationZ) {
     this->rotationZ = rotationZ;
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 float RenderNode::getCameraDistance() const {
@@ -204,46 +216,38 @@ float RenderNode::getCameraDistance() const {
 void RenderNode::setCameraDistance(float cameraDistance) {
     this->setCameraLocation(0.0f, 0.0f, cameraDistance);
     this->matrixDirty = true;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setClipRect(const std::optional<SkRect>& clipRect) {
     this->clipRect = clipRect;
     this->clipRRect.reset();
     this->clipPath.reset();
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setClipRRect(const std::optional<SkRRect>& clipRRect) {
     this->clipRect.reset();
     this->clipRRect = clipRRect;
     this->clipPath.reset();
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setClipPath(const std::optional<SkPath>& clipPath) {
     this->clipRect.reset();
     this->clipRRect.reset();
     this->clipPath = clipPath;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 void RenderNode::setClip(bool clip) {
     this->clip = clip;
-    this->notifyDrawingChanged();
+    this->invalidateSnapshot();
 }
 
 const SkMatrix& RenderNode::getMatrix() {
     this->updateMatrix();
     return this->transformMatrix;
-}
-
-int64_t RenderNode::getSnapshotId() {
-    int64_t snapshotId = this->getGenerationID();
-    for (auto renderNode : this->contentDependencies) {
-        snapshotId += renderNode->getSnapshotId();
-    }
-    return snapshotId;
 }
 
 SkCanvas *RenderNode::beginRecording() {
@@ -255,14 +259,8 @@ SkCanvas *RenderNode::beginRecording() {
 
 void RenderNode::endRecording() {
     this->contentCache = this->recorder.finishRecordingAsDrawable();
-    this->contentSnapshot.reset();
-    this->contentSnapshotId = 0;
-
-    // Update dependencies
-    DependencyTrackerCanvas dependencyTracker(&this->contentDependencies);
-    this->contentCache->draw(&dependencyTracker);
-
-    this->notifyDrawingChanged();
+    this->updateDependencies();
+    this->invalidateSnapshot(false, true);
 }
 
 void RenderNode::drawInto(SkCanvas* canvas) {
@@ -390,17 +388,21 @@ void RenderNode::updateMatrix() {
     this->matrixIdentity = this->transformMatrix.isIdentity();
 }
 
+void RenderNode::updateDependencies() {
+    for (auto renderNode : this->dependencies) {
+        renderNode->observers.erase(this);
+        this->unref();
+    }
+    DependencyTrackerCanvas dependencyTracker(&this->dependencies);
+    this->contentCache->draw(&dependencyTracker);
+    for (auto renderNode : this->dependencies) {
+        renderNode->observers.insert(this);
+        this->ref();
+    }
+}
+
 void RenderNode::updateSnapshot() {
-    if (!this->contentCache) {
-        return;
-    }
-    int64_t currentContentSnapshotId = this->getContentSnapshotId();
-    if (this->contentSnapshot && this->contentSnapshotId == currentContentSnapshotId) {
-        return;
-    }
-    if (this->isContentContainsShadow()) {
-        this->contentSnapshot.reset();
-        this->contentSnapshotId = 0;
+    if (!this->contentCache || this->contentSnapshot || this->contentSnapshotDisabled) {
         return;
     }
 
@@ -411,7 +413,28 @@ void RenderNode::updateSnapshot() {
     UnrollDrawableCanvas unrollCanvas(recordingCanvas);
     this->contentCache->draw(&unrollCanvas);
     this->contentSnapshot = recorder.finishRecordingAsPicture();
-    this->contentSnapshotId = currentContentSnapshotId;
+}
+
+void RenderNode::invalidateSnapshot(bool disabled, bool force) {
+    this->notifyDrawingChanged();
+    if (!force && !this->contentSnapshot) {
+        return;
+    }
+    this->contentSnapshot.reset();
+    if (force) {
+        this->contentSnapshotDisabled = false;
+        for (auto renderNode : this->dependencies) {
+            if (renderNode->contentSnapshotDisabled ||
+                renderNode->shadowElevation > 0) {
+                this->contentSnapshotDisabled = true;
+                break;
+            }
+        }
+    }
+    this->contentSnapshotDisabled |= disabled;
+    for (auto renderNode : this->observers) {
+        renderNode->invalidateSnapshot(this->contentSnapshotDisabled || this->shadowElevation > 0);
+    }
 }
 
 void RenderNode::drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo) {
@@ -442,27 +465,6 @@ void RenderNode::drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry
         spotColor,
         this->alpha < 1.0f ? SkShadowFlags::kTransparentOccluder_ShadowFlag : SkShadowFlags::kNone_ShadowFlag
     );
-}
-
-int64_t RenderNode::getContentSnapshotId() {
-    int64_t snapshotId = 0L;
-    for (auto renderNode : this->contentDependencies) {
-        snapshotId += renderNode->getSnapshotId();
-    }
-    return snapshotId;
-}
-
-
-bool RenderNode::isContentContainsShadow() const {
-    if (this->shadowElevation > 0) {
-        return true;
-    }
-    for (auto renderNode : this->contentDependencies) {
-        if (renderNode->isContentContainsShadow()) {
-            return true;
-        }
-    }
-    return false;
 }
 
 // Adoption from frameworks/base/libs/hwui/RenderProperties.cpp
