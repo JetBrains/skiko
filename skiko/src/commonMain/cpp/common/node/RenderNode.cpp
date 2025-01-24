@@ -1,3 +1,5 @@
+#include <SkNWayCanvas.h>
+#include <SkPicture.h>
 #include <SkShadowUtils.h>
 #include "node/RenderNode.h"
 #include "node/RenderNodeContext.h"
@@ -39,6 +41,20 @@ static SkColor multiplyAlpha(SkColor color, float alpha) {
     return SkColorSetA(color, alpha * SkColorGetA(color));
 }
 
+
+class UnrollDrawableCanvas : public SkNWayCanvas {
+public:
+    UnrollDrawableCanvas(SkCanvas* canvas)
+        : SkNWayCanvas(canvas->imageInfo().width(), canvas->imageInfo().height()) {
+        this->addCanvas(canvas);
+    }
+
+protected:
+    void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) override {
+        drawable->draw(this, matrix);
+    }
+};
+
 RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
     : context(context),
       bbhFactory(context->shouldMeasureDrawBounds() ? new SkRTreeFactory() : nullptr),
@@ -62,7 +78,6 @@ RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
       clipRRect(),
       clipPath(),
       clip(false),
-      lastDrawMatrix(),
       transformMatrix(),
       transformCamera(),
       matrixIdentity(true),
@@ -190,37 +205,20 @@ void RenderNode::endRecording() {
 }
 
 void RenderNode::drawInto(SkCanvas* canvas) {
-    // Save the current matrix for correct shadow drawing in case of snapshoting RenderNode as SkPicture
-    this->lastDrawMatrix = canvas->getLocalToDevice().asM33();
     canvas->drawDrawable(this);
 }
 
 void RenderNode::onDraw(SkCanvas* canvas) {
     this->updateMatrix();
-    auto drawMatrix = canvas->getLocalToDevice().asM33();
 
-    int restoreCount = canvas->save();
     canvas->translate(this->bounds.left(), this->bounds.top());
     if (!this->matrixIdentity) {
         canvas->concat(this->transformMatrix);
     }
 
     if (this->shadowElevation > 0) {
-        LightGeometry lightGeometry = this->context->getLightGeometry();
-        const LightInfo& lightInfo = this->context->getLightInfo();
-
-        // Transform light position to current canvas coordinate system
-        SkPoint lightPosition = { lightGeometry.center.fX, lightGeometry.center.fY };
-        SkMatrix invertDrawMatrix;
-        if (!this->lastDrawMatrix.invert(&invertDrawMatrix)) {
-            invertDrawMatrix.setIdentity();
-        }
-        // In case of this->lastDrawMatrix == drawMatrix it will be identity matrix
-        SkMatrix shadowTransformMatrix = invertDrawMatrix * drawMatrix;
-        shadowTransformMatrix.mapPoints(&lightPosition, 1);
-        lightGeometry.center.fX = lightPosition.fX;
-        lightGeometry.center.fX = lightPosition.fX;
-
+        auto lightGeometry = this->context->getLightGeometry();
+        auto lightInfo = this->context->getLightInfo();
         this->drawShadow(canvas, lightGeometry, lightInfo);
     }
 
@@ -244,11 +242,18 @@ void RenderNode::onDraw(SkCanvas* canvas) {
     }
 
     canvas->drawDrawable(this->contentCache.get());
-    canvas->restoreToCount(restoreCount);
 }
 
 SkRect RenderNode::onGetBounds() {
     return this->bounds;
+}
+
+sk_sp<SkPicture> RenderNode::onMakePictureSnapshot() {
+    const SkRect bounds = this->getBounds();
+    SkCanvas* canvas = this->recorder.beginRecording(bounds);
+    UnrollDrawableCanvas unrollCanvas(canvas);
+    this->draw(&unrollCanvas);
+    return this->recorder.finishRecordingAsPicture();
 }
 
 // Adoption from frameworks/base/libs/hwui/RenderProperties.cpp

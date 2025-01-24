@@ -71,6 +71,10 @@ public:
     // SkDrawable
     void onDraw(SkCanvas* canvas) override;
     SkRect onGetBounds() override;
+
+protected:
+    sk_sp<SkPicture> onMakePictureSnapshot() override;
+
 private:
     void updateMatrix();
     void drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo);
@@ -97,7 +101,6 @@ private:
     std::optional<SkPath> clipPath;
     bool clip;
 
-    SkMatrix lastDrawMatrix;
     SkMatrix transformMatrix;
     SkCamera3D transformCamera;
     bool matrixIdentity;
