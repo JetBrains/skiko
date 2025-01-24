@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include <set>
 #include <SkBBHFactory.h>
 #include <SkCamera.h>
 #include <SkCanvas.h>
@@ -62,22 +63,27 @@ public:
     void setClip(bool clip);
 
     const SkMatrix& getMatrix();
+    int64_t getSnapshotId();
 
     SkCanvas * beginRecording();
     void endRecording();
 
     void drawInto(SkCanvas *canvas);
 
-    // SkDrawable
-    void onDraw(SkCanvas* canvas) override;
-    SkRect onGetBounds() override;
-
 protected:
+    // SkDrawable
+    SkRect onGetBounds() override;
+    size_t onApproximateBytesUsed() override;
+
+    void onDraw(SkCanvas* canvas) override;
     sk_sp<SkPicture> onMakePictureSnapshot() override;
 
 private:
     void updateMatrix();
+    void updateSnapshot();
     void drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo);
+    int64_t getContentSnapshotId();
+    bool isContentContainsShadow() const;
     void setCameraLocation(float x, float y, float z);
 
     sk_sp<RenderNodeContext> context;
@@ -85,6 +91,9 @@ private:
     SkBBHFactory *bbhFactory;
     SkPictureRecorder recorder;
     sk_sp<SkDrawable> contentCache;
+    std::set<RenderNode *> contentDependencies;
+    sk_sp<SkPicture> contentSnapshot;
+    int64_t contentSnapshotId;
 
     std::optional<SkPaint> layerPaint;
     SkRect bounds;

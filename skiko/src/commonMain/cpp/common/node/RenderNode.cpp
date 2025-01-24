@@ -16,13 +16,13 @@ namespace node {
 // 2^30 was chosen because it's big enough, leaves quite a lot of room between it
 // and Float.MAX_VALUE, and also lets the width and height fit into int32 (just in
 // case).
-static const float PICTURE_MIN_VALUE = static_cast<float>(-(1L << 30));
-static const float PICTURE_MAX_VALUE = static_cast<float>((1L << 30) - 1);
-static SkRect PICTURE_BOUNDS {
-    PICTURE_MIN_VALUE,
-    PICTURE_MIN_VALUE,
-    PICTURE_MAX_VALUE,
-    PICTURE_MAX_VALUE
+static const float UNKNOWN_BOUNDS_MIN_VALUE = static_cast<float>(-(1L << 30));
+static const float UNKNOWN_BOUNDS_MAX_VALUE = static_cast<float>((1L << 30) - 1);
+static SkRect UNKNOWN_BOUNDS {
+    UNKNOWN_BOUNDS_MIN_VALUE,
+    UNKNOWN_BOUNDS_MIN_VALUE,
+    UNKNOWN_BOUNDS_MAX_VALUE,
+    UNKNOWN_BOUNDS_MAX_VALUE
 };
 
 static const float DEFAULT_CAMERA_DISTANCE = 8.0f;
@@ -41,7 +41,6 @@ static SkColor multiplyAlpha(SkColor color, float alpha) {
     return SkColorSetA(color, alpha * SkColorGetA(color));
 }
 
-
 class UnrollDrawableCanvas : public SkNWayCanvas {
 public:
     UnrollDrawableCanvas(SkCanvas* canvas)
@@ -55,11 +54,34 @@ protected:
     }
 };
 
+class DependencyTrackerCanvas : public SkNoDrawCanvas {
+public:
+    DependencyTrackerCanvas(std::set<RenderNode *> *dependencies)
+        : SkNoDrawCanvas(INT_MAX, INT_MAX), dependencies(dependencies) {
+        dependencies->clear();
+    }
+
+protected:
+    void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) override {
+        if (auto renderNode = dynamic_cast<RenderNode *>(drawable)) {
+            dependencies->insert(renderNode);
+        } else {
+            drawable->draw(this, matrix);
+        }
+    }
+
+private:
+    std::set<RenderNode *> *dependencies;
+};
+
 RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
     : context(context),
       bbhFactory(context->shouldMeasureDrawBounds() ? new SkRTreeFactory() : nullptr),
       recorder(),
       contentCache(),
+      contentSnapshot(),
+      contentSnapshotId(0),
+      contentDependencies(),
       layerPaint(),
       bounds { 0.0f, 0.0f, 0.0f, 0.0f },
       pivot { SK_FloatNaN, SK_FloatNaN },
@@ -94,67 +116,81 @@ RenderNode::~RenderNode() {
 
 void RenderNode::setLayerPaint(const std::optional<SkPaint>& layerPaint) {
     this->layerPaint = layerPaint;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setBounds(const SkRect& bounds) {
     this->bounds = bounds;
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setPivot(const SkPoint& pivot) {
     this->pivot = pivot;
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setAlpha(float alpha) {
     this->alpha = alpha;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setScaleX(float scaleX) {
     this->scaleX = scaleX;
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setScaleY(float scaleY) {
     this->scaleY = scaleY;
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setTranslationX(float translationX) {
     this->translationX = translationX;
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setTranslationY(float translationY) {
     this->translationY = translationY;
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setShadowElevation(float shadowElevation) {
     this->shadowElevation = shadowElevation;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setAmbientShadowColor(SkColor ambientShadowColor) {
     this->ambientShadowColor = ambientShadowColor;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setSpotShadowColor(SkColor spotShadowColor) {
     this->spotShadowColor = spotShadowColor;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setRotationX(float rotationX) {
     this->rotationX = rotationX;
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setRotationY(float rotationY) {
     this->rotationY = rotationY;
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setRotationZ(float rotationZ) {
     this->rotationZ = rotationZ;
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 float RenderNode::getCameraDistance() const {
@@ -164,28 +200,33 @@ float RenderNode::getCameraDistance() const {
 void RenderNode::setCameraDistance(float cameraDistance) {
     this->setCameraLocation(0.0f, 0.0f, cameraDistance);
     this->matrixDirty = true;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setClipRect(const std::optional<SkRect>& clipRect) {
     this->clipRect = clipRect;
     this->clipRRect.reset();
     this->clipPath.reset();
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setClipRRect(const std::optional<SkRRect>& clipRRect) {
     this->clipRect.reset();
     this->clipRRect = clipRRect;
     this->clipPath.reset();
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setClipPath(const std::optional<SkPath>& clipPath) {
     this->clipRect.reset();
     this->clipRRect.reset();
     this->clipPath = clipPath;
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::setClip(bool clip) {
     this->clip = clip;
+    this->notifyDrawingChanged();
 }
 
 const SkMatrix& RenderNode::getMatrix() {
@@ -193,19 +234,61 @@ const SkMatrix& RenderNode::getMatrix() {
     return this->transformMatrix;
 }
 
+int64_t RenderNode::getSnapshotId() {
+    int64_t snapshotId = this->getGenerationID();
+    for (auto renderNode : this->contentDependencies) {
+        snapshotId += renderNode->getSnapshotId();
+    }
+    return snapshotId;
+}
+
 SkCanvas *RenderNode::beginRecording() {
-    bool measureDrawBounds = !clip || shadowElevation > 0.0f;
-    const SkRect& bounds = measureDrawBounds ? PICTURE_BOUNDS : SkRect::MakeWH(this->bounds.width(), this->bounds.height());
-    SkBBHFactory* bbhFactory = measureDrawBounds ? this->bbhFactory : nullptr;
+    bool canDrawOutOfBounds = !clip || shadowElevation > 0.0f;
+    const SkRect& bounds = canDrawOutOfBounds ? UNKNOWN_BOUNDS : SkRect::MakeWH(this->bounds.width(), this->bounds.height());
+    SkBBHFactory* bbhFactory = canDrawOutOfBounds ? this->bbhFactory : nullptr;
     return this->recorder.beginRecording(bounds, bbhFactory);
 }
 
 void RenderNode::endRecording() {
     this->contentCache = this->recorder.finishRecordingAsDrawable();
+    this->contentSnapshot.reset();
+    this->contentSnapshotId = 0;
+
+    // Update dependencies
+    DependencyTrackerCanvas dependencyTracker(&this->contentDependencies);
+    this->contentCache->draw(&dependencyTracker);
+
+    this->notifyDrawingChanged();
 }
 
 void RenderNode::drawInto(SkCanvas* canvas) {
     canvas->drawDrawable(this);
+}
+
+SkRect RenderNode::onGetBounds() {
+    this->updateMatrix();
+    SkRect result;
+    if (this->contentCache) {
+        result = this->contentCache->getBounds().makeOffset(this->bounds.left(), this->bounds.top());
+    } else {
+        bool canDrawOutOfBounds = !clip || shadowElevation > 0.0f;
+        result = canDrawOutOfBounds ? UNKNOWN_BOUNDS : this->bounds;
+    }
+    if (!this->matrixIdentity) {
+        this->transformMatrix.mapRect(&result);
+    }
+    return result;
+}
+
+size_t RenderNode::onApproximateBytesUsed() {
+    size_t contentSize = 0;
+    if (this->contentCache) {
+        contentSize += this->contentCache->approximateBytesUsed();
+    }
+    if (this->clipPath) {
+        contentSize += this->clipPath->approximateBytesUsed();
+    }
+    return sizeof(*this) + contentSize;
 }
 
 void RenderNode::onDraw(SkCanvas* canvas) {
@@ -241,19 +324,24 @@ void RenderNode::onDraw(SkCanvas* canvas) {
         canvas->save();
     }
 
-    canvas->drawDrawable(this->contentCache.get());
+    this->updateSnapshot();
+    if (this->contentSnapshot) {
+        canvas->drawPicture(this->contentSnapshot.get());
+    } else {
+        canvas->drawDrawable(this->contentCache.get());
+    }
 }
 
-SkRect RenderNode::onGetBounds() {
-    return this->bounds;
-}
-
+// Note: the assupmtion is that the context's light geometry uses the same coordinate space.
 sk_sp<SkPicture> RenderNode::onMakePictureSnapshot() {
+    SkPictureRecorder recorder;
+
     const SkRect bounds = this->getBounds();
-    SkCanvas* canvas = this->recorder.beginRecording(bounds);
+    SkCanvas* canvas = recorder.beginRecording(bounds);
+    // Force unrolling all drawables to avoid nested snapshoting.
     UnrollDrawableCanvas unrollCanvas(canvas);
     this->draw(&unrollCanvas);
-    return this->recorder.finishRecordingAsPicture();
+    return recorder.finishRecordingAsPicture();
 }
 
 // Adoption from frameworks/base/libs/hwui/RenderProperties.cpp
@@ -294,6 +382,30 @@ void RenderNode::updateMatrix() {
     this->matrixIdentity = this->transformMatrix.isIdentity();
 }
 
+void RenderNode::updateSnapshot() {
+    if (!this->contentCache) {
+        return;
+    }
+    int64_t currentContentSnapshotId = this->getContentSnapshotId();
+    if (this->contentSnapshot && this->contentSnapshotId == currentContentSnapshotId) {
+        return;
+    }
+    if (this->isContentContainsShadow()) {
+        this->contentSnapshot.reset();
+        this->contentSnapshotId = 0;
+        return;
+    }
+
+    SkPictureRecorder recorder;
+    auto contentBounds = this->contentCache->getBounds();
+    SkCanvas* recordingCanvas = recorder.beginRecording(contentBounds);
+    // Force unrolling all drawables to avoid nested snapshoting.
+    UnrollDrawableCanvas unrollCanvas(recordingCanvas);
+    this->contentCache->draw(&unrollCanvas);
+    this->contentSnapshot = recorder.finishRecordingAsPicture();
+    this->contentSnapshotId = currentContentSnapshotId;
+}
+
 void RenderNode::drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo) {
     SkPath tmpPath, *path = &tmpPath;
     if (this->clipRect) {
@@ -322,6 +434,27 @@ void RenderNode::drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry
         spotColor,
         this->alpha < 1.0f ? SkShadowFlags::kTransparentOccluder_ShadowFlag : SkShadowFlags::kNone_ShadowFlag
     );
+}
+
+int64_t RenderNode::getContentSnapshotId() {
+    int64_t snapshotId = 0L;
+    for (auto renderNode : this->contentDependencies) {
+        snapshotId += renderNode->getSnapshotId();
+    }
+    return snapshotId;
+}
+
+
+bool RenderNode::isContentContainsShadow() const {
+    if (this->shadowElevation > 0) {
+        return true;
+    }
+    for (auto renderNode : this->contentDependencies) {
+        if (renderNode->isContentContainsShadow()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Adoption from frameworks/base/libs/hwui/RenderProperties.cpp
