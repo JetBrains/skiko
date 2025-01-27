@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSkikoApi::class)
+
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
@@ -11,6 +13,7 @@ import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.context.JvmContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
 import org.jetbrains.skiko.util.UiTestWindow
@@ -169,6 +172,35 @@ class SkiaLayerTest {
 
             app.rectWidth = 100
             window.layer.needRedraw()
+            delay(1000)
+            screenshots.assert(window.bounds, "frame2")
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `render single swing layer`() = uiTest {
+        val window = JFrame()
+        val app = RectRenderer(window, 200, 100, Color.RED)
+        val layer = SkiaSwingLayer(
+            app,
+            properties = SkiaLayerProperties(renderApi = renderApi)
+        )
+        window.contentPane.add(layer)
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            layer.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1000)
+            screenshots.assert(window.bounds, "frame1")
+
+            app.rectWidth = 100
+            layer.repaint()
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
         } finally {
@@ -968,17 +1000,36 @@ class SkiaLayerTest {
     }
 
     private class RectRenderer(
-        private val layer: SkiaLayer,
+        private val getContentScale: () -> Float,
         var rectWidth: Int,
         var rectHeight: Int,
         private val rectColor: Color
     ) : SkikoRenderDelegate {
+        constructor(
+            layer: SkiaLayer,
+            rectWidth: Int,
+            rectHeight: Int,
+            rectColor: Color
+        ) : this(
+            { layer.contentScale }, rectWidth, rectHeight, rectColor
+        )
+
+        constructor(
+            layer: JFrame,
+            rectWidth: Int,
+            rectHeight: Int,
+            rectColor: Color
+        ) : this(
+            { layer.graphicsConfiguration.defaultTransform.scaleX.toFloat() }, rectWidth, rectHeight, rectColor
+        )
+
+        private val contentScale get() = getContentScale()
+
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-            val dpi = layer.contentScale
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
                 color = Color.WHITE.rgb
             })
-            canvas.drawRect(Rect(0f, 0f, rectWidth * dpi, rectHeight * dpi), Paint().apply {
+            canvas.drawRect(Rect(0f, 0f, rectWidth * contentScale, rectHeight * contentScale), Paint().apply {
                 color = rectColor.rgb
             })
         }

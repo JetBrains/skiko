@@ -28,14 +28,13 @@ open class SkiaSwingLayer(
     renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
+    private val properties: SkiaLayerProperties = SkiaLayerProperties()
 ) : JPanel() {
     internal companion object {
         init {
             Library.load()
         }
     }
-
-    private val properties = SkiaLayerProperties()
 
     private var isInitialized = false
 
