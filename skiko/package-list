@@ -2625,6 +2625,19 @@ $dokka.location:org.jetbrains.skia/VertexMode/values/#/PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skia/WStream///PointingToDeclaration/skiko/org.jetbrains.skia/-w-stream/index.html
 $dokka.location:org.jetbrains.skia/WStream/WStream/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-w-stream/-w-stream.html
 $dokka.location:org.jetbrains.skia/WStream/WStream/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer/PointingToDeclaration/skiko/org.jetbrains.skia/-w-stream/-w-stream.html
+$dokka.location:org.jetbrains.skiko.graphicapi////PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/index.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext.Texture///PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/-texture/index.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext.Texture/Texture/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/-texture/-texture.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext.Texture/actualHeight/#/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/-texture/actual-height.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext.Texture/actualWidth/#/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/-texture/actual-width.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext.Texture/backendRenderTarget/#/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/-texture/backend-render-target.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext.Texture/close/#/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/-texture/close.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext.Texture/readPixels/#kotlin.ByteArray/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/-texture/read-pixels.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext.Texture/waitForCompletion/#/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/-texture/wait-for-completion.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext///PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/index.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext/DirectXOffscreenContext/#/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/-direct-x-offscreen-context.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext/close/#/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/close.html
+$dokka.location:org.jetbrains.skiko.graphicapi/DirectXOffscreenContext/directContext/#/PointingToDeclaration/skiko/org.jetbrains.skiko.graphicapi/-direct-x-offscreen-context/direct-context.html
 $dokka.location:org.jetbrains.skiko.ios////PointingToDeclaration/skiko/org.jetbrains.skiko.ios/index.html
 $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits///PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-skiko-u-i-text-input-traits/index.html
 $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits/autocapitalizationType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-skiko-u-i-text-input-traits/autocapitalization-type.html
@@ -2641,7 +2654,7 @@ $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits/spellCheckingType
 $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits/textContentType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-skiko-u-i-text-input-traits/text-content-type.html
 $dokka.location:org.jetbrains.skiko.swing////PointingToDeclaration/skiko/org.jetbrains.skiko.swing/index.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer///PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/index.html
-$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/SkiaSwingLayer/#org.jetbrains.skiko.SkikoRenderDelegate#org.jetbrains.skiko.SkiaLayerAnalytics#kotlin.Function1[java.awt.Component,javax.accessibility.Accessible]?/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/-skia-swing-layer.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/SkiaSwingLayer/#org.jetbrains.skiko.SkikoRenderDelegate#org.jetbrains.skiko.SkiaLayerAnalytics#kotlin.Function1[java.awt.Component,javax.accessibility.Accessible]?#org.jetbrains.skiko.SkiaLayerProperties/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/-skia-swing-layer.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/addNotify/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/add-notify.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/clipComponents/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/clip-components.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/dispose/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/dispose.html
@@ -2977,6 +2990,7 @@ org.jetbrains.skia.skottie
 org.jetbrains.skia.sksg
 org.jetbrains.skia.svg
 org.jetbrains.skiko
+org.jetbrains.skiko.graphicapi
 org.jetbrains.skiko.ios
 org.jetbrains.skiko.swing
 org.jetbrains.skiko.wasm
