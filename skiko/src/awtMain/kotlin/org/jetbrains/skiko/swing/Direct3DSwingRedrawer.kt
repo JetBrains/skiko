@@ -2,8 +2,19 @@ package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.alignedTextureWidth
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.createDirectXOffscreenDevice
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.disposeDirectXTexture
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.chooseAdapter
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.disposeDevice
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXContext
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXRenderTargetOffScreen
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXTexture
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.readPixels
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.waitForCompletion
 import java.awt.Graphics2D
 
+// TODO reuse DirectXOffscreenContext
 internal class Direct3DSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
     private val renderDelegate: SkikoRenderDelegate,
@@ -15,7 +26,7 @@ internal class Direct3DSwingRedrawer(
         }
     }
 
-    private val adapter = chooseAdapter(swingLayerProperties.adapterPriority.ordinal).also {
+    private val adapter = chooseAdapter(swingLayerProperties.adapterPriority).also {
         onDeviceChosen("DirectX12") // TODO: properly get name
     }
 
@@ -33,8 +44,6 @@ internal class Direct3DSwingRedrawer(
 
     private var texturePtr: Long = 0
     private var bytesToDraw = ByteArray(0)
-    private val rowBytesAlignment = getAlignment().toInt()
-    private val widthSizeAlignment = rowBytesAlignment / 4
 
     init {
         onContextInit()
@@ -50,15 +59,9 @@ internal class Direct3DSwingRedrawer(
 
     override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) {
         autoCloseScope {
-            // Calculate aligned width that is needed for performance optimization,
-            // since DirectX uses aligned bytebuffer.
-            // So we will have [Surface] with width == [alignedWidth],
+            // We will have [Surface] with width == [alignedWidth],
             // but imitate (for SkikoRenderDelegate and Swing) like it has width == [width].
-            val alignedWidth = if (width % widthSizeAlignment != 0) {
-                width + widthSizeAlignment - (width % widthSizeAlignment);
-            } else {
-                width
-            }
+            val alignedWidth = alignedTextureWidth(width)
 
             texturePtr = makeDirectXTexture(device, texturePtr, alignedWidth, height)
             if (texturePtr == 0L) {
@@ -90,7 +93,8 @@ internal class Direct3DSwingRedrawer(
             bytesToDraw = ByteArray(bytesArraySize)
         }
 
-        if(!readPixels(device, texturePtr, bytesToDraw)) {
+        waitForCompletion(device, texturePtr)
+        if(!readPixels(texturePtr, bytesToDraw)) {
             throw RenderException("Couldn't read pixels")
         }
 
@@ -100,27 +104,4 @@ internal class Direct3DSwingRedrawer(
     private fun makeRenderTarget() = BackendRenderTarget(
         makeDirectXRenderTargetOffScreen(texturePtr)
     )
-
-    // Called from native code
-    private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
-
-    private external fun chooseAdapter(adapterPriority: Int): Long
-    private external fun createDirectXOffscreenDevice(adapter: Long): Long
-    private external fun makeDirectXContext(device: Long): Long
-
-    private external fun readPixels(device: Long, texturePtr: Long, byteArray: ByteArray): Boolean
-
-    private external fun getAlignment(): Long
-
-    /**
-     * Provides ID3D12Resource texture taking given [oldTexturePtr] into account
-     * since it can be reused if width and height are not changed,
-     * or the new one will be created.
-     */
-    private external fun makeDirectXTexture(device: Long, oldTexturePtr: Long, width: Int, height: Int): Long
-    private external fun disposeDirectXTexture(texturePtr: Long)
-
-    private external fun makeDirectXRenderTargetOffScreen(texturePtr: Long): Long
-
-    private external fun disposeDevice(device: Long)
 }
