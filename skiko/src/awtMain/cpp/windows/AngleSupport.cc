@@ -1,11 +1,22 @@
 #ifdef SK_ANGLE
 
 #include <windows.h>
+#include <shlwapi.h>
 #define GL_GLES_PROTOTYPES 0
 #define EGL_EGL_PROTOTYPES 0
 #include <GLES/gl.h>
 #include <EGL/egl.h>
 #include "exceptions_handler.h"
+
+#define THROW_IF_NULL(action)                                               \
+    do {                                                                    \
+        auto __result { action };                                           \
+        if (0 == __result) {                                                \
+            auto __code = GetLastError();                                   \
+            throwJavaRenderExceptionByErrorCode(env, __FUNCTION__, __code); \
+            return;                                                         \
+        }                                                                   \
+    } while ((void)0, 0)
 
 static HINSTANCE AngleEGLLibrary = nullptr;
 
@@ -73,11 +84,19 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AngleSupport_1jvmKt_loadAngleLibraryWindows(JNIEnv *env, jobject obj) {
-        AngleEGLLibrary = LoadLibrary("libEGL.dll");
-        if (AngleEGLLibrary == nullptr) {
-            auto code = GetLastError();
-            throwJavaRenderExceptionByErrorCode(env, __FUNCTION__, code);
-        }
+        TCHAR basePath[MAX_PATH] = TEXT("");
+        TCHAR libEGL[MAX_PATH] = TEXT("");
+        TCHAR libGLESv2[MAX_PATH] = TEXT("");
+        HMODULE hmodule = nullptr;
+        THROW_IF_NULL(GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                                        (LPTSTR) &Java_org_jetbrains_skiko_AngleSupport_1jvmKt_loadAngleLibraryWindows,
+                                        &hmodule));
+        THROW_IF_NULL(GetModuleFileName(hmodule, basePath, sizeof(basePath)));
+        THROW_IF_NULL(PathRemoveFileSpec(basePath));
+        THROW_IF_NULL(PathCombine(libEGL, basePath, TEXT("libEGL.dll")));
+        THROW_IF_NULL(PathCombine(libGLESv2, basePath, TEXT("libGLESv2.dll")));
+        THROW_IF_NULL(AngleEGLLibrary = LoadLibrary(libEGL));
+        THROW_IF_NULL(LoadLibrary(libGLESv2));
     }
 }
 
