@@ -15,6 +15,7 @@
 #include "gl/GrGLAssembleInterface.h"
 #include "ganesh/gl/GrGLDefines.h"
 #include <GL/gl.h>
+#include "window_util.h"
 
 void throwAngleException(JNIEnv *env, const char * function, const char * msg) {
     char fullMsg[1024];
@@ -73,7 +74,7 @@ extern "C"
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_createAngleDevice(
-        JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
+        JNIEnv *env, jobject redrawer, jlong platformInfoPtr, jboolean transparency)
     {
         __try
         {
@@ -88,6 +89,11 @@ extern "C"
             {
                 throwAngleException(env, __FUNCTION__, "Could not get display!");
                 return 0;
+            }
+
+            if (transparency)
+            {
+                enableTransparentWindow(angleDevice->window);
             }
 
             EGLint majorVersion;

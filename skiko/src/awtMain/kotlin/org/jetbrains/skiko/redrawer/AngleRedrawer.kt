@@ -44,7 +44,7 @@ internal class AngleRedrawer(
 
     init {
         device = layer.backedLayer.useDrawingSurfacePlatformInfo { platformInfo ->
-            createAngleDevice(platformInfo).takeIf { it != 0L }
+            createAngleDevice(platformInfo, layer.transparency).takeIf { it != 0L }
                 ?: throw RenderException("Failed to create ANGLE device.")
         }
         adapterName.let { adapterName ->
@@ -103,7 +103,7 @@ internal class AngleRedrawer(
     )
 }
 
-private external fun createAngleDevice(platformInfo: Long): Long
+private external fun createAngleDevice(platformInfo: Long, transparency: Boolean): Long
 private external fun makeAngleContext(device: Long): Long
 private external fun makeAngleRenderTarget(device: Long, width: Int, height: Int): Long
 private external fun finishFrame(device: Long)
