@@ -15,6 +15,17 @@
 #include "ganesh/gl/GrGLDefines.h"
 #include <GL/gl.h>
 
+void throwAngleException(JNIEnv *env, const char * function, const char * msg) {
+    char fullMsg[1024];
+    snprintf(fullMsg, sizeof(fullMsg) - 1, "Native exception in [%s], message: %s", function, msg);
+
+    static jclass cls = static_cast<jclass>(env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/redrawer/AngleRedrawerException")));
+    static jmethodID init = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;)V");
+
+    jthrowable throwable = (jthrowable) env->NewObject(cls, init, env->NewStringUTF(fullMsg));
+    env->Throw(throwable);
+}
+
 class AngleDevice
 {
 public:
@@ -74,7 +85,7 @@ extern "C"
             angleDevice->display = getAngleEGLDisplay(angleDevice->device);
             if (EGL_NO_DISPLAY == angleDevice->display)
             {
-                fprintf(stderr, "Could not get display!\n");
+                throwAngleException(env, __FUNCTION__, "Could not get display!");
                 return 0;
             }
 
@@ -82,7 +93,7 @@ extern "C"
             EGLint minorVersion;
             if (!eglInitialize(angleDevice->display, &majorVersion, &minorVersion))
             {
-                fprintf(stderr, "Could not initialize display!\n");
+                throwAngleException(env, __FUNCTION__, "Could not initialize display!");
                 return 0;
             }
             EGLint numConfigs;
@@ -107,7 +118,7 @@ extern "C"
             EGLConfig surfaceConfig;
             if (!eglChooseConfig(angleDevice->display, configAttribs, &surfaceConfig, 1, &numConfigs))
             {
-                fprintf(stderr, "Could not create choose config!\n");
+                throwAngleException(env, __FUNCTION__, "Could not create choose config!");
                 return 0;
             }
             // We currently only support ES3.
@@ -115,18 +126,18 @@ extern "C"
             angleDevice->context = eglCreateContext(angleDevice->display, surfaceConfig, nullptr, contextAttribs);
             if (EGL_NO_CONTEXT == angleDevice->context)
             {
-                fprintf(stderr, "Could not create context!\n");
+                throwAngleException(env, __FUNCTION__, "Could not create context!");
                 return 0;
             }
             angleDevice->surface = eglCreateWindowSurface(angleDevice->display, surfaceConfig, angleDevice->window, nullptr);
             if (EGL_NO_SURFACE == angleDevice->surface)
             {
-                fprintf(stderr, "Could not create surface!\n");
+                throwAngleException(env, __FUNCTION__, "Could not create surface!");
                 return 0;
             }
             if (!eglMakeCurrent(angleDevice->display, angleDevice->surface, angleDevice->surface, angleDevice->context))
             {
-                fprintf(stderr, "Could not make context current!\n");
+                throwAngleException(env, __FUNCTION__, "Could not make context current!");
                 return 0;
             }
 
@@ -197,7 +208,7 @@ extern "C"
             eglSwapInterval(angleDevice->display, (int)isVsyncEnabled); // wait for vsync
             if (!eglSwapBuffers(angleDevice->display, angleDevice->surface))
             {
-                fprintf(stderr, "Could not complete eglSwapBuffers.\n");
+                throwAngleException(env, __FUNCTION__, "Could not complete eglSwapBuffers.");
             }
         }
         __except(EXCEPTION_EXECUTE_HANDLER)

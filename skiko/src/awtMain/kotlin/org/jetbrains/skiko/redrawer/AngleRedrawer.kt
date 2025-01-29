@@ -102,3 +102,6 @@ private external fun makeAngleContext(device: Long): Long
 private external fun makeAngleRenderTarget(device: Long, width: Int, height: Int): Long
 private external fun finishFrame(device: Long, isVsyncEnabled: Boolean)
 private external fun disposeDevice(device: Long)
+
+@Suppress("unused")
+class AngleRedrawerException(message: String) : RuntimeException(message)
