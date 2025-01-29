@@ -43,7 +43,7 @@ case $SKIA_TARGET in
     ;;
   "windows")
     SKIKO_TARGET_FLAGS="-Pskiko.awt.enabled=true"
-    if [[ $(uname -m) == 'arm64' ]]; then
+    if [[ $(powershell.exe -command '(Get-CimInstance Win32_OperatingSystem).OSArchitecture') == *'ARM 64'* ]]; then
       skikoMachines=("arm64")
     else
       skikoMachines=("x64")
@@ -87,4 +87,6 @@ cd "$SCRIPT_DIR"
 
 rm -rf build/classes/kotlin/* # We need to drop old cache. We can do it with ./gradlew clean as well, but it tooks longer time to redownload dependencies dir.
 
-./gradlew publishToMavenLocal $SKIKO_TARGET_FLAGS -Pskia.dir="$(pwd)/skia-pack/skia" -Pskiko.debug=$SKIA_DEBUG_MODE
+for skikoMachine in ${skikoMachines[@]}; do
+  ./gradlew publishToMavenLocal $SKIKO_TARGET_FLAGS -Pskia.dir="${SCRIPT_DIR}/../../skia-pack/skia" -Pskiko.debug=$SKIA_DEBUG_MODE -Pskiko.arch="$skikoMachine"
+done
