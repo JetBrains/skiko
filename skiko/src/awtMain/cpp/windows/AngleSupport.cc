@@ -1,6 +1,7 @@
 #ifdef SK_ANGLE
 
 #include <windows.h>
+#include <shlwapi.h>
 #include <EGL/egl.h>
 #include "exceptions_handler.h"
 
@@ -63,7 +64,23 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AngleSupport_1jvmKt_loadAngleLibraryWindows(JNIEnv *env, jobject obj) {
-        AngleEGLLibrary = LoadLibrary("libEGL.dll");
+        TCHAR path[MAX_PATH];
+        HMODULE hmodule;
+        if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                              (LPTSTR) &Java_org_jetbrains_skiko_AngleSupport_1jvmKt_loadAngleLibraryWindows,
+                              &hmodule) == 0) {
+            auto code = GetLastError();
+            throwJavaRenderExceptionByErrorCode(env, __FUNCTION__, code);
+            return;
+        }
+        if (GetModuleFileName(hmodule, path, sizeof(path)) == 0) {
+            auto code = GetLastError();
+            throwJavaRenderExceptionByErrorCode(env, __FUNCTION__, code);
+            return;
+        }
+        PathRemoveFileSpec(path);
+        PathAppend(path, TEXT("libEGL.dll"));
+        AngleEGLLibrary = LoadLibrary(path);
         if (AngleEGLLibrary == nullptr) {
             auto code = GetLastError();
             throwJavaRenderExceptionByErrorCode(env, __FUNCTION__, code);

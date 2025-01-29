@@ -107,7 +107,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
                 "/utf-8",
                 "/GR-", // no-RTTI.
                 "/FS", // Due to an error when building in Teamcity. https://docs.microsoft.com/en-us/cpp/build/reference/fs-force-synchronous-pdb-writes
-                "-DSK_ANGLE",
+                "/DSK_ANGLE",
             )
         }
         OS.Android -> {
@@ -317,6 +317,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                         "ole32.lib",
                         "Propsys.lib",
                         "shcore.lib",
+                        "Shlwapi.lib",
                         "user32.lib",
                     )
                 )
