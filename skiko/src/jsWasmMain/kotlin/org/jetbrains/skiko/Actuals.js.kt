@@ -36,3 +36,7 @@ internal actual fun getCursorById(id: PredefinedCursorsId): Cursor =
 internal actual fun loadOpenGLLibrary() {
    // Nothing to do here
 }
+
+internal actual fun loadAngleLibrary() {
+    // Nothing to do here
+}
