@@ -32,6 +32,11 @@ internal class AngleRedrawer(
         if (layer.isShowing) {
             update(System.nanoTime())
             draw()
+            if (properties.isVsyncEnabled) {
+                withContext(dispatcherToBlockOn) {
+                    dwmFlush()
+                }
+            }
         }
     }
 
@@ -68,22 +73,23 @@ internal class AngleRedrawer(
         check(!isDisposed) { "ANGLE redrawer is disposed" }
         inDrawScope {
             update(System.nanoTime())
-            drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
+            drawAndSwap()
+            if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
+                dwmFlush()
+            }
         }
     }
 
     private fun draw() {
-        inDrawScope {
-            drawAndSwap(withVsync = properties.isVsyncEnabled)
-        }
+        inDrawScope(::drawAndSwap)
     }
 
-    private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
+    private fun drawAndSwap() = synchronized(drawLock) {
         if (isDisposed) {
             return
         }
         contextHandler.draw()
-        finishFrame(device, withVsync)
+        finishFrame(device)
     }
 
     fun makeContext() = DirectContext(
@@ -100,7 +106,8 @@ internal class AngleRedrawer(
 private external fun createAngleDevice(platformInfo: Long): Long
 private external fun makeAngleContext(device: Long): Long
 private external fun makeAngleRenderTarget(device: Long, width: Int, height: Int): Long
-private external fun finishFrame(device: Long, isVsyncEnabled: Boolean)
+private external fun finishFrame(device: Long)
+private external fun dwmFlush()
 private external fun disposeDevice(device: Long)
 
 @Suppress("unused")
