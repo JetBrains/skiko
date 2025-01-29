@@ -1,7 +1,9 @@
 #ifdef SK_ANGLE
 
 #include <windows.h>
+#define GL_GLES_PROTOTYPES 0
 #define EGL_EGL_PROTOTYPES 0
+#include <GLES/gl.h>
 #include <EGL/egl.h>
 #include "exceptions_handler.h"
 
@@ -61,6 +63,13 @@ extern "C" {
     __eglMustCastToProperFunctionPointerType EGLAPIENTRY eglGetProcAddress (const char *procname) {
         static auto eglGetProcAddress = (PFNEGLGETPROCADDRESSPROC) GetProcAddress(AngleEGLLibrary, "eglGetProcAddress");
         return eglGetProcAddress(procname);
+    }
+
+    JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_AngleApi_glGetString(JNIEnv *env, jobject object, jint value)
+    {
+        static auto glGetString = (PFNGLGETSTRINGPROC) eglGetProcAddress("glGetString");
+        const char *content = reinterpret_cast<const char *>(glGetString(value));
+        return env->NewStringUTF(content);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AngleSupport_1jvmKt_loadAngleLibraryWindows(JNIEnv *env, jobject obj) {
