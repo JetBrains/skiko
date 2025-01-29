@@ -43,13 +43,13 @@ fun compilerForTarget(os: OS, arch: Arch): String =
             Arch.Wasm -> "Unexpected combination: $os & $arch"
         }
         OS.Android -> "clang++"
-        OS.Windows -> "cl.exe"
+        OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
         OS.Wasm -> "emcc"
     }
 
 fun linkerForTarget(os: OS, arch: Arch): String =
-    if (os.isWindows) "link.exe" else compilerForTarget(os, arch)
+    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch)
 
 val OS.dynamicLibExt: String
     get() = when (this) {

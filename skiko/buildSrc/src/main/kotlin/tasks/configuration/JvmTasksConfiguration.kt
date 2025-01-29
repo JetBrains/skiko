@@ -95,7 +95,6 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
             )
         }
         OS.Windows -> {
-            compiler.set(windowsSdkPaths.compiler.absolutePath)
             includeHeadersNonRecursive(windowsSdkPaths.includeDirs)
             includeHeadersNonRecursive(jdkHome.resolve("include/win32"))
             osFlags = arrayOf(
@@ -104,7 +103,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
                 "/utf-8",
                 "/GR-", // no-RTTI.
                 "/FS", // Due to an error when building in Teamcity. https://docs.microsoft.com/en-us/cpp/build/reference/fs-force-synchronous-pdb-writes
-                // LATER. Ange rendering arguments:
+                // LATER. Angle rendering arguments:
                 // "-I$skiaDir/third_party/externals/angle2/include",
                 // "-I$skiaDir/src/gpu",
                 // "-DSK_ANGLE",
@@ -287,7 +286,6 @@ fun SkikoProjectContext.createLinkJvmBindings(
             )
         }
         OS.Windows -> {
-            linker.set(windowsSdkPaths.linker.absolutePath)
             libDirs.set(windowsSdkPaths.libDirs)
             osFlags = mutableListOf<String>().apply {
                 addAll(buildType.msvcLinkerFlags)
