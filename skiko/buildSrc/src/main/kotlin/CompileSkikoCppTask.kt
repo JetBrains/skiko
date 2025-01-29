@@ -148,7 +148,12 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
                 arg("-o", outputFile.absolutePath.replace("\\", "/"))
                 arg(value = sourceFile.absolutePath.replace("\\", "/"))
                 if (compiler.get().startsWith("clang")) {
-                    arg("-MJ", outputFile.absolutePath + ".json")
+                    // We use Clang-CL on Windows which doesn't directly support the -MJ flag.
+                    // We have to use the /clang:-MJ"path" form instead.
+                    when {
+                        buildTargetOS.get().isWindows -> rawArg("/clang:-MJ\"" + outputFile.absolutePath + ".json\"")
+                        else -> arg("-MJ", outputFile.absolutePath + ".json")
+                    }
                 }
             }
 

@@ -1,5 +1,4 @@
 #include "exceptions_handler.h"
-#include "../common/interop.hh"
 
 const char *getDescription(DWORD code) {
     switch (code) {

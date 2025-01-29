@@ -11,7 +11,7 @@
 #include "ganesh/GrDirectContext.h"
 #include "SkSurface.h"
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
-#include "../common/interop.hh"
+#include "interop.hh"
 #include "DCompLibrary.h"
 
 #include "ganesh/d3d/GrD3DTypes.h"
