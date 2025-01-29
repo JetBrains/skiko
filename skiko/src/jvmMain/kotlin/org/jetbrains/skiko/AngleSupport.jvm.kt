@@ -12,7 +12,12 @@ internal actual fun loadAngleLibrary() {
         when {
             hostOs.isWindows -> {
                 Library.staticLoad()
-                loadAngleLibraryWindows()
+                try {
+                    loadAngleLibraryWindows()
+                }
+                catch (e: Exception) {
+                    throw RenderException("Failed to load ANGLE library: ${e}")
+                }
             }
             else -> Unit
         }
