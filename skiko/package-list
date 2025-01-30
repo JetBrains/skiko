@@ -2652,6 +2652,34 @@ $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits/smartInsertDelete
 $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits/smartQuotesType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-skiko-u-i-text-input-traits/smart-quotes-type.html
 $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits/spellCheckingType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-skiko-u-i-text-input-traits/spell-checking-type.html
 $dokka.location:org.jetbrains.skiko.ios/SkikoUITextInputTraits/textContentType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-skiko-u-i-text-input-traits/text-content-type.html
+$dokka.location:org.jetbrains.skiko.node////PointingToDeclaration/skiko/org.jetbrains.skiko.node/index.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode///PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/index.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/RenderNode/#org.jetbrains.skiko.node.RenderNodeContext/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/-render-node.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/alpha/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/alpha.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/ambientShadowColor/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/ambient-shadow-color.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/beginRecording/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/begin-recording.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/bounds/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/bounds.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/cameraDistance/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/camera-distance.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/clip/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/clip.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/drawInto/#org.jetbrains.skia.Canvas/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/draw-into.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/endRecording/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/end-recording.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/layerPaint/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/layer-paint.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/pivot/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/pivot.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/rotationX/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/rotation-x.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/rotationY/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/rotation-y.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/rotationZ/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/rotation-z.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/scaleX/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/scale-x.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/scaleY/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/scale-y.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/setClipPath/#org.jetbrains.skia.Path?/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/set-clip-path.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/setClipRRect/#org.jetbrains.skia.RRect/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/set-clip-r-rect.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/setClipRect/#org.jetbrains.skia.Rect/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/set-clip-rect.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/shadowElevation/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/shadow-elevation.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/spotShadowColor/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/spot-shadow-color.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/translationX/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/translation-x.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/translationY/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/translation-y.html
+$dokka.location:org.jetbrains.skiko.node/RenderNodeContext///PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node-context/index.html
+$dokka.location:org.jetbrains.skiko.node/RenderNodeContext/RenderNodeContext/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node-context/-render-node-context.html
+$dokka.location:org.jetbrains.skiko.node/RenderNodeContext/setLightingInfo/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node-context/set-lighting-info.html
 $dokka.location:org.jetbrains.skiko.swing////PointingToDeclaration/skiko/org.jetbrains.skiko.swing/index.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer///PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/index.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/SkiaSwingLayer/#org.jetbrains.skiko.SkikoRenderDelegate#org.jetbrains.skiko.SkiaLayerAnalytics#kotlin.Function1[java.awt.Component,javax.accessibility.Accessible]?#org.jetbrains.skiko.SkiaLayerProperties/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/-skia-swing-layer.html
@@ -2992,6 +3020,7 @@ org.jetbrains.skia.svg
 org.jetbrains.skiko
 org.jetbrains.skiko.graphicapi
 org.jetbrains.skiko.ios
+org.jetbrains.skiko.node
 org.jetbrains.skiko.swing
 org.jetbrains.skiko.wasm
 org.jetbrains.skiko.windows
