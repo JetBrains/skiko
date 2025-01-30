@@ -156,7 +156,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeRuntimeShader
   (JNIEnv* env, jclass jclass, jlong runtimeShaderBuilderPtr, jstring childShaderName, jlong inputPtr) {
-    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(static_cast<uintptr_t>(runtimeShaderBuilderPtr));
+    SkRuntimeEffectBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeEffectBuilder*>(static_cast<uintptr_t>(runtimeShaderBuilderPtr));
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
 
     SkImageFilter* ptr = SkImageFilters::RuntimeShader(*runtimeShaderBuilder, skString(env, childShaderName).c_str(), sk_ref_sp(input)).release();
@@ -165,7 +165,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeRuntimeShaderFromArray
   (JNIEnv* env, jclass jclass, jlong runtimeShaderBuilderPtr, jobjectArray childShaderNamesArr, jlongArray inputPtrsArray, jint _inputCount) {
-    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(static_cast<uintptr_t>(runtimeShaderBuilderPtr));
+    SkRuntimeEffectBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeEffectBuilder*>(static_cast<uintptr_t>(runtimeShaderBuilderPtr));
 
     jsize inputCount = env->GetArrayLength(inputPtrsArray);
     jlong* inputPtrs = env->GetLongArrayElements(inputPtrsArray, 0);

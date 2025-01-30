@@ -1,6 +1,6 @@
 #include <iostream>
 #include <jni.h>
-#include "GrDirectContext.h"
+#include "ganesh/GrDirectContext.h"
 #include "SkSurface.h"
 #include "interop.hh"
 

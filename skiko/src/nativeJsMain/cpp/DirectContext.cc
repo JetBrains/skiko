@@ -1,5 +1,5 @@
-#include "GrDirectContext.h"
-#include "include/gpu/gl/GrGLInterface.h"
+#include "ganesh/GrDirectContext.h"
+#include "ganesh/gl/GrGLInterface.h"
 #include "common.h"
 #include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
 

@@ -4,8 +4,8 @@
 #include <jawt_md.h>
 #include "jni_helpers.h"
 
-#include "GrBackendSurface.h"
-#include "GrDirectContext.h"
+#include "ganesh/GrBackendSurface.h"
+#include "ganesh/GrDirectContext.h"
 #include "SkSurface.h"
 #include "exceptions_handler.h"
 
