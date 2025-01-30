@@ -9,7 +9,7 @@ namespace node {
 
 // The goal with selecting the size of the rectangle here is to avoid limiting the
 // drawable area as much as possible.
-// Due to https://partnerissuetracker.corp.google.com/issues/324465764 we have to
+// Due to https://issuetracker.google.com/issues/324465764 we have to
 // leave room for scale between the values we specify here and Float.MAX_VALUE.
 // The maximum possible scale that can be applied to the canvas will be
 // Float.MAX_VALUE divided by the largest value below.
