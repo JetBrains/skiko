@@ -1,7 +1,7 @@
 #include <ganesh/mtl/GrMtlTypes.h>
 
-#include "GrBackendSurface.h"
-#include "GrDirectContext.h"
+#include "ganesh/GrBackendSurface.h"
+#include "ganesh/GrDirectContext.h"
 #include "common.h"
 #include "ganesh/gl/GrGLDirectContext.h"
 #include "ganesh/gl/GrGLBackendSurface.h"

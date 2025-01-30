@@ -6,6 +6,8 @@
 #include "SkRect.h"
 #include "common.h"
 
+using SkRuntimeShaderBuilder = SkRuntimeEffectBuilder;
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeArithmetic
   (KFloat k1, KFloat k2, KFloat k3, KFloat k4, KBoolean enforcePMColor, KNativePointer bgPtr, KNativePointer fgPtr, KInt* cropInts) {
     SkImageFilter* bg = reinterpret_cast<SkImageFilter*>((bgPtr));

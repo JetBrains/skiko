@@ -1,7 +1,7 @@
 #include <iostream>
 #include <jni.h>
 #include <ganesh/gl/GrGLBackendSurface.h>
-#include "GrBackendSurface.h"
+#include "ganesh/GrBackendSurface.h"
 #ifdef SK_METAL
 #include "ganesh/mtl/GrMtlBackendSurface.h"
 #include "ganesh/mtl/GrMtlTypes.h"

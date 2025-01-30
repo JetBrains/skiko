@@ -12,8 +12,8 @@
 #include "window_util.h"
 
 #include "SkColorSpace.h"
-#include "GrBackendSurface.h"
-#include "GrDirectContext.h"
+#include "ganesh/GrBackendSurface.h"
+#include "ganesh/GrDirectContext.h"
 #include "SkSurface.h"
 #include "../common/interop.hh"
 

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <jni.h>
-#include "GrDirectContext.h"
+#include "ganesh/GrDirectContext.h"
 #include "ganesh/gl/GrGLDirectContext.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeGL
