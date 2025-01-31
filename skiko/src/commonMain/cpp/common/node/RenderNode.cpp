@@ -77,6 +77,8 @@ RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
       clipRect(),
       clipRRect(),
       clipPath(),
+      clipOp(SkClipOp::kIntersect),
+      clipAntiAlias(false),
       clip(false),
       transformMatrix(),
       transformCamera(),
@@ -166,22 +168,28 @@ void RenderNode::setCameraDistance(float cameraDistance) {
     this->matrixDirty = true;
 }
 
-void RenderNode::setClipRect(const std::optional<SkRect>& clipRect) {
+void RenderNode::setClipRect(const std::optional<SkRect>& clipRect, SkClipOp op, bool doAntiAlias) {
     this->clipRect = clipRect;
     this->clipRRect.reset();
     this->clipPath.reset();
+    this->clipOp = op;
+    this->clipAntiAlias = doAntiAlias;
 }
 
-void RenderNode::setClipRRect(const std::optional<SkRRect>& clipRRect) {
+void RenderNode::setClipRRect(const std::optional<SkRRect>& clipRRect, SkClipOp op, bool doAntiAlias) {
     this->clipRect.reset();
     this->clipRRect = clipRRect;
     this->clipPath.reset();
+    this->clipOp = op;
+    this->clipAntiAlias = doAntiAlias;
 }
 
-void RenderNode::setClipPath(const std::optional<SkPath>& clipPath) {
+void RenderNode::setClipPath(const std::optional<SkPath>& clipPath, SkClipOp op, bool doAntiAlias) {
     this->clipRect.reset();
     this->clipRRect.reset();
     this->clipPath = clipPath;
+    this->clipOp = op;
+    this->clipAntiAlias = doAntiAlias;
 }
 
 void RenderNode::setClip(bool clip) {
@@ -225,18 +233,20 @@ void RenderNode::onDraw(SkCanvas* canvas) {
     if (this->clip) {
         canvas->save();
         if (this->clipRect) {
-            canvas->clipRect(*this->clipRect);
+            canvas->clipRect(*this->clipRect, this->clipOp, this->clipAntiAlias);
         } else if (this->clipRRect) {
-            canvas->clipRRect(*this->clipRRect);
+            canvas->clipRRect(*this->clipRRect, this->clipOp, this->clipAntiAlias);
         } else if (this->clipPath) {
-            canvas->clipPath(*this->clipPath);
+            canvas->clipPath(*this->clipPath, this->clipOp, this->clipAntiAlias);
         } else {
-            canvas->clipRect(SkRect::MakeWH(this->bounds.width(), this->bounds.height()));
+            auto rect = SkRect::MakeWH(this->bounds.width(), this->bounds.height());
+            canvas->clipRect(rect, this->clipOp, this->clipAntiAlias);
         }
     }
 
     if (this->layerPaint) {
-        canvas->saveLayer(SkRect::MakeWH(this->bounds.width(), this->bounds.height()), &*this->layerPaint);
+        auto rect = SkRect::MakeWH(this->bounds.width(), this->bounds.height());
+        canvas->saveLayer(rect, &*this->layerPaint);
     } else {
         canvas->save();
     }

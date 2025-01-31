@@ -241,22 +241,45 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
             reachabilityBarrier(this)
         }
 
-    fun setClipRect(r: Rect) {
+    fun setClipRect(r: Rect, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
         Stats.onNativeCall()
-        RenderNode_nSetClipRect(_ptr, r.left, r.top, r.right, r.bottom)
+        RenderNode_nSetClipRect(
+            ptr = _ptr,
+            left = r.left,
+            top = r.top,
+            right = r.right,
+            bottom = r.bottom,
+            mode = mode.ordinal,
+            antiAlias = antiAlias
+        )
     }
 
-    fun setClipRRect(r: RRect) {
+    fun setClipRRect(r: RRect, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
         Stats.onNativeCall()
         interopScope {
-            RenderNode_nSetClipRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size)
+            RenderNode_nSetClipRRect(
+                ptr = _ptr,
+                left = r.left,
+                top = r.top,
+                right = r.right,
+                bottom = r.bottom,
+                radii = toInterop(r.radii),
+                radiiSize = r.radii.size,
+                mode = mode.ordinal,
+                antiAlias = antiAlias
+            )
         }
     }
 
-    fun setClipPath(p: Path?) {
+    fun setClipPath(p: Path?, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
         try {
             Stats.onNativeCall()
-            RenderNode_nSetClipPath(_ptr, getPtr(p))
+            RenderNode_nSetClipPath(
+                ptr = _ptr,
+                pathPtr = getPtr(p),
+                mode = mode.ordinal,
+                antiAlias = antiAlias
+            )
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(p)
@@ -435,15 +458,15 @@ private external fun RenderNode_nSetCameraDistance(ptr: NativePointer, distance:
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect")
-private external fun RenderNode_nSetClipRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)
+private external fun RenderNode_nSetClipRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, mode: Int, antiAlias: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect")
-private external fun RenderNode_nSetClipRRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, radii: InteropPointer, radiiSize: Int)
+private external fun RenderNode_nSetClipRRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, radii: InteropPointer, radiiSize: Int, mode: Int, antiAlias: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath")
-private external fun RenderNode_nSetClipPath(ptr: NativePointer, pathPtr: NativePointer)
+private external fun RenderNode_nSetClipPath(ptr: NativePointer, pathPtr: NativePointer, mode: Int, antiAlias: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip")

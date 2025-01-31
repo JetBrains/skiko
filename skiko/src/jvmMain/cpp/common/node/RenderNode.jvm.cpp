@@ -197,22 +197,22 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_Ren
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect
-  (JNIEnv *env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom) {
+  (JNIEnv *env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jint mode, jboolean antiAlias) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-    instance->setClipRect(SkRect::MakeLTRB(left, top, right, bottom));
+    instance->setClipRect(SkRect::MakeLTRB(left, top, right, bottom), static_cast<SkClipOp>(mode), antiAlias);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect
-  (JNIEnv *env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray radii, jint radiiSize) {
+  (JNIEnv *env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray radii, jint radiiSize, jint mode, jboolean antiAlias) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-    instance->setClipRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, radii));
+    instance->setClipRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, radii), static_cast<SkClipOp>(mode), antiAlias);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath
-  (JNIEnv *env, jclass jclass, jlong ptr, jlong pathPtr) {
+  (JNIEnv *env, jclass jclass, jlong ptr, jlong pathPtr, jint mode, jboolean antiAlias) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
-    instance->setClipPath(path ? std::optional<SkPath>{*path} : std::nullopt);
+    instance->setClipPath(path ? std::optional<SkPath>{*path} : std::nullopt, static_cast<SkClipOp>(mode), antiAlias);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip

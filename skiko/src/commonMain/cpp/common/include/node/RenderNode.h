@@ -55,9 +55,9 @@ public:
     void setRotationZ(float rotationZ);
     float getCameraDistance() const;
     void setCameraDistance(float cameraDistance);
-    void setClipRect(const std::optional<SkRect>& clipRect);
-    void setClipRRect(const std::optional<SkRRect>& clipRRect);
-    void setClipPath(const std::optional<SkPath>& clipPath);
+    void setClipRect(const std::optional<SkRect>& clipRect, SkClipOp op = SkClipOp::kIntersect, bool doAntiAlias = false);
+    void setClipRRect(const std::optional<SkRRect>& clipRRect, SkClipOp op = SkClipOp::kIntersect, bool doAntiAlias = false);
+    void setClipPath(const std::optional<SkPath>& clipPath, SkClipOp op = SkClipOp::kIntersect, bool doAntiAlias = false);
     bool getClip() const { return this->clip; }
     void setClip(bool clip);
 
@@ -99,6 +99,8 @@ private:
     std::optional<SkRect> clipRect;
     std::optional<SkRRect> clipRRect;
     std::optional<SkPath> clipPath;
+    SkClipOp clipOp;
+    bool clipAntiAlias;
     bool clip;
 
     SkMatrix transformMatrix;
