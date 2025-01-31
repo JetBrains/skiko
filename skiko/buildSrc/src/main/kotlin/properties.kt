@@ -78,17 +78,17 @@ enum class SkiaBuildType(
     val msvcLinkerFlags: Array<String>
 ) {
     DEBUG(
-        "Debug",
+        id = "Debug",
         flags = arrayOf("-DSK_DEBUG"),
         clangFlags = arrayOf("-std=c++17", "-g", "-DSK_TRIVIAL_ABI=[[clang::trivial_abi]]"),
-        msvcCompilerFlags = arrayOf("/Zi /std:c++17"),
+        msvcCompilerFlags = arrayOf("/Zi", "/std:c++17"),
         msvcLinkerFlags = arrayOf("/DEBUG"),
     ),
     RELEASE(
         id = "Release",
         flags = arrayOf("-DNDEBUG"),
         clangFlags = arrayOf("-std=c++17", "-O3"),
-        msvcCompilerFlags = arrayOf("/O2 /std:c++17"),
+        msvcCompilerFlags = arrayOf("/O2", "/std:c++17"),
         msvcLinkerFlags = arrayOf("/DEBUG"),
     );
     override fun toString() = id

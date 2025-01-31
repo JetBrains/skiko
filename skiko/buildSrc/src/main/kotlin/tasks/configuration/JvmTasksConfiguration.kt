@@ -107,7 +107,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
                 "/utf-8",
                 "/GR-", // no-RTTI.
                 "/FS", // Due to an error when building in Teamcity. https://docs.microsoft.com/en-us/cpp/build/reference/fs-force-synchronous-pdb-writes
-                "/DSK_ANGLE",
+                *(if (targetArch == Arch.Arm64) arrayOf("--target=arm64-windows") else arrayOf())
             )
         }
         OS.Android -> {
