@@ -196,22 +196,22 @@ SKIKO_EXPORT void org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetCameraDi
 }
 
 SKIKO_EXPORT void org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect
-  (KNativePointer ptr, KFloat left, KFloat top, KFloat right, KFloat bottom) {
+  (KNativePointer ptr, KFloat left, KFloat top, KFloat right, KFloat bottom, KInt mode, KBoolean antiAlias) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-    instance->setClipRect(SkRect::MakeLTRB(left, top, right, bottom));
+    instance->setClipRect(SkRect::MakeLTRB(left, top, right, bottom), static_cast<SkClipOp>(mode), antiAlias);
 }
 
 SKIKO_EXPORT void org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect
-  (KNativePointer ptr, KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* radii, KInt radiiSize) {
+  (KNativePointer ptr, KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* radii, KInt radiiSize, KInt mode, KBoolean antiAlias) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-    instance->setClipRRect(skija::RRect::toSkRRect(left, top, right, bottom, radii, radiiSize));
+    instance->setClipRRect(skija::RRect::toSkRRect(left, top, right, bottom, radii, radiiSize), static_cast<SkClipOp>(mode), antiAlias);
 }
 
 SKIKO_EXPORT void org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath
-  (KNativePointer ptr, KNativePointer pathPtr) {
+  (KNativePointer ptr, KNativePointer pathPtr, KInt mode, KBoolean antiAlias) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
     SkPath* path = reinterpret_cast<SkPath*>(pathPtr);
-    instance->setClipPath(path ? std::optional<SkPath>{*path} : std::nullopt);
+    instance->setClipPath(path ? std::optional<SkPath>{*path} : std::nullopt, static_cast<SkClipOp>(mode), antiAlias);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip
