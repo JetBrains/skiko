@@ -43,13 +43,13 @@ fun compilerForTarget(os: OS, arch: Arch): String =
             Arch.Wasm -> "Unexpected combination: $os & $arch"
         }
         OS.Android -> "clang++"
-        OS.Windows -> "cl.exe"
+        OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
         OS.Wasm -> "emcc"
     }
 
 fun linkerForTarget(os: OS, arch: Arch): String =
-    if (os.isWindows) "link.exe" else compilerForTarget(os, arch)
+    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch)
 
 val OS.dynamicLibExt: String
     get() = when (this) {
@@ -78,17 +78,17 @@ enum class SkiaBuildType(
     val msvcLinkerFlags: Array<String>
 ) {
     DEBUG(
-        "Debug",
+        id = "Debug",
         flags = arrayOf("-DSK_DEBUG"),
         clangFlags = arrayOf("-std=c++17", "-g", "-DSK_TRIVIAL_ABI=[[clang::trivial_abi]]"),
-        msvcCompilerFlags = arrayOf("/Zi /std:c++17"),
+        msvcCompilerFlags = arrayOf("/Zi", "/std:c++17"),
         msvcLinkerFlags = arrayOf("/DEBUG"),
     ),
     RELEASE(
         id = "Release",
         flags = arrayOf("-DNDEBUG"),
         clangFlags = arrayOf("-std=c++17", "-O3"),
-        msvcCompilerFlags = arrayOf("/O2 /std:c++17"),
+        msvcCompilerFlags = arrayOf("/O2", "/std:c++17"),
         msvcLinkerFlags = arrayOf("/DEBUG"),
     );
     override fun toString() = id
