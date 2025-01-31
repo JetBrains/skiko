@@ -2670,9 +2670,9 @@ $dokka.location:org.jetbrains.skiko.node/RenderNode/rotationY/#/PointingToDeclar
 $dokka.location:org.jetbrains.skiko.node/RenderNode/rotationZ/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/rotation-z.html
 $dokka.location:org.jetbrains.skiko.node/RenderNode/scaleX/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/scale-x.html
 $dokka.location:org.jetbrains.skiko.node/RenderNode/scaleY/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/scale-y.html
-$dokka.location:org.jetbrains.skiko.node/RenderNode/setClipPath/#org.jetbrains.skia.Path?/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/set-clip-path.html
-$dokka.location:org.jetbrains.skiko.node/RenderNode/setClipRRect/#org.jetbrains.skia.RRect/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/set-clip-r-rect.html
-$dokka.location:org.jetbrains.skiko.node/RenderNode/setClipRect/#org.jetbrains.skia.Rect/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/set-clip-rect.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/setClipPath/#org.jetbrains.skia.Path?#org.jetbrains.skia.ClipMode#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/set-clip-path.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/setClipRRect/#org.jetbrains.skia.RRect#org.jetbrains.skia.ClipMode#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/set-clip-r-rect.html
+$dokka.location:org.jetbrains.skiko.node/RenderNode/setClipRect/#org.jetbrains.skia.Rect#org.jetbrains.skia.ClipMode#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/set-clip-rect.html
 $dokka.location:org.jetbrains.skiko.node/RenderNode/shadowElevation/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/shadow-elevation.html
 $dokka.location:org.jetbrains.skiko.node/RenderNode/spotShadowColor/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/spot-shadow-color.html
 $dokka.location:org.jetbrains.skiko.node/RenderNode/translationX/#/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node/translation-x.html
