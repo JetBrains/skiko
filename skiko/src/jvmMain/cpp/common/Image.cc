@@ -114,6 +114,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nMakeS
     return reinterpret_cast<jlong>(shader.release());
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nMakeRawShader
+  (JNIEnv* env, jclass jclass, jlong ptr, jint tmx, jint tmy, jint samplingVal1, jint samplingVal2, jfloatArray localMatrixArr) {
+    SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
+    std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
+    sk_sp<SkShader> shader = instance->makeRawShader(static_cast<SkTileMode>(tmx), static_cast<SkTileMode>(tmy), skija::SamplingMode::unpackFrom2Ints(env, samplingVal1, samplingVal2), localMatrix.get());
+    return reinterpret_cast<jlong>(shader.release());
+}
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nPeekPixels
   (JNIEnv* env, jclass jclass, jlong ptr) {
