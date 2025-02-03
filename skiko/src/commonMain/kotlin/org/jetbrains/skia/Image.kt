@@ -138,6 +138,36 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             return Image(ptr)
         }
 
+        /** Creates GPU-backed [org.jetbrains.skia.Image] from backendTexture associated with context.
+        Skia will assume ownership of the resource and will release it when no longer needed.
+        A non-null SkImage is returned if format of backendTexture is recognized and supported.
+        Recognized formats vary by GPU backend.
+         */
+        fun adoptTextureFrom(
+            context: DirectContext,
+            textureId: Int,
+            target: Int,
+            width: Int,
+            height: Int,
+            format: Int,
+            origin: SurfaceOrigin = SurfaceOrigin.TOP_LEFT,
+            colorType: ColorType = ColorType.RGBA_8888,
+        ): Image {
+            Stats.onNativeCall()
+            val ptr = _nAdoptTextureFrom(
+                context._ptr,
+                textureId,
+                target,
+                width,
+                height,
+                format,
+                origin.ordinal,
+                colorType.ordinal,
+            )
+            require(ptr != NullPointer) { "Failed to Image::adoptTextureFrom" }
+            return Image(ptr)
+        }
+
         init {
             staticLoad()
         }
@@ -391,6 +421,20 @@ private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, s
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nPeekPixels")
 private external fun Image_nPeekPixels(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nAdoptTextureFrom")
+private external fun _nAdoptTextureFrom(
+    contextPtr: NativePointer,
+    textureId: Int,
+    target: Int,
+    width: Int,
+    height: Int,
+    format: Int,
+    surfaceOrigin: Int,
+    colorType: Int,
+): NativePointer
+
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRaster")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nMakeRaster")

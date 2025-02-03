@@ -2,13 +2,43 @@
 #include <jni.h>
 #include "SkData.h"
 #include "SkImage.h"
+#include "GrDirectContext.h"
+
+#include "ganesh/gl/GrGLBackendSurface.h"
+#include "include/gpu/ganesh/SkImageGanesh.h"
 #include "SkBitmap.h"
 #include "SkShader.h"
+#include "include/gpu/gl/GrGLTypes.h"
+#include "GrBackendSurface.h"
+#include "GrDirectContext.h"
 #include "SkEncodedImageFormat.h"
 #include "encode/SkPngEncoder.h"
 #include "encode/SkJpegEncoder.h"
 #include "encode/SkWebpEncoder.h"
 #include "interop.hh"
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptTextureFrom
+  (JNIEnv* env, jclass jclass, jlong contextPtr, jint textureId, jint target, jint width, jint height, jint format, jint surfaceOrigin, jint colorType) {
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(contextPtr));
+
+    GrGLTextureInfo textureInfo;
+    textureInfo.fID = static_cast<GrGLuint>(textureId);
+    textureInfo.fTarget = static_cast<GrGLenum>(target);
+    textureInfo.fFormat = static_cast<GrGLenum>(format);
+
+    GrBackendTexture backendTexture = GrBackendTextures::MakeGL(
+        width, height, skgpu::Mipmapped::kYes, textureInfo
+    );
+
+    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
+        context,
+        backendTexture,
+        static_cast<GrSurfaceOrigin>(surfaceOrigin),
+        static_cast<SkColorType>(colorType)
+    );
+
+    return reinterpret_cast<jlong>(image.release());
+}
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeRaster
   (JNIEnv* env, jclass jclass, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray bytesArr, jint rowBytes) {
@@ -101,7 +131,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToDa
         break;
       }
     } else {
-      env->ThrowNew(java::lang::RuntimeException::cls, "Textture backed images is not supported yet");
+      env->ThrowNew(java::lang::RuntimeException::cls, "Texture backed images is not supported yet");
     }
     return 0;
 }
