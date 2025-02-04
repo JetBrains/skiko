@@ -29,20 +29,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nMake
 }
 
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nClone
-  (KNativePointer ptr, KInt* errorCode) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    UErrorCode status = U_ZERO_ERROR;
-    UBreakIterator* clone = ubrk_clone(instance, &status);
-
-    errorCode[0] = status;
-    if (U_FAILURE(status)) {
-      return 0;
-    } else
-      return reinterpret_cast<KNativePointer>(clone);
-}
-
-
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nCurrent
   (KNativePointer ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);

@@ -29,18 +29,6 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nMa
       return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nClone
-  (JNIEnv* env, jclass jclass, jlong ptr, jintArray errorCode) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    UErrorCode status = U_ZERO_ERROR;
-    UBreakIterator* clone = ubrk_clone(instance, &status);
-    if (U_FAILURE(status)) {
-      env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
-      return 0;
-    } else
-      return reinterpret_cast<jlong>(clone);
-}
-
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nCurrent
   (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
