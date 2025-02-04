@@ -1,14 +1,45 @@
 #include <iostream>
 #include "SkData.h"
 #include "SkImage.h"
+#include "GrDirectContext.h"
+#include "ganesh/gl/GrGLBackendSurface.h"
+#include "include/gpu/ganesh/SkImageGanesh.h"
 #include "SkBitmap.h"
 #include "SkShader.h"
+#include "include/gpu/gl/GrGLTypes.h"
+#include "GrBackendSurface.h"
+#include "GrDirectContext.h"
 #include "SkEncodedImageFormat.h"
 #include "encode/SkPngEncoder.h"
 #include "encode/SkJpegEncoder.h"
 #include "encode/SkWebpEncoder.h"
 #include "common.h"
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nAdoptTextureFrom
+  (KNativePointer contextPtr, KInt textureId, KInt target, KInt width, KInt height, KInt format, KInt surfaceOrigin, KInt colorType) {
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(contextPtr);
+
+    GrGLTextureInfo textureInfo;
+    textureInfo.fID = static_cast<GrGLuint>(textureId);
+    textureInfo.fTarget = static_cast<GrGLenum>(target);
+    textureInfo.fFormat = static_cast<GrGLenum>(format);
+
+    GrBackendTexture backendTexture = GrBackendTextures::MakeGL(
+        width,
+        height,
+        skgpu::Mipmapped::kYes,
+        textureInfo
+    );
+
+    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
+        context,
+        backendTexture,
+        static_cast<GrSurfaceOrigin>(surfaceOrigin),
+        static_cast<SkColorType>(colorType)
+    );
+
+    return reinterpret_cast<KNativePointer>(image.release());
+}
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRaster
   (KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* bytesArr, KInt rowBytes) {
