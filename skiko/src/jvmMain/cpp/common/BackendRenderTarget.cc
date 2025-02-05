@@ -1,7 +1,7 @@
 #include <iostream>
 #include <jni.h>
 #include <ganesh/gl/GrGLBackendSurface.h>
-#include "GrBackendSurface.h"
+#include "ganesh/GrBackendSurface.h"
 #ifdef SK_METAL
 #include "ganesh/mtl/GrMtlBackendSurface.h"
 #include "ganesh/mtl/GrMtlTypes.h"
@@ -38,7 +38,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt
 #endif
 
 #ifdef SK_DIRECT3D
-#include "d3d/GrD3DTypes.h"
+#include "ganesh/d3d/GrD3DTypes.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt__1nMakeDirect3D
   (JNIEnv* env, jclass jclass, jint width, jint height, jlong texturePtr, jint format, jint sampleCnt, jint levelCnt) {

@@ -7,8 +7,8 @@
 #endif
 
 #include "jni_helpers.h"
-#include "GrBackendSurface.h"
-#include "GrDirectContext.h"
+#include "ganesh/GrBackendSurface.h"
+#include "ganesh/GrDirectContext.h"
 
 #ifdef SK_METAL
 #include "ganesh/mtl/GrMtlDirectContext.h"

@@ -1,5 +1,5 @@
-#include "GrDirectContext.h"
-#include "include/gpu/gl/GrGLInterface.h"
+#include "ganesh/GrDirectContext.h"
+#include "ganesh/gl/GrGLInterface.h"
 #include "common.h"
 #include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
 
@@ -9,7 +9,7 @@
 #endif
 
 #ifdef SK_DIRECT3D
-#include "d3d/GrD3DBackendContext.h"
+#include "ganesh/d3d/GrD3DBackendContext.h"
 #endif
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdint.h>
-#include "GrBackendSurface.h"
+#include "ganesh/GrBackendSurface.h"
 #include "common.h"
 #include "ganesh/gl/GrGLDirectContext.h"
 #include "ganesh/gl/GrGLBackendSurface.h"
@@ -39,7 +39,7 @@ SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeMetal
 }
 
 #ifdef SK_DIRECT3D
-#include "d3d/GrD3DTypes.h"
+#include "ganesh/d3d/GrD3DTypes.h"
 #endif
 
 SKIKO_EXPORT KNativePointer BackendRenderTarget_MakeDirect3D

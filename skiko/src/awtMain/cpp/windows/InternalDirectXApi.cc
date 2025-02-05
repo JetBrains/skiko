@@ -12,13 +12,13 @@
 #include "window_util.h"
 
 #include "SkColorSpace.h"
-#include "GrBackendSurface.h"
-#include "GrDirectContext.h"
+#include "ganesh/GrBackendSurface.h"
+#include "ganesh/GrDirectContext.h"
 #include "SkSurface.h"
 #include "../common/interop.hh"
 
-#include "d3d/GrD3DTypes.h"
-#include "d3d/GrD3DBackendContext.h"
+#include "ganesh/d3d/GrD3DTypes.h"
+#include "ganesh/d3d/GrD3DBackendContext.h"
 
 class DirectXOffscreenDevice
 {
