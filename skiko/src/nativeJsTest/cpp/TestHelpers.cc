@@ -90,8 +90,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGe
 #include <GL/glx.h>
 #include <iostream>
 
-#include "include/gpu/gl/GrGLInterface.h"
-#include "include/gpu/gl/egl/GrGLMakeEGLInterface.h"
+#include "ganesh/gl/GrGLInterface.h"
+#include "ganesh/gl/egl/GrGLMakeEGLInterface.h"
 
 struct SkikoTestGlContext {
     Display* display;
