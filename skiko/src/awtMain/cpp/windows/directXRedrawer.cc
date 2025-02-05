@@ -14,9 +14,9 @@
 #include "../common/interop.hh"
 #include "DCompLibrary.h"
 
-#include "d3d/GrD3DTypes.h"
+#include "ganesh/d3d/GrD3DTypes.h"
 #include <d3d12sdklayers.h>
-#include "d3d/GrD3DBackendContext.h"
+#include "ganesh/d3d/GrD3DBackendContext.h"
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>

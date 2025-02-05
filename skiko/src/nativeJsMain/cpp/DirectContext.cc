@@ -9,7 +9,7 @@
 #endif
 
 #ifdef SK_DIRECT3D
-#include "d3d/GrD3DBackendContext.h"
+#include "ganesh/d3d/GrD3DBackendContext.h"
 #endif
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL

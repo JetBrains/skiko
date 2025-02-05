@@ -39,7 +39,7 @@ SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeMetal
 }
 
 #ifdef SK_DIRECT3D
-#include "d3d/GrD3DTypes.h"
+#include "ganesh/d3d/GrD3DTypes.h"
 #endif
 
 SKIKO_EXPORT KNativePointer BackendRenderTarget_MakeDirect3D

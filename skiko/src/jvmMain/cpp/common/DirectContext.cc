@@ -25,7 +25,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 #endif
 
 #ifdef SK_DIRECT3D
-#include "d3d/GrD3DBackendContext.h"
+#include "ganesh/d3d/GrD3DBackendContext.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeDirect3D
   (JNIEnv* env, jclass jclass, jlong adapterPtr, jlong devicePtr, jlong queuePtr) {
