@@ -36,6 +36,7 @@ public:
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLContext context = EGL_NO_CONTEXT;
     EGLSurface surface = EGL_NO_SURFACE;
+    EGLConfig surfaceConfig;
     sk_sp<const GrGLInterface> backendContext;
     ~AngleDevice()
     {
@@ -70,6 +71,33 @@ EGLDisplay getAngleEGLDisplay(HDC hdc)
         EGL_NONE, EGL_NONE
     };
     return eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE, hdc, attribs);
+}
+
+bool initAngleSurface(JNIEnv *env, AngleDevice *angleDevice, EGLint width, EGLint height)
+{
+    const EGLint surfaceAttribs[] = {
+        EGL_FIXED_SIZE_ANGLE, EGL_TRUE,
+        EGL_WIDTH, width,
+        EGL_HEIGHT, height,
+        EGL_NONE, EGL_NONE
+    };
+    if (EGL_NO_SURFACE != angleDevice->surface)
+    {
+        eglDestroySurface(angleDevice->display, angleDevice->surface);
+    }
+    angleDevice->surface = eglCreateWindowSurface(angleDevice->display, angleDevice->surfaceConfig, angleDevice->window, surfaceAttribs);
+    if (EGL_NO_SURFACE == angleDevice->surface)
+    {
+        return false;
+    }
+    if (!eglMakeCurrent(angleDevice->display, angleDevice->surface, angleDevice->surface, angleDevice->context))
+    {
+        throwAngleException(env, __FUNCTION__, "Could not make context current!");
+        return false;
+    }
+    // For vsync we will use dwmFlush instead of swapInterval, see WindowsOpenGLRedrawer.kt
+    eglSwapInterval(angleDevice->display, 0);
+    return true;
 }
 
 extern "C"
@@ -122,8 +150,7 @@ extern "C"
             };
 
             EGLint numConfigs;
-            EGLConfig surfaceConfig;
-            if (!eglChooseConfig(angleDevice->display, configAttribs, &surfaceConfig, 1, &numConfigs))
+            if (!eglChooseConfig(angleDevice->display, configAttribs, &angleDevice->surfaceConfig, 1, &numConfigs))
             {
                 throwAngleException(env, __FUNCTION__, "Could not create choose config!");
                 return (jlong) 0;
@@ -135,28 +162,19 @@ extern "C"
                 EGL_CONTEXT_MINOR_VERSION, 0,
                 EGL_NONE, EGL_NONE
             };
-            angleDevice->context = eglCreateContext(angleDevice->display, surfaceConfig, nullptr, contextAttribs);
+            angleDevice->context = eglCreateContext(angleDevice->display, angleDevice->surfaceConfig, nullptr, contextAttribs);
             if (EGL_NO_CONTEXT == angleDevice->context)
             {
                 throwAngleException(env, __FUNCTION__, "Could not create context!");
                 return (jlong) 0;
             }
 
-            angleDevice->surface = eglCreateWindowSurface(angleDevice->display, surfaceConfig, angleDevice->window, nullptr);
-            if (EGL_NO_SURFACE == angleDevice->surface)
+            // initial surface
+            if (!initAngleSurface(env, angleDevice, 0, 0))
             {
                 throwAngleException(env, __FUNCTION__, "Could not create surface!");
                 return (jlong) 0;
             }
-
-            if (!eglMakeCurrent(angleDevice->display, angleDevice->surface, angleDevice->surface, angleDevice->context))
-            {
-                throwAngleException(env, __FUNCTION__, "Could not make context current!");
-                return (jlong) 0;
-            }
-
-            // For vsync we will use dwmFlush instead of swapInterval, see WindowsOpenGLRedrawer.kt
-            eglSwapInterval(angleDevice->display, 0);
 
             sk_sp<const GrGLInterface> glInterface(GrGLMakeAssembledInterface(
                 nullptr,
@@ -198,6 +216,13 @@ extern "C"
         __try
         {
             AngleDevice *angleDevice = fromJavaPointer<AngleDevice *>(devicePtr);
+
+            if (!initAngleSurface(env, angleDevice, width, height))
+            {
+                throwAngleException(env, __FUNCTION__, "Could not create surface!");
+                return (jlong) 0;
+            }
+
             angleDevice->backendContext->fFunctions.fViewport(0, 0, width, height);
 
             GrGLint buffer;
