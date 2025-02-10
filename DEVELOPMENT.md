@@ -9,14 +9,15 @@
   * `Windows`
     1. Download [Visual Studio Build Tools 2019](https://learn.microsoft.com/en-us/visualstudio/releases/2019/history) (search "BuildTools" on the page).
     2. During the installation, select "Desktop development with C++"
-    3. Add an environment variable SKIKO_VSBT_PATH=C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools
-    ```
-    Control Panel|All Control Panel Items|System|Advanced system settings|Environment variables
-    ```
-    or by running `cmd` as administrator:
-    ```
-    setx /M SKIKO_VSBT_PATH "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools"
-    ```
+    3. Add an environment variable SKIKO_VSBT_PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools
+       ```
+       Control Panel|All Control Panel Items|System|Advanced system settings|Environment variables
+       ```
+       or by running `cmd` as administrator:
+       ```
+       setx /M SKIKO_VSBT_PATH "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools"
+       ```
+    4. Skiko is built using Clang-cl. Clang-cl is a part of LLVM and can be downloaded from the [LLVM project's website](https://releases.llvm.org/). Please also make sure that Clang-cl.exe is available in %PATH%.
 
 * Install Emscripten
 * Set `JAVA_HOME` to location of JDK, at least version 11
