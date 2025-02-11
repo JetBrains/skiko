@@ -306,14 +306,6 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 
     /**
-     * Create a copy of this iterator
-     */
-    fun clone(): BreakIterator {
-        Stats.onNativeCall()
-        return BreakIterator(withErrorGuard("Failed to clone") { _nClone(_ptr, it) })
-    }
-
-    /**
      * Returns character index of the text boundary that was most recently
      * returned by [], [], [],
      * [], [], [] or
@@ -551,10 +543,6 @@ private external fun BreakIterator_nGetFinalizer(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nMake")
 private external fun _nMake(type: Int, locale: InteropPointer, errorCode: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nClone")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nClone")
-private external fun _nClone(ptr: NativePointer, errorCode: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nCurrent")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nCurrent")

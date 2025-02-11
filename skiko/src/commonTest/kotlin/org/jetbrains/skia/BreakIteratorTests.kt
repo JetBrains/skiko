@@ -34,31 +34,6 @@ class BreakIteratorTests {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipWasmTarget
-    fun breakIteratorCloneTest() {
-        // Wasm, iOS, and tvOS builds of Skia do not include required data to implement those iterators,
-        // see `third_party/externals/icu/flutter/README.md`.
-        if (hostOs == OS.Ios || hostOs == OS.Tvos)
-            return
-
-        if (isDebugModeOnJvm)
-            throw Error("This test is usually crashes in DEBUG mode")
-
-        val boundary = BreakIterator.makeWordInstance()
-
-        val boundaryCloned = boundary.clone()
-
-        boundaryCloned.setText("家捷克的软件开发公司 ,software development company")
-        val boundariesList = listOf(1, 3, 4, 6, 8, 10, 11, 12, 20, 21, 32, 33, 40)
-        assertContentEquals(boundariesList, boundaryCloned.asSequence().toList())
-
-        assertEquals(0, boundaryCloned.first())
-        assertEquals(40, boundaryCloned.last())
-        reachabilityBarrier(boundary)
-    }
-
-    @Test
     @SkipNativeTarget
     @SkipJvmTarget
     fun breakIteratorSentenceFailsOnJsTest() {
