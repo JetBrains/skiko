@@ -967,7 +967,6 @@ $dokka.location:org.jetbrains.skia/BreakIterator.Companion/makeLineInstance/#kot
 $dokka.location:org.jetbrains.skia/BreakIterator.Companion/makeSentenceInstance/#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/-companion/make-sentence-instance.html
 $dokka.location:org.jetbrains.skia/BreakIterator.Companion/makeWordInstance/#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/-companion/make-word-instance.html
 $dokka.location:org.jetbrains.skia/BreakIterator///PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/index.html
-$dokka.location:org.jetbrains.skia/BreakIterator/clone/#/PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/clone.html
 $dokka.location:org.jetbrains.skia/BreakIterator/close/#/PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/close.html
 $dokka.location:org.jetbrains.skia/BreakIterator/current/#/PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/current.html
 $dokka.location:org.jetbrains.skia/BreakIterator/first/#/PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/first.html
