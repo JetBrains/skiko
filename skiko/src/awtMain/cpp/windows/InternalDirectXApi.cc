@@ -15,6 +15,7 @@
 #include "ganesh/GrBackendSurface.h"
 #include "ganesh/GrDirectContext.h"
 #include "SkSurface.h"
+#include "../common/interop.hh"
 
 #include "ganesh/d3d/GrD3DTypes.h"
 #include "ganesh/d3d/GrD3DBackendContext.h"
@@ -350,7 +351,7 @@ extern "C"
         dst.PlacedFootprint.Footprint.Depth = 1;
         dst.PlacedFootprint.Footprint.RowPitch = calculateRowPitch(texture->width);
 
-        D3D12_BOX srcBox = {0, 0, 0, static_cast<UINT>(texture->width), static_cast<UINT>(texture->height), 1};
+        D3D12_BOX srcBox = {0, 0, 0, texture->width, texture->height, 1};
 
         commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, &srcBox);
 
@@ -380,7 +381,7 @@ extern "C"
         DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
 
         auto rangeLength = texture->readbackBufferWidth();
-        D3D12_RANGE readbackBufferRange{ 0, static_cast<SIZE_T>(rangeLength) };
+        D3D12_RANGE readbackBufferRange{ 0, rangeLength };
 
         /*
          * TODO: memcpy from unaligned texture is not supported, line by line copy is very slow,
