@@ -87,18 +87,9 @@ internal class Direct3DSwingRedrawer(
 
     fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = false)
-
-        val bytesArraySize = surface.width * surface.height * 4
-        if (bytesToDraw.size != bytesArraySize) {
-            bytesToDraw = ByteArray(bytesArraySize)
-        }
-
         waitForCompletion(device, texturePtr)
-        if(!readPixels(texturePtr, bytesToDraw)) {
-            throw RenderException("Couldn't read pixels")
-        }
 
-        swingOffscreenDrawer.draw(g, bytesToDraw, surface.width, surface.height)
+        swingOffscreenDrawer.draw(g, surface)
     }
 
     private fun makeRenderTarget() = BackendRenderTarget(
