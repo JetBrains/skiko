@@ -46,19 +46,20 @@ internal class SoftwareSwingRedrawer(
             storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
         }
 
-        val canvas = Canvas(storage, SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)).autoClose()
-        canvas.clear(Color.TRANSPARENT)
-        renderDelegate.onRender(canvas, width, height, nanoTime)
+        val pixelsPointer = storage.peekPixels()?.addr!!
+        val surface = Surface.makeRasterDirect(
+            imageInfo = storage.imageInfo,
+            pixelsPtr = pixelsPointer,
+            rowBytes = storage.rowBytes
+        ).autoClose()
 
-        flush(g)
+        surface.canvas.clear(Color.TRANSPARENT)
+        renderDelegate.onRender(surface.canvas, width, height, nanoTime)
+
+        flush(g, surface)
     }
 
-    private fun flush(g: Graphics2D) {
-        val width = storage.width
-        val height = storage.height
-        val bytes = storage.readPixels(storage.imageInfo, (width * 4), 0, 0)
-        if (bytes != null) {
-            swingOffscreenDrawer.draw(g, bytes, width, height)
-        }
+    private fun flush(g: Graphics2D, surface: Surface) = autoCloseScope() {
+        swingOffscreenDrawer.draw(g, surface)
     }
 }

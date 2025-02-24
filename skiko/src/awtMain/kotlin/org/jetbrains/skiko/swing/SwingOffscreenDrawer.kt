@@ -1,116 +1,53 @@
 package org.jetbrains.skiko.swing
 
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.impl.BufferUtil
+import org.jetbrains.skiko.RenderException
 import java.awt.*
 import java.awt.geom.AffineTransform
 import java.awt.image.*
-import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.IntBuffer
 import kotlin.math.*
 
-// TODO: extract this code to a library and share it with JCEF implementation in IntelliJ
-//  since this code is mostly taken from intellij repository with some small changes
 internal class SwingOffscreenDrawer(
     private val swingLayerProperties: SwingLayerProperties
 ) {
-    @Volatile
-    private var volatileImage: VolatileImage? = null
-    private var bufferedImage: BufferedImage? = null
-    private var bufferedImageGraphics: Graphics2D? = null
+    private var bufferedImage = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE)
+    private var bitmap = Bitmap()
 
-    /**
-     * Draws rendered image that is represented by [bytes] on [g].
-     *
-     * If size of the rendered image is bigger than size from [swingLayerProperties]
-     * then only part of the image will be drawn on [g].
-     *
-     * @param g graphics where rendered picture given in [bytes] should be drawn
-     * @param bytes bytes of rendered picture in little endian order
-     * @param width width of rendered picture in real pixels
-     * @param height height of rendered picture in real pixels
-     */
-    fun draw(g: Graphics2D, bytes: ByteArray, width: Int, height: Int) {
-        val dirtyRectangles = listOf(
-            Rectangle(0, 0, width, height)
-        )
-        val image = createImageFromBytes(bytes, width, height, dirtyRectangles)
-        var vi = volatileImage
+    fun draw(g: Graphics2D, surface: Surface) {
+        val width = surface.width
+        val height = surface.height
+        if (bitmap.width != width || bitmap.height != height) {
+            bitmap.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
+        }
 
-        do {
-            if (vi == null || vi.width != swingLayerProperties.width || vi.height != swingLayerProperties.height) {
-                vi = createVolatileImage(image)
-            }
-            drawVolatileImage(vi, image)
-            when (vi.validate(swingLayerProperties.graphicsConfiguration)) {
-                VolatileImage.IMAGE_RESTORED -> drawVolatileImage(vi, image)
-                VolatileImage.IMAGE_INCOMPATIBLE -> vi = createVolatileImage(image)
-            }
-            g.drawImage(vi, 0, 0, null)
-        } while (vi!!.contentsLost())
-
-        volatileImage = vi
+        surface.readPixels(bitmap, 0, 0)
+        val bufferPtr = bitmap.peekPixels()?.addr ?: throw RenderException("Can't get pixels address")
+        bufferedImage = createImageFromBytes(bufferPtr, width, height)
+        drawImage(g, bufferedImage)
     }
 
     private fun createImageFromBytes(
-        bytes: ByteArray,
+        pBytes: Long,
         width: Int,
         height: Int,
-        dirtyRectangles: List<Rectangle>
     ): BufferedImage {
-        val src = ByteBuffer.wrap(bytes)
-        if (bufferedImage == null || bufferedImage?.width != width || bufferedImage?.height != height) {
-            bufferedImage?.flush()
+        if (bufferedImage.width != width || bufferedImage.height != height) {
             bufferedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE)
-            bufferedImageGraphics = bufferedImage?.createGraphics()
-        } else {
-            bufferedImageGraphics?.clearRect(0,0, width, height)
         }
-        val image = bufferedImage!!
+        val image = bufferedImage
 
         val dstData = (image.raster.dataBuffer as DataBufferInt).data
+        val src = BufferUtil.getByteBufferFromPointer(pBytes, width * height * 4)
         val srcData: IntBuffer = src.order(ByteOrder.LITTLE_ENDIAN).asIntBuffer()
-        for (rect in dirtyRectangles) {
-            if (rect.width < image.width) {
-                for (line in rect.y until rect.y + rect.height) {
-                    val offset: Int = line * image.width + rect.x
-                    srcData.position(offset)[dstData, offset, min(
-                        rect.width.toDouble(),
-                        (src.capacity() - offset).toDouble()
-                    ).toInt()]
-                }
-            } else { // optimized for a buffer wide dirty rect
-                val offset: Int = rect.y * image.width
-                srcData.position(offset)[dstData, offset, min(
-                    (rect.height * image.width).toDouble(),
-                    (src.capacity() - offset).toDouble()
-                ).toInt()]
-            }
-        }
+        srcData.position(0).get(dstData, 0, min(image.height * image.width, srcData.capacity()))
 
         return image
-    }
-
-    private fun createVolatileImage(image: BufferedImage): VolatileImage {
-        val vi = swingLayerProperties.graphicsConfiguration.createCompatibleVolatileImage(
-            swingLayerProperties.width,
-            swingLayerProperties.height,
-            Transparency.TRANSLUCENT
-        )
-        drawVolatileImage(vi, image)
-        return vi
-    }
-
-    private fun drawVolatileImage(vi: VolatileImage, image: BufferedImage) {
-        val g = vi.graphics.create() as Graphics2D
-        try {
-            g.background = Color(0, 0, 0, 0)
-            g.composite = AlphaComposite.Src
-            g.clearRect(0, 0, swingLayerProperties.width, swingLayerProperties.height)
-            val imageClipRectangle = Rectangle(0, 0, swingLayerProperties.width, swingLayerProperties.height)
-            drawImage(g, image, sourceBounds = imageClipRectangle)
-        } finally {
-            g.dispose()
-        }
     }
 
     private fun drawImage(
