@@ -58,6 +58,6 @@ internal class SoftwareSwingRedrawer(
     }
 
     private fun flush(g: Graphics2D, surface: Surface) = autoCloseScope() {
-        getSwingDrawer().draw(g, surface)
+        getSwingDrawer().draw(g, surface, texture = 0)
     }
 }

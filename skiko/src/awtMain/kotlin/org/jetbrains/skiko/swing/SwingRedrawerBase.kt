@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.swing
 
 import com.jetbrains.JBR
+import com.jetbrains.SharedTextures
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
@@ -102,6 +103,11 @@ internal abstract class SwingRedrawerBase(
     protected fun getSwingDrawer(): SwingDrawer = swingDrawer
 
     private fun createSwingDrawer(): SwingDrawer {
+        if (graphicsApi == GraphicsApi.METAL &&
+            JBR.isSharedTexturesSupported() && JBR.getSharedTextures().textureType == SharedTextures.METAL_TEXTURE_TYPE
+        ) {
+            return AcceleratedSwingDrawer()
+        }
         if (JBR.isNativeRasterLoaderSupported()) {
             // TODO: check if not OpenGL
             // TODO: report a bug

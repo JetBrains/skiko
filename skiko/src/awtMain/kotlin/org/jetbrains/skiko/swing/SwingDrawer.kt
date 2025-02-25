@@ -9,6 +9,6 @@ import java.awt.Graphics2D
  * @see SoftwareSwingDrawer
  */
 interface SwingDrawer {
-    fun draw(g: Graphics2D, surface: Surface)
+    fun draw(g: Graphics2D, surface: Surface, texture: Long)
     fun dispose()
 }

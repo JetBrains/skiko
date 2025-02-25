@@ -21,7 +21,7 @@ class VolatileImageSwingDrawer : SwingDrawer {
         if (JBR.isNativeRasterLoaderSupported()) JBR.getNativeRasterLoader()
         else throw UnsupportedOperationException("NativeRasterLoader is not supported")
 
-    override fun draw(g: Graphics2D, surface: Surface) {
+    override fun draw(g: Graphics2D, surface: Surface, texture: Long) {
         if (volatileImage?.width != surface.width || volatileImage?.height != surface.height ||
             volatileImage?.validate(g.deviceConfiguration) == VolatileImage.IMAGE_INCOMPATIBLE
         ) {

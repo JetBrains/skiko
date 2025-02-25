@@ -23,7 +23,7 @@ internal class SoftwareSwingDrawer(
     private var bufferedImage = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE)
     private var bitmap = Bitmap()
 
-    override fun draw(g: Graphics2D, surface: Surface) {
+    override fun draw(g: Graphics2D, surface: Surface, texture: Long) {
         val width = surface.width
         val height = surface.height
         if (bitmap.width != width || bitmap.height != height) {

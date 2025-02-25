@@ -86,7 +86,7 @@ internal class Direct3DSwingRedrawer(
         surface.flushAndSubmit(syncCpu = false)
         waitForCompletion(device, texturePtr)
 
-        getSwingDrawer().draw(g, surface)
+        getSwingDrawer().draw(g, surface, texture = texturePtr)
     }
 
     private fun makeRenderTarget() = BackendRenderTarget(

@@ -70,7 +70,7 @@ internal class MetalSwingRedrawer(
 
     private fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = true)
-        getSwingDrawer().draw(g, surface)
+        getSwingDrawer().draw(g, surface, texture = texturePtr)
     }
 
     override fun rendererInfo(): String {
