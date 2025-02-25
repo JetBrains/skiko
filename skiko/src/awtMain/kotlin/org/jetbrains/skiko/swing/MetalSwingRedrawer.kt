@@ -15,7 +15,7 @@ import java.awt.Graphics2D
  * For on-screen rendering see [org.jetbrains.skiko.redrawer.MetalRedrawer].
  *
  * @see SwingRedrawerBase
- * @see SwingOffscreenDrawer
+ * @see SoftwareSwingDrawer
  */
 internal class MetalSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
@@ -38,8 +38,6 @@ internal class MetalSwingRedrawer(
     init {
         onContextInit()
     }
-
-    private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
     override fun dispose() {
         disposeMetalTexture(texturePtr)
@@ -72,7 +70,7 @@ internal class MetalSwingRedrawer(
 
     private fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = true)
-        swingOffscreenDrawer.draw(g, surface)
+        getSwingDrawer().draw(g, surface)
     }
 
     override fun rendererInfo(): String {

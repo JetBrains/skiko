@@ -12,13 +12,18 @@ import java.nio.ByteOrder
 import java.nio.IntBuffer
 import kotlin.math.*
 
-internal class SwingOffscreenDrawer(
+/**
+ * A specialized implementation of [SwingDrawer] that uses a [BufferedImage] as the intermediate storage.
+ * It dumps the [Surface] underlining raster image directly to the [BufferedImage] back buffer and draws the image onto
+ * the given [Graphics2D].
+ */
+internal class SoftwareSwingDrawer(
     private val swingLayerProperties: SwingLayerProperties
-) {
+) : SwingDrawer {
     private var bufferedImage = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE)
     private var bitmap = Bitmap()
 
-    fun draw(g: Graphics2D, surface: Surface) {
+    override fun draw(g: Graphics2D, surface: Surface) {
         val width = surface.width
         val height = surface.height
         if (bitmap.width != width || bitmap.height != height) {
@@ -28,6 +33,10 @@ internal class SwingOffscreenDrawer(
         surface.readPixels(bitmap, 0, 0)
         bufferedImage = createImageFromBytes(bitmap.peekPixels()!!.addr, width, height)
         drawImage(g, bufferedImage)
+    }
+
+    override fun dispose() {
+        bitmap.close()
     }
 
     private fun createImageFromBytes(

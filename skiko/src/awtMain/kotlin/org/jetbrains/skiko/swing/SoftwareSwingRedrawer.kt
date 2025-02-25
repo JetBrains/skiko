@@ -13,7 +13,7 @@ import java.awt.Graphics2D
  * Content to draw is provided by [SkikoRenderDelegate].
  *
  * @see SwingRedrawerBase
- * @see SwingOffscreenDrawer
+ * @see SoftwareSwingDrawer
  */
 internal class SoftwareSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
@@ -27,8 +27,6 @@ internal class SoftwareSwingRedrawer(
     init {
         onDeviceChosen("Software")
     }
-
-    private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
     private val storage = Bitmap()
 
@@ -60,6 +58,6 @@ internal class SoftwareSwingRedrawer(
     }
 
     private fun flush(g: Graphics2D, surface: Surface) = autoCloseScope() {
-        swingOffscreenDrawer.draw(g, surface)
+        getSwingDrawer().draw(g, surface)
     }
 }

@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.swing
 
+import com.jetbrains.JBR
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
@@ -29,6 +30,7 @@ internal abstract class SwingRedrawerBase(
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
     private var deviceAnalytics: DeviceAnalytics? = null
     private var isDisposed = false
+    private val swingDrawer = createSwingDrawer()
 
     init {
         rendererAnalytics.init()
@@ -39,6 +41,7 @@ internal abstract class SwingRedrawerBase(
     override fun dispose() {
         require(!isDisposed) { "$javaClass is disposed" }
         isDisposed = true
+        swingDrawer.dispose()
     }
 
     final override fun redraw(g: Graphics2D) {
@@ -94,5 +97,17 @@ internal abstract class SwingRedrawerBase(
             }
             isFirstFrameRendered = true
         }
+    }
+
+    protected fun getSwingDrawer(): SwingDrawer = swingDrawer
+
+    private fun createSwingDrawer(): SwingDrawer {
+        if (JBR.isNativeRasterLoaderSupported()) {
+            // TODO: check if not OpenGL
+            // TODO: report a bug
+            return VolatileImageSwingDrawer()
+        }
+
+        return SoftwareSwingDrawer(swingLayerProperties)
     }
 }

@@ -13,8 +13,6 @@ internal class LinuxOpenGLSwingRedrawer(
         onDeviceChosen("OpenGL OffScreen") // TODO: properly choose device
     }
 
-    private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
-
     private val offScreenContextPtr: Long = makeOffScreenContext().also {
         if (it == 0L) {
             throw RenderException("Cannot create OpenGL context")
@@ -87,7 +85,7 @@ internal class LinuxOpenGLSwingRedrawer(
 
     private fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = true)
-        swingOffscreenDrawer.draw(g, surface)
+        getSwingDrawer().draw(g, surface)
     }
 
     /**
