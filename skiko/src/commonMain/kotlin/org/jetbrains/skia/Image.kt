@@ -138,6 +138,36 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             return Image(ptr)
         }
 
+        fun adoptGLTextureFrom(
+            context: DirectContext,
+            textureId: Int,
+            target: Int,
+            width: Int,
+            height: Int,
+            format: Int,
+            origin: SurfaceOrigin,
+            colorType: ColorType,
+        ): Image {
+            return try {
+                Stats.onNativeCall()
+                val ptr = _nAdoptGLTextureFrom(
+                    getPtr(context),
+                    textureId,
+                    target,
+                    width,
+                    height,
+                    format,
+                    origin.ordinal,
+                    colorType.ordinal
+                )
+                require(ptr != NullPointer) { "Failed to Image::makeFromTexture" }
+                Image(ptr)
+            }
+            finally {
+                reachabilityBarrier(context)
+            }
+        }
+
         init {
             staticLoad()
         }
@@ -457,3 +487,16 @@ private external fun _nReadPixelsBitmap(
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nReadPixelsPixmap")
 private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nAdoptTextureFrom")
+external fun _nAdoptGLTextureFrom(
+    contextPtr: NativePointer,
+    textureId: Int,
+    target: Int,
+    width: Int,
+    height: Int,
+    format: Int,
+    surfaceOrigin: Int,
+    colorType: Int
+): NativePointer

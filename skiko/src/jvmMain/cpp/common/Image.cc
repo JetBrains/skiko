@@ -2,6 +2,12 @@
 #include <jni.h>
 #include "SkData.h"
 #include "SkImage.h"
+#include <ganesh/gl/GrGLBackendSurface.h>
+#include "ganesh/GrBackendSurface.h"
+#include "ganesh/gl/GrGLBackendSurface.h"
+#include "include/gpu/ganesh/SkImageGanesh.h"
+#include "ganesh/GrDirectContext.h"
+#include "ganesh/gl/GrGLDirectContext.h"
 #include "SkBitmap.h"
 #include "SkShader.h"
 #include "SkEncodedImageFormat.h"
@@ -157,4 +163,28 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_ImageKt__1nScalePi
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
     auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;
     return instance->scalePixels(*pixmap, skija::SamplingMode::unpackFrom2Ints(env, samplingOptionsVal1, samplingOptionsVal2), cachingHint);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptGLTextureFrom
+  (JNIEnv* env, jclass jclass, jlong contextPtr, jint textureId, jint target, jint width, jint height, jint format, jint surfaceOrigin, jint colorType) {
+
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(contextPtr));
+
+    GrGLTextureInfo textureInfo;
+    textureInfo.fID = static_cast<GrGLuint>(textureId);
+    textureInfo.fTarget = static_cast<GrGLenum>(target);
+    textureInfo.fFormat = static_cast<GrGLenum>(format);
+
+    GrBackendTexture backendTexture = GrBackendTextures::MakeGL(
+         width, height, skgpu::Mipmapped::kNo, textureInfo
+    );
+
+    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
+        context,
+        backendTexture,
+        static_cast<GrSurfaceOrigin>(surfaceOrigin),
+        static_cast<SkColorType>(colorType)
+    );
+
+    return reinterpret_cast<jlong>(image.release());
 }
