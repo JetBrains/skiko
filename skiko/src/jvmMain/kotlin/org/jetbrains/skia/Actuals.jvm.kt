@@ -6,8 +6,6 @@ internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     synchronized(lock, block)
 }
 
-internal actual fun String.intCodePoints(): IntArray = this.codePoints().toArray()
-
 actual typealias Pattern = java.util.regex.Pattern
 
 actual typealias Matcher = java.util.regex.Matcher

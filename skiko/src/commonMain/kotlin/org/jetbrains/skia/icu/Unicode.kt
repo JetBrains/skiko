@@ -47,10 +47,13 @@ object CharDirection {
      */
     fun of(codePoint: Int): Int {
         Stats.onNativeCall()
-        return charDirection(codePoint)
+        return _nCharDirection(codePoint)
     }
 }
 
+/**
+ * Bundles functions to inspect Unicode character properties.
+ */
 @Suppress("MemberVisibilityCanBePrivate", "unused", "SpellCheckingInspection")
 object CharProperties {
     init {
@@ -178,16 +181,15 @@ object CharProperties {
      */
     fun codePointHasBinaryProperty(codePoint: Int, property: Int): Boolean {
         Stats.onNativeCall()
-        return nCodePointHasBinaryProperty(codePoint, property)
+        return _nCodePointHasBinaryProperty(codePoint, property)
     }
-
 }
 
-@ExternalSymbolName("org_jetbrains_skia_icu_Unicode_charDirection")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_icu_Unicode_charDirection")
-private external fun charDirection(codePoint: Int): Int
+@ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCharDirection")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_icu_Unicode__1nCharDirection")
+private external fun _nCharDirection(codePoint: Int): Int
 
-@ExternalSymbolName("org_jetbrains_skia_icu_Unicode_nCodePointHasBinaryProperty")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_icu_Unicode_nCodePointHasBinaryProperty")
-private external fun nCodePointHasBinaryProperty(codePoint: Int, property: Int): Boolean
+@ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCodePointHasBinaryProperty")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_icu_Unicode__1nCodePointHasBinaryProperty")
+private external fun _nCodePointHasBinaryProperty(codePoint: Int, property: Int): Boolean
 

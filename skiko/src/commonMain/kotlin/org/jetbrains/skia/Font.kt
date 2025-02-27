@@ -336,7 +336,7 @@ class Font : Managed {
      * @return  the corresponding glyph ids for each character.
      */
     fun getStringGlyphs(s: String): ShortArray {
-        return getUTF32Glyphs(s.intCodePoints())
+        return getUTF32Glyphs(s.codePointsAsIntArray)
     }
 
     /**

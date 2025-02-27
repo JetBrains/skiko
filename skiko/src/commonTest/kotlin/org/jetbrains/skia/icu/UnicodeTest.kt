@@ -1,6 +1,6 @@
 package org.jetbrains.skia.icu
 
-import org.jetbrains.skia.intCodePoints
+import org.jetbrains.skia.codePoints
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -17,13 +17,16 @@ class UnicodeTest {
 
     @Test
     fun binaryProperties() {
-        fun String.firstCodePointHasProperty(property: Int) =
-            CharProperties.codePointHasBinaryProperty(this.intCodePoints().first(), property)
+        fun String.firstCodePointHasProperty(property: Int): Boolean {
+            val codePoint = this.codePoints.first()
+            println(codePoint.toString(16))
+            return CharProperties.codePointHasBinaryProperty(codePoint, property)
+        }
 
         assertTrue("⌚".firstCodePointHasProperty(CharProperties.EMOJI))
         assertTrue("✅".firstCodePointHasProperty(CharProperties.EMOJI_PRESENTATION))
         assertTrue("♥️".firstCodePointHasProperty(CharProperties.EXTENDED_PICTOGRAPHIC))
-        assertTrue("\uD83C\uDDEE\uD83C\uDDF1".firstCodePointHasProperty(CharProperties.EMOJI))  // flag
+        assertTrue("🇮🇱".firstCodePointHasProperty(CharProperties.EMOJI))  // flag
 
         assertFalse("x".firstCodePointHasProperty(CharProperties.EMOJI))
     }
