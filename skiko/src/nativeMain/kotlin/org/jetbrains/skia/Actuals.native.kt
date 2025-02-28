@@ -9,8 +9,6 @@ internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
 }
 
-internal actual fun String.intCodePoints(): IntArray = IntArray(this.length) { this[it].code }
-
 actual class Pattern constructor(regex: String) {
     private val _regex = Regex(regex)
 
