@@ -45,6 +45,7 @@ allprojects {
 
 repositories {
     mavenCentral()
+    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
 }
 
 kotlin {
@@ -159,6 +160,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                implementation("com.jetbrains:jbr-api:1.4.0")
             }
         }
         val commonTest by getting {

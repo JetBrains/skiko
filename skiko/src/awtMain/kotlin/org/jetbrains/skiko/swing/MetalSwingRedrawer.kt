@@ -26,6 +26,12 @@ internal class MetalSwingRedrawer(
         init {
             Library.load()
         }
+
+        private fun createSwingPainter(swingLayerProperties: SwingLayerProperties): SwingPainter = try {
+            AcceleratedSwingPainter()
+        } catch (_ : RenderException) {
+            SoftwareSwingPainter(swingLayerProperties)
+        }
     }
 
     private val adapter: MetalAdapter = chooseMetalAdapter(swingLayerProperties.adapterPriority).also {
@@ -39,7 +45,7 @@ internal class MetalSwingRedrawer(
         onContextInit()
     }
 
-    private val painter: SwingPainter = SoftwareSwingPainter(swingLayerProperties)
+    private val painter: SwingPainter = createSwingPainter(swingLayerProperties)
 
     override fun dispose() {
         disposeMetalTexture(texturePtr)
