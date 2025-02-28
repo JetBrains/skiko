@@ -13,13 +13,13 @@ import java.nio.ByteOrder
 import java.nio.IntBuffer
 import kotlin.math.*
 
-internal class SwingOffscreenDrawer(
+internal class SoftwareSwingPainter(
     private val swingLayerProperties: SwingLayerProperties
-) {
+) : SwingPainter {
     private var bufferedImage = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE)
     private var bitmap = Bitmap()
 
-    fun draw(g: Graphics2D, surface: Surface) {
+    override fun paint(g: Graphics2D, surface: Surface, texture: Long) {
         val width = surface.width
         val height = surface.height
         if (bitmap.width != width || bitmap.height != height) {
@@ -30,6 +30,10 @@ internal class SwingOffscreenDrawer(
         val bufferPtr = bitmap.peekPixels()?.addr ?: throw RenderException("Can't get pixels address")
         bufferedImage = createImageFromBytes(bufferPtr, width, height)
         drawImage(g, bufferedImage)
+    }
+
+    override fun dispose() {
+        bitmap.close()
     }
 
     private fun createImageFromBytes(

@@ -13,7 +13,7 @@ internal class LinuxOpenGLSwingRedrawer(
         onDeviceChosen("OpenGL OffScreen") // TODO: properly choose device
     }
 
-    private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
+    private val painter: SwingPainter = SoftwareSwingPainter(swingLayerProperties)
 
     private val offScreenContextPtr: Long = makeOffScreenContext().also {
         if (it == 0L) {
@@ -37,6 +37,7 @@ internal class LinuxOpenGLSwingRedrawer(
         storage.close()
         disposeOffScreenBuffer(offScreenBufferPtr)
         disposeOffScreenContext(offScreenContextPtr)
+        painter.dispose()
         super.dispose()
     }
 
@@ -87,7 +88,7 @@ internal class LinuxOpenGLSwingRedrawer(
 
     private fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = true)
-        swingOffscreenDrawer.draw(g, surface)
+        painter.paint(g, surface, 0)
     }
 
     /**
