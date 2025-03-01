@@ -2,8 +2,6 @@ package org.jetbrains.skia
 
 internal expect fun <R> commonSynchronized(lock: Any, block: () -> R)
 
-internal expect fun String.intCodePoints(): IntArray
-
 internal expect fun defaultLanguageTag(): String
 
 expect class Pattern {
