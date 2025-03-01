@@ -37,3 +37,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendTextureKt__1nM
     GrBackendTexture* instance = new GrBackendTexture(obj);
     return reinterpret_cast<jlong>(instance);
 }
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BackendTextureKt__1nGLTextureParametersModified
+  (JNIEnv* env, jclass jclass, jlong backendTexturePtr) {
+    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(static_cast<uintptr_t>(backendTexturePtr));
+    GrBackendTextures::GLTextureParametersModified(backendTexture);
+}

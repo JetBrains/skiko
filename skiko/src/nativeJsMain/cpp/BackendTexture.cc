@@ -30,3 +30,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendTexture__1nMakeGL
     GrBackendTexture* instance = new GrBackendTexture(obj);
     return instance;
 }
+
+SKIKO_EXPORT void org_jetbrains_skia_BackendTexture__1nGLTextureParametersModified
+  (KNativePointer backendTexturePtr) {
+    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(backendTexturePtr);
+    GrBackendTextures::GLTextureParametersModified(backendTexture);
+}
