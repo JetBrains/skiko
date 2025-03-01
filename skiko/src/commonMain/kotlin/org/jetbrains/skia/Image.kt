@@ -142,16 +142,16 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          * Creates GPU-backed SkImage from backendTexture associated with context.
          *
          * Skia will assume ownership of the resource and will release it when no longer needed.
-         * A non-null SkImage is returned if format of backendTexture is recognized and supported.
+         * A non-null Image is returned if format of backendTexture is recognized and supported.
          * Recognized formats vary by GPU backend.
          *
          * @param context         GPU context
          * @param backendTexture  texture residing on GPU
          * @param origin          origin of backendTexture
-         * @param colorType       color type of the resulting image
-         * @return                created SkImage
+         * @param colorType       color type of the resulting Image
+         * @return                created Image
          *
-         * @throws RuntimeException - if nullPtr is returned to create.
+         * @throws RuntimeException - if nullPtr is returned.
          */
         fun adoptTextureFrom(
             context: DirectContext,

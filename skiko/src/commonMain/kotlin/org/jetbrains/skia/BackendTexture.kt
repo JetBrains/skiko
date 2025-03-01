@@ -12,7 +12,9 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
          * Creates BackendTexture from GL texture.
          *
          * @param textureFormat - GL enum, must be valid
-         * @throws RuntimeException if nullptr is returned
+         * @throws RuntimeException if nullptr is returned.
+         *
+         * @see glTextureParametersModified
          */
         fun makeGL(
             textureId: Int,

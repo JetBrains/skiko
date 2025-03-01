@@ -2,7 +2,6 @@
 #include <jni.h>
 #include "SkData.h"
 #include "SkImage.h"
-#include <ganesh/gl/GrGLBackendSurface.h>
 #include "ganesh/GrBackendSurface.h"
 #include "ganesh/gl/GrGLBackendSurface.h"
 #include "include/gpu/ganesh/SkImageGanesh.h"
