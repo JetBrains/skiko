@@ -138,25 +138,17 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             return Image(ptr)
         }
 
-        fun adoptGLTextureFrom(
+        fun adoptTextureFrom(
             context: DirectContext,
-            textureId: Int,
-            target: Int,
-            width: Int,
-            height: Int,
-            format: Int,
+            backendTexture: BackendTexture,
             origin: SurfaceOrigin,
             colorType: ColorType,
         ): Image {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nAdoptGLTextureFrom(
+                val ptr = _nAdoptTextureFrom(
                     getPtr(context),
-                    textureId,
-                    target,
-                    width,
-                    height,
-                    format,
+                    getPtr(backendTexture),
                     origin.ordinal,
                     colorType.ordinal
                 )
@@ -165,6 +157,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             }
             finally {
                 reachabilityBarrier(context)
+                reachabilityBarrier(backendTexture)
             }
         }
 
@@ -490,13 +483,9 @@ private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePoi
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nAdoptTextureFrom")
-external fun _nAdoptGLTextureFrom(
+external fun _nAdoptTextureFrom(
     contextPtr: NativePointer,
-    textureId: Int,
-    target: Int,
-    width: Int,
-    height: Int,
-    format: Int,
+    backendTexture: NativePointer,
     surfaceOrigin: Int,
     colorType: Int
 ): NativePointer
