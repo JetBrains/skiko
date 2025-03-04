@@ -9,6 +9,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
 }
 
 val osName = System.getProperty("os.name")
@@ -39,6 +40,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
     implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
+    implementation("com.jetbrains:jbr-api:1.4.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
