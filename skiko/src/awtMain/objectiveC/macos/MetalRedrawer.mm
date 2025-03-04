@@ -269,7 +269,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
         env->DeleteGlobalRef(device.layer.javaRef);
         [[NSNotificationCenter defaultCenter] removeObserver:device.occlusionObserver];
         [device.layer removeFromSuperlayer];
-        [CATransaction flush];
     }
 }
 
