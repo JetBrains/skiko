@@ -7,17 +7,19 @@ import org.jetbrains.skiko.SkikoProperties
 
 internal class RedrawerManager<R>(
     defaultRenderApi: GraphicsApi,
-    private val redrawerFactory: (renderApi: GraphicsApi, oldRedrawer: R?) -> R
+    private val redrawerFactory: (renderApi: GraphicsApi, oldRedrawer: R?) -> R,
+    private val onRenderApiChanged: ((GraphicsApi) -> Unit)? = null
 ) {
-    private var _redrawer: R? = null
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue(defaultRenderApi).toMutableList()
-    private var _renderApi = fallbackRenderApiQueue[0]
 
-    val redrawer: R?
-        get() = _redrawer
+    var redrawer: R? = null
+        private set
 
-    val renderApi: GraphicsApi
-        get() = _renderApi
+    var renderApi: GraphicsApi = fallbackRenderApiQueue[0]
+        set(value) {
+            field = value
+            onRenderApiChanged?.invoke(value)
+        }
 
     fun findNextWorkingRenderApi(recreation: Boolean = false) {
         if (recreation) {
@@ -27,10 +29,10 @@ internal class RedrawerManager<R>(
         do {
             thrown = false
             try {
-                _renderApi = fallbackRenderApiQueue.removeAt(0)
-                _redrawer = redrawerFactory(_renderApi, redrawer)
+                renderApi = fallbackRenderApiQueue.removeAt(0)
+                redrawer = redrawerFactory(renderApi, redrawer)
             } catch (e: RenderException) {
-                _redrawer = null
+                redrawer = null
                 Logger.warn(e) { "Fallback to next API" }
                 thrown = true
             }
@@ -41,11 +43,7 @@ internal class RedrawerManager<R>(
         }
     }
 
-    fun forceRenderApi(renderApi: GraphicsApi) {
-        _renderApi = renderApi
-    }
-
     fun dispose() {
-        _redrawer = null
+        redrawer = null
     }
 }

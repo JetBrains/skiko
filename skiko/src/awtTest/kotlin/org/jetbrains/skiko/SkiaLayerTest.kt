@@ -541,63 +541,41 @@ class SkiaLayerTest {
         }
     }
 
+    private abstract class BaseTestRedrawer: Redrawer {
+        override fun dispose() = Unit
+        override fun needRedraw() = Unit
+        override fun redrawImmediately() = Unit
+        override val renderInfo: String
+            get() = ""
+    }
+
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on init context`() = uiTest {
-        testFallbackToSoftware(
-            object : RenderFactory {
-                override fun createRedrawer(
-                    layer: SkiaLayer,
-                    renderApi: GraphicsApi,
-                    analytics: SkiaLayerAnalytics,
-                    properties: SkiaLayerProperties
-                ) = object : Redrawer {
-                    private val contextHandler = object : JvmContextHandler(layer) {
-                        override fun initContext() = false
-                        override fun initCanvas() = Unit
-                    }
-
-                    override fun dispose() = Unit
-                    override fun needRedraw() = Unit
-                    override fun redrawImmediately() = layer.inDrawScope(contextHandler::draw)
-                    override val renderInfo = ""
+        testFallbackToSoftware { layer, _, _, _ ->
+            object : BaseTestRedrawer() {
+                private val contextHandler = object : JvmContextHandler(layer) {
+                    override fun initContext() = false
+                    override fun initCanvas() = Unit
                 }
+                override fun redrawImmediately() = layer.inDrawScope(contextHandler::draw)
             }
-        )
+        }
     }
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on create redrawer`() = uiTest {
-        testFallbackToSoftware(
-            object : RenderFactory {
-                override fun createRedrawer(
-                    layer: SkiaLayer,
-                    renderApi: GraphicsApi,
-                    analytics: SkiaLayerAnalytics,
-                    properties: SkiaLayerProperties
-                ) = throw RenderException()
-            }
-        )
+        testFallbackToSoftware { _, _, _, _ -> throw RenderException() }
     }
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on draw`() = uiTest {
-        testFallbackToSoftware(
-            object : RenderFactory {
-                override fun createRedrawer(
-                    layer: SkiaLayer,
-                    renderApi: GraphicsApi,
-                    analytics: SkiaLayerAnalytics,
-                    properties: SkiaLayerProperties
-                ) = object : Redrawer {
-                    override fun dispose() = Unit
-                    override fun needRedraw() = Unit
-                    override fun redrawImmediately() = layer.inDrawScope {
-                        throw RenderException()
-                    }
-                    override val renderInfo = ""
+        testFallbackToSoftware { layer, _, _, _ ->
+            object : BaseTestRedrawer() {
+                override fun redrawImmediately() = layer.inDrawScope {
+                    throw RenderException()
                 }
             }
-        )
+        }
     }
 
     private suspend fun UiTestScope.testFallbackToSoftware(nonSoftwareRenderFactory: RenderFactory) {
@@ -641,6 +619,35 @@ class SkiaLayerTest {
             } else {
                 nonSoftwareRenderFactory.createRedrawer(layer, renderApi, analytics, properties)
             }
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun `renderApi change callback is invoked on fallback`() = uiTest {
+        val window = UiTestWindow(
+            renderFactory = OverrideNonSoftwareRenderFactory { layer, _, _, _ ->
+                object : BaseTestRedrawer() {
+                    override fun redrawImmediately() = layer.inDrawScope {
+                        throw RenderException()
+                    }
+                }
+            }
+        )
+        try {
+            var rendererChangedCallbackInvoked = false
+            window.layer.onStateChanged(SkiaLayer.PropertyKind.Renderer) {
+                rendererChangedCallbackInvoked = true
+            }
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.isVisible = true
+
+            delay(1000)
+
+            assertEquals(GraphicsApi.SOFTWARE_COMPAT, window.layer.renderApi)
+            assertTrue(rendererChangedCallbackInvoked)
+        } finally {
+            window.close()
         }
     }
 
@@ -981,21 +988,25 @@ class SkiaLayerTest {
             }
             contentPane.add(layer)
         }
-        window.size = Dimension(400, 400)
-        window.isVisible = true
+        try {
+            window.size = Dimension(400, 400)
+            window.isVisible = true
 
-        repeat(20) {
-            window.location = window.location.let {
-                java.awt.Point(it.x + 10, it.y + 10)
+            repeat(20) {
+                window.location = window.location.let {
+                    java.awt.Point(it.x + 10, it.y + 10)
+                }
+                delay(50)
             }
-            delay(50)
-        }
 
-        // Ideally, layoutCount would be just 1, but Swing appears to call layout one extra time, so it ends up being 2.
-        // Compare to 3 just to avoid a false-failure if there's another layout for whatever reason.
-        // What we're interested to validate is that there's no layout occurring on every window move.
-        assert(layoutCount <= 3) {
-            "Layout count: $layoutCount"
+            // Ideally, layoutCount would be just 1, but Swing appears to call layout one extra time, so it ends up being 2.
+            // Compare to 3 just to avoid a false-failure if there's another layout for whatever reason.
+            // What we're interested to validate is that there's no layout occurring on every window move.
+            assert(layoutCount <= 3) {
+                "Layout count: $layoutCount"
+            }
+        } finally {
+            window.dispose()
         }
     }
 

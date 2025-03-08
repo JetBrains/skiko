@@ -284,22 +284,22 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    private val redrawerManager = RedrawerManager<Redrawer>(properties.renderApi) { renderApi, oldRedrawer ->
-        oldRedrawer?.dispose()
-        val newRedrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
-        newRedrawer.syncBounds()
-        newRedrawer
-    }
-
-    internal val redrawer: Redrawer?
-        get() = redrawerManager.redrawer
-
-    actual var renderApi: GraphicsApi
-        get() = redrawerManager.renderApi
-        set(value) {
-            redrawerManager.forceRenderApi(value)
+    private val redrawerManager = RedrawerManager<Redrawer>(
+        defaultRenderApi = properties.renderApi,
+        redrawerFactory = { renderApi, oldRedrawer ->
+            oldRedrawer?.dispose()
+            renderFactory.createRedrawer(this, renderApi, analytics, properties).also {
+                it.syncBounds()
+            }
+        },
+        onRenderApiChanged = {
             notifyChange(PropertyKind.Renderer)
         }
+    )
+
+    internal val redrawer: Redrawer? by redrawerManager::redrawer
+
+    actual var renderApi: GraphicsApi by redrawerManager::renderApi
 
     val renderInfo: String
         get() = if (redrawer == null)
@@ -320,15 +320,15 @@ actual open class SkiaLayer internal constructor(
         isInited = true
     }
 
-    private val stateHandlers =
+    private val stateChangeListeners =
         mutableMapOf<PropertyKind, MutableList<(SkiaLayer) -> Unit>>()
 
     fun onStateChanged(kind: PropertyKind, handler: (SkiaLayer) -> Unit) {
-        stateHandlers.getOrPut(kind, { mutableListOf() }) += handler
+        stateChangeListeners.getOrPut(kind, ::mutableListOf) += handler
     }
 
     private fun notifyChange(kind: PropertyKind) {
-        stateHandlers.get(kind)?.let { handlers ->
+        stateChangeListeners[kind]?.let { handlers ->
             handlers.forEach { it(this) }
         }
     }
@@ -583,7 +583,7 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    actual internal fun draw(canvas: Canvas) {
+    internal actual fun draw(canvas: Canvas) {
         check(!isDisposed) { "SkiaLayer is disposed" }
         lockPicture {
             canvas.drawPicture(it.instance)

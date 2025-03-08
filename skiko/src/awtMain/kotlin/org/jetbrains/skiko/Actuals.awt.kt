@@ -8,7 +8,6 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
-import java.net.MalformedURLException
 import java.net.URI
 import java.net.URL
 import javax.swing.UIManager
@@ -16,13 +15,8 @@ import javax.swing.UIManager
 actual fun setSystemLookAndFeel() = UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
 
 internal actual fun makeDefaultRenderFactory(): RenderFactory =
-    object : RenderFactory {
-        override fun createRedrawer(
-            layer: SkiaLayer,
-            renderApi: GraphicsApi,
-            analytics: SkiaLayerAnalytics,
-            properties: SkiaLayerProperties
-        ): Redrawer = when (hostOs) {
+    RenderFactory { layer, renderApi, analytics, properties ->
+        when (hostOs) {
             OS.MacOS -> when (renderApi) {
                 GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareRedrawer(layer, analytics, properties)
                 else -> MetalRedrawer(layer, analytics, properties)
