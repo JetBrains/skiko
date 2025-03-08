@@ -4,11 +4,11 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Component
+import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.GraphicsConfiguration
 import javax.accessibility.Accessible
 import javax.accessibility.AccessibleContext
-import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -65,10 +65,13 @@ open class SkiaSwingLayer(
             get() = this@SkiaSwingLayer.properties.adapterPriority
     }
 
-    private val redrawerManager = RedrawerManager<SwingRedrawer>(properties.renderApi) { renderApi, oldRedrawer ->
-        oldRedrawer?.dispose()
-        createSwingRedrawer(swingLayerProperties, renderDelegateWithClipping, renderApi, analytics)
-    }
+    private val redrawerManager = RedrawerManager<SwingRedrawer>(
+        properties.renderApi,
+        redrawerFactory = { renderApi, oldRedrawer ->
+            oldRedrawer?.dispose()
+            createSwingRedrawer(swingLayerProperties, renderDelegateWithClipping, renderApi, analytics)
+        }
+    )
 
     private val redrawer: SwingRedrawer?
         get() = redrawerManager.redrawer
@@ -109,7 +112,7 @@ open class SkiaSwingLayer(
         }
     }
 
-    override fun paint(g: java.awt.Graphics) {
+    override fun paint(g: Graphics) {
         try {
             redrawer?.redraw(g as Graphics2D)
         } catch (e: RenderException) {
