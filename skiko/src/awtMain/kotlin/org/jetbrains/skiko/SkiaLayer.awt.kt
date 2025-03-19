@@ -537,6 +537,10 @@ actual open class SkiaLayer internal constructor(
         FrameWatcher.nextFrame()
         fpsCounter?.tick()
 
+        // The current approach is to render into a picture in the main thread, and render this picture in the render thread
+        // If this approach will be changed, create an issue in https://youtrack.jetbrains.com/issues/CMP for changing it in
+        // https://github.com/JetBrains/compose-multiplatform/blob/e4e2d329709cded91a09cc612d4defbce37aad96/benchmarks/multiplatform/benchmarks/src/commonMain/kotlin/MeasureComposable.kt#L151 as well
+
         val pictureWidth = (width * contentScale).toInt().coerceAtLeast(0)
         val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
 
