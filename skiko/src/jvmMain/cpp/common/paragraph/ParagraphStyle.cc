@@ -30,7 +30,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_Paragrap
 }
 
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetReplaceTabCharacters
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetReplaceTabCharacters
     (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
   ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
   instance->setReplaceTabCharacters(value);
