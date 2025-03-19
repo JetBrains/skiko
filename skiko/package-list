@@ -373,6 +373,7 @@ $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/heightMode/#/Pointin
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/isApplyRoundingHackEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/is-apply-rounding-hack-enabled.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/isHintingEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/is-hinting-enabled.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/maxLinesCount/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/max-lines-count.html
+$dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/replaceTabCharacters/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/replace-tab-characters.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/strutStyle/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/strut-style.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/textIndent/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/text-indent.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/textStyle/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/text-style.html
