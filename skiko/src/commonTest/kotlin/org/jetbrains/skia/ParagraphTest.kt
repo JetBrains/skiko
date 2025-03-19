@@ -5,14 +5,11 @@ import org.jetbrains.skia.paragraph.*
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
-import org.jetbrains.skiko.tests.*
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.truncate
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import org.jetbrains.skiko.tests.SkipJsTarget
+import org.jetbrains.skiko.tests.SkipNativeTarget
+import org.jetbrains.skiko.tests.SkipWasmTarget
+import org.jetbrains.skiko.tests.runTest
+import kotlin.test.*
 
 class ParagraphTest {
     private val fontCollection = suspend {
@@ -209,5 +206,14 @@ class ParagraphTest {
         }
         testWraps(isApplyRoundingHackEnabled = false, unexpectedWrapsPresent = false)
         testWraps(isApplyRoundingHackEnabled = true, unexpectedWrapsPresent = true)
+    }
+
+    @Test
+    fun paragraphStyleCanChangeReplaceTab() {
+        ParagraphStyle().use { it ->
+            assertFalse(it.replaceTabCharacters)
+            it.replaceTabCharacters = true
+            assertTrue(it.replaceTabCharacters)
+        }
     }
 }

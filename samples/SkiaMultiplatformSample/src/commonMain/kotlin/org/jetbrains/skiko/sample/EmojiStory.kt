@@ -15,13 +15,14 @@ class EmojiStory : SkikoRenderDelegate {
     private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
 
     private val style = ParagraphStyle().apply {
+        replaceTabCharacters = true
         textStyle = TextStyle().apply {
             this.fontSize = 16.0f
         }.setColor(0xFF000000.toInt())
     }
 
     private val paragraph = ParagraphBuilder(style, fontCollection)
-        .addText("\uD83D\uDCE1 Antenna - 天线\n")
+        .addText("\uD83D\uDCE1\tAntenna\t-\t天线\t\n")
         .addText("⁉\uFE0F 〰\uFE0F ⁉\uFE0F\n")
         .addText("\uD83D\uDE32 \uD83E\uDD14 \uD83D\uDCA1\n")
         .addText("\uD83C\uDF0D Earth - 地球\n")
