@@ -1,5 +1,6 @@
 package internal.utils
 
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.Provider
 import java.io.File
@@ -86,6 +87,15 @@ internal abstract class BaseVisualStudioBuildToolsArgBuilder : AbstractArgBuilde
 
 internal class DefaultArgBuilder() : AbstractArgBuilder() {
     override fun newSelfInstance(): ArgBuilder = DefaultArgBuilder()
+    override fun escapePathIfNeeded(file: File): String {
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            val path = file.absolutePath
+                .replace("/", "\\")
+                .replace("\\", "\\\\")
+            return if (" " in path) "\"$path\"" else path
+        }
+        else return super.escapePathIfNeeded(file)
+    }
 }
 
 internal class VisualCppCompilerArgBuilder : BaseVisualStudioBuildToolsArgBuilder() {
