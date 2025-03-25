@@ -252,16 +252,10 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAn
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_finishFrame(
-    JNIEnv *env, jobject redrawer, jlong devicePtr)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_swapBuffers(
+    JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean waitForVsync)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_finishFrame");
-}
-
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_dwmFlush(
-    JNIEnv *env, jobject redrawer)
-{
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_dwmFlush");
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_swapBuffers");
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_disposeDevice(

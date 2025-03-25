@@ -1,7 +1,6 @@
 #ifdef SK_ANGLE
 
 #include <Windows.h>
-#include <dwmapi.h>
 #include <jawt_md.h>
 #include "jni_helpers.h"
 #include "exceptions_handler.h"
@@ -95,8 +94,7 @@ bool initAngleSurface(JNIEnv *env, AngleDevice *angleDevice, EGLint width, EGLin
         throwAngleException(env, __FUNCTION__, "Could not make context current!");
         return false;
     }
-    // For vsync we will use dwmFlush instead of swapInterval, see WindowsOpenGLRedrawer.kt
-    eglSwapInterval(angleDevice->display, 0);
+    eglSwapInterval(angleDevice->display, 1);
     return true;
 }
 
@@ -246,29 +244,23 @@ extern "C"
         return (jlong) 0;
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_finishFrame(
-        JNIEnv *env, jobject redrawer, jlong devicePtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_swapBuffers(
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean waitForVsync)
     {
         __try
         {
             AngleDevice *angleDevice = fromJavaPointer<AngleDevice *>(devicePtr);
+            eglSwapInterval(angleDevice->display, waitForVsync ? 1 : 0);
             if (!eglSwapBuffers(angleDevice->display, angleDevice->surface))
             {
                 throwAngleException(env, __FUNCTION__, "Could not complete eglSwapBuffers.");
             }
-            angleDevice->backendContext->fFunctions.fFinish();
         }
         __except(EXCEPTION_EXECUTE_HANDLER)
         {
             auto code = GetExceptionCode();
             throwJavaRenderExceptionByExceptionCode(env, __FUNCTION__, code);
         }
-    }
-
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_dwmFlush(
-        JNIEnv *env, jobject redrawer)
-    {
-        DwmFlush();
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_disposeDevice(
