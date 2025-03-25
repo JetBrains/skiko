@@ -246,6 +246,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
         MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
         env->DeleteGlobalRef(device.layer.javaRef);
         [[NSNotificationCenter defaultCenter] removeObserver:device.occlusionObserver];
+        device.layer.displaySyncEnabled = false;  // Prevents window background flashing when the window is disposed
         [device.layer removeFromSuperlayer];
     }
 }
