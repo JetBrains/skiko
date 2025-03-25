@@ -132,7 +132,7 @@ object SkikoProperties {
         when(hostOs) {
             OS.MacOS -> return GraphicsApi.METAL
             OS.Linux -> return GraphicsApi.OPENGL
-            OS.Windows -> return GraphicsApi.ANGLE
+            OS.Windows -> return GraphicsApi.DIRECT3D
             OS.Android -> return GraphicsApi.OPENGL
             OS.JS, OS.Ios, OS.Tvos, OS.Unknown -> TODO("commonize me")
         }
@@ -144,8 +144,8 @@ object SkikoProperties {
             OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE_COMPAT)
             OS.Windows -> when (hostArch) {
                 // Skia isn't properly tested on OpenGL and Windows ARM (https://groups.google.com/g/skia-discuss/c/McoclAhLpvg?pli=1)
-                Arch.Arm64 -> listOf(GraphicsApi.ANGLE, GraphicsApi.DIRECT3D, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
-                else -> listOf(GraphicsApi.ANGLE, GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
+                Arch.Arm64 -> listOf(GraphicsApi.DIRECT3D, GraphicsApi.ANGLE, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
+                else -> listOf(GraphicsApi.DIRECT3D, GraphicsApi.ANGLE, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             }
             OS.Android -> return listOf(GraphicsApi.OPENGL)
             OS.JS, OS.Ios, OS.Tvos, OS.Unknown -> TODO("commonize me")
