@@ -16,17 +16,6 @@
 #include <GL/gl.h>
 #include "window_util.h"
 
-void throwAngleException(JNIEnv *env, const char * function, const char * msg) {
-    char fullMsg[1024];
-    snprintf(fullMsg, sizeof(fullMsg) - 1, "Native exception in [%s], message: %s", function, msg);
-
-    static jclass cls = static_cast<jclass>(env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/redrawer/AngleRedrawerException")));
-    static jmethodID init = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;)V");
-
-    jthrowable throwable = (jthrowable) env->NewObject(cls, init, env->NewStringUTF(fullMsg));
-    env->Throw(throwable);
-}
-
 class AngleDevice
 {
 public:
@@ -91,7 +80,7 @@ bool initAngleSurface(JNIEnv *env, AngleDevice *angleDevice, EGLint width, EGLin
     }
     if (!eglMakeCurrent(angleDevice->display, angleDevice->surface, angleDevice->surface, angleDevice->context))
     {
-        throwAngleException(env, __FUNCTION__, "Could not make context current!");
+        throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not make context current!");
         return false;
     }
     eglSwapInterval(angleDevice->display, 1);
@@ -120,7 +109,7 @@ extern "C"
             angleDevice->display = getAngleEGLDisplay(angleDevice->device);
             if (EGL_NO_DISPLAY == angleDevice->display)
             {
-                throwAngleException(env, __FUNCTION__, "Could not get display!");
+                throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not get display!");
                 return (jlong) 0;
             }
 
@@ -128,7 +117,7 @@ extern "C"
             EGLint minorVersion;
             if (!eglInitialize(angleDevice->display, &majorVersion, &minorVersion))
             {
-                throwAngleException(env, __FUNCTION__, "Could not initialize display!");
+                throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not initialize display!");
                 return (jlong) 0;
             }
 
@@ -150,7 +139,7 @@ extern "C"
             EGLint numConfigs;
             if (!eglChooseConfig(angleDevice->display, configAttribs, &angleDevice->surfaceConfig, 1, &numConfigs))
             {
-                throwAngleException(env, __FUNCTION__, "Could not create choose config!");
+                throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not create choose config!");
                 return (jlong) 0;
             }
 
@@ -163,14 +152,14 @@ extern "C"
             angleDevice->context = eglCreateContext(angleDevice->display, angleDevice->surfaceConfig, nullptr, contextAttribs);
             if (EGL_NO_CONTEXT == angleDevice->context)
             {
-                throwAngleException(env, __FUNCTION__, "Could not create context!");
+                throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not create context!");
                 return (jlong) 0;
             }
 
             // initial surface
             if (!initAngleSurface(env, angleDevice, 0, 0))
             {
-                throwAngleException(env, __FUNCTION__, "Could not create surface!");
+                throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not create surface!");
                 return (jlong) 0;
             }
 
@@ -196,7 +185,7 @@ extern "C"
         AngleDevice *angleDevice = fromJavaPointer<AngleDevice *>(devicePtr);
         if (!eglMakeCurrent(angleDevice->display, angleDevice->surface, angleDevice->surface, angleDevice->context))
         {
-            throwAngleException(env, __FUNCTION__, "Could not make context current!");
+            throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not make context current!");
         }
     }
 
@@ -217,7 +206,7 @@ extern "C"
 
             if (!initAngleSurface(env, angleDevice, width, height))
             {
-                throwAngleException(env, __FUNCTION__, "Could not create surface!");
+                throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not create surface!");
                 return (jlong) 0;
             }
 
@@ -253,7 +242,7 @@ extern "C"
             eglSwapInterval(angleDevice->display, waitForVsync ? 1 : 0);
             if (!eglSwapBuffers(angleDevice->display, angleDevice->surface))
             {
-                throwAngleException(env, __FUNCTION__, "Could not complete eglSwapBuffers.");
+                throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not complete eglSwapBuffers.");
             }
         }
         __except(EXCEPTION_EXECUTE_HANDLER)
