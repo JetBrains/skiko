@@ -98,11 +98,11 @@ class SkiaLayerTest {
                 override fun keyTyped(e: KeyEvent?) {
                     launch {
                         val redrawer = window.layer.redrawer as MetalRedrawer
-                        redrawer.drawSync()
+                        redrawer.redrawImmediately()
                         counter1 += 1
-                        redrawer.drawSync()
+                        redrawer.redrawImmediately()
                         counter2 += 1
-                        redrawer.drawSync()
+                        redrawer.redrawImmediately()
                     }
                 }
             })
