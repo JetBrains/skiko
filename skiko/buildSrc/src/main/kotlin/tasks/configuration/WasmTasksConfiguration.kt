@@ -112,7 +112,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     "-s", "MAX_WEBGL_VERSION=2",
                     "-s", "MIN_WEBGL_VERSION=2",
                     "-s", "OFFSCREEN_FRAMEBUFFER=1",
-                    "-s", "MALLOC=mimalloc",
+                    "-s", "MALLOC=mimalloc", // its performance is expected to be better than the default dlmalloc
                     "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
                     "--bind",
                     // -O2 saves 800kB for the output file, and ~100kB for transferred size.
