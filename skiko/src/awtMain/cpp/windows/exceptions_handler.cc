@@ -74,3 +74,13 @@ void throwJavaRenderExceptionByErrorCode(JNIEnv *env, const char *function, DWOR
     static jmethodID method = env->GetStaticMethodID(cls, "throwException", "(Ljava/lang/String;)V");
     env->CallStaticVoidMethod(cls, method, env->NewStringUTF(fullMsg));
 }
+
+
+void throwJavaRenderExceptionWithMessage(JNIEnv *env, const char *function, const char *msg) {
+    char fullMsg[1024];
+    snprintf(fullMsg, sizeof(fullMsg) - 1, "Native exception in [%s], message: %s", function, msg);
+
+    static jclass cls = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler"));
+    static jmethodID method = env->GetStaticMethodID(cls, "throwException", "(Ljava/lang/String;)V");
+    env->CallStaticVoidMethod(cls, method, env->NewStringUTF(fullMsg));
+}
