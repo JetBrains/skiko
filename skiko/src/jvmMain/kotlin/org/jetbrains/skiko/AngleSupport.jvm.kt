@@ -16,7 +16,7 @@ internal actual fun loadAngleLibrary() {
                     loadAngleLibraryWindows()
                 }
                 catch (e: Exception) {
-                    throw RenderException("Failed to load ANGLE library: ${e}")
+                    throw OptionalRenderApiException("Failed to load ANGLE library: ${e}")
                 }
             }
             else -> Unit

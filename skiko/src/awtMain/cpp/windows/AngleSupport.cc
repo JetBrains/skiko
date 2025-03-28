@@ -76,13 +76,6 @@ extern "C" {
         return eglGetProcAddress(procname);
     }
 
-    JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_AngleApi_glGetString(JNIEnv *env, jobject object, jint value)
-    {
-        static auto glGetString = (PFNGLGETSTRINGPROC) eglGetProcAddress("glGetString");
-        const char *content = reinterpret_cast<const char *>(glGetString(value));
-        return env->NewStringUTF(content);
-    }
-
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AngleSupport_1jvmKt_loadAngleLibraryWindows(JNIEnv *env, jobject obj) {
         TCHAR basePath[MAX_PATH] = TEXT("");
         TCHAR libEGL[MAX_PATH] = TEXT("");
