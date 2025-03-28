@@ -8,7 +8,7 @@ import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
 
-class AwtClocks(private val layer: SkiaLayer) : Clocks(layer.renderApi), MouseMotionListener, MouseWheelListener {
+class AwtClocks(private val layer: SkiaLayer) : Clocks(layer::renderApi), MouseMotionListener, MouseWheelListener {
     private val cursorManager = CursorManager()
 
     init {
