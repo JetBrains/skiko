@@ -10,7 +10,6 @@ import org.jetbrains.skiko.graphicapi.InternalDirectXApi.disposeDevice
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXContext
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXRenderTargetOffScreen
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXTexture
-import org.jetbrains.skiko.graphicapi.InternalDirectXApi.readPixels
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.waitForCompletion
 import java.awt.Graphics2D
 
@@ -31,8 +30,6 @@ internal class Direct3DSwingRedrawer(
     }
 
     private val device = createDirectXOffscreenDevice(adapter)
-
-    private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
     private val context = if (device == 0L) {
         throw RenderException("Failed to create DirectX12 device.")
@@ -87,18 +84,9 @@ internal class Direct3DSwingRedrawer(
 
     fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = false)
-
-        val bytesArraySize = surface.width * surface.height * 4
-        if (bytesToDraw.size != bytesArraySize) {
-            bytesToDraw = ByteArray(bytesArraySize)
-        }
-
         waitForCompletion(device, texturePtr)
-        if(!readPixels(texturePtr, bytesToDraw)) {
-            throw RenderException("Couldn't read pixels")
-        }
 
-        swingOffscreenDrawer.draw(g, bytesToDraw, surface.width, surface.height)
+        getSwingDrawer().draw(g, surface, texture = texturePtr)
     }
 
     private fun makeRenderTarget() = BackendRenderTarget(
