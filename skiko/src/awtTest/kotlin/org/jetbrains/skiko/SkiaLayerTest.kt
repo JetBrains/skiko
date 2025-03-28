@@ -25,14 +25,19 @@ import org.junit.Rule
 import org.junit.Test
 import java.awt.*
 import java.awt.Color
+import java.awt.Point
 import java.awt.event.*
+import java.util.concurrent.Semaphore
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.Box
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
+import kotlin.concurrent.thread
 import kotlin.random.Random
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration
@@ -994,7 +999,7 @@ class SkiaLayerTest {
 
             repeat(20) {
                 window.location = window.location.let {
-                    java.awt.Point(it.x + 10, it.y + 10)
+                    Point(it.x + 10, it.y + 10)
                 }
                 delay(50)
             }
@@ -1007,6 +1012,94 @@ class SkiaLayerTest {
             }
         } finally {
             window.dispose()
+        }
+    }
+
+    @Test
+    fun `no window flash on hide or dispose while animation is running`() = uiTest {
+        assumeTrue(hostOs == OS.MacOS)  // Until the issue is fixed on Windows and Linux
+
+        // Put up a large green window, and then repeatedly show and hide/dispose
+        // a smaller black window on top of it while screenshotting the pixel at the center,
+        // and making sure that pixel is always either black or green.
+
+        val bgColor = Color.GREEN  // Green
+        val fgColor = Color.BLACK  // Black
+        val backgroundWindow = JFrame().also {
+            it.size = Dimension(1000, 1000)
+            it.location = Point(200, 200)
+            it.contentPane.background = bgColor
+            it.isVisible = true
+        }
+
+        lateinit var renderDelegate: SolidColorRenderer
+        val window = UiTestWindow {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            renderDelegate = SolidColorRenderer(
+                layer = layer,
+                color = fgColor,
+                continuousRedraw = true  // Continuously redraw to simulate a running animation
+            )
+            layer.renderDelegate = renderDelegate
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+
+        window.isVisible = true
+        delay(500)
+        val pixelLocation = window.bounds.let {
+            Point(it.x + it.width/2, it.y + it.height/2)
+        }
+
+        var nonBlackPixelDetected = false
+        val stopThread = AtomicBoolean(false)
+        // This semaphore ensures that screenshots are only taken when the window is becoming hidden/disposed.
+        // It's needed because the window can (and does, with SOFTWARE_COMPAT) also flash when becoming visible.
+        val semaphore = Semaphore(1, true)
+        val t = thread {
+            val robot = Robot()
+            while(!stopThread.get()) {
+                semaphore.acquire()
+                val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
+                semaphore.release()
+                if ((pixel != fgColor) && (pixel != bgColor)) {
+                    println("window is visible: ${window.isVisible}")
+                    nonBlackPixelDetected = true
+                    return@thread
+                }
+            }
+        }
+
+        try {
+            repeat(20) {
+                delay(200)
+                window.isVisible = false
+                delay(300)
+                assertFalse(nonBlackPixelDetected, "Detected a non-black pixel when hiding window")
+                // Acquire the semaphore while making the window visible, to disable screenshotting
+                semaphore.acquire()
+                window.isVisible = true
+                delay(1000)
+                semaphore.release()
+            }
+
+            repeat(20) {
+                delay(200)
+                window.dispose()
+                delay(300)
+                assertFalse(nonBlackPixelDetected, "Detected a non-black pixel when disposing window")
+                // Acquire the semaphore while making the window visible, to disable screenshotting
+                semaphore.acquire()
+                window.isVisible = true
+                delay(1000)
+                semaphore.release()
+            }
+        } finally {
+            stopThread.getAndSet(true)
+            t.join()
+
+            window.dispose()
+            backgroundWindow.dispose()
         }
     }
 
@@ -1072,6 +1165,30 @@ class SkiaLayerTest {
             layer.needRedraw()
         }
     }
+
+    private class SolidColorRenderer(
+        val layer: SkiaLayer,
+        color: Color,
+        continuousRedraw: Boolean = false
+    ) : SkikoRenderDelegate {
+
+        var continuousRedraw = continuousRedraw
+            set(value) {
+                if (value)
+                    layer.needRedraw()
+                field = value
+            }
+
+        val paint = Paint().also { it.color = color.rgb }
+
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), paint)
+            if (continuousRedraw) {
+                layer.needRedraw()
+            }
+        }
+    }
+
 }
 
 private fun JFrame.close() = dispatchEvent(WindowEvent(this, WindowEvent.WINDOW_CLOSING))

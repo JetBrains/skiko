@@ -221,11 +221,18 @@ actual open class SkiaLayer internal constructor(
 
     private fun checkShowing() {
         val wasShowing = isShowingCached
-        isShowingCached = super.isShowing()
-        if (wasShowing != isShowing) {
-            redrawer?.setVisible(isShowing)
+        val isShowingNow = super.isShowing().also {
+            isShowingCached = it
         }
-        if (isShowing) {
+        if (wasShowing != isShowingNow) {
+            // We don't want to call redrawer.setVisible(false) when the window becomes hidden, because that hides the
+            // layer immediately and stops it from being painted (at the system level). But the window itself is still
+            // actually visible for a few frames, and it draws its own background, causing a "flash".
+            if (SwingUtilities.getWindowAncestor(this).isShowing) {
+                redrawer?.setVisible(isShowingNow)
+            }
+        }
+        if (isShowingNow) {
             redrawer?.syncBounds()
             repaint()
         }
