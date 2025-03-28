@@ -11,7 +11,7 @@ import platform.AppKit.NSViewHeightSizable
 import platform.AppKit.NSViewWidthSizable
 import platform.AppKit.NSWindow
 
-class MacosClocks(skiaLayer: SkiaLayer, window: NSWindow) : Clocks(skiaLayer.renderApi) {
+class MacosClocks(skiaLayer: SkiaLayer, window: NSWindow) : Clocks({ skiaLayer.renderApi }) {
     init {
         val nsView = object : NSView(window.frame) {
             private var trackingArea : NSTrackingArea? = null

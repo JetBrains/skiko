@@ -5,7 +5,7 @@ import org.jetbrains.skiko.SkikoUIView
 import platform.UIKit.NSLayoutConstraint
 import platform.UIKit.UIViewController
 
-class IosClocks(skiaLayer: SkiaLayer) : Clocks(skiaLayer.renderApi) {
+class IosClocks(skiaLayer: SkiaLayer) : Clocks({ skiaLayer.renderApi }) {
     val viewController: UIViewController
     init {
         val view = SkikoUIView(skiaLayer)
