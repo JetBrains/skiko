@@ -96,10 +96,10 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
             "-DSK_BUILD_FOR_LINUX",
             "-D_GLIBCXX_USE_CXX11_ABI=0"
         )
-        OS.Wasm -> mutableListOf<String>().apply {
-            add("-DSKIKO_WASM")
-            add("-sSUPPORT_LONGJMP=wasm")
-        }
+        OS.Wasm -> listOf(
+            "-DSKIKO_WASM",
+            "-sSUPPORT_LONGJMP=wasm"
+        )
         OS.Android -> listOf(
             "-DSK_BUILD_FOR_ANDROID"
         )
