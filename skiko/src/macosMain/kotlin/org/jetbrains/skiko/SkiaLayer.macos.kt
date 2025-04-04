@@ -33,6 +33,8 @@ actual open class SkiaLayer {
             field = value
         }
 
+    actual val clearColor: Int = Color.WHITE
+
     /**
      * The scale factor of [NSWindow]
      * https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
