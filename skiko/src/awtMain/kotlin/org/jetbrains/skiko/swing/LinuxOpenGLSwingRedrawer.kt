@@ -13,8 +13,6 @@ internal class LinuxOpenGLSwingRedrawer(
         onDeviceChosen("OpenGL OffScreen") // TODO: properly choose device
     }
 
-    private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
-
     private val offScreenContextPtr: Long = makeOffScreenContext().also {
         if (it == 0L) {
             throw RenderException("Cannot create OpenGL context")
@@ -87,22 +85,7 @@ internal class LinuxOpenGLSwingRedrawer(
 
     private fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = true)
-
-        val width = surface.width
-        val height = surface.height
-
-        val dstRowBytes = width * 4
-        if (storage.width != width || storage.height != height) {
-            storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
-            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
-        }
-        // TODO: it copies pixels from GPU to CPU, so it is really slow
-        surface.readPixels(storage, 0, 0)
-
-        val successfulRead = storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
-        if (successfulRead) {
-            swingOffscreenDrawer.draw(g, bytesToDraw, width, height)
-        }
+        getSwingDrawer().draw(g, surface, texture = 0)
     }
 
     /**
