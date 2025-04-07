@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.9.1")
+        classpath("com.android.tools.build:gradle:7.4.2")
     }
 }
 
@@ -18,8 +18,8 @@ repositories {
 }
 
 plugins {
-    id("com.android.application") version "8.2.2"
-    kotlin("android") version "2.1.0"
+    id("com.android.application") version "7.4.2"
+    kotlin("android") version "1.9.21"
 }
 
 val skikoNativeX64 by configurations.creating
@@ -43,11 +43,11 @@ kotlin {
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 31
     namespace = "org.jetbrains.skiko.sample"
     defaultConfig {
         minSdk = 27
-        targetSdk = 35
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
 
@@ -81,7 +81,7 @@ var version = if (project.hasProperty("skiko.version")) {
 //    publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal \
 //    publishAndroidPublicationToMavenLocal
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
     implementation("org.jetbrains.skiko:skiko-android:$version")
 
     skikoNativeX64("org.jetbrains.skiko:skiko-android-runtime-x64:$version")
