@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.2")
+        classpath("com.android.tools.build:gradle:8.9.1")
     }
 }
 
@@ -18,8 +18,8 @@ repositories {
 }
 
 plugins {
-    id("com.android.application")  version "7.0.2"
-    kotlin("android") version "1.8.0"
+    id("com.android.application") version "8.2.2"
+    kotlin("android") version "2.1.0"
 }
 
 val skikoNativeX64 by configurations.creating
@@ -38,12 +38,16 @@ val unzipTaskArm64 = tasks.register("unzipNativeArm64", Copy::class) {
     from(skikoNativeArm64.map { zipTree(it) })
 }
 
-android {
-    compileSdk = 31
+kotlin {
+    jvmToolchain(11)
+}
 
+android {
+    compileSdk = 35
+    namespace = "org.jetbrains.skiko.sample"
     defaultConfig {
         minSdk = 27
-        targetSdk = 31
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -67,9 +71,9 @@ android {
 }
 
 var version = if (project.hasProperty("skiko.version")) {
-  project.properties["skiko.version"] as String
+    project.properties["skiko.version"] as String
 } else {
-  "0.0.0-SNAPSHOT"
+    "0.0.0-SNAPSHOT"
 }
 
 // ./gradlew -Pskiko.android.enabled=true \
@@ -77,17 +81,26 @@ var version = if (project.hasProperty("skiko.version")) {
 //    publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal \
 //    publishAndroidPublicationToMavenLocal
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
     implementation("org.jetbrains.skiko:skiko-android:$version")
 
     skikoNativeX64("org.jetbrains.skiko:skiko-android-runtime-x64:$version")
     skikoNativeArm64("org.jetbrains.skiko:skiko-android-runtime-arm64:$version")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile>().configureEach {
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
     dependsOn(unzipTaskX64)
     dependsOn(unzipTaskArm64)
 }
+
+// SKIKO-934: we need to unpack these libraries before these are collected from android
+// TODO the tasks we're actually targetting are mergeDebugJniLibFolders and mergeReleaseJniLibFolders,
+//  this adds unncessary dependencies
+tasks.withType<com.android.build.gradle.tasks.MergeSourceSetFolders>()
+    .configureEach {
+        dependsOn(unzipTaskX64)
+        dependsOn(unzipTaskArm64)
+    }
 
 tasks.withType<Copy> {
     // This line needs to properly merge MANIFEST files from jars into dex
