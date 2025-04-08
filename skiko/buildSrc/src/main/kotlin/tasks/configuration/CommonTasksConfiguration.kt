@@ -161,7 +161,8 @@ fun Project.configureSignAndPublishDependencies() {
 fun KotlinTarget.generateVersion(
     targetOs: OS,
     targetArch: Arch,
-    skikoProperties: SkikoProperties
+    skikoProperties: SkikoProperties,
+    compilationName: String = "main"
 ) {
     val targetName = this.name
     val isUikitSim = isUikitSimulator()
@@ -194,9 +195,11 @@ fun KotlinTarget.generateVersion(
         }
     }
 
-    val compilation = compilations["main"] ?: error("Could not find 'main' compilation for target '$this'")
-    compilation.compileKotlinTaskProvider.configure {
-        dependsOn(generateVersionTask)
-        (this as KotlinCompileTool).source(generatedDir.get().asFile)
+    // Needs to be lazily loaded as android compilations are not available right away
+    compilations.matching { it.name == compilationName }.configureEach {
+        compileTaskProvider.configure {
+            dependsOn(generateVersionTask)
+            (this as KotlinCompileTool).source(generatedDir.get().asFile)
+        }
     }
 }
