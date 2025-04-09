@@ -111,8 +111,7 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
 
 fun Project.configureSignAndPublishDependencies() {
     if (supportWasm) {
-        tasks.forEach { task ->
-            val name = task.name
+        tasks.configureEach {
             val publishJs = "publishJsPublicationTo"
             val publishWasm = "publishSkikoWasmRuntimePublicationTo"
             val publishWasmPub = "publishWasmJsPublicationTo"
@@ -121,16 +120,15 @@ fun Project.configureSignAndPublishDependencies() {
             val signWasmPub = "signWasmJsPublication"
 
             when {
-                name.startsWith(publishJs) -> task.dependsOn(signWasm, signWasmPub)
-                name.startsWith(publishWasm) -> task.dependsOn(signJs)
-                name.startsWith(publishWasmPub) -> task.dependsOn(signJs)
-                name.startsWith(signWasmPub) -> task.dependsOn(signWasm)
+                name.startsWith(publishJs) -> dependsOn(signWasm, signWasmPub)
+                name.startsWith(publishWasm) -> dependsOn(signJs)
+                name.startsWith(publishWasmPub) -> dependsOn(signJs)
+                name.startsWith(signWasmPub) -> dependsOn(signWasm)
             }
         }
     }
     if (supportAndroid) {
-        tasks.forEach { task ->
-            val name = task.name
+        tasks.configureEach {
             val signAndroid = "signAndroidPublication"
             val generateMetadata = "generateMetadataFileForAndroidPublication"
             val publishAndroid = "publishAndroidPublicationTo"
@@ -142,16 +140,16 @@ fun Project.configureSignAndPublishDependencies() {
 
             when {
                 name.startsWith(signAndroid) || name.startsWith(generateMetadata) -> {
-                    task.dependsOn(skikoAndroidJar)
+                    dependsOn(skikoAndroidJar)
                 }
                 name.startsWith(publishAndroid) -> {
-                    task.dependsOn(signX64, signArm64)
+                    dependsOn(signX64, signArm64)
                 }
                 name.startsWith(publishX64) -> {
-                    task.dependsOn(signAndroid, signArm64)
+                    dependsOn(signAndroid, signArm64)
                 }
                 name.startsWith(publishArm64) -> {
-                    task.dependsOn(signX64, signAndroid)
+                    dependsOn(signX64, signAndroid)
                 }
             }
         }
