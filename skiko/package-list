@@ -156,7 +156,7 @@ $dokka.location:org.jetbrains.skia.impl//skia_memSetShort/#kotlin.Int#kotlin.Sho
 $dokka.location:org.jetbrains.skia.impl//use/TypeParam(bounds=[org.jetbrains.skia.impl.Managed])#kotlin.Function1[TypeParam(bounds=[org.jetbrains.skia.impl.Managed]),TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skia.impl/use.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/index.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil/getByteBufferFromPointer/#kotlin.Long#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/get-byte-buffer-from-pointer.html
-$dokka.location:org.jetbrains.skia.impl/BufferUtil/getPointerFromByteBuffer/#[Error type: Unresolved type for ByteBuffer]/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/get-pointer-from-byte-buffer.html
+$dokka.location:org.jetbrains.skia.impl/BufferUtil/getPointerFromByteBuffer/#java.nio.ByteBuffer/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/get-pointer-from-byte-buffer.html
 $dokka.location:org.jetbrains.skia.impl/InteropPointer///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-interop-pointer/index.html
 $dokka.location:org.jetbrains.skia.impl/Library.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-library/-companion/index.html
 $dokka.location:org.jetbrains.skia.impl/Library.Companion/_nAfterLoad/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-library/-companion/_n-after-load.html
@@ -2059,7 +2059,7 @@ $dokka.location:org.jetbrains.skia/ModuleImport/module/#/PointingToDeclaration/
 $dokka.location:org.jetbrains.skia/ModuleImport/name/#/PointingToDeclaration/skiko/org.jetbrains.skia/-module-import/name.html
 $dokka.location:org.jetbrains.skia/OutputWStream.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/-companion/index.html
 $dokka.location:org.jetbrains.skia/OutputWStream///PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/index.html
-$dokka.location:org.jetbrains.skia/OutputWStream/OutputWStream/#[Error type: Unresolved type for OutputStream]?/PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/-output-w-stream.html
+$dokka.location:org.jetbrains.skia/OutputWStream/OutputWStream/#java.io.OutputStream?/PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/-output-w-stream.html
 $dokka.location:org.jetbrains.skia/Paint.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-paint/-companion/index.html
 $dokka.location:org.jetbrains.skia/Paint///PointingToDeclaration/skiko/org.jetbrains.skia/-paint/index.html
 $dokka.location:org.jetbrains.skia/Paint/Paint/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/-paint.html
@@ -2932,7 +2932,7 @@ $dokka.location:org.jetbrains.skiko/FrameDispatcher/FrameDispatcher/#kotlinx.cor
 $dokka.location:org.jetbrains.skiko/FrameDispatcher/cancel/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/cancel.html
 $dokka.location:org.jetbrains.skiko/FrameDispatcher/scheduleFrame/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/schedule-frame.html
 $dokka.location:org.jetbrains.skiko/FrameLimiter///PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/index.html
-$dokka.location:org.jetbrains.skiko/FrameLimiter/FrameLimiter/#kotlinx.coroutines.CoroutineScope#kotlin.Function0[kotlin.Long]#kotlin.coroutines.SuspendFunction1[kotlin.Long,kotlin.Unit]#kotlin.Function0[kotlin.time.Duration]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/-frame-limiter.html
+$dokka.location:org.jetbrains.skiko/FrameLimiter/FrameLimiter/#[Error type: Unresolved type for CoroutineScope]#kotlin.Function0[kotlin.Long]#kotlin.coroutines.SuspendFunction1[kotlin.Long,kotlin.Unit]#kotlin.Function0[[Error type: Unresolved type for Duration]]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/-frame-limiter.html
 $dokka.location:org.jetbrains.skiko/FrameLimiter/awaitNextFrame/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/await-next-frame.html
 $dokka.location:org.jetbrains.skiko/GenericSkikoView///PointingToDeclaration/skiko/org.jetbrains.skiko/-generic-skiko-view/index.html
 $dokka.location:org.jetbrains.skiko/GpuPriority.Auto///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-gpu-priority/-auto/index.html
