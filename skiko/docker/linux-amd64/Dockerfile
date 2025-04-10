@@ -10,14 +10,17 @@ RUN apt-get update -y && \
     apt-get update && \
     apt-get install gcc-9 g++-9 -y && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 && \
-    update-alternatives --config gcc 
+    update-alternatives --config gcc \
+    apt-get install gcc-9-aarch64-linux-gnu g++-9-aarch64-linux-gnu -y \
+    update-alternatives --install /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc-9 60 --slave /usr/bin/aarch64-linux-gnu-g++ aarch64-linux-gnu-g++ /usr/bin/aarch64-linux-gnu-g++-9 \
+    update-alternatives --config aarch64-linux-gnu-gcc
 ENV PATH=/usr/lib/binutils-2.26/bin:$PATH
 
 # Install libs & tools
 ENV DEPOT_TOOLS=/usr/depot_tools
 ENV PATH=$DEPOT_TOOLS:$PATH
 RUN apt-get install git python wget -y && \
-    apt-get install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev curl zip -y && \
+    apt-get install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev curl zip multistrap -y && \
     git clone 'https://chromium.googlesource.com/chromium/tools/depot_tools.git' $DEPOT_TOOLS
 
 # Install Java
