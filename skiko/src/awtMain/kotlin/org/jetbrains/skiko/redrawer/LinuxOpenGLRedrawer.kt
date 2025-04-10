@@ -89,7 +89,7 @@ internal class LinuxOpenGLRedrawer(
                 it.setSwapInterval(0)
             }
             it.swapBuffers()
-            OpenGLApi.instance.glFinish()
+            OpenGLApi.instance.glFlush()
             if (turnOfVsync) {
                 it.setSwapInterval(swapInterval)
             }
@@ -147,14 +147,14 @@ internal class LinuxOpenGLRedrawer(
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     drawingSurfaces[redrawer]!!.setSwapInterval(0)
                     drawingSurfaces[redrawer]!!.swapBuffers()
-                    OpenGLApi.instance.glFinish()
+                    OpenGLApi.instance.glFlush()
                 }
 
                 if (vsyncRedrawer != null) {
                     drawingSurfaces[vsyncRedrawer]!!.makeCurrent(vsyncRedrawer.context)
                     drawingSurfaces[vsyncRedrawer]!!.setSwapInterval(1)
                     drawingSurfaces[vsyncRedrawer]!!.swapBuffers()
-                    OpenGLApi.instance.glFinish()
+                    OpenGLApi.instance.glFlush()
                 }
             } finally {
                 drawingSurfaces.values.forEach(::unlockLinuxDrawingSurface)

@@ -19,6 +19,10 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_OpenGLApi_glFinish(JNIEnv * env,
 	glFinish();
 }
 
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_OpenGLApi_glFlush(JNIEnv * env, jobject object) {
+	glFlush();
+}
+
 JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_OpenGLApi_glGetIntegerv(JNIEnv * env, jobject object, jint pname) {
 	GLint data;
 	glGetIntegerv(pname, &data);
