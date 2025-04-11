@@ -5,7 +5,6 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
 import kotlin.collections.HashMap
 import declareSkiaTasks
-import com.android.build.gradle.LibraryExtension
 
 plugins {
     kotlin("multiplatform")
@@ -13,10 +12,6 @@ plugins {
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.4.0"
-}
-
-if (supportAndroid) {
-    apply<com.android.build.gradle.LibraryPlugin>()
 }
 
 apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
@@ -50,7 +45,6 @@ allprojects {
 
 repositories {
     mavenCentral()
-    google()
 }
 
 kotlin {
@@ -66,19 +60,17 @@ kotlin {
     }
 
     if (supportAndroid) {
-        androidTarget("android") {
-            publishLibraryVariants("release")
-
+        jvm("android") {
+            withJava() // This line needs to add Java sources in src/androidMain/java
             compilations.all {
                 kotlinOptions.jvmTarget = "1.8"
             }
-
-            // Keep the previously defined attribute that was used to distinguish JVM and android variant
+            // We need an additional attribute to distinguish between JVM variants.
             attributes {
                 attributes.attribute(Attribute.of("ui", String::class.java), "android")
             }
             // TODO: seems incorrect.
-            generateVersion( OS.Android, Arch.Arm64, skiko, "release")
+            generateVersion( OS.Android, Arch.Arm64, skiko)
         }
     }
 
@@ -193,6 +185,7 @@ kotlin {
             val androidMain by getting {
                 dependsOn(jvmMain)
                 dependencies {
+                    compileOnly(files(androidJar()))
                     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
                 }
             }
@@ -213,7 +206,7 @@ kotlin {
         }
 
         if (supportAndroid) {
-            val androidUnitTest by getting {
+            val androidTest by getting {
                 dependsOn(jvmTest)
             }
         }
@@ -401,37 +394,19 @@ kotlin {
 }
 
 if (supportAndroid) {
-    // Android configuration, when available
-    configure<LibraryExtension> {
-        compileSdk = 31
-        namespace = "org.jetbrains.skiko"
-
-        defaultConfig.minSdk = 24
-        defaultConfig.targetSdk = 24
-        defaultConfig.javaCompileOptions
-
-        compileOptions.sourceCompatibility = JavaVersion.VERSION_1_8
-        compileOptions.targetCompatibility = JavaVersion.VERSION_1_8
-
-        sourceSets.named("main") {
-            java.srcDirs("src/androidMain/java")
-            res.srcDirs("src/androidMain/res")
-        }
-    }
-
     val os = OS.Android
     val skikoAndroidJar by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-android")
-        from(kotlin.androidTarget("android").compilations["release"].output.allOutputs)
+        from(kotlin.jvm("android").compilations["main"].output.allOutputs)
     }
     for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
         skikoProjectContext.createSkikoJvmJarTask(os, arch, skikoAndroidJar)
     }
-    tasks.matching { name == "publishAndroidReleasePublicationToMavenLocal" }.configureEach {
+    tasks.getByName("publishAndroidPublicationToMavenLocal") {
         // It needs to be compatible with Gradle 8.1
         dependsOn(skikoAndroidJar)
     }
-    tasks.matching { name == "generateMetadataFileForAndroidReleasePublication" }.configureEach {
+    tasks.getByName("generateMetadataFileForAndroidPublication") {
         // It needs to be compatible with Gradle 8.1
         dependsOn(skikoAndroidJar)
     }
@@ -579,10 +554,6 @@ publishing {
                 artifact(tasks.named("skikoWasmJar").get())
                 artifact(emptySourcesJar)
             }
-        }
-
-        if (supportAndroid) {
-            pomNameForPublication["androidRelease"] = "Skiko Android Runtime"
         }
 
         val publicationsWithoutPomNames = publications.filter { it.name !in pomNameForPublication }
