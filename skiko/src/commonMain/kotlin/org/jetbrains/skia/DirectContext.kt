@@ -181,12 +181,12 @@ private external fun DirectContext_nFlushDefault(ptr: NativePointer)
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGL")
 private external fun _nMakeGL(): NativePointer
 
-@ExternalSymbolName("Java_org_jetbrains_skia_DirectContextKt__1nMakeGLWithInterface")
-@ModuleImport("./skiko.mjs", "Java_org_jetbrains_skia_DirectContextKt__1nMakeGLWithInterface")
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGLWithInterface")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGLWithInterface")
 private external fun _nMakeGLWithInterface(interfacePtr: NativePointer): NativePointer
 
-@ExternalSymbolName("Java_org_jetbrains_skia_DirectContextKt__1nMakeGlAssembledInterface")
-@ModuleImport("./skiko.mjs", "Java_org_jetbrains_skia_DirectContextKt__1nMakeGlAssembledInterface")
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGlAssembledInterface")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGlAssembledInterface")
 private external fun _nMakeGlAssembledInterface(ctxPtr: Long, fPtr: Long): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")

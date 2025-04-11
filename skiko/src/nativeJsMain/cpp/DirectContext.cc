@@ -1,6 +1,7 @@
 #include "ganesh/GrDirectContext.h"
 #include "ganesh/gl/GrGLInterface.h"
 #include "common.h"
+#include "ganesh/gl/GrGLAssembleInterface.h"
 #include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
 
 #ifdef SK_METAL
@@ -14,13 +15,20 @@
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
   () {
-    return reinterpret_cast<KNativePointer>(GrDirectContexts::MakeGL().release());
+    return static_cast<KNativePointer>(GrDirectContexts::MakeGL().release());
+}
+
+SKIKO_EXPORT KNativeConstPointer org_jetbrains_skia_DirectContext__1nMakeGlAssembledInterface
+  (KNativePointer ctxPtr, KNativePointer fPtr) {
+    GrGLGetProc f = reinterpret_cast<GrGLGetProc>(fPtr);
+    sk_sp<const GrGLInterface> interface = GrGLMakeAssembledInterface(ctxPtr, f);
+    return static_cast<const void*>(interface.release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGLWithInterface
   (KNativePointer ptr) {
     sk_sp<GrGLInterface> iface = sk_ref_sp(reinterpret_cast<GrGLInterface*>(ptr));
-    return reinterpret_cast<KNativePointer>(GrDirectContexts::MakeGL(iface).release());
+    return static_cast<KNativePointer>(GrDirectContexts::MakeGL(iface).release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
@@ -32,7 +40,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
     backendContext.fDevice.retain(device);
     backendContext.fQueue.retain(queue);
     sk_sp<GrDirectContext> instance = GrDirectContexts::MakeMetal(backendContext);
-    return reinterpret_cast<KNativePointer>(instance.release());
+    return static_cast<KNativePointer>(instance.release());
 #else
     return nullptr;
 #endif // SK_METAL
@@ -49,7 +57,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
     backendContext.fDevice.retain(device);
     backendContext.fQueue.retain(queue);
     sk_sp<GrDirectContext> instance = GrDirectContext::MakeDirect3D(backendContext);
-    return reinterpret_cast<KNativePointer>(instance.release());
+    return static_cast<KNativePointer>(instance.release());
 #else // SK_DIRECT3D
     return nullptr;
 #endif // SK_DIRECT3D
