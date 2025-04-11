@@ -1,11 +1,27 @@
 #include <iostream>
 #include <jni.h>
 #include "ganesh/GrDirectContext.h"
+#include "ganesh/gl/GrGLAssembleInterface.h"
 #include "ganesh/gl/GrGLDirectContext.h"
+#include "ganesh/gl/GrGLInterface.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeGL
   (JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(GrDirectContexts::MakeGL().release());
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeGlAssembledInterface
+  (JNIEnv* env, jclass jclass, jlong ctxPtr, jlong fPtr) {
+    void* ctx = reinterpret_cast<void*>(static_cast<uintptr_t>(ctxPtr));
+    GrGLGetProc f = reinterpret_cast<GrGLGetProc>(static_cast<uintptr_t>(fPtr));
+    sk_sp<const GrGLInterface> interface = GrGLMakeAssembledInterface(ctx, f);
+    return reinterpret_cast<jlong>(interface.release());
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeGLWithInterface
+  (JNIEnv* env, jclass jclass, jlong interfacePtr) {
+    sk_sp<const GrGLInterface> interface = sk_ref_sp(reinterpret_cast<const GrGLInterface*>(interfacePtr));
+    return reinterpret_cast<jlong>(GrDirectContexts::MakeGL(interface).release());
 }
 
 #ifdef SK_METAL
