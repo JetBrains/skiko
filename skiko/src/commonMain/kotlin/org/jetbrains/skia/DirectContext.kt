@@ -7,6 +7,13 @@ import org.jetbrains.skiko.loadOpenGLLibrary
 
 class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
+        fun makeEGL(): DirectContext {
+            Stats.onNativeCall()
+            val ptr = _nMakeEGL()
+            if (ptr == NullPointer) throw RenderException("Can't create EGL DirectContext")
+            return DirectContext(ptr)
+        }
+
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
             loadOpenGLLibrary()
@@ -140,6 +147,10 @@ private external fun DirectContext_nFlush(ptr: NativePointer, surfacePtr: Native
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushDefault")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlushDefault")
 private external fun DirectContext_nFlushDefault(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeEGL")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeEGL")
+private external fun _nMakeEGL(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGL")
