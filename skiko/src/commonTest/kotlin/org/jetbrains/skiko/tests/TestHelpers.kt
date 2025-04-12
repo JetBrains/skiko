@@ -2,10 +2,8 @@ package org.jetbrains.skiko.tests
 
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.*
-import org.jetbrains.skiko.Arch
 import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.OS
-import org.jetbrains.skiko.hostArch
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.kotlinBackend
 
@@ -27,10 +25,6 @@ internal class TestGlContext : Managed(TestGlContext_nCreate(), FinalizerHolder.
         fun isAvailabale(): Boolean {
             if (hostOs != OS.Linux || kotlinBackend != KotlinBackend.Native) {
                 // TODO implement for other platforms and render targets
-                return false
-            }
-            if (hostArch == Arch.Arm64) {
-                // TODO implement and test EGL on arm64
                 return false
             }
             return true
