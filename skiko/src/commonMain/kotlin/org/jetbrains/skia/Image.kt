@@ -138,6 +138,44 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             return Image(ptr)
         }
 
+        /**
+         * Creates GPU-backed SkImage from backendTexture associated with context.
+         *
+         * Skia will assume ownership of the resource and will release it when no longer needed.
+         * A non-null Image is returned if format of backendTexture is recognized and supported.
+         * Recognized formats vary by GPU backend.
+         *
+         * @param context         GPU context
+         * @param backendTexture  texture residing on GPU
+         * @param origin          origin of backendTexture
+         * @param colorType       color type of the resulting Image
+         * @return                created Image
+         *
+         * @throws RuntimeException - if nullPtr is returned.
+         */
+        fun adoptTextureFrom(
+            context: DirectContext,
+            backendTexture: BackendTexture,
+            origin: SurfaceOrigin,
+            colorType: ColorType,
+        ): Image {
+            return try {
+                Stats.onNativeCall()
+                val ptr = _nAdoptTextureFrom(
+                    getPtr(context),
+                    getPtr(backendTexture),
+                    origin.ordinal,
+                    colorType.ordinal
+                )
+                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromTexture")
+                Image(ptr)
+            }
+            finally {
+                reachabilityBarrier(context)
+                reachabilityBarrier(backendTexture)
+            }
+        }
+
         init {
             staticLoad()
         }
@@ -457,3 +495,12 @@ private external fun _nReadPixelsBitmap(
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nReadPixelsPixmap")
 private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nAdoptTextureFrom")
+external fun _nAdoptTextureFrom(
+    contextPtr: NativePointer,
+    backendTexture: NativePointer,
+    surfaceOrigin: Int,
+    colorType: Int
+): NativePointer
