@@ -79,7 +79,7 @@ var version = if (project.hasProperty("skiko.version")) {
 // ./gradlew -Pskiko.android.enabled=true \
 //    publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal \
 //    publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal \
-//    publishAndroidPublicationToMavenLocal
+//    publishAndroidReleasePublicationToMavenLocal
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
     implementation("org.jetbrains.skiko:skiko-android:$version")

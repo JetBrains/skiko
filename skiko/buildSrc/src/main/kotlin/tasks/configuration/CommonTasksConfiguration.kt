@@ -129,9 +129,9 @@ fun Project.configureSignAndPublishDependencies() {
     }
     if (supportAndroid) {
         tasks.configureEach {
-            val signAndroid = "signAndroidPublication"
-            val generateMetadata = "generateMetadataFileForAndroidPublication"
-            val publishAndroid = "publishAndroidPublicationTo"
+            val signAndroid = "signAndroidReleasePublication"
+            val generateMetadata = "generateMetadataFileForAndroidReleasePublication"
+            val publishAndroid = "publishAndroidReleasePublicationTo"
             val publishX64 = "publishSkikoJvmRuntimeAndroidX64PublicationTo"
             val publishArm64 = "publishSkikoJvmRuntimeAndroidArm64PublicationTo"
             val signX64 = "signSkikoJvmRuntimeAndroidX64Publication"
