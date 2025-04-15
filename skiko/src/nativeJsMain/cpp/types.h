@@ -12,7 +12,6 @@ typedef float KFloat;
 typedef int64_t KLong;
 typedef double KDouble;
 typedef void* KNativePointer;
-typedef const void* KNativeConstPointer;
 typedef void* KInteropPointer;
 // TODO: remove me!
 typedef void* KInteropPointerArray;

@@ -1,7 +1,6 @@
 #include "ganesh/GrDirectContext.h"
 #include "ganesh/gl/GrGLInterface.h"
 #include "common.h"
-#include "ganesh/gl/GrGLAssembleInterface.h"
 #include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
 
 #ifdef SK_METAL
@@ -16,13 +15,6 @@
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
   () {
     return static_cast<KNativePointer>(GrDirectContexts::MakeGL().release());
-}
-
-SKIKO_EXPORT KNativeConstPointer org_jetbrains_skia_DirectContext__1nMakeGlAssembledInterface
-  (KNativePointer ctxPtr, KNativePointer fPtr) {
-    GrGLGetProc f = reinterpret_cast<GrGLGetProc>(fPtr);
-    sk_sp<const GrGLInterface> interface = GrGLMakeAssembledInterface(ctxPtr, f);
-    return static_cast<const void*>(interface.release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGLWithInterface

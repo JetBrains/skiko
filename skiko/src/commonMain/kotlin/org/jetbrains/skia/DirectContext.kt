@@ -15,42 +15,6 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return DirectContext(ptr)
         }
 
-        /**
-         * Creates OpenGL interface that can later be used in [makeGLWithInterface].
-         *
-         * There must be a current OpenGL context set (i.e., by calling `eglMakeCurrent` before this), otherwise
-         * this function will fail.
-         * For more information refer to skia `GrGLMakeAssembledInterface` function.
-         *
-         * @param ctxPtr    native pointer to the custom context, that the function will be called with
-         * @param fPtr      native pointer to the function that takes context and the OpenGL function name,
-         *                  and returns a function pointer of that OpenGL function (see skia `GrGLGetProc`).
-         */
-        fun makeGlAssembledInterface(ctxPtr: Long, fPtr: Long): NativePointer {
-            Stats.onNativeCall()
-            loadOpenGLLibrary()
-            val ptr = _nMakeGlAssembledInterface(ctxPtr, fPtr)
-            if (ptr == NullPointer) throw RenderException("Can't assemble OpenGL interface")
-            return ptr
-        }
-
-        /**
-         * Creates OpenGL [DirectContext] using the provided interface.
-         * This allows usage of different OpenGL interfaces (e.g., EGL).
-         *
-         * There must be a current OpenGL context set (i.e., by calling `eglMakeCurrent` before this), otherwise
-         * this function will fail.
-         * For more information refer to skia `GrGLMakeAssembledInterface` function.
-         *
-         * @param interfacePtr    native pointer created by [makeGlAssembledInterface].
-         */
-        fun makeGLWithInterface(interfacePtr: NativePointer): DirectContext {
-            Stats.onNativeCall()
-            val ptr = _nMakeGLWithInterface(interfacePtr)
-            if (ptr == NullPointer) throw RenderException("Can't create OpenGL DirectContext with provided interface")
-            return DirectContext(ptr)
-        }
-
         fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeMetal(devicePtr, queuePtr))
@@ -180,14 +144,6 @@ private external fun DirectContext_nFlushDefault(ptr: NativePointer)
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGL")
 private external fun _nMakeGL(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGLWithInterface")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGLWithInterface")
-private external fun _nMakeGLWithInterface(interfacePtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGlAssembledInterface")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGlAssembledInterface")
-private external fun _nMakeGlAssembledInterface(ctxPtr: Long, fPtr: Long): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeMetal")
