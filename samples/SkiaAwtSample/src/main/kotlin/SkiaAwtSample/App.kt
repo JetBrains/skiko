@@ -1,6 +1,7 @@
 package SkiaAwtSample
 
 import kotlinx.coroutines.*
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.*
 import java.awt.Color
@@ -33,8 +34,16 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR -> PixelGeometry.BGR_V
         else -> PixelGeometry.UNKNOWN
     }
-    val skiaLayer = SkiaLayer(pixelGeometry = pixelGeometry)
-    val clocks = ClocksAwt(skiaLayer)
+    val fpsCounter = FPSCounter(logOnTick = true)
+    lateinit var skiaLayer: SkiaSwingPanel
+    val clocks = object : ClocksAwt({ 1.5f }) {
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            fpsCounter.tick()
+            super.onRender(canvas, width, height, nanoTime)
+            skiaLayer.repaint()
+        }
+    }
+    skiaLayer = SkiaSwingPanel(clocks)
 
     val window = JFrame(title)
     window.defaultCloseOperation =
@@ -52,7 +61,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     miFullscreenState.setAccelerator(ctrlI)
     miFullscreenState.addActionListener(object : ActionListener {
         override fun actionPerformed(actionEvent: ActionEvent?) {
-            println("${window.title} is in fullscreen mode: ${skiaLayer.fullscreen}")
+            println("${window.title} is in fullscreen mode:")
         }
     })
 
@@ -61,7 +70,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     miToggleFullscreen.setAccelerator(ctrlF)
     miToggleFullscreen.addActionListener(object : ActionListener {
         override fun actionPerformed(actionEvent: ActionEvent?) {
-            skiaLayer.fullscreen = !skiaLayer.fullscreen
+            //skiaLayer.fullscreen = !skiaLayer.fullscreen
         }
     })
 
@@ -70,24 +79,13 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     val miTakeScreenshot = JMenuItem("Take screenshot to $defaultScreenshotPath")
     val ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
     miTakeScreenshot.setAccelerator(ctrlS)
-    miTakeScreenshot.addActionListener(object : ActionListener {
-        override fun actionPerformed(actionEvent: ActionEvent?) {
-            val screenshot = skiaLayer.screenshot()!!
-            @OptIn(DelicateCoroutinesApi::class)
-            GlobalScope.launch(Dispatchers.IO) {
-                val image = screenshot.toBufferedImage()
-                ImageIO.write(image, "png", File(defaultScreenshotPath))
-                println("Saved to $defaultScreenshotPath")
-            }
-        }
-    })
 
     val miDpiState = JMenuItem("Get current DPI")
     val ctrlD = KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
     miDpiState.setAccelerator(ctrlD)
     miDpiState.addActionListener(object : ActionListener {
         override fun actionPerformed(actionEvent: ActionEvent?) {
-            println("DPI: ${skiaLayer.currentDPI}")
+            println("DPI:")
         }
     })
 
@@ -111,30 +109,11 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
 
     window.setJMenuBar(menuBar)
 
-    skiaLayer.onStateChanged(SkiaLayer.PropertyKind.Renderer) { layer ->
-        println("Changed renderer for $layer: new value is ${layer.renderApi}")
-    }
-
-    skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, clocks)
     skiaLayer.addMouseMotionListener(clocks)
 
     // Window transparency
     if (System.getProperty("skiko.transparency") == "true") {
-        window.isUndecorated = true
 
-        /**
-         * There is a hack inside skiko OpenGL and Software redrawers for Windows that makes current
-         * window transparent without setting `background` to JDK's window. It's done by getting native
-         * component parent and calling `DwmEnableBlurBehindWindow`.
-         *
-         * FIXME: Make OpenGL work inside transparent window (background == Color(0, 0, 0, 0)) without this hack.
-         *
-         * See `enableTransparentWindow` (skiko/src/awtMain/cpp/windows/window_util.cc)
-         */
-        if (hostOs != OS.Windows || skiaLayer.renderApi == GraphicsApi.DIRECT3D) {
-            window.background = Color(0, 0, 0, 0)
-        }
-        skiaLayer.transparency = true
 
         /*
          * Windows makes clicks on transparent pixels fall through, but it doesn't work
@@ -155,7 +134,6 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     // MANDATORY: set window preferred size before calling pack()
     window.preferredSize = Dimension(800, 600)
     window.pack()
-    skiaLayer.disableTitleBar(64f)
     window.pack()
     skiaLayer.paint(window.graphics)
     window.isVisible = true
