@@ -15,6 +15,8 @@ actual open class SkiaLayer  {
     actual var transparency: Boolean
         get() = TODO("Not yet implemented")
         set(value) {}
+    actual val clearColor: Int
+        get() = TODO("Not yet implemented")
     actual val component: Any?
         get() = TODO("Not yet implemented")
     actual fun needRedraw() {
