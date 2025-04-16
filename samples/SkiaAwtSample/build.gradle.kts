@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "2.1.0"
     application
 }
 
@@ -55,7 +55,7 @@ val casualRun = tasks.named<JavaExec>("run") {
     systemProperty("skiko.hardwareInfo.enabled", "true")
     systemProperty("skiko.win.exception.logger.enabled", "true")
     systemProperty("skiko.win.exception.handler.enabled", "true")
-    jvmArgs?.add("-ea")
+    //jvmArgs?.add("-ea")
     // jvmArgs?.add("-Xcheck:jni")
     // Use systemProperty("skiko.library.path", "/tmp") to test loader.
     System.getProperties().entries
