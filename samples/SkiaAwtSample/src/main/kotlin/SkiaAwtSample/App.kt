@@ -36,7 +36,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     }
     val fpsCounter = FPSCounter(logOnTick = true)
     lateinit var skiaLayer: SkiaSwingPanel
-    val clocks = object : ClocksAwt({ 1.5f }) {
+    val clocks = object : ClocksAwt({ 1.0f }) {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             fpsCounter.tick()
             super.onRender(canvas, width, height, nanoTime)
