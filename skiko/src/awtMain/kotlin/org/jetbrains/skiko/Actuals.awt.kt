@@ -25,6 +25,7 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory =
                 GraphicsApi.SOFTWARE_COMPAT -> SoftwareRedrawer(layer, analytics, properties)
                 GraphicsApi.SOFTWARE_FAST -> WindowsSoftwareRedrawer(layer, analytics, properties)
                 GraphicsApi.OPENGL -> WindowsOpenGLRedrawer(layer, analytics, properties)
+                GraphicsApi.ANGLE -> AngleRedrawer(layer, analytics, properties)
                 else -> Direct3DRedrawer(layer, analytics, properties)
             }
             OS.Linux -> when (renderApi) {
