@@ -1,0 +1,15 @@
+[General]
+arch=arm64
+directory=build/multistrap-arm64
+cleanup=true
+noauth=false
+unpack=true
+cleanup=true
+aptsources=Ubuntu
+bootstrap=Ubuntu
+
+[Ubuntu]
+packages=build-essential software-properties-common gcc-9 g++-9 fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev
+source=https://ports.ubuntu.com/
+keyring=ubuntu-keyring
+suite=focal
