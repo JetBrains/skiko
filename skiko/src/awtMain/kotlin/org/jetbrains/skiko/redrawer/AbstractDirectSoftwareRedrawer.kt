@@ -22,22 +22,26 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         }
 
         if (layer.isShowing) {
-            update(System.nanoTime())
+            update()
             draw()
         }
     }
 
     protected var device = 0L
 
-    override fun needRedraw() {
+    override fun needRedraw(throttledToVsync: Boolean) {
         frameDispatcher.scheduleFrame()
     }
 
     protected open fun draw() = inDrawScope(contextHandler::draw)
 
-    override fun redrawImmediately() {
-        update(System.nanoTime())
-        draw()
+    override fun redrawImmediately(updateNeeded: Boolean) {
+        if (updateNeeded) {
+            update()
+        }
+        if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+            draw()
+        }
     }
 
     open fun resize(width: Int, height: Int) = resize(device, width, height)
