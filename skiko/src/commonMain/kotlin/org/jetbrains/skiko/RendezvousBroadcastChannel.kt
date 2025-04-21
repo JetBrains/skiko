@@ -2,33 +2,37 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
+import kotlin.coroutines.*
 
 /**
- * Behaves as `Channel<Unit>(Channel.RENDEZVOUS)`, but with ability to send a value to all current consumers
- * (which will await on `receive` method).
+ * Behaves like `Channel<Unit>(Channel.RENDEZVOUS)`, but with the ability to send a value to all current consumers
+ * suspended in [receive].
  */
 internal class RendezvousBroadcastChannel<T> {
     private val onRequest = Channel<Unit>(Channel.CONFLATED)
-    private val receivers = mutableListOf<Continuation<T>>()
+    private var suspended = mutableListOf<Continuation<T>>()
+    private var suspendedCopy = mutableListOf<Continuation<T>>()
 
     /**
-     * Send value to all current consumers which await value on `receive` method, or await for the first one.
+     * Send value to all current consumers that await value on `receive` method, or await for the first one.
      *
      * Can't be called concurrently from multiple threads.
      */
     suspend fun sendAll(value: T) {
         onRequest.receive()
-        val receiversCopy = maybeSynchronized(receivers) {
-            mutableListOf<Continuation<T>>().apply {
-                addAll(receivers)
-                receivers.clear()
-            }
+
+        // Swap the lists
+        maybeSynchronized(this) {
+            val tmp = suspended
+            suspended = suspendedCopy
+            suspendedCopy = tmp
         }
-        for (receiver in receiversCopy) {
-            receiver.resume(value)
+
+        // Safe to touch `suspendedCopy` without lock because receive will now add to `suspended`.
+        for (cont in suspendedCopy) {
+            cont.resume(value)
         }
+        suspendedCopy.clear()
     }
 
     /**
@@ -37,8 +41,8 @@ internal class RendezvousBroadcastChannel<T> {
      * Can be called concurrently from multiple threads.
      */
     suspend fun receive(): T = suspendCancellableCoroutine { continuation ->
-        maybeSynchronized(receivers) {
-            receivers.add(continuation)
+        maybeSynchronized(this) {
+            suspended.add(continuation)
         }
         onRequest.trySend(Unit)
     }

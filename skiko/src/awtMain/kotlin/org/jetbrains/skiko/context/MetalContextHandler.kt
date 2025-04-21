@@ -66,6 +66,7 @@ internal class MetalContextHandler(
         super.flush()
         surface?.flushAndSubmit()
         finishFrame()
+        Logger.debug { "MetalContextHandler finished drawing frame" }
     }
 
     override fun rendererInfo(): String {

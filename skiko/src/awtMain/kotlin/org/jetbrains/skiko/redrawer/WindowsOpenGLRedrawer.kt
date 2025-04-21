@@ -55,22 +55,26 @@ internal class WindowsOpenGLRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw() {
+    override fun needRedraw(throttledToVsync: Boolean) {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() {
+    override fun redrawImmediately(updateNeeded: Boolean) {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         inDrawScope {
-            update(System.nanoTime())
-            makeCurrent()
-            contextHandler.draw()
-            swapBuffers()
-            OpenGLApi.instance.glFinish()
-            if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
-                dwmFlush()
+            if (updateNeeded) {
+                update()
+            }
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                makeCurrent()
+                contextHandler.draw()
+                swapBuffers()
+                OpenGLApi.instance.glFinish()
+                if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
+                    dwmFlush()
+                }
             }
         }
     }
@@ -95,7 +99,6 @@ internal class WindowsOpenGLRedrawer(
             toRedraw.clear()
 
             val nanoTime = System.nanoTime()
-
             for (redrawer in toRedrawVisible) {
                 try {
                     redrawer.update(nanoTime)

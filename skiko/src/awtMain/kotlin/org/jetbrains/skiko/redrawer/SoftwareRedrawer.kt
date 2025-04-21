@@ -8,7 +8,7 @@ import org.jetbrains.skiko.context.SoftwareContextHandler
 internal class SoftwareRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
-    private val properties: SkiaLayerProperties
+    properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
     init {
         onDeviceChosen("Software")
@@ -17,16 +17,16 @@ internal class SoftwareRedrawer(
     private val contextHandler = SoftwareContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private val frameJob = Job()
-    private val frameLimiter = layerFrameLimiter(CoroutineScope(frameJob), layer.backedLayer)
+    private val frameJob = if (properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) Job() else null
+    private val frameLimiter = frameJob?.let {
+        layerFrameLimiter(CoroutineScope(it), layer.backedLayer)
+    }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) {
-            frameLimiter.awaitNextFrame()
-        }
+        frameLimiter?.awaitNextFrame()
 
         if (layer.isShowing) {
-            update(System.nanoTime())
+            update()
             inDrawScope(contextHandler::draw)
         }
     }
@@ -36,18 +36,25 @@ internal class SoftwareRedrawer(
     }
 
     override fun dispose() {
-        frameJob.cancel()
+        frameJob?.cancel()
         frameDispatcher.cancel()
         contextHandler.dispose()
         super.dispose()
     }
 
-    override fun needRedraw() {
+    override fun needRedraw(throttledToVsync: Boolean) {
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() {
-        update(System.nanoTime())
-        inDrawScope(contextHandler::draw)
+    override fun redrawImmediately(updateNeeded: Boolean) {
+        checkDisposed()
+        inDrawScope {
+            if (updateNeeded) {
+                update()
+            }
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                contextHandler.draw()
+            }
+        }
     }
 }
