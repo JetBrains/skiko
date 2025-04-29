@@ -9,7 +9,7 @@ import java.awt.GraphicsConfiguration
 import java.awt.GraphicsEnvironment
 import java.awt.Image
 
-class AcceleratedSwingPainter : SwingPainter {
+internal class AcceleratedSwingPainter : SwingPainter {
     private val sharedTextures =
         if (JBR.isSharedTexturesSupported() &&
             JBR.getSharedTextures().textureType == SharedTextures.METAL_TEXTURE_TYPE
