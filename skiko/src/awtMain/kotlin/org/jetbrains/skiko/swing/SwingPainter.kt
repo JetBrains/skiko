@@ -8,7 +8,7 @@ import java.awt.Graphics2D
  *
  * @see SoftwareSwingDrawer
  */
-interface SwingPainter {
+internal interface SwingPainter {
     fun paint(g: Graphics2D, surface: Surface, texture: Long)
     fun dispose()
 }
