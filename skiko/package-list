@@ -935,6 +935,7 @@ $dokka.location:org.jetbrains.skia////PointingToDeclaration/skiko/org.jetbrains
 $dokka.location:org.jetbrains.skia//LANG/#/PointingToDeclaration/skiko/org.jetbrains.skia/-l-a-n-g.html
 $dokka.location:org.jetbrains.skia//makeFromEncoded/org.jetbrains.skia.Image.Companion#[Error type: Unresolved type for NSData]/PointingToDeclaration/skiko/org.jetbrains.skia/make-from-encoded.html
 $dokka.location:org.jetbrains.skia//makeFromFileName/org.jetbrains.skia.Data.Companion#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file-name.html
+$dokka.location:org.jetbrains.skia//makeGLWithInterface/org.jetbrains.skia.DirectContext.Companion#org.jetbrains.skia.GLAssembledInterface/PointingToDeclaration/skiko/org.jetbrains.skia/make-g-l-with-interface.html
 $dokka.location:org.jetbrains.skia//toIPoint/#kotlin.Long/PointingToDeclaration/skiko/org.jetbrains.skia/to-i-point.html
 $dokka.location:org.jetbrains.skia//useContext/org.jetbrains.skia.DirectContext#kotlin.Function1[org.jetbrains.skia.DirectContext,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skia/use-context.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod.KEEP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-animation-disposal-method/-k-e-e-p/index.html
@@ -1791,6 +1792,9 @@ $dokka.location:org.jetbrains.skia/FramebufferFormat.Companion/GR_GL_STENCIL_IND
 $dokka.location:org.jetbrains.skia/FramebufferFormat.Companion/GR_GL_STENCIL_INDEX4/#/PointingToDeclaration/skiko/org.jetbrains.skia/-framebuffer-format/-companion/-g-r_-g-l_-s-t-e-n-c-i-l_-i-n-d-e-x4.html
 $dokka.location:org.jetbrains.skia/FramebufferFormat.Companion/GR_GL_STENCIL_INDEX8/#/PointingToDeclaration/skiko/org.jetbrains.skia/-framebuffer-format/-companion/-g-r_-g-l_-s-t-e-n-c-i-l_-i-n-d-e-x8.html
 $dokka.location:org.jetbrains.skia/FramebufferFormat///PointingToDeclaration/skiko/org.jetbrains.skia/-framebuffer-format/index.html
+$dokka.location:org.jetbrains.skia/GLAssembledInterface.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-g-l-assembled-interface/-companion/index.html
+$dokka.location:org.jetbrains.skia/GLAssembledInterface.Companion/createFromNativePointers/#kotlin.Long#kotlin.Long/PointingToDeclaration/skiko/org.jetbrains.skia/-g-l-assembled-interface/-companion/create-from-native-pointers.html
+$dokka.location:org.jetbrains.skia/GLAssembledInterface///PointingToDeclaration/skiko/org.jetbrains.skia/-g-l-assembled-interface/index.html
 $dokka.location:org.jetbrains.skia/GLBackendState.BLEND///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-g-l-backend-state/-b-l-e-n-d/index.html
 $dokka.location:org.jetbrains.skia/GLBackendState.FIXED_FUNCTION///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-g-l-backend-state/-f-i-x-e-d_-f-u-n-c-t-i-o-n/index.html
 $dokka.location:org.jetbrains.skia/GLBackendState.MISC///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-g-l-backend-state/-m-i-s-c/index.html
