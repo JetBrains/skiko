@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -8,10 +9,12 @@ import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
 import java.awt.Component
+import java.awt.Graphics
 import java.awt.Point
 import java.awt.event.*
 import java.awt.geom.AffineTransform
 import java.awt.im.InputMethodRequests
+import java.beans.PropertyChangeListener
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
 import javax.swing.JComponent
@@ -100,18 +103,29 @@ actual open class SkiaLayer internal constructor(
         isOpaque = false
         layout = null
         backedLayer = object : HardwareLayer(externalAccessibleFactory) {
-            override fun paint(g: java.awt.Graphics) {
-                Logger.debug { "Paint called on $this" }
-                checkContentScale()
 
-                // 1. JPanel.paint is not always called (in rare cases).
-                //    For example if we call 'jframe.isResizable = false` on Ubuntu
-                //
-                // 2. HardwareLayer.paint is also not always called.
-                //    For example, on macOs when we resize window or change DPI
-                //
-                // 3. to avoid double paint in one single frame, use needRedraw instead of redrawImmediately
-                redrawer?.needRedraw()
+            @Suppress("OVERRIDE_DEPRECATION")
+            override fun reshape(x: Int, y: Int, width: Int, height: Int) {
+                Logger.debug { "reshape(x=$x, y=$y, w=$width, h=$height) called on $this" }
+                super.reshape(x, y, width, height)
+
+                redrawer?.syncBounds()
+                // There's no reason for the render delegate to directly cause resizing SkiaLayer, but protect
+                // against it anyway.
+                if (!isRendering) {
+                    // When the layer isn't yet showing, paint will not be called,
+                    // but in order to avoid the background flashing when the layer
+                    // does show, we already draw to the native surface.
+                    redrawer?.redrawImmediately(updateNeeded = true)
+                } else {
+                    redrawer?.needRedraw(throttledToVsync = false)
+                }
+            }
+
+            override fun paint(g: Graphics) {
+                Logger.debug { "paint called on $this" }
+                checkContentScale()
+                redrawer?.redrawImmediately(updateNeeded = false)
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -175,7 +189,6 @@ actual open class SkiaLayer internal constructor(
             }
         }
 
-
         addPropertyChangeListener("graphicsContextScaleTransform") {
             Logger.debug { "graphicsContextScaleTransform changed for $this" }
             latestReceivedGraphicsContextScaleTransform = it.newValue as AffineTransform
@@ -185,12 +198,23 @@ actual open class SkiaLayer internal constructor(
             // Workaround for JBR-5259
             if (hostOs == OS.Windows) {
                 peerBufferSizeFixJob?.cancel()
+                @OptIn(DelicateCoroutinesApi::class)
                 peerBufferSizeFixJob = GlobalScope.launch(MainUIDispatcher) {
                     backedLayer.setLocation(1, 0)
                     backedLayer.setLocation(0, 0)
                 }
             }
         }
+    }
+
+    // Override to make final, because it's called it in the init block
+    final override fun addAncestorListener(listener: AncestorListener?) {
+        super.addAncestorListener(listener)
+    }
+
+    // Override to make final, because it's called it in the init block
+    final override fun addPropertyChangeListener(propertyName: String?, listener: PropertyChangeListener?) {
+        super.addPropertyChangeListener(propertyName, listener)
     }
 
     private var fullscreenAdapter = FullscreenAdapter(backedLayer)
@@ -356,6 +380,16 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
+    override fun reshape(x: Int, y: Int, w: Int, h: Int) {
+        super.reshape(x, y, w, h)
+
+        // Setting the bounds of children should be done only in the layout pass,
+        // but unfortunately, Compose expects the drawing area to be resized
+        // immediately when `SkiaLayer` is resized.
+        validate()
+    }
+
     override fun doLayout() {
         Logger.debug { "doLayout on $this" }
         backedLayer.setBounds(
@@ -365,41 +399,6 @@ actual open class SkiaLayer internal constructor(
             adjustSizeToContentScale(contentScale, height)
         )
         backedLayer.validate()
-        redrawer?.syncBounds()
-    }
-
-    override fun paint(g: java.awt.Graphics) {
-        Logger.debug { "Paint called on: $this" }
-        checkContentScale()
-        tryRedrawImmediately()
-    }
-
-    override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-        super.setBounds(x, y, width, height)
-
-        // To avoid visual artifacts on Windows/Direct3D,
-        // redrawing should be performed immediately, without scheduling to "later".
-        // Subscribing to events instead of overriding this method won't help too.
-        //
-        // Please note that calling redraw during layout might break software renderers,
-        // so applying this fix only for Direct3D case.
-        if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
-            redrawer?.syncBounds()
-            tryRedrawImmediately()
-        }
-    }
-
-    private fun tryRedrawImmediately() {
-        // It might be called inside `renderDelegate`,
-        // so to avoid recursive call (not supported) just schedule redrawing.
-        //
-        // For example if we call some AWT function inside renderer.onRender,
-        // such as `jframe.isEnabled = false` on Linux
-        if (isRendering) {
-            redrawer?.needRedraw()
-        } else {
-            redrawer?.redrawImmediately()
-        }
     }
 
     // Workaround for JBR-5274 and JBR-5305
@@ -526,10 +525,10 @@ actual open class SkiaLayer internal constructor(
     /**
      * Redraw on the next animation Frame (on vsync signal if vsync is enabled).
      */
-    actual fun needRedraw() {
+    actual fun needRedraw(throttledToVsync: Boolean) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
-        redrawer?.needRedraw()
+        redrawer?.needRedraw(throttledToVsync)
     }
 
     @Suppress("LeakingThis")
@@ -548,8 +547,8 @@ actual open class SkiaLayer internal constructor(
         // If this approach will be changed, create an issue in https://youtrack.jetbrains.com/issues/CMP for changing it in
         // https://github.com/JetBrains/compose-multiplatform/blob/e4e2d329709cded91a09cc612d4defbce37aad96/benchmarks/multiplatform/benchmarks/src/commonMain/kotlin/MeasureComposable.kt#L151 as well
 
-        val pictureWidth = (width * contentScale).toInt().coerceAtLeast(0)
-        val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
+        val pictureWidth = (backedLayer.width * contentScale).toInt().coerceAtLeast(0)
+        val pictureHeight = (backedLayer.height * contentScale).toInt().coerceAtLeast(0)
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val pictureRecorder = pictureRecorder!!
@@ -589,7 +588,7 @@ actual open class SkiaLayer internal constructor(
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
                 redrawerManager.findNextWorkingRenderApi()
-                redrawer?.redrawImmediately()
+                redrawer?.redrawImmediately(updateNeeded = true)
             }
         }
     }
@@ -651,7 +650,7 @@ fun orderEmojiAndSymbolsPopup() {
 internal fun defaultFPSCounter(
     component: Component
 ): FPSCounter? = with(SkikoProperties) {
-    if (!SkikoProperties.fpsEnabled) return@with null
+    if (!fpsEnabled) return@with null
 
     // it is slow on Linux (100ms), so we cache it. Also refreshRate available only after window is visible
     val refreshRate by lazy { component.graphicsConfiguration.device.displayMode.refreshRate }
