@@ -36,8 +36,8 @@ internal enum class LogLevel {
     }
 }
 
-class DefaultConsoleLogger(override val isTraceEnabled: Boolean = false,
-                           override val isDebugEnabled: Boolean = false,
+class DefaultConsoleLogger(override val isTraceEnabled: Boolean = true,
+                           override val isDebugEnabled: Boolean = true,
                            override val isInfoEnabled: Boolean = true,
                            override val isWarnEnabled: Boolean = true,
                            override val isErrorEnabled: Boolean = true): SkikoLoggerInterface {
@@ -56,48 +56,52 @@ class DefaultConsoleLogger(override val isTraceEnabled: Boolean = false,
     }
 
     override fun trace(message: String) {
-        println("[SKIKO] trace: $message")
+        append("[SKIKO] trace: $message")
     }
 
     override fun trace(t: Throwable, message: String) {
-        println("[SKIKO] trace: $message")
-        println(t)
+        append("[SKIKO] trace: $message")
+        append(t.toString())
     }
 
     override fun debug(message: String) {
-        println("[SKIKO] debug: $message")
+        append("[SKIKO] debug: $message")
     }
 
     override fun debug(t: Throwable, message: String) {
-        println("[SKIKO] debug: $message")
-        println(t)
+        append("[SKIKO] debug: $message")
+        append(t.toString())
     }
 
     override fun info(message: String) {
-        println("[SKIKO] info: $message")
+        append("[SKIKO] info: $message")
     }
 
     override fun info(t: Throwable, message: String) {
-        println("[SKIKO] info: $message")
-        println(t)
+        append("[SKIKO] info: $message")
+        append(t.toString())
     }
 
     override fun warn(message: String) {
-        println("[SKIKO] warn: $message")
+        append("[SKIKO] warn: $message")
     }
 
     override fun warn(t: Throwable, message: String) {
-        println("[SKIKO] warn: $message")
-        println(t)
+        append("[SKIKO] warn: $message")
+        append(t.toString())
     }
 
     override fun error(message: String) {
-        println("[SKIKO] error: $message")
+        append("[SKIKO] error: $message")
     }
 
     override fun error(t: Throwable, message: String) {
-        println("[SKIKO] error: $message")
-        println(t)
+        append("[SKIKO] error: $message")
+        append(t.toString())
+    }
+
+    fun append(msg: String) {
+        java.io.File("log.txt").appendText("$msg\n")
     }
 }
 

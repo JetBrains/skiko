@@ -59,6 +59,19 @@ void throwJavaRenderExceptionByExceptionCode(JNIEnv *env, const char *function, 
     env->CallStaticVoidMethod(cls, method, env->NewStringUTF(fullMsg));
 }
 
+void logJava(JNIEnv *env, const char *msg) {
+    static jclass cls = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler"));
+    static jmethodID method = env->GetStaticMethodID(cls, "logJava", "(Ljava/lang/String;)V");
+    env->CallStaticVoidMethod(cls, method, env->NewStringUTF(msg));
+}
+
+
+void logJava(JNIEnv *env, jlong msg) {
+    static jclass cls = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler"));
+    static jmethodID method = env->GetStaticMethodID(cls, "logJava", "(J)V");
+    env->CallStaticVoidMethod(cls, method, msg);
+}
+
 
 void throwJavaRenderExceptionByErrorCode(JNIEnv *env, const char *function, DWORD code) {
     char fullMsg[1024];

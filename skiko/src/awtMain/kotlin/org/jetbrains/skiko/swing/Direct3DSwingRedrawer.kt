@@ -65,6 +65,7 @@ internal class Direct3DSwingRedrawer(
 
             texturePtr = makeDirectXTexture(device, texturePtr, alignedWidth, height)
             if (texturePtr == 0L) {
+                Logger.debug { "Can't allocate DirectX resources" }
                 throw RenderException("Can't allocate DirectX resources")
             }
             val renderTarget = makeRenderTarget().autoClose()
@@ -76,7 +77,10 @@ internal class Direct3DSwingRedrawer(
                 SurfaceColorFormat.BGRA_8888,
                 ColorSpace.sRGB,
                 SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
-            )?.autoClose() ?: throw RenderException("Cannot create surface")
+            )?.autoClose() ?: run {
+                Logger.debug { "Cannot create surface" }
+                throw RenderException("Cannot create surface")
+            }
 
             val canvas = surface.canvas
             canvas.clear(Color.TRANSPARENT)
@@ -95,6 +99,7 @@ internal class Direct3DSwingRedrawer(
 
         waitForCompletion(device, texturePtr)
         if(!readPixels(texturePtr, bytesToDraw)) {
+            Logger.debug { "Couldn't read pixels" }
             throw RenderException("Couldn't read pixels")
         }
 

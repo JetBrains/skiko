@@ -159,43 +159,57 @@ extern "C"
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_chooseAdapter(
             JNIEnv *env, jobject redrawer, jint adapterPriority) {
         gr_cp<IDXGIFactory4> deviceFactory;
+
+        logJava(env, "chooseAdapter1");
+
         if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory)))) {
             return 0;
         }
+
+        logJava(env, "chooseAdapter2");
 
         gr_cp<IDXGIFactory6> factory6;
         if (!SUCCEEDED(deviceFactory->QueryInterface(IID_PPV_ARGS(&factory6)))) {
             return 0;
         }
 
+        logJava(env, "chooseAdapter3");
         for (UINT adapterIndex = 0;; ++adapterIndex) {
             IDXGIAdapter1 *adapter = nullptr;
+        logJava(env, "chooseAdapter4 index");
+        logJava(env, adapterIndex);
             if (!SUCCEEDED(factory6->EnumAdapterByGpuPreference(adapterIndex, (DXGI_GPU_PREFERENCE) adapterPriority, IID_PPV_ARGS(&adapter)))) {
+                logJava(env, "chooseAdapter5");
                 break;
             }
             if (
                 SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)) &&
                 isAdapterSupported2(env, redrawer, adapter)
             ) {
+                logJava(env, "chooseAdapter6");
                 return toJavaPointer(adapter);
             } else {
+                logJava(env, "chooseAdapter7");
                 adapter->Release();
             }
         }
 
+        logJava(env, "chooseAdapter8");
         return 0;
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_createDirectXOffscreenDevice(
         JNIEnv *env, jobject redrawer, jlong adapterPtr) {
-
+        logJava(env, "createDirectXOffscreenDevice1");
         gr_cp<IDXGIFactory4> deviceFactory;
         if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory)))) {
             return 0;
         }
+        logJava(env, "createDirectXOffscreenDevice2");
         if (adapterPtr == 0) {
             return 0;
         }
+        logJava(env, "createDirectXOffscreenDevice3");
         gr_cp<IDXGIAdapter1> adapter((IDXGIAdapter1 *) adapterPtr);
 
         D3D_FEATURE_LEVEL maxSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
@@ -210,11 +224,15 @@ extern "C"
                 break;
             }
         }
+        logJava(env, "createDirectXOffscreenDevice4 maxSupportedFeatureLevel");
+        logJava(env, maxSupportedFeatureLevel);
 
         gr_cp<ID3D12Device> device;
         if (!SUCCEEDED(D3D12CreateDevice(adapter.get(), maxSupportedFeatureLevel, IID_PPV_ARGS(&device)))) {
             return 0;
         }
+        logJava(env, "createDirectXOffscreenDevice5 adapter");
+        logJava(env, (jlong) adapter.get());
 
         // Create the command queue
         gr_cp<ID3D12CommandQueue> queue;
@@ -225,26 +243,35 @@ extern "C"
         if (!SUCCEEDED(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&queue)))) {
             return 0;
         }
+        logJava(env, "createDirectXOffscreenDevice6");
 
         ID3D12CommandAllocator* commandAllocator;
         if (!SUCCEEDED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)))) {
             return 0;
         }
+        logJava(env, "createDirectXOffscreenDevice7 commandAllocator");
+        logJava(env, (jlong) commandAllocator);
 
         ID3D12GraphicsCommandList* commandList;
         if (!SUCCEEDED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList)))) {
             return 0;
         }
+        logJava(env, "createDirectXOffscreenDevice8 commandList");
+        logJava(env, (jlong) commandList);
 
         ID3D12Fence* fence;
         if (!SUCCEEDED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))) {
             return 0;
         }
+        logJava(env, "createDirectXOffscreenDevice9 fence");
+        logJava(env, (jlong) fence);
 
         HANDLE fenceEvent = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
         if (!fenceEvent) {
             return 0;
         }
+        logJava(env, "createDirectXOffscreenDevice10 fenceEvent");
+        logJava(env, (jlong) fenceEvent);
 
         DirectXOffscreenDevice *d3dDevice = new DirectXOffscreenDevice();
         d3dDevice->commandAllocator = commandAllocator;
@@ -264,6 +291,9 @@ extern "C"
         DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
         ID3D12Resource* resource = texture->resource;
 
+        logJava(env, "makeDirectXRenderTargetOffScreen texture->resource");
+        logJava(env, (jlong) texture->resource);
+
         GrD3DTextureResourceInfo texResInfo = {};
         texResInfo.fResource.retain(resource);
         texResInfo.fResourceState = D3D12_RESOURCE_STATE_COMMON;
@@ -277,19 +307,32 @@ extern "C"
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_makeDirectXContext(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
+        logJava(env, "makeDirectXContext");
         DirectXOffscreenDevice *d3dDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
         GrD3DBackendContext backendContext = d3dDevice->backendContext;
-        return toJavaPointer(GrDirectContext::MakeDirect3D(backendContext).release());
+        auto res = GrDirectContext::MakeDirect3D(backendContext);
+        logJava(env, "MakeDirect3D");
+        logJava(env, (jlong) res.get());
+        return toJavaPointer(res.release());
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_makeDirectXTexture(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jlong oldTexturePtr, jint width, jint height) {
+
+        logJava(env, "makeDirectXTexture1");
+        logJava(env, "devicePtr");
+        logJava(env, (jlong) devicePtr);
+        logJava(env, "oldTexturePtr");
+        logJava(env, (jlong) oldTexturePtr);
+
         DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
         DirectXOffScreenTexture *oldTexture = fromJavaPointer<DirectXOffScreenTexture *>(oldTexturePtr);
 
         DirectXOffScreenTexture *texture;
 
+        logJava(env, "makeDirectXTexture2");
         if (oldTexture == nullptr || oldTexture->width != width || oldTexture->height != height) {
+            logJava(env, "makeDirectXTexture3");
             if (oldTexture != nullptr) {
                 delete oldTexture;
             }
@@ -300,6 +343,7 @@ extern "C"
                 return 0;
             }
         } else {
+            logJava(env, "makeDirectXTexture34");
             texture = oldTexture;
         }
 
@@ -314,6 +358,9 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_waitForCompletion(
             JNIEnv *env, jobject redrawer, jlong devicePtr, jlong texturePtr) {
+
+
+        logJava(env, "waitForCompletion");
 
         DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
 
@@ -375,6 +422,9 @@ extern "C"
 
     JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_readPixels(
             JNIEnv *env, jobject redrawer, jlong texturePtr, jbyteArray byteArray) {
+
+
+        logJava(env, "readPixels1");
         jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
 
         DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
@@ -399,6 +449,7 @@ extern "C"
         );
 
         if (!readbackBufferBytesPtr) {
+            logJava(env, "readPixels2");
             // Couldn't map readback buffer
             return false;
         }

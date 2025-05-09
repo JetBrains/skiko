@@ -31,6 +31,16 @@ internal class RenderExceptionsHandler {
             throw exception
         }
 
+        @JvmStatic
+        fun logJava(msg: String) {
+            Logger.debug { msg }
+        }
+
+        @JvmStatic
+        fun logJava(msg: Long) {
+            Logger.debug { msg.toString() }
+        }
+
         private fun systemInfo(): String {
             return StringBuilder().apply {
                 append("When: ${SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(Date())}\n")
