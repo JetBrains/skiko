@@ -59,7 +59,7 @@ internal class MetalRedrawer(
         }
 
     private val adapter = chooseMetalAdapter(properties.adapterPriority)
-    private val vSyncer = if (properties.isVsyncEnabled) VSyncer(layer.windowHandle) else null
+    private val vSyncer = if (properties.isVsyncEnabled) MetalVSyncer(layer.windowHandle) else null
 
     private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
     @Volatile private var isWindowOccluded = false
@@ -72,29 +72,43 @@ internal class MetalRedrawer(
         }
         _device = initDevice
         contextHandler = MetalContextHandler(layer, initDevice, adapter)
-        setDisplaySyncEnabled(initDevice.ptr, false)  // VSync is managed manually (see vsyncedFrameDispatcher)
+        setDisplaySyncEnabled(initDevice.ptr, properties.isVsyncEnabled)
     }
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
+    private var updateRequested = false
+
+    private fun updateIfRequested() {
+        if (updateRequested) {
+            // Clear the flag before calling update so that update itself
+            // can request updating again.
+            updateRequested = false
+            update()
+        }
+    }
+
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
-            update()
+            // Schedule drawing before calling update so that if update
+            // schedules this frameDispatcher again, and update is a long
+            // operation, the frame is drawn before update is called again.
             drawOnlyFrameDispatcher.scheduleFrame()
+            updateIfRequested()
         }
     }
 
     private val throttledFrameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
-            update()
-            drawOnlyFrameDispatcher.scheduleFrame()
+            updateIfRequested()
+            draw()
         }
         waitForVSyncIfNeeded()
     }
 
     private val drawOnlyFrameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        waitForVSyncIfNeeded()
         draw()
+        waitForVSyncIfNeeded()
     }
 
     init {
@@ -119,6 +133,7 @@ internal class MetalRedrawer(
 
     override fun needRedraw(throttledToVsync: Boolean) {
         checkDisposed()
+        updateRequested = true
         if (throttledToVsync) {
             throttledFrameDispatcher.scheduleFrame()
         } else {
@@ -128,27 +143,22 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately(updateNeeded: Boolean) {
         checkDisposed()
-        inDrawScope {
-            if (updateNeeded) {
-                update()
-            }
-
-            // Trying to draw immediately in Metal will result in lost (undrawn)
-            // frames if there's more than two between consecutive vsync events.
-            if (layer.isShowing) {
-                drawOnlyFrameDispatcher.scheduleFrame()
-            } else {
-                // But if the layer isn't showing yet, we want to draw immediately,
-                // so that if it shows before the next vsync, there is no background flash
-                performDraw()
-            }
+        if (updateNeeded) {
+            update()
+        }
+        // Trying to draw immediately in Metal will result in lost (undrawn)
+        // frames if there's more than two between consecutive vsync events.
+        if (layer.isShowing) {
+            drawOnlyFrameDispatcher.scheduleFrame()
+        } else {
+            // But if the layer isn't showing yet, we want to draw immediately,
+            // so that if it shows before the next vsync, there is no background flash
+            performDraw()
         }
     }
 
     private suspend fun draw() {
-        inDrawScope {
-            performDraw()
-        }
+        performDraw()
         if (isDisposed) throw CancellationException()
 
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
@@ -168,10 +178,12 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun performDraw() = synchronized(drawLock) {
-        if (!isDisposed) {
-            autoreleasepool {
-                contextHandler.draw()
+    private fun performDraw() = inDrawScope {
+        synchronized(drawLock) {
+            if (!isDisposed) {
+                autoreleasepool {
+                    contextHandler.draw()
+                }
             }
         }
     }

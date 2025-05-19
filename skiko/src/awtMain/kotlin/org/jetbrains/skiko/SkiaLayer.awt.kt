@@ -531,17 +531,11 @@ actual open class SkiaLayer internal constructor(
         redrawer?.needRedraw(throttledToVsync)
     }
 
-    @Suppress("LeakingThis")
-    private val fpsCounter = defaultFPSCounter(this)
-
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
         checkContentScale()
-
-        FrameWatcher.nextFrame()
-        fpsCounter?.tick()
 
         // The current approach is to render into a picture in the main thread, and render this picture in the render thread
         // If this approach will be changed, create an issue in https://youtrack.jetbrains.com/issues/CMP for changing it in
@@ -577,10 +571,16 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
+    @Suppress("LeakingThis")
+    private val fpsCounter = defaultFPSCounter(this)
+
     internal inline fun inDrawScope(body: () -> Unit) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
         try {
+            FrameWatcher.nextFrame()
+            fpsCounter?.tick()
+
             body()
         } catch (e: CancellationException) {
             // ignore

@@ -80,10 +80,10 @@ internal class LinuxOpenGLRedrawer(
 
     override fun redrawImmediately(updateNeeded: Boolean) = layer.backedLayer.lockLinuxDrawingSurface {
         checkDisposed()
+        if (updateNeeded) {
+            update()
+        }
         inDrawScope {
-            if (updateNeeded) {
-                update()
-            }
             it.makeCurrent(context)
             contextHandler.draw()
             val turnOfVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately

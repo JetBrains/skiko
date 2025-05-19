@@ -11,7 +11,7 @@ import org.jetbrains.skiko.RendezvousBroadcastChannel
 /**
  * A utility allowing several coroutines to wait for the next vsync.
  */
-internal class VSyncer(windowPtr: Long) {
+internal class MetalVSyncer(windowPtr: Long) {
 
     // The underlying throttler that blocks a thread
     private val displayLinkThrottler = DisplayLinkThrottler(windowPtr)
