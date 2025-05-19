@@ -63,10 +63,10 @@ internal class WindowsOpenGLRedrawer(
 
     override fun redrawImmediately(updateNeeded: Boolean) {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
+        if (updateNeeded) {
+            update()
+        }
         inDrawScope {
-            if (updateNeeded) {
-                update()
-            }
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 makeCurrent()
                 contextHandler.draw()

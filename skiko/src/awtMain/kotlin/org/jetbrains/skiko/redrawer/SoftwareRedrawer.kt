@@ -48,10 +48,10 @@ internal class SoftwareRedrawer(
 
     override fun redrawImmediately(updateNeeded: Boolean) {
         checkDisposed()
+        if (updateNeeded) {
+            update()
+        }
         inDrawScope {
-            if (updateNeeded) {
-                update()
-            }
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 contextHandler.draw()
             }

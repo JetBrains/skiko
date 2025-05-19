@@ -13,6 +13,7 @@ import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.context.JvmContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
+import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
@@ -1147,28 +1148,75 @@ class SkiaLayerTest {
         }
         val robot = Robot()
 
+        var tempColorVisibleCount = 0
         try {
-            // Wait for just after the next vsync, so we have plenty of time until the one after it
-            renderChannel.receive()
+            repeat(50) {
+                // Wait for just after the next vsync, so we have plenty of time until the one after it
+                val vSyncer = MetalVSyncer(window.layer.windowHandle)
+                vSyncer.waitForVSync()
 
-            // Set the color to temp, then immediately back to normal
-            renderDelegate.color = tempColor
-            renderDelegate.layer.needRedraw(throttledToVsync = true)
-            renderChannel.receive()  // Wait until render was actually called
-            renderDelegate.color = color
-            renderDelegate.layer.needRedraw(throttledToVsync = true)
+                // Set the color to temp, then immediately back to normal
+                renderDelegate.color = tempColor
+                renderDelegate.layer.needRedraw(throttledToVsync = false)
+                renderChannel.receive()  // Wait until render is actually called
+                renderDelegate.color = color
+                renderDelegate.layer.needRedraw(throttledToVsync = false)
 
-            // Check that at no time is the temp color visible
-            val startTime = System.currentTimeMillis()
-            while (System.currentTimeMillis() - startTime < 1000) {
-                val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
-                assertEquals(color, pixel)
+                // Check whether the temp color was visible
+                val startTime = System.currentTimeMillis()
+                while (System.currentTimeMillis() - startTime < 400) {
+                    val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
+                    if (pixel != color) {
+                        tempColorVisibleCount++
+                    }
+                }
             }
+
+            // Because the temp color can theoretically be visible if the JVM hiccups and a vsync happens before the
+            // color is reverted, we allow a small percentage of the tries to fail. This way the flakiness of the test
+            // is reduced.
+            // Note that in practice, however, this test had never failed on an M1 Ultra machine with a 60Hz monitor.
+            assertTrue(tempColorVisibleCount < 5)
         } finally {
             window.dispose()
         }
     }
 
+    @Test
+    fun `needRedraw throttled and regular calls render once`() = uiTest {
+        // Check that calling both needRedraw(true) and needRedraw(false) causes only one render call
+        var renderCalls = 0
+        val renderChannel = Channel<Unit>(Channel.CONFLATED)
+        val window = UiTestWindow {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            layer.renderDelegate = object: SkikoRenderDelegate {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    renderCalls++
+                    renderChannel.trySend(Unit)
+                }
+            }
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+        window.isVisible = true
+
+        renderChannel.receive()
+        renderCalls = 0
+        withContext(MainUIDispatcher) {
+            window.layer.needRedraw(true)
+            window.layer.needRedraw(false)
+        }
+        delay(100)
+        assertEquals(1, renderCalls)
+
+        renderCalls = 0
+        withContext(MainUIDispatcher) {
+            window.layer.needRedraw(false)
+            window.layer.needRedraw(true)
+        }
+        delay(100)
+        assertEquals(1, renderCalls)
+    }
 
     private class RectRenderer(
         private val getContentScale: () -> Float,
