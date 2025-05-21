@@ -1200,22 +1200,30 @@ class SkiaLayerTest {
         }
         window.isVisible = true
 
-        renderChannel.receive()
-        renderCalls = 0
-        withContext(MainUIDispatcher) {
-            window.layer.needRedraw(true)
-            window.layer.needRedraw(false)
-        }
+        // Wait for things to settle down, specifically the workaround for  JBR-5259, which moves
+        // the backed layer when graphicsContextScaleTransform changes
         delay(100)
-        assertEquals(1, renderCalls)
 
-        renderCalls = 0
-        withContext(MainUIDispatcher) {
-            window.layer.needRedraw(false)
-            window.layer.needRedraw(true)
+        try {
+            renderChannel.receive()
+            renderCalls = 0
+            withContext(MainUIDispatcher) {
+                window.layer.needRedraw(true)
+                window.layer.needRedraw(false)
+            }
+            delay(100)
+            assertEquals(1, renderCalls)
+
+            renderCalls = 0
+            withContext(MainUIDispatcher) {
+                window.layer.needRedraw(false)
+                window.layer.needRedraw(true)
+            }
+            delay(100)
+            assertEquals(1, renderCalls)
+        } finally {
+            window.dispose()
         }
-        delay(100)
-        assertEquals(1, renderCalls)
     }
 
     private class RectRenderer(
