@@ -384,6 +384,19 @@ actual open class SkiaLayer internal constructor(
     override fun reshape(x: Int, y: Int, w: Int, h: Int) {
         super.reshape(x, y, w, h)
 
+        // Calling redrawImmediately as early as possible improves the situation with
+        // the visual glitch when the drawn content is scaled during window resize.
+        // Note, however, that this actually causes the reverse glitch (content appears
+        // scaled in the other direction from the window size), but this seems to
+        // happen less often.
+        //
+        // Calling redraw during layout might break software renderers,
+        // so apply this fix only for the Direct3D case.
+        if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
+            redrawer?.syncBounds()
+            redrawer?.redrawImmediately(updateNeeded = true)
+        }
+
         // Setting the bounds of children should be done only in the layout pass,
         // but unfortunately, Compose expects the drawing area to be resized
         // immediately when `SkiaLayer` is resized.
