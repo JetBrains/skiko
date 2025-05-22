@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -11,7 +10,7 @@ import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 
-class TextBlobBuilderRunHandler<T> internal constructor(
+class TextBlobBuilderRunHandler internal constructor(
     text: ManagedString?,
     manageText: Boolean,
     offsetX: Float,
@@ -80,14 +79,14 @@ class TextBlobBuilderRunHandler<T> internal constructor(
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
+@ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nGetFinalizer")
 private external fun TextBlobBuilderRunHandler_nGetFinalizer(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilderRunHandler__1nMake")
+@ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nMake")
 private external fun TextBlobBuilderRunHandler_nMake(textPtr: NativePointer, offsetX: Float, offsetY: Float): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMakeBlob")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilderRunHandler__1nMakeBlob")
+@ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nMakeBlob")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nMakeBlob")
 private external fun _nMakeBlob(ptr: NativePointer): NativePointer
