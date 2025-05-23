@@ -1420,6 +1420,11 @@ $dokka.location:org.jetbrains.skia/Drawable/makePictureSnapshot/#/PointingToDecl
 $dokka.location:org.jetbrains.skia/Drawable/notifyDrawingChanged/#/PointingToDeclaration/skiko/org.jetbrains.skia/-drawable/notify-drawing-changed.html
 $dokka.location:org.jetbrains.skia/Drawable/onDraw/#org.jetbrains.skia.Canvas?/PointingToDeclaration/skiko/org.jetbrains.skia/-drawable/on-draw.html
 $dokka.location:org.jetbrains.skia/Drawable/onGetBounds/#/PointingToDeclaration/skiko/org.jetbrains.skia/-drawable/on-get-bounds.html
+$dokka.location:org.jetbrains.skia/DynamicMemoryWStream.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-dynamic-memory-w-stream/-companion/index.html
+$dokka.location:org.jetbrains.skia/DynamicMemoryWStream///PointingToDeclaration/skiko/org.jetbrains.skia/-dynamic-memory-w-stream/index.html
+$dokka.location:org.jetbrains.skia/DynamicMemoryWStream/DynamicMemoryWStream/#/PointingToDeclaration/skiko/org.jetbrains.skia/-dynamic-memory-w-stream/-dynamic-memory-w-stream.html
+$dokka.location:org.jetbrains.skia/DynamicMemoryWStream/bytesWritten/#/PointingToDeclaration/skiko/org.jetbrains.skia/-dynamic-memory-w-stream/bytes-written.html
+$dokka.location:org.jetbrains.skia/DynamicMemoryWStream/read/#kotlin.ByteArray#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-dynamic-memory-w-stream/read.html
 $dokka.location:org.jetbrains.skia/EncodedImageFormat.ASTC///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-encoded-image-format/-a-s-t-c/index.html
 $dokka.location:org.jetbrains.skia/EncodedImageFormat.BMP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-encoded-image-format/-b-m-p/index.html
 $dokka.location:org.jetbrains.skia/EncodedImageFormat.DNG///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-encoded-image-format/-d-n-g/index.html
