@@ -142,6 +142,7 @@ kotlin {
     }
     if (supportNativeLinux) {
         skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
+        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
     }
     if (supportNativeIosArm64) {
         skikoProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())
@@ -290,6 +291,12 @@ kotlin {
                         dependsOn(linuxMain)
                     }
                     val linuxX64Test by getting {
+                        dependsOn(linuxTest)
+                    }
+                    val linuxArm64Main by getting {
+                        dependsOn(linuxMain)
+                    }
+                    val linuxArm64Test by getting {
                         dependsOn(linuxTest)
                     }
                 }
