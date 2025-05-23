@@ -46,6 +46,11 @@ actual open class SkiaLayer {
         }
 
     /**
+     * Clear color for the canvas.
+     */
+    actual val clearColor: Int = org.jetbrains.skia.Color.WHITE
+
+    /**
      * Schedules a drawFrame to the appropriate moment.
      */
     actual fun needRedraw() {
