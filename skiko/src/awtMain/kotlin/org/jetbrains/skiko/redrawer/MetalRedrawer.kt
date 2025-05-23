@@ -24,7 +24,6 @@ internal value class MetalDevice(val ptr: Long)
  *
  * This [MetalRedrawer] draws content on-screen for maximum efficiency,
  * but it may prevent for using it in embedded components (such as interop with Swing).
- * For off-screen implementation see [MetalOffScreenRedrawer]
  *
  * Content to draw is provided by [SkiaLayer.draw].
  *
@@ -34,7 +33,7 @@ internal value class MetalDevice(val ptr: Long)
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
-    private val properties: SkiaLayerProperties
+    properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.METAL) {
     private val contextHandler: MetalContextHandler
 
@@ -60,7 +59,7 @@ internal class MetalRedrawer(
         }
 
     private val adapter = chooseMetalAdapter(properties.adapterPriority)
-    private val displayLinkThrottler = DisplayLinkThrottler(layer.windowHandle)
+    private val vSyncer = if (properties.isVsyncEnabled) MetalVSyncer(layer.windowHandle) else null
 
     private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
     @Volatile private var isWindowOccluded = false
@@ -78,11 +77,38 @@ internal class MetalRedrawer(
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
+    private var updateRequested = false
+
+    private fun updateIfRequested() {
+        if (updateRequested) {
+            // Clear the flag before calling update so that update itself
+            // can request updating again.
+            updateRequested = false
+            update()
+        }
+    }
+
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
-            update(System.nanoTime())
+            // Schedule drawing before calling update so that if update
+            // schedules this frameDispatcher again, and update is a long
+            // operation, the frame is drawn before update is called again.
+            drawOnlyFrameDispatcher.scheduleFrame()
+            updateIfRequested()
+        }
+    }
+
+    private val throttledFrameDispatcher = FrameDispatcher(MainUIDispatcher) {
+        if (layer.isShowing) {
+            updateIfRequested()
             draw()
         }
+        waitForVSyncIfNeeded()
+    }
+
+    private val drawOnlyFrameDispatcher = FrameDispatcher(MainUIDispatcher) {
+        draw()
+        waitForVSyncIfNeeded()
     }
 
     init {
@@ -91,46 +117,48 @@ internal class MetalRedrawer(
 
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
+        throttledFrameDispatcher.cancel()
+        drawOnlyFrameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device.ptr)
         adapter.dispose()
-        displayLinkThrottler.dispose()
+        vSyncer?.dispose()
         _device = null
         super.dispose()
     }
 
-    override fun needRedraw() {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
-        frameDispatcher.scheduleFrame()
+    private suspend fun waitForVSyncIfNeeded() {
+        vSyncer?.waitForVSync()
     }
 
-    override fun redrawImmediately() {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
-        inDrawScope {
-            update(System.nanoTime())
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw(waitVsync = SkikoProperties.macOSWaitForPreviousFrameVsyncOnRedrawImmediately)
-            }
+    override fun needRedraw(throttledToVsync: Boolean) {
+        checkDisposed()
+        updateRequested = true
+        if (throttledToVsync) {
+            throttledFrameDispatcher.scheduleFrame()
+        } else {
+            frameDispatcher.scheduleFrame()
+        }
+    }
+
+    override fun redrawImmediately(updateNeeded: Boolean) {
+        checkDisposed()
+        if (updateNeeded) {
+            update()
+        }
+        // Trying to draw immediately in Metal will result in lost (undrawn)
+        // frames if there's more than two between consecutive vsync events.
+        if (layer.isShowing) {
+            drawOnlyFrameDispatcher.scheduleFrame()
+        } else {
+            // But if the layer isn't showing yet, we want to draw immediately,
+            // so that if it shows before the next vsync, there is no background flash
+            performDraw()
         }
     }
 
     private suspend fun draw() {
-        // 2,3 GHz 8-Core Intel Core i9
-        //
-        // Test1. 8 windows, multiple clocks, 800x600
-        //
-        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 20 FPS, 130% CPU
-        // Dispatchers.IO: 58 FPS, 460% CPU
-        //
-        // Test2. 60 windows, single clock, 800x600
-        //
-        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
-        // Dispatchers.IO: 50 FPS, 200% CPU
-        inDrawScope {
-            withContext(dispatcherToBlockOn) {
-                performDraw()
-            }
-        }
+        performDraw()
         if (isDisposed) throw CancellationException()
 
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
@@ -150,16 +178,12 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun performDraw(waitVsync: Boolean = true) = synchronized(drawLock) {
-        if (!isDisposed) {
-            if (waitVsync) {
-                // Wait for vsync because:
-                // - macOS drops the second/next drawables if they are sent in the same vsync
-                // - it makes frames consistent and limits FPS
-                displayLinkThrottler.waitVSync()
-            }
-            autoreleasepool {
-                contextHandler.draw()
+    private fun performDraw() = inDrawScope {
+        synchronized(drawLock) {
+            if (!isDisposed) {
+                autoreleasepool {
+                    contextHandler.draw()
+                }
             }
         }
     }
@@ -178,7 +202,7 @@ internal class MetalRedrawer(
     }
 
     override fun setVisible(isVisible: Boolean) {
-        Logger.debug { "MetalRedrawer#setVisible $this $isVisible" }
+        Logger.debug { "MetalRedrawer#setVisible($isVisible)" }
         setLayerVisible(device.ptr, isVisible)
     }
 
