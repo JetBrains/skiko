@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.shaper.TextBlobBuilderRunHandler
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
@@ -120,6 +121,14 @@ class TextBlobBuilderTest {
             expected = Rect(0f, 0f, 150f, 40f),
             textBlob.bounds
         )
+    }
+
+    @Test
+    fun simpleTextBlobBuilderRunHandler() {
+        val handler = TextBlobBuilderRunHandler("Some text")
+        handler.makeBlob()
+        handler.close()
+        require(handler.isClosed)
     }
 
     @Test
