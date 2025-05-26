@@ -176,12 +176,14 @@ jobs:
           export DISPLAY=:0
           ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:linuxX64Test
 
-      # Linux arm64 tests cannot be run but are tested for building
+      # Linux arm64 tests cannot be run but are tested for building:
+      # https://youtrack.jetbrains.com/issue/KT-36871
+      # https://youtrack.jetbrains.com/issue/KT-43996
       - shell: bash
         name: 'Compile Linux arm64 tests'
         run: |
           export DISPLAY=:0
-          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:linuxArm64TestBinaries
+          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:linkDebugTestLinuxArm64
 
       - shell: bash
         name: 'Compile and run AWT tests'

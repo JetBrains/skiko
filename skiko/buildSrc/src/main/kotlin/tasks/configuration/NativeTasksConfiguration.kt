@@ -325,13 +325,15 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     }
 }
 
+/**
+ * This installs dependencies needed for cross compiling Skiko on Linux.
+ * https://youtrack.jetbrains.com/issue/KT-36871
+ */
 fun SkikoProjectContext.setupMultistrapTask(
     os: OS, arch: Arch, isUikitSim: Boolean
 ): TaskProvider<Exec> = with (this.project) {
     require(os == OS.Linux)
     require(arch == Arch.Arm64)
-
-    val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isUikitSim = isUikitSim)
 
     val actionName = "setupMultistrap".withSuffix(isUikitSim = isUikitSim)
 
