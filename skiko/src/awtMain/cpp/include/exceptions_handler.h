@@ -6,5 +6,6 @@
 
 void throwJavaRenderExceptionByExceptionCode(JNIEnv *env, const char * function, DWORD code);
 void throwJavaRenderExceptionByErrorCode(JNIEnv *env, const char * function, DWORD code);
+void throwJavaRenderExceptionWithMessage(JNIEnv *env, const char * function, const char * msg);
 
 #endif
