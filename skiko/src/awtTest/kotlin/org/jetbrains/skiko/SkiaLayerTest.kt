@@ -1183,11 +1183,29 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `needRedraw throttled and regular calls render once`() = uiTest {
-        // Check that calling both needRedraw(true) and needRedraw(false) causes only one render call
+    fun `needRedraw throttled and regular calls render and draw once`() = uiTest {
+        // Check that calling both needRedraw(true) and needRedraw(false) causes only one render and one draw call
         var renderCalls = 0
         val renderChannel = Channel<Unit>(Channel.CONFLATED)
-        val window = UiTestWindow {
+
+        var drawCalls = 0
+        val deviceAnalytics = object : SkiaLayerAnalytics.DeviceAnalytics {
+            override fun beforeFrameRender() {
+                drawCalls++
+            }
+        }
+        val analytics = object : SkiaLayerAnalytics {
+            @ExperimentalSkikoApi
+            override fun device(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi,
+                deviceName: String?
+            ): SkiaLayerAnalytics.DeviceAnalytics {
+                return deviceAnalytics
+            }
+        }
+        val window = UiTestWindow(analytics = analytics) {
             size = Dimension(600, 600)
             location = Point(400, 400)
             layer.renderDelegate = object: SkikoRenderDelegate {
@@ -1200,27 +1218,31 @@ class SkiaLayerTest {
         }
         window.isVisible = true
 
-        // Wait for things to settle down, specifically the workaround for  JBR-5259, which moves
+        // Wait for things to settle down, specifically the workaround for JBR-5259, which moves
         // the backed layer when graphicsContextScaleTransform changes
         delay(100)
 
         try {
             renderChannel.receive()
             renderCalls = 0
+            drawCalls = 0
             withContext(MainUIDispatcher) {
                 window.layer.needRedraw(true)
                 window.layer.needRedraw(false)
             }
             delay(100)
-            assertEquals(1, renderCalls)
+            assertEquals("Render was called more than once on needRedraw(true), needRedraw(false)", 1, renderCalls)
+            assertEquals("Draw was called more than once on needRedraw(true), needRedraw(false)", 1, drawCalls)
 
             renderCalls = 0
+            drawCalls = 0
             withContext(MainUIDispatcher) {
                 window.layer.needRedraw(false)
                 window.layer.needRedraw(true)
             }
             delay(100)
-            assertEquals(1, renderCalls)
+            assertEquals("Render was called more than once on needRedraw(false), needRedraw(true)", 1, renderCalls)
+            assertEquals("Draw was called more than once on needRedraw(true), needRedraw(true)", 1, drawCalls)
         } finally {
             window.dispose()
         }
