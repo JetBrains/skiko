@@ -124,8 +124,8 @@ actual open class SkiaLayer internal constructor(
 
             override fun paint(g: Graphics) {
                 Logger.debug { "paint called on $this" }
-                checkContentScale()
-                redrawer?.redrawImmediately(updateNeeded = false)
+                val updateNeeded = checkContentScale()
+                redrawer?.redrawImmediately(updateNeeded = updateNeeded)
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -415,14 +415,16 @@ actual open class SkiaLayer internal constructor(
     }
 
     // Workaround for JBR-5274 and JBR-5305
-    fun checkContentScale() {
+    fun checkContentScale(): Boolean {
         val currentGraphicsContextScaleTransform = graphicsConfiguration.defaultTransform
-        if (currentGraphicsContextScaleTransform != latestReceivedGraphicsContextScaleTransform) {
-            firePropertyChange(
-                "graphicsContextScaleTransform",
-                latestReceivedGraphicsContextScaleTransform,
-                currentGraphicsContextScaleTransform
-            )
+        return (currentGraphicsContextScaleTransform != latestReceivedGraphicsContextScaleTransform).also {
+            if (it) {
+                firePropertyChange(
+                    "graphicsContextScaleTransform",
+                    latestReceivedGraphicsContextScaleTransform,
+                    currentGraphicsContextScaleTransform
+                )
+            }
         }
     }
 
@@ -549,6 +551,7 @@ actual open class SkiaLayer internal constructor(
         check(!isDisposed) { "SkiaLayer is disposed" }
 
         checkContentScale()
+        FrameWatcher.nextFrame()
 
         // The current approach is to render into a picture in the main thread, and render this picture in the render thread
         // If this approach will be changed, create an issue in https://youtrack.jetbrains.com/issues/CMP for changing it in
@@ -591,9 +594,7 @@ actual open class SkiaLayer internal constructor(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
         try {
-            FrameWatcher.nextFrame()
             fpsCounter?.tick()
-
             body()
         } catch (e: CancellationException) {
             // ignore

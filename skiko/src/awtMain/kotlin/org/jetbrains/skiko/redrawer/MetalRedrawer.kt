@@ -100,8 +100,8 @@ internal class MetalRedrawer(
 
     private val throttledFrameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
+            drawOnlyFrameDispatcher.scheduleFrame()
             updateIfRequested()
-            draw()
         }
         waitForVSyncIfNeeded()
     }
