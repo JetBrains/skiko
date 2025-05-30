@@ -46,8 +46,11 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         buildTargetArch.set(osArch.second)
         buildVariant.set(buildType)
 
-        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsWasmMain/cpp", "src/nativeJsMain/cpp") +
-                if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
+        val srcDirs = projectDirs(*listOfNotNull(
+            "src/commonMain/cpp/common", "src/jsWasmMain/cpp", "src/nativeJsMain/cpp",
+            if (skiko.includeTestHelpers) "src/nativeJsTest/cpp" else null
+        ).toTypedArray())
+
         sourceRoots.set(srcDirs)
 
         includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
