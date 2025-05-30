@@ -41,7 +41,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
 
         dependsOn(skiaWasmDir)
 
-        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
+        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm, isJvm = false))
         buildTargetOS.set(osArch.first)
         buildTargetArch.set(osArch.second)
         buildVariant.set(buildType)
@@ -73,7 +73,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         dependsOn(skiaWasmDir)
         val unpackedSkia = skiaWasmDir.get()
 
-        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
+        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm, isJvm = false))
         buildTargetOS.set(osArch.first)
         buildTargetArch.set(osArch.second)
         buildVariant.set(buildType)

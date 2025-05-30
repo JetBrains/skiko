@@ -4,7 +4,7 @@
   * `macOs` Install Xcode Command Line Tools
   * `Linux` Install these tools:
     ```
-    sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip libx11-dev
+    sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip multistrap libx11-dev
     ```
   * `Windows`
     1. Download [Visual Studio Build Tools 2019](https://learn.microsoft.com/en-us/visualstudio/releases/2019/history) (search "BuildTools" on the page).
