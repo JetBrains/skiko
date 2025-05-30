@@ -115,7 +115,6 @@ kotlin {
             }
             generateVersion(OS.Wasm, Arch.Wasm, skiko)
 
-            val main by compilations.getting
             val test by compilations.getting
 
             val linkWasmTasks = skikoProjectContext.createWasmLinkTasks()
