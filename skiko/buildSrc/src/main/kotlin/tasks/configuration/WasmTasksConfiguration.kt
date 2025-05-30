@@ -31,6 +31,15 @@ data class LinkWasmTasks(
     val linkWasmWithES6: TaskProvider<LinkSkikoWasmTask>?
 )
 
+
+private sealed interface WasmOutputMode {
+    object ES6 : WasmOutputMode
+    object D8 : WasmOutputMode
+    object ES5 : WasmOutputMode
+
+    fun isES6Target() = this is ES6 || this is D8
+}
+
 fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project) {
     if (!supportWasm && !supportJs) {
         return LinkWasmTasks(null, null)
@@ -69,7 +78,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         )
     }
 
-    val configureCommon: LinkSkikoWasmTask.(outputES6: Boolean, prefixPath: String, forD8: Boolean) -> Unit = { outputES6, prefixPath, isForD8 ->
+    val configureCommon: LinkSkikoWasmTask.(outputMode: WasmOutputMode, prefixPath: String) -> Unit = { outputMode, prefixPath ->
         val osArch = OS.Wasm to Arch.Wasm
 
         dependsOn(compileWasm)
@@ -80,24 +89,30 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         buildTargetOS.set(osArch.first)
         buildTargetArch.set(osArch.second)
         buildVariant.set(buildType)
-        if (outputES6) buildSuffix.set("es6")
-        if (isForD8) buildSuffix.set("d8")
+
+        if (outputMode is WasmOutputMode.ES6) {
+            buildSuffix.set("es6")
+        } else if (outputMode is WasmOutputMode.D8) {
+            buildSuffix.set("d8")
+        }
 
         libFiles = project.fileTree(unpackedSkia) { include("**/*.a") }
         objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
             include("**/*.o")
         }
 
-        val wasmFileName = if (outputES6) {
-            if (isForD8) "skikod8.wasm" else "skikomjs.wasm"
-        } else {
-            "skiko.wasm" // to keep it compatible with older apps
+        val wasmFileName = when (outputMode) {
+            is WasmOutputMode.ES6 -> "skikomjs.wasm"
+            is WasmOutputMode.D8 -> "skikod8.wasm"
+            is WasmOutputMode.ES5 -> "skiko.wasm"
         }
-        val jsFileName = if (outputES6) {
-            if (isForD8) "skikod8.mjs" else "skikomjs.mjs"
-        } else {
-            "skiko.js" // to keep it compatible with older apps
+
+        val jsFileName = when (outputMode) {
+            is WasmOutputMode.ES6 -> "skikomjs.mjs"
+            is WasmOutputMode.D8 -> "skikod8.mjs"
+            is WasmOutputMode.ES5 -> "skiko.js"
         }
+
         libOutputFileName.set(wasmFileName) // emcc ignores this, it names .wasm file identically to js output
         jsOutputFileName.set(jsFileName) // this determines the name .wasm file too
 
@@ -123,7 +138,8 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                 )
             )
             addAll(listOf("-s", "SUPPORT_LONGJMP=wasm"))
-            if (outputES6) {
+
+            if (outputMode.isES6Target()) {
                 addAll(
                     listOf(
                         "-s", "EXPORT_ES6=1",
@@ -133,9 +149,9 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                         // "-s", "EXPORT_ALL=1",
                     )
                 )
-                if (isForD8) {
-                    addAll(listOf("-s", "ENVIRONMENT=shell"))
-                }
+            }
+            if (outputMode is WasmOutputMode.D8) {
+                addAll(listOf("-s", "ENVIRONMENT=shell"))
             }
 
             if (skiko.isWasmBuildWithProfiling) add("--profiling")
@@ -160,12 +176,12 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     .replace(isEnvironmentNodeCheckRegex, "if (false) {") // to make webpack erase this part
                 jsFile.writeText(newContent)
 
-                if (outputES6) {
+                if (outputMode.isES6Target()) {
                     // delete this file as its presence can be confusing.
                     // It's identical to skiko.wasm and we use skiko.wasm in `skikoWasmJar`task
                     outDir.file(wasmFileName).get().asFile.delete()
 
-                    val renameTo = if (isForD8) "skikod8.mjs" else "skiko.mjs"
+                    val renameTo = if (outputMode is WasmOutputMode.D8) "skikod8.mjs" else "skiko.mjs"
                     outDir.file(jsFileName).get().asFile.renameTo(outDir.asFile.get().resolve(renameTo))
                 }
             }
@@ -176,19 +192,19 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         val wasmJsTarget = kotlin.wasmJs()
         val main by wasmJsTarget.compilations
         dependsOn(main.compileTaskProvider)
-        configureCommon(true, setupMjs.normalize().absolutePath, false)
+        configureCommon(WasmOutputMode.ES6, setupMjs.normalize().absolutePath)
     }
 
     val linkWasmD8WithES6 by tasks.registering(LinkSkikoWasmTask::class) {
         val wasmJsTarget = kotlin.wasmJs()
         val main by wasmJsTarget.compilations
         dependsOn(main.compileTaskProvider)
-        configureCommon(true, setupMjs.normalize().absolutePath, true)
+        configureCommon(WasmOutputMode.D8, setupMjs.normalize().absolutePath)
     }
 
     val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
         dependsOn(linkWasmWithES6)
-        configureCommon(false, "src/jsWasmMain/resources/setup.js", false)
+        configureCommon(WasmOutputMode.ES5, "src/jsWasmMain/resources/setup.js")
     }
 
     // skikoWasmJar is used by task name
