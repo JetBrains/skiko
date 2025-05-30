@@ -35,11 +35,15 @@ val OS.isCompatibleWithHost: Boolean
         OS.Android -> true
     }
 
-fun compilerForTarget(os: OS, arch: Arch): String =
+fun compilerForTarget(os: OS, arch: Arch, isJvm: Boolean): String =
     when (os) {
         OS.Linux -> when (arch) {
             Arch.X64 -> "g++"
-            Arch.Arm64 -> if (hostArch == Arch.Arm64) "g++" else "aarch64-linux-gnu-g++"
+            Arch.Arm64 -> if (isJvm) {
+                "clang++"
+            } else {
+                if (hostArch == Arch.Arm64) "g++" else "aarch64-linux-gnu-g++"
+            }
             Arch.Wasm -> "Unexpected combination: $os & $arch"
         }
         OS.Android -> "clang++"
@@ -48,8 +52,8 @@ fun compilerForTarget(os: OS, arch: Arch): String =
         OS.Wasm -> "emcc"
     }
 
-fun linkerForTarget(os: OS, arch: Arch): String =
-    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch)
+fun linkerForTarget(os: OS, arch: Arch, isJvm: Boolean): String =
+    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch, isJvm)
 
 val OS.dynamicLibExt: String
     get() = when (this) {

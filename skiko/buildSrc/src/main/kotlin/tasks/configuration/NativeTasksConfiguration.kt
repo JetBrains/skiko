@@ -66,7 +66,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
 
         setupMultistrapTask?.let { dependsOn(it) }
 
-        compiler.set(compilerForTarget(os, arch))
+        compiler.set(compilerForTarget(os, arch, isJvm = false))
         buildTargetOS.set(os)
         if (isUikitSim) {
             buildSuffix.set("sim")
@@ -135,7 +135,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 ))
             }
             OS.Linux -> {
-                flags.set(listOf(
+                flags.set(listOfNotNull(
                     *buildType.clangFlags,
                     "-fPIC",
                     "-fno-rtti",
