@@ -37,6 +37,7 @@ val OS.isCompatibleWithHost: Boolean
 
 fun compilerForTarget(os: OS, arch: Arch, isJvm: Boolean): String =
     when (os) {
+        // TODO: Use clang++ for all Linux targets
         OS.Linux -> when (arch) {
             Arch.X64 -> "g++"
             Arch.Arm64 -> if (isJvm) {
