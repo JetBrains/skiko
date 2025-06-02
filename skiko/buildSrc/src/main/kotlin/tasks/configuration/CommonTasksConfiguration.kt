@@ -15,6 +15,7 @@ import supportWasm
 import toTitleCase
 import java.io.File
 import skiaVersion
+import supportNativeLinux
 
 fun skiaHeadersDirs(skiaDir: File): List<File> =
     listOf(
@@ -152,6 +153,24 @@ fun Project.configureSignAndPublishDependencies() {
                     dependsOn(signX64, signAndroid)
                 }
             }
+        }
+
+        if (supportNativeLinux) {
+            val publishLinuxX64 = "publishLinuxX64PublicationTo"
+            val publishLinuxArm64 = "publishLinuxX64PublicationTo"
+            val signLinuxArm64Publication = "signLinuxArm64Publication"
+            val signLinuxX64Publication = "signLinuxX64Publication"
+
+            tasks.named("publishLinuxX64PublicationToComposeRepoRepository") {
+                dependsOn(signLinuxArm64Publication)
+            }
+//            tasks.configureEach {
+//                when {
+//                    name.startsWith(publishLinuxX64) -> {
+//                        dependsOn(signLinuxArm64Publication)
+//                    }
+//                }
+//            }
         }
     }
 }
