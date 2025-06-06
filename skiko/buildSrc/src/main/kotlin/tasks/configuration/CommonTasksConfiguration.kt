@@ -154,23 +154,26 @@ fun Project.configureSignAndPublishDependencies() {
                 }
             }
         }
+    }
 
-        if (supportNativeLinux) {
-            val publishLinuxX64 = "publishLinuxX64PublicationTo"
-            val publishLinuxArm64 = "publishLinuxX64PublicationTo"
-            val signLinuxArm64Publication = "signLinuxArm64Publication"
-            val signLinuxX64Publication = "signLinuxX64Publication"
+    if (supportNativeLinux) {
+        val publishLinuxX64 = "publishLinuxX64PublicationTo"
+        val publishLinuxArm64 = "publishLinuxArm64PublicationTo"
+        val signLinuxArm64Publication = "signLinuxArm64Publication"
+        val signLinuxX64Publication = "signLinuxX64Publication"
 
-            tasks.named("publishLinuxX64PublicationToComposeRepoRepository") {
-                dependsOn(signLinuxArm64Publication)
+        tasks.configureEach {
+            when {
+                name.startsWith(publishLinuxX64) -> {
+                    dependsOn(signLinuxArm64Publication)
+                    dependsOn(signLinuxX64Publication)
+                }
+
+                name.startsWith(publishLinuxArm64) -> {
+                    dependsOn(signLinuxArm64Publication)
+                    dependsOn(signLinuxX64Publication)
+                }
             }
-//            tasks.configureEach {
-//                when {
-//                    name.startsWith(publishLinuxX64) -> {
-//                        dependsOn(signLinuxArm64Publication)
-//                    }
-//                }
-//            }
         }
     }
 }
