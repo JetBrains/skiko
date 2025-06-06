@@ -1,3 +1,4 @@
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import java.io.File
@@ -50,7 +51,7 @@ fun compilerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
         OS.Android -> "clang++"
         OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
-        OS.Wasm -> "emcc"
+        OS.Wasm -> if (Os.isFamily(Os.FAMILY_WINDOWS)) "emcc.bat" else "emcc"
     }
 
 fun linkerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
