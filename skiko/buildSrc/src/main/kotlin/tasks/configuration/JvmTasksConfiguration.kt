@@ -66,7 +66,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
 
-    compiler.set(compilerForTarget(targetOs, targetArch))
+    compiler.set(compilerForTarget(targetOs, targetArch, isJvm = true))
 
     val osFlags: Array<String>
     when (targetOs) {
@@ -237,7 +237,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
     buildSuffix.set("jvm")
     buildTargetArch.set(targetArch)
     buildVariant.set(buildType)
-    linker.set(linkerForTarget(targetOs, targetArch))
+    linker.set(linkerForTarget(targetOs, targetArch, isJvm = true))
 
     when (targetOs) {
         OS.MacOS -> {
