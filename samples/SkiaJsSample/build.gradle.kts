@@ -10,7 +10,7 @@ repositories {
 
 val skikoVersion = when {
     project.hasProperty("skiko.version") -> project.properties["skiko.version"] as String
-    else ->  "0.0.0-SNAPSHOT"
+    else ->  "0.0.1-SHAGEN"
 }
 
 val resourcesDir = "$buildDir/resources/"
