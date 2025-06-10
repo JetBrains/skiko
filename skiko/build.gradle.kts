@@ -115,16 +115,12 @@ kotlin {
             }
             generateVersion(OS.Wasm, Arch.Wasm, skiko)
 
-            val main by compilations.getting
             val test by compilations.getting
 
             val linkWasmTasks = skikoProjectContext.createWasmLinkTasks()
             project.tasks.named<Copy>(test.processResourcesTaskName) {
                 from(linkWasmTasks.linkWasm!!) {
                     include("*.wasm")
-                }
-
-                from(linkWasmTasks.linkWasmWithES6!!) {
                     include("*.mjs")
                 }
 
