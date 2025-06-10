@@ -304,28 +304,28 @@ internal actual class InteropScope actual constructor() {
     actual fun booleanCallback(callback: (() -> Boolean)?): NativePointer {
         if (callback == null) { return 0 }
         initCallbacks()
-        val data = crateCallbackObj() as CallbackDataBoolean
+        val data = createCallbackObj() as CallbackDataBoolean
         return _registerCallback({ data.value = callback() }, data, global = false)
     }
 
     actual fun intCallback(callback: (() -> Int)?): NativePointer {
         if (callback == null) { return 0 }
         initCallbacks()
-        val data = crateCallbackObj() as CallbackDataInt
+        val data = createCallbackObj() as CallbackDataInt
         return _registerCallback({ data.value = callback() }, data, global = false)
     }
 
     actual fun nativePointerCallback(callback: (() -> NativePointer)?): NativePointer {
         if (callback == null) { return 0 }
         initCallbacks()
-        val data = crateCallbackObj() as CallbackDataNativePointer
+        val data = createCallbackObj() as CallbackDataNativePointer
         return _registerCallback({ data.value = callback() }, data, global = false)
     }
 
     actual fun interopPointerCallback(callback: (() -> InteropPointer)?): NativePointer {
         if (callback == null) { return 0 }
         initCallbacks()
-        val data = crateCallbackObj() as CallbackDataInteropPointer
+        val data = createCallbackObj() as CallbackDataInteropPointer
         return _registerCallback({ data.value = callback() }, data, global = false)
     }
 
@@ -341,22 +341,22 @@ internal actual class InteropScope actual constructor() {
     }
 
     actual fun virtualBoolean(method: () -> Boolean): InteropPointer {
-        val data = crateCallbackObj() as CallbackDataBoolean
+        val data = createCallbackObj() as CallbackDataBoolean
         return _registerCallback({ data.value = method() }, data, global = true)
     }
 
     actual fun virtualInt(method: () -> Int): InteropPointer {
-        val data = crateCallbackObj() as CallbackDataInt
+        val data = createCallbackObj() as CallbackDataInt
         return _registerCallback({ data.value = method() }, data, global = true)
     }
 
     actual fun virtualNativePointer(method: () -> NativePointer): InteropPointer {
-        val data = crateCallbackObj() as CallbackDataNativePointer
+        val data = createCallbackObj() as CallbackDataNativePointer
         return _registerCallback({ data.value = method() }, data, global = true)
     }
 
     actual fun virtualInteropPointer(method: () -> InteropPointer): InteropPointer {
-        val data = crateCallbackObj() as CallbackDataInteropPointer
+        val data = createCallbackObj() as CallbackDataInteropPointer
         return _registerCallback({ data.value = method() }, data, global = true)
     }
 
@@ -384,7 +384,7 @@ internal actual class InteropScope actual constructor() {
 }
 
 @JsFun("() => { return {} }")
-private external fun crateCallbackObj(): JsAny
+private external fun createCallbackObj(): JsAny
 
 // Callbacks
 private external interface CallbackDataBoolean : JsAny { @JsName("value") var value: Boolean? }
