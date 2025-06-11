@@ -1,7 +1,7 @@
 import org.gradle.api.Project
 
 val Project.wasmImports
-    get() = buildDir.resolve("imports")
+    get() = layout.buildDirectory.asFile.get().resolve("imports")
 
 
 val Project.skikoTestMjs
