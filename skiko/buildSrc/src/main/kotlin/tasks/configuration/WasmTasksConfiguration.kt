@@ -20,11 +20,16 @@ import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
 import projectDirs
 import registerOrGetSkiaDirProvider
-import setupMjs
 import skikoTestMjs
 import supportJs
 import supportWasm
+import wasmImports
 import java.io.File
+
+
+private val Project.setupMjs
+    get() = wasmImports.resolve("setup.mjs")
+
 
 data class LinkWasmTasks(
     val linkWasmWithES6: TaskProvider<LinkSkikoWasmTask>?
