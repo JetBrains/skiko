@@ -120,12 +120,14 @@ kotlin {
 
             val linkWasmTasks = skikoProjectContext.createWasmLinkTasks()
             project.tasks.named<Copy>(test.processResourcesTaskName) {
-                from(linkWasmTasks.linkWasm!!) {
-                    include("*.wasm")
-                }
+
+//                from(linkWasmTasks.linkWasm!!) {
+//                    include("*.wasm")
+//                }
 
                 from(linkWasmTasks.linkWasmWithES6!!) {
                     include("*.mjs")
+                    include("*.wasm")
                 }
 
                 from(skikoTestMjs)

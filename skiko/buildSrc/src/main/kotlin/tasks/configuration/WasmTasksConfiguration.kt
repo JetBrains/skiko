@@ -27,13 +27,12 @@ import supportWasm
 import java.io.File
 
 data class LinkWasmTasks(
-    val linkWasm: TaskProvider<LinkSkikoWasmTask>?,
     val linkWasmWithES6: TaskProvider<LinkSkikoWasmTask>?
 )
 
 fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project) {
     if (!supportWasm && !supportJs) {
-        return LinkWasmTasks(null, null)
+        return LinkWasmTasks(null)
     }
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by tasks.registering(CompileSkikoCppTask::class) {
@@ -214,7 +213,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         }
     }
 
-    return LinkWasmTasks(linkWasm, linkWasmWithES6)
+    return LinkWasmTasks(linkWasmWithES6)
 }
 
 abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
