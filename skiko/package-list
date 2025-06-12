@@ -2011,6 +2011,8 @@ $dokka.location:org.jetbrains.skia/ManagedString/remove/#kotlin.Int#kotlin.Int/P
 $dokka.location:org.jetbrains.skia/ManagedString/remove/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-managed-string/remove.html
 $dokka.location:org.jetbrains.skia/ManagedString/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia/-managed-string/to-string.html
 $dokka.location:org.jetbrains.skia/MaskFilter.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-mask-filter/-companion/index.html
+$dokka.location:org.jetbrains.skia/MaskFilter.Companion/convertRadiusToSigma/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-mask-filter/-companion/convert-radius-to-sigma.html
+$dokka.location:org.jetbrains.skia/MaskFilter.Companion/convertSigmaToRadius/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-mask-filter/-companion/convert-sigma-to-radius.html
 $dokka.location:org.jetbrains.skia/MaskFilter.Companion/makeBlur/#org.jetbrains.skia.FilterBlurMode#kotlin.Float#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-mask-filter/-companion/make-blur.html
 $dokka.location:org.jetbrains.skia/MaskFilter.Companion/makeClip/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-mask-filter/-companion/make-clip.html
 $dokka.location:org.jetbrains.skia/MaskFilter.Companion/makeGamma/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-mask-filter/-companion/make-gamma.html
