@@ -8,6 +8,14 @@
 #include "SkSize.h"
 #include "interop.hh"
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ShaderKt__1nMakeWithLocalMatrix
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray localMatrixArr) {
+    SkShader* instance = reinterpret_cast<SkShader*>(static_cast<uintptr_t>(ptr));
+    std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
+    SkShader* newPtr = instance->makeWithLocalMatrix(*localMatrix).release();
+    return reinterpret_cast<jlong>(newPtr);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ShaderKt__1nMakeWithColorFilter
   (JNIEnv* env, jclass jclass, jlong ptr, jlong filterPtr) {
     SkShader* instance = reinterpret_cast<SkShader*>(static_cast<uintptr_t>(ptr));

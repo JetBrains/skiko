@@ -102,4 +102,14 @@ class ShaderTest {
         Shader.makeTurbulence(0.4f, 0.5f, 10, 0.5f)
         Shader.makeTurbulence(0.4f, 0.5f, 10, 0.5f, ISize(16, 16))
     }
+
+    @Test
+    fun canMakeWithLocalMatrix() {
+        Shader.makeEmpty().makeWithLocalMatrix(Matrix33.IDENTITY)
+    }
+
+    @Test
+    fun canMakeWithColorFilter() {
+        Shader.makeEmpty().makeWithColorFilter(ColorFilter.sRGBToLinearGamma)
+    }
 }
