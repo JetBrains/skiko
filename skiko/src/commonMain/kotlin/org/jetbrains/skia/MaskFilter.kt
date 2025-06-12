@@ -5,6 +5,18 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
+        init {
+            staticLoad()
+        }
+
+        /**
+         * Create a blur [MaskFilter].
+         *
+         *  @param mode The [FilterBlurMode] to use.
+         *  @param sigma Standard deviation of the Gaussian blur to apply. Must be > 0.
+         *  @param respectCTM if `true` the blur's sigma is modified by the CTM.
+         *  @return The new blur [MaskFilter]
+         */
         fun makeBlur(mode: FilterBlurMode, sigma: Float, respectCTM: Boolean = true): MaskFilter {
             Stats.onNativeCall()
             return MaskFilter(_nMakeBlur(mode.ordinal, sigma, respectCTM))
@@ -40,11 +52,20 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return MaskFilter(_nMakeClip(min.toByte(), max.toByte()))
         }
 
-        init {
-            staticLoad()
-        }
+        // If radius > 0, return the corresponding sigma, else return 0
+        fun convertRadiusToSigma(radius: Float) =
+            if (radius > 0) kBLUR_SIGMA_SCALE * radius + 0.5f else 0.0f
+
+        // If sigma > 0.5, return the corresponding radius, else return 0
+        fun convertSigmaToRadius(sigma: Float) =
+            if (sigma > 0.5f) (sigma - 0.5f) / kBLUR_SIGMA_SCALE else 0.0f
     }
 }
+
+// A copy from SkBlurMask.cpp
+// This constant approximates the scaling done in the software path's
+// "high quality" mode, in SkBlurMask::Blur() (1 / sqrt(3)).
+private const val kBLUR_SIGMA_SCALE = 0.57735f
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeTable")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_MaskFilter__1nMakeTable")
