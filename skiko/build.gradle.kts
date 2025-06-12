@@ -3,8 +3,6 @@ import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
-import kotlin.collections.HashMap
-import declareSkiaTasks
 import com.android.build.gradle.LibraryExtension
 
 plugins {
@@ -515,7 +513,7 @@ publishing {
         }
     }
     publications {
-        val pomNameForPublication = HashMap<String, String>()
+        val pomNameForPublication = mutableMapOf<String, String>()
         pomNameForPublication["kotlinMultiplatform"] = "Skiko MPP"
         kotlin.targets.forEach {
             pomNameForPublication[it.name] = "Skiko ${toTitleCase(it.name)}"
