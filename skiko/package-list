@@ -2573,6 +2573,7 @@ $dokka.location:org.jetbrains.skia/Shader.Companion/makeTwoPointConicalGradient/
 $dokka.location:org.jetbrains.skia/Shader.Companion/makeTwoPointConicalGradient/#org.jetbrains.skia.Point#kotlin.Float#org.jetbrains.skia.Point#kotlin.Float#kotlin.IntArray/PointingToDeclaration/skiko/org.jetbrains.skia/-shader/-companion/make-two-point-conical-gradient.html
 $dokka.location:org.jetbrains.skia/Shader///PointingToDeclaration/skiko/org.jetbrains.skia/-shader/index.html
 $dokka.location:org.jetbrains.skia/Shader/makeWithColorFilter/#org.jetbrains.skia.ColorFilter?/PointingToDeclaration/skiko/org.jetbrains.skia/-shader/make-with-color-filter.html
+$dokka.location:org.jetbrains.skia/Shader/makeWithLocalMatrix/#org.jetbrains.skia.Matrix33/PointingToDeclaration/skiko/org.jetbrains.skia/-shader/make-with-local-matrix.html
 $dokka.location:org.jetbrains.skia/ShadowUtils///PointingToDeclaration/skiko/org.jetbrains.skia/-shadow-utils/index.html
 $dokka.location:org.jetbrains.skia/ShadowUtils/computeTonalAmbientColor/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-shadow-utils/compute-tonal-ambient-color.html
 $dokka.location:org.jetbrains.skia/ShadowUtils/computeTonalSpotColor/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-shadow-utils/compute-tonal-spot-color.html
