@@ -3,8 +3,21 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
+/**
+ *  Shaders specify the source color(s) for what is being drawn. If a paint
+ *  has no shader, then the paint's color is used. If the paint has a
+ *  shader, then the shader's color(s) are use instead, but they are
+ *  modulated by the paint's alpha. This makes it easy to create a shader
+ *  once (e.g. bitmap tiling or gradient) and then change its transparency
+ *  w/o having to modify the original shader... only the paint's alpha needs
+ *  to be modified.
+ */
 class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
+        init {
+            staticLoad()
+        }
+
         // Linear
         fun makeLinearGradient(p0: Point, p1: Point, colors: IntArray): Shader {
             return makeLinearGradient(p0.x, p0.y, p1.x, p1.y, colors)
@@ -501,18 +514,36 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 reachabilityBarrier(this)
             }
         }
+    }
 
-        init {
-            staticLoad()
+    /**
+     *  Return a shader that will apply the specified localMatrix to this shader.
+     *  The specified matrix will be applied before any matrix associated with this shader.
+     */
+    fun makeWithLocalMatrix(localMatrix: Matrix33): Shader {
+        return try {
+            Stats.onNativeCall()
+            Shader(
+                interopScope {
+                    _nMakeWithLocalMatrix(_ptr, toInterop(localMatrix.mat))
+                })
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(localMatrix)
         }
     }
 
-    fun makeWithColorFilter(f: ColorFilter?): Shader {
+    /**
+     *  Create a new shader that produces the same colors as invoking this shader and then applying
+     *  the colorfilter.
+     */
+    fun makeWithColorFilter(filter: ColorFilter?): Shader {
         return try {
-            Shader(_nMakeWithColorFilter(_ptr, getPtr(f)))
+            Stats.onNativeCall()
+            Shader(_nMakeWithColorFilter(_ptr, getPtr(filter)))
         } finally {
             reachabilityBarrier(this)
-            reachabilityBarrier(f)
+            reachabilityBarrier(filter)
         }
     }
 }
@@ -520,6 +551,10 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeEmpty")
 private external fun Shader_nMakeEmpty(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithLocalMatrix")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeWithLocalMatrix")
+private external fun _nMakeWithLocalMatrix(ptr: NativePointer, localMatrix: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithColorFilter")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeWithColorFilter")
