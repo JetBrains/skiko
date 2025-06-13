@@ -14,5 +14,6 @@ private val defaultFactory = Executors.defaultThreadFactory()
 internal val dispatcherToBlockOn = Executors.newCachedThreadPool {
     defaultFactory.newThread(it).apply {
         isDaemon = true
+        name = "skiko-dispatcher-to-block-on"
     }
 }.asCoroutineDispatcher()
