@@ -28,9 +28,10 @@ pluginManagement {
     }
 
     plugins {
-        val kotlinVersion = extra["kotlin.version"] as String
-        kotlin("jvm").version(kotlinVersion)
-        kotlin("multiplatform").version(kotlinVersion)
+        // whatever kotlinVersion we point to here, it will be ignored due to the nature of gradle design
+        // the actual version is set in buildSrc/gradle.properties
+        kotlin("jvm")
+        kotlin("multiplatform")
         id("com.android.library").version("7.4.2") apply false
     }
 }
