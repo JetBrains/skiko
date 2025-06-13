@@ -8,12 +8,6 @@ private external fun skia_memSetByte(address: NativePointer, value: Byte)
 @kotlin.wasm.WasmImport(SkikoMjsPath, "skia_memGetByte")
 private external fun skia_memGetByte(address: NativePointer): Byte
 
-@kotlin.wasm.WasmImport(SkikoMjsPath, "skia_memSetChar")
-private external fun skia_memSetChar(address: NativePointer, value: Char)
-
-@kotlin.wasm.WasmImport(SkikoMjsPath, "skia_memGetChar")
-private external fun skia_memGetChar(address: NativePointer): Char
-
 @kotlin.wasm.WasmImport(SkikoMjsPath, "skia_memSetShort")
 private external fun skia_memSetShort(address: NativePointer, value: Short)
 
@@ -54,13 +48,7 @@ internal actual fun toWasm(dest: NativePointer, src: ShortArray) {
     }
 }
 
-internal actual fun toWasm(dest: NativePointer, src: CharArray) {
-    var address = dest
-    for (value in src) {
-        skia_memSetChar(address, value)
-        address += Char.SIZE_BYTES
-    }
-}
+internal actual fun toWasm(dest: NativePointer, src: CharArray): Unit = TODO("CharArray interop is implemented for Wasm target without toWasm actualisation")
 
 internal actual fun toWasm(dest: NativePointer, src: IntArray) {
     var address = dest
