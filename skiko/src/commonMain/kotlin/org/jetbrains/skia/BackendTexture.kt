@@ -2,39 +2,39 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skiko.RenderException
 
 class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         /**
          * Creates BackendTexture from GL texture.
          *
-         * @param textureFormat - GL enum, must be valid
-         * @throws RuntimeException if nullptr is returned.
+         * @param width - width of the [BackendTexture] to be created
+         * @param height - height of the [BackendTexture] to be created
+         * @param isMipmapped - if the passed [textureId] has a GL mipmap, this should be true, otherwise false
+         * @param textureId - GL id of the texture to use
+         * @param textureTarget - GL enum, must be valid texture target for 2D, e.g. GL_TEXTURE_2D
+         * @param textureFormat - GL enum, must be valid color format, e.g. GL_RGBA or GL_BGRA_INTEGER
          *
          * @see glTextureParametersModified
          */
         fun makeGL(
-            textureId: Int,
-            textureTarget: Int,
-            textureFormat: Int,
             width: Int,
             height: Int,
-            isMipmapped: Boolean
+            isMipmapped: Boolean,
+            textureId: Int,
+            textureTarget: Int,
+            textureFormat: Int
         ): BackendTexture {
             Stats.onNativeCall()
             val ptr = _nMakeGL(
-                textureId,
-                textureTarget,
-                textureFormat,
                 width,
                 height,
-                isMipmapped
+                isMipmapped,
+                textureId,
+                textureTarget,
+                textureFormat
             )
-            return if (ptr == NullPointer) throw RenderException("Can't create OpenGL BackendTexture")
-            else BackendTexture(ptr)
+            return BackendTexture(ptr)
         }
 
         init {
@@ -66,12 +66,12 @@ private external fun BackendTexture_nGetFinalizer(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nMakeGL")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_BackendTexture__1nMakeGL")
 private external fun _nMakeGL(
-    textureId: Int,
-    target: Int,
-    format: Int,
     width: Int,
     height: Int,
-    isMipmapped: Boolean
+    isMipmapped: Boolean,
+    textureId: Int,
+    target: Int,
+    format: Int
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nGLTextureParametersModified")

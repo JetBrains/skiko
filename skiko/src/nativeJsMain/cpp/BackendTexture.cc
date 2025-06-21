@@ -14,7 +14,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendTexture__1nGetFinalizer() 
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendTexture__1nMakeGL
-  (KInt textureId, KInt target, KInt width, KInt height, KInt format, KInt surfaceOrigin, KInt colorType, KBoolean isMipmapped) {
+  (KInt width, KInt height, KBoolean isMipmapped, KInt textureId, KInt target, KInt format) {
     GrGLTextureInfo textureInfo;
     textureInfo.fID = static_cast<GrGLuint>(textureId);
     textureInfo.fTarget = static_cast<GrGLenum>(target);
