@@ -7,6 +7,7 @@ import SkiaBuildType
 import SkikoProjectContext
 import WriteCInteropDefFile
 import compilerForTarget
+import hostArch
 import isCompatibleWithHost
 import joinToTitleCamelCase
 import listOfFrameworks
@@ -51,13 +52,21 @@ fun SkikoProjectContext.compileNativeBridgesTask(
 ): TaskProvider<CompileSkikoCppTask> = with (this.project) {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isUikitSim = isUikitSim)
 
+    val setupMultistrapTask = if (os == OS.Linux && arch == Arch.Arm64 && hostArch != Arch.Arm64) {
+        setupMultistrapTask(os, arch, isUikitSim = isUikitSim)
+    } else {
+        null
+    }
+
     val actionName = "compileNativeBridges".withSuffix(isUikitSim = isUikitSim)
 
     return project.registerSkikoTask<CompileSkikoCppTask>(actionName, os, arch) {
         dependsOn(skiaNativeDir)
         val unpackedSkia = skiaNativeDir.get()
 
-        compiler.set(compilerForTarget(os, arch))
+        setupMultistrapTask?.let { dependsOn(it) }
+
+        compiler.set(compilerForTarget(os, arch, isJvm = false))
         buildTargetOS.set(os)
         if (isUikitSim) {
             buildSuffix.set("sim")
@@ -126,8 +135,9 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 ))
             }
             OS.Linux -> {
-                flags.set(listOf(
+                flags.set(listOfNotNull(
                     *buildType.clangFlags,
+                    "-fPIC",
                     "-fno-rtti",
                     "-fno-exceptions",
                     "-fvisibility=hidden",
@@ -239,17 +249,24 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             configureCinterop("uikit", os, arch, target, targetString, tvosFrameworks)
             mutableListOfLinkerOptions(tvosFrameworks)
         }
-        OS.Linux -> mutableListOfLinkerOptions(
-            "-L/usr/lib/x86_64-linux-gnu",
-            "-lfontconfig",
-            "-lGL",
-            // TODO: an ugly hack, Linux linker searches only unresolved symbols.
-            "$skiaBinDir/libsksg.a",
-            "$skiaBinDir/libskshaper.a",
-            "$skiaBinDir/libskunicode_core.a",
-            "$skiaBinDir/libskunicode_icu.a",
-            "$skiaBinDir/libskia.a"
-        )
+        OS.Linux -> {
+            val options = mutableListOf(
+                "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
+                "-lfontconfig",
+                "-lGL",
+                // TODO: an ugly hack, Linux linker searches only unresolved symbols.
+                "$skiaBinDir/libsksg.a",
+                "$skiaBinDir/libskshaper.a",
+                "$skiaBinDir/libskunicode_core.a",
+                "$skiaBinDir/libskunicode_icu.a",
+                "$skiaBinDir/libskia.a"
+            )
+            if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
+                options.add(0, "-L$buildDir/multistrap-arm64/usr/lib")
+                options.add(1, "-L$buildDir/multistrap-arm64/usr/lib/aarch64-linux-gnu")
+            }
+            mutableListOfLinkerOptions(options)
+        }
         else -> mutableListOf()
     }
     if (skiko.includeTestHelpers) {
@@ -305,6 +322,24 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         compileTaskProvider.configure {
             dependsOn(linkTask)
         }
+    }
+}
+
+/**
+ * This installs dependencies needed for cross compiling Skiko on Linux.
+ * https://youtrack.jetbrains.com/issue/KT-36871
+ */
+fun SkikoProjectContext.setupMultistrapTask(
+    os: OS, arch: Arch, isUikitSim: Boolean
+): TaskProvider<Exec> = with (this.project) {
+    require(os == OS.Linux)
+    require(arch == Arch.Arm64)
+
+    val actionName = "setupMultistrap".withSuffix(isUikitSim = isUikitSim)
+
+    return project.registerSkikoTask<Exec>(actionName, os, arch) {
+        workingDir(projectDir)
+        commandLine("multistrap", "-f", "multistrap-config-${arch.id}")
     }
 }
 

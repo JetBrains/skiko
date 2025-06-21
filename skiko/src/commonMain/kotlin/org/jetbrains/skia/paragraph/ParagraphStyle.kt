@@ -29,6 +29,27 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
+    /**
+     * Controls whether tab characters are replaced with spaces in text layout.
+     *
+     * Note:
+     * All the platforms except web do not render tab characters even when this is 'false', but put a space instead.
+     * With this property we can make web behave similarly, by setting true.
+     */
+    var replaceTabCharacters: Boolean
+        get() = try {
+            Stats.onNativeCall()
+            _nGetReplaceTabCharacters(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetReplaceTabCharacters(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
     var strutStyle: StrutStyle
         get() = try {
             Stats.onNativeCall()
@@ -350,3 +371,11 @@ private external fun _nSetTextIndent(ptr: NativePointer, firstLine: Float, restL
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextIndent")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextIndent")
 private external fun _nGetTextIndent(ptr: NativePointer, result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetReplaceTabCharacters")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetReplaceTabCharacters")
+private external fun _nGetReplaceTabCharacters(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetReplaceTabCharacters")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetReplaceTabCharacters")
+private external fun _nSetReplaceTabCharacters(ptr: NativePointer, value: Boolean)

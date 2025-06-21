@@ -44,7 +44,7 @@ class DefaultConsoleLogger(override val isTraceEnabled: Boolean = false,
 
     companion object {
         fun fromLevel(level: String): DefaultConsoleLogger {
-            val logLevel = LogLevel.values().filter { it.name == level }.firstOrNull() ?: LogLevel.INFO
+            val logLevel = LogLevel.entries.firstOrNull { it.name == level } ?: LogLevel.INFO
             return DefaultConsoleLogger(
                 isTraceEnabled = LogLevel.TRACE.noMoreVerboseThan(logLevel),
                 isDebugEnabled = LogLevel.DEBUG.noMoreVerboseThan(logLevel),

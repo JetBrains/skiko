@@ -15,7 +15,7 @@ import java.awt.Graphics2D
  * For on-screen rendering see [org.jetbrains.skiko.redrawer.MetalRedrawer].
  *
  * @see SwingRedrawerBase
- * @see SwingOffscreenDrawer
+ * @see SoftwareSwingPainter
  */
 internal class MetalSwingRedrawer(
     swingLayerProperties: SwingLayerProperties,
@@ -26,6 +26,12 @@ internal class MetalSwingRedrawer(
         init {
             Library.load()
         }
+
+        private fun createSwingPainter(swingLayerProperties: SwingLayerProperties): SwingPainter = try {
+            AcceleratedSwingPainter()
+        } catch (_ : RenderException) {
+            SoftwareSwingPainter(swingLayerProperties)
+        }
     }
 
     private val adapter: MetalAdapter = chooseMetalAdapter(swingLayerProperties.adapterPriority).also {
@@ -35,22 +41,17 @@ internal class MetalSwingRedrawer(
 
     private var texturePtr: Long = 0
 
-    private val storage = Bitmap()
-
-    private var bytesToDraw = ByteArray(0)
-
     init {
         onContextInit()
     }
 
-    private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
+    private val painter: SwingPainter = createSwingPainter(swingLayerProperties)
 
     override fun dispose() {
-        bytesToDraw = ByteArray(0)
-        storage.close()
         disposeMetalTexture(texturePtr)
         context.close()
         adapter.dispose()
+        painter.dispose()
         super.dispose()
     }
 
@@ -78,22 +79,7 @@ internal class MetalSwingRedrawer(
 
     private fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = true)
-
-        val width = surface.width
-        val height = surface.height
-
-        val dstRowBytes = width * 4
-        if (storage.width != width || storage.height != height) {
-            storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
-            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
-        }
-        // TODO: it copies pixels from GPU to CPU, so it is really slow
-        surface.readPixels(storage, 0, 0)
-
-        val successfulRead = storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
-        if (successfulRead) {
-            swingOffscreenDrawer.draw(g, bytesToDraw, width, height)
-        }
+        painter.paint(g, surface, texturePtr)
     }
 
     override fun rendererInfo(): String {

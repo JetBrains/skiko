@@ -59,11 +59,6 @@ internal class UiTestScope(
         init {
             setupContent()
         }
-
-        override fun dispose() {
-            layer.dispose()
-            super.dispose()
-        }
     }
 }
 

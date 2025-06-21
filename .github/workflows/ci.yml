@@ -105,7 +105,7 @@ jobs:
           retention-days: 5
 
   tvOS:
-    # TVOS requires macos 13 
+    # TVOS requires macos 13
     runs-on: macos-13
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -128,7 +128,7 @@ jobs:
           retention-days: 5
 
   linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -164,7 +164,10 @@ jobs:
           sudo apt-get install gcc-9 g++-9 -y
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
           sudo update-alternatives --config gcc
-          sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip xvfb -y
+          sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip multistrap xvfb -y
+          sudo apt-get install gcc-9-aarch64-linux-gnu g++-9-aarch64-linux-gnu -y
+          sudo update-alternatives --install /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc-9 60 --slave /usr/bin/aarch64-linux-gnu-g++ aarch64-linux-gnu-g++ /usr/bin/aarch64-linux-gnu-g++-9
+          sudo update-alternatives --config aarch64-linux-gnu-gcc
           sudo Xvfb :0 -screen 0 1280x720x24 &
 
       - shell: bash
@@ -172,6 +175,12 @@ jobs:
         run: |
           export DISPLAY=:0
           ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:linuxX64Test
+
+      # Linux arm64 tests are executed on a separate runner
+      - shell: bash
+        name: 'Compile Linux arm64 tests'
+        run: |
+          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:linkDebugTestLinuxArm64
 
       - shell: bash
         name: 'Compile and run AWT tests'
@@ -187,13 +196,86 @@ jobs:
         run: |
           ./gradlew --no-daemon --stacktrace --info -Pkotlin.native.cacheKind.linuxX64=none :skiko:publishToMavenLocal
           ./gradlew --no-daemon --stacktrace --info :SkiaAwtSample:installDist
-          ./gradlew --no-daemon -Pskiko.android.enabled=true :skiko:publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal :skiko:publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal :skiko:publishAndroidPublicationToMavenLocal
+          ./gradlew --no-daemon -Pskiko.android.enabled=true :skiko:publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal :skiko:publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal :skiko:publishAndroidReleasePublicationToMavenLocal
 
       - uses: actions/upload-artifact@v4
         name: 'Save test results as artifact'
         if: always()
         with:
           name: test-reports-linux
+          path: ./skiko/build/reports/tests
+          retention-days: 5
+
+      - uses: actions/upload-artifact@v4
+        name: 'Save linuxArm64 test binary as artifact'
+        with:
+          name: test-binary-linuxArm64
+          path: ./skiko/build/bin/linuxArm64
+          if-no-files-found: error
+          retention-days: 5
+
+  linux-arm:
+    needs: linux
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: actions/setup-java@v3
+        name: 'Set up JDK 11'
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+          cache: 'gradle'
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: test-binary-linuxArm64
+          path: ./skiko/build/bin/linuxArm64
+
+      - shell: bash
+        name: 'Set up Linux build environment'
+        run: |
+          # TODO: simplify installation of compilers.
+          sudo apt-get update -y
+          sudo apt-get install build-essential software-properties-common -y
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt-get update -y
+          sudo apt-get install build-essential software-properties-common -y
+          sudo apt-get update
+          sudo apt-get install clang-11 -y
+          sudo apt-get remove g++ -y
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-11 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-11 100
+          sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip xvfb -y
+          sudo Xvfb :0 -screen 0 1280x720x24 &
+
+      - shell: bash
+        name: 'Run Linux arm64 tests'
+        working-directory: ./skiko
+        run: |
+          export DISPLAY=:0
+          chmod +x ./build/bin/linuxArm64/debugTest/test.kexe
+          ./build/bin/linuxArm64/debugTest/test.kexe
+
+      - shell: bash
+        name: 'Compile and run AWT tests'
+        run: |
+          export DISPLAY=:0
+          ./gradlew --no-daemon --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
+        timeout-minutes: 25
+
+      - shell: bash
+        name: 'Publish to Maven Local, check AWT sample'
+        run: |
+          ./gradlew --no-daemon --stacktrace --info :skiko:publishToMavenLocal
+          ./gradlew --no-daemon --stacktrace --info :SkiaAwtSample:installDist
+
+      - uses: actions/upload-artifact@v4
+        name: 'Save test results as artifact'
+        if: always()
+        with:
+          name: test-reports-linux-arm
           path: ./skiko/build/reports/tests
           retention-days: 5
 

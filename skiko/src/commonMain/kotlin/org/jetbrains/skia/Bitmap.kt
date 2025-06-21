@@ -1098,10 +1098,6 @@ private external fun _nMakeClone(ptr: NativePointer): NativePointer
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Bitmap__1nSwap")
 private external fun _nSwap(ptr: NativePointer, otherPtr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixmap")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Bitmap__1nGetPixmap")
-private external fun _nGetPixmap(ptr: NativePointer): NativePointer
-
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetImageInfo")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Bitmap__1nGetImageInfo")
 private external fun _nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
@@ -1133,14 +1129,6 @@ private external fun _nIsImmutable(ptr: NativePointer): Boolean
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetImmutable")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Bitmap__1nSetImmutable")
 private external fun _nSetImmutable(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsVolatile")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Bitmap__1nIsVolatile")
-private external fun _nIsVolatile(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetVolatile")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Bitmap__1nSetVolatile")
-private external fun _nSetVolatile(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nReset")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_Bitmap__1nReset")

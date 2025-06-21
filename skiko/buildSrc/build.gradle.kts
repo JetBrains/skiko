@@ -10,6 +10,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     compileOnly(gradleApi())
-    implementation(kotlin("gradle-plugin", "1.9.21"))
+    val kotlinVersion = project.properties["kotlin.version"] as String
+    implementation(kotlin("gradle-plugin", kotlinVersion))
     implementation("de.undercouch:gradle-download-task:5.5.0")
 }

@@ -23,6 +23,19 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphSt
     return reinterpret_cast<jlong>(instance);
 }
 
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetReplaceTabCharacters
+    (JNIEnv* env, jclass jclass, jlong ptr) {
+  ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+  return instance->getReplaceTabCharacters();
+}
+
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetReplaceTabCharacters
+    (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
+  ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+  instance->setReplaceTabCharacters(value);
+}
+
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nEquals
   (JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));

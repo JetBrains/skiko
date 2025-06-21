@@ -20,6 +20,19 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphStyle__1nMake
     return reinterpret_cast<KNativePointer>(instance);
 }
 
+SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_ParagraphStyle__1nGetReplaceTabCharacters
+    (KNativePointer ptr) {
+  ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>((ptr));
+  return instance->getReplaceTabCharacters();
+}
+
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetReplaceTabCharacters
+    (KNativePointer ptr, KBoolean value) {
+  ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>((ptr));
+  instance->setReplaceTabCharacters(value);
+}
+
 SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_ParagraphStyle__1nEquals
   (KNativePointer ptr, KNativePointer otherPtr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>((ptr));

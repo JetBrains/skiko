@@ -115,26 +115,6 @@ static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawe
     return onOcclusionStateChanged;
 }
 
-
-static void setWindowPropertiesUnsafe(NSWindow* window, jboolean transparency) {
-    if (window == NULL) return;
-    if (transparency) {
-        window.hasShadow = NO;
-    }
-}
-
-static void setWindowProperties(NSWindow* window, jboolean transparency) {
-    if (NSThread.currentThread.isMainThread) {
-        setWindowPropertiesUnsafe(window, transparency);
-    } else {
-        // In case of OpenJDK, EDT thread != NSThread main thread
-        __weak NSWindow *weakWindow = window;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            setWindowPropertiesUnsafe(weakWindow, transparency);
-        });
-    }
-}
-
 extern "C"
 {
 
@@ -181,8 +161,6 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         device.inflightSemaphore = dispatch_semaphore_create(device.layer.maximumDrawableCount);
 
         NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
-        setWindowProperties(window, transparency);
-
         jmethodID onOcclusionStateChanged = getOnOcclusionStateChangedMethodID(env, redrawer);
         device.occlusionObserver =
             [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidChangeOcclusionStateNotification
@@ -268,6 +246,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
         MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
         env->DeleteGlobalRef(device.layer.javaRef);
         [[NSNotificationCenter defaultCenter] removeObserver:device.occlusionObserver];
+        device.layer.displaySyncEnabled = false;  // Prevents window background flashing when the window is disposed
         [device.layer removeFromSuperlayer];
     }
 }

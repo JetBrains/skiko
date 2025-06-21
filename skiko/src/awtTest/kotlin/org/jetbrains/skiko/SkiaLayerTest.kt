@@ -25,14 +25,19 @@ import org.junit.Rule
 import org.junit.Test
 import java.awt.*
 import java.awt.Color
+import java.awt.Point
 import java.awt.event.*
+import java.util.concurrent.Semaphore
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.Box
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
+import kotlin.concurrent.thread
 import kotlin.random.Random
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration
@@ -98,11 +103,11 @@ class SkiaLayerTest {
                 override fun keyTyped(e: KeyEvent?) {
                     launch {
                         val redrawer = window.layer.redrawer as MetalRedrawer
-                        redrawer.drawSync()
+                        redrawer.redrawImmediately()
                         counter1 += 1
-                        redrawer.drawSync()
+                        redrawer.redrawImmediately()
                         counter2 += 1
-                        redrawer.drawSync()
+                        redrawer.redrawImmediately()
                     }
                 }
             })
@@ -541,63 +546,41 @@ class SkiaLayerTest {
         }
     }
 
+    private abstract class BaseTestRedrawer: Redrawer {
+        override fun dispose() = Unit
+        override fun needRedraw() = Unit
+        override fun redrawImmediately() = Unit
+        override val renderInfo: String
+            get() = ""
+    }
+
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on init context`() = uiTest {
-        testFallbackToSoftware(
-            object : RenderFactory {
-                override fun createRedrawer(
-                    layer: SkiaLayer,
-                    renderApi: GraphicsApi,
-                    analytics: SkiaLayerAnalytics,
-                    properties: SkiaLayerProperties
-                ) = object : Redrawer {
-                    private val contextHandler = object : JvmContextHandler(layer) {
-                        override fun initContext() = false
-                        override fun initCanvas() = Unit
-                    }
-
-                    override fun dispose() = Unit
-                    override fun needRedraw() = Unit
-                    override fun redrawImmediately() = layer.inDrawScope(contextHandler::draw)
-                    override val renderInfo = ""
+        testFallbackToSoftware { layer, _, _, _ ->
+            object : BaseTestRedrawer() {
+                private val contextHandler = object : JvmContextHandler(layer) {
+                    override fun initContext() = false
+                    override fun initCanvas() = Unit
                 }
+                override fun redrawImmediately() = layer.inDrawScope(contextHandler::draw)
             }
-        )
+        }
     }
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on create redrawer`() = uiTest {
-        testFallbackToSoftware(
-            object : RenderFactory {
-                override fun createRedrawer(
-                    layer: SkiaLayer,
-                    renderApi: GraphicsApi,
-                    analytics: SkiaLayerAnalytics,
-                    properties: SkiaLayerProperties
-                ) = throw RenderException()
-            }
-        )
+        testFallbackToSoftware { _, _, _, _ -> throw RenderException() }
     }
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on draw`() = uiTest {
-        testFallbackToSoftware(
-            object : RenderFactory {
-                override fun createRedrawer(
-                    layer: SkiaLayer,
-                    renderApi: GraphicsApi,
-                    analytics: SkiaLayerAnalytics,
-                    properties: SkiaLayerProperties
-                ) = object : Redrawer {
-                    override fun dispose() = Unit
-                    override fun needRedraw() = Unit
-                    override fun redrawImmediately() = layer.inDrawScope {
-                        throw RenderException()
-                    }
-                    override val renderInfo = ""
+        testFallbackToSoftware { layer, _, _, _ ->
+            object : BaseTestRedrawer() {
+                override fun redrawImmediately() = layer.inDrawScope {
+                    throw RenderException()
                 }
             }
-        )
+        }
     }
 
     private suspend fun UiTestScope.testFallbackToSoftware(nonSoftwareRenderFactory: RenderFactory) {
@@ -641,6 +624,35 @@ class SkiaLayerTest {
             } else {
                 nonSoftwareRenderFactory.createRedrawer(layer, renderApi, analytics, properties)
             }
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun `renderApi change callback is invoked on fallback`() = uiTest {
+        val window = UiTestWindow(
+            renderFactory = OverrideNonSoftwareRenderFactory { layer, _, _, _ ->
+                object : BaseTestRedrawer() {
+                    override fun redrawImmediately() = layer.inDrawScope {
+                        throw RenderException()
+                    }
+                }
+            }
+        )
+        try {
+            var rendererChangedCallbackInvoked = false
+            window.layer.onStateChanged(SkiaLayer.PropertyKind.Renderer) {
+                rendererChangedCallbackInvoked = true
+            }
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.isVisible = true
+
+            delay(1000)
+
+            assertEquals(GraphicsApi.SOFTWARE_COMPAT, window.layer.renderApi)
+            assertTrue(rendererChangedCallbackInvoked)
+        } finally {
+            window.close()
         }
     }
 
@@ -981,21 +993,113 @@ class SkiaLayerTest {
             }
             contentPane.add(layer)
         }
-        window.size = Dimension(400, 400)
-        window.isVisible = true
+        try {
+            window.size = Dimension(400, 400)
+            window.isVisible = true
 
-        repeat(20) {
-            window.location = window.location.let {
-                java.awt.Point(it.x + 10, it.y + 10)
+            repeat(20) {
+                window.location = window.location.let {
+                    Point(it.x + 10, it.y + 10)
+                }
+                delay(50)
             }
-            delay(50)
+
+            // Ideally, layoutCount would be just 1, but Swing appears to call layout one extra time, so it ends up being 2.
+            // Compare to 3 just to avoid a false-failure if there's another layout for whatever reason.
+            // What we're interested to validate is that there's no layout occurring on every window move.
+            assert(layoutCount <= 3) {
+                "Layout count: $layoutCount"
+            }
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @Test
+    fun `no window flash on hide or dispose while animation is running`() = uiTest {
+        assumeTrue(hostOs == OS.MacOS)  // Until the issue is fixed on Windows and Linux
+
+        // Put up a large green window, and then repeatedly show and hide/dispose
+        // a smaller black window on top of it while screenshotting the pixel at the center,
+        // and making sure that pixel is always either black or green.
+
+        val bgColor = Color.GREEN  // Green
+        val fgColor = Color.BLACK  // Black
+        val backgroundWindow = JFrame().also {
+            it.size = Dimension(1000, 1000)
+            it.location = Point(200, 200)
+            it.contentPane.background = bgColor
+            it.isVisible = true
         }
 
-        // Ideally, layoutCount would be just 1, but Swing appears to call layout one extra time, so it ends up being 2.
-        // Compare to 3 just to avoid a false-failure if there's another layout for whatever reason.
-        // What we're interested to validate is that there's no layout occurring on every window move.
-        assert(layoutCount <= 3) {
-            "Layout count: $layoutCount"
+        lateinit var renderDelegate: SolidColorRenderer
+        val window = UiTestWindow {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            renderDelegate = SolidColorRenderer(
+                layer = layer,
+                color = fgColor,
+                continuousRedraw = true  // Continuously redraw to simulate a running animation
+            )
+            layer.renderDelegate = renderDelegate
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+
+        window.isVisible = true
+        delay(500)
+        val pixelLocation = window.bounds.let {
+            Point(it.x + it.width/2, it.y + it.height/2)
+        }
+
+        var nonBlackPixelDetected = false
+        val stopThread = AtomicBoolean(false)
+        // This semaphore ensures that screenshots are only taken when the window is becoming hidden/disposed.
+        // It's needed because the window can (and does, with SOFTWARE_COMPAT) also flash when becoming visible.
+        val semaphore = Semaphore(1, true)
+        val t = thread {
+            val robot = Robot()
+            while(!stopThread.get()) {
+                semaphore.acquire()
+                val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
+                semaphore.release()
+                if ((pixel != fgColor) && (pixel != bgColor)) {
+                    println("window is visible: ${window.isVisible}")
+                    nonBlackPixelDetected = true
+                    return@thread
+                }
+            }
+        }
+
+        try {
+            repeat(20) {
+                delay(200)
+                window.isVisible = false
+                delay(300)
+                assertFalse(nonBlackPixelDetected, "Detected a non-black pixel when hiding window")
+                // Acquire the semaphore while making the window visible, to disable screenshotting
+                semaphore.acquire()
+                window.isVisible = true
+                delay(1000)
+                semaphore.release()
+            }
+
+            repeat(20) {
+                delay(200)
+                window.dispose()
+                delay(300)
+                assertFalse(nonBlackPixelDetected, "Detected a non-black pixel when disposing window")
+                // Acquire the semaphore while making the window visible, to disable screenshotting
+                semaphore.acquire()
+                window.isVisible = true
+                delay(1000)
+                semaphore.release()
+            }
+        } finally {
+            stopThread.getAndSet(true)
+            t.join()
+
+            window.dispose()
+            backgroundWindow.dispose()
         }
     }
 
@@ -1061,6 +1165,30 @@ class SkiaLayerTest {
             layer.needRedraw()
         }
     }
+
+    private class SolidColorRenderer(
+        val layer: SkiaLayer,
+        color: Color,
+        continuousRedraw: Boolean = false
+    ) : SkikoRenderDelegate {
+
+        var continuousRedraw = continuousRedraw
+            set(value) {
+                if (value)
+                    layer.needRedraw()
+                field = value
+            }
+
+        val paint = Paint().also { it.color = color.rgb }
+
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), paint)
+            if (continuousRedraw) {
+                layer.needRedraw()
+            }
+        }
+    }
+
 }
 
 private fun JFrame.close() = dispatchEvent(WindowEvent(this, WindowEvent.WINDOW_CLOSING))

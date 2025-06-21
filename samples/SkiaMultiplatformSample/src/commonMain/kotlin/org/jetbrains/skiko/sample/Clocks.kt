@@ -12,7 +12,6 @@ import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.FPSCounter
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.OS
-import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoRenderDelegate
 import org.jetbrains.skiko.currentSystemTheme
 import org.jetbrains.skiko.hostOs
@@ -20,7 +19,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-abstract class Clocks(private val renderApi: GraphicsApi): SkikoRenderDelegate {
+abstract class Clocks(private val renderApi: () -> GraphicsApi): SkikoRenderDelegate {
     private val withFps = true
     private val fpsCounter = FPSCounter()
     private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
@@ -102,7 +101,7 @@ abstract class Clocks(private val renderApi: GraphicsApi): SkikoRenderDelegate {
 
         val renderInfo = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: $renderApi ✿ﾟ ${currentSystemTheme}${maybeFps}")
+            .addText("Graphics API: ${renderApi()} ✿ﾟ ${currentSystemTheme}${maybeFps}")
             .popStyle()
             .build()
         renderInfo.layout(Float.POSITIVE_INFINITY)

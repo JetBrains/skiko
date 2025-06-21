@@ -39,6 +39,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
     implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
+    implementation("org.jetbrains.runtime:jbr-api:1.5.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }

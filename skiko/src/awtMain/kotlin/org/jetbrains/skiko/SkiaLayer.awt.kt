@@ -221,11 +221,18 @@ actual open class SkiaLayer internal constructor(
 
     private fun checkShowing() {
         val wasShowing = isShowingCached
-        isShowingCached = super.isShowing()
-        if (wasShowing != isShowing) {
-            redrawer?.setVisible(isShowing)
+        val isShowingNow = super.isShowing().also {
+            isShowingCached = it
         }
-        if (isShowing) {
+        if (wasShowing != isShowingNow) {
+            // We don't want to call redrawer.setVisible(false) when the window becomes hidden, because that hides the
+            // layer immediately and stops it from being painted (at the system level). But the window itself is still
+            // actually visible for a few frames, and it draws its own background, causing a "flash".
+            if (SwingUtilities.getWindowAncestor(this).isShowing) {
+                redrawer?.setVisible(isShowingNow)
+            }
+        }
+        if (isShowingNow) {
             redrawer?.syncBounds()
             repaint()
         }
@@ -284,22 +291,22 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    private val redrawerManager = RedrawerManager<Redrawer>(properties.renderApi) { renderApi, oldRedrawer ->
-        oldRedrawer?.dispose()
-        val newRedrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
-        newRedrawer.syncBounds()
-        newRedrawer
-    }
-
-    internal val redrawer: Redrawer?
-        get() = redrawerManager.redrawer
-
-    actual var renderApi: GraphicsApi
-        get() = redrawerManager.renderApi
-        set(value) {
-            redrawerManager.forceRenderApi(value)
+    private val redrawerManager = RedrawerManager<Redrawer>(
+        defaultRenderApi = properties.renderApi,
+        redrawerFactory = { renderApi, oldRedrawer ->
+            oldRedrawer?.dispose()
+            renderFactory.createRedrawer(this, renderApi, analytics, properties).also {
+                it.syncBounds()
+            }
+        },
+        onRenderApiChanged = {
             notifyChange(PropertyKind.Renderer)
         }
+    )
+
+    internal val redrawer: Redrawer? by redrawerManager::redrawer
+
+    actual var renderApi: GraphicsApi by redrawerManager::renderApi
 
     val renderInfo: String
         get() = if (redrawer == null)
@@ -320,15 +327,15 @@ actual open class SkiaLayer internal constructor(
         isInited = true
     }
 
-    private val stateHandlers =
+    private val stateChangeListeners =
         mutableMapOf<PropertyKind, MutableList<(SkiaLayer) -> Unit>>()
 
     fun onStateChanged(kind: PropertyKind, handler: (SkiaLayer) -> Unit) {
-        stateHandlers.getOrPut(kind, { mutableListOf() }) += handler
+        stateChangeListeners.getOrPut(kind, ::mutableListOf) += handler
     }
 
     private fun notifyChange(kind: PropertyKind) {
-        stateHandlers.get(kind)?.let { handlers ->
+        stateChangeListeners[kind]?.let { handlers ->
             handlers.forEach { it(this) }
         }
     }
@@ -537,6 +544,10 @@ actual open class SkiaLayer internal constructor(
         FrameWatcher.nextFrame()
         fpsCounter?.tick()
 
+        // The current approach is to render into a picture in the main thread, and render this picture in the render thread
+        // If this approach will be changed, create an issue in https://youtrack.jetbrains.com/issues/CMP for changing it in
+        // https://github.com/JetBrains/compose-multiplatform/blob/e4e2d329709cded91a09cc612d4defbce37aad96/benchmarks/multiplatform/benchmarks/src/commonMain/kotlin/MeasureComposable.kt#L151 as well
+
         val pictureWidth = (width * contentScale).toInt().coerceAtLeast(0)
         val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
 
@@ -583,7 +594,7 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    actual internal fun draw(canvas: Canvas) {
+    internal actual fun draw(canvas: Canvas) {
         check(!isDisposed) { "SkiaLayer is disposed" }
         lockPicture {
             canvas.drawPicture(it.instance)
