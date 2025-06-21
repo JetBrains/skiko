@@ -21,7 +21,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendTextureKt_Back
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendTextureKt__1nMakeGL
-  (JNIEnv* env, jclass jclass, jint textureId, jint target, jint format, jint width, jint height, jboolean isMipmapped) {
+  (JNIEnv* env, jclass jclass, jint width, jint height, jboolean isMipmapped, jint textureId, jint target, jint format) {
     GrGLTextureInfo textureInfo;
     textureInfo.fID = static_cast<GrGLuint>(textureId);
     textureInfo.fTarget = static_cast<GrGLenum>(target);
