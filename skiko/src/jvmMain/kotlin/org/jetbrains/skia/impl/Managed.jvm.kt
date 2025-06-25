@@ -3,7 +3,10 @@ package org.jetbrains.skia.impl
 import org.jetbrains.skiko.Logger
 import java.lang.ref.PhantomReference
 import java.lang.ref.ReferenceQueue
+import java.util.function.Consumer
 import kotlin.concurrent.thread
+import kotlin.time.measureTime
+
 
 // Android doesn't have Cleaner API, so use explicit phantom references + finalization queue.
 // Consider using this on all JVM platforms eventually.
@@ -62,7 +65,7 @@ private interface Cleanable {
     var next: Cleanable?
 }
 
-private class CleanableImpl(managed: Managed, action: Runnable, cleaner: Cleaner) :
+private class CleanableImpl(val className: String, managed: Managed, action: Runnable, cleaner: Cleaner) :
     PhantomReference<Managed>(managed, cleaner.queue), Cleanable {
 
     override var prev: Cleanable? = this
@@ -128,9 +131,12 @@ private class Cleaner {
     init {
         thread(start = true, isDaemon = true, name = "Reference Cleaner") {
             while (!stopped) {
-                val ref = queue.remove(60 * 1000L) as Cleanable?
+                val ref = queue.remove(60 * 1000L) as CleanableImpl?
                 try {
-                    ref?.clean()
+                    val time = measureTime {
+                        ref?.clean()
+                    }
+                    println("Cleaned ${ref?.className} took $time")
                 } catch (t: Throwable) {
                 }
             }
@@ -138,7 +144,8 @@ private class Cleaner {
     }
 
     fun register(managed: Managed, action: Runnable): Cleanable {
-        return CleanableImpl(managed, action, this)
+        val className = managed.javaClass.simpleName
+        return CleanableImpl(className, managed, action, this)
     }
 
     fun stop() {
