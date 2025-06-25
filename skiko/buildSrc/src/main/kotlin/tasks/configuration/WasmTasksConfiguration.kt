@@ -184,7 +184,9 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
     }
 
     val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
-        dependsOn(linkWasmWithES6)
+        val wasmJsTarget = kotlin.wasmJs()
+        val main by wasmJsTarget.compilations
+        dependsOn(main.compileTaskProvider)
         configureCommon(false, "src/jsWasmMain/resources/setup.js", false)
     }
 
