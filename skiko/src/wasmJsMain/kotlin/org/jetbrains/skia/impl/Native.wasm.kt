@@ -2,40 +2,42 @@ package org.jetbrains.skia.impl
 
 import org.jetbrains.skia.ModuleImport
 
-@ModuleImport("./skiko.mjs", "skia_memSetByte")
+const val skikoMjs: String = "./skiko.mjs"
+
+@ModuleImport(skikoMjs, "skia_memSetByte")
 private external fun skia_memSetByte(address: NativePointer, value: Byte)
 
-@ModuleImport("./skiko.mjs", "skia_memGetByte")
+@ModuleImport(skikoMjs, "skia_memGetByte")
 private external fun skia_memGetByte(address: NativePointer): Byte
 
-@ModuleImport("./skiko.mjs", "skia_memSetChar")
+@ModuleImport(skikoMjs, "skia_memSetChar")
 private external fun skia_memSetChar(address: NativePointer, value: Char)
 
-@ModuleImport("./skiko.mjs", "skia_memGetChar")
+@ModuleImport(skikoMjs, "skia_memGetChar")
 private external fun skia_memGetChar(address: NativePointer): Char
 
-@ModuleImport("./skiko.mjs", "skia_memSetShort")
+@ModuleImport(skikoMjs, "skia_memSetShort")
 private external fun skia_memSetShort(address: NativePointer, value: Short)
 
-@ModuleImport("./skiko.mjs", "skia_memGetShort")
+@ModuleImport(skikoMjs, "skia_memGetShort")
 private external fun skia_memGetShort(address: NativePointer): Short
 
-@ModuleImport("./skiko.mjs", "skia_memSetInt")
+@ModuleImport(skikoMjs, "skia_memSetInt")
 private external fun skia_memSetInt(address: NativePointer, value: Int)
 
-@ModuleImport("./skiko.mjs", "skia_memGetInt")
+@ModuleImport(skikoMjs, "skia_memGetInt")
 private external fun skia_memGetInt(address: NativePointer): Int
 
-@ModuleImport("./skiko.mjs", "skia_memSetFloat")
+@ModuleImport(skikoMjs, "skia_memSetFloat")
 private external fun skia_memSetFloat(address: NativePointer, value: Float)
 
-@ModuleImport("./skiko.mjs", "skia_memGetFloat")
+@ModuleImport(skikoMjs, "skia_memGetFloat")
 private external fun skia_memGetFloat(address: NativePointer): Float
 
-@ModuleImport("./skiko.mjs", "skia_memSetDouble")
+@ModuleImport(skikoMjs, "skia_memSetDouble")
 private external fun skia_memSetDouble(address: NativePointer, value: Double)
 
-@ModuleImport("./skiko.mjs", "skia_memGetDouble")
+@ModuleImport(skikoMjs, "skia_memGetDouble")
 private external fun skia_memGetDouble(address: NativePointer): Double
 
 internal actual fun toWasm(dest: NativePointer, src: ByteArray) {
