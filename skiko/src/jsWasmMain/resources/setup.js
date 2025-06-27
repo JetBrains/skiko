@@ -2,10 +2,15 @@
 
 export const { _callCallback, _registerCallback, _releaseCallback, _createLocalCallbackScope, _releaseLocalCallbackScope } = SkikoCallbacks;
 
-var wasmSetup = new Promise(function(resolve, reject) {
-    Module['onRuntimeInitialized'] = _ => {
-        resolve(Module);
-    };
+const skikoModule = new Promise((resolve, reject) => {
+   (async function() {
+      const skikoModule = await loadSkikoWASM();
+      resolve(skikoModule)
+   }())
 });
 
-export function onWasmReady(onReady) { wasmSetup.then(onReady); }
+
+export function onWasmReady(onReady) {
+   console.log("onWasmReady");
+    skikoModule.then(onReady)
+}

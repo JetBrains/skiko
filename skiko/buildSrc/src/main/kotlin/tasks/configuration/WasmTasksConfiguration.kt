@@ -115,7 +115,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
                     "-s", "EXPORT_ES6=1",
                     "-s", "MODULARIZE=1",
-                   // "-s", "EXPORT_NAME=loadSkikoWASM",
+                    "-s", "EXPORT_NAME=loadSkikoWASM",
                     "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
                     "--bind",
                     // -O2 saves 800kB for the output file, and ~100kB for transferred size.
