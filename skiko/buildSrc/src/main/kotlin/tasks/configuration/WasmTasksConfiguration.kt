@@ -9,6 +9,7 @@ import SkikoProjectContext
 import compilerForTarget
 import linkerForTarget
 import org.gradle.api.Project
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
@@ -92,7 +93,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         }
 
         val wasmFileName = jsFileNamePrefix + ".wasm"
-        val jsFileName = jsFileNamePrefix + if (outputES6) ".mjs" else ".js"
+        val jsFileName = jsFileNamePrefix + ".mjs"
 
         libOutputFileName.set(wasmFileName) // emcc ignores this, it names .wasm file identically to js output
         jsOutputFileName.set(jsFileName) // this determines the name .wasm file too
@@ -114,7 +115,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
                     "-s", "EXPORT_ES6=1",
                     "-s", "MODULARIZE=1",
-                    "-s", "EXPORT_NAME=loadSkikoWASM",
+                   // "-s", "EXPORT_NAME=loadSkikoWASM",
                     "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
                     "--bind",
                     // -O2 saves 800kB for the output file, and ~100kB for transferred size.
@@ -186,6 +187,8 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
     // skikoWasmJar is used by task name
     val skikoWasmJar by project.tasks.registering(Jar::class) {
         dependsOn(linkWasm)
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
         // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
         val wasmOutDir = linkWasm.map { it.outDir }
         val wasmEsOutDir = linkWasmWithES6.map { it.outDir }

@@ -9,7 +9,7 @@ import kotlin.js.*
  * Calling onWasmReady after onRuntimeInitialized invokes [onReady] as well.
  * It's safe to call wasm functions within [onReady] callback, or after it was invoked.
  */
- @JsModule("./skiko.js")
+ @JsModule("./skiko.mjs")
  @JsNonModule
 external fun onWasmReady(onReady: () -> Unit)
 
