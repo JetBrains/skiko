@@ -17,7 +17,7 @@ import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.jetbrains.kotlin.gradle.plugin.*
-import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
+import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import projectDirs
 import registerOrGetSkiaDirProvider
 import setupMjs
@@ -261,7 +261,7 @@ class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGen
     { it.projectDir.resolve("src/jsWasmMain/resources/pre-skiko-test.mjs") }
 )
 
-fun KotlinWasmJsTargetDsl.setupImportsGeneratorPlugin(mainOutput: File, testOutput: File) {
+fun KotlinJsTargetDsl.setupImportsGeneratorPlugin(mainOutput: File, testOutput: File) {
     val main by compilations.getting
     val test by compilations.getting
 
