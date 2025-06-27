@@ -132,7 +132,7 @@ kotlin {
                 dependsOn(test.compileTaskProvider)
             }
 
-            setupImportsGeneratorPlugin()
+            setupImportsGeneratorPlugin(project.setupMjs, project.skikoTestMjs)
         }
     }
 

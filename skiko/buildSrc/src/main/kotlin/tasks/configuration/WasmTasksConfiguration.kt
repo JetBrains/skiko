@@ -261,16 +261,16 @@ class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGen
     { it.projectDir.resolve("src/jsWasmMain/resources/pre-skiko-test.mjs") }
 )
 
-fun KotlinWasmJsTargetDsl.setupImportsGeneratorPlugin() {
+fun KotlinWasmJsTargetDsl.setupImportsGeneratorPlugin(mainOutput: File, testOutput: File) {
     val main by compilations.getting
     val test by compilations.getting
 
     main.compileTaskProvider.configure {
-        outputs.file(project.setupMjs)
+        outputs.file(mainOutput)
     }
 
     test.compileTaskProvider.configure {
-        outputs.file(project.skikoTestMjs)
+        outputs.file(testOutput)
     }
 
     listOf(main, test).forEach {
