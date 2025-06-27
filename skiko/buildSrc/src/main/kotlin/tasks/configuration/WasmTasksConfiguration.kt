@@ -113,6 +113,10 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     "-s", "MIN_WEBGL_VERSION=2",
                     "-s", "OFFSCREEN_FRAMEBUFFER=1",
                     "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
+                    "-s", "EXPORT_ES6=1",
+                    "-s", "MODULARIZE=1",
+                    "-s", "EXPORT_NAME=loadSkikoWASM",
+                    "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
                     "--bind",
                     // -O2 saves 800kB for the output file, and ~100kB for transferred size.
                     // -O3 breaks the exports in js/mjs files. skiko.wasm size is the same though
@@ -123,10 +127,6 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
             if (outputES6) {
                 addAll(
                     listOf(
-                        "-s", "EXPORT_ES6=1",
-                        "-s", "MODULARIZE=1",
-                        "-s", "EXPORT_NAME=loadSkikoWASM",
-                        "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
                         // "-s", "EXPORT_ALL=1",
                     )
                 )
