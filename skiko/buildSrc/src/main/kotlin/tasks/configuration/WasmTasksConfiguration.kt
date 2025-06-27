@@ -122,16 +122,10 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
                     "-O2"
                 )
             )
+
             addAll(listOf("-s", "SUPPORT_LONGJMP=wasm"))
-            if (outputES6) {
-                addAll(
-                    listOf(
-                        // "-s", "EXPORT_ALL=1",
-                    )
-                )
-                if (isForD8) {
-                    addAll(listOf("-s", "ENVIRONMENT=shell"))
-                }
+            if (outputES6 && isForD8) {
+                addAll(listOf("-s", "ENVIRONMENT=shell"))
             }
 
             if (skiko.isWasmBuildWithProfiling) add("--profiling")
