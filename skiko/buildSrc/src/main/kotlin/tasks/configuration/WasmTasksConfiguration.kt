@@ -85,16 +85,15 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
             include("**/*.o")
         }
 
-        val wasmFileName = if (outputES6) {
-            if (isForD8) "skikod8.wasm" else "skikomjs.wasm"
+        val jsFileNamePrefix = if (outputES6) {
+            if (isForD8) "skikod8" else "skikomjs"
         } else {
-            "skiko.wasm" // to keep it compatible with older apps
+            "skiko"
         }
-        val jsFileName = if (outputES6) {
-            if (isForD8) "skikod8.mjs" else "skikomjs.mjs"
-        } else {
-            "skiko.js" // to keep it compatible with older apps
-        }
+
+        val wasmFileName = jsFileNamePrefix + ".wasm"
+        val jsFileName = jsFileNamePrefix + if (outputES6) ".mjs" else ".js"
+
         libOutputFileName.set(wasmFileName) // emcc ignores this, it names .wasm file identically to js output
         jsOutputFileName.set(jsFileName) // this determines the name .wasm file too
 
