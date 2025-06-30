@@ -78,14 +78,11 @@ val deleteGithubRelease by tasks.registering {
 val uploadSkikoArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::class) {
     dependsOn(downloadSkikoArtifactsFromComposeDev)
 
-    stagingDescription.set("Skiko ${skiko.deployVersion}")
+    deployName.set("Skiko ${skiko.deployVersion}")
     modulesToUpload.set(skikoMavenModules(skiko.deployVersion))
 
-    sonatypeServer.set("https://oss.sonatype.org")
     user.set(mavenCentral.user)
-    password.set(mavenCentral.password)
-    autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
-    stagingProfileName.set("org.jetbrains.skiko")
+    token.set(mavenCentral.token)
 }
 
 fun Project.skikoMavenModules(version: String): Provider<List<ModuleToUpload>> =
