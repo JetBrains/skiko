@@ -346,11 +346,7 @@ enum class ColorType {
      */
     val isAlwaysOpaque: Boolean
         get() {
-            return _nIsAlwaysOpaque(ordinal)
+            return ColorType_nIsAlwaysOpaque(ordinal)
         }
 
 }
-
-@ExternalSymbolName("org_jetbrains_skia_ColorType__1nIsAlwaysOpaque")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorType__1nIsAlwaysOpaque")
-private external fun _nIsAlwaysOpaque(value: Int): Boolean
