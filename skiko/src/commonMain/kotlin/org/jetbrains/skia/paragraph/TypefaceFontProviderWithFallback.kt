@@ -1,10 +1,9 @@
 package org.jetbrains.skia.paragraph
 
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.FontMgr
-import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.Typeface
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Library
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
@@ -13,7 +12,7 @@ class TypefaceFontProviderWithFallback private constructor(
     ptr: NativePointer,
 ) : TypefaceFontProvider(ptr) {
 
-    constructor() : this(_nMakeAsFallbackProvider())
+    constructor() : this(TypefaceFontProviderWithFallback_nMakeAsFallbackProvider())
 
     companion object {
         init {
@@ -25,7 +24,7 @@ class TypefaceFontProviderWithFallback private constructor(
         return try {
             Stats.onNativeCall()
             interopScope {
-                _nRegisterTypefaceForFallback(
+                TypefaceFontProviderWithFallback_nRegisterTypefaceForFallback(
                     _ptr,
                     getPtr(typeface),
                     toInterop(alias)
@@ -42,15 +41,3 @@ class TypefaceFontProviderWithFallback private constructor(
         Stats.onNativeCall()
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallback__1nMakeAsFallbackProvider")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallback__1nMakeAsFallbackProvider")
-private external fun _nMakeAsFallbackProvider(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallback__1nRegisterTypefaceForFallback")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallback__1nRegisterTypefaceForFallback")
-private external fun _nRegisterTypefaceForFallback(
-    ptr: NativePointer,
-    typefacePtr: NativePointer,
-    alias: InteropPointer
-): Int
