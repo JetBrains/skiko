@@ -8,7 +8,7 @@ fun Image.Companion.makeFromEncoded(nsData: NSData): Image {
     require(ptr != NativePtr.NULL) { "Failed to Image::makeFromEncoded" }
 
     // skia makes an internal copy of the nsData bytes
-    val imgPtr = _nMakeFromEncoded(ptr, nsData.length.toInt())
+    val imgPtr = Image_nMakeFromEncoded(ptr, nsData.length.toInt())
     require(imgPtr != NativePtr.NULL) { "Failed to Image::makeFromEncoded" }
     return Image(imgPtr)
 }
