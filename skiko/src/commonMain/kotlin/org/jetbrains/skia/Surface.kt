@@ -1,8 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skiko.RenderException
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class Surface : RefCnt {
     companion object {
@@ -52,7 +56,7 @@ class Surface : RefCnt {
             return try {
                 Stats.onNativeCall()
                 val ptr = interopScope {
-                    _nMakeRasterDirectWithPixmap(
+                    Surface_nMakeRasterDirectWithPixmap(
                         getPtr(pixmap), toInterop(surfaceProps?.packToIntArray())
                     )
                 }
@@ -103,7 +107,7 @@ class Surface : RefCnt {
             return try {
                 Stats.onNativeCall()
                 val ptr = interopScope {
-                    _nMakeRasterDirect(
+                    Surface_nMakeRasterDirect(
                         imageInfo.width,
                         imageInfo.height,
                         imageInfo.colorInfo.colorType.ordinal,
@@ -204,7 +208,7 @@ class Surface : RefCnt {
             return try {
                 Stats.onNativeCall()
                 val ptr = interopScope {
-                    _nMakeRaster(
+                    Surface_nMakeRaster(
                         imageInfo.width,
                         imageInfo.height,
                         imageInfo.colorInfo.colorType.ordinal,
@@ -278,7 +282,7 @@ class Surface : RefCnt {
             return try {
                 Stats.onNativeCall()
                 val ptr = interopScope {
-                    _nMakeFromBackendRenderTarget(
+                    Surface_nMakeFromBackendRenderTarget(
                         getPtr(context),
                         getPtr(rt),
                         origin.ordinal,
@@ -310,7 +314,7 @@ class Surface : RefCnt {
             return try {
                 Stats.onNativeCall()
                 val ptr = interopScope {
-                    _nMakeFromMTKView(
+                    Surface_nMakeFromMTKView(
                         getPtr(context),
                         mtkViewPtr,
                         origin.ordinal,
@@ -355,7 +359,7 @@ class Surface : RefCnt {
          */
         fun makeRasterN32Premul(width: Int, height: Int): Surface {
             Stats.onNativeCall()
-            val ptr = _nMakeRasterN32Premul(width, height)
+            val ptr = Surface_nMakeRasterN32Premul(width, height)
             require(ptr != NullPointer) { "Failed Surface.makeRasterN32Premul($width, $height)" }
             return Surface(ptr)
         }
@@ -494,7 +498,7 @@ class Surface : RefCnt {
             return try {
                 Stats.onNativeCall()
                 val ptr = interopScope {
-                    _nMakeRenderTarget(
+                    Surface_nMakeRenderTarget(
                         getPtr(context),
                         budgeted,
                         imageInfo.width,
@@ -530,7 +534,7 @@ class Surface : RefCnt {
          */
         fun makeNull(width: Int, height: Int): Surface {
             Stats.onNativeCall()
-            val ptr = _nMakeNull(width, height)
+            val ptr = Surface_nMakeNull(width, height)
             require(ptr != NullPointer) { "Failed Surface.makeNull($width, $height)" }
             return Surface(ptr)
         }
@@ -603,7 +607,7 @@ class Surface : RefCnt {
     val generationId: Int
         get() = try {
             Stats.onNativeCall()
-            _nGenerationId(_ptr)
+            Surface_nGenerationId(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -620,7 +624,7 @@ class Surface : RefCnt {
     fun notifyContentWillChange(mode: ContentChangeMode) {
         try {
             Stats.onNativeCall()
-            _nNotifyContentWillChange(_ptr, mode.ordinal)
+            Surface_nNotifyContentWillChange(_ptr, mode.ordinal)
         } finally {
             reachabilityBarrier(this)
         }
@@ -635,7 +639,7 @@ class Surface : RefCnt {
     val recordingContext: DirectContext?
         get() = try {
             Stats.onNativeCall()
-            val ptr = _nGetRecordingContext(_ptr)
+            val ptr = Surface_nGetRecordingContext(_ptr)
             if (ptr == NullPointer) null else DirectContext(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -654,7 +658,7 @@ class Surface : RefCnt {
     val canvas: Canvas
         get() = try {
             Stats.onNativeCall()
-            val ptr = _nGetCanvas(_ptr)
+            val ptr = Surface_nGetCanvas(_ptr)
             if (ptr == NullPointer) throw IllegalArgumentException() else Canvas(ptr, false, this)
         } finally {
             reachabilityBarrier(this)
@@ -678,7 +682,7 @@ class Surface : RefCnt {
     fun makeSurface(imageInfo: ImageInfo): Surface? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nMakeSurfaceI(
+            val ptr = Surface_nMakeSurfaceI(
                 _ptr,
                 imageInfo.width,
                 imageInfo.height,
@@ -712,7 +716,7 @@ class Surface : RefCnt {
     fun makeSurface(width: Int, height: Int): Surface? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nMakeSurface(_ptr, width, height)
+            val ptr = Surface_nMakeSurface(_ptr, width, height)
             Surface(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -733,7 +737,7 @@ class Surface : RefCnt {
     fun makeImageSnapshot(): Image {
         return try {
             Stats.onNativeCall()
-            Image(_nMakeImageSnapshot(_ptr))
+            Image(Surface_nMakeImageSnapshot(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -760,7 +764,7 @@ class Surface : RefCnt {
         return try {
             Stats.onNativeCall()
             Image(
-                _nMakeImageSnapshotR(
+                Surface_nMakeImageSnapshotR(
                     _ptr,
                     area.left,
                     area.top,
@@ -807,7 +811,7 @@ class Surface : RefCnt {
     fun draw(canvas: Canvas?, x: Int, y: Int, samplingMode: SamplingMode, paint: Paint?) {
         try {
             Stats.onNativeCall()
-            _nDraw(_ptr, getPtr(canvas), x.toFloat(), y.toFloat(), samplingMode._packedInt1(), samplingMode._packedInt2(), getPtr(paint))
+            Surface_nDraw(_ptr, getPtr(canvas), x.toFloat(), y.toFloat(), samplingMode._packedInt1(), samplingMode._packedInt2(), getPtr(paint))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(canvas)
@@ -818,7 +822,7 @@ class Surface : RefCnt {
     fun peekPixels(pixmap: Pixmap): Boolean {
         return try {
             Stats.onNativeCall()
-            _nPeekPixels(
+            Surface_nPeekPixels(
                 _ptr,
                 getPtr(pixmap)
             )
@@ -831,7 +835,7 @@ class Surface : RefCnt {
     fun readPixels(pixmap: Pixmap?, srcX: Int, srcY: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            _nReadPixelsToPixmap(
+            Surface_nReadPixelsToPixmap(
                 _ptr,
                 getPtr(pixmap),
                 srcX,
@@ -901,7 +905,7 @@ class Surface : RefCnt {
     fun writePixels(pixmap: Pixmap?, x: Int, y: Int) {
         try {
             Stats.onNativeCall()
-            _nWritePixelsFromPixmap(_ptr, getPtr(pixmap), x, y)
+            Surface_nWritePixelsFromPixmap(_ptr, getPtr(pixmap), x, y)
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(pixmap)
@@ -981,7 +985,7 @@ class Surface : RefCnt {
     val isUnique: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nUnique(_ptr)
+            Surface_nUnique(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -1001,162 +1005,3 @@ class Surface : RefCnt {
         _renderTarget = renderTarget
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetWidth")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nGetWidth")
-private external fun Surface_nGetWidth(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetHeight")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nGetHeight")
-private external fun Surface_nGetHeight(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetImageInfo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nGetImageInfo")
-private external fun Surface_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixels")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nReadPixels")
-private external fun Surface_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixels")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nWritePixels")
-private external fun Surface_nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeRasterDirect")
-private external fun _nMakeRasterDirect(
-    width: Int,
-    height: Int,
-    colorType: Int,
-    alphaType: Int,
-    colorSpacePtr: NativePointer,
-    pixelsPtr: NativePointer,
-    rowBytes: Int,
-    surfaceProps: InteropPointer
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap")
-private external fun _nMakeRasterDirectWithPixmap(pixmapPtr: NativePointer, surfaceProps: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRaster")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeRaster")
-private external fun _nMakeRaster(
-    width: Int,
-    height: Int,
-    colorType: Int,
-    alphaType: Int,
-    colorSpacePtr: NativePointer,
-    rowBytes: Int,
-    surfaceProps: InteropPointer
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterN32Premul")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeRasterN32Premul")
-private external fun _nMakeRasterN32Premul(width: Int, height: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget")
-private external fun _nMakeFromBackendRenderTarget(
-    pContext: NativePointer,
-    pBackendRenderTarget: NativePointer,
-    surfaceOrigin: Int,
-    colorType: Int,
-    colorSpacePtr: NativePointer,
-    surfaceProps: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromMTKView")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeFromMTKView")
-private external fun _nMakeFromMTKView(
-    contextPtr: NativePointer,
-    mtkViewPtr: NativePointer,
-    surfaceOrigin: Int,
-    sampleCount: Int,
-    colorType: Int,
-    colorSpacePtr: NativePointer,
-    surfaceProps: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRenderTarget")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeRenderTarget")
-private external fun _nMakeRenderTarget(
-    contextPtr: NativePointer,
-    budgeted: Boolean,
-    width: Int,
-    height: Int,
-    colorType: Int,
-    alphaType: Int,
-    colorSpacePtr: NativePointer,
-    sampleCount: Int,
-    surfaceOrigin: Int,
-    surfaceProps: InteropPointer,
-    shouldCreateWithMips: Boolean
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeNull")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeNull")
-private external fun _nMakeNull(width: Int, height: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nGenerationId")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nGenerationId")
-private external fun _nGenerationId(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nNotifyContentWillChange")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nNotifyContentWillChange")
-private external fun _nNotifyContentWillChange(ptr: NativePointer, mode: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetRecordingContext")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nGetRecordingContext")
-private external fun _nGetRecordingContext(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetCanvas")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nGetCanvas")
-private external fun _nGetCanvas(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurfaceI")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeSurfaceI")
-private external fun _nMakeSurfaceI(
-    ptr: NativePointer,
-    width: Int,
-    height: Int,
-    colorType: Int,
-    alphaType: Int,
-    colorSpacePtr: NativePointer
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurface")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeSurface")
-private external fun _nMakeSurface(ptr: NativePointer, width: Int, height: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshot")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeImageSnapshot")
-private external fun _nMakeImageSnapshot(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshotR")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nMakeImageSnapshotR")
-private external fun _nMakeImageSnapshotR(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nDraw")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nDraw")
-private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float, samplingModeValue1: Int, samplingModeValue2: Int, paintPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nPeekPixels")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nPeekPixels")
-private external fun _nPeekPixels(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixelsToPixmap")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nReadPixelsToPixmap")
-private external fun _nReadPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
-private external fun _nWritePixelsFromPixmap(ptr: NativePointer, pixmapPtr: NativePointer, x: Int, y: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nUnique")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Surface__1nUnique")
-private external fun _nUnique(ptr: NativePointer): Boolean
