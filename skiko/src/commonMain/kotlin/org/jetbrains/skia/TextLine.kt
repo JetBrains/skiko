@@ -1,7 +1,15 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
-import org.jetbrains.skia.shaper.*
+import org.jetbrains.skia.impl.Library
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.impl.withResult
+import org.jetbrains.skia.shaper.Shaper
+import org.jetbrains.skia.shaper.ShapingOptions
+
 
 class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -29,7 +37,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetAscent(_ptr)
+                TextLine_nGetAscent(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -42,7 +50,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetCapHeight(_ptr)
+                TextLine_nGetCapHeight(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -55,7 +63,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetXHeight(_ptr)
+                TextLine_nGetXHeight(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -68,7 +76,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetDescent(_ptr)
+                TextLine_nGetDescent(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -81,7 +89,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetLeading(_ptr)
+                TextLine_nGetLeading(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -111,7 +119,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                val res = _nGetTextBlob(_ptr)
+                val res = TextLine_nGetTextBlob(_ptr)
                 if (res == NullPointer) null else TextBlob(res)
             } finally {
                 reachabilityBarrier(this)
@@ -160,8 +168,8 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                withResult(FloatArray(_nGetRunPositionsCount(_ptr))) {
-                    _nGetRunPositions(_ptr, it)
+                withResult(FloatArray(TextLine_nGetRunPositionsCount(_ptr))) {
+                    TextLine_nGetRunPositions(_ptr, it)
                 }
             } finally {
                 reachabilityBarrier(this)
@@ -172,8 +180,8 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                withResult(FloatArray(_nGetBreakPositionsCount(_ptr))) {
-                    _nGetBreakPositions(_ptr, it)
+                withResult(FloatArray(TextLine_nGetBreakPositionsCount(_ptr))) {
+                    TextLine_nGetBreakPositions(_ptr, it)
                 }
             } finally {
                 reachabilityBarrier(this)
@@ -184,8 +192,8 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                withResult(IntArray(_nGetBreakOffsetsCount(_ptr))) {
-                    _nGetBreakOffsets(_ptr, it)
+                withResult(IntArray(TextLine_nGetBreakOffsetsCount(_ptr))) {
+                    TextLine_nGetBreakOffsets(_ptr, it)
                 }
             } finally {
                 reachabilityBarrier(this)
@@ -199,7 +207,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     fun getOffsetAtCoord(x: Float): Int {
         return try {
             Stats.onNativeCall()
-            _nGetOffsetAtCoord(_ptr, x)
+            TextLine_nGetOffsetAtCoord(_ptr, x)
         } finally {
             reachabilityBarrier(this)
         }
@@ -212,7 +220,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     fun getLeftOffsetAtCoord(x: Float): Int {
         return try {
             Stats.onNativeCall()
-            _nGetLeftOffsetAtCoord(_ptr, x)
+            TextLine_nGetLeftOffsetAtCoord(_ptr, x)
         } finally {
             reachabilityBarrier(this)
         }
@@ -225,7 +233,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     fun getCoordAtOffset(offset: Int): Float {
         return try {
             Stats.onNativeCall()
-            _nGetCoordAtOffset(_ptr, offset)
+            TextLine_nGetCoordAtOffset(_ptr, offset)
         } finally {
             reachabilityBarrier(this)
         }
@@ -267,88 +275,3 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         }
     }
 }
-
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetFinalizer")
-private external fun TextLine_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetWidth")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetWidth")
-private external fun TextLine_nGetWidth(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetHeight")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetHeight")
-private external fun TextLine_nGetHeight(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphsLength")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetGlyphsLength")
-private external fun TextLine_nGetGlyphsLength(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphs")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetGlyphs")
-private external fun TextLine_nGetGlyphs(ptr: NativePointer, resultGlyphs: InteropPointer, resultLength: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetPositions")
-private external fun TextLine_nGetPositions(ptr: NativePointer, resultArray: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetAscent")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetAscent")
-private external fun _nGetAscent(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCapHeight")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetCapHeight")
-private external fun _nGetCapHeight(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetXHeight")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetXHeight")
-private external fun _nGetXHeight(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetDescent")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetDescent")
-private external fun _nGetDescent(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeading")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetLeading")
-private external fun _nGetLeading(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetTextBlob")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetTextBlob")
-private external fun _nGetTextBlob(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositions")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetRunPositions")
-private external fun _nGetRunPositions(ptr: NativePointer, resultArray: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositionsCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetRunPositionsCount")
-private external fun _nGetRunPositionsCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositionsCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetBreakPositionsCount")
-private external fun _nGetBreakPositionsCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositions")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetBreakPositions")
-private external fun _nGetBreakPositions(ptr: NativePointer, result: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsetsCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetBreakOffsetsCount")
-private external fun _nGetBreakOffsetsCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsets")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetBreakOffsets")
-private external fun _nGetBreakOffsets(ptr: NativePointer, result: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
-private external fun _nGetOffsetAtCoord(ptr: NativePointer, x: Float): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord")
-private external fun _nGetLeftOffsetAtCoord(ptr: NativePointer, x: Float): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCoordAtOffset")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextLine__1nGetCoordAtOffset")
-private external fun _nGetCoordAtOffset(ptr: NativePointer, offset: Int): Float
