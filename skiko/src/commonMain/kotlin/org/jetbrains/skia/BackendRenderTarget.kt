@@ -9,6 +9,13 @@ import org.jetbrains.skiko.loadOpenGLLibrary
 
 class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
+        /**
+         * Creates BackendRenderTarget from GL framebuffer.
+         *
+         * @param stencilBits If wrapping in a Surface we require them to be either 0, 8 or 16.
+         *
+         * @throws RenderException if returned nullptr
+         */
         fun makeGL(
             width: Int,
             height: Int,
@@ -37,7 +44,7 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
          * @param width         width of the render target in pixels
          * @param height        height of the render target in pixels
          * @param texturePtr    pointer to ID3D12Resource texture resource object; must be not zero
-         * @param format        pixel data DXGI_FORMAT fromat of the texturePtr resource
+         * @param format        pixel data DXGI_FORMAT format of the texturePtr resource
          * @param sampleCnt     samples count for texture resource
          * @param levelCnt      sampling quality level for texture resource
          */
