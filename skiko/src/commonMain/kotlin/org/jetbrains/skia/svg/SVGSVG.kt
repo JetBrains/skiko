@@ -1,10 +1,11 @@
 package org.jetbrains.skia.svg
 
+import org.jetbrains.skia.Point
+import org.jetbrains.skia.Rect
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.*
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     companion object {

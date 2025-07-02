@@ -1,11 +1,10 @@
 package org.jetbrains.skia.svg
 
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.WStream
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
-import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 

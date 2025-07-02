@@ -23,14 +23,6 @@ expect annotation class ExternalSymbolName(val name: String)
 
 @OptIn(ExperimentalMultiplatform::class)
 @OptionalExpectation
-@Target(AnnotationTarget.FUNCTION)
-expect annotation class ModuleImport(
-    val module: String,
-    val name: String
-)
-
-@OptIn(ExperimentalMultiplatform::class)
-@OptionalExpectation
 @Target(AnnotationTarget.FILE)
 expect annotation class QuasiJsModule(
     val import: String,

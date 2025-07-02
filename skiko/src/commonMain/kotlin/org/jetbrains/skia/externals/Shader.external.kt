@@ -169,5 +169,4 @@ internal external fun Shader_nMakeColorCS(r: Float, g: Float, b: Float, a: Float
 internal external fun Shader_nMakeBlend(blendMode: Int, dst: NativePointer, src: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithLocalMatrix")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeWithLocalMatrix")
 internal external fun Shader_nMakeWithLocalMatrix(ptr: NativePointer, localMatrix: InteropPointer): NativePointer
