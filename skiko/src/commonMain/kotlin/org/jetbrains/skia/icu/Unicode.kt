@@ -1,6 +1,5 @@
 package org.jetbrains.skia.icu
 
-import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Stats
 
@@ -47,7 +46,7 @@ object CharDirection {
      */
     fun of(codePoint: Int): Int {
         Stats.onNativeCall()
-        return _nCharDirection(codePoint)
+        return Unicode_nCharDirection(codePoint)
     }
 }
 
@@ -181,15 +180,6 @@ object CharProperties {
      */
     fun codePointHasBinaryProperty(codePoint: Int, property: Int): Boolean {
         Stats.onNativeCall()
-        return _nCodePointHasBinaryProperty(codePoint, property)
+        return Unicode_nCodePointHasBinaryProperty(codePoint, property)
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCharDirection")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_icu_Unicode__1nCharDirection")
-private external fun _nCharDirection(codePoint: Int): Int
-
-@ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCodePointHasBinaryProperty")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_icu_Unicode__1nCodePointHasBinaryProperty")
-private external fun _nCodePointHasBinaryProperty(codePoint: Int, property: Int): Boolean
-

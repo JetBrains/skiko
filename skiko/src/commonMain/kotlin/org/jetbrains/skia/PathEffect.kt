@@ -1,7 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -9,7 +14,7 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 PathEffect(
-                    _nMakePath1D(
+                    PathEffect_nMakePath1D(
                         getPtr(path),
                         advance,
                         phase,
@@ -26,7 +31,7 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 PathEffect(
                     interopScope {
-                        _nMakePath2D(
+                        PathEffect_nMakePath2D(
                             toInterop(matrix.mat),
                             getPtr(path)
                         )
@@ -41,28 +46,28 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             Stats.onNativeCall()
             return PathEffect(
                 interopScope {
-                    _nMakeLine2D(width, toInterop(matrix.mat))
+                    PathEffect_nMakeLine2D(width, toInterop(matrix.mat))
                 }
             )
         }
 
         fun makeCorner(radius: Float): PathEffect {
             Stats.onNativeCall()
-            return PathEffect(_nMakeCorner(radius))
+            return PathEffect(PathEffect_nMakeCorner(radius))
         }
 
         fun makeDash(intervals: FloatArray, phase: Float): PathEffect {
             Stats.onNativeCall()
             return PathEffect(
                 interopScope {
-                    _nMakeDash(toInterop(intervals), intervals.size, phase)
+                    PathEffect_nMakeDash(toInterop(intervals), intervals.size, phase)
                 }
             )
         }
 
         fun makeDiscrete(segLength: Float, dev: Float, seed: Int): PathEffect {
             Stats.onNativeCall()
-            return PathEffect(_nMakeDiscrete(segLength, dev, seed))
+            return PathEffect(PathEffect_nMakeDiscrete(segLength, dev, seed))
         }
 
         init {
@@ -84,7 +89,7 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun makeSum(second: PathEffect?): PathEffect {
         return try {
             Stats.onNativeCall()
-            PathEffect(_nMakeSum(_ptr, getPtr(second)))
+            PathEffect(PathEffect_nMakeSum(_ptr, getPtr(second)))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(second)
@@ -101,35 +106,3 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeCompose")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathEffect__1nMakeCompose")
-private external fun PathEffect_nMakeCompose(outerPtr: NativePointer, innerPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeSum")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathEffect__1nMakeSum")
-private external fun _nMakeSum(firstPtr: NativePointer, secondPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakePath1D")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathEffect__1nMakePath1D")
-private external fun _nMakePath1D(pathPtr: NativePointer, advance: Float, phase: Float, style: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakePath2D")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathEffect__1nMakePath2D")
-private external fun _nMakePath2D(matrix: InteropPointer, pathPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeLine2D")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathEffect__1nMakeLine2D")
-private external fun _nMakeLine2D(width: Float, matrix: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeCorner")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathEffect__1nMakeCorner")
-private external fun _nMakeCorner(radius: Float): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeDash")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathEffect__1nMakeDash")
-private external fun _nMakeDash(intervals: InteropPointer, count: Int, phase: Float): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeDiscrete")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathEffect__1nMakeDiscrete")
-private external fun _nMakeDiscrete(segLength: Float, dev: Float, seed: Int): NativePointer

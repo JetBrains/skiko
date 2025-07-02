@@ -4,8 +4,6 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 
@@ -20,7 +18,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
         try {
             _validate()
             Stats.onNativeCall()
-            _nAbandon(_ptr)
+            ParagraphCache_nAbandon(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -30,7 +28,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
         try {
             _validate()
             Stats.onNativeCall()
-            _nReset(_ptr)
+            ParagraphCache_nReset(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -40,7 +38,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
         return try {
             _validate()
             Stats.onNativeCall()
-            _nUpdateParagraph(_ptr, getPtr(paragraph))
+            ParagraphCache_nUpdateParagraph(_ptr, getPtr(paragraph))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(paragraph)
@@ -51,7 +49,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
         return try {
             _validate()
             Stats.onNativeCall()
-            _nFindParagraph(_ptr, getPtr(paragraph))
+            ParagraphCache_nFindParagraph(_ptr, getPtr(paragraph))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(paragraph)
@@ -62,7 +60,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
         try {
             _validate()
             Stats.onNativeCall()
-            _nPrintStatistics(_ptr, NullPointer)
+            ParagraphCache_nPrintStatistics(_ptr, NullPointer)
         } finally {
             reachabilityBarrier(this)
         }
@@ -72,7 +70,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
         try {
             _validate()
             Stats.onNativeCall()
-            _nSetEnabled(_ptr, value)
+            ParagraphCache_nSetEnabled(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }
@@ -82,7 +80,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
         get() = try {
             _validate()
             Stats.onNativeCall()
-            _nGetCount(_ptr)
+            ParagraphCache_nGetCount(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -100,31 +98,3 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
         _owner = owner
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nAbandon")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphCache__1nAbandon")
-private external fun _nAbandon(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nReset")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphCache__1nReset")
-private external fun _nReset(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nUpdateParagraph")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphCache__1nUpdateParagraph")
-private external fun _nUpdateParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nFindParagraph")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphCache__1nFindParagraph")
-private external fun _nFindParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nPrintStatistics")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphCache__1nPrintStatistics")
-private external fun _nPrintStatistics(ptr: NativePointer, paragraphPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nSetEnabled")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphCache__1nSetEnabled")
-private external fun _nSetEnabled(ptr: NativePointer, value: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nGetCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphCache__1nGetCount")
-private external fun _nGetCount(ptr: NativePointer): Int

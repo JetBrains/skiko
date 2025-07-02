@@ -1,8 +1,5 @@
 package org.jetbrains.skia.impl
 
-import org.jetbrains.skia.ModuleImport
-import org.jetbrains.skia.ExternalSymbolName
-
 actual abstract class Native actual constructor(ptr: NativePointer) {
     actual var _ptr: NativePointer
 
@@ -53,16 +50,6 @@ internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
         }
     }
 }
-
-
-// Those functions are defined by Emscripten.
-@ExternalSymbolName("_malloc")
-@ModuleImport("./skiko.mjs", "malloc")
-internal external fun _malloc(size: Int): NativePointer
-
-@ExternalSymbolName("_free")
-@ModuleImport("./skiko.mjs", "free")
-internal external fun _free(ptr: NativePointer)
 
 // Data copying routines.
 internal expect fun toWasm(dest: NativePointer, src: ByteArray)

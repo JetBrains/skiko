@@ -1,6 +1,5 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.paragraph.TypefaceFontProviderWithFallback
 
 /**
@@ -12,8 +11,4 @@ import org.jetbrains.skia.paragraph.TypefaceFontProviderWithFallback
  */
 class FontMgrWithFallback(
     fallbackProvider: TypefaceFontProviderWithFallback
-) : FontMgr(_nDefaultWithFallbackFontProvider(fallbackProvider._ptr))
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgrWithFallback__1nDefaultWithFallbackFontProvider")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgrWithFallback__1nDefaultWithFallbackFontProvider")
-private external fun _nDefaultWithFallbackFontProvider(fallbackPtr: NativePointer): NativePointer
+) : FontMgr(FontMgrWithFallback_nDefaultWithFallbackFontProvider(fallbackProvider._ptr))

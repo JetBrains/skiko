@@ -8,11 +8,11 @@ internal actual fun Drawable.doInit(ptr: NativePointer) {
     Stats.onNativeCall()
     interopScope {
         val onDrawCallback = virtual {
-            onDraw(Canvas(_nGetOnDrawCanvas(_ptr), false, this))
+            onDraw(Canvas(Drawable_nGetOnDrawCanvas(_ptr), false, this))
         }
         val onGetBoundsCallback = virtual {
             val bounds = onGetBounds()
-            _nSetBounds(_ptr, bounds.left, bounds.top, bounds.right, bounds.bottom)
+            Drawable_nSetBounds(_ptr, bounds.left, bounds.top, bounds.right, bounds.bottom)
         }
         Drawable_nInit(_ptr, onGetBoundsCallback, onDrawCallback)
     }

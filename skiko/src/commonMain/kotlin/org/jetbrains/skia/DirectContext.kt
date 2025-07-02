@@ -10,14 +10,14 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
             loadOpenGLLibrary()
-            val ptr = _nMakeGL()
+            val ptr = DirectContext_nMakeGL()
             if (ptr == NullPointer) throw RenderException("Can't create OpenGL DirectContext")
             return DirectContext(ptr)
         }
 
         fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
             Stats.onNativeCall()
-            return DirectContext(_nMakeMetal(devicePtr, queuePtr))
+            return DirectContext(DirectContext_nMakeMetal(devicePtr, queuePtr))
         }
 
         /**
@@ -35,7 +35,7 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          */
         fun makeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
             Stats.onNativeCall()
-            return DirectContext(_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
+            return DirectContext(DirectContext_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
         }
 
         init {
@@ -57,13 +57,13 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
     fun resetAll(): DirectContext {
         Stats.onNativeCall()
-        _nReset(_ptr, -1)
+        DirectContext_nReset(_ptr, -1)
         return this
     }
 
     fun resetGLAll(): DirectContext {
         Stats.onNativeCall()
-        _nReset(_ptr, 0xffff)
+        DirectContext_nReset(_ptr, 0xffff)
         return this
     }
 
@@ -71,7 +71,7 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         Stats.onNativeCall()
         var flags = 0
         for (state in states) flags = flags or state._bit
-        _nReset(_ptr, flags)
+        DirectContext_nReset(_ptr, flags)
         return this
     }
 
@@ -87,13 +87,13 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      */
     fun submit(syncCpu: Boolean) {
         Stats.onNativeCall()
-        _nSubmit(_ptr, syncCpu)
+        DirectContext_nSubmit(_ptr, syncCpu)
     }
 
     fun flushAndSubmit(surface: Surface, syncCpu: Boolean = false) {
         try {
             Stats.onNativeCall()
-            _nFlushAndSubmit(_ptr, surface._ptr, syncCpu)
+            DirectContext_nFlushAndSubmit(_ptr, surface._ptr, syncCpu)
         } finally {
             reachabilityBarrier(this)
         }
@@ -122,7 +122,7 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun abandon() {
         try {
             Stats.onNativeCall()
-            _nAbandon(_ptr, 0)
+            DirectContext_nAbandon(_ptr, 0)
         } finally {
             reachabilityBarrier(this)
         }
@@ -132,39 +132,3 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
     block(this).also { abandon() }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlush")
-private external fun DirectContext_nFlush(ptr: NativePointer, surfacePtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushDefault")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlushDefault")
-private external fun DirectContext_nFlushDefault(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGL")
-private external fun _nMakeGL(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeMetal")
-private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeDirect3D")
-private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nSubmit")
-private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushAndSubmit")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlushAndSubmit")
-private external fun _nFlushAndSubmit(ptr: NativePointer, surfacePtr: NativePointer, syncCpu: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nReset")
-private external fun _nReset(ptr: NativePointer, flags: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nAbandon")
-private external fun _nAbandon(ptr: NativePointer, flags: Int)

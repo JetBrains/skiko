@@ -1,21 +1,27 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.NativePointerArray
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         fun makeForShader(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
             return interopScope {
-                makeFromResultPtr(_nMakeForShader(toInterop(sksl)))
+                makeFromResultPtr(RuntimeEffect_nMakeForShader(toInterop(sksl)))
             }
         }
 
         fun makeForColorFilter(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
             return interopScope {
-                makeFromResultPtr(_nMakeForColorFilter(toInterop(sksl)))
+                makeFromResultPtr(RuntimeEffect_nMakeForColorFilter(toInterop(sksl)))
             }
         }
 
@@ -34,7 +40,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         val matrix = localMatrix?.mat
         return try {
             interopScope {
-                Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), childCount, toInterop(matrix)))
+                Shader(RuntimeEffect_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), childCount, toInterop(matrix)))
             }
         } finally {
             reachabilityBarrier(this)
@@ -45,33 +51,3 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 internal expect fun RuntimeEffect.Companion.makeFromResultPtr(ptr: NativePointer): RuntimeEffect
-
-@ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_RuntimeEffect__1nMakeShader")
-private external fun _nMakeShader(
-    runtimeEffectPtr: NativePointer, uniformPtr: NativePointer, childrenPtrs: InteropPointer,
-    childCount: Int, localMatrix: InteropPointer
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForShader")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_RuntimeEffect__1nMakeForShader")
-private external fun _nMakeForShader(sksl: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter")
-private external fun _nMakeForColorFilter(sksl: InteropPointer): NativePointer
-
-//  The functions below can be used only in JS and native targets
-
-@ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1Result_nGetPtr")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_RuntimeEffect__1Result_nGetPtr")
-internal external fun Result_nGetPtr(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1Result_nGetError")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_RuntimeEffect__1Result_nGetError")
-internal external fun Result_nGetError(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1Result_nDestroy")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_RuntimeEffect__1Result_nDestroy")
-internal external fun Result_nDestroy(ptr: NativePointer)

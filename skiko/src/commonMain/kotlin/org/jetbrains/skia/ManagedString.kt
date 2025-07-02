@@ -1,7 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withResult
 
 class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = true) : Managed(ptr, _FinalizerHolder.PTR, managed) {
     companion object {
@@ -11,7 +16,7 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
     }
 
     constructor(s: String?) : this(
-        interopScope {  _nMake(toInterop(s)) }
+        interopScope {  ManagedString_nMake(toInterop(s)) }
     ) {
         Stats.onNativeCall()
     }
@@ -19,9 +24,9 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
     override fun toString(): String {
         return try {
             Stats.onNativeCall()
-            val size = _nStringSize(_ptr)
+            val size = ManagedString_nStringSize(_ptr)
             withResult(ByteArray(size)) {
-                _nStringData(_ptr, it, size)
+                ManagedString_nStringData(_ptr, it, size)
             }.decodeToString()
         } finally {
             reachabilityBarrier(this)
@@ -31,7 +36,7 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
     fun insert(offset: Int, s: String): ManagedString {
         Stats.onNativeCall()
         interopScope {
-            _nInsert(_ptr, offset, toInterop(s))
+            ManagedString_nInsert(_ptr, offset, toInterop(s))
         }
         return this
     }
@@ -39,20 +44,20 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
     fun append(s: String): ManagedString {
         Stats.onNativeCall()
         interopScope {
-            _nAppend(_ptr, toInterop(s))
+            ManagedString_nAppend(_ptr, toInterop(s))
         }
         return this
     }
 
     fun remove(from: Int): ManagedString {
         Stats.onNativeCall()
-        _nRemoveSuffix(_ptr, from)
+        ManagedString_nRemoveSuffix(_ptr, from)
         return this
     }
 
     fun remove(from: Int, length: Int): ManagedString {
         Stats.onNativeCall()
-        _nRemove(_ptr, from, length)
+        ManagedString_nRemove(_ptr, from, length)
         return this
     }
 
@@ -60,35 +65,3 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
         val PTR = ManagedString_nGetFinalizer()
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ManagedString__1nGetFinalizer")
-internal external fun ManagedString_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ManagedString__1nMake")
-private external fun _nMake(s: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringSize")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ManagedString__nStringSize")
-private external fun _nStringSize(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ManagedString__nStringData")
-private external fun _nStringData(ptr: NativePointer, result: InteropPointer, size: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nInsert")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ManagedString__1nInsert")
-private external fun _nInsert(ptr: NativePointer, offset: Int, s: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nAppend")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ManagedString__1nAppend")
-private external fun _nAppend(ptr: NativePointer, s: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nRemoveSuffix")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ManagedString__1nRemoveSuffix")
-private external fun _nRemoveSuffix(ptr: NativePointer, from: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nRemove")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ManagedString__1nRemove")
-private external fun _nRemove(ptr: NativePointer, from: Int, length: Int)

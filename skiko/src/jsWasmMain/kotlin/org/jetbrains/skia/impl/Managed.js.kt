@@ -1,12 +1,9 @@
 package org.jetbrains.skia.impl
 
-import org.jetbrains.skia.ModuleImport
-import org.jetbrains.skia.ExternalSymbolName
-
 internal class FinalizationThunk(private val finalizer: NativePointer, private var obj: NativePointer) {
     fun clean() {
         if (obj != 0)
-            _nInvokeFinalizer(finalizer, obj)
+            Managed_nInvokeFinalizer(finalizer, obj)
         obj = 0
     }
 }
@@ -44,7 +41,3 @@ actual abstract class Managed actual constructor(ptr: NativePointer, finalizer: 
         }
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_impl_Managed__invokeFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_impl_Managed__invokeFinalizer")
-private external fun _nInvokeFinalizer(finalizer: NativePointer, obj: NativePointer)

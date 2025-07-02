@@ -1,7 +1,13 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.NativePointerArray
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -19,7 +25,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeArithmetic(
+                        ImageFilter_nMakeArithmetic(
                             k1,
                             k2,
                             k3,
@@ -42,7 +48,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeBlend(
+                        ImageFilter_nMakeBlend(
                             blendMode.ordinal,
                             getPtr(bg),
                             getPtr(fg),
@@ -67,7 +73,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeBlur(
+                        ImageFilter_nMakeBlur(
                             sigmaX,
                             sigmaY,
                             mode.ordinal,
@@ -86,7 +92,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeColorFilter(
+                        ImageFilter_nMakeColorFilter(
                             getPtr(f), getPtr(input),
                             toInterop(crop?.serializeToIntArray())
                         )
@@ -102,7 +108,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 ImageFilter(
-                    _nMakeCompose(
+                    ImageFilter_nMakeCompose(
                         getPtr(outer), getPtr(inner)
                     )
                 )
@@ -124,7 +130,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeDisplacementMap(
+                        ImageFilter_nMakeDisplacementMap(
                             x.ordinal,
                             y.ordinal,
                             scale,
@@ -153,7 +159,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeDropShadow(
+                        ImageFilter_nMakeDropShadow(
                             dx,
                             dy,
                             sigmaX,
@@ -182,7 +188,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeDropShadowOnly(
+                        ImageFilter_nMakeDropShadowOnly(
                             dx,
                             dy,
                             sigmaX,
@@ -207,7 +213,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 ImageFilter(
-                    _nMakeImage(
+                    ImageFilter_nMakeImage(
                         getPtr(image),
                         src.left,
                         src.top,
@@ -231,7 +237,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeMagnifier(
+                        ImageFilter_nMakeMagnifier(
                             r.left,
                             r.top,
                             r.right,
@@ -267,7 +273,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 ImageFilter(
                     interopScope {
-                        _nMakeMatrixConvolution(
+                        ImageFilter_nMakeMatrixConvolution(
                             kernelW,
                             kernelH,
                             toInterop(kernel),
@@ -292,7 +298,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 ImageFilter(
                     interopScope {
-                        _nMakeMatrixTransform(
+                        ImageFilter_nMakeMatrixTransform(
                             toInterop(matrix.mat),
                             mode._packedInt1(),
                             mode._packedInt2(),
@@ -312,7 +318,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                     val filterPtrs = NativePointerArray(filters.size)
                     for (i in filters.indices) filterPtrs[i] = getPtr(filters[i])
                     ImageFilter(
-                        _nMakeMerge(
+                        ImageFilter_nMakeMerge(
                             filters = toInterop(filterPtrs),
                             filtersLength = filters.size,
                             crop = toInterop(crop?.serializeToIntArray())
@@ -329,7 +335,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeOffset(
+                        ImageFilter_nMakeOffset(
                             dx, dy,
                             getPtr(input),
                             toInterop(crop?.serializeToIntArray())
@@ -346,7 +352,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeShader(
+                        ImageFilter_nMakeShader(
                             shader = getPtr(shader),
                             dither = dither,
                             crop = toInterop(crop?.serializeToIntArray())
@@ -363,7 +369,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeRuntimeShader(
+                        ImageFilter_nMakeRuntimeShader(
                             runtimeShaderBuilderPtr = getPtr(runtimeShaderBuilder),
                             childShaderName = toInterop(shaderName),
                             input = getPtr(input)
@@ -385,7 +391,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                     val inputPtrs = NativePointerArray(inputs.size)
                     for (i in inputs.indices) inputPtrs[i] = getPtr(inputs[i])
                     ImageFilter(
-                        _nMakeRuntimeShaderFromArray(
+                        ImageFilter_nMakeRuntimeShaderFromArray(
                             runtimeShaderBuilderPtr = getPtr(runtimeShaderBuilder),
                             childShaderNames = toInterop(shaderNames),
                             inputs = toInterop(inputPtrs),
@@ -403,7 +409,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 ImageFilter(
-                    _nMakeTile(
+                    ImageFilter_nMakeTile(
                         src.left,
                         src.top,
                         src.right,
@@ -425,7 +431,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeDilate(
+                        ImageFilter_nMakeDilate(
                             rx,
                             ry,
                             getPtr(input),
@@ -443,7 +449,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeErode(
+                        ImageFilter_nMakeErode(
                             rx, ry,
                             getPtr(input),
                             toInterop(crop?.serializeToIntArray())
@@ -469,7 +475,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeDistantLitDiffuse(
+                        ImageFilter_nMakeDistantLitDiffuse(
                             x, y, z,
                             lightColor,
                             surfaceScale,
@@ -498,7 +504,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakePointLitDiffuse(
+                        ImageFilter_nMakePointLitDiffuse(
                             x, y, z,
                             lightColor,
                             surfaceScale,
@@ -532,7 +538,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeSpotLitDiffuse(
+                        ImageFilter_nMakeSpotLitDiffuse(
                             x0, y0, z0,
                             x1, y1, z1,
                             falloffExponent,
@@ -565,7 +571,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeDistantLitSpecular(
+                        ImageFilter_nMakeDistantLitSpecular(
                             x,
                             y,
                             z,
@@ -598,7 +604,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakePointLitSpecular(
+                        ImageFilter_nMakePointLitSpecular(
                             x, y, z,
                             lightColor,
                             surfaceScale,
@@ -634,7 +640,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakeSpotLitSpecular(
+                        ImageFilter_nMakeSpotLitSpecular(
                             x0, y0, z0,
                             x1, y1, z1,
                             falloffExponent,
@@ -658,251 +664,3 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
-private external fun _nMakeArithmetic(
-    k1: Float,
-    k2: Float,
-    k3: Float,
-    k4: Float,
-    enforcePMColor: Boolean,
-    bg: NativePointer,
-    fg: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeBlend")
-private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: InteropPointer): NativePointer
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeBlur")
-private external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: InteropPointer): NativePointer
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
-private external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: InteropPointer): NativePointer
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeCompose")
-private external fun _nMakeCompose(outer: NativePointer, inner: NativePointer): NativePointer
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
-private external fun _nMakeDisplacementMap(
-    xChan: Int,
-    yChan: Int,
-    scale: Float,
-    displacement: NativePointer,
-    color: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
-private external fun _nMakeDropShadow(
-    dx: Float,
-    dy: Float,
-    sigmaX: Float,
-    sigmaY: Float,
-    color: Int,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
-private external fun _nMakeDropShadowOnly(
-    dx: Float,
-    dy: Float,
-    sigmaX: Float,
-    sigmaY: Float,
-    color: Int,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeImage")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeImage")
-private external fun _nMakeImage(
-    image: NativePointer,
-    l0: Float,
-    t0: Float,
-    r0: Float,
-    b0: Float,
-    l1: Float,
-    t1: Float,
-    r1: Float,
-    b1: Float,
-    samplingModeVal1: Int,
-    samplingModeVal2: Int,
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
-private external fun _nMakeMagnifier(
-    l: Float,
-    t: Float,
-    r: Float,
-    b: Float,
-    zoomAmount: Float,
-    inset: Float,
-    samplingModeVal1: Int,
-    samplingModeVal2: Int,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
-private external fun _nMakeMatrixConvolution(
-    kernelW: Int,
-    kernelH: Int,
-    kernel: InteropPointer,
-    gain: Float,
-    bias: Float,
-    offsetX: Int,
-    offsetY: Int,
-    tileMode: Int,
-    convolveAlpha: Boolean,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
-private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingModeVal1: Int, samplingModeVal2: Int, input: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeMerge")
-private external fun _nMakeMerge(filters: InteropPointer, filtersLength: Int, crop: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeOffset")
-private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeShader")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeShader")
-private external fun _nMakeShader(shader: NativePointer, dither: Boolean, crop: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakePicture")
-private external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader")
-private external fun _nMakeRuntimeShader(runtimeShaderBuilderPtr: NativePointer, childShaderName: InteropPointer, input: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray")
-private external fun _nMakeRuntimeShaderFromArray(runtimeShaderBuilderPtr: NativePointer, childShaderNames: InteropPointer, inputs: InteropPointer, inputLength: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeTile")
-private external fun _nMakeTile(
-    l0: Float,
-    t0: Float,
-    r0: Float,
-    b0: Float,
-    l1: Float,
-    t1: Float,
-    r1: Float,
-    b1: Float,
-    input: NativePointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeDilate")
-private external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeErode")
-private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
-private external fun _nMakeDistantLitDiffuse(
-    x: Float,
-    y: Float,
-    z: Float,
-    lightColor: Int,
-    surfaceScale: Float,
-    kd: Float,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
-private external fun _nMakePointLitDiffuse(
-    x: Float,
-    y: Float,
-    z: Float,
-    lightColor: Int,
-    surfaceScale: Float,
-    kd: Float,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
-private external fun _nMakeSpotLitDiffuse(
-    x0: Float,
-    y0: Float,
-    z0: Float,
-    x1: Float,
-    y1: Float,
-    z1: Float,
-    falloffExponent: Float,
-    cutoffAngle: Float,
-    lightColor: Int,
-    surfaceScale: Float,
-    kd: Float,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
-private external fun _nMakeDistantLitSpecular(
-    x: Float,
-    y: Float,
-    z: Float,
-    lightColor: Int,
-    surfaceScale: Float,
-    ks: Float,
-    shininess: Float,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
-private external fun _nMakePointLitSpecular(
-    x: Float,
-    y: Float,
-    z: Float,
-    lightColor: Int,
-    surfaceScale: Float,
-    ks: Float,
-    shininess: Float,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
-private external fun _nMakeSpotLitSpecular(
-    x0: Float,
-    y0: Float,
-    z0: Float,
-    x1: Float,
-    y1: Float,
-    z1: Float,
-    falloffExponent: Float,
-    cutoffAngle: Float,
-    lightColor: Int,
-    surfaceScale: Float,
-    ks: Float,
-    shininess: Float,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer

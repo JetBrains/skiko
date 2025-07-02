@@ -1,7 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withNullableResult
 
 private fun makePath(
     path: Path?,
@@ -10,7 +15,7 @@ private fun makePath(
 ): NativePointer {
     Stats.onNativeCall()
     return try {
-        _nMakePath(getPtr(path), forceClosed, resScale)
+        PathMeasure_nMakePath(getPtr(path), forceClosed, resScale)
     } finally {
         Stats.onNativeCall()
         reachabilityBarrier(path)
@@ -55,7 +60,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun setPath(path: Path?, forceClosed: Boolean): PathMeasure {
         return try {
             Stats.onNativeCall()
-            _nSetPath(_ptr, getPtr(path), forceClosed)
+            PathMeasure_nSetPath(_ptr, getPtr(path), forceClosed)
             this
         } finally {
             reachabilityBarrier(this)
@@ -70,7 +75,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     val length: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetLength(_ptr)
+            PathMeasure_nGetLength(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -84,7 +89,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getPosition(distance: Float): Point? {
         return try {
             Stats.onNativeCall()
-            withNullableResult(FloatArray(2)) { _nGetPosition(_ptr, distance, it) }?.let { points ->
+            withNullableResult(FloatArray(2)) { PathMeasure_nGetPosition(_ptr, distance, it) }?.let { points ->
                 Point(points[0], points[1])
             }
         } finally {
@@ -101,7 +106,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getTangent(distance: Float): Point? {
         return try {
             Stats.onNativeCall()
-            withNullableResult(FloatArray(2)) { _nGetTangent(_ptr, distance, it) }?.let { points ->
+            withNullableResult(FloatArray(2)) { PathMeasure_nGetTangent(_ptr, distance, it) }?.let { points ->
                 Point(points[0], points[1])
             }
         } finally {
@@ -119,7 +124,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
         return try {
             Stats.onNativeCall()
             withNullableResult(FloatArray(4)) {
-                _nGetRSXform(_ptr, distance, it)
+                PathMeasure_nGetRSXform(_ptr, distance, it)
             }?.let { data ->
                 RSXform(
                     data[0],
@@ -143,7 +148,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
         return try {
             Stats.onNativeCall()
             withNullableResult(FloatArray(9)) {
-                _nGetMatrix(_ptr, distance, getPosition, getTangent, it)
+                PathMeasure_nGetMatrix(_ptr, distance, getPosition, getTangent, it)
             }?.let { data ->
                 Matrix33(
                     data[0],
@@ -172,7 +177,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getSegment(startD: Float, endD: Float, dst: Path, startWithMoveTo: Boolean): Boolean {
         return try {
             Stats.onNativeCall()
-            _nGetSegment(
+            PathMeasure_nGetSegment(
                 _ptr,
                 startD,
                 endD,
@@ -191,7 +196,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     override val isClosed: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsClosed(_ptr)
+            PathMeasure_nIsClosed(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -203,7 +208,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun nextContour(): Boolean {
         return try {
             Stats.onNativeCall()
-            _nNextContour(_ptr)
+            PathMeasure_nNextContour(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -213,64 +218,3 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
         val PTR = PathMeasure_nGetFinalizer()
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nGetFinalizer")
-private external fun PathMeasure_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nMake")
-private external fun PathMeasure_nMake(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMakePath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nMakePath")
-private external fun _nMakePath(pathPtr: NativePointer, forceClosed: Boolean, resScale: Float): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nSetPath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nSetPath")
-private external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, forceClosed: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetLength")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nGetLength")
-private external fun _nGetLength(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetPosition")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nGetPosition")
-private external fun _nGetPosition(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetTangent")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nGetTangent")
-private external fun _nGetTangent(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetRSXform")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nGetRSXform")
-private external fun _nGetRSXform(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetMatrix")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nGetMatrix")
-private external fun _nGetMatrix(
-    ptr: NativePointer,
-    distance: Float,
-    getPosition: Boolean,
-    getTangent: Boolean,
-    data: InteropPointer
-): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetSegment")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nGetSegment")
-private external fun _nGetSegment(
-    ptr: NativePointer,
-    startD: Float,
-    endD: Float,
-    dstPtr: NativePointer,
-    startWithMoveTo: Boolean
-): Boolean
-
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nIsClosed")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nIsClosed")
-private external fun _nIsClosed(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nNextContour")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathMeasure__1nNextContour")
-private external fun _nNextContour(ptr: NativePointer): Boolean

@@ -1,8 +1,19 @@
 package org.jetbrains.skiko.node
 
-import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.ClipMode
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.Path
+import org.jetbrains.skia.Point
+import org.jetbrains.skia.RRect
+import org.jetbrains.skia.Rect
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 /**
  * <p>RenderNode is used to build hardware accelerated rendering hierarchies. Each RenderNode
@@ -331,159 +342,3 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
         }
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake")
-private external fun RenderNode_nMake(context: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")
-private external fun RenderNode_nGetLayerPaint(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetLayerPaint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetLayerPaint")
-private external fun RenderNode_nSetLayerPaint(ptr: NativePointer, paint: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds")
-private external fun RenderNode_nGetBounds(ptr: NativePointer, result: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBounds")
-private external fun RenderNode_nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetPivot")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetPivot")
-private external fun RenderNode_nGetPivot(ptr: NativePointer, result: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetPivot")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetPivot")
-private external fun RenderNode_nSetPivot(ptr: NativePointer, x: Float, y: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAlpha")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAlpha")
-private external fun RenderNode_nGetAlpha(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAlpha")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAlpha")
-private external fun RenderNode_nSetAlpha(ptr: NativePointer, alpha: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleX")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleX")
-private external fun RenderNode_nGetScaleX(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleX")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleX")
-private external fun RenderNode_nSetScaleX(ptr: NativePointer, scaleX: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleY")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleY")
-private external fun RenderNode_nGetScaleY(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleY")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleY")
-private external fun RenderNode_nSetScaleY(ptr: NativePointer, scaleY: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationX")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationX")
-private external fun RenderNode_nGetTranslationX(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationX")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationX")
-private external fun RenderNode_nSetTranslationX(ptr: NativePointer, translationX: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationY")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationY")
-private external fun RenderNode_nGetTranslationY(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationY")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationY")
-private external fun RenderNode_nSetTranslationY(ptr: NativePointer, translationY: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetShadowElevation")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetShadowElevation")
-private external fun RenderNode_nGetShadowElevation(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetShadowElevation")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetShadowElevation")
-private external fun RenderNode_nSetShadowElevation(ptr: NativePointer, elevation: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAmbientShadowColor")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAmbientShadowColor")
-private external fun RenderNode_nGetAmbientShadowColor(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAmbientShadowColor")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAmbientShadowColor")
-private external fun RenderNode_nSetAmbientShadowColor(ptr: NativePointer, color: Int)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetSpotShadowColor")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetSpotShadowColor")
-private external fun RenderNode_nGetSpotShadowColor(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetSpotShadowColor")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetSpotShadowColor")
-private external fun RenderNode_nSetSpotShadowColor(ptr: NativePointer, color: Int)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationX")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationX")
-private external fun RenderNode_nGetRotationX(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationX")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationX")
-private external fun RenderNode_nSetRotationX(ptr: NativePointer, rotationX: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationY")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationY")
-private external fun RenderNode_nGetRotationY(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationY")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationY")
-private external fun RenderNode_nSetRotationY(ptr: NativePointer, rotationY: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationZ")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationZ")
-private external fun RenderNode_nGetRotationZ(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationZ")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationZ")
-private external fun RenderNode_nSetRotationZ(ptr: NativePointer, rotationZ: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetCameraDistance")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetCameraDistance")
-private external fun RenderNode_nGetCameraDistance(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetCameraDistance")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetCameraDistance")
-private external fun RenderNode_nSetCameraDistance(ptr: NativePointer, distance: Float)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect")
-private external fun RenderNode_nSetClipRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, mode: Int, antiAlias: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect")
-private external fun RenderNode_nSetClipRRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, radii: InteropPointer, radiiSize: Int, mode: Int, antiAlias: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath")
-private external fun RenderNode_nSetClipPath(ptr: NativePointer, pathPtr: NativePointer, mode: Int, antiAlias: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip")
-private external fun RenderNode_nGetClip(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClip")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClip")
-private external fun RenderNode_nSetClip(ptr: NativePointer, clip: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nBeginRecording")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nBeginRecording")
-private external fun RenderNode_nBeginRecording(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nEndRecording")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nEndRecording")
-private external fun RenderNode_nEndRecording(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nDrawInto")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nDrawInto")
-private external fun RenderNode_nDrawInto(ptr: NativePointer, canvas: NativePointer)

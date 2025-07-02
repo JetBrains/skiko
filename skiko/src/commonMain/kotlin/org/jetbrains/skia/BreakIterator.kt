@@ -259,7 +259,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard("Failed to create character iterator") { _nMake(0, toInterop(locale), it)  }) // UBRK_CHARACTER
+            return BreakIterator(withErrorGuard("Failed to create character iterator") { BreakIterator_nMake(0, toInterop(locale), it)  }) // UBRK_CHARACTER
         }
         /**
          * Returns a new BreakIterator instance for word breaks for the given locale.
@@ -269,7 +269,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard("Failed to create word iterator") { _nMake(1, toInterop(locale), it) }) // UBRK_WORD
+            return BreakIterator(withErrorGuard("Failed to create word iterator") { BreakIterator_nMake(1, toInterop(locale), it) }) // UBRK_WORD
         }
         /**
          * Returns a new BreakIterator instance for line breaks for the given locale.
@@ -279,7 +279,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard("Failed to create line iterator")  { _nMake(2, toInterop(locale), it) }) // UBRK_LINE
+            return BreakIterator(withErrorGuard("Failed to create line iterator")  { BreakIterator_nMake(2, toInterop(locale), it) }) // UBRK_LINE
         }
         /**
          * Returns a new BreakIterator instance for sentence breaks for the given locale.
@@ -290,7 +290,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
             return BreakIterator(withErrorGuard("Failed to create sentence iterator")  {
-                _nMake(3, toInterop(locale), it)
+                BreakIterator_nMake(3, toInterop(locale), it)
             }) // UBRK_SENTENCE
         }
 
@@ -317,7 +317,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     fun current(): Int {
         return try {
             Stats.onNativeCall()
-            _nCurrent(_ptr)
+            BreakIterator_nCurrent(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -333,7 +333,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     operator fun next(): Int {
         return try {
             Stats.onNativeCall()
-            _nNext(_ptr)
+            BreakIterator_nNext(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -377,7 +377,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     fun previous(): Int {
         return try {
             Stats.onNativeCall()
-            _nPrevious(_ptr)
+            BreakIterator_nPrevious(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -389,7 +389,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     fun first(): Int {
         return try {
             Stats.onNativeCall()
-            _nFirst(_ptr)
+            BreakIterator_nFirst(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -401,7 +401,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     fun last(): Int {
         return try {
             Stats.onNativeCall()
-            _nLast(_ptr)
+            BreakIterator_nLast(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -418,7 +418,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     fun preceding(offset: Int): Int {
         return try {
             Stats.onNativeCall()
-            _nPreceding(_ptr, offset)
+            BreakIterator_nPreceding(_ptr, offset)
         } finally {
             reachabilityBarrier(this)
         }
@@ -435,7 +435,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     fun following(offset: Int): Int {
         return try {
             Stats.onNativeCall()
-            _nFollowing(_ptr, offset)
+            BreakIterator_nFollowing(_ptr, offset)
         } finally {
             reachabilityBarrier(this)
         }
@@ -447,7 +447,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     fun isBoundary(offset: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            _nIsBoundary(_ptr, offset)
+            BreakIterator_nIsBoundary(_ptr, offset)
         } finally {
             reachabilityBarrier(this)
         }
@@ -468,7 +468,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     val ruleStatus: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetRuleStatus(_ptr)
+            BreakIterator_nGetRuleStatus(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -486,9 +486,9 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     val ruleStatuses: IntArray
         get() = try {
             Stats.onNativeCall()
-            val arrayLen = _nGetRuleStatusesLen(_ptr)
+            val arrayLen = BreakIterator_nGetRuleStatusesLen(_ptr)
             withResult(IntArray(arrayLen)) { result ->
-                _nGetRuleStatuses(_ptr, result, arrayLen)
+                BreakIterator_nGetRuleStatuses(_ptr, result, arrayLen)
             }
         } finally {
             reachabilityBarrier(this)
@@ -502,7 +502,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
             Stats.onNativeCall()
             _text?.close()
             _text = U16String(withErrorGuard("Failed to setText") {
-                _nSetText(
+                BreakIterator_nSetText(
                     _ptr,
                     toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }),
                     text?.length ?: 0,
@@ -535,59 +535,3 @@ private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer)
         res
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nGetFinalizer")
-private external fun BreakIterator_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nMake")
-private external fun _nMake(type: Int, locale: InteropPointer, errorCode: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nCurrent")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nCurrent")
-private external fun _nCurrent(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nNext")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nNext")
-private external fun _nNext(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPrevious")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nPrevious")
-private external fun _nPrevious(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFirst")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nFirst")
-private external fun _nFirst(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nLast")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nLast")
-private external fun _nLast(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPreceding")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nPreceding")
-private external fun _nPreceding(ptr: NativePointer, offset: Int): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFollowing")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nFollowing")
-private external fun _nFollowing(ptr: NativePointer, offset: Int): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nIsBoundary")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nIsBoundary")
-private external fun _nIsBoundary(ptr: NativePointer, offset: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatus")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nGetRuleStatus")
-private external fun _nGetRuleStatus(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen")
-private external fun _nGetRuleStatusesLen(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatuses")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nGetRuleStatuses")
-private external fun _nGetRuleStatuses(ptr: NativePointer, result: InteropPointer, len: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BreakIterator__1nSetText")
-private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int, errorCode: InteropPointer): NativePointer

@@ -1,8 +1,10 @@
 package org.jetbrains.skiko.node
 
-import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class RenderNodeContext internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     private companion object {
@@ -41,11 +43,3 @@ class RenderNodeContext internal constructor(ptr: NativePointer, managed: Boolea
         }
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake")
-private external fun RenderNodeContext_nMake(measureDrawBounds: Boolean): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nSetLightingInfo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nSetLightingInfo")
-private external fun RenderNodeContext_nSetLightingInfo(ptr: NativePointer, centerX: Float, centerY: Float, centerZ: Float, radius: Float, ambientShadowAlpha: Float, spotShadowAlpha: Float)

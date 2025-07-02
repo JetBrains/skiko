@@ -1,8 +1,6 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.shaper
 
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.Font
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.ManagedString
@@ -19,7 +17,7 @@ private fun makeHbIcuScriptRunIterator(
 ): NativePointer {
     Stats.onNativeCall()
     return try {
-        _nMake(getPtr(text), getPtr(font), getPtr(opts.fontMgr), opts._booleanPropsToInt())
+        FontMgrRunIterator_nMake(getPtr(text), getPtr(font), getPtr(opts.fontMgr), opts._booleanPropsToInt())
     } finally {
         reachabilityBarrier(text)
         reachabilityBarrier(font)
@@ -45,8 +43,8 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
 
     override operator fun next(): FontRun {
         return try {
-            _nConsume(_ptr)
-            FontRun(_getEndOfCurrentRun(), Font(_nGetCurrentFont(_ptr)))
+            ManagedRunIterator_nConsume(_ptr)
+            FontRun(_getEndOfCurrentRun(), Font(FontMgrRunIterator_nGetCurrentFont(_ptr)))
         } finally {
             reachabilityBarrier(this)
         }
@@ -56,11 +54,3 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
         TODO("Not yet implemented")
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
-private external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, fontMgrPtr: NativePointer, optsBooleanProps: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont")
-private external fun _nGetCurrentFont(ptr: NativePointer): NativePointer

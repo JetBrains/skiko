@@ -2,9 +2,12 @@ package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.ManagedString
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     Managed(makeParagraphBuilder(style, fc), _FinalizerHolder.PTR) {
@@ -18,7 +21,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     fun pushStyle(style: TextStyle?): ParagraphBuilder {
         return try {
             Stats.onNativeCall()
-            _nPushStyle(_ptr, getPtr(style))
+            ParagraphBuilder_nPushStyle(_ptr, getPtr(style))
             this
         } finally {
             reachabilityBarrier(style)
@@ -28,7 +31,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     fun popStyle(): ParagraphBuilder {
         Stats.onNativeCall()
         try {
-            _nPopStyle(_ptr, NullPointer)
+            ParagraphBuilder_nPopStyle(_ptr, NullPointer)
         } finally {
             reachabilityBarrier(this)
         }
@@ -39,7 +42,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
         Stats.onNativeCall()
         try {
             interopScope {
-                _nAddText(_ptr, toInterop(text))
+                ParagraphBuilder_nAddText(_ptr, toInterop(text))
             }
         } finally {
             reachabilityBarrier(this)
@@ -54,7 +57,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
         check(!style.baseline.isNaN())
         try {
             Stats.onNativeCall()
-            _nAddPlaceholder(
+            ParagraphBuilder_nAddPlaceholder(
                 _ptr,
                 style.width,
                 style.height,
@@ -71,7 +74,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     fun build(): Paragraph {
         return try {
             Stats.onNativeCall()
-            val paragraph = Paragraph(_nBuild(_ptr), _text)
+            val paragraph = Paragraph(ParagraphBuilder_nBuild(_ptr), _text)
             _text = null
             paragraph
         } finally {
@@ -90,44 +93,9 @@ private fun makeParagraphBuilder(
 ): NativePointer {
     Stats.onNativeCall()
     return try {
-        _nMake(getPtr(style), getPtr(fc))
+        ParagraphBuilder_nMake(getPtr(style), getPtr(fc))
     } finally {
         reachabilityBarrier(style)
         reachabilityBarrier(fc)
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
-private external fun ParagraphBuilder_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
-private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
-private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
-private external fun _nPopStyle(ptr: NativePointer, textStylePtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
-private external fun _nAddText(ptr: NativePointer, text: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
-private external fun _nAddPlaceholder(
-    ptr: NativePointer,
-    width: Float,
-    height: Float,
-    alignment: Int,
-    baselineMode: Int,
-    baseline: Float
-)
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
-private external fun _nBuild(ptr: NativePointer): NativePointer

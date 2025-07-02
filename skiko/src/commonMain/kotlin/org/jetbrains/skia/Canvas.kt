@@ -1,8 +1,14 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.ImageFilter.Companion.makeDropShadowOnly
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.use
 
 open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, internal val _owner: Any) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
@@ -45,7 +51,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @see [https://fiddle.skia.org/c/@Canvas_copy_const_SkBitmap](https://fiddle.skia.org/c/@Canvas_copy_const_SkBitmap)
      */
     constructor(bitmap: Bitmap, surfaceProps: SurfaceProps = SurfaceProps()) : this(
-        _nMakeFromBitmap(
+        Canvas_nMakeFromBitmap(
             bitmap._ptr,
             surfaceProps._getFlags(),
             surfaceProps.pixelGeometry.ordinal
@@ -58,7 +64,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawPoint(x: Float, y: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawPoint(_ptr, x, y, getPtr(paint))
+            Canvas_nDrawPoint(_ptr, x, y, getPtr(paint))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(paint)
@@ -124,7 +130,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+                Canvas_nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, coords.size, toInterop(coords), getPtr(paint))
             }
         } finally {
             reachabilityBarrier(paint)
@@ -187,7 +193,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, coords.size, toInterop(coords),getPtr(paint))
+                Canvas_nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, coords.size, toInterop(coords),getPtr(paint))
             }
         } finally {
             reachabilityBarrier(paint)
@@ -248,7 +254,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+                Canvas_nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, coords.size, toInterop(coords), getPtr(paint))
             }
         } finally {
             reachabilityBarrier(this)
@@ -260,7 +266,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawLine(x0: Float, y0: Float, x1: Float, y1: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawLine(_ptr, x0, y0, x1, y1, getPtr(paint))
+            Canvas_nDrawLine(_ptr, x0, y0, x1, y1, getPtr(paint))
         } finally {
             reachabilityBarrier(paint)
             reachabilityBarrier(this)
@@ -280,7 +286,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     ): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawArc(_ptr, left, top, right, bottom, startAngle, sweepAngle, includeCenter, getPtr(paint))
+            Canvas_nDrawArc(_ptr, left, top, right, bottom, startAngle, sweepAngle, includeCenter, getPtr(paint))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(paint)
@@ -291,7 +297,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawRect(r: Rect, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawRect(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
+            Canvas_nDrawRect(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(paint)
@@ -302,7 +308,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawOval(r: Rect, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawOval(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
+            Canvas_nDrawOval(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
         } finally {
             reachabilityBarrier(paint)
             reachabilityBarrier(this)
@@ -313,7 +319,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawCircle(x: Float, y: Float, radius: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawOval(_ptr, x - radius, y - radius, x + radius, y + radius, getPtr(paint))
+            Canvas_nDrawOval(_ptr, x - radius, y - radius, x + radius, y + radius, getPtr(paint))
         } finally {
             reachabilityBarrier(paint)
             reachabilityBarrier(this)
@@ -325,7 +331,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, getPtr(paint))
+                Canvas_nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, getPtr(paint))
             }
         } finally {
             reachabilityBarrier(paint)
@@ -338,7 +344,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawDRRect(
+                Canvas_nDrawDRRect(
                     _ptr,
                     outer.left,
                     outer.top,
@@ -391,7 +397,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawPath(path: Path, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawPath(_ptr, getPtr(path), getPtr(paint))
+            Canvas_nDrawPath(_ptr, getPtr(path), getPtr(paint))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(path)
@@ -466,7 +472,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     ): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawImageRect(
+            Canvas_nDrawImageRect(
                 _ptr,
                 getPtr(image),
                 src.left,
@@ -493,7 +499,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawImageNine(image: Image, center: IRect, dst: Rect, filterMode: FilterMode, paint: Paint?): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawImageNine(
+            Canvas_nDrawImageNine(
                 _ptr,
                 getPtr(image),
                 center.left,
@@ -518,7 +524,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawRegion(r: Region, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawRegion(_ptr, getPtr(r), getPtr(paint))
+            Canvas_nDrawRegion(_ptr, getPtr(r), getPtr(paint))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(r)
@@ -531,7 +537,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawString(_ptr, toInterop(s), x, y, getPtr(font), getPtr(paint))
+                Canvas_nDrawString(_ptr, toInterop(s), x, y, getPtr(font), getPtr(paint))
             }
         } finally {
             reachabilityBarrier(this)
@@ -547,7 +553,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawTextBlob(blob: TextBlob, x: Float, y: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawTextBlob(_ptr, getPtr(blob), x, y, getPtr(paint))
+            Canvas_nDrawTextBlob(_ptr, getPtr(blob), x, y, getPtr(paint))
         } finally {
             reachabilityBarrier(blob)
             reachabilityBarrier(paint)
@@ -568,7 +574,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPicture(_ptr, getPtr(picture), toInterop(matrix?.mat), getPtr(paint))
+                Canvas_nDrawPicture(_ptr, getPtr(picture), toInterop(matrix?.mat), getPtr(paint))
             }
         } finally {
             reachabilityBarrier(this)
@@ -615,7 +621,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawVertices(
+                Canvas_nDrawVertices(
                     _ptr,
                     0 /* kTriangles_VertexMode */,
                     positions.size,
@@ -671,7 +677,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawVertices(
+                Canvas_nDrawVertices(
                     _ptr,
                     1 /* kTriangleStrip_VertexMode */,
                     positions.size,
@@ -727,7 +733,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawVertices(
+                Canvas_nDrawVertices(
                     _ptr,
                     2 /* kTriangleFan_VertexMode */,
                     positions.size,
@@ -794,7 +800,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawVertices(
+                Canvas_nDrawVertices(
                     _ptr,
                     vertexMode.ordinal,
                     points,
@@ -862,7 +868,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPatch(
+                Canvas_nDrawPatch(
                     _ptr,
                     toInterop(Point.flattenArray(cubics)),
                     toInterop(colors),
@@ -937,7 +943,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawDrawable(_ptr, getPtr(drawable), toInterop(matrix?.mat))
+                Canvas_nDrawDrawable(_ptr, getPtr(drawable), toInterop(matrix?.mat))
             }
         } finally {
             reachabilityBarrier(this)
@@ -949,7 +955,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun clear(color: Int): Canvas {
         Stats.onNativeCall()
         try {
-            _nClear(_ptr, color)
+            Canvas_nClear(_ptr, color)
         } finally {
             reachabilityBarrier(this)
         }
@@ -959,7 +965,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawPaint(paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
-            _nDrawPaint(_ptr, getPtr(paint))
+            Canvas_nDrawPaint(_ptr, getPtr(paint))
         } finally {
             reachabilityBarrier(paint)
             reachabilityBarrier(this)
@@ -978,7 +984,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun setMatrix(matrix: Matrix33): Canvas {
         Stats.onNativeCall()
         interopScope {
-            _nSetMatrix(_ptr, toInterop(matrix.mat))
+            Canvas_nSetMatrix(_ptr, toInterop(matrix.mat))
         }
         return this
     }
@@ -991,7 +997,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun resetMatrix(): Canvas {
         Stats.onNativeCall()
-        _nResetMatrix(_ptr)
+        Canvas_nResetMatrix(_ptr)
         return this
     }
 
@@ -1001,7 +1007,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     val localToDevice: Matrix44
         get() = try {
             Stats.onNativeCall()
-            Matrix44.fromInteropPointer { interopPointer -> _nGetLocalToDevice(_ptr, interopPointer) }
+            Matrix44.fromInteropPointer { interopPointer -> Canvas_nGetLocalToDevice(_ptr, interopPointer) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -1011,7 +1017,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun clipRect(r: Rect, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
-        _nClipRect(_ptr, r.left, r.top, r.right, r.bottom, mode.ordinal, antiAlias)
+        Canvas_nClipRect(_ptr, r.left, r.top, r.right, r.bottom, mode.ordinal, antiAlias)
         return this
     }
 
@@ -1030,7 +1036,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun clipRRect(r: RRect, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
         interopScope {
-            _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, mode.ordinal, antiAlias)
+            Canvas_nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, mode.ordinal, antiAlias)
         }
         return this
     }
@@ -1050,7 +1056,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun clipPath(p: Path, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
         try {
-            _nClipPath(_ptr, getPtr(p), mode.ordinal, antiAlias)
+            Canvas_nClipPath(_ptr, getPtr(p), mode.ordinal, antiAlias)
         } finally {
             reachabilityBarrier(p)
             reachabilityBarrier(this)
@@ -1073,7 +1079,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun clipRegion(r: Region, mode: ClipMode): Canvas {
         Stats.onNativeCall()
         try {
-            _nClipRegion(_ptr, getPtr(r), mode.ordinal)
+            Canvas_nClipRegion(_ptr, getPtr(r), mode.ordinal)
         } finally {
             reachabilityBarrier(r)
             reachabilityBarrier(this)
@@ -1088,7 +1094,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun translate(dx: Float, dy: Float): Canvas {
         interopScope {
             Stats.onNativeCall()
-            _nTranslate(_ptr, dx, dy)
+            Canvas_nTranslate(_ptr, dx, dy)
         }
         return this
     }
@@ -1096,7 +1102,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun scale(sx: Float, sy: Float): Canvas {
         interopScope {
             Stats.onNativeCall()
-            _nScale(_ptr, sx, sy)
+            Canvas_nScale(_ptr, sx, sy)
         }
         return this
     }
@@ -1108,7 +1114,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun rotate(deg: Float): Canvas {
         interopScope {
             Stats.onNativeCall()
-            _nRotate(_ptr, deg, 0f, 0f)
+            Canvas_nRotate(_ptr, deg, 0f, 0f)
         }
         return this
     }
@@ -1116,7 +1122,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun rotate(deg: Float, x: Float, y: Float): Canvas {
         interopScope {
             Stats.onNativeCall()
-            _nRotate(_ptr, deg, x, y)
+            Canvas_nRotate(_ptr, deg, x, y)
         }
         return this
     }
@@ -1124,7 +1130,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun skew(sx: Float, sy: Float): Canvas {
         interopScope {
             Stats.onNativeCall()
-            _nSkew(_ptr, sx, sy)
+            Canvas_nSkew(_ptr, sx, sy)
         }
         return this
     }
@@ -1132,7 +1138,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun concat(matrix: Matrix33): Canvas {
         interopScope {
             Stats.onNativeCall()
-            _nConcat(
+            Canvas_nConcat(
                 _ptr, toInterop(matrix.mat)
             )
         }
@@ -1142,7 +1148,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun concat(matrix: Matrix44): Canvas {
         interopScope {
             Stats.onNativeCall()
-            _nConcat44(
+            Canvas_nConcat44(
                 _ptr, toInterop(matrix.mat)
             )
         }
@@ -1197,7 +1203,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun readPixels(bitmap: Bitmap, srcX: Int, srcY: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            _nReadPixels(
+            Canvas_nReadPixels(
                 _ptr,
                 getPtr(bitmap),
                 srcX,
@@ -1262,7 +1268,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun writePixels(bitmap: Bitmap, x: Int, y: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            _nWritePixels(
+            Canvas_nWritePixels(
                 _ptr,
                 getPtr(bitmap),
                 x,
@@ -1277,7 +1283,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun save(): Int {
         return try {
             Stats.onNativeCall()
-            _nSave(_ptr)
+            Canvas_nSave(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -1286,7 +1292,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun saveLayer(left: Float, top: Float, right: Float, bottom: Float, paint: Paint?): Int {
         return try {
             Stats.onNativeCall()
-            _nSaveLayerRect(
+            Canvas_nSaveLayerRect(
                 _ptr,
                 left,
                 top,
@@ -1332,10 +1338,10 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun saveLayer(bounds: Rect?, paint: Paint?): Int {
         return try {
             Stats.onNativeCall()
-            if (bounds == null) _nSaveLayer(
+            if (bounds == null) Canvas_nSaveLayer(
                 _ptr,
                 getPtr(paint)
-            ) else _nSaveLayerRect(
+            ) else Canvas_nSaveLayerRect(
                 _ptr,
                 bounds.left,
                 bounds.top,
@@ -1353,7 +1359,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return try {
             Stats.onNativeCall()
             if (layerRec.bounds != null) {
-                _nSaveLayerSaveLayerRecRect(
+                Canvas_nSaveLayerSaveLayerRecRect(
                     _ptr,
                     layerRec.bounds.left,
                     layerRec.bounds.top,
@@ -1365,7 +1371,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                     layerRec.saveLayerFlags.mask
                 )
             } else {
-                _nSaveLayerSaveLayerRec(
+                Canvas_nSaveLayerSaveLayerRec(
                     _ptr,
                     getPtr(layerRec.paint),
                     getPtr(layerRec.backdrop),
@@ -1382,20 +1388,20 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     val saveCount: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetSaveCount(_ptr)
+            Canvas_nGetSaveCount(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
 
     fun restore(): Canvas {
         Stats.onNativeCall()
-        _nRestore(_ptr)
+        Canvas_nRestore(_ptr)
         return this
     }
 
     fun restoreToCount(saveCount: Int): Canvas {
         Stats.onNativeCall()
-        _nRestoreToCount(_ptr, saveCount)
+        Canvas_nRestoreToCount(_ptr, saveCount)
         return this
     }
 
@@ -1436,310 +1442,3 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         val PTR = Canvas_nGetFinalizer()
     }
 }
-
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nGetFinalizer")
-private external fun Canvas_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nMakeFromBitmap")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nMakeFromBitmap")
-private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPoint")
-private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoints")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPoints")
-private external fun _nDrawPoints(ptr: NativePointer, mode: Int, coordsCount: Int, coords: InteropPointer, paintPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawLine")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawLine")
-private external fun _nDrawLine(ptr: NativePointer, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawArc")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawArc")
-private external fun _nDrawArc(
-    ptr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    startAngle: Float,
-    sweepAngle: Float,
-    includeCenter: Boolean,
-    paintPtr: NativePointer
-)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawRect")
-private external fun _nDrawRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paintPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawOval")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawOval")
-private external fun _nDrawOval(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paint: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawRRect")
-private external fun _nDrawRRect(
-    ptr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    radii: InteropPointer,
-    radiiSize: Int,
-    paintPtr: NativePointer
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDRRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawDRRect")
-private external fun _nDrawDRRect(
-    ptr: NativePointer,
-    ol: Float,
-    ot: Float,
-    or: Float,
-    ob: Float,
-    oradii: InteropPointer,
-    oradiiSize: Int,
-    il: Float,
-    it: Float,
-    ir: Float,
-    ib: Float,
-    iradii: InteropPointer,
-    iradiiSize: Int,
-    paintPtr: NativePointer
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPath")
-private external fun _nDrawPath(ptr: NativePointer, nativePath: NativePointer, paintPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawImageRect")
-private external fun _nDrawImageRect(
-    ptr: NativePointer,
-    nativeImage: NativePointer,
-    sl: Float,
-    st: Float,
-    sr: Float,
-    sb: Float,
-    dl: Float,
-    dt: Float,
-    dr: Float,
-    db: Float,
-    samplingModeVal1: Int,
-    samplingModeVal2: Int,
-    paintPtr: NativePointer,
-    strict: Boolean
-)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageNine")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawImageNine")
-private external fun _nDrawImageNine(
-    ptr: NativePointer,
-    nativeImage: NativePointer,
-    cl: Int,
-    ct: Int,
-    cr: Int,
-    cb: Int,
-    dl: Float,
-    dt: Float,
-    dr: Float,
-    db: Float,
-    filterMode: Int,
-    paintPtr: NativePointer
-)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRegion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawRegion")
-private external fun _nDrawRegion(ptr: NativePointer, nativeRegion: NativePointer, paintPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawString")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawString")
-private external fun _nDrawString(ptr: NativePointer, string: InteropPointer, x: Float, y: Float, font: NativePointer, paint: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawTextBlob")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawTextBlob")
-private external fun _nDrawTextBlob(ptr: NativePointer, blob: NativePointer, x: Float, y: Float, paint: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPicture")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPicture")
-private external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer, matrix: InteropPointer, paintPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawVertices")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawVertices")
-private external fun _nDrawVertices(
-    ptr: NativePointer,
-    verticesMode: Int,
-    vertexCount: Int,
-    cubics: InteropPointer,
-    colors: InteropPointer,
-    texCoords: InteropPointer,
-    indexCount: Int,
-    indices: InteropPointer,
-    blendMode: Int,
-    paintPtr: NativePointer
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPatch")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPatch")
-private external fun _nDrawPatch(
-    ptr: NativePointer,
-    cubics: InteropPointer,
-    colors: InteropPointer,
-    texCoords: InteropPointer,
-    blendMode: Int,
-    paintPtr: NativePointer
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDrawable")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawDrawable")
-private external fun _nDrawDrawable(ptr: NativePointer, drawablePrt: NativePointer, matrix: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nClear")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClear")
-private external fun _nClear(ptr: NativePointer, color: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPaint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPaint")
-private external fun _nDrawPaint(ptr: NativePointer, paintPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSetMatrix")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSetMatrix")
-private external fun _nSetMatrix(ptr: NativePointer, matrix: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalToDevice")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nGetLocalToDevice")
-private external fun _nGetLocalToDevice(ptr: NativePointer, resultFloats: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nResetMatrix")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nResetMatrix")
-private external fun _nResetMatrix(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClipRect")
-private external fun _nClipRect(
-    ptr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    mode: Int,
-    antiAlias: Boolean
-)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClipRRect")
-private external fun _nClipRRect(
-    ptr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    radii: InteropPointer,
-    size: Int,
-    mode: Int,
-    antiAlias: Boolean
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipPath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClipPath")
-private external fun _nClipPath(ptr: NativePointer, nativePath: NativePointer, mode: Int, antiAlias: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRegion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClipRegion")
-private external fun _nClipRegion(ptr: NativePointer, nativeRegion: NativePointer, mode: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nTranslate")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nTranslate")
-private external fun _nTranslate(ptr: NativePointer, dx: Float, dy: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nScale")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nScale")
-private external fun _nScale(ptr: NativePointer, sx: Float, sy: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nRotate")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nRotate")
-private external fun _nRotate(ptr: NativePointer, deg: Float, x: Float, y: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSkew")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSkew")
-private external fun _nSkew(ptr: NativePointer, sx: Float, sy: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nConcat")
-private external fun _nConcat(ptr: NativePointer, matrix: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat44")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nConcat44")
-private external fun _nConcat44(ptr: NativePointer, matrix: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nReadPixels")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nReadPixels")
-private external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nWritePixels")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nWritePixels")
-private external fun _nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSave")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSave")
-private external fun _nSave(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSaveLayer")
-private external fun _nSaveLayer(ptr: NativePointer, paintPtr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSaveLayerRect")
-private external fun _nSaveLayerRect(
-    ptr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    paintPtr: NativePointer
-): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRec")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRec")
-private external fun _nSaveLayerSaveLayerRec(
-    ptr: NativePointer,
-    paintPtr: NativePointer,
-    backdropImageFilterPtr: NativePointer,
-    colorSpacePtr: NativePointer,
-    saveLayerFlags: Int
-): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRecRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRecRect")
-private external fun _nSaveLayerSaveLayerRecRect(
-    ptr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    paintPtr: NativePointer,
-    backdropImageFilterPtr: NativePointer,
-    colorSpacePtr: NativePointer,
-    saveLayerFlags: Int
-): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSaveCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nGetSaveCount")
-private external fun _nGetSaveCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestore")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nRestore")
-private external fun _nRestore(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestoreToCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nRestoreToCount")
-private external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)

@@ -1,7 +1,14 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withResult
 
 /**
  * Data holds an immutable data buffer.
@@ -19,7 +26,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             return Data(
                 interopScope {
-                    _nMakeFromBytes(toInterop(bytes), offset, length)
+                    Data_nMakeFromBytes(toInterop(bytes), offset, length)
                 }
             )
         }
@@ -35,7 +42,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             return Data(
                 interopScope {
-                    _nMakeWithoutCopy(memoryAddr, length)
+                    Data_nMakeWithoutCopy(memoryAddr, length)
                 }
             ).also {
                 it.underlyingMemoryOwner = underlyingMemoryOwner
@@ -48,12 +55,12 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          */
         fun makeEmpty(): Data {
             Stats.onNativeCall()
-            return Data(_nMakeEmpty())
+            return Data(Data_nMakeEmpty())
         }
 
         fun makeUninitialized(length: Int): Data {
             Stats.onNativeCall()
-            return Data(_nMakeUninitialized(length))
+            return Data(Data_nMakeUninitialized(length))
         }
 
         init {
@@ -64,7 +71,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val size: Int
         get() = try {
             Stats.onNativeCall()
-            _nSize(_ptr)
+            Data_nSize(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -74,11 +81,11 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun getBytes(offset: Int, length: Int): ByteArray {
         return try {
             Stats.onNativeCall()
-            check(_nSize(_ptr) >= offset + length) {
+            check(Data_nSize(_ptr) >= offset + length) {
                 "Data=${_ptr}: Can't getBytes with offset=$offset and length=$length"
             }
             withResult(ByteArray(length)) {
-                _nBytes(_ptr, offset, length, it)
+                Data_nBytes(_ptr, offset, length, it)
             }
         } finally {
             reachabilityBarrier(this)
@@ -97,7 +104,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     override fun nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nEquals(_ptr, getPtr(other))
+            Data_nEquals(_ptr, getPtr(other))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(other)
@@ -111,7 +118,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun makeSubset(offset: Int, length: Int): Data {
         return try {
             Stats.onNativeCall()
-            Data(_nMakeSubset(_ptr, offset, length))
+            Data(Data_nMakeSubset(_ptr, offset, length))
         } finally {
             reachabilityBarrier(this)
         }
@@ -120,7 +127,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun makeCopy(): Data {
         return try {
             Stats.onNativeCall()
-            Data(_nMakeSubset(_ptr, 0, size))
+            Data(Data_nMakeSubset(_ptr, 0, size))
         } finally {
             reachabilityBarrier(this)
         }
@@ -129,7 +136,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun writableData(): NativePointer {
         return try {
             Stats.onNativeCall()
-            _nWritableData(_ptr)
+            Data_nWritableData(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -139,47 +146,3 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         val PTR = Data_nGetFinalizer()
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nGetFinalizer")
-private external fun Data_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nSize")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nSize")
-private external fun _nSize(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nBytes")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nBytes")
-private external fun _nBytes(ptr: NativePointer, offset: Int, length: Int, destBytes: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nEquals")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nEquals")
-private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeFromBytes")
-private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeWithoutCopy")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeWithoutCopy")
-private external fun _nMakeWithoutCopy(memoryAddr: NativePointer, length: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeFromFileName")
-internal external fun _nMakeFromFileName(path: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeSubset")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeSubset")
-private external fun _nMakeSubset(ptr: NativePointer, offset: Int, length: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeEmpty")
-private external fun _nMakeEmpty(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeUninitialized")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeUninitialized")
-private external fun _nMakeUninitialized(length: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Data__1nWritableData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nWritableData")
-private external fun _nWritableData(dataPtr: NativePointer): NativePointer

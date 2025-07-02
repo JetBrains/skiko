@@ -1,7 +1,11 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
@@ -13,7 +17,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
             return try {
                 Stats.onNativeCall()
                 val ptr =
-                    _nMakeFromData(getPtr(data))
+                    Codec_nMakeFromData(getPtr(data))
                 require(ptr != NullPointer) { "Unsupported format" }
                 Codec(ptr)
             } finally {
@@ -57,21 +61,21 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     val size: IPoint
         get() = try {
             Stats.onNativeCall()
-            IPoint(_nGetSizeWidth(_ptr), _nGetSizeHeight(_ptr))
+            IPoint(Codec_nGetSizeWidth(_ptr), Codec_nGetSizeHeight(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
     val encodedOrigin: EncodedOrigin
         get() = try {
             Stats.onNativeCall()
-            EncodedOrigin.values().get(_nGetEncodedOrigin(_ptr))
+            EncodedOrigin.values().get(Codec_nGetEncodedOrigin(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
     val encodedImageFormat: EncodedImageFormat
         get() = try {
             Stats.onNativeCall()
-            EncodedImageFormat.values().get(_nGetEncodedImageFormat(_ptr))
+            EncodedImageFormat.values().get(Codec_nGetEncodedImageFormat(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -273,7 +277,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     val frameCount: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetFrameCount(_ptr)
+            Codec_nGetFrameCount(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -290,7 +294,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     fun getFrameInfo(frame: Int): AnimationFrameInfo {
         return try {
             Stats.onNativeCall()
-            AnimationFrameInfo.fromInteropPointer { _nGetFrameInfo(_ptr, frame, it) }
+            AnimationFrameInfo.fromInteropPointer { Codec_nGetFrameInfo(_ptr, frame, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -313,7 +317,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     val framesInfo: Array<AnimationFrameInfo>
         get() = try {
             Stats.onNativeCall()
-            val buffer = _nGetFramesInfo(_ptr)
+            val buffer = Codec_nGetFramesInfo(_ptr)
             val size = FramesInfo_nGetSize(buffer)
             if (size > 0) {
                 AnimationFrameInfo.fromInteropArrayPointer(size) {
@@ -350,7 +354,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     val repetitionCount: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetRepetitionCount(_ptr)
+            Codec_nGetRepetitionCount(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -359,63 +363,3 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
         val PTR = Codec_nGetFinalizer()
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetFinalizer")
-private external fun Codec_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetImageInfo")
-private external fun Codec_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nReadPixels")
-private external fun Codec_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nMakeFromData")
-private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeWidth")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetSizeWidth")
-private external fun _nGetSizeWidth(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeHeight")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetSizeHeight")
-private external fun _nGetSizeHeight(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetEncodedOrigin")
-private external fun _nGetEncodedOrigin(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
-private external fun _nGetEncodedImageFormat(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetFrameCount")
-private external fun _nGetFrameCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameInfo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetFrameInfo")
-private external fun _nGetFrameInfo(ptr: NativePointer, frame: Int, result: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFramesInfo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetFramesInfo")
-private external fun _nGetFramesInfo(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetRepetitionCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nGetRepetitionCount")
-private external fun _nGetRepetitionCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_Delete")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nFramesInfo_Delete")
-private external fun FramesInfo_nDelete(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetSize")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nFramesInfo_GetSize")
-private external fun FramesInfo_nGetSize(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetInfos")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Codec__1nFramesInfo_GetInfos")
-private external fun FramesInfo_nGetInfos(ptr: NativePointer, result: InteropPointer)

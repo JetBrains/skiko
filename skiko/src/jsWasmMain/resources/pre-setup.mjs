@@ -10,4 +10,4 @@ export const {
 
 export const loadedWasm = await loadSkikoWASM();
 
-export const { GL } = loadedWasm;
+export const { GL, wasmExports } = loadedWasm;

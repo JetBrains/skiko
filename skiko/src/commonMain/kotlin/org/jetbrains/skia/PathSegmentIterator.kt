@@ -1,6 +1,5 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.NativePointer
@@ -15,7 +14,7 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     companion object {
         fun make(path: Path?, forceClose: Boolean): PathSegmentIterator {
             return try {
-                val i = PathSegmentIterator(path, _nMake(getPtr(path), forceClose))
+                val i = PathSegmentIterator(path, PathSegmentIterator_nMake(getPtr(path), forceClose))
                 i._nextSegment = i.nextSegment()
                 i
             } finally {
@@ -124,15 +123,3 @@ private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
         }
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
-private external fun PathSegmentIterator_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nNext")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathSegmentIterator__1nNext")
-private external fun PathSegmentIterator_nNext(ptr: NativePointer, points: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathSegmentIterator__1nMake")
-private external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer

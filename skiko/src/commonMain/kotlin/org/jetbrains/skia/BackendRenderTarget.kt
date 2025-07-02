@@ -5,7 +5,6 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.RenderException
-import org.jetbrains.skiko.loadOpenGLLibrary
 
 class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -18,14 +17,14 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
             fbFormat: Int
         ): BackendRenderTarget {
             Stats.onNativeCall()
-            val ptr =_nMakeGL(width, height, sampleCnt, stencilBits, fbId, fbFormat)
+            val ptr =BackendRenderTarget_nMakeGL(width, height, sampleCnt, stencilBits, fbId, fbFormat)
             if (ptr == NullPointer) throw RenderException("Can't create OpenGL BackendRenderTarget")
             return BackendRenderTarget(ptr)
         }
 
         fun makeMetal(width: Int, height: Int, texturePtr: NativePointer): BackendRenderTarget {
             Stats.onNativeCall()
-            return BackendRenderTarget(_nMakeMetal(width, height, texturePtr))
+            return BackendRenderTarget(BackendRenderTarget_nMakeMetal(width, height, texturePtr))
         }
 
         /**
@@ -50,7 +49,7 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
             levelCnt: Int
         ): BackendRenderTarget {
             Stats.onNativeCall()
-            return BackendRenderTarget(_nMakeDirect3D(width, height, texturePtr, format, sampleCnt, levelCnt))
+            return BackendRenderTarget(BackendRenderTarget_nMakeDirect3D(width, height, texturePtr, format, sampleCnt, levelCnt))
         }
 
         init {
@@ -62,26 +61,3 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
         val PTR = BackendRenderTarget_nGetFinalizer()
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer")
-private external fun BackendRenderTarget_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nMakeGL")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BackendRenderTarget__1nMakeGL")
-private external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer
-
-@ExternalSymbolName("BackendRenderTarget_nMakeMetal")
-@ModuleImport("./skiko.mjs", "BackendRenderTarget_nMakeMetal")
-private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
-
-@ExternalSymbolName("BackendRenderTarget_MakeDirect3D")
-@ModuleImport("./skiko.mjs", "BackendRenderTarget_MakeDirect3D")
-private external fun _nMakeDirect3D(
-    width: Int,
-    height: Int,
-    texturePtr: NativePointer,
-    format: Int,
-    sampleCnt: Int,
-    levelCnt: Int
-): NativePointer

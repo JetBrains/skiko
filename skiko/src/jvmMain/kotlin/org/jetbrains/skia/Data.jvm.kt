@@ -10,6 +10,6 @@ import org.jetbrains.skia.impl.interopScope
 fun Data.Companion.makeFromFileName(path: String?): Data {
     Stats.onNativeCall()
     interopScope {
-        return Data(_nMakeFromFileName(toInterop(path)))
+        return Data(Data_nMakeFromFileName(toInterop(path)))
     }
 }

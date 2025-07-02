@@ -1,7 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -36,7 +41,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
     fun build(): TextBlob? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nBuild(_ptr)
+            val ptr = TextBlobBuilder_nBuild(_ptr)
             if (ptr == NullPointer) null else TextBlob(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -79,7 +84,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         return try {
             Stats.onNativeCall()
             interopScope {
-                _nAppendRun(
+                TextBlobBuilder_nAppendRun(
                     _ptr,
                     getPtr(font),
                     toInterop(glyphs),
@@ -132,7 +137,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
             require(glyphs.size == xs.size) { "glyphs.length " + glyphs.size + " != xs.length " + xs.size }
             Stats.onNativeCall()
             interopScope {
-                _nAppendRunPosH(
+                TextBlobBuilder_nAppendRunPosH(
                     _ptr,
                     getPtr(font),
                     toInterop(glyphs),
@@ -182,7 +187,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
             }
             Stats.onNativeCall()
             interopScope {
-                _nAppendRunPos(
+                TextBlobBuilder_nAppendRunPos(
                     _ptr,
                     getPtr(font),
                     toInterop(glyphs),
@@ -210,7 +215,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
             }
             Stats.onNativeCall()
             interopScope {
-                _nAppendRunRSXform(
+                TextBlobBuilder_nAppendRunRSXform(
                     _ptr,
                     getPtr(font),
                     toInterop(glyphs),
@@ -229,55 +234,3 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         val PTR = TextBlobBuilder_nGetFinalizer()
     }
 }
-
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
-private external fun TextBlobBuilder_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilder__1nMake")
-private external fun TextBlobBuilder_nMake(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nBuild")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilder__1nBuild")
-private external fun _nBuild(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
-private external fun _nAppendRun(
-    ptr: NativePointer, fontPtr: NativePointer,
-    glyphs: InteropPointer, glyphsLen: Int,
-    x: Float, y: Float,
-    bounds: InteropPointer
-)
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
-private external fun _nAppendRunPosH(
-    ptr: NativePointer,
-    fontPtr: NativePointer,
-    glyphs: InteropPointer,
-    glyphsLen: Int,
-    xs: InteropPointer,
-    y: Float,
-    bounds: InteropPointer
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
-private external fun _nAppendRunPos(
-    ptr: NativePointer, fontPtr: NativePointer,
-    glyphs: InteropPointer, glyphsLen: Int,
-    pos: InteropPointer,
-    bounds: InteropPointer
-)
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
-private external fun _nAppendRunRSXform(
-    ptr: NativePointer, fontPtr: NativePointer,
-    glyphs: InteropPointer, glyphsLen: Int,
-    xform: InteropPointer
-)

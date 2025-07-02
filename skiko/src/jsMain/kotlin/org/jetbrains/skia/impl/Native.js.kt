@@ -77,7 +77,7 @@ internal actual class InteropScope actual constructor() {
 
     private fun toInterop(array: ByteArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
-            val data = _malloc(array.size)
+            val data = Native_malloc(array.size)
             elements.add(data)
             if (copyArrayToWasm) toWasm(data, array)
             data
@@ -98,7 +98,7 @@ internal actual class InteropScope actual constructor() {
 
     private fun toInterop(array: ShortArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
-            val data = _malloc(array.size * 2)
+            val data = Native_malloc(array.size * 2)
             elements.add(data)
             if (copyArrayToWasm) toWasm(data, array)
             data
@@ -119,7 +119,7 @@ internal actual class InteropScope actual constructor() {
 
     private fun toInterop(array: IntArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
-            val data = _malloc(array.size * 4)
+            val data = Native_malloc(array.size * 4)
             elements.add(data)
             if (copyArrayToWasm) toWasm(data, array)
             data
@@ -148,7 +148,7 @@ internal actual class InteropScope actual constructor() {
 
     private fun toInterop(array: FloatArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
-            val data = _malloc(array.size * 4)
+            val data = Native_malloc(array.size * 4)
             elements.add(data)
             if (copyArrayToWasm) toWasm(data, array)
             data
@@ -169,7 +169,7 @@ internal actual class InteropScope actual constructor() {
 
     private fun toInterop(array: DoubleArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
-            val data = _malloc(array.size * 8)
+            val data = Native_malloc(array.size * 8)
             elements.add(data)
             if (copyArrayToWasm) toWasm(data, array)
             data
@@ -190,7 +190,7 @@ internal actual class InteropScope actual constructor() {
 
     private fun toInterop(array: NativePointerArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.size > 0) {
-            val data = _malloc(array.size * 4)
+            val data = Native_malloc(array.size * 4)
             elements.add(data)
             if (copyArrayToWasm) toWasm(data, array.backing)
             data
@@ -299,7 +299,7 @@ internal actual class InteropScope actual constructor() {
 
     actual fun release()  {
         elements.forEach {
-            _free(it)
+            Native_free(it)
         }
         elements.clear()
         releaseCallbacks()

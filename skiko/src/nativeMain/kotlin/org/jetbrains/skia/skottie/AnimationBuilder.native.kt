@@ -8,7 +8,7 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 fun AnimationBuilder.buildFromFile(path: String): Animation {
     return try {
         Stats.onNativeCall()
-        val ptr = interopScope { _nBuildFromFile(_ptr, toInterop(path)) }
+        val ptr = interopScope { AnimationBuilder_nBuildFromFile(_ptr, toInterop(path)) }
         require(ptr != Native.NullPointer) { "Failed to create Animation from path: $path" }
         Animation(ptr)
     } finally {

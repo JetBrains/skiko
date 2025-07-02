@@ -1,7 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -19,13 +24,13 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          */
         fun makeBlur(mode: FilterBlurMode, sigma: Float, respectCTM: Boolean = true): MaskFilter {
             Stats.onNativeCall()
-            return MaskFilter(_nMakeBlur(mode.ordinal, sigma, respectCTM))
+            return MaskFilter(MaskFilter_nMakeBlur(mode.ordinal, sigma, respectCTM))
         }
 
         fun makeShader(s: Shader?): MaskFilter {
             return try {
                 Stats.onNativeCall()
-                MaskFilter(_nMakeShader(getPtr(s)))
+                MaskFilter(MaskFilter_nMakeShader(getPtr(s)))
             } finally {
                 reachabilityBarrier(s)
             }
@@ -44,12 +49,12 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
         fun makeGamma(gamma: Float): MaskFilter {
             Stats.onNativeCall()
-            return MaskFilter(_nMakeGamma(gamma))
+            return MaskFilter(MaskFilter_nMakeGamma(gamma))
         }
 
         fun makeClip(min: Int, max: Int): MaskFilter {
             Stats.onNativeCall()
-            return MaskFilter(_nMakeClip(min.toByte(), max.toByte()))
+            return MaskFilter(MaskFilter_nMakeClip(min.toByte(), max.toByte()))
         }
 
         // If radius > 0, return the corresponding sigma, else return 0
@@ -66,23 +71,3 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 // This constant approximates the scaling done in the software path's
 // "high quality" mode, in SkBlurMask::Blur() (1 / sqrt(3)).
 private const val kBLUR_SIGMA_SCALE = 0.57735f
-
-@ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeTable")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_MaskFilter__1nMakeTable")
-private external fun MaskFilter_nMakeTable(table: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeBlur")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_MaskFilter__1nMakeBlur")
-private external fun _nMakeBlur(mode: Int, sigma: Float, respectCTM: Boolean): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeShader")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_MaskFilter__1nMakeShader")
-private external fun _nMakeShader(shaderPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeGamma")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_MaskFilter__1nMakeGamma")
-private external fun _nMakeGamma(gamma: Float): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeClip")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_MaskFilter__1nMakeClip")
-private external fun _nMakeClip(min: Byte, max: Byte): NativePointer

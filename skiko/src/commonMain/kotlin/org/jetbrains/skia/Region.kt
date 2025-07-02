@@ -1,7 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withResult
 
 class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     companion object {
@@ -323,139 +328,3 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
         Stats.onNativeCall()
     }
 }
-
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nMake")
-private external fun Region_nMake(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nGetFinalizer")
-private external fun Region_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nIsEmpty")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nIsEmpty")
-private external fun Region_nIsEmpty(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nIsRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nIsRect")
-private external fun Region_nIsRect(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nGetBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nGetBounds")
-private external fun Region_nGetBounds(ptr: NativePointer, ltrb: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nSet")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nSet")
-private external fun Region_nSet(ptr: NativePointer, regoinPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nIsComplex")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nIsComplex")
-private external fun Region_nIsComplex(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nComputeRegionComplexity")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nComputeRegionComplexity")
-private external fun Region_nComputeRegionComplexity(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nGetBoundaryPath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nGetBoundaryPath")
-private external fun Region_nGetBoundaryPath(ptr: NativePointer, pathPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nSetEmpty")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nSetEmpty")
-private external fun Region_nSetEmpty(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nSetRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nSetRect")
-private external fun Region_nSetRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nSetRects")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nSetRects")
-private external fun Region_nSetRects(ptr: NativePointer, rects: InteropPointer, count: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nSetRegion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nSetRegion")
-private external fun Region_nSetRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nSetPath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nSetPath")
-private external fun Region_nSetPath(ptr: NativePointer, pathPtr: NativePointer, regionPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsIRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nIntersectsIRect")
-private external fun Region_nIntersectsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsRegion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nIntersectsRegion")
-private external fun Region_nIntersectsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIPoint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nContainsIPoint")
-private external fun Region_nContainsIPoint(ptr: NativePointer, x: Int, y: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nContainsIRect")
-private external fun Region_nContainsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nContainsRegion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nContainsRegion")
-private external fun Region_nContainsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nQuickContains")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nQuickContains")
-private external fun Region_nQuickContains(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectIRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nQuickRejectIRect")
-private external fun Region_nQuickRejectIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectRegion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nQuickRejectRegion")
-private external fun Region_nQuickRejectRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nTranslate")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nTranslate")
-private external fun Region_nTranslate(ptr: NativePointer, dx: Int, dy: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nOpIRect")
-private external fun Region_nOpIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int, op: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nOpRegion")
-private external fun Region_nOpRegion(ptr: NativePointer, regionPtr: NativePointer, op: Int): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRectRegion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nOpIRectRegion")
-private external fun Region_nOpIRectRegion(
-    ptr: NativePointer,
-    left: Int,
-    top: Int,
-    right: Int,
-    bottom: Int,
-    regionPtr: NativePointer,
-    op: Int
-): Boolean
-
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionIRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nOpRegionIRect")
-private external fun Region_nOpRegionIRect(
-    ptr: NativePointer,
-    regionPtr: NativePointer,
-    left: Int,
-    top: Int,
-    right: Int,
-    bottom: Int,
-    op: Int
-): Boolean
-
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionRegion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Region__1nOpRegionRegion")
-private external fun Region_nOpRegionRegion(
-    ptr: NativePointer,
-    regionPtrA: NativePointer,
-    regionPtrB: NativePointer,
-    op: Int
-): Boolean

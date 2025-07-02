@@ -1,7 +1,14 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withNullableResult
+import org.jetbrains.skia.impl.withResult
 
 class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<TextBlob.TextBlobIter.Run> {
     companion object {
@@ -20,7 +27,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 require(glyphs.size == xpos.size) { "glyphs.length " + glyphs.size + " != xpos.length " + xpos.size }
                 Stats.onNativeCall()
                 val ptr = interopScope {
-                    _nMakeFromPosH(
+                    TextBlob_nMakeFromPosH(
                         toInterop(glyphs),
                         glyphs.size,
                         toInterop(xpos),
@@ -54,7 +61,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 Stats.onNativeCall()
                 val ptr =
                     interopScope {
-                        _nMakeFromPos(toInterop(glyphs), glyphs.size, toInterop(floatPos), getPtr(font))
+                        TextBlob_nMakeFromPos(toInterop(glyphs), glyphs.size, toInterop(floatPos), getPtr(font))
                     }
                 if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
@@ -74,7 +81,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 }
                 Stats.onNativeCall()
                 val ptr = interopScope {
-                    _nMakeFromRSXform(
+                    TextBlob_nMakeFromRSXform(
                         toInterop(glyphs),
                         glyphs.size,
                         toInterop(floatXform),
@@ -113,7 +120,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() = try {
             Stats.onNativeCall()
             Rect.fromInteropPointer {
-                _nBounds(_ptr, it)
+                TextBlob_nBounds(_ptr, it)
             }
         } finally {
             reachabilityBarrier(this)
@@ -168,8 +175,8 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     fun getIntercepts(lowerBound: Float, upperBound: Float, paint: Paint?): FloatArray? {
         return try {
             Stats.onNativeCall()
-            withResult(FloatArray(_nGetInterceptsLength(_ptr, lowerBound, upperBound, getPtr(paint)))) {
-                _nGetIntercepts(
+            withResult(FloatArray(TextBlob_nGetInterceptsLength(_ptr, lowerBound, upperBound, getPtr(paint)))) {
+                TextBlob_nGetIntercepts(
                     ptr = _ptr,
                     lower = lowerBound,
                     upper = upperBound,
@@ -199,7 +206,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() = try {
             Stats.onNativeCall()
             withResult(ShortArray(glyphsLength)) {
-                _nGetGlyphs(_ptr, it)
+                TextBlob_nGetGlyphs(_ptr, it)
             }
         } finally {
             reachabilityBarrier(this)
@@ -208,7 +215,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     internal val glyphsLength: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetGlyphsLength(_ptr)
+            TextBlob_nGetGlyphsLength(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -229,8 +236,8 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val positions: FloatArray
         get() = try {
             Stats.onNativeCall()
-            withResult(FloatArray(_nGetPositionsLength(_ptr))) {
-                _nGetPositions(_ptr, it)
+            withResult(FloatArray(TextBlob_nGetPositionsLength(_ptr))) {
+                TextBlob_nGetPositions(_ptr, it)
             }
         } finally {
             reachabilityBarrier(this)
@@ -245,8 +252,8 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val clusters: IntArray
         get() = try {
             Stats.onNativeCall()
-            withNullableResult(IntArray(_nGetClustersLength(_ptr))) {
-                _nGetClusters(_ptr, it)
+            withNullableResult(IntArray(TextBlob_nGetClustersLength(_ptr))) {
+                TextBlob_nGetClusters(_ptr, it)
             } ?: throw IllegalArgumentException()
         } finally {
             reachabilityBarrier(this)
@@ -262,7 +269,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() = try {
             Stats.onNativeCall()
             Rect.fromInteropPointerNullable {
-                _nGetTightBounds(_ptr, it)
+                TextBlob_nGetTightBounds(_ptr, it)
             } ?: throw IllegalArgumentException()
         } finally {
             reachabilityBarrier(this)
@@ -278,7 +285,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() = try {
             Stats.onNativeCall()
             Rect.fromInteropPointerNullable {
-                _nGetBlockBounds(_ptr, it)
+                TextBlob_nGetBlockBounds(_ptr, it)
             } ?: throw IllegalArgumentException()
         } finally {
             reachabilityBarrier(this)
@@ -294,7 +301,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() = try {
             Stats.onNativeCall()
             withNullableResult(FloatArray(1)) {
-                _nGetFirstBaseline(_ptr, it)
+                TextBlob_nGetFirstBaseline(_ptr, it)
             }?.firstOrNull() ?: throw IllegalArgumentException()
         } finally {
             reachabilityBarrier(this)
@@ -310,7 +317,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() = try {
             Stats.onNativeCall()
             withNullableResult(FloatArray(1)) {
-                _nGetLastBaseline(_ptr, it)
+                TextBlob_nGetLastBaseline(_ptr, it)
             }?.firstOrNull() ?: throw IllegalArgumentException()
         } finally {
             reachabilityBarrier(this)
@@ -366,113 +373,4 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             val PTR = Iter_nGetFinalizer()
         }
     }
-
 }
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetFinalizer")
-private external fun TextBlob_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetUniqueId")
-private external fun TextBlob_nGetUniqueId(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nSerializeToData")
-private external fun TextBlob_nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nMakeFromData")
-private external fun TextBlob_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nBounds")
-private external fun _nBounds(ptr: NativePointer, resultRect: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetInterceptsLength")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetInterceptsLength")
-private external fun _nGetInterceptsLength(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetIntercepts")
-private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer, resultArray: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nMakeFromPosH")
-private external fun _nMakeFromPosH(glyphs: InteropPointer, glyphsLen: Int, xpos: InteropPointer, ypos: Float, fontPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nMakeFromPos")
-private external fun _nMakeFromPos(glyphs: InteropPointer, glyphsLen: Int, pos: InteropPointer, fontPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
-private external fun _nMakeFromRSXform(glyphs: InteropPointer, glyphsLen: Int, xform: InteropPointer, fontPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphsLength")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetGlyphsLength")
-private external fun _nGetGlyphsLength(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetGlyphs")
-private external fun _nGetGlyphs(ptr: NativePointer, result: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositionsLength")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetPositionsLength")
-private external fun _nGetPositionsLength(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetPositions")
-private external fun _nGetPositions(ptr: NativePointer, resultArray: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClustersLength")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetClustersLength")
-private external fun _nGetClustersLength(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetClusters")
-private external fun _nGetClusters(ptr: NativePointer, resultArray: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetTightBounds")
-private external fun _nGetTightBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetBlockBounds")
-private external fun _nGetBlockBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
-private external fun _nGetFirstBaseline(ptr: NativePointer, resultArray: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob__1nGetLastBaseline")
-private external fun _nGetLastBaseline(ptr: NativePointer, resultArray: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nCreate")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob_Iter__1nCreate")
-private external fun Iter_nCreate(textBlobPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob_Iter__1nGetFinalizer")
-private external fun Iter_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nFetch")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob_Iter__1nFetch")
-private external fun Iter_nFetch(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetTypeface")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob_Iter__1nGetTypeface")
-private external fun Iter_nGetTypeface(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nHasNext")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob_Iter__1nHasNext")
-private external fun Iter_nHasNext(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob_Iter__1nGetGlyphCount")
-private external fun Iter_nGetGlyphCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphs")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlob_Iter__1nGetGlyphs")
-private external fun Iter_nGetGlyphs(ptr: NativePointer, glyphs: InteropPointer, max: Int): Int

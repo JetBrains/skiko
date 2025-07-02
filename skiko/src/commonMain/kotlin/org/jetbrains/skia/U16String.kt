@@ -18,7 +18,3 @@ class U16String internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         val PTR = U16String_nGetFinalizer()
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_U16String__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_U16String__1nGetFinalizer")
-private external fun U16String_nGetFinalizer(): NativePointer

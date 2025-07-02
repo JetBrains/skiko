@@ -52,7 +52,7 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         return try {
             Stats.onNativeCall()
             Canvas(
-                _nBeginRecording(
+                PictureRecorder_nBeginRecording(
                     _ptr,
                     bounds.left,
                     bounds.top,
@@ -72,7 +72,7 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
     val recordingCanvas: Canvas?
         get() = try {
             Stats.onNativeCall()
-            val ptr = _nGetRecordingCanvas(_ptr)
+            val ptr = PictureRecorder_nGetRecordingCanvas(_ptr)
             if (ptr == NullPointer) null else Canvas(ptr, false, this)
         } finally {
             reachabilityBarrier(this)
@@ -92,7 +92,7 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
     fun finishRecordingAsPicture(): Picture {
         return try {
             Stats.onNativeCall()
-            Picture(_nFinishRecordingAsPicture(_ptr))
+            Picture(PictureRecorder_nFinishRecordingAsPicture(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -112,7 +112,7 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         return try {
             Stats.onNativeCall()
             Picture(
-                _nFinishRecordingAsPictureWithCull(
+                PictureRecorder_nFinishRecordingAsPictureWithCull(
                     _ptr,
                     cull.left,
                     cull.top,
@@ -125,47 +125,3 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         }
     }
 }
-
-
-@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureRecorder__1nMake")
-private external fun PictureRecorder_nMake(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureRecorder__1nGetFinalizer")
-private external fun PictureRecorder_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nBeginRecording")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureRecorder__1nBeginRecording")
-private external fun _nBeginRecording(
-    ptr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    bbh: NativePointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas")
-private external fun _nGetRecordingCanvas(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPicture")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPicture")
-private external fun _nFinishRecordingAsPicture(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPictureWithCull")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPictureWithCull")
-private external fun _nFinishRecordingAsPictureWithCull(
-    ptr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsDrawable")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsDrawable")
-private external fun _nFinishRecordingAsDrawable(ptr: NativePointer): NativePointer
-

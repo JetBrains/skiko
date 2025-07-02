@@ -1,7 +1,14 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withResult
 import kotlin.math.min
 
 /**
@@ -33,7 +40,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         fun makeFromSVGString(svg: String): Path  {
             Stats.onNativeCall()
             val result = interopScope {
-                _nMakeFromSVGString(toInterop(svg))
+                Path_nMakeFromSVGString(toInterop(svg))
             }
 
             if (result == NullPointer) {
@@ -64,7 +71,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          */
         fun isLineDegenerate(p1: Point, p2: Point, exact: Boolean): Boolean {
             Stats.onNativeCall()
-            return _nIsLineDegenerate(p1.x, p1.y, p2.x, p2.y, exact)
+            return Path_nIsLineDegenerate(p1.x, p1.y, p2.x, p2.y, exact)
         }
 
         /**
@@ -84,7 +91,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          */
         fun isQuadDegenerate(p1: Point, p2: Point, p3: Point, exact: Boolean): Boolean {
             Stats.onNativeCall()
-            return _nIsQuadDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, exact)
+            return Path_nIsQuadDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, exact)
         }
 
         /**
@@ -105,7 +112,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          */
         fun isCubicDegenerate(p1: Point, p2: Point, p3: Point, p4: Point, exact: Boolean): Boolean {
             Stats.onNativeCall()
-            return _nIsCubicDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y, exact)
+            return Path_nIsCubicDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y, exact)
         }
 
         /**
@@ -150,7 +157,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             val maxResultPointCount = (1 + 2 * (1 shl pow2)) // See Skia docs
             var pointCount = 0
             val coords = withResult(FloatArray(maxResultPointCount * 2)) {
-                pointCount = _nConvertConicToQuads(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, w, pow2, it)
+                pointCount = Path_nConvertConicToQuads(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, w, pow2, it)
             }
             return Array(pointCount) { Point(coords[2 * it], coords[2 * it + 1]) }
         }
@@ -172,7 +179,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         fun makeCombining(one: Path, two: Path, op: PathOp): Path? {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeCombining(
+                val ptr = Path_nMakeCombining(
                     getPtr(one),
                     getPtr(two),
                     op.ordinal
@@ -205,7 +212,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         fun makeFromBytes(data: ByteArray): Path {
             Stats.onNativeCall()
             val result = interopScope {
-                _nMakeFromBytes(toInterop(data), data.size)
+                Path_nMakeFromBytes(toInterop(data), data.size)
             }
 
             if (result == NullPointer) {
@@ -266,7 +273,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun isInterpolatable(compare: Path?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nIsInterpolatable(
+            Path_nIsInterpolatable(
                 _ptr,
                 getPtr(compare)
             )
@@ -304,7 +311,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun makeLerp(ending: Path?, weight: Float): Path {
         return try {
             Stats.onNativeCall()
-            val ptr = _nMakeLerp(
+            val ptr = Path_nMakeLerp(
                 _ptr,
                 getPtr(ending),
                 weight
@@ -320,13 +327,13 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     var fillMode: PathFillMode
         get() = try {
             Stats.onNativeCall()
-            PathFillMode.values().get(_nGetFillMode(_ptr))
+            PathFillMode.values().get(Path_nGetFillMode(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
         set(value) = try {
             Stats.onNativeCall()
-            _nSetFillMode(_ptr, value.ordinal)
+            Path_nSetFillMode(_ptr, value.ordinal)
         } finally {
             reachabilityBarrier(this)
         }
@@ -339,7 +346,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val isConvex: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsConvex(_ptr)
+            Path_nIsConvex(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -354,7 +361,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val isOval: Rect?
         get() = try {
             Stats.onNativeCall()
-            Rect.fromInteropPointerNullable { _nIsOval(_ptr, it) }
+            Rect.fromInteropPointerNullable { Path_nIsOval(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -369,7 +376,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val isRRect: RRect?
         get() = try {
             Stats.onNativeCall()
-            RRect.fromInteropPointerNullable { _nIsRRect(_ptr, it) }
+            RRect.fromInteropPointerNullable { Path_nIsRRect(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -408,7 +415,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun rewind(): Path {
         Stats.onNativeCall()
-        _nRewind(_ptr)
+        Path_nRewind(_ptr)
         return this
     }
 
@@ -425,7 +432,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val isEmpty: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsEmpty(_ptr)
+            Path_nIsEmpty(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -445,7 +452,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val isLastContourClosed: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsLastContourClosed(_ptr)
+            Path_nIsLastContourClosed(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -461,7 +468,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         get() = try {
             Stats.onNativeCall()
             // TODO For some reason this method returns 0 instead of false in JS target, investigate
-            !!_nIsFinite(_ptr)
+            !!Path_nIsFinite(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -542,7 +549,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         get() = try {
             Stats.onNativeCall()
             // HACK Use a temporary Rect as a buffer to store two points
-            val rectBuffer = Rect.fromInteropPointerNullable { _nMaybeGetAsLine(_ptr, it) }
+            val rectBuffer = Rect.fromInteropPointerNullable { Path_nMaybeGetAsLine(_ptr, it) }
             rectBuffer?.run {
                 arrayOf(
                     Point(left, top),
@@ -564,7 +571,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val pointsCount: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetPointsCount(_ptr)
+            Path_nGetPointsCount(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -585,7 +592,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun getPoint(index: Int): Point {
         return try {
             Stats.onNativeCall()
-            Point.fromInteropPointer { _nGetPoint(_ptr, index, it) }
+            Point.fromInteropPointer { Path_nGetPoint(_ptr, index, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -626,12 +633,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             if (points == null) {
                 interopScope {
-                    _nGetPoints(_ptr, toInterop(null as FloatArray?), max)
+                    Path_nGetPoints(_ptr, toInterop(null as FloatArray?), max)
                 }
             } else {
                 var result = 0
                 val coords = withResult(FloatArray(max * 2)) {
-                    result = _nGetPoints(_ptr, it, max)
+                    result = Path_nGetPoints(_ptr, it, max)
                 }
                 for (i in 0 until min(max, result)) {
                     points[i] = Point(coords[2 * i], coords[2 * i + 1])
@@ -654,7 +661,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val verbsCount: Int
         get() = try {
             Stats.onNativeCall()
-            _nCountVerbs(_ptr)
+            Path_nCountVerbs(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -681,7 +688,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             val out = if (verbs == null) null else ByteArray(max)
             val count = interopScope {
                 val ptr = toInterop(out)
-                _nGetVerbs(_ptr, ptr, max).also {
+                Path_nGetVerbs(_ptr, ptr, max).also {
                     out?.let { ptr.fromInterop(it) }
                 }
             }
@@ -702,7 +709,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val approximateBytesUsed: NativePointer
         get() = try {
             Stats.onNativeCall()
-            _nApproximateBytesUsed(_ptr)
+            Path_nApproximateBytesUsed(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -746,7 +753,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            Rect.fromInteropPointer { _nGetBounds(_ptr, it) }
+            Rect.fromInteropPointer { Path_nGetBounds(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -767,7 +774,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun updateBoundsCache(): Path {
         Stats.onNativeCall()
-        _nUpdateBoundsCache(_ptr)
+        Path_nUpdateBoundsCache(_ptr)
         return this
     }
 
@@ -794,7 +801,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun computeTightBounds(): Rect {
         return try {
             Stats.onNativeCall()
-            Rect.fromInteropPointer { _nComputeTightBounds(_ptr, it) }
+            Rect.fromInteropPointer { Path_nComputeTightBounds(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -819,7 +826,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun conservativelyContainsRect(rect: Rect): Boolean {
         return try {
             Stats.onNativeCall()
-            _nConservativelyContainsRect(
+            Path_nConservativelyContainsRect(
                 _ptr,
                 rect.left,
                 rect.top,
@@ -844,7 +851,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun incReserve(extraPtCount: Int): Path {
         Stats.onNativeCall()
-        _nIncReserve(_ptr, extraPtCount)
+        Path_nIncReserve(_ptr, extraPtCount)
         return this
     }
 
@@ -859,7 +866,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun moveTo(x: Float, y: Float): Path {
         Stats.onNativeCall()
-        _nMoveTo(_ptr, x, y)
+        Path_nMoveTo(_ptr, x, y)
         return this
     }
 
@@ -890,7 +897,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun rMoveTo(dx: Float, dy: Float): Path {
         Stats.onNativeCall()
-        _nRMoveTo(_ptr, dx, dy)
+        Path_nRMoveTo(_ptr, dx, dy)
         return this
     }
 
@@ -911,7 +918,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun lineTo(x: Float, y: Float): Path {
         Stats.onNativeCall()
-        _nLineTo(_ptr, x, y)
+        Path_nLineTo(_ptr, x, y)
         return this
     }
 
@@ -958,7 +965,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun rLineTo(dx: Float, dy: Float): Path {
         Stats.onNativeCall()
-        _nRLineTo(_ptr, dx, dy)
+        Path_nRLineTo(_ptr, dx, dy)
         return this
     }
 
@@ -981,7 +988,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun quadTo(x1: Float, y1: Float, x2: Float, y2: Float): Path {
         Stats.onNativeCall()
-        _nQuadTo(_ptr, x1, y1, x2, y2)
+        Path_nQuadTo(_ptr, x1, y1, x2, y2)
         return this
     }
 
@@ -1042,7 +1049,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun rQuadTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float): Path {
         Stats.onNativeCall()
-        _nRQuadTo(_ptr, dx1, dy1, dx2, dy2)
+        Path_nRQuadTo(_ptr, dx1, dy1, dx2, dy2)
         return this
     }
 
@@ -1078,7 +1085,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun conicTo(x1: Float, y1: Float, x2: Float, y2: Float, w: Float): Path {
         Stats.onNativeCall()
-        _nConicTo(_ptr, x1, y1, x2, y2, w)
+        Path_nConicTo(_ptr, x1, y1, x2, y2, w)
         return this
     }
 
@@ -1147,7 +1154,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun rConicTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float): Path {
         Stats.onNativeCall()
-        _nRConicTo(_ptr, dx1, dy1, dx2, dy2, w)
+        Path_nRConicTo(_ptr, dx1, dy1, dx2, dy2, w)
         return this
     }
 
@@ -1172,7 +1179,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun cubicTo(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float): Path {
         Stats.onNativeCall()
-        _nCubicTo(_ptr, x1, y1, x2, y2, x3, y3)
+        Path_nCubicTo(_ptr, x1, y1, x2, y2, x3, y3)
         return this
     }
 
@@ -1227,7 +1234,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun rCubicTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float): Path {
         Stats.onNativeCall()
-        _nRCubicTo(_ptr, dx1, dy1, dx2, dy2, dx3, dy3)
+        Path_nRCubicTo(_ptr, dx1, dy1, dx2, dy2, dx3, dy3)
         return this
     }
 
@@ -1253,7 +1260,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun arcTo(oval: Rect, startAngle: Float, sweepAngle: Float, forceMoveTo: Boolean): Path {
         Stats.onNativeCall()
-        _nArcTo(_ptr, oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle, forceMoveTo)
+        Path_nArcTo(_ptr, oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle, forceMoveTo)
         return this
     }
 
@@ -1293,7 +1300,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun tangentArcTo(x1: Float, y1: Float, x2: Float, y2: Float, radius: Float): Path {
         Stats.onNativeCall()
-        _nTangentArcTo(_ptr, x1, y1, x2, y2, radius)
+        Path_nTangentArcTo(_ptr, x1, y1, x2, y2, radius)
         return this
     }
 
@@ -1367,7 +1374,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         y: Float
     ): Path {
         Stats.onNativeCall()
-        _nEllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, x, y)
+        Path_nEllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, x, y)
         return this
     }
 
@@ -1445,7 +1452,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         dy: Float
     ): Path {
         Stats.onNativeCall()
-        _nREllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, dx, dy)
+        Path_nREllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, dx, dy)
         return this
     }
 
@@ -1466,7 +1473,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun closePath(): Path {
         Stats.onNativeCall()
-        _nClosePath(_ptr)
+        Path_nClosePath(_ptr)
         return this
     }
 
@@ -1484,7 +1491,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val isRect: Rect?
         get() = try {
             Stats.onNativeCall()
-            Rect.fromInteropPointerNullable { _nIsRect(_ptr, it) }
+            Rect.fromInteropPointerNullable { Path_nIsRect(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -1525,7 +1532,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun addRect(rect: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 0): Path {
         Stats.onNativeCall()
-        _nAddRect(_ptr, rect.left, rect.top, rect.right, rect.bottom, dir.ordinal, start)
+        Path_nAddRect(_ptr, rect.left, rect.top, rect.right, rect.bottom, dir.ordinal, start)
         return this
     }
     /**
@@ -1572,7 +1579,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun addOval(oval: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 1): Path {
         Stats.onNativeCall()
-        _nAddOval(_ptr, oval.left, oval.top, oval.right, oval.bottom, dir.ordinal, start)
+        Path_nAddOval(_ptr, oval.left, oval.top, oval.right, oval.bottom, dir.ordinal, start)
         return this
     }
     /**
@@ -1605,7 +1612,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun addCircle(x: Float, y: Float, radius: Float, dir: PathDirection = PathDirection.CLOCKWISE): Path {
         Stats.onNativeCall()
-        _nAddCircle(_ptr, x, y, radius, dir.ordinal)
+        Path_nAddCircle(_ptr, x, y, radius, dir.ordinal)
         return this
     }
 
@@ -1630,7 +1637,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun addArc(oval: Rect, startAngle: Float, sweepAngle: Float): Path {
         Stats.onNativeCall()
-        _nAddArc(_ptr, oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle)
+        Path_nAddArc(_ptr, oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle)
         return this
     }
 
@@ -1664,7 +1671,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun addRRect(rrect: RRect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 6): Path {
         Stats.onNativeCall()
         interopScope {
-            _nAddRRect(_ptr, rrect.left, rrect.top, rrect.right, rrect.bottom, toInterop(rrect.radii), rrect.radii.size, dir.ordinal, start)
+            Path_nAddRRect(_ptr, rrect.left, rrect.top, rrect.right, rrect.bottom, toInterop(rrect.radii), rrect.radii.size, dir.ordinal, start)
         }
         return this
     }
@@ -1714,7 +1721,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         require(pts.size % 2 == 0) { "Expected even amount of pts, got " + pts.size }
         Stats.onNativeCall()
         interopScope {
-            _nAddPoly(_ptr, toInterop(pts), pts.size / 2, close)
+            Path_nAddPoly(_ptr, toInterop(pts), pts.size / 2, close)
         }
         return this
     }
@@ -1745,7 +1752,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun addPath(src: Path?, extend: Boolean = false): Path {
         return try {
             Stats.onNativeCall()
-            _nAddPath(
+            Path_nAddPath(
                 _ptr,
                 getPtr(src),
                 extend
@@ -1787,7 +1794,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun addPath(src: Path?, dx: Float, dy: Float, extend: Boolean = false): Path {
         return try {
             Stats.onNativeCall()
-            _nAddPathOffset(
+            Path_nAddPathOffset(
                 _ptr,
                 getPtr(src),
                 dx,
@@ -1832,7 +1839,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         return try {
             Stats.onNativeCall()
             interopScope {
-                _nAddPathTransform(
+                Path_nAddPathTransform(
                     _ptr,
                     getPtr(src),
                     toInterop(matrix.mat),
@@ -1858,7 +1865,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun reverseAddPath(src: Path?): Path {
         return try {
             Stats.onNativeCall()
-            _nReverseAddPath(_ptr, getPtr(src))
+            Path_nReverseAddPath(_ptr, getPtr(src))
             this
         } finally {
             reachabilityBarrier(this)
@@ -1886,7 +1893,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun offset(dx: Float, dy: Float, dst: Path? = null): Path {
         return try {
             Stats.onNativeCall()
-            _nOffset(_ptr, dx, dy, getPtr(dst))
+            Path_nOffset(_ptr, dx, dy, getPtr(dst))
             this
         } finally {
             reachabilityBarrier(this)
@@ -1943,7 +1950,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         return try {
             Stats.onNativeCall()
             interopScope {
-                _nTransform(
+                Path_nTransform(
                     _ptr,
                     toInterop(matrix.mat),
                     getPtr(dst),
@@ -1967,7 +1974,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     var lastPt: Point
         get() = try {
             Stats.onNativeCall()
-            Point.fromInteropPointer { _nGetLastPt(_ptr, it) }
+            Point.fromInteropPointer { Path_nGetLastPt(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -1987,7 +1994,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun setLastPt(x: Float, y: Float): Path {
         Stats.onNativeCall()
-        _nSetLastPt(_ptr, x, y)
+        Path_nSetLastPt(_ptr, x, y)
         return this
     }
 
@@ -2015,7 +2022,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val segmentMasks: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetSegmentMasks(_ptr)
+            Path_nGetSegmentMasks(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -2041,7 +2048,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun contains(x: Float, y: Float): Boolean {
         return try {
             Stats.onNativeCall()
-            _nContains(_ptr, x, y)
+            Path_nContains(_ptr, x, y)
         } finally {
             reachabilityBarrier(this)
         }
@@ -2072,7 +2079,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun dump(): Path {
         Stats.onNativeCall()
-        _nDump(_ptr)
+        Path_nDump(_ptr)
         return this
     }
 
@@ -2092,7 +2099,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun dumpHex(): Path {
         Stats.onNativeCall()
-        _nDumpHex(_ptr)
+        Path_nDumpHex(_ptr)
         return this
     }
 
@@ -2115,12 +2122,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun serializeToBytes(): ByteArray {
         return try {
             Stats.onNativeCall()
-            val size = interopScope { _nSerializeToBytes(_ptr, toInterop(null as ByteArray?)) }
+            val size = interopScope { Path_nSerializeToBytes(_ptr, toInterop(null as ByteArray?)) }
             if (size == -1) {
                 throw Error("Path is too big")
             }
             withResult(ByteArray(size)) {
-                _nSerializeToBytes(_ptr, it)
+                Path_nSerializeToBytes(_ptr, it)
             }
         } finally {
             reachabilityBarrier(this)
@@ -2163,377 +2170,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val isValid: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsValid(_ptr)
+            Path_nIsValid(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
 }
-
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetFinalizer")
-internal external fun Path_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nMake")
-private external fun Path_nMake(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nEquals")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nEquals")
-private external fun Path_nEquals(aPtr: NativePointer, bPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nReset")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nReset")
-private external fun Path_nReset(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsVolatile")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsVolatile")
-private external fun Path_nIsVolatile(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nSetVolatile")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nSetVolatile")
-private external fun Path_nSetVolatile(ptr: NativePointer, isVolatile: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nSwap")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nSwap")
-private external fun Path_nSwap(ptr: NativePointer, otherPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetGenerationId")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetGenerationId")
-private external fun Path_nGetGenerationId(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromSVGString")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nMakeFromSVGString")
-private external fun _nMakeFromSVGString(svg: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsInterpolatable")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsInterpolatable")
-private external fun _nIsInterpolatable(ptr: NativePointer, comparePtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeLerp")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nMakeLerp")
-private external fun _nMakeLerp(ptr: NativePointer, endingPtr: NativePointer, weight: Float): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetFillMode")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetFillMode")
-private external fun _nGetFillMode(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nSetFillMode")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nSetFillMode")
-private external fun _nSetFillMode(ptr: NativePointer, fillMode: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsConvex")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsConvex")
-private external fun _nIsConvex(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsOval")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsOval")
-private external fun _nIsOval(ptr: NativePointer, rect: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsRRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsRRect")
-private external fun _nIsRRect(ptr: NativePointer, rrect: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nRewind")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nRewind")
-private external fun _nRewind(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsEmpty")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsEmpty")
-private external fun _nIsEmpty(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsLastContourClosed")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsLastContourClosed")
-private external fun _nIsLastContourClosed(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsFinite")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsFinite")
-private external fun _nIsFinite(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsLineDegenerate")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsLineDegenerate")
-private external fun _nIsLineDegenerate(x0: Float, y0: Float, x1: Float, y1: Float, exact: Boolean): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsQuadDegenerate")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsQuadDegenerate")
-private external fun _nIsQuadDegenerate(
-    x0: Float,
-    y0: Float,
-    x1: Float,
-    y1: Float,
-    x2: Float,
-    y2: Float,
-    exact: Boolean
-): Boolean
-
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsCubicDegenerate")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsCubicDegenerate")
-private external fun _nIsCubicDegenerate(
-    x0: Float,
-    y0: Float,
-    x1: Float,
-    y1: Float,
-    x2: Float,
-    y2: Float,
-    x3: Float,
-    y3: Float,
-    exact: Boolean
-): Boolean
-
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nMaybeGetAsLine")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nMaybeGetAsLine")
-private external fun _nMaybeGetAsLine(ptr: NativePointer, rectBuffer: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetPointsCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetPointsCount")
-private external fun _nGetPointsCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetPoint")
-private external fun _nGetPoint(ptr: NativePointer, index: Int, result: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoints")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetPoints")
-private external fun _nGetPoints(ptr: NativePointer, points: InteropPointer, max: Int): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nCountVerbs")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nCountVerbs")
-private external fun _nCountVerbs(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetVerbs")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetVerbs")
-private external fun _nGetVerbs(ptr: NativePointer, verbs: InteropPointer, max: Int): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nApproximateBytesUsed")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nApproximateBytesUsed")
-private external fun _nApproximateBytesUsed(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetBounds")
-private external fun _nGetBounds(ptr: NativePointer, rect: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nUpdateBoundsCache")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nUpdateBoundsCache")
-private external fun _nUpdateBoundsCache(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nComputeTightBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nComputeTightBounds")
-private external fun _nComputeTightBounds(ptr: NativePointer, rect: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nConservativelyContainsRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nConservativelyContainsRect")
-private external fun _nConservativelyContainsRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIncReserve")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIncReserve")
-private external fun _nIncReserve(ptr: NativePointer, extraPtCount: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nMoveTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nMoveTo")
-private external fun _nMoveTo(ptr: NativePointer, x: Float, y: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nRMoveTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nRMoveTo")
-private external fun _nRMoveTo(ptr: NativePointer, dx: Float, dy: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nLineTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nLineTo")
-private external fun _nLineTo(ptr: NativePointer, x: Float, y: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nRLineTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nRLineTo")
-private external fun _nRLineTo(ptr: NativePointer, dx: Float, dy: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nQuadTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nQuadTo")
-private external fun _nQuadTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nRQuadTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nRQuadTo")
-private external fun _nRQuadTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nConicTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nConicTo")
-private external fun _nConicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, w: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nRConicTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nRConicTo")
-private external fun _nRConicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nCubicTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nCubicTo")
-private external fun _nCubicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nRCubicTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nRCubicTo")
-private external fun _nRCubicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nArcTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nArcTo")
-private external fun _nArcTo(
-    ptr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    startAngle: Float,
-    sweepAngle: Float,
-    forceMoveTo: Boolean
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nTangentArcTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nTangentArcTo")
-private external fun _nTangentArcTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, radius: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nEllipticalArcTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nEllipticalArcTo")
-private external fun _nEllipticalArcTo(
-    ptr: NativePointer,
-    rx: Float,
-    ry: Float,
-    xAxisRotate: Float,
-    size: Int,
-    direction: Int,
-    x: Float,
-    y: Float
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nREllipticalArcTo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nREllipticalArcTo")
-private external fun _nREllipticalArcTo(
-    ptr: NativePointer,
-    rx: Float,
-    ry: Float,
-    xAxisRotate: Float,
-    size: Int,
-    direction: Int,
-    dx: Float,
-    dy: Float
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nClosePath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nClosePath")
-private external fun _nClosePath(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nConvertConicToQuads")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nConvertConicToQuads")
-private external fun _nConvertConicToQuads(
-    x0: Float,
-    y0: Float,
-    x1: Float,
-    y1: Float,
-    x2: Float,
-    y2: Float,
-    w: Float,
-    pow2: Int,
-    result: InteropPointer
-): Int
-
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsRect")
-private external fun _nIsRect(ptr: NativePointer, rect: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nAddRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nAddRect")
-private external fun _nAddRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nAddOval")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nAddOval")
-private external fun _nAddOval(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nAddCircle")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nAddCircle")
-private external fun _nAddCircle(ptr: NativePointer, x: Float, y: Float, r: Float, dir: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nAddArc")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nAddArc")
-private external fun _nAddArc(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, startAngle: Float, sweepAngle: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nAddRRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nAddRRect")
-private external fun _nAddRRect(
-    ptr: NativePointer,
-    l: Float,
-    t: Float,
-    r: Float,
-    b: Float,
-    radii: InteropPointer,
-    size: Int,
-    dir: Int,
-    start: Int
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nAddPoly")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nAddPoly")
-private external fun _nAddPoly(ptr: NativePointer, coords: InteropPointer, count: Int, close: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nAddPath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nAddPath")
-private external fun _nAddPath(ptr: NativePointer, srcPtr: NativePointer, extend: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nAddPathOffset")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nAddPathOffset")
-private external fun _nAddPathOffset(ptr: NativePointer, srcPtr: NativePointer, dx: Float, dy: Float, extend: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nAddPathTransform")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nAddPathTransform")
-private external fun _nAddPathTransform(ptr: NativePointer, srcPtr: NativePointer, matrix: InteropPointer, extend: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nReverseAddPath")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nReverseAddPath")
-private external fun _nReverseAddPath(ptr: NativePointer, srcPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nOffset")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nOffset")
-private external fun _nOffset(ptr: NativePointer, dx: Float, dy: Float, dst: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nTransform")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nTransform")
-private external fun _nTransform(ptr: NativePointer, matrix: InteropPointer, dst: NativePointer, applyPerspectiveClip: Boolean)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetLastPt")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetLastPt")
-private external fun _nGetLastPt(ptr: NativePointer, result: InteropPointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nSetLastPt")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nSetLastPt")
-private external fun _nSetLastPt(ptr: NativePointer, x: Float, y: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetSegmentMasks")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nGetSegmentMasks")
-private external fun _nGetSegmentMasks(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nContains")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nContains")
-private external fun _nContains(ptr: NativePointer, x: Float, y: Float): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nDump")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nDump")
-private external fun _nDump(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nDumpHex")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nDumpHex")
-private external fun _nDumpHex(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nSerializeToBytes")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nSerializeToBytes")
-private external fun _nSerializeToBytes(ptr: NativePointer, dst: InteropPointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeCombining")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nMakeCombining")
-private external fun _nMakeCombining(onePtr: NativePointer, twoPtr: NativePointer, op: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromBytes")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nMakeFromBytes")
-private external fun _nMakeFromBytes(data: InteropPointer, size: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsValid")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Path__1nIsValid")
-private external fun _nIsValid(ptr: NativePointer): Boolean

@@ -1,8 +1,9 @@
 package org.jetbrains.skia.paragraph
 
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.ArrayInteropDecoder
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.withResult
+
 
 class LineMetrics(
     /**
@@ -170,13 +171,3 @@ class LineMetrics(
         return "LineMetrics(_startIndex=$startIndex, _endIndex=$endIndex, _endExcludingWhitespaces=$endExcludingWhitespaces, _endIncludingNewline=$endIncludingNewline, _hardBreak=$isHardBreak, _ascent=$ascent, _descent=$descent, _unscaledAscent=$unscaledAscent, _height=$height, _width=$width, _left=$left, _baseline=$baseline, _lineNumber=$lineNumber)"
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArraySize")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_LineMetrics__1nGetArraySize")
-private external fun LineMetrics_nGetArraySize(array: InteropPointer): Int
-@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nDisposeArray")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_LineMetrics__1nDisposeArray")
-private external fun LineMetrics_nDisposeArray(array: InteropPointer)
-@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement")
-private external fun LineMetrics_nGetArrayElement(array: InteropPointer, index: Int, intArgs: InteropPointer, doubleArgs: InteropPointer)

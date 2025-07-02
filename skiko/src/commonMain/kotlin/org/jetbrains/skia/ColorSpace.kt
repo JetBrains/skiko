@@ -1,7 +1,12 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withResult
 
 class ColorSpace : Managed {
     companion object {
@@ -10,9 +15,9 @@ class ColorSpace : Managed {
             staticLoad()
         }
 
-        val sRGB = ColorSpace(_nMakeSRGB(), false)
-        val sRGBLinear = ColorSpace(_nMakeSRGBLinear(), false)
-        val displayP3 = ColorSpace(_nMakeDisplayP3(), false)
+        val sRGB = ColorSpace(ColorSpace_nMakeSRGB(), false)
+        val sRGBLinear = ColorSpace(ColorSpace_nMakeSRGBLinear(), false)
+        val displayP3 = ColorSpace(ColorSpace_nMakeDisplayP3(), false)
     }
 
 
@@ -21,7 +26,7 @@ class ColorSpace : Managed {
         to = to ?: sRGB
         return try {
             Color4f(withResult(FloatArray(4)) {
-                    _nConvert(
+                    ColorSpace_nConvert(
                         _ptr,
                         getPtr(to),
                         color.r,
@@ -47,7 +52,7 @@ class ColorSpace : Managed {
     val isGammaCloseToSRGB: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsGammaCloseToSRGB(_ptr)
+            ColorSpace_nIsGammaCloseToSRGB(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -58,7 +63,7 @@ class ColorSpace : Managed {
     val isGammaLinear: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsGammaLinear(_ptr)
+            ColorSpace_nIsGammaLinear(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -80,7 +85,7 @@ class ColorSpace : Managed {
     val isSRGB: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsSRGB(_ptr)
+            ColorSpace_nIsSRGB(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -89,35 +94,3 @@ class ColorSpace : Managed {
         val PTR = ColorSpace_nGetFinalizer()
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nGetFinalizer")
-private external fun ColorSpace_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ColorSpace__nConvert")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__nConvert")
-private external fun _nConvert(fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float, result: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nMakeSRGB")
-private external fun _nMakeSRGB(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
-private external fun _nMakeDisplayP3(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
-private external fun _nMakeSRGBLinear(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
-private external fun _nIsGammaCloseToSRGB(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
-private external fun _nIsGammaLinear(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsSRGB")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nIsSRGB")
-private external fun _nIsSRGB(ptr: NativePointer): Boolean

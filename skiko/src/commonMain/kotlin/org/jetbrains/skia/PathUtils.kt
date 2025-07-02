@@ -1,8 +1,9 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
 
 object PathUtils {
@@ -37,7 +38,7 @@ object PathUtils {
             Stats.onNativeCall()
             if (cull == null) org.jetbrains.skia.Path(
                 interopScope {
-                    _nFillPathWithPaint(
+                    PathUtils_nFillPathWithPaint(
                         getPtr(src),
                         getPtr(paint),
                         toInterop(matrix.mat)
@@ -45,7 +46,7 @@ object PathUtils {
                 }
             ) else org.jetbrains.skia.Path(
                 interopScope {
-                    _nFillPathWithPaintCull(
+                    PathUtils_nFillPathWithPaintCull(
                         getPtr(src),
                         getPtr(paint),
                         cull.left,
@@ -77,23 +78,3 @@ object PathUtils {
         staticLoad()
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathUtils__1nFillPathWithPaint")
-private external fun _nFillPathWithPaint(
-    srcPtr: NativePointer,
-    paintPtr: NativePointer,
-    matrix: InteropPointer
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintCull")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PathUtils__1nFillPathWithPaintCull")
-private external fun _nFillPathWithPaintCull(
-    srcPtr: NativePointer,
-    paintPtr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    matrix: InteropPointer
-): NativePointer

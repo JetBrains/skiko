@@ -1,8 +1,13 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.paragraph.TypefaceFontProvider
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withStringResult
 
 open class FontMgr : RefCnt {
     companion object {
@@ -10,13 +15,13 @@ open class FontMgr : RefCnt {
             staticLoad()
         }
 
-        val default = FontMgr(_nDefault(), false)
+        val default = FontMgr(FontMgr_nDefault(), false)
     }
 
     val familiesCount: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetFamiliesCount(_ptr)
+            FontMgr_nGetFamiliesCount(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -25,7 +30,7 @@ open class FontMgr : RefCnt {
         try {
             Stats.onNativeCall()
             withStringResult {
-                _nGetFamilyName(_ptr, index)
+                FontMgr_nGetFamilyName(_ptr, index)
             }
         } finally {
             reachabilityBarrier(this)
@@ -34,7 +39,7 @@ open class FontMgr : RefCnt {
     fun makeStyleSet(index: Int): FontStyleSet? =
         try {
             Stats.onNativeCall()
-            val ptr = _nMakeStyleSet(_ptr, index)
+            val ptr = FontMgr_nMakeStyleSet(_ptr, index)
             if (ptr == NullPointer) null else FontStyleSet(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -54,7 +59,7 @@ open class FontMgr : RefCnt {
     fun matchFamily(familyName: String?): FontStyleSet =
         try {
             Stats.onNativeCall()
-            interopScope { FontStyleSet(_nMatchFamily(_ptr, toInterop(familyName))) }
+            interopScope { FontStyleSet(FontMgr_nMatchFamily(_ptr, toInterop(familyName))) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -74,7 +79,7 @@ open class FontMgr : RefCnt {
     fun matchFamilyStyle(familyName: String?, style: FontStyle): Typeface? =
         try {
             Stats.onNativeCall()
-            val ptr = interopScope { _nMatchFamilyStyle(_ptr, toInterop(familyName), style._value) }
+            val ptr = interopScope { FontMgr_nMatchFamilyStyle(_ptr, toInterop(familyName), style._value) }
             if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -112,7 +117,7 @@ open class FontMgr : RefCnt {
         try {
             Stats.onNativeCall()
             val ptr = interopScope {
-                _nMatchFamilyStyleCharacter(
+                FontMgr_nMatchFamilyStyleCharacter(
                     _ptr,
                     toInterop(familyName),
                     style._value,
@@ -148,7 +153,7 @@ open class FontMgr : RefCnt {
         try {
             Stats.onNativeCall()
             val ptr =
-                _nMakeFromData(_ptr, getPtr(data), ttcIndex)
+                FontMgr_nMakeFromData(_ptr, getPtr(data), ttcIndex)
             if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -159,7 +164,7 @@ open class FontMgr : RefCnt {
         return try {
             Stats.onNativeCall()
             val ptr = interopScope {
-                _nMakeFromFile(_ptr, toInterop(path), ttcIndex)
+                FontMgr_nMakeFromFile(_ptr, toInterop(path), ttcIndex)
             }
             if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
@@ -171,7 +176,7 @@ open class FontMgr : RefCnt {
         return try {
             Stats.onNativeCall()
             val ptr = interopScope {
-                _nLegacyMakeTypeface(_ptr, toInterop(name), style._value)
+                FontMgr_nLegacyMakeTypeface(_ptr, toInterop(name), style._value)
             }
             if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
@@ -183,51 +188,3 @@ open class FontMgr : RefCnt {
 
     internal constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, allowClose)
 }
-
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamiliesCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nGetFamiliesCount")
-private external fun _nGetFamiliesCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamilyName")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nGetFamilyName")
-private external fun _nGetFamilyName(ptr: NativePointer, index: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeStyleSet")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nMakeStyleSet")
-private external fun _nMakeStyleSet(ptr: NativePointer, index: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamily")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nMatchFamily")
-private external fun _nMatchFamily(ptr: NativePointer, familyName: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
-private external fun _nMatchFamilyStyle(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter")
-private external fun _nMatchFamilyStyleCharacter(
-    ptr: NativePointer,
-    familyName: InteropPointer,
-    fontStyle: Int,
-    bcp47: InteropPointer,
-    bcp47size: Int,
-    character: Int
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nMakeFromData")
-private external fun _nMakeFromData(ptr: NativePointer, dataPtr: NativePointer, ttcIndex: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromFile")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nMakeFromFile")
-private external fun _nMakeFromFile(ptr: NativePointer, pathPtr: InteropPointer, ttcIndex: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nDefault")
-private external fun _nDefault(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_FontMgr__1nLegacyMakeTypeface")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgr__1nLegacyMakeTypeface")
-private external fun _nLegacyMakeTypeface(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer

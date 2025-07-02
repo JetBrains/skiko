@@ -1,7 +1,10 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 /**
  * A utility proxy base class for implementing draw/paint filters.
@@ -54,7 +57,3 @@ private fun makePaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean): Nati
 }
 
 internal expect fun PaintFilterCanvas.doInit(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PaintFilterCanvas__1nMake")
-private external fun PaintFilterCanvas_nMake(canvasPtr: NativePointer, unrollDrawable: Boolean): NativePointer

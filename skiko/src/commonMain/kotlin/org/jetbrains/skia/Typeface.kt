@@ -1,7 +1,16 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withNullableResult
+import org.jetbrains.skia.impl.withResult
+import org.jetbrains.skia.impl.withStringResult
 
 class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -11,7 +20,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
         fun makeEmpty(): Typeface {
             Stats.onNativeCall()
-            return Typeface(_nMakeEmptyTypeface())
+            return Typeface(Typeface_nMakeEmptyTypeface())
         }
     }
 
@@ -21,7 +30,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val fontStyle: FontStyle
         get() = try {
             Stats.onNativeCall()
-            FontStyle(_nGetFontStyle(_ptr))
+            FontStyle(Typeface_nGetFontStyle(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -45,7 +54,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val isFixedPitch: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsFixedPitch(_ptr)
+            Typeface_nIsFixedPitch(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -57,10 +66,10 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val variations: Array<FontVariation>?
         get() = try {
             Stats.onNativeCall()
-            val count = _nGetVariationsCount(_ptr)
+            val count = Typeface_nGetVariationsCount(_ptr)
             if (count > 0) {
                 val variationsData = withResult(IntArray(count * 2)) {
-                    _nGetVariations(_ptr, it, count)
+                    Typeface_nGetVariations(_ptr, it, count)
                 }
                 (0 until count).map { i ->
                     val j = 2 * i
@@ -78,12 +87,12 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val variationAxes: Array<FontVariationAxis>?
         get() = try {
             Stats.onNativeCall()
-            val axisCount = _nGetVariationAxesCount(_ptr)
+            val axisCount = Typeface_nGetVariationAxesCount(_ptr)
             if (axisCount <= 0) {
                 null
             } else {
                 val axisData = withResult(IntArray(axisCount * 5)) {
-                    _nGetVariationAxes(_ptr, it, axisCount)
+                    Typeface_nGetVariationAxes(_ptr, it, axisCount)
                 }
                 (0 until axisCount).map { i ->
                     val j = 5 * i
@@ -153,7 +162,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             Stats.onNativeCall()
             val variationsData = variations.asList().flatMap { listOf(it._tag, it.value.toRawBits()) }.toIntArray()
             val ptr =
-                interopScope { _nMakeClone(_ptr, toInterop(variationsData), 2 * variations.size, collectionIndex) }
+                interopScope { Typeface_nMakeClone(_ptr, toInterop(variationsData), 2 * variations.size, collectionIndex) }
             require(ptr != NullPointer) {
                 "Failed to clone Typeface $this with $variations"
             }
@@ -211,7 +220,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val glyphsCount: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetGlyphsCount(_ptr)
+            Typeface_nGetGlyphsCount(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -222,7 +231,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val tablesCount: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetTablesCount(_ptr)
+            Typeface_nGetTablesCount(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -233,10 +242,10 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val tableTags: Array<String>
         get() = try {
             Stats.onNativeCall()
-            val count = _nGetTableTagsCount(_ptr)
+            val count = Typeface_nGetTableTagsCount(_ptr)
             if (count > 0) {
                 withResult(IntArray(count)) {
-                    _nGetTableTags(_ptr, it, count)
+                    Typeface_nGetTableTags(_ptr, it, count)
                 }.toList().map { FourByteTag.toString(it) }.toTypedArray()
             } else emptyArray()
         } finally {
@@ -249,7 +258,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun getTableSize(tag: String): NativePointer {
         return try {
             Stats.onNativeCall()
-            _nGetTableSize(_ptr, FourByteTag.fromString(tag))
+            Typeface_nGetTableSize(_ptr, FourByteTag.fromString(tag))
         } finally {
             reachabilityBarrier(this)
         }
@@ -265,7 +274,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun getTableData(tag: String): Data? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nGetTableData(_ptr, FourByteTag.fromString(tag))
+            val ptr = Typeface_nGetTableData(_ptr, FourByteTag.fromString(tag))
             if (ptr == NullPointer) null else Data(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -278,7 +287,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val unitsPerEm: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetUnitsPerEm(_ptr)
+            Typeface_nGetUnitsPerEm(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -301,7 +310,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             if (glyphs != null) {
                 if (glyphs.size > 0) {
                     withNullableResult(IntArray(glyphs.size)) {
-                        _nGetKerningPairAdjustments(_ptr, toInterop(glyphs), glyphs.size, it)
+                        Typeface_nGetKerningPairAdjustments(_ptr, toInterop(glyphs), glyphs.size, it)
                     }
                 } else null
             } else null
@@ -319,7 +328,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
 
                 arrayDecoderScope({
-                    ArrayDecoder(_nGetFamilyNames(_ptr), ManagedString_nGetFinalizer())
+                    ArrayDecoder(Typeface_nGetFamilyNames(_ptr), ManagedString_nGetFinalizer())
                 }) { arrayDecoder ->
                     val size = arrayDecoder.size
                     (0 until size / 2).map { i ->
@@ -340,7 +349,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         get() = try {
             Stats.onNativeCall()
             withStringResult {
-                _nGetFamilyName(_ptr)
+                Typeface_nGetFamilyName(_ptr)
             }
         } finally {
             reachabilityBarrier(this)
@@ -363,110 +372,3 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
     override fun toString() = "Typeface(familyName='$familyName', fontStyle=$fontStyle, uniqueId=$uniqueId)"
 }
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetUniqueId")
-private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nEquals")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nEquals")
-private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
-private external fun Typeface_nGetUTF32Glyphs(
-    ptr: NativePointer,
-    uni: InteropPointer,
-    count: Int,
-    glyphs: InteropPointer
-)
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
-private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetBounds")
-private external fun Typeface_nGetBounds(ptr: NativePointer, bounds: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetFontStyle")
-private external fun _nGetFontStyle(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nIsFixedPitch")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nIsFixedPitch")
-private external fun _nIsFixedPitch(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationsCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetVariationsCount")
-private external fun _nGetVariationsCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetVariations")
-private external fun _nGetVariations(ptr: NativePointer, variations: InteropPointer, count: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
-private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetVariationAxes")
-private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeClone")
-private external fun _nMakeClone(
-    ptr: NativePointer,
-    variations: InteropPointer,
-    variationsCount: Int,
-    collectionIndex: Int
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeEmptyTypeface")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeEmptyTypeface")
-private external fun _nMakeEmptyTypeface(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetGlyphsCount")
-private external fun _nGetGlyphsCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTablesCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTablesCount")
-private external fun _nGetTablesCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTagsCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTableTagsCount")
-private external fun _nGetTableTagsCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTags")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTableTags")
-private external fun _nGetTableTags(ptr: NativePointer, tags: InteropPointer, count: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableSize")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTableSize")
-private external fun _nGetTableSize(ptr: NativePointer, tag: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTableData")
-private external fun _nGetTableData(ptr: NativePointer, tag: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
-private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
-private external fun _nGetKerningPairAdjustments(
-    ptr: NativePointer,
-    glyphs: InteropPointer,
-    count: Int,
-    adjustments: InteropPointer
-): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetFamilyNames")
-private external fun _nGetFamilyNames(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetFamilyName")
-private external fun _nGetFamilyName(ptr: NativePointer): NativePointer

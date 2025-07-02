@@ -1,7 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     companion object {
@@ -37,7 +42,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
          */
         fun makePlaceholder(cull: Rect): Picture {
             Stats.onNativeCall()
-            return Picture(_nMakePlaceholder(cull.left, cull.top, cull.right, cull.bottom))
+            return Picture(Picture_nMakePlaceholder(cull.left, cull.top, cull.right, cull.bottom))
         }
 
         init {
@@ -77,7 +82,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
         return try {
             Stats.onNativeCall()
             interopScope {
-                _nPlayback(_ptr, getPtr(canvas), booleanCallback(abort))
+                Picture_nPlayback(_ptr, getPtr(canvas), booleanCallback(abort))
             }
             this
         } finally {
@@ -102,7 +107,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
     val cullRect: Rect
         get() = try {
             Stats.onNativeCall()
-            Rect.fromInteropPointer { _nGetCullRect(_ptr, it) }
+            Rect.fromInteropPointer { Picture_nGetCullRect(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -115,7 +120,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
     val uniqueId: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetUniqueId(_ptr)
+            Picture_nGetUniqueId(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -128,7 +133,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
     fun serializeToData(): Data {
         return try {
             Stats.onNativeCall()
-            Data(_nSerializeToData(_ptr))
+            Data(Picture_nSerializeToData(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -147,7 +152,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
     val approximateOpCount: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetApproximateOpCount(_ptr)
+            Picture_nGetApproximateOpCount(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -163,7 +168,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
     val approximateBytesUsed: NativePointer
         get() = try {
             Stats.onNativeCall()
-            _nGetApproximateBytesUsed(_ptr)
+            Picture_nGetApproximateBytesUsed(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -212,7 +217,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
             val arr = localMatrix?.mat
             Shader(
                 interopScope {
-                    _nMakeShader(
+                    Picture_nMakeShader(
                         _ptr,
                         tmx.ordinal,
                         tmy.ordinal,
@@ -231,50 +236,3 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
         }
     }
 }
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Picture__1nMakeFromData")
-private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Picture__1nGetCullRect")
-private external fun _nGetCullRect(ptr: NativePointer, ltrb: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Picture__1nGetUniqueId")
-private external fun _nGetUniqueId(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Picture__1nSerializeToData")
-private external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Picture__1nMakePlaceholder")
-private external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Picture__1nGetApproximateOpCount")
-private external fun _nGetApproximateOpCount(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
-private external fun _nGetApproximateBytesUsed(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Picture__1nMakeShader")
-private external fun _nMakeShader(
-    ptr: NativePointer,
-    tmx: Int,
-    tmy: Int,
-    filterMode: Int,
-    localMatrix: InteropPointer,
-    hasTile: Boolean,
-    tileL: Float,
-    tileT: Float,
-    tileR: Float,
-    tileB: Float,
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Picture__1nPlayback")
-private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, data: InteropPointer)

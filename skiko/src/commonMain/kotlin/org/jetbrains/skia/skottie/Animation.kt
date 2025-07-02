@@ -1,19 +1,26 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.skottie
 
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Data
+import org.jetbrains.skia.Point
+import org.jetbrains.skia.Rect
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withStringReferenceResult
 import org.jetbrains.skia.sksg.InvalidationController
-import org.jetbrains.skia.*
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
-import org.jetbrains.skia.impl.*
 
 class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         fun makeFromString(data: String): Animation {
             Stats.onNativeCall()
             interopScope {
-                val ptr = _nMakeFromString(toInterop(data))
+                val ptr = Animation_nMakeFromString(toInterop(data))
                 require(ptr != NullPointer) { "Failed to create Animation from string=\"$data\"" }
                 return Animation(ptr)
             }
@@ -22,7 +29,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         fun makeFromData(data: Data): Animation {
             Stats.onNativeCall()
             val ptr = try {
-                _nMakeFromData(getPtr(data))
+                Animation_nMakeFromData(getPtr(data))
             } finally {
                 reachabilityBarrier(data)
             }
@@ -36,7 +43,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Animation_nGetFinalizer()
     }
 
     /**
@@ -105,7 +112,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             Stats.onNativeCall()
             var flags = 0
             for (flag in renderFlags) flags = flags or flag._flag
-            _nRender(_ptr, getPtr(canvas), dst.left, dst.top, dst.right, dst.bottom, flags)
+            Animation_nRender(_ptr, getPtr(canvas), dst.left, dst.top, dst.right, dst.bottom, flags)
             this
         } finally {
             reachabilityBarrier(this)
@@ -135,7 +142,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     fun seek(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
-            _nSeek(_ptr, t, getPtr(ic))
+            Animation_nSeek(_ptr, t, getPtr(ic))
             this
         } finally {
             reachabilityBarrier(this)
@@ -175,7 +182,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     fun seekFrame(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
-            _nSeekFrame(_ptr, t, getPtr(ic))
+            Animation_nSeekFrame(_ptr, t, getPtr(ic))
             this
         } finally {
             reachabilityBarrier(this)
@@ -207,7 +214,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     fun seekFrameTime(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
-            _nSeekFrameTime(_ptr, t, getPtr(ic))
+            Animation_nSeekFrameTime(_ptr, t, getPtr(ic))
             this
         } finally {
             reachabilityBarrier(this)
@@ -221,7 +228,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val duration: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetDuration(_ptr)
+            Animation_nGetDuration(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -232,7 +239,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val fPS: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetFPS(_ptr)
+            Animation_nGetFPS(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -243,7 +250,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val inPoint: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetInPoint(_ptr)
+            Animation_nGetInPoint(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -254,14 +261,14 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val outPoint: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetOutPoint(_ptr)
+            Animation_nGetOutPoint(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
     val version: String
         get() = try {
             Stats.onNativeCall()
-            withStringReferenceResult { _nGetVersion(_ptr) }
+            withStringReferenceResult { Animation_nGetVersion(_ptr) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -270,7 +277,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val size: Point
         get() {
             if (_size == null) {
-                _size = Point.fromInteropPointer { _nGetSize(_ptr, it) }
+                _size = Point.fromInteropPointer { Animation_nGetSize(_ptr, it) }
             }
             return _size!!
         }
@@ -279,69 +286,3 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val height: Float
         get() = size.y
 }
-
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromString")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nMakeFromString")
-private external fun _nMakeFromString(data: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
-internal external fun _nMakeFromFile(path: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromData")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nMakeFromData")
-private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nRender")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nRender")
-private external fun _nRender(
-    ptr: NativePointer,
-    canvasPtr: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    flags: Int
-)
-
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeek")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nSeek")
-private external fun _nSeek(ptr: NativePointer, t: Float, icPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrame")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nSeekFrame")
-private external fun _nSeekFrame(ptr: NativePointer, t: Float, icPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
-private external fun _nSeekFrameTime(ptr: NativePointer, t: Float, icPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetDuration")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetDuration")
-private external fun _nGetDuration(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFPS")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetFPS")
-private external fun _nGetFPS(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetInPoint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetInPoint")
-private external fun _nGetInPoint(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetOutPoint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetOutPoint")
-private external fun _nGetOutPoint(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetVersion")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetVersion")
-private external fun _nGetVersion(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetSize")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetSize")
-private external fun _nGetSize(ptr: NativePointer, dst: InteropPointer)

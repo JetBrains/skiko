@@ -1,7 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skiko.maybeSynchronized
 
 /**
@@ -50,7 +55,7 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
         return try {
             Stats.onNativeCall()
             interopScope {
-                _nDraw(
+                Drawable_nDraw(
                     _ptr,
                     getPtr(canvas),
                     toInterop(matrix?.mat)
@@ -66,7 +71,7 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
     fun makePictureSnapshot(): Picture {
         return try {
             Stats.onNativeCall()
-            Picture(_nMakePictureSnapshot(_ptr))
+            Picture(Drawable_nMakePictureSnapshot(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -110,7 +115,7 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
     fun notifyDrawingChanged(): Drawable {
         maybeSynchronized(boundsLock) {
             Stats.onNativeCall()
-            _nNotifyDrawingChanged(_ptr)
+            Drawable_nNotifyDrawingChanged(_ptr)
             _bounds = null
         }
         return this
@@ -133,45 +138,3 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
 }
 
 internal expect fun Drawable.doInit(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nGetFinalizer")
-private external fun Drawable_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nMake")
-private external fun Drawable_nMake(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nGetGenerationId")
-private external fun Drawable_nGetGenerationId(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nDraw")
-private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
-private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
-private external fun _nNotifyDrawingChanged(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nGetBounds")
-private external fun Drawable_nGetBounds(ptr: NativePointer, result: InteropPointer)
-
-// For Native/JS usage only
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nInit")
-internal external fun Drawable_nInit(ptr: NativePointer, onGetBounds: InteropPointer, onDraw: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetOnDrawCanvas")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nGetOnDrawCanvas")
-internal external fun _nGetOnDrawCanvas(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nSetBounds")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Drawable__1nSetBounds")
-internal external fun _nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)
