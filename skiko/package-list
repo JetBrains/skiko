@@ -933,6 +933,7 @@ $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode.Companion///Pointing
 $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-transformable-node/index.html
 $dokka.location:org.jetbrains.skia////PointingToDeclaration/skiko/org.jetbrains.skia/index.html
 $dokka.location:org.jetbrains.skia//LANG/#/PointingToDeclaration/skiko/org.jetbrains.skia/-l-a-n-g.html
+$dokka.location:org.jetbrains.skia//_nAdoptTextureFrom/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/_n-adopt-texture-from.html
 $dokka.location:org.jetbrains.skia//makeFromEncoded/org.jetbrains.skia.Image.Companion#[Error type: Unresolved type for NSData]/PointingToDeclaration/skiko/org.jetbrains.skia/make-from-encoded.html
 $dokka.location:org.jetbrains.skia//makeFromFileName/org.jetbrains.skia.Data.Companion#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file-name.html
 $dokka.location:org.jetbrains.skia//makeGLWithInterface/org.jetbrains.skia.DirectContext.Companion#org.jetbrains.skia.GLAssembledInterface/PointingToDeclaration/skiko/org.jetbrains.skia/make-g-l-with-interface.html
@@ -986,6 +987,10 @@ $dokka.location:org.jetbrains.skia/BackendRenderTarget.Companion/makeDirect3D/#k
 $dokka.location:org.jetbrains.skia/BackendRenderTarget.Companion/makeGL/#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-backend-render-target/-companion/make-g-l.html
 $dokka.location:org.jetbrains.skia/BackendRenderTarget.Companion/makeMetal/#kotlin.Int#kotlin.Int#org.jetbrains.skia.impl.NativePointer/PointingToDeclaration/skiko/org.jetbrains.skia/-backend-render-target/-companion/make-metal.html
 $dokka.location:org.jetbrains.skia/BackendRenderTarget///PointingToDeclaration/skiko/org.jetbrains.skia/-backend-render-target/index.html
+$dokka.location:org.jetbrains.skia/BackendTexture.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-backend-texture/-companion/index.html
+$dokka.location:org.jetbrains.skia/BackendTexture.Companion/makeGL/#kotlin.Int#kotlin.Int#kotlin.Boolean#kotlin.Int#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-backend-texture/-companion/make-g-l.html
+$dokka.location:org.jetbrains.skia/BackendTexture///PointingToDeclaration/skiko/org.jetbrains.skia/-backend-texture/index.html
+$dokka.location:org.jetbrains.skia/BackendTexture/glTextureParametersModified/#/PointingToDeclaration/skiko/org.jetbrains.skia/-backend-texture/gl-texture-parameters-modified.html
 $dokka.location:org.jetbrains.skia/Bitmap.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-bitmap/-companion/index.html
 $dokka.location:org.jetbrains.skia/Bitmap.Companion/makeFromImage/#org.jetbrains.skia.Image#org.jetbrains.skia.DirectContext/PointingToDeclaration/skiko/org.jetbrains.skia/-bitmap/-companion/make-from-image.html
 $dokka.location:org.jetbrains.skia/Bitmap.Companion/makeFromImage/#org.jetbrains.skia.Image/PointingToDeclaration/skiko/org.jetbrains.skia/-bitmap/-companion/make-from-image.html
@@ -1905,6 +1910,7 @@ $dokka.location:org.jetbrains.skia/ISize/isZero/#/PointingToDeclaration/skiko/o
 $dokka.location:org.jetbrains.skia/ISize/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia/-i-size/to-string.html
 $dokka.location:org.jetbrains.skia/ISize/width/#/PointingToDeclaration/skiko/org.jetbrains.skia/-i-size/width.html
 $dokka.location:org.jetbrains.skia/Image.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/index.html
+$dokka.location:org.jetbrains.skia/Image.Companion/adoptTextureFrom/#org.jetbrains.skia.DirectContext#org.jetbrains.skia.BackendTexture#org.jetbrains.skia.SurfaceOrigin#org.jetbrains.skia.ColorType/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/adopt-texture-from.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeFromBitmap/#org.jetbrains.skia.Bitmap/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-from-bitmap.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeFromEncoded/#kotlin.ByteArray/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-from-encoded.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeFromPixmap/#org.jetbrains.skia.Pixmap/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-from-pixmap.html
