@@ -83,6 +83,7 @@ val uploadSkikoArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask
 
     user.set(mavenCentral.user)
     password.set(mavenCentral.password)
+    publishAfterUploading.set(mavenCentral.publishAfterUploading)
 }
 
 fun Project.skikoMavenModules(version: String): Provider<List<ModuleToUpload>> =
