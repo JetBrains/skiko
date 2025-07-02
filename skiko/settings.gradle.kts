@@ -12,7 +12,7 @@ pluginManagement {
             google()
         }
         dependencies {
-            classpath("org.jetbrains.compose.internal.build-helpers:publishing:0.1.6")
+            classpath("org.jetbrains.compose.internal.build-helpers:publishing:0.1.18")
 
             classpath("org.kohsuke:github-api:1.116")
 
