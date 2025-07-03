@@ -9,3 +9,7 @@ var wasmSetup = new Promise(function(resolve, reject) {
 });
 
 function onWasmReady(onReady) { wasmSetup.then(onReady); }
+
+// This will be gone as soon js will move to skiko.mjs
+var malloc = _malloc;
+var free = _free;
