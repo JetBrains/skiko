@@ -4,7 +4,7 @@
 #include "SkPaint.h"
 #include "interop.hh"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathUtilsKt__1nFillPathWithPaint
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathUtilsExternalKt_PathUtils_1nFillPathWithPaint
   (JNIEnv* env, jclass jclass, jlong srcPtr, jlong paintPtr, jfloatArray matrixArr) {
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
     SkPath* src = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(srcPtr));
@@ -14,7 +14,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathUtilsKt__1nFillPa
     return reinterpret_cast<jlong>(dst);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathUtilsKt__1nFillPathWithPaintCull
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathUtilsExternalKt_PathUtils_1nFillPathWithPaintCull
   (JNIEnv* env, jclass jclass, jlong srcPtr, jlong paintPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray matrixArr) {
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
     SkPath* src = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(srcPtr));

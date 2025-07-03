@@ -4,7 +4,7 @@
 #include "SkSVGCanvas.h"
 #include "SkStream.h"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_svg_SVGCanvasKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_svg_SVGCanvasExternalKt_SVGCanvas_1nMake
   (JNIEnv* env, jclass jclass, jfloat left, jfloat top, jfloat right, jfloat bottom, jlong wstreamPtr, jint flags) {
     SkWStream* wstream = reinterpret_cast<SkWStream*>(static_cast<uintptr_t>(wstreamPtr));
     SkRect bounds {left, top, right, bottom};

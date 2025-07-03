@@ -21,28 +21,28 @@ static void deleteShaper(SkShaper* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shaper_1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteShaper));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakePrimitive
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nMakePrimitive
   (JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(SkShapers::Primitive::PrimitiveText().release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShaperDrivenWrapper
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nMakeShaperDrivenWrapper
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::MakeShaperDrivenWrapper(sk_ref_sp(fontMgr)).release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShapeThenWrap
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nMakeShapeThenWrap
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::MakeShapeThenWrap(sk_ref_sp(fontMgr)).release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShapeDontWrapOrReorder
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nMakeShapeDontWrapOrReorder
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     // TODO: consider if we need/want to use ICU4X or Libgrapheme (skuincode/include has those implementations too)
@@ -50,7 +50,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMa
     return reinterpret_cast<jlong>(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr)).release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeCoreText
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nMakeCoreText
   (JNIEnv* env, jclass jclass) {
     #ifdef SK_SHAPER_CORETEXT_AVAILABLE
         return reinterpret_cast<jlong>(SkShapers::CT::CoreText().release());
@@ -59,13 +59,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMa
     #endif
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shaper_1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nMake
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::Make(sk_ref_sp(fontMgr)).release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeBlob
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nShapeBlob
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jfloat offsetX, jfloat offsetY) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
     SkString& text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
@@ -106,7 +106,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
     return reinterpret_cast<jlong>(blob);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeLine
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nShapeLine
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
 
@@ -345,7 +345,7 @@ private:
     std::vector<jint> fClusters;
 };
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shaper_1nShape
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_ShaperExternalKt_Shaper_1nShape
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jobject runHandlerObj)
 {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));

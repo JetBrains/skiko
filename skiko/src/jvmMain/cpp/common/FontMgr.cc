@@ -7,13 +7,13 @@
 #include "SkFontMgr.h"
 #include "FontMgrWithFallbackWrapper.hh"
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontMgrKt__1nGetFamiliesCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nGetFamiliesCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
     return instance->countFamilies();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nGetFamilyName
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nGetFamilyName
   (JNIEnv* env, jclass jclass, jlong ptr, jint index) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
     SkString familyName;
@@ -21,14 +21,14 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nGetFamil
     return reinterpret_cast<jlong>(new SkString(familyName));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeStyleSet
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nMakeStyleSet
   (JNIEnv* env, jclass jclass, jlong ptr, jint index) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
     SkFontStyleSet* styleSet = instance->createStyleSet(index).release();
     return reinterpret_cast<jlong>(styleSet);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFamily
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nMatchFamily
   (JNIEnv* env, jclass jclass, jlong ptr, jstring familyNameStr) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
     SkString familyName = skString(env, familyNameStr);
@@ -36,7 +36,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFam
     return reinterpret_cast<jlong>(styleSet);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFamilyStyle
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nMatchFamilyStyle
   (JNIEnv* env, jclass jclass, jlong ptr, jstring familyNameStr, jint fontStyle) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
     SkString familyName = skString(env, familyNameStr);
@@ -44,7 +44,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFam
     return reinterpret_cast<jlong>(typeface);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFamilyStyleCharacter
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nMatchFamilyStyleCharacter
   (JNIEnv* env, jclass jclass, jlong ptr, jstring familyNameStr, jint fontStyle, jobjectArray bcp47Array, jint bcp47size, jint character) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
 
@@ -60,7 +60,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFam
     return reinterpret_cast<jlong>(typeface);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeFromData
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nMakeFromData
   (JNIEnv* env, jclass jclass, jlong ptr, jlong dataPtr, jint ttcIndex) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
@@ -68,7 +68,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeFrom
     return reinterpret_cast<jlong>(typeface);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeFromFile
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nMakeFromFile
   (JNIEnv* env, jclass jclass, jlong ptr, jstring pathStrPtr, jint ttcIndex) {
   SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
   SkString path = skString(env, pathStrPtr);
@@ -76,7 +76,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeFrom
   return reinterpret_cast<jlong>(typeface);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nLegacyMakeTypeface
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nLegacyMakeTypeface
     (JNIEnv* env, jclass jclass, jlong ptr, jstring familyNameStr, jint fontStyle) {
 
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
@@ -86,13 +86,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nLegacyMa
     return reinterpret_cast<jlong>(typeface);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nDefault
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrExternalKt_FontMgr_1nDefault
   (JNIEnv* env, jclass jclass) {
     SkFontMgr* instance = SkFontMgrSkikoDefault().release();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrWithFallbackKt__1nDefaultWithFallbackFontProvider
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrWithFallbackExternalKt_FontMgrWithFallback_1nDefaultWithFallbackFontProvider
 (JNIEnv* env, jclass jclass, jlong fallbackPtr) {
     TypefaceFontProviderWithFallback* fallback = reinterpret_cast<TypefaceFontProviderWithFallback*>((fallbackPtr));
     FontMgrWithFallbackWrapper* instance = new FontMgrWithFallbackWrapper(sk_ref_sp(fallback));

@@ -7,7 +7,7 @@
 #include "SkOverdrawColorFilter.h"
 #include "interop.hh"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeComposed
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeComposed
   (JNIEnv* env, jclass jclass, jlong outerPtr, jlong innerPtr) {
     SkColorFilter* outer = reinterpret_cast<SkColorFilter*>(static_cast<uintptr_t>(outerPtr));
     SkColorFilter* inner = reinterpret_cast<SkColorFilter*>(static_cast<uintptr_t>(innerPtr));
@@ -15,7 +15,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeBlend
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeBlend
   (JNIEnv* env, jclass jclass, jint colorInt, jint modeInt) {
     SkColor color = static_cast<SkColor>(colorInt);
     SkBlendMode mode = static_cast<SkBlendMode>(modeInt);
@@ -23,7 +23,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeMatrix
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeMatrix
   (JNIEnv* env, jclass jclass, jfloatArray rowMajorArray) {
     jfloat* rowMajor = env->GetFloatArrayElements(rowMajorArray, 0);
     SkColorFilter* ptr = SkColorFilters::Matrix(rowMajor).release();
@@ -31,7 +31,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeHSLAMatrix
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeHSLAMatrix
   (JNIEnv* env, jclass jclass, jfloatArray rowMajorArray) {
     jfloat* rowMajor = env->GetFloatArrayElements(rowMajorArray, 0);
     SkColorFilter* ptr = SkColorFilters::HSLAMatrix(rowMajor).release();
@@ -39,19 +39,19 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nGetLinearToSRGBGamma
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nGetLinearToSRGBGamma
   (JNIEnv* env, jclass jclass) {
     SkColorFilter* ptr = SkColorFilters::LinearToSRGBGamma().release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nGetSRGBToLinearGamma
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nGetSRGBToLinearGamma
   (JNIEnv* env, jclass jclass) {
     SkColorFilter* ptr = SkColorFilters::SRGBToLinearGamma().release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeLerp
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeLerp
   (JNIEnv* env, jclass jclass, jfloat t, jlong dstPtr, jlong srcPtr) {
     SkColorFilter* dst = reinterpret_cast<SkColorFilter*>(static_cast<uintptr_t>(dstPtr));
     SkColorFilter* src = reinterpret_cast<SkColorFilter*>(static_cast<uintptr_t>(srcPtr));
@@ -59,20 +59,20 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeLighting
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeLighting
   (JNIEnv* env, jclass jclass, jint mul, jint add) {
     SkColorFilter* ptr = SkColorMatrixFilter::MakeLightingFilter(mul, add).release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeHighContrast
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeHighContrast
   (JNIEnv* env, jclass jclass, jboolean grayscale, jint inverionModeInt, jfloat contrast) {
     SkHighContrastConfig config(grayscale, static_cast<SkHighContrastConfig::InvertStyle>(inverionModeInt), contrast);
     SkColorFilter* ptr = SkHighContrastFilter::Make(config).release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeTable
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeTable
   (JNIEnv* env, jclass jclass, jbyteArray tableArray) {
     jbyte* table = env->GetByteArrayElements(tableArray, 0);
     SkColorFilter* ptr = SkColorFilters::Table(reinterpret_cast<uint8_t*>(table)).release();
@@ -80,7 +80,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeTableARGB(
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeTableARGB(
     JNIEnv* env, jclass jclass,
     jbyteArray arrayA,
     jbyteArray arrayR,
@@ -107,7 +107,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeOverdraw
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nMakeOverdraw
   (JNIEnv* env, jclass jclass, jint c0, jint c1, jint c2, jint c3, jint c4, jint c5) {
     SkColor colors[6];
     colors[0] = c0;
@@ -120,7 +120,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nGetLuma
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterExternalKt_ColorFilter_1nGetLuma
   (JNIEnv* env, jclass jclass) {
     SkColorFilter* ptr = SkLumaColorFilter::Make().release();
     return reinterpret_cast<jlong>(ptr);

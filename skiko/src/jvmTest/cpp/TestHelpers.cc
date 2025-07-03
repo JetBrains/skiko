@@ -3,7 +3,7 @@
 
 #include "SkString.h"
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillByteArrayOf5
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersExternalKt_TestGlContext_1nFillByteArrayOf5
 (JNIEnv* env, jclass jclass, jbyteArray jbarray) {
     jbyte *result_bytes = env->GetByteArrayElements(jbarray, NULL);
     result_bytes[0] = 1;
@@ -14,7 +14,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__
     env->ReleaseByteArrayElements(jbarray, result_bytes, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillFloatArrayOf5
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersExternalKt_TestGlContext_1nFillFloatArrayOf5
 (JNIEnv* env, jclass jclass, jfloatArray jfarray) {
     jfloat *result_float = env->GetFloatArrayElements(jfarray, NULL);
     result_float[0] = 0.0;
@@ -25,7 +25,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__
     env->ReleaseFloatArrayElements(jfarray, result_float, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillShortArrayOf5
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersExternalKt_TestGlContext_1nFillShortArrayOf5
 (JNIEnv* env, jclass jclass, jshortArray jsarray) {
     jshort *result_short = env->GetShortArrayElements(jsarray, NULL);
     result_short[0] = 0;
@@ -36,7 +36,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__
     env->ReleaseShortArrayElements(jsarray, result_short, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillIntArrayOf5
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersExternalKt_TestGlContext_1nFillIntArrayOf5
 (JNIEnv* env, jclass jclass, jintArray jiarray) {
     jint *result_int = env->GetIntArrayElements(jiarray, NULL);
     result_int[0] = 0;
@@ -47,7 +47,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__
     env->ReleaseIntArrayElements(jiarray, result_int, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillDoubleArrayOf5
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersExternalKt_TestGlContext_1nFillDoubleArrayOf5
 (JNIEnv* env, jclass jclass, jdoubleArray jdarray) {
     jdouble *result_double = env->GetDoubleArrayElements(jdarray, NULL);
     result_double[0] = -0.001;
@@ -62,7 +62,7 @@ static inline jlong ptrToJlong(void* ptr) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(ptr));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nStringByIndex
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersExternalKt_TestGlContext_1nStringByIndex
 (JNIEnv* env, jclass jclass, jint index) {
     switch (index) {
         case 0: return ptrToJlong(new SkString("Hello"));
@@ -72,7 +72,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt_
     }
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nWriteArraysOfInts
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersExternalKt_TestGlContext_1nWriteArraysOfInts
 (JNIEnv* env, jclass jclass, jobjectArray arrayOfIntArray) {
     // hardcoded length is ok for testing purposes
     jsize len = 3; //(*env)->GetArrayLength(env, arrayOfIntArray);

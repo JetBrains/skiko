@@ -13,73 +13,73 @@ static void deleteParagraph(Paragraph* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt_Paragraph_1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteParagraph));
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetMaxWidth
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetMaxWidth
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->getMaxWidth();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->getHeight();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetMinIntrinsicWidth
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetMinIntrinsicWidth
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->getMinIntrinsicWidth();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetMaxIntrinsicWidth
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetMaxIntrinsicWidth
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->getMaxIntrinsicWidth();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetAlphabeticBaseline
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetAlphabeticBaseline
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->getAlphabeticBaseline();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetIdeographicBaseline
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetIdeographicBaseline
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->getIdeographicBaseline();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetLongestLine
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetLongestLine
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->getLongestLine();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nDidExceedMaxLines
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nDidExceedMaxLines
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->didExceedMaxLines();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nLayout
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nLayout
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat width) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     instance->layout(width);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nPaint
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nPaint
   (JNIEnv* env, jclass jclass, jlong ptr, jlong canvasPtr, jfloat x, jfloat y) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     instance->paint(canvas, x, y);
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetRectsForRange
+extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetRectsForRange
   (JNIEnv* env, jclass jclass, jlong ptr, jint start, jint end, jint rectHeightStyle, jint rectWidthStyle) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     std::vector<TextBox> originalRects = instance->getRectsForRange(start, end, static_cast<RectHeightStyle>(rectHeightStyle), static_cast<RectWidthStyle>(rectWidthStyle));
@@ -103,7 +103,7 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_Para
     return rectsArray;
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetRectsForPlaceholders
+extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetRectsForPlaceholders
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     std::vector<TextBox> rects = instance->getRectsForPlaceholders();
@@ -117,7 +117,7 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_Para
     return rectsArray;
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetGlyphPositionAtCoordinate
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetGlyphPositionAtCoordinate
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat dx, jfloat dy) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     PositionWithAffinity p = instance->getGlyphPositionAtCoordinate(dx, dy);
@@ -127,7 +127,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt_
         return -p.position-1;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetWordBoundary
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetWordBoundary
   (JNIEnv* env, jclass jclass, jlong ptr, jint offset, jintArray resultArray) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     SkRange<size_t> range = instance->getWordBoundary(offset);
@@ -138,7 +138,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt_
     env->SetIntArrayRegion(resultArray, 0, 2, result);
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetLineMetrics
+extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetLineMetrics
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));
@@ -159,37 +159,37 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_Para
     return resArray;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetLineNumber
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetLineNumber
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->lineNumber();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nMarkDirty
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nMarkDirty
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->markDirty();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetUnresolvedGlyphsCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nGetUnresolvedGlyphsCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->unresolvedGlyphs();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nUpdateAlignment
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nUpdateAlignment
   (JNIEnv* env, jclass jclass, jlong ptr, jint textAlignment) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     return instance->updateTextAlign(static_cast<TextAlign>(textAlignment));
 }
 
-// extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nUpdateText
+// extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nUpdateText
 //   (JNIEnv* env, jclass jclass, jlong ptr, jint from, jstring text) {
 //     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
 //     return instance->updateText(from, skString(env, text));
 // }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nUpdateFontSize
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nUpdateFontSize
   (JNIEnv* env, jclass jclass, jlong ptr, jint from, jint to, jfloat fontSize, jlong textPtr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));
@@ -197,7 +197,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt_
     return instance->updateFontSize(conv.from16To8(from), conv.from16To8(to), fontSize);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nUpdateForegroundPaint
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nUpdateForegroundPaint
   (JNIEnv* env, jclass jclass, jlong ptr, jint from, jint to, jlong paintPtr, jlong textPtr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
@@ -206,7 +206,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt_
     return instance->updateForegroundPaint(conv.from16To8(from), conv.from16To8(to), *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nUpdateBackgroundPaint
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphExternalKt_Paragraph_1nUpdateBackgroundPaint
   (JNIEnv* env, jclass jclass, jlong ptr, jint from, jint to, jlong paintPtr, jlong textPtr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));

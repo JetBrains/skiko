@@ -9,49 +9,49 @@ static void deleteCodec(SkCodec* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt_Codec_1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteCodec));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nMakeFromData
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nMakeFromData
   (JNIEnv* env, jclass jclass, jlong dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     std::unique_ptr<SkCodec> instance = SkCodec::MakeFromData(sk_ref_sp(data));
     return reinterpret_cast<jlong>(instance.release());
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecKt_Codec_1nGetImageInfo
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetImageInfo
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray imageInfoResult, jlongArray colorSpaceResultPtr) {
     auto instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkImageInfo imageInfo = instance->getInfo();
     skija::ImageInfo::writeImageInfoForInterop(env, imageInfo, imageInfoResult, colorSpaceResultPtr);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nGetSizeWidth
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetSizeWidth
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return instance->dimensions().fWidth;
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nGetSizeHeight
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetSizeHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return instance->dimensions().fHeight;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetEncodedOrigin
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetEncodedOrigin
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getOrigin());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetEncodedImageFormat
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetEncodedImageFormat
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getEncodedFormat());
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt_Codec_1nReadPixels
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nReadPixels
   (JNIEnv* env, jclass jclass, jlong ptr, jlong bitmapPtr, jint frame, jint priorFrame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
@@ -62,13 +62,13 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt_Codec_1nReadPi
     return static_cast<jint>(result);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nGetFrameCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetFrameCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return instance->getFrameCount();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecKt__1nGetFrameInfo
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetFrameInfo
   (JNIEnv* env, jclass jclass, jlong ptr, jint frame, jintArray result) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkCodec::FrameInfo info;
@@ -76,31 +76,31 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecKt__1nGetFrameInf
     skija::AnimationFrameInfo::copyToInterop(env, info, result);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetFramesInfo
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetFramesInfo
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     auto* infos = new std::vector<SkCodec::FrameInfo> { instance->getFrameInfo() };
     return reinterpret_cast<jlong>(infos);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nGetRepetitionCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecExternalKt_Codec_1nGetRepetitionCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return instance->getRepetitionCount();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecKt_FramesInfo_1nDelete
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecExternalKt_FramesInfo_1nDelete
   (JNIEnv* env, jclass jclass, jlong ptr) {
     delete reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(static_cast<uintptr_t>(ptr));
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt_FramesInfo_1nGetSize
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecExternalKt_FramesInfo_1nGetSize
   (JNIEnv* env, jclass jclass, jlong ptr) {
     auto* infos = reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(static_cast<uintptr_t>(ptr));
     return infos->size();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecKt_FramesInfo_1nGetInfos
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecExternalKt_FramesInfo_1nGetInfos
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray result) {
     auto* infos = reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(static_cast<uintptr_t>(ptr));
     skija::AnimationFrameInfo::copyToInterop(env, *infos, result);

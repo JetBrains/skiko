@@ -6,35 +6,35 @@ static void deletePathMeasure(SkPathMeasure* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureKt_PathMeasure_1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePathMeasure));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureKt_PathMeasure_1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nMake
   (JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(new SkPathMeasure());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nMakePath
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nMakePath
   (JNIEnv* env, jclass jclass, jlong pathPtr, jboolean forceClosed, jfloat resScale) {
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
     return reinterpret_cast<jlong>(new SkPathMeasure(*path, forceClosed, resScale));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nSetPath
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nSetPath
   (JNIEnv* env, jclass jclass, jlong ptr, jlong pathPtr, jboolean forceClosed) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
     instance->setPath(path, forceClosed);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetLength
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nGetLength
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     return instance->getLength();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetPosition
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nGetPosition
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jfloatArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPoint position;
@@ -47,7 +47,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nG
     return false;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetTangent
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nGetTangent
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jfloatArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkVector tangent;
@@ -60,7 +60,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nG
     return false;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetRSXform
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nGetRSXform
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jfloatArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPoint position;
@@ -76,7 +76,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nG
     return false;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetMatrix
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nGetMatrix
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent, jfloatArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkMatrix matrix;
@@ -111,20 +111,20 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nG
     return false;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetSegment
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nGetSegment
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat startD, jfloat endD, jlong dstPtr, jboolean startWithMoveTo) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPath* dst = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(dstPtr));
     return instance->getSegment(startD, endD, dst, startWithMoveTo);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nIsClosed
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nIsClosed
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     return instance->isClosed();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nNextContour
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureExternalKt_PathMeasure_1nNextContour
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     return instance->nextContour();

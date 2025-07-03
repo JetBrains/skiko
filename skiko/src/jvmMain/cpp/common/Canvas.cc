@@ -12,25 +12,25 @@ static void deleteCanvas(SkCanvas* canvas) {
     delete canvas;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt_Canvas_1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteCanvas));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nMakeFromBitmap
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nMakeFromBitmap
   (JNIEnv* env, jclass jclass, jlong bitmapPtr, jint flags, jint pixelGeometry) {
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
     SkCanvas* canvas = new SkCanvas(*bitmap, {static_cast<uint32_t>(flags), static_cast<SkPixelGeometry>(pixelGeometry)});
     return reinterpret_cast<jlong>(canvas);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoint
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawPoint
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat x, jfloat y, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     canvas->drawPoint(x, y, *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoints
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawPoints
   (JNIEnv* env, jclass jclass, jlong canvasPtr, int mode, jint _coordsCount, jfloatArray coords, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
@@ -41,42 +41,42 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoints
     env->ReleasePrimitiveArrayCritical(coords, arr, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawLine
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawLine
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat x0, jfloat y0, jfloat x1, jfloat y1, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     canvas->drawLine(x0, y0, x1, y1, *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawArc
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawArc
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloat startAngle, jfloat sweepAngle, jboolean includeCenter, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     canvas->drawArc({left, top, right, bottom}, startAngle, sweepAngle, includeCenter, *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawRect
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawRect
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     canvas->drawRect({left, top, right, bottom}, *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawOval
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawOval
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     canvas->drawOval({left, top, right, bottom}, *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawRRect
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawRRect
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint jradiiSize, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     canvas->drawRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, jradii), *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawDRRect
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawDRRect
   (JNIEnv* env, jclass jclass, jlong canvasPtr,
    jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii, jint ojradiiSize,
    jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii, jint ijradiiSize,
@@ -87,7 +87,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawDRRect
         skija::RRect::toSkRRect(env, il, it, ir, ib, ijradii), *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPath
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawPath
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong pathPtr, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
@@ -95,7 +95,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPath
     canvas->drawPath(*path, *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawImageRect
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawImageRect
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong imagePtr, jfloat sl, jfloat st, jfloat sr, jfloat sb, jfloat dl, jfloat dt, jfloat dr, jfloat db, jint samplingModeVal1, jint samplingModeVal2, jlong paintPtr, jboolean strict) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkImage* image = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(imagePtr));
@@ -106,7 +106,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawImageR
     canvas->drawImageRect(image, src, dst, skija::SamplingMode::unpackFrom2Ints(env, samplingModeVal1, samplingModeVal2), paint, constraint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawImageNine
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawImageNine
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong imagePtr, jint cl, jint ct, jint cr, jint cb, jfloat dl, jfloat dt, jfloat dr, jfloat db, jint filterMode, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkImage* image = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(imagePtr));
@@ -116,7 +116,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawImageN
     canvas->drawImageNine(image, center, dst, static_cast<SkFilterMode>(filterMode), paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawRegion
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawRegion
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong regionPtr, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkRegion* region = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(regionPtr));
@@ -124,7 +124,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawRegion
     canvas->drawRegion(*region, *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawString
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawString
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jstring stringObj, jfloat x, jfloat y, jlong skFontPtr, jlong paintPtr) {
     SkCanvas* canvas    = reinterpret_cast<SkCanvas*>   (static_cast<uintptr_t>(canvasPtr));
     SkString string     = skString(env, stringObj);
@@ -135,7 +135,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawString
 }
 
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawTextBlob
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawTextBlob
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong blobPtr, jfloat x, jfloat y, jlong paintPtr) {
     SkCanvas* canvas    = reinterpret_cast<SkCanvas*>   (static_cast<uintptr_t>(canvasPtr));
     SkTextBlob* blob    = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(blobPtr));
@@ -144,7 +144,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawTextBl
     canvas->drawTextBlob(blob, x, y, *paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPicture
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawPicture
   (JNIEnv* env, jclass jclass, jlong ptr, jlong picturePtr, jfloatArray matrixArr, jlong paintPtr) {
     SkCanvas* canvas   = reinterpret_cast<SkCanvas*>   (static_cast<uintptr_t>(ptr));
     SkPicture* picture = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(picturePtr));
@@ -153,7 +153,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPictur
     canvas->drawPicture(picture, matrix.get(), paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawVertices
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawVertices
   (JNIEnv* env, jclass jclass, jlong ptr, jint verticesMode, jint _vertexCount, jfloatArray positionsArr, jintArray colorsArr, jfloatArray texCoordsArr, jint _indexCount, jshortArray indexArr, jint blendMode, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>   (static_cast<uintptr_t>(ptr));
     int indexCount = indexArr == nullptr ? 0 : env->GetArrayLength(indexArr);
@@ -180,7 +180,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawVertic
     env->ReleaseFloatArrayElements(positionsArr, positions, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPatch
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawPatch
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray cubicsArr, jintArray colorsArr, jfloatArray texCoordsArr, jint blendMode, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>   (static_cast<uintptr_t>(ptr));
     jfloat* cubics    = env->GetFloatArrayElements(cubicsArr, 0);
@@ -196,7 +196,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPatch
     env->ReleaseFloatArrayElements(cubicsArr, cubics, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawDrawable
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawDrawable
   (JNIEnv* env, jclass jclass, jlong ptr, jlong drawablePtr, jfloatArray matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     SkDrawable* drawable = reinterpret_cast<SkDrawable*>(static_cast<uintptr_t>(drawablePtr));
@@ -204,32 +204,32 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawDrawab
     canvas->drawDrawable(drawable, matrix.get());
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nClear(JNIEnv* env, jclass jclass, jlong ptr, jint color) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nClear(JNIEnv* env, jclass jclass, jlong ptr, jint color) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     canvas->clear(color);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPaint
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nDrawPaint
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     canvas->drawPaint(*paint);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nSetMatrix
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nSetMatrix
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloatArray matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
     canvas->setMatrix(*matrix);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nResetMatrix
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nResetMatrix
   (JNIEnv* env, jclass jclass, jlong canvasPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     canvas->resetMatrix();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetLocalToDevice
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nGetLocalToDevice
 (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloatArray resultingMatrix) {
   jfloat *floats = env->GetFloatArrayElements(resultingMatrix, NULL);
   SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
@@ -238,96 +238,96 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetLocalTo
   env->ReleaseFloatArrayElements(resultingMatrix, floats, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nClipRect
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nClipRect
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jint mode, jboolean antiAlias) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     canvas->clipRect({left, top, right, bottom}, static_cast<SkClipOp>(mode), antiAlias);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nClipRRect
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nClipRRect
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint jradiiSize, jint mode, jboolean antiAlias) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     canvas->clipRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, jradii), static_cast<SkClipOp>(mode), antiAlias);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nClipPath
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nClipPath
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong pathPtr, jint mode, jboolean antiAlias) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
     canvas->clipPath(*path, static_cast<SkClipOp>(mode), antiAlias);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nClipRegion
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nClipRegion
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong regionPtr, jint mode) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkRegion* region = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(regionPtr));
     canvas->clipRegion(*region, static_cast<SkClipOp>(mode));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nConcat
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nConcat
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     std::unique_ptr<SkMatrix> m = skMatrix(env, matrixArr);
     canvas->concat(*m);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nConcat44
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nConcat44
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     std::unique_ptr<SkM44> m = skM44(env, matrixArr);
     canvas->concat(*m);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nTranslate
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nTranslate
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat dx, jfloat dy) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     canvas->translate(dx, dy);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nScale
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nScale
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat sx, jfloat sy) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     canvas->scale(sx, sy);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nRotate
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nRotate
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat deg, jfloat x, jfloat y) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     canvas->rotate(deg, x, y);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nSkew
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nSkew
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat sx, jfloat sy) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     canvas->skew(sx, sy);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nReadPixels
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nReadPixels
   (JNIEnv* env, jclass jclass, jlong ptr, jlong bitmapPtr, jint srcX, jint srcY) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
     return canvas->readPixels(*bitmap, srcX, srcY);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nWritePixels
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nWritePixels
   (JNIEnv* env, jclass jclass, jlong ptr, jlong bitmapPtr, jint x, jint y) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
     return canvas->writePixels(*bitmap, x, y);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSave(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nSave(JNIEnv* env, jclass jclass, jlong ptr) {
     return reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr))->save();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayer
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nSaveLayer
   (JNIEnv* env, jclass jclass, jlong ptr, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     return canvas->saveLayer(nullptr, paint);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayerRect
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nSaveLayerRect
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     SkRect bounds {left, top, right, bottom};
@@ -335,7 +335,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayerR
     return canvas->saveLayer(&bounds, paint);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayerSaveLayerRec
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nSaveLayerSaveLayerRec
   (JNIEnv* env, jclass jclass, jlong ptr, jlong paintPtr, jlong backdropImageFilterPtr, jlong colorSpacePtr, jint saveLayerFlags) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
@@ -345,7 +345,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayerS
     return canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, paint, backdrop, colorSpace, saveLayerFlags));
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayerSaveLayerRecRect
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nSaveLayerSaveLayerRecRect
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jlong paintPtr, jlong backdropImageFilterPtr, jlong colorSpacePtr, jint saveLayerFlags) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     SkRect bounds {left, top, right, bottom};
@@ -356,14 +356,14 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nSaveLayerS
     return canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, paint, backdrop, colorSpace, saveLayerFlags));
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetSaveCount(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nGetSaveCount(JNIEnv* env, jclass jclass, jlong ptr) {
     return reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr))->getSaveCount();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nRestore(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nRestore(JNIEnv* env, jclass jclass, jlong ptr) {
     reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr))->restore();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nRestoreToCount(JNIEnv* env, jclass jclass, jlong ptr, jint saveCount) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasExternalKt_Canvas_1nRestoreToCount(JNIEnv* env, jclass jclass, jlong ptr, jint saveCount) {
     reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr))->restoreToCount(saveCount);
 }

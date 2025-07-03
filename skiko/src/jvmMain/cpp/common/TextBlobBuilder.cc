@@ -8,23 +8,23 @@ static void deleteTextBlobBuilder(SkTextBlobBuilder* ptr) {
     delete ptr;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt_TextBlobBuilder_1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderExternalKt_TextBlobBuilder_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteTextBlobBuilder));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt_TextBlobBuilder_1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderExternalKt_TextBlobBuilder_1nMake
   (JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(new SkTextBlobBuilder());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nBuild
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderExternalKt_TextBlobBuilder_1nBuild
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(instance->make().release());
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nAppendRun
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderExternalKt_TextBlobBuilder_1nAppendRun
   (JNIEnv* env, jclass jclass, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jint glyphsLen, jfloat x, jfloat y, jfloatArray rectFloats) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
@@ -39,7 +39,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nA
     env->GetShortArrayRegion(glyphsArr, 0, glyphsLen, reinterpret_cast<jshort*>(run.glyphs));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nAppendRunPosH
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderExternalKt_TextBlobBuilder_1nAppendRunPosH
   (JNIEnv* env, jclass jclass, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jint glyphsLen, jfloatArray xsArr, jfloat y, jfloatArray rectFloats) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
@@ -55,7 +55,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nA
     env->GetFloatArrayRegion(xsArr, 0, glyphsLen, reinterpret_cast<jfloat*>(run.pos));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nAppendRunPos
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderExternalKt_TextBlobBuilder_1nAppendRunPos
   (JNIEnv* env, jclass jclass, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jint glyphsLen, jfloatArray posArr, jfloatArray rectFloats) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
@@ -71,7 +71,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nA
     env->GetFloatArrayRegion(posArr, 0, glyphsLen * 2, reinterpret_cast<jfloat*>(run.pos));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nAppendRunRSXform
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderExternalKt_TextBlobBuilder_1nAppendRunRSXform
   (JNIEnv* env, jclass jclass, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jint glyphsLen, jfloatArray xformArr) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));

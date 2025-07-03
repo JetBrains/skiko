@@ -42,7 +42,7 @@ object SVGCanvas {
     fun make(bounds: Rect, out: WStream, convertTextToPaths: Boolean, prettyXML: Boolean): Canvas {
         Stats.onNativeCall()
         val ptr = try {
-            _nMake(
+            SVGCanvas_nMake(
                 bounds.left,
                 bounds.top,
                 bounds.right,

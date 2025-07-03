@@ -1,6 +1,6 @@
-@file:QuasiJsModule("./skiko.mjs")
-@file:QuasiJsNonModule
-@file:QuasiJsQualifier("wasmExports")
+@file:org.jetbrains.skia.QuasiJsModule("./skiko.mjs")
+@file:org.jetbrains.skia.QuasiJsNonModule
+@file:org.jetbrains.skia.QuasiJsQualifier("wasmExports")
 package org.jetbrains.skiko.tests
 
 import org.jetbrains.skia.ExternalSymbolName

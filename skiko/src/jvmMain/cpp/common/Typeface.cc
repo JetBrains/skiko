@@ -4,25 +4,25 @@
 #include "SkTypeface.h"
 #include "interop.hh"
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFontStyle
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetFontStyle
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return skija::FontStyle::toJava(instance->fontStyle());
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TypefaceKt__1nIsFixedPitch
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nIsFixedPitch
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->isFixedPitch();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVariationsCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetVariationsCount
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->getVariationDesignPosition(nullptr, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVariations
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetVariations
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray res, jint count) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     if (count > 0) {
@@ -35,14 +35,14 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVaria
     }
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVariationAxesCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetVariationAxesCount
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat* axisData) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->getVariationDesignParameters(nullptr, 0);
 }
 
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVariationAxes
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetVariationAxes
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray axisData, jint count) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     if (count > 0) {
@@ -55,20 +55,20 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVaria
     }
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetUniqueId
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetUniqueId
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->uniqueID();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nEquals
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nEquals
   (JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkTypeface* other = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(otherPtr));
     return SkTypeface::Equal(instance, other);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeClone
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nMakeClone
   (JNIEnv* env, jclass jclass, jlong typefacePtr, jintArray variationsArr, jint variationsCount, jint collectionIndex) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates(variationsCount);
@@ -87,7 +87,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeClo
     return reinterpret_cast<jlong>(clone);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetUTF32Glyphs
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetUTF32Glyphs
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr, jint count, jshortArray res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     std::vector<short> glyphs(count);
@@ -97,31 +97,31 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1n
     env->SetShortArrayRegion(res, 0, count, glyphs.data());
 }
 
-extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetUTF32Glyph
+extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetUTF32Glyph
   (JNIEnv* env, jclass jclass, jlong ptr, jint uni) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->unicharToGlyph(uni);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetGlyphsCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetGlyphsCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->countGlyphs();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTablesCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetTablesCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->countTables();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTableTagsCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetTableTagsCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->countTables();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTableTags
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetTableTags
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray res, jint count) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     std::vector<jint> tags(count);
@@ -129,26 +129,26 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTable
     env->SetIntArrayRegion(res, 0, count, tags.data());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTableSize
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetTableSize
   (JNIEnv* env, jclass jclass, jlong ptr, jint tag) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->getTableSize(tag);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTableData
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetTableData
   (JNIEnv* env, jclass jclass, jlong ptr, jint tag) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkData* data = instance->copyTableData(tag).release();
     return reinterpret_cast<jlong>(data);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetUnitsPerEm
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetUnitsPerEm
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->getUnitsPerEm();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetKerningPairAdjustments
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetKerningPairAdjustments
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count, jintArray res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     if (count > 0) {
@@ -168,7 +168,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetK
     return false;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFamilyNames
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetFamilyNames
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkTypeface::LocalizedStrings* iter = instance->createFamilyNameIterator();
@@ -184,7 +184,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFami
     return reinterpret_cast<jlong>(res);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFamilyName
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetFamilyName
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkString name;
@@ -192,7 +192,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFami
     return reinterpret_cast<jlong>(new SkString(name));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetBounds
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nGetBounds
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkRect b = instance->getBounds();
@@ -200,7 +200,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1n
     env->SetFloatArrayRegion(res, 0, 4, r);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeEmptyTypeface
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceExternalKt_Typeface_1nMakeEmptyTypeface
   (JNIEnv* env, jclass jclass) {
 
     SkTypeface* res = SkTypeface::MakeEmpty().release();

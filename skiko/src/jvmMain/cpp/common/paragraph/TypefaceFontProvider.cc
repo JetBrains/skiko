@@ -7,13 +7,13 @@
 
 using namespace skia::textlayout;
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderKt_TypefaceFontProvider_1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderExternalKt_TypefaceFontProvider_1nMake
   (JNIEnv* env, jclass jclass) {
     TypefaceFontProvider* instance = new TypefaceFontProvider();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderKt__1nRegisterTypeface
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderExternalKt_TypefaceFontProvider_1nRegisterTypeface
   (JNIEnv* env, jclass jclass, jlong ptr, jlong typefacePtr, jstring aliasStr) {
     TypefaceFontProvider* instance = reinterpret_cast<TypefaceFontProvider*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
@@ -25,13 +25,13 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFont
 }
 
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallbackKt__1nMakeAsFallbackProvider
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallbackExternalKt_TypefaceFontProviderWithFallback_1nMakeAsFallbackProvider
   (JNIEnv* env, jclass jclass) {
     TypefaceFontProviderWithFallback* instance = new TypefaceFontProviderWithFallback();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallbackKt__1nRegisterTypefaceForFallback
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallbackExternalKt_TypefaceFontProviderWithFallback_1nRegisterTypefaceForFallback
   (JNIEnv* env, jclass jclass, jlong ptr, jlong typefacePtr, jstring aliasStr) {
     TypefaceFontProviderWithFallback* instance = reinterpret_cast<TypefaceFontProviderWithFallback*>((ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>((typefacePtr));

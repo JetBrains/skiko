@@ -12,25 +12,25 @@ static void deleteStrutStyle(StrutStyle* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteStrutStyle));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nMake
   (JNIEnv* env, jclass jclass) {
     StrutStyle* instance = new StrutStyle();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nEquals
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nEquals
   (JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     StrutStyle* other = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(otherPtr));
     return *instance == *other;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetFontFamilies
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nGetFontFamilies
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
 
@@ -42,13 +42,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleK
     return reinterpret_cast<jlong>(res);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nSetFontFamilies
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetFontFamilies
   (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familiesArr, jint familiesCount) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontFamilies(skStringVector(env, familiesArr));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetFontStyle
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nGetFontStyle
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray fontStyleData) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     SkFontStyle fontStyle = instance->getFontStyle();
@@ -56,103 +56,103 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt
     env->SetIntArrayRegion(fontStyleData, 0, 3, res);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetFontStyle
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetFontStyle
   (JNIEnv* env, jclass jclass, jlong ptr, jint style) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontStyle(skija::FontStyle::fromJava(style));
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetFontSize
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nGetFontSize
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getFontSize();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetFontSize
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetFontSize
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat size) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontSize(size);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nGetHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getHeight();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nSetHeight
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetHeight
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat height) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setHeight(height);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetLeading
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nGetLeading
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getLeading();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetLeading
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetLeading
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat leading) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setLeading(leading);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nIsEnabled
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nIsEnabled
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getStrutEnabled();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nSetEnabled
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetEnabled
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setStrutEnabled(value);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nIsHeightForced
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nIsHeightForced
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getForceStrutHeight();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetHeightForced
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetHeightForced
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setForceStrutHeight(value);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nIsHeightOverridden
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nIsHeightOverridden
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getHeightOverride();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetHeightOverridden
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetHeightOverridden
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setHeightOverride(value);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nIsHalfLeading
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nIsHalfLeading
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getHalfLeading();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetHalfLeading
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetHalfLeading
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setHalfLeading(value);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetTopRatio
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nGetTopRatio
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getTopRatio();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetTopRatio
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleExternalKt_StrutStyle_1nSetTopRatio
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat value) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setTopRatio(value);

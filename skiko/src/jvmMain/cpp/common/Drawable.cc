@@ -42,11 +42,11 @@ static void deleteDrawable(SkijaDrawableImpl* drawable) {
     delete drawable;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nGetFinalizer() {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableExternalKt_Drawable_1nGetFinalizer() {
     return reinterpret_cast<jlong>(&deleteDrawable);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableExternalKt_Drawable_1nMake
   (JNIEnv* env, jclass jclass) {
     SkijaDrawableImpl* instance = new SkijaDrawableImpl();
     return reinterpret_cast<jlong>(instance);
@@ -58,7 +58,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Drawable_1jvmKt_Drawab
     instance->init(env, jthis);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt__1nDraw
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableExternalKt_Drawable_1nDraw
   (JNIEnv* env, jclass jclass, jlong ptr, jlong canvasPtr, jfloatArray matrixArr) {
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
@@ -66,25 +66,25 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt__1nDraw
     instance->draw(canvas, matrix.get());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt__1nMakePictureSnapshot
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableExternalKt_Drawable_1nMakePictureSnapshot
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(instance->makePictureSnapshot().release());
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nGetGenerationId
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_DrawableExternalKt_Drawable_1nGetGenerationId
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
     return instance->getGenerationID();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt__1nNotifyDrawingChanged
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableExternalKt_Drawable_1nNotifyDrawingChanged
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
     return instance->notifyDrawingChanged();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nGetBounds
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableExternalKt_Drawable_1nGetBounds
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray result) {
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
     skija::Rect::copyToInterop(env, instance->getBounds(), result);

@@ -37,7 +37,7 @@ private:
     jobject fObject;
 };
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_skottie_LoggerKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_skottie_LoggerExternalKt_Logger_1nMake
   (JNIEnv* env, jclass jclass) {
     SkikoLogger* instance = new SkikoLogger();
     return reinterpret_cast<jlong>(instance);

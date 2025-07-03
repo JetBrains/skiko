@@ -6,11 +6,11 @@ static void deleteBreakIterator(UBreakIterator* instance) {
   ubrk_close(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt_BreakIterator_1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteBreakIterator));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nMake
   (JNIEnv* env, jclass jclass, jint type, jstring localeStr, jintArray errorCode) {
     UErrorCode errorCodes[1] = { U_ZERO_ERROR };
     UBreakIterator* instance;
@@ -29,61 +29,61 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nMa
       return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nCurrent
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nCurrent
   (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_current(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nNext
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nNext
   (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_next(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nPrevious
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nPrevious
   (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_previous(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nFirst
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nFirst
   (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_first(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nLast
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nLast
   (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_last(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nPreceding
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nPreceding
   (JNIEnv* env, jclass jclass, jlong ptr, jint offset) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_preceding(instance, offset);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nFollowing
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nFollowing
   (JNIEnv* env, jclass jclass, jlong ptr, jint offset) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_following(instance, offset);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nIsBoundary
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nIsBoundary
   (JNIEnv* env, jclass jclass, jlong ptr, jint offset) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_isBoundary(instance, offset);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGetRuleStatus
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nGetRuleStatus
   (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_getRuleStatus(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGetRuleStatusesLen
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nGetRuleStatusesLen
   (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     UErrorCode status = U_ZERO_ERROR;
@@ -93,7 +93,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGet
     return len;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGetRuleStatuses
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nGetRuleStatuses
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray result, jint len) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     UErrorCode status = U_ZERO_ERROR;
@@ -104,7 +104,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGet
     env->SetIntArrayRegion(result, 0, len, statuses.data());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nSetText
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorExternalKt_BreakIterator_1nSetText
   (JNIEnv* env, jclass jclass, jlong ptr, jcharArray textArr, jint len, jintArray errorCode) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
 

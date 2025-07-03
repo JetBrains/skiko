@@ -9,7 +9,7 @@
 using namespace std;
 using namespace skia::textlayout;
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nMake
   (JNIEnv* env, jclass jclass) {
     TextStyle* instance = new TextStyle();
     return reinterpret_cast<jlong>(instance);
@@ -19,19 +19,19 @@ static void deleteTextStyle(TextStyle* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteTextStyle));
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nEquals
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nEquals
   (JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     TextStyle* other = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(otherPtr));
     return instance->equals(*other);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nAttributeEquals
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nAttributeEquals
   (JNIEnv* env, jclass jclass, jlong ptr, jint attribute, jlong otherPtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     TextStyle* other = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(otherPtr));
@@ -41,25 +41,25 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyl
         return instance->matchOneAttribute(static_cast<StyleType>(attribute), *other);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetColor
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetColor
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getColor();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetColor
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetColor
   (JNIEnv* env, jclass jclass, jlong ptr, jint color) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setColor(color);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetForeground
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetForeground
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->hasForeground() ? reinterpret_cast<jlong>(new SkPaint(instance->getForeground())) : 0;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetForeground
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetForeground
   (JNIEnv* env, jclass jclass, jlong ptr, jlong paintPtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     if (paintPtr == 0)
@@ -70,13 +70,13 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     }
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetBackground
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetBackground
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->hasBackground() ? reinterpret_cast<jlong>(new SkPaint(instance->getBackground())) : 0;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetBackground
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetBackground
   (JNIEnv* env, jclass jclass, jlong ptr, jlong paintPtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     if (paintPtr == 0)
@@ -87,7 +87,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     }
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetDecorationStyle
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetDecorationStyle
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray res) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     Decoration d = instance->getDecoration();
@@ -118,7 +118,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     env->SetIntArrayRegion(res, 0, 4, r);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetDecorationStyle
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetDecorationStyle
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean underline, jboolean overline, jboolean lineThrough, jboolean gaps, jint color, jint style, jfloat thicknessMultiplier) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     int typeMask = 0;
@@ -132,25 +132,25 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setDecorationThicknessMultiplier(thicknessMultiplier);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetFontStyle
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetFontStyle
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return skija::FontStyle::toJava(instance->getFontStyle());
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetFontStyle
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetFontStyle
   (JNIEnv* env, jclass jclass, jlong ptr, jint fontStyleValue) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontStyle(skija::FontStyle::fromJava(fontStyleValue));
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetShadowsCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetShadowsCount
     (JNIEnv* env, jclass jclass, jlong ptr) {
         TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
         return static_cast<jint>(instance->getShadows().size());
     }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetShadows
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetShadows
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray res) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     std::vector<TextShadow> shadows = instance->getShadows();
@@ -163,26 +163,26 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     }
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nAddShadow
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nAddShadow
   (JNIEnv* env, jclass jclass, jlong ptr, jint color, jfloat offsetX, jfloat offsetY, jdouble blurSigma) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->addShadow({static_cast<SkColor>(color), {offsetX, offsetY}, blurSigma});
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nClearShadows
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nClearShadows
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->resetShadows();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFeaturesSize
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetFontFeaturesSize
 (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     std::vector<FontFeature> fontFeatures = instance->getFontFeatures();
     return static_cast<jint>(fontFeatures.size());
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFeatures
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetFontFeatures
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray resultArr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     std::vector<FontFeature> fontFeatures = instance->getFontFeatures();
@@ -192,31 +192,31 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     env->ReleaseIntArrayElements(resultArr, ints, 0);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nAddFontFeature
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nAddFontFeature
   (JNIEnv* env, jclass jclass, jlong ptr, jstring nameStr, jint value) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->addFontFeature(skString(env, nameStr), value);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nClearFontFeatures
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nClearFontFeatures
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->resetFontFeatures();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetFontSize
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetFontSize
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getFontSize();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetFontSize
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetFontSize
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat size) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontSize(size);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetFontFamilies
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetFontFamilies
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     std::vector<jlong>* res = new std::vector<jlong>();
@@ -226,123 +226,123 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt
     return reinterpret_cast<jlong>(res);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontFamilies
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetFontFamilies
   (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familiesArray, int familiesArraySize) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontFamilies(skStringVector(env, familiesArray));
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getHeightOverride() ? static_cast<jfloat>(instance->getHeight()) : std::numeric_limits<jfloat>::quiet_NaN();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetHeight
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetHeight
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean override, jfloat height) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setHeightOverride(override);
     instance->setHeight(height);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetHalfLeading
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetHalfLeading
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getHalfLeading();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetHalfLeading
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetHalfLeading
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setHalfLeading(value);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetTopRatio
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetTopRatio
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getTopRatio();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetTopRatio
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetTopRatio
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat value) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setTopRatio(value);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetBaselineShift
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetBaselineShift
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getBaselineShift();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetBaselineShift
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetBaselineShift
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat baselineShift) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setBaselineShift(baselineShift);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetLetterSpacing
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetLetterSpacing
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getLetterSpacing();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetLetterSpacing
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetLetterSpacing
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat letterSpacing) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setLetterSpacing(letterSpacing);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetWordSpacing
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetWordSpacing
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getWordSpacing();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetWordSpacing
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetWordSpacing
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat wordSpacing) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setWordSpacing(wordSpacing);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetTypeface
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetTypeface
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(instance->refTypeface().release());
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetTypeface
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetTypeface
   (JNIEnv* env, jclass jclass, jlong ptr, jlong typefacePtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     instance->setTypeface(sk_ref_sp(typeface));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetLocale
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetLocale
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(new SkString(instance->getLocale()));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetLocale
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetLocale
   (JNIEnv* env, jclass jclass, jlong ptr, jstring locale) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setLocale(skString(env, locale));
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetBaselineMode
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetBaselineMode
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getTextBaseline());
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetBaselineMode
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetBaselineMode
   (JNIEnv* env, jclass jclass, jlong ptr, jint baselineModeValue) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setTextBaseline(static_cast<TextBaseline>(baselineModeValue));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontMetrics
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nGetFontMetrics
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray fontMetrics) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     SkFontMetrics m;
@@ -383,13 +383,13 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     env->SetFloatArrayRegion(fontMetrics, 0, 15, f);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nIsPlaceholder
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nIsPlaceholder
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->isPlaceholder();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetPlaceholder
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleExternalKt_TextStyle_1nSetPlaceholder
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setPlaceholder();

@@ -4,7 +4,7 @@
 #include "interop.hh"
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeShader(JNIEnv* env,
+Java_org_jetbrains_skia_RuntimeEffectExternalKt_RuntimeEffect_1nMakeShader(JNIEnv* env,
                                                      jclass jclass,
                                                      jlong ptr,
                                                      jlong uniformPtr,
@@ -32,7 +32,7 @@ Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeShader(JNIEnv* env,
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeForShader(JNIEnv* env, jclass jclass, jstring sksl) {
+Java_org_jetbrains_skia_RuntimeEffectExternalKt_RuntimeEffect_1nMakeForShader(JNIEnv* env, jclass jclass, jstring sksl) {
     SkString skslProper = skString(env, sksl);
     SkRuntimeEffect::Result result = SkRuntimeEffect::MakeForShader(skslProper);
     if (result.errorText.isEmpty()) {
@@ -45,7 +45,7 @@ Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeForShader(JNIEnv* env, jclass jcl
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeForColorFilter(JNIEnv* env,
+Java_org_jetbrains_skia_RuntimeEffectExternalKt_RuntimeEffect_1nMakeForColorFilter(JNIEnv* env,
                                                              jclass jclass,
                                                              jstring sksl) {
     SkString skslProper = skString(env, sksl);

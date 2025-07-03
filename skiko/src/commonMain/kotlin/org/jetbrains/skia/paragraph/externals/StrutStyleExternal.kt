@@ -35,7 +35,7 @@ internal external fun StrutStyle_nSetFontFamilies(ptr: NativePointer, families: 
 internal external fun StrutStyle_nGetFontStyle(ptr: NativePointer, fontStyleData: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle")
-internal external fun _nSetFontStyle(ptr: NativePointer, value: Int)
+internal external fun StrutStyle_nSetFontStyle(ptr: NativePointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize")
 internal external fun StrutStyle_nGetFontSize(ptr: NativePointer): Float

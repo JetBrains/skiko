@@ -81,7 +81,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
     fun setFontStyle(style: FontStyle): StrutStyle {
         try {
             Stats.onNativeCall()
-            _nSetFontStyle(_ptr, style._value)
+            StrutStyle_nSetFontStyle(_ptr, style._value)
         } finally {
             reachabilityBarrier(this)
         }

@@ -10,29 +10,29 @@ static void deleteBitmap(SkBitmap* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt_Bitmap_1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteBitmap));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nMake
   (JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(new SkBitmap());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nMakeClone
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nMakeClone
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(new SkBitmap(*instance));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nSwap
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nSwap
   (JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkBitmap* other = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(otherPtr));
     instance->swap(*other);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetImageInfo
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetImageInfo
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray imageInfoResult, jlongArray colorSpaceResultPtr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkImageInfo imageInfo = instance->info();
@@ -42,61 +42,61 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetImageIn
     );
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetRowBytesAsPixels
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetRowBytesAsPixels
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->rowBytesAsPixels();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nIsNull
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nIsNull
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->isNull();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetRowBytes
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetRowBytes
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->rowBytes();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nSetAlphaType
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nSetAlphaType
   (JNIEnv* env, jclass jclass, jlong ptr, jint alphaType) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->setAlphaType(static_cast<SkAlphaType>(alphaType));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nComputeByteSize
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nComputeByteSize
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->computeByteSize();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nIsImmutable
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nIsImmutable
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->isImmutable();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nSetImmutable
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nSetImmutable
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     instance->setImmutable();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nReset
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nReset
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     instance->reset();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nComputeIsOpaque
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nComputeIsOpaque
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return SkBitmap::ComputeIsOpaque(*instance);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nSetImageInfo
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nSetImageInfo
   (JNIEnv* env, jclass jclass, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jint rowBytes) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
@@ -108,7 +108,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nSetIma
     return instance->setInfo(imageInfo, rowBytes);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nAllocPixelsFlags
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nAllocPixelsFlags
   (JNIEnv* env, jclass jclass, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jint flags) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
@@ -120,7 +120,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nAllocP
     return instance->tryAllocPixelsFlags(imageInfo, flags);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nAllocPixelsRowBytes
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nAllocPixelsRowBytes
   (JNIEnv* env, jclass jclass, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jint rowBytes) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
@@ -132,7 +132,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nAllocP
     return instance->tryAllocPixels(imageInfo, rowBytes);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nInstallPixels
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nInstallPixels
   (JNIEnv* env, jclass jclass, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray pixelsArr, jint rowBytes, jint pixelsLen) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
@@ -147,13 +147,13 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nInstal
     return instance->installPixels(imageInfo, pixels, rowBytes, deleteJBytes, nullptr);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nAllocPixels
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nAllocPixels
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->tryAllocPixels();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetPixelRef
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetPixelRef
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkPixelRef* pixelRef = instance->pixelRef();
@@ -161,70 +161,70 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetPixelR
     return reinterpret_cast<jlong>(pixelRef);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetPixelRefOriginX
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetPixelRefOriginX
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkIPoint origin = instance->pixelRefOrigin();
     return origin.x();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetPixelRefOriginY
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetPixelRefOriginY
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkIPoint origin = instance->pixelRefOrigin();
     return origin.y();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nSetPixelRef
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nSetPixelRef
   (JNIEnv* env, jclass jclass, jlong ptr, jlong pixelRefPtr, jint dx, jint dy) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkPixelRef* pixelRef = reinterpret_cast<SkPixelRef*>(static_cast<uintptr_t>(pixelRefPtr));
     instance->setPixelRef(sk_ref_sp<SkPixelRef>(pixelRef), dx, dy);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nIsReadyToDraw
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nIsReadyToDraw
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->readyToDraw();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetGenerationId
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetGenerationId
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->getGenerationID();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nNotifyPixelsChanged
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nNotifyPixelsChanged
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     instance->notifyPixelsChanged();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nEraseColor
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nEraseColor
   (JNIEnv* env, jclass jclass, jlong ptr, jint color) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     instance->eraseColor(color);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nErase
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nErase
   (JNIEnv* env, jclass jclass, jlong ptr, jint color, jint left, jint top, jint right, jint bottom) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     instance->erase(color, {left, top, right, bottom});
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt_Bitmap_1nGetColor
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetColor
   (JNIEnv* env, jclass jclass, jlong ptr, jint x, jint y) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->getColor(x, y);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetAlphaf
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nGetAlphaf
   (JNIEnv* env, jclass jclass, jlong ptr, jint x, jint y) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->getAlphaf(x, y);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtractSubset
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nExtractSubset
   (JNIEnv* env, jclass jclass, jlong ptr, jlong dstPtr, jint left, jint top, jint right, jint bottom) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkBitmap* dst = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(dstPtr));
@@ -232,7 +232,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtrac
 }
 
 // returns true if readBytes array contains successfully read bytes. returns false otherwise
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nReadPixels
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nReadPixels
   (JNIEnv* env, jclass jclass, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jint rowBytes, jint srcX, jint srcY, jbyteArray readBytes) {
     jbyte *result_bytes = env->GetByteArrayElements(readBytes, NULL);
 
@@ -248,7 +248,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nReadPi
     return result;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtractAlpha
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nExtractAlpha
   (JNIEnv* env, jclass jclass, jlong ptr, jlong dstPtr, jlong paintPtr, jintArray resultPoint) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkBitmap* dst = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(dstPtr));
@@ -266,7 +266,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtrac
     return result;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nPeekPixels
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nPeekPixels
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkPixmap* pixmap = new SkPixmap();
@@ -278,7 +278,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nPeekPixel
     }
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nMakeShader
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapExternalKt_Bitmap_1nMakeShader
   (JNIEnv* env, jclass jclass, jlong ptr, jint tmx, jint tmy, jint samplingModeVal1, jint samplingModeVal2, jfloatArray localMatrixArr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
