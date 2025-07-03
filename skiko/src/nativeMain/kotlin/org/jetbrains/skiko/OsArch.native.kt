@@ -10,6 +10,7 @@ actual val hostOs: OS by lazy {
         OsFamily.WINDOWS -> OS.Windows
         OsFamily.IOS -> OS.Ios
         OsFamily.TVOS -> OS.Tvos
+        OsFamily.ANDROID -> OS.Android
         else -> throw Error("Unsupported OS ${Platform.osFamily}")
     }
 }
