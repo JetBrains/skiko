@@ -50,6 +50,10 @@ internal open class HardwareLayer(
         get() = platformOperations.isFullscreen(this)
         set(value) = platformOperations.setFullscreen(this, value)
 
+    var maximized: Boolean
+        get() = platformOperations.isMaximized(this)
+        set(value) = platformOperations.setMaximized(this, value)
+
     fun disableTitleBar(customHeaderHeight: Float) {
         platformOperations.disableTitleBar(this, customHeaderHeight)
     }
