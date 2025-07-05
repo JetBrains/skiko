@@ -83,7 +83,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGe
 }
 
 #ifdef SK_GL
-#ifdef __linux__
+#ifdef SK_BUILD_FOR_LINUX
 
 #define SKIKO_TEST_GL_INCLUDED
 
@@ -168,7 +168,7 @@ SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(
     glXSwapBuffers(instance->display, instance->surface);
 }
 
-#endif // __linux__
+#endif // SK_BUILD_FOR_LINUX
 #endif // SK_GL
 
 #ifndef SKIKO_TEST_GL_INCLUDED
