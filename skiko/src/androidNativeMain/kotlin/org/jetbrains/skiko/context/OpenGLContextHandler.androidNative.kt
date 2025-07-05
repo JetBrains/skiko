@@ -1,11 +1,14 @@
 package org.jetbrains.skiko.context
 
+import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.IntVar
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.cValuesOf
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
+import kotlinx.cinterop.reinterpret
+import kotlinx.cinterop.toKString
 import kotlinx.cinterop.value
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.ColorSpace
@@ -157,7 +160,7 @@ internal class AndroidNativeOpenGLContextHandler(layer: SkiaLayer) :
     }
 
     override fun initContext(): Boolean {
-        return eglDisplay != null || initEGL()
+        return eglContext != null || initEGL()
     }
 
     override fun initCanvas() {
@@ -220,7 +223,7 @@ internal class AndroidNativeOpenGLContextHandler(layer: SkiaLayer) :
 
     override fun rendererInfo(): String {
         return super.rendererInfo() +
-                "Vendor: ${glGetString(GL_VENDOR)}\n" +
-                "Model: ${glGetString(GL_RENDERER)}\n"
+                "Vendor: ${glGetString(GL_VENDOR)?.reinterpret<ByteVar>()?.toKString()}\n" +
+                "Model: ${glGetString(GL_RENDERER)?.reinterpret<ByteVar>()?.toKString()}\n"
     }
 }
