@@ -279,9 +279,13 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             mutableListOfLinkerOptions(options)
         }
         OS.Android -> {
-            val skiaLibraries = skiaStaticLibraries(skiaDir, targetString, buildType)
-            configureCinterop("skia", os, arch, target, targetString, skiaLibraries)
-            mutableListOf()
+            val options = mutableListOf(
+                "-lGLESv3",
+                "-lEGL",
+                "-llog",
+                "-landroid",
+            ) + allLibraries
+            mutableListOfLinkerOptions(options)
         }
         else -> mutableListOf()
     }
