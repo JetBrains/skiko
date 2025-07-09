@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.SwingUtilities.*
 
 /**
@@ -77,39 +78,12 @@ internal class MetalRedrawer(
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private var updateRequested = false
-
-    private fun updateIfRequested() {
-        if (updateRequested) {
-            // Clear the flag before calling update so that update itself
-            // can request updating again.
-            updateRequested = false
-            update()
-        }
-    }
-
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing) {
-            // Schedule drawing before calling update so that if update
-            // schedules this frameDispatcher again, and update is a long
-            // operation, the frame is drawn before update is called again.
-            drawOnlyFrameDispatcher.scheduleFrame()
-            updateIfRequested()
-        }
-    }
-
-    private val throttledFrameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing) {
-            drawOnlyFrameDispatcher.scheduleFrame()
-            updateIfRequested()
-        }
-        waitForVSyncIfNeeded()
-    }
-
-    private val drawOnlyFrameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        draw()
-        waitForVSyncIfNeeded()
-    }
+    private val frameDispatcher = MetalFrameDispatcher(
+        update = { update() },
+        draw = { draw() },
+        isShowing = { layer.isShowing },
+        waitForVSync = { vSyncer?.waitForVSync() }
+    )
 
     init {
         onContextInit()
@@ -117,8 +91,6 @@ internal class MetalRedrawer(
 
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
-        throttledFrameDispatcher.cancel()
-        drawOnlyFrameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device.ptr)
         adapter.dispose()
@@ -127,18 +99,9 @@ internal class MetalRedrawer(
         super.dispose()
     }
 
-    private suspend fun waitForVSyncIfNeeded() {
-        vSyncer?.waitForVSync()
-    }
-
     override fun needRedraw(throttledToVsync: Boolean) {
         checkDisposed()
-        updateRequested = true
-        if (throttledToVsync) {
-            throttledFrameDispatcher.scheduleFrame()
-        } else {
-            frameDispatcher.scheduleFrame()
-        }
+        frameDispatcher.scheduleFrame(needUpdate = true, throttledToVsync = throttledToVsync)
     }
 
     override fun redrawImmediately(updateNeeded: Boolean) {
@@ -149,7 +112,7 @@ internal class MetalRedrawer(
         // Trying to draw immediately in Metal will result in lost (undrawn)
         // frames if there's more than two between consecutive vsync events.
         if (layer.isShowing) {
-            drawOnlyFrameDispatcher.scheduleFrame()
+            frameDispatcher.scheduleFrame(needUpdate = false, throttledToVsync = false)
         } else {
             // But if the layer isn't showing yet, we want to draw immediately,
             // so that if it shows before the next vsync, there is no background flash
@@ -220,4 +183,49 @@ internal class MetalRedrawer(
      * @note see https://developer.apple.com/documentation/quartzcore/cametallayer/2887087-displaysyncenabled
      */
     private external fun setDisplaySyncEnabled(device: Long, enabled: Boolean)
+
+    private class MetalFrameDispatcher(
+        private val update: () -> Unit,
+        private val draw: suspend CoroutineScope.() -> Unit,
+        private val isShowing: () -> Boolean,
+        private val waitForVSync: suspend CoroutineScope.() -> Unit,
+    ) {
+        private var updateRequested = AtomicBoolean(false)
+
+        private fun updateIfRequested() {
+            if (updateRequested.getAndSet(false)) {
+                update()
+            }
+        }
+
+        private val updateDispatcher = FrameDispatcher(MainUIDispatcher) {
+            if (isShowing()) {
+                updateIfRequested()
+            }
+        }
+
+        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
+            if (isShowing()) {
+                updateIfRequested()
+                draw()
+            }
+            waitForVSync()
+        }
+
+        fun scheduleFrame(needUpdate: Boolean, throttledToVsync: Boolean) {
+            if (needUpdate) {
+                updateRequested.set(true)
+
+                if (!throttledToVsync) {
+                    updateDispatcher.scheduleFrame()
+                }
+            }
+            frameDispatcher.scheduleFrame()
+        }
+
+        fun cancel() {
+            updateDispatcher.cancel()
+            frameDispatcher.cancel()
+        }
+    }
 }
