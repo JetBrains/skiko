@@ -51,6 +51,37 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
         annotations += annotationCall
     }
 
+    private fun IrFunction.addWasmImportAnnotation(name: String) {
+        val annotationClass = pluginContext.referenceClass(
+            ClassId.fromString("kotlin/wasm/WasmImport") // Replace with your fully qualified annotation name
+        ) ?: return
+
+        val ctor = annotationClass.owner.constructors.first()
+
+        val annotationCall = IrConstructorCallImpl.fromSymbolOwner(
+            startOffset = startOffset,
+            endOffset = endOffset,
+            type = annotationClass.owner.defaultType,
+            constructorSymbol = ctor.symbol,
+        )
+
+        annotationCall.putValueArgument(0, IrConstImpl.string(
+            startOffset,
+            endOffset,
+            pluginContext.irBuiltIns.stringType,
+            "./skiko.mjs"
+        ))
+
+        annotationCall.putValueArgument(1, IrConstImpl.string(
+            startOffset,
+            endOffset,
+            pluginContext.irBuiltIns.stringType,
+            name
+        ))
+
+        annotations += annotationCall
+    }
+
 
     override fun visitFunction(declaration: IrFunction, data: OutputStreamWriter): IrStatement {
 
@@ -65,7 +96,11 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
 
             addSkikoJsModuleAnnotation()
 
+            annotations -= wasmImportAnnotation
+
             val name = jsNameAnnotation.getStringValue("name")
+            addWasmImportAnnotation(name)
+
             data.appendLine("export let ${name} = (...a) => ($name = loadedWasm.wasmExports[\"${name}\"])(...a)")
         }
     }
