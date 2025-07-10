@@ -17,9 +17,12 @@ internal class ImportGeneratorTransformer : IrElementTransformer<OutputStreamWri
             val wasmImportAnnotation = declaration.getAnnotation(FqName("kotlin.wasm.WasmImport"))
                 ?: return@apply
 
+            val jsNameAnnotation = declaration.getAnnotation(FqName("kotlin.js.JsName"))
+                ?: return@apply
+
             @Suppress("UNCHECKED_CAST")
             val const = wasmImportAnnotation.getValueArgument(Name.identifier("name")) as IrConst<String>
-            data.appendLine("export const  ${const.value} = loadedWasm.wasmExports[\"${const.value}\"];")
+            data.appendLine("export const ${const.value} = loadedWasm.wasmExports[\"${const.value}\"];")
         }
     }
 }
