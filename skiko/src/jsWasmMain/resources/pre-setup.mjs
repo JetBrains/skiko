@@ -8,6 +8,11 @@ export const {
     _releaseLocalCallbackScope
 } = SkikoCallbacks;
 
-export const loadedWasm = await loadSkikoWASM();
+// export const loadedWasm = await loadSkikoWASM();
+//
+// export const { GL } = loadedWasm;
 
-export const { GL } = loadedWasm;
+
+export const api = {
+    awaitSkiko: loadSkikoWASM()
+}

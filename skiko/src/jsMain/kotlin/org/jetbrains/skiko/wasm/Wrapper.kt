@@ -9,7 +9,9 @@ import kotlin.js.*
  * Calling onWasmReady after onRuntimeInitialized invokes [onReady] as well.
  * It's safe to call wasm functions within [onReady] callback, or after it was invoked.
  */
-external fun onWasmReady(onReady: () -> Unit)
+fun onWasmReady(onReady: () -> Unit) {
+    awaitSkiko.then { onReady() }
+}
 
 internal external val wasmSetup: Promise<Boolean>
 
