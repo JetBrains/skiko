@@ -123,9 +123,6 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
             if (outputES6) {
                 addAll(
                     listOf(
-                        "-s", "EXPORT_ES6=1",
-                        "-s", "MODULARIZE=1",
-                        "-s", "EXPORT_NAME=loadSkikoWASM",
                         "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
                         // "-s", "EXPORT_ALL=1",
                     )
@@ -194,7 +191,7 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
         val wasmOutDir = linkWasm.map { it.outDir }
         val wasmEsOutDir = linkWasmWithES6.map { it.outDir }
-        val wasmD8OutDir = linkWasmD8WithES6.map { it.outDir }
+//        val wasmD8OutDir = linkWasmD8WithES6.map { it.outDir }
 
         from(wasmOutDir) {
             include("*.wasm")
@@ -204,9 +201,9 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         from(wasmEsOutDir) {
             include("*.mjs")
         }
-        from(wasmD8OutDir) {
-            include("*.mjs")
-        }
+//        from(wasmD8OutDir) {
+//            include("*.mjs")
+//        }
 
         archiveBaseName.set("skiko-wasm")
         doLast {
