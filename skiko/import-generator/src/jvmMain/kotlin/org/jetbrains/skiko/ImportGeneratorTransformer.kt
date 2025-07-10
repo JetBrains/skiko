@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrConst
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.getValueArgument
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
@@ -11,6 +12,11 @@ import org.jetbrains.kotlin.name.Name
 import java.io.OutputStreamWriter
 
 internal class ImportGeneratorTransformer : IrElementTransformer<OutputStreamWriter> {
+
+    @Suppress("UNCHECKED_CAST")
+    private fun IrConstructorCall.getStringValue(value: String): String =
+        (getValueArgument(Name.identifier(value)) as IrConst<String>).value
+
     override fun visitFunction(declaration: IrFunction, data: OutputStreamWriter): IrStatement {
 
         return super.visitFunction(declaration, data).apply {
@@ -20,9 +26,8 @@ internal class ImportGeneratorTransformer : IrElementTransformer<OutputStreamWri
             val jsNameAnnotation = declaration.getAnnotation(FqName("kotlin.js.JsName"))
                 ?: return@apply
 
-            @Suppress("UNCHECKED_CAST")
-            val const = wasmImportAnnotation.getValueArgument(Name.identifier("name")) as IrConst<String>
-            data.appendLine("export const ${const.value} = loadedWasm.wasmExports[\"${const.value}\"];")
+            val name = jsNameAnnotation.getStringValue("name")
+            data.appendLine("export const ${name} = loadedWasm.wasmExports[\"${name}\"];")
         }
     }
 }

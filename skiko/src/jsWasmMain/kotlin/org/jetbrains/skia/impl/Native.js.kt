@@ -56,11 +56,11 @@ internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
 
 
 // Those functions are defined by Emscripten.
-@ExternalSymbolName("_malloc")
+@ExternalSymbolName("malloc")
 @ModuleImport("./skiko.mjs", "malloc")
 internal external fun _malloc(size: Int): NativePointer
 
-@ExternalSymbolName("_free")
+@ExternalSymbolName("free")
 @ModuleImport("./skiko.mjs", "free")
 internal external fun _free(ptr: NativePointer)
 
