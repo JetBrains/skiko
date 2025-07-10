@@ -18,7 +18,7 @@ internal class ImportGeneratorExtension(
         val prefixFile = prefix?.let { File(it) }
         outputFile.writer().use { writer ->
             prefixFile?.let { writer.appendLine(it.readText()) }
-            moduleFragment.transformChildren(ImportGeneratorTransformer(), writer)
+            moduleFragment.transformChildren(ImportGeneratorTransformer(pluginContext), writer)
         }
     }
 }
