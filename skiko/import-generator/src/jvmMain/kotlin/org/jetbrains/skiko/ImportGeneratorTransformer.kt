@@ -88,15 +88,13 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
         return super.visitFunction(declaration, data).apply {
             if (this !is IrFunction) return@apply
 
-            val wasmImportAnnotation = getAnnotation(FqName("kotlin.wasm.WasmImport"))
+            getAnnotation(FqName("org.jetbrains.skia.ModuleImport"))
                 ?: return@apply
 
             val jsNameAnnotation = getAnnotation(FqName("kotlin.js.JsName"))
                 ?: return@apply
 
             addSkikoJsModuleAnnotation()
-
-            annotations -= wasmImportAnnotation
 
             val name = jsNameAnnotation.getStringValue("name")
             addWasmImportAnnotation(name)
