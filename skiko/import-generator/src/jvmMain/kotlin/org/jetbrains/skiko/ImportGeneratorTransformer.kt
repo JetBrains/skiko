@@ -66,7 +66,7 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
             addSkikoJsModuleAnnotation()
 
             val name = jsNameAnnotation.getStringValue("name")
-            data.appendLine("export let ${name} = (...args) => { $name = loadedWasm.wasmExports[\"${name}\"]; return $name(...args)}")
+            data.appendLine("export let ${name} = (...a) => ($name = loadedWasm.wasmExports[\"${name}\"])(...a)")
         }
     }
 }
