@@ -19,7 +19,7 @@ internal class ImportGeneratorTransformer : IrElementTransformer<OutputStreamWri
 
             @Suppress("UNCHECKED_CAST")
             val const = wasmImportAnnotation.getValueArgument(Name.identifier("name")) as IrConst<String>
-            data.appendLine("    ${const.value},")
+            data.appendLine("export const  ${const.value} = loadedWasm.wasmExports[\"${const.value}\"];")
         }
     }
 }

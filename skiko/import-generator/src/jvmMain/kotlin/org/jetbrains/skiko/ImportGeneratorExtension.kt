@@ -18,9 +18,7 @@ internal class ImportGeneratorExtension(
         val prefixFile = prefix?.let { File(it) }
         outputFile.writer().use { writer ->
             prefixFile?.let { writer.appendLine(it.readText()) }
-            writer.appendLine("export const {")
             moduleFragment.transformChildren(ImportGeneratorTransformer(), writer)
-            writer.appendLine("} = loadedWasm.wasmExports;")
         }
     }
 }
