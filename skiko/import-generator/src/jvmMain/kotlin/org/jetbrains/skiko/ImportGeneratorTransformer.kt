@@ -27,7 +27,7 @@ internal class ImportGeneratorTransformer : IrElementTransformer<OutputStreamWri
                 ?: return@apply
 
             val name = jsNameAnnotation.getStringValue("name")
-            data.appendLine("export const ${name} = loadedWasm.wasmExports[\"${name}\"];")
+            data.appendLine("export let ${name} = (...args) => { $name = loadedWasm.wasmExports[\"${name}\"]; return $name(...args)}")
         }
     }
 }
