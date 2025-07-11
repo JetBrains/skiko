@@ -28,6 +28,7 @@ internal class ImportGeneratorExtension(
 
         reexportFile.writer().use { reexportWriter ->
             reexportWriter.appendLine("import loadSkikoWASM from \"./skiko.mjs\";")
+            reexportWriter.appendLine("import * as wasmApi from \"./skiko.mjs\";")
             reexportWriter.appendLine("export const api = { awaitSkiko: loadSkikoWASM() }")
             moduleFragment.transformChildren(ReexportGeneratorTransformer(pluginContext), reexportWriter)
         }
