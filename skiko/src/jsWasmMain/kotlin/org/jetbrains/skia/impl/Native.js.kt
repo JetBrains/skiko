@@ -2,6 +2,7 @@ package org.jetbrains.skia.impl
 
 import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.ExternalSymbolName
+import kotlin.js.JsName
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
     actual var _ptr: NativePointer
@@ -64,20 +65,6 @@ internal external fun _malloc(size: Int): NativePointer
 @ModuleImport("./skiko.mjs", "free")
 internal external fun _free(ptr: NativePointer)
 
-// Data copying routines.
-internal expect fun toWasm(dest: NativePointer, src: ByteArray)
-internal expect fun toWasm(dest: NativePointer, src: ShortArray)
-internal expect fun toWasm(dest: NativePointer, src: CharArray)
-internal expect fun toWasm(dest: NativePointer, src: FloatArray)
-internal expect fun toWasm(dest: NativePointer, src: DoubleArray)
-internal expect fun toWasm(dest: NativePointer, src: IntArray)
-
-internal expect fun fromWasm(src: NativePointer, result: ByteArray)
-internal expect fun fromWasm(src: NativePointer, result: ShortArray)
-internal expect fun fromWasm(src: NativePointer, result: IntArray)
-internal expect fun fromWasm(src: NativePointer, result: FloatArray)
-internal expect fun fromWasm(src: NativePointer, result: DoubleArray)
-
 actual class NativePointerArray actual constructor(size: Int) {
     internal val backing = IntArray(size)
     actual operator fun get(index: Int): NativePointer {
@@ -99,3 +86,140 @@ actual class NativePointerArray actual constructor(size: Int) {
         }
     }
 }
+
+@ExternalSymbolName("skia_memSetByte")
+@ModuleImport("./skiko.mjs", "skia_memSetByte")
+external fun skia_memSetByte(address: NativePointer, value: Byte)
+
+@ExternalSymbolName("skia_memGetByte")
+@ModuleImport("./skiko.mjs", "skia_memGetByte")
+external fun skia_memGetByte(address: NativePointer): Byte
+
+@ExternalSymbolName("skia_memSetChar")
+@ModuleImport("./skiko.mjs", "skia_memSetChar")
+external fun skia_memSetChar(address: NativePointer, value: Char)
+
+@ExternalSymbolName("skia_memGetChar")
+@ModuleImport("./skiko.mjs", "skia_memGetChar")
+external fun skia_memGetChar(address: NativePointer): Char
+
+@ExternalSymbolName("skia_memSetShort")
+@ModuleImport("./skiko.mjs", "skia_memSetShort")
+external fun skia_memSetShort(address: NativePointer, value: Short)
+
+@ExternalSymbolName("skia_memGetShort")
+@ModuleImport("./skiko.mjs", "skia_memGetShort")
+external fun skia_memGetShort(address: NativePointer): Short
+
+@ExternalSymbolName("skia_memSetInt")
+@ModuleImport("./skiko.mjs", "skia_memSetInt")
+external fun skia_memSetInt(address: NativePointer, value: Int)
+
+@ExternalSymbolName("skia_memGetInt")
+@ModuleImport("./skiko.mjs", "skia_memGetInt")
+external fun skia_memGetInt(address: NativePointer): Int
+
+@ExternalSymbolName("skia_memSetFloat")
+@ModuleImport("./skiko.mjs", "skia_memSetFloat")
+external fun skia_memSetFloat(address: NativePointer, value: Float)
+
+@ExternalSymbolName("skia_memGetFloat")
+@ModuleImport("./skiko.mjs", "skia_memGetFloat")
+external fun skia_memGetFloat(address: NativePointer): Float
+
+@ExternalSymbolName("skia_memSetDouble")
+@ModuleImport("./skiko.mjs", "skia_memSetDouble")
+external fun skia_memSetDouble(address: NativePointer, value: Double)
+
+@ExternalSymbolName("skia_memGetDouble")
+@ModuleImport("./skiko.mjs", "skia_memGetDouble")
+external fun skia_memGetDouble(address: NativePointer): Double
+
+internal fun toWasm(dest: NativePointer, src: ByteArray) {
+    var address = dest
+    for (value in src) {
+        skia_memSetByte(address, value)
+        address += Byte.SIZE_BYTES
+    }
+}
+
+internal fun toWasm(dest: NativePointer, src: ShortArray) {
+    var address = dest
+    for (value in src) {
+        skia_memSetShort(address, value)
+        address += Short.SIZE_BYTES
+    }
+}
+
+internal fun toWasm(dest: NativePointer, src: CharArray) {
+    var address = dest
+    for (value in src) {
+        skia_memSetChar(address, value)
+        address += Char.SIZE_BYTES
+    }
+}
+
+internal fun toWasm(dest: NativePointer, src: IntArray) {
+    var address = dest
+    for (value in src) {
+        skia_memSetInt(address, value)
+        address += Int.SIZE_BYTES
+    }
+}
+
+internal fun toWasm(dest: NativePointer, src: FloatArray) {
+    var address = dest
+    for (value in src) {
+        skia_memSetFloat(address, value)
+        address += Float.SIZE_BYTES
+    }
+}
+
+internal fun toWasm(dest: NativePointer, src: DoubleArray) {
+    var address = dest
+    for (value in src) {
+        skia_memSetDouble(address, value)
+        address += Double.SIZE_BYTES
+    }
+}
+
+internal fun fromWasm(src: NativePointer, result: ByteArray) {
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetByte(address)
+        address += Byte.SIZE_BYTES
+    }
+}
+
+internal fun fromWasm(src: NativePointer, result: ShortArray) {
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetShort(address)
+        address += Short.SIZE_BYTES
+    }
+}
+
+internal fun fromWasm(src: NativePointer, result: IntArray) {
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetInt(address)
+        address += Int.SIZE_BYTES
+    }
+}
+
+internal fun fromWasm(src: NativePointer, result: FloatArray) {
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetFloat(address)
+        address += Float.SIZE_BYTES
+    }
+}
+
+internal fun fromWasm(src: NativePointer, result: DoubleArray) {
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetDouble(address)
+        address += Double.SIZE_BYTES
+    }
+}
+
