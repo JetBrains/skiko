@@ -61,9 +61,6 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
         return super.visitFunction(declaration, data).apply {
             if (this !is IrFunction) return@apply
 
-            getAnnotation(FqName("org.jetbrains.skia.ModuleImport"))
-                ?: return@apply
-
             val jsNameAnnotation = getAnnotation(FqName("kotlin.js.JsName"))
                 ?: return@apply
 
