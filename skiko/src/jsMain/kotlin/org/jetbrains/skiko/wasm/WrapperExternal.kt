@@ -1,4 +1,4 @@
-@file:JsModule("./skiko.mjs")
+@file:JsModule("./js-reexport-symbols.mjs")
 @file:JsNonModule
 @file:JsQualifier("api")
 package org.jetbrains.skiko.wasm
