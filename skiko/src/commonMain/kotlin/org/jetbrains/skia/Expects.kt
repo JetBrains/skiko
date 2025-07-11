@@ -25,6 +25,5 @@ expect annotation class ExternalSymbolName(val name: String)
 @OptionalExpectation
 @Target(AnnotationTarget.FUNCTION)
 expect annotation class ModuleImport(
-    val module: String,
     val name: String
 )

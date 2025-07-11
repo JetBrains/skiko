@@ -58,11 +58,11 @@ internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
 
 // Those functions are defined by Emscripten.
 @ExternalSymbolName("malloc")
-@ModuleImport("./skiko.mjs", "malloc")
+@ModuleImport("malloc")
 internal external fun _malloc(size: Int): NativePointer
 
 @ExternalSymbolName("free")
-@ModuleImport("./skiko.mjs", "free")
+@ModuleImport("free")
 internal external fun _free(ptr: NativePointer)
 
 actual class NativePointerArray actual constructor(size: Int) {
@@ -88,51 +88,51 @@ actual class NativePointerArray actual constructor(size: Int) {
 }
 
 @ExternalSymbolName("skia_memSetByte")
-@ModuleImport("./skiko.mjs", "skia_memSetByte")
+@ModuleImport("skia_memSetByte")
 external fun skia_memSetByte(address: NativePointer, value: Byte)
 
 @ExternalSymbolName("skia_memGetByte")
-@ModuleImport("./skiko.mjs", "skia_memGetByte")
+@ModuleImport("skia_memGetByte")
 external fun skia_memGetByte(address: NativePointer): Byte
 
 @ExternalSymbolName("skia_memSetChar")
-@ModuleImport("./skiko.mjs", "skia_memSetChar")
+@ModuleImport("skia_memSetChar")
 external fun skia_memSetChar(address: NativePointer, value: Char)
 
 @ExternalSymbolName("skia_memGetChar")
-@ModuleImport("./skiko.mjs", "skia_memGetChar")
+@ModuleImport("skia_memGetChar")
 external fun skia_memGetChar(address: NativePointer): Char
 
 @ExternalSymbolName("skia_memSetShort")
-@ModuleImport("./skiko.mjs", "skia_memSetShort")
+@ModuleImport("skia_memSetShort")
 external fun skia_memSetShort(address: NativePointer, value: Short)
 
 @ExternalSymbolName("skia_memGetShort")
-@ModuleImport("./skiko.mjs", "skia_memGetShort")
+@ModuleImport("skia_memGetShort")
 external fun skia_memGetShort(address: NativePointer): Short
 
 @ExternalSymbolName("skia_memSetInt")
-@ModuleImport("./skiko.mjs", "skia_memSetInt")
+@ModuleImport("skia_memSetInt")
 external fun skia_memSetInt(address: NativePointer, value: Int)
 
 @ExternalSymbolName("skia_memGetInt")
-@ModuleImport("./skiko.mjs", "skia_memGetInt")
+@ModuleImport("skia_memGetInt")
 external fun skia_memGetInt(address: NativePointer): Int
 
 @ExternalSymbolName("skia_memSetFloat")
-@ModuleImport("./skiko.mjs", "skia_memSetFloat")
+@ModuleImport("skia_memSetFloat")
 external fun skia_memSetFloat(address: NativePointer, value: Float)
 
 @ExternalSymbolName("skia_memGetFloat")
-@ModuleImport("./skiko.mjs", "skia_memGetFloat")
+@ModuleImport("skia_memGetFloat")
 external fun skia_memGetFloat(address: NativePointer): Float
 
 @ExternalSymbolName("skia_memSetDouble")
-@ModuleImport("./skiko.mjs", "skia_memSetDouble")
+@ModuleImport("skia_memSetDouble")
 external fun skia_memSetDouble(address: NativePointer, value: Double)
 
 @ExternalSymbolName("skia_memGetDouble")
-@ModuleImport("./skiko.mjs", "skia_memGetDouble")
+@ModuleImport("skia_memGetDouble")
 external fun skia_memGetDouble(address: NativePointer): Double
 
 internal fun toWasm(dest: NativePointer, src: ByteArray) {

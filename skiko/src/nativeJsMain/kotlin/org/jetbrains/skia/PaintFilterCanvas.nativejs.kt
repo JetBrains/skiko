@@ -14,9 +14,9 @@ internal actual fun PaintFilterCanvas.doInit(ptr: NativePointer) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nInit")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PaintFilterCanvas__1nInit")
+@ModuleImport("org_jetbrains_skia_PaintFilterCanvas__1nInit")
 internal external fun PaintFilterCanvas_nInit(ptr: NativePointer, onFilter: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint")
+@ModuleImport("org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint")
 internal external fun PaintFilterCanvas_nGetOnFilterPaint(ptr: NativePointer): NativePointer
