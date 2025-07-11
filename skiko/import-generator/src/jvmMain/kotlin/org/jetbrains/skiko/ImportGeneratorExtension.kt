@@ -27,8 +27,16 @@ internal class ImportGeneratorExtension(
         reexportFile.parentFile.mkdirs()
 
         reexportFile.writer().use { reexportWriter ->
-x            reexportWriter.appendLine("import * as wasmApi from \"./skiko.mjs\";")
+            reexportWriter.appendLine("import * as wasmApi from \"./skiko.mjs\";")
+            reexportWriter.appendLine("console.log(wasmApi)");
+            reexportWriter.appendLine("window['GL'] = wasmApi.GL;")
+//            reexportWriter.appendLine("window['HEAPU8'] = wasmApi.HEAPU8;")
+//            reexportWriter.appendLine("window['HEAPU16'] = wasmApi.HEAPU16;")
+//            reexportWriter.appendLine("window['HEAPU32'] = wasmApi.HEAPU32;")
+//            reexportWriter.appendLine("window['HEAPF32'] = wasmApi.HEAPF32;")
+//            reexportWriter.appendLine("window['HEAPF64'] = wasmApi.HEAPF64;")
             reexportWriter.appendLine("export const api = { awaitSkiko: wasmApi.awaitSkiko }")
+
             moduleFragment.transformChildren(ReexportGeneratorTransformer(pluginContext), reexportWriter)
         }
     }

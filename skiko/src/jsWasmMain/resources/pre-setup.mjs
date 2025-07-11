@@ -12,6 +12,23 @@ export const {
 //
 // export const { GL } = loadedWasm;
 
-export const awaitSkiko = loadSkikoWASM()
+
+const loadedWasm = {
+    wasmExports: {}
+}
+
+let skikoGl = null;
+
+export const awaitSkiko = loadSkikoWASM().then((module) => {
+    loadedWasm.wasmExports = module.wasmExports;
+    skikoGl = module.GL;
+    return module
+});
+
+export const GL = new Proxy({}, {
+    get(object, propName) {
+        return skikoGl[propName];
+    }
+})
 
 
