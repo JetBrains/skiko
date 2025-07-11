@@ -12,7 +12,6 @@ export const {
 //
 // export const { GL } = loadedWasm;
 
-
 const loadedWasm = {
     wasmExports: {}
 }
