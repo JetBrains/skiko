@@ -56,5 +56,4 @@ private fun makePaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean): Nati
 internal expect fun PaintFilterCanvas.doInit(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
-@ModuleImport("org_jetbrains_skia_PaintFilterCanvas__1nMake")
 private external fun PaintFilterCanvas_nMake(canvasPtr: NativePointer, unrollDrawable: Boolean): NativePointer

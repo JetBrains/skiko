@@ -64,19 +64,15 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
 }
 
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer")
 private external fun BackendRenderTarget_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nMakeGL")
-@ModuleImport("org_jetbrains_skia_BackendRenderTarget__1nMakeGL")
 private external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer
 
 @ExternalSymbolName("BackendRenderTarget_nMakeMetal")
-@ModuleImport("BackendRenderTarget_nMakeMetal")
 private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("BackendRenderTarget_MakeDirect3D")
-@ModuleImport("BackendRenderTarget_MakeDirect3D")
 private external fun _nMakeDirect3D(
     width: Int,
     height: Int,

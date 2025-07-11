@@ -20,9 +20,7 @@ class RTreeFactory : BBHFactory {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_RTreeFactory__1nMake")
-@ModuleImport("org_jetbrains_skia_RTreeFactory__1nMake")
 private external fun RTreeFactory_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BBHFactory__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_BBHFactory__1nGetFinalizer")
 private external fun BBHFactory_nGetFinalizer(): NativePointer

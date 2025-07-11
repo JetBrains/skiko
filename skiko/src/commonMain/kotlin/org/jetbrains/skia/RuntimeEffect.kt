@@ -47,7 +47,6 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 internal expect fun RuntimeEffect.Companion.makeFromResultPtr(ptr: NativePointer): RuntimeEffect
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
-@ModuleImport("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
 private external fun _nMakeShader(
     runtimeEffectPtr: NativePointer, uniformPtr: NativePointer, childrenPtrs: InteropPointer,
     childCount: Int, localMatrix: InteropPointer
@@ -55,23 +54,18 @@ private external fun _nMakeShader(
 
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForShader")
-@ModuleImport("org_jetbrains_skia_RuntimeEffect__1nMakeForShader")
 private external fun _nMakeForShader(sksl: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter")
-@ModuleImport("org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter")
 private external fun _nMakeForColorFilter(sksl: InteropPointer): NativePointer
 
 //  The functions below can be used only in JS and native targets
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1Result_nGetPtr")
-@ModuleImport("org_jetbrains_skia_RuntimeEffect__1Result_nGetPtr")
 internal external fun Result_nGetPtr(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1Result_nGetError")
-@ModuleImport("org_jetbrains_skia_RuntimeEffect__1Result_nGetError")
 internal external fun Result_nGetError(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1Result_nDestroy")
-@ModuleImport("org_jetbrains_skia_RuntimeEffect__1Result_nDestroy")
 internal external fun Result_nDestroy(ptr: NativePointer)

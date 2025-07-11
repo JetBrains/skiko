@@ -71,25 +71,19 @@ class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
-@ModuleImport("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
 private external fun FontStyleSet_nMakeEmpty(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nCount")
-@ModuleImport("org_jetbrains_skia_FontStyleSet__1nCount")
 private external fun _nCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyle")
-@ModuleImport("org_jetbrains_skia_FontStyleSet__1nGetStyle")
 private external fun _nGetStyle(ptr: NativePointer, index: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyleName")
-@ModuleImport("org_jetbrains_skia_FontStyleSet__1nGetStyleName")
 private external fun _nGetStyleName(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetTypeface")
-@ModuleImport("org_jetbrains_skia_FontStyleSet__1nGetTypeface")
 private external fun _nGetTypeface(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMatchStyle")
-@ModuleImport("org_jetbrains_skia_FontStyleSet__1nMatchStyle")
 private external fun _nMatchStyle(ptr: NativePointer, style: Int): NativePointer

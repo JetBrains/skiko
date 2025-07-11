@@ -370,109 +370,82 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
 }
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetFinalizer")
 private external fun TextBlob_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetUniqueId")
 private external fun TextBlob_nGetUniqueId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nSerializeToData")
 private external fun TextBlob_nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nMakeFromData")
 private external fun TextBlob_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nBounds")
 private external fun _nBounds(ptr: NativePointer, resultRect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetInterceptsLength")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetInterceptsLength")
 private external fun _nGetInterceptsLength(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetIntercepts")
 private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer, resultArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
 private external fun _nMakeFromPosH(glyphs: InteropPointer, glyphsLen: Int, xpos: InteropPointer, ypos: Float, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nMakeFromPos")
 private external fun _nMakeFromPos(glyphs: InteropPointer, glyphsLen: Int, pos: InteropPointer, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
 private external fun _nMakeFromRSXform(glyphs: InteropPointer, glyphsLen: Int, xform: InteropPointer, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphsLength")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetGlyphsLength")
 private external fun _nGetGlyphsLength(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetGlyphs")
 private external fun _nGetGlyphs(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositionsLength")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetPositionsLength")
 private external fun _nGetPositionsLength(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetPositions")
 private external fun _nGetPositions(ptr: NativePointer, resultArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClustersLength")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetClustersLength")
 private external fun _nGetClustersLength(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetClusters")
 private external fun _nGetClusters(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetTightBounds")
 private external fun _nGetTightBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
 private external fun _nGetBlockBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
 private external fun _nGetFirstBaseline(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
-@ModuleImport("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
 private external fun _nGetLastBaseline(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nCreate")
-@ModuleImport("org_jetbrains_skia_TextBlob_Iter__1nCreate")
 private external fun Iter_nCreate(textBlobPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_TextBlob_Iter__1nGetFinalizer")
 private external fun Iter_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nFetch")
-@ModuleImport("org_jetbrains_skia_TextBlob_Iter__1nFetch")
 private external fun Iter_nFetch(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetTypeface")
-@ModuleImport("org_jetbrains_skia_TextBlob_Iter__1nGetTypeface")
 private external fun Iter_nGetTypeface(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nHasNext")
-@ModuleImport("org_jetbrains_skia_TextBlob_Iter__1nHasNext")
 private external fun Iter_nHasNext(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphCount")
-@ModuleImport("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphCount")
 private external fun Iter_nGetGlyphCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphs")
-@ModuleImport("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphs")
 private external fun Iter_nGetGlyphs(ptr: NativePointer, glyphs: InteropPointer, max: Int): Int

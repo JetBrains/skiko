@@ -1083,63 +1083,48 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetFinalizer")
 private external fun Bitmap_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMake")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nMake")
 private external fun _nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeClone")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nMakeClone")
 private external fun _nMakeClone(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSwap")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nSwap")
 private external fun _nSwap(ptr: NativePointer, otherPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetImageInfo")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetImageInfo")
 private external fun _nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetRowBytesAsPixels")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetRowBytesAsPixels")
 private external fun _nGetRowBytesAsPixels(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsNull")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nIsNull")
 private external fun _nIsNull(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetRowBytes")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetRowBytes")
 private external fun _nGetRowBytes(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetAlphaType")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nSetAlphaType")
 private external fun _nSetAlphaType(ptr: NativePointer, alphaType: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nComputeByteSize")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nComputeByteSize")
 private external fun _nComputeByteSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsImmutable")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nIsImmutable")
 private external fun _nIsImmutable(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetImmutable")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nSetImmutable")
 private external fun _nSetImmutable(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nReset")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nReset")
 private external fun _nReset(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nComputeIsOpaque")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nComputeIsOpaque")
 private external fun _nComputeIsOpaque(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetImageInfo")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nSetImageInfo")
 private external fun _nSetImageInfo(
     ptr: NativePointer,
     width: Int,
@@ -1152,7 +1137,6 @@ private external fun _nSetImageInfo(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nAllocPixelsFlags")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nAllocPixelsFlags")
 private external fun _nAllocPixelsFlags(
     ptr: NativePointer,
     width: Int,
@@ -1165,7 +1149,6 @@ private external fun _nAllocPixelsFlags(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nAllocPixelsRowBytes")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nAllocPixelsRowBytes")
 private external fun _nAllocPixelsRowBytes(
     ptr: NativePointer,
     width: Int,
@@ -1178,7 +1161,6 @@ private external fun _nAllocPixelsRowBytes(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nInstallPixels")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nInstallPixels")
 private external fun _nInstallPixels(
     ptr: NativePointer,
     width: Int,
@@ -1193,59 +1175,45 @@ private external fun _nInstallPixels(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nAllocPixels")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nAllocPixels")
 private external fun _nAllocPixels(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRef")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetPixelRef")
 private external fun _nGetPixelRef(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRefOriginX")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetPixelRefOriginX")
 private external fun _nGetPixelRefOriginX(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRefOriginY")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetPixelRefOriginY")
 private external fun _nGetPixelRefOriginY(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetPixelRef")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nSetPixelRef")
 private external fun _nSetPixelRef(ptr: NativePointer, pixelRefPtr: NativePointer, dx: Int, dy: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsReadyToDraw")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nIsReadyToDraw")
 private external fun _nIsReadyToDraw(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetGenerationId")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetGenerationId")
 private external fun _nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nNotifyPixelsChanged")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nNotifyPixelsChanged")
 private external fun _nNotifyPixelsChanged(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nEraseColor")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nEraseColor")
 private external fun _nEraseColor(ptr: NativePointer, color: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nErase")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nErase")
 private external fun _nErase(ptr: NativePointer, color: Int, left: Int, top: Int, right: Int, bottom: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetColor")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetColor")
 private external fun Bitmap_nGetColor(ptr: NativePointer, x: Int, y: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetAlphaf")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nGetAlphaf")
 private external fun _nGetAlphaf(ptr: NativePointer, x: Int, y: Int): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nExtractSubset")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nExtractSubset")
 private external fun _nExtractSubset(ptr: NativePointer, dstPtr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nReadPixels")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nReadPixels")
 private external fun _nReadPixels(
     ptr: NativePointer,
     width: Int,
@@ -1261,13 +1229,10 @@ private external fun _nReadPixels(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nExtractAlpha")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nExtractAlpha")
 private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer, iPointResultIntArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nPeekPixels")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nPeekPixels")
 private external fun _nPeekPixels(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeShader")
-@ModuleImport("org_jetbrains_skia_Bitmap__1nMakeShader")
 private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingModeValue1: Int, samplingModeValue2: Int, localMatrix: InteropPointer): NativePointer

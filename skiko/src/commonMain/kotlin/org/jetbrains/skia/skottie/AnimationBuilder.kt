@@ -3,7 +3,6 @@ package org.jetbrains.skia.skottie
 
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -86,29 +85,22 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
 }
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
 private external fun AnimationBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
-@ModuleImport("org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
 private external fun AnimationBuilder_nMake(flags: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
-@ModuleImport("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
 private external fun _nSetFontManager(ptr: NativePointer, fontMgrPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
-@ModuleImport("org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
 private external fun _nSetLogger(ptr: NativePointer, loggerPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
-@ModuleImport("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
 private external fun _nBuildFromString(ptr: NativePointer, data: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
-@ModuleImport("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
 internal external fun _nBuildFromFile(ptr: NativePointer, path: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
-@ModuleImport("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
 private external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer

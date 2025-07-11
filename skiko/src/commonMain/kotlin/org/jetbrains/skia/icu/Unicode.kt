@@ -186,10 +186,8 @@ object CharProperties {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCharDirection")
-@ModuleImport("org_jetbrains_skia_icu_Unicode__1nCharDirection")
 private external fun _nCharDirection(codePoint: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCodePointHasBinaryProperty")
-@ModuleImport("org_jetbrains_skia_icu_Unicode__1nCodePointHasBinaryProperty")
 private external fun _nCodePointHasBinaryProperty(codePoint: Int, property: Int): Boolean
 

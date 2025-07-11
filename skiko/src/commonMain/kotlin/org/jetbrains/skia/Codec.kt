@@ -361,61 +361,46 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetFinalizer")
 private external fun Codec_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetImageInfo")
 private external fun Codec_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
-@ModuleImport("org_jetbrains_skia_Codec__1nReadPixels")
 private external fun Codec_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
-@ModuleImport("org_jetbrains_skia_Codec__1nMakeFromData")
 private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeWidth")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetSizeWidth")
 private external fun _nGetSizeWidth(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeHeight")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetSizeHeight")
 private external fun _nGetSizeHeight(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
 private external fun _nGetEncodedOrigin(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
 private external fun _nGetEncodedImageFormat(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameCount")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetFrameCount")
 private external fun _nGetFrameCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameInfo")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetFrameInfo")
 private external fun _nGetFrameInfo(ptr: NativePointer, frame: Int, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFramesInfo")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetFramesInfo")
 private external fun _nGetFramesInfo(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetRepetitionCount")
-@ModuleImport("org_jetbrains_skia_Codec__1nGetRepetitionCount")
 private external fun _nGetRepetitionCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_Delete")
-@ModuleImport("org_jetbrains_skia_Codec__1nFramesInfo_Delete")
 private external fun FramesInfo_nDelete(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetSize")
-@ModuleImport("org_jetbrains_skia_Codec__1nFramesInfo_GetSize")
 private external fun FramesInfo_nGetSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetInfos")
-@ModuleImport("org_jetbrains_skia_Codec__1nFramesInfo_GetInfos")
 private external fun FramesInfo_nGetInfos(ptr: NativePointer, result: InteropPointer)

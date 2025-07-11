@@ -233,35 +233,27 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
-@ModuleImport("org_jetbrains_skia_Picture__1nMakeFromData")
 private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
-@ModuleImport("org_jetbrains_skia_Picture__1nGetCullRect")
 private external fun _nGetCullRect(ptr: NativePointer, ltrb: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
-@ModuleImport("org_jetbrains_skia_Picture__1nGetUniqueId")
 private external fun _nGetUniqueId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
-@ModuleImport("org_jetbrains_skia_Picture__1nSerializeToData")
 private external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
-@ModuleImport("org_jetbrains_skia_Picture__1nMakePlaceholder")
 private external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
-@ModuleImport("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
 private external fun _nGetApproximateOpCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
-@ModuleImport("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
 private external fun _nGetApproximateBytesUsed(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
-@ModuleImport("org_jetbrains_skia_Picture__1nMakeShader")
 private external fun _nMakeShader(
     ptr: NativePointer,
     tmx: Int,
@@ -276,5 +268,4 @@ private external fun _nMakeShader(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
-@ModuleImport("org_jetbrains_skia_Picture__1nPlayback")
 private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, data: InteropPointer)

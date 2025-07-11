@@ -43,9 +43,7 @@ class RenderNodeContext internal constructor(ptr: NativePointer, managed: Boolea
 }
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake")
-@ModuleImport("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake")
 private external fun RenderNodeContext_nMake(measureDrawBounds: Boolean): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nSetLightingInfo")
-@ModuleImport("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nSetLightingInfo")
 private external fun RenderNodeContext_nSetLightingInfo(ptr: NativePointer, centerX: Float, centerY: Float, centerZ: Float, radius: Float, ambientShadowAlpha: Float, spotShadowAlpha: Float)

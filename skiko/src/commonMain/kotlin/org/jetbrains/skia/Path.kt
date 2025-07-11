@@ -2171,91 +2171,69 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_Path__1nGetFinalizer")
 internal external fun Path_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMake")
-@ModuleImport("org_jetbrains_skia_Path__1nMake")
 private external fun Path_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nEquals")
-@ModuleImport("org_jetbrains_skia_Path__1nEquals")
 private external fun Path_nEquals(aPtr: NativePointer, bPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nReset")
-@ModuleImport("org_jetbrains_skia_Path__1nReset")
 private external fun Path_nReset(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsVolatile")
-@ModuleImport("org_jetbrains_skia_Path__1nIsVolatile")
 private external fun Path_nIsVolatile(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSetVolatile")
-@ModuleImport("org_jetbrains_skia_Path__1nSetVolatile")
 private external fun Path_nSetVolatile(ptr: NativePointer, isVolatile: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSwap")
-@ModuleImport("org_jetbrains_skia_Path__1nSwap")
 private external fun Path_nSwap(ptr: NativePointer, otherPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetGenerationId")
-@ModuleImport("org_jetbrains_skia_Path__1nGetGenerationId")
 private external fun Path_nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromSVGString")
-@ModuleImport("org_jetbrains_skia_Path__1nMakeFromSVGString")
 private external fun _nMakeFromSVGString(svg: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsInterpolatable")
-@ModuleImport("org_jetbrains_skia_Path__1nIsInterpolatable")
 private external fun _nIsInterpolatable(ptr: NativePointer, comparePtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeLerp")
-@ModuleImport("org_jetbrains_skia_Path__1nMakeLerp")
 private external fun _nMakeLerp(ptr: NativePointer, endingPtr: NativePointer, weight: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFillMode")
-@ModuleImport("org_jetbrains_skia_Path__1nGetFillMode")
 private external fun _nGetFillMode(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSetFillMode")
-@ModuleImport("org_jetbrains_skia_Path__1nSetFillMode")
 private external fun _nSetFillMode(ptr: NativePointer, fillMode: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsConvex")
-@ModuleImport("org_jetbrains_skia_Path__1nIsConvex")
 private external fun _nIsConvex(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsOval")
-@ModuleImport("org_jetbrains_skia_Path__1nIsOval")
 private external fun _nIsOval(ptr: NativePointer, rect: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsRRect")
-@ModuleImport("org_jetbrains_skia_Path__1nIsRRect")
 private external fun _nIsRRect(ptr: NativePointer, rrect: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nRewind")
-@ModuleImport("org_jetbrains_skia_Path__1nRewind")
 private external fun _nRewind(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsEmpty")
-@ModuleImport("org_jetbrains_skia_Path__1nIsEmpty")
 private external fun _nIsEmpty(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsLastContourClosed")
-@ModuleImport("org_jetbrains_skia_Path__1nIsLastContourClosed")
 private external fun _nIsLastContourClosed(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsFinite")
-@ModuleImport("org_jetbrains_skia_Path__1nIsFinite")
 private external fun _nIsFinite(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsLineDegenerate")
-@ModuleImport("org_jetbrains_skia_Path__1nIsLineDegenerate")
 private external fun _nIsLineDegenerate(x0: Float, y0: Float, x1: Float, y1: Float, exact: Boolean): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsQuadDegenerate")
-@ModuleImport("org_jetbrains_skia_Path__1nIsQuadDegenerate")
 private external fun _nIsQuadDegenerate(
     x0: Float,
     y0: Float,
@@ -2268,7 +2246,6 @@ private external fun _nIsQuadDegenerate(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsCubicDegenerate")
-@ModuleImport("org_jetbrains_skia_Path__1nIsCubicDegenerate")
 private external fun _nIsCubicDegenerate(
     x0: Float,
     y0: Float,
@@ -2283,95 +2260,72 @@ private external fun _nIsCubicDegenerate(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMaybeGetAsLine")
-@ModuleImport("org_jetbrains_skia_Path__1nMaybeGetAsLine")
 private external fun _nMaybeGetAsLine(ptr: NativePointer, rectBuffer: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPointsCount")
-@ModuleImport("org_jetbrains_skia_Path__1nGetPointsCount")
 private external fun _nGetPointsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoint")
-@ModuleImport("org_jetbrains_skia_Path__1nGetPoint")
 private external fun _nGetPoint(ptr: NativePointer, index: Int, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoints")
-@ModuleImport("org_jetbrains_skia_Path__1nGetPoints")
 private external fun _nGetPoints(ptr: NativePointer, points: InteropPointer, max: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nCountVerbs")
-@ModuleImport("org_jetbrains_skia_Path__1nCountVerbs")
 private external fun _nCountVerbs(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetVerbs")
-@ModuleImport("org_jetbrains_skia_Path__1nGetVerbs")
 private external fun _nGetVerbs(ptr: NativePointer, verbs: InteropPointer, max: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nApproximateBytesUsed")
-@ModuleImport("org_jetbrains_skia_Path__1nApproximateBytesUsed")
 private external fun _nApproximateBytesUsed(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetBounds")
-@ModuleImport("org_jetbrains_skia_Path__1nGetBounds")
 private external fun _nGetBounds(ptr: NativePointer, rect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nUpdateBoundsCache")
-@ModuleImport("org_jetbrains_skia_Path__1nUpdateBoundsCache")
 private external fun _nUpdateBoundsCache(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nComputeTightBounds")
-@ModuleImport("org_jetbrains_skia_Path__1nComputeTightBounds")
 private external fun _nComputeTightBounds(ptr: NativePointer, rect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nConservativelyContainsRect")
-@ModuleImport("org_jetbrains_skia_Path__1nConservativelyContainsRect")
 private external fun _nConservativelyContainsRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIncReserve")
-@ModuleImport("org_jetbrains_skia_Path__1nIncReserve")
 private external fun _nIncReserve(ptr: NativePointer, extraPtCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMoveTo")
-@ModuleImport("org_jetbrains_skia_Path__1nMoveTo")
 private external fun _nMoveTo(ptr: NativePointer, x: Float, y: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nRMoveTo")
-@ModuleImport("org_jetbrains_skia_Path__1nRMoveTo")
 private external fun _nRMoveTo(ptr: NativePointer, dx: Float, dy: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nLineTo")
-@ModuleImport("org_jetbrains_skia_Path__1nLineTo")
 private external fun _nLineTo(ptr: NativePointer, x: Float, y: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nRLineTo")
-@ModuleImport("org_jetbrains_skia_Path__1nRLineTo")
 private external fun _nRLineTo(ptr: NativePointer, dx: Float, dy: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nQuadTo")
-@ModuleImport("org_jetbrains_skia_Path__1nQuadTo")
 private external fun _nQuadTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nRQuadTo")
-@ModuleImport("org_jetbrains_skia_Path__1nRQuadTo")
 private external fun _nRQuadTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nConicTo")
-@ModuleImport("org_jetbrains_skia_Path__1nConicTo")
 private external fun _nConicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, w: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nRConicTo")
-@ModuleImport("org_jetbrains_skia_Path__1nRConicTo")
 private external fun _nRConicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nCubicTo")
-@ModuleImport("org_jetbrains_skia_Path__1nCubicTo")
 private external fun _nCubicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nRCubicTo")
-@ModuleImport("org_jetbrains_skia_Path__1nRCubicTo")
 private external fun _nRCubicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nArcTo")
-@ModuleImport("org_jetbrains_skia_Path__1nArcTo")
 private external fun _nArcTo(
     ptr: NativePointer,
     left: Float,
@@ -2385,11 +2339,9 @@ private external fun _nArcTo(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nTangentArcTo")
-@ModuleImport("org_jetbrains_skia_Path__1nTangentArcTo")
 private external fun _nTangentArcTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, radius: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nEllipticalArcTo")
-@ModuleImport("org_jetbrains_skia_Path__1nEllipticalArcTo")
 private external fun _nEllipticalArcTo(
     ptr: NativePointer,
     rx: Float,
@@ -2403,7 +2355,6 @@ private external fun _nEllipticalArcTo(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nREllipticalArcTo")
-@ModuleImport("org_jetbrains_skia_Path__1nREllipticalArcTo")
 private external fun _nREllipticalArcTo(
     ptr: NativePointer,
     rx: Float,
@@ -2417,11 +2368,9 @@ private external fun _nREllipticalArcTo(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nClosePath")
-@ModuleImport("org_jetbrains_skia_Path__1nClosePath")
 private external fun _nClosePath(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nConvertConicToQuads")
-@ModuleImport("org_jetbrains_skia_Path__1nConvertConicToQuads")
 private external fun _nConvertConicToQuads(
     x0: Float,
     y0: Float,
@@ -2436,27 +2385,21 @@ private external fun _nConvertConicToQuads(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsRect")
-@ModuleImport("org_jetbrains_skia_Path__1nIsRect")
 private external fun _nIsRect(ptr: NativePointer, rect: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddRect")
-@ModuleImport("org_jetbrains_skia_Path__1nAddRect")
 private external fun _nAddRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddOval")
-@ModuleImport("org_jetbrains_skia_Path__1nAddOval")
 private external fun _nAddOval(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddCircle")
-@ModuleImport("org_jetbrains_skia_Path__1nAddCircle")
 private external fun _nAddCircle(ptr: NativePointer, x: Float, y: Float, r: Float, dir: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddArc")
-@ModuleImport("org_jetbrains_skia_Path__1nAddArc")
 private external fun _nAddArc(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, startAngle: Float, sweepAngle: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddRRect")
-@ModuleImport("org_jetbrains_skia_Path__1nAddRRect")
 private external fun _nAddRRect(
     ptr: NativePointer,
     l: Float,
@@ -2471,69 +2414,52 @@ private external fun _nAddRRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPoly")
-@ModuleImport("org_jetbrains_skia_Path__1nAddPoly")
 private external fun _nAddPoly(ptr: NativePointer, coords: InteropPointer, count: Int, close: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPath")
-@ModuleImport("org_jetbrains_skia_Path__1nAddPath")
 private external fun _nAddPath(ptr: NativePointer, srcPtr: NativePointer, extend: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPathOffset")
-@ModuleImport("org_jetbrains_skia_Path__1nAddPathOffset")
 private external fun _nAddPathOffset(ptr: NativePointer, srcPtr: NativePointer, dx: Float, dy: Float, extend: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPathTransform")
-@ModuleImport("org_jetbrains_skia_Path__1nAddPathTransform")
 private external fun _nAddPathTransform(ptr: NativePointer, srcPtr: NativePointer, matrix: InteropPointer, extend: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nReverseAddPath")
-@ModuleImport("org_jetbrains_skia_Path__1nReverseAddPath")
 private external fun _nReverseAddPath(ptr: NativePointer, srcPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nOffset")
-@ModuleImport("org_jetbrains_skia_Path__1nOffset")
 private external fun _nOffset(ptr: NativePointer, dx: Float, dy: Float, dst: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nTransform")
-@ModuleImport("org_jetbrains_skia_Path__1nTransform")
 private external fun _nTransform(ptr: NativePointer, matrix: InteropPointer, dst: NativePointer, applyPerspectiveClip: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetLastPt")
-@ModuleImport("org_jetbrains_skia_Path__1nGetLastPt")
 private external fun _nGetLastPt(ptr: NativePointer, result: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSetLastPt")
-@ModuleImport("org_jetbrains_skia_Path__1nSetLastPt")
 private external fun _nSetLastPt(ptr: NativePointer, x: Float, y: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetSegmentMasks")
-@ModuleImport("org_jetbrains_skia_Path__1nGetSegmentMasks")
 private external fun _nGetSegmentMasks(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nContains")
-@ModuleImport("org_jetbrains_skia_Path__1nContains")
 private external fun _nContains(ptr: NativePointer, x: Float, y: Float): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nDump")
-@ModuleImport("org_jetbrains_skia_Path__1nDump")
 private external fun _nDump(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nDumpHex")
-@ModuleImport("org_jetbrains_skia_Path__1nDumpHex")
 private external fun _nDumpHex(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSerializeToBytes")
-@ModuleImport("org_jetbrains_skia_Path__1nSerializeToBytes")
 private external fun _nSerializeToBytes(ptr: NativePointer, dst: InteropPointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeCombining")
-@ModuleImport("org_jetbrains_skia_Path__1nMakeCombining")
 private external fun _nMakeCombining(onePtr: NativePointer, twoPtr: NativePointer, op: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromBytes")
-@ModuleImport("org_jetbrains_skia_Path__1nMakeFromBytes")
 private external fun _nMakeFromBytes(data: InteropPointer, size: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsValid")
-@ModuleImport("org_jetbrains_skia_Path__1nIsValid")
 private external fun _nIsValid(ptr: NativePointer): Boolean

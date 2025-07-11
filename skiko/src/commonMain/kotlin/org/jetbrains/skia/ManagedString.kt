@@ -62,33 +62,25 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
 }
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_ManagedString__1nGetFinalizer")
 internal external fun ManagedString_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nMake")
-@ModuleImport("org_jetbrains_skia_ManagedString__1nMake")
 private external fun _nMake(s: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringSize")
-@ModuleImport("org_jetbrains_skia_ManagedString__nStringSize")
 private external fun _nStringSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringData")
-@ModuleImport("org_jetbrains_skia_ManagedString__nStringData")
 private external fun _nStringData(ptr: NativePointer, result: InteropPointer, size: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nInsert")
-@ModuleImport("org_jetbrains_skia_ManagedString__1nInsert")
 private external fun _nInsert(ptr: NativePointer, offset: Int, s: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nAppend")
-@ModuleImport("org_jetbrains_skia_ManagedString__1nAppend")
 private external fun _nAppend(ptr: NativePointer, s: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nRemoveSuffix")
-@ModuleImport("org_jetbrains_skia_ManagedString__1nRemoveSuffix")
 private external fun _nRemoveSuffix(ptr: NativePointer, from: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nRemove")
-@ModuleImport("org_jetbrains_skia_ManagedString__1nRemove")
 private external fun _nRemove(ptr: NativePointer, from: Int, length: Int)

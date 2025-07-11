@@ -270,85 +270,64 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetFinalizer")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetFinalizer")
 private external fun TextLine_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetWidth")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetWidth")
 private external fun TextLine_nGetWidth(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetHeight")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetHeight")
 private external fun TextLine_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphsLength")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetGlyphsLength")
 private external fun TextLine_nGetGlyphsLength(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphs")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetGlyphs")
 private external fun TextLine_nGetGlyphs(ptr: NativePointer, resultGlyphs: InteropPointer, resultLength: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetPositions")
 private external fun TextLine_nGetPositions(ptr: NativePointer, resultArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetAscent")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetAscent")
 private external fun _nGetAscent(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCapHeight")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetCapHeight")
 private external fun _nGetCapHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetXHeight")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetXHeight")
 private external fun _nGetXHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetDescent")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetDescent")
 private external fun _nGetDescent(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeading")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetLeading")
 private external fun _nGetLeading(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetTextBlob")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetTextBlob")
 private external fun _nGetTextBlob(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositions")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetRunPositions")
 private external fun _nGetRunPositions(ptr: NativePointer, resultArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositionsCount")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetRunPositionsCount")
 private external fun _nGetRunPositionsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositionsCount")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetBreakPositionsCount")
 private external fun _nGetBreakPositionsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositions")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetBreakPositions")
 private external fun _nGetBreakPositions(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsetsCount")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetBreakOffsetsCount")
 private external fun _nGetBreakOffsetsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsets")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetBreakOffsets")
 private external fun _nGetBreakOffsets(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
 private external fun _nGetOffsetAtCoord(ptr: NativePointer, x: Float): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord")
 private external fun _nGetLeftOffsetAtCoord(ptr: NativePointer, x: Float): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCoordAtOffset")
-@ModuleImport("org_jetbrains_skia_TextLine__1nGetCoordAtOffset")
 private external fun _nGetCoordAtOffset(ptr: NativePointer, offset: Int): Float

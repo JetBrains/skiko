@@ -79,7 +79,6 @@ object PathUtils {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaint")
-@ModuleImport("org_jetbrains_skia_PathUtils__1nFillPathWithPaint")
 private external fun _nFillPathWithPaint(
     srcPtr: NativePointer,
     paintPtr: NativePointer,
@@ -87,7 +86,6 @@ private external fun _nFillPathWithPaint(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintCull")
-@ModuleImport("org_jetbrains_skia_PathUtils__1nFillPathWithPaintCull")
 private external fun _nFillPathWithPaintCull(
     srcPtr: NativePointer,
     paintPtr: NativePointer,
