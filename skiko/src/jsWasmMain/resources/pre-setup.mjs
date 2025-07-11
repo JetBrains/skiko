@@ -13,13 +13,13 @@ export const {
 // export const { GL } = loadedWasm;
 
 const loadedWasm = {
-    wasmExports: {}
+    _: {}
 }
 
 let skikoGl = null;
 
 export const awaitSkiko = loadSkikoWASM().then((module) => {
-    loadedWasm.wasmExports = module.wasmExports;
+    loadedWasm._ = module.wasmExports;
     skikoGl = module.GL;
     return module
 });

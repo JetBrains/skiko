@@ -67,7 +67,7 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
             val name = jsNameAnnotation.getStringValue("name")
             addWasmImportAnnotation(name)
 
-            data.appendLine("export let ${name} = (...a) => ($name = loadedWasm.wasmExports[\"${name}\"])(...a)")
+            data.appendLine("export let ${name} = (...a) => ($name = loadedWasm._[\"${name}\"])(...a)")
         }
     }
 }
