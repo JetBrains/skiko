@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skiko.GL
 import org.jetbrains.skiko.w3c.HTMLCanvasElement
 import kotlin.js.*
 
@@ -30,16 +31,6 @@ internal fun ContextAttributes.asJsObject(): dynamic {
     renderViaOffscreenBackBuffer?.let { jsObject.renderViaOffscreenBackBuffer = renderViaOffscreenBackBuffer }
     majorVersion?.let { jsObject.majorVersion = majorVersion }
     return jsObject
-}
-
-private external interface GLInterface {
-    fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer;
-    fun makeContextCurrent(contextPointer: NativePointer): Boolean;
-}
-
-internal external object GL : GLInterface {
-    override fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): Int = definedExternally
-    override fun makeContextCurrent(contextPointer: NativePointer): Boolean = definedExternally
 }
 
 internal actual fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes?): NativePointer {
