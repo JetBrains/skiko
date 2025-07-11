@@ -12,4 +12,6 @@ export const {
 //
 // export const { GL } = loadedWasm;
 
+export const awaitSkiko = loadSkikoWASM()
+
 
