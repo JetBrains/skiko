@@ -1,10 +1,7 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
-import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
@@ -26,30 +23,6 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
     @Suppress("UNCHECKED_CAST")
     private fun IrConstructorCall.getStringValue(value: String): String =
         (getValueArgument(Name.identifier(value)) as IrConst<String>).value
-
-    private fun IrFunction.addSkikoJsModuleAnnotation() {
-        val annotationClass = pluginContext.referenceClass(
-            ClassId.fromString("kotlin/js/JsModule") // Replace with your fully qualified annotation name
-        ) ?: return
-
-        val ctor = annotationClass.owner.constructors.first()
-
-        val annotationCall = IrConstructorCallImpl.fromSymbolOwner(
-            startOffset = startOffset,
-            endOffset = endOffset,
-            type = annotationClass.owner.defaultType,
-            constructorSymbol = ctor.symbol,
-        )
-
-        annotationCall.putValueArgument(0, IrConstImpl.string(
-            startOffset,
-            endOffset,
-            pluginContext.irBuiltIns.stringType,
-            "./skiko.mjs"
-        ))
-
-        annotations += annotationCall
-    }
 
     private fun IrFunction.addWasmImportAnnotation(name: String) {
         val annotationClass = pluginContext.referenceClass(
@@ -93,8 +66,6 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
 
             val jsNameAnnotation = getAnnotation(FqName("kotlin.js.JsName"))
                 ?: return@apply
-
-            addSkikoJsModuleAnnotation()
 
             val name = jsNameAnnotation.getStringValue("name")
             addWasmImportAnnotation(name)
