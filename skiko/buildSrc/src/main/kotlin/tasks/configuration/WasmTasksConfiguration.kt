@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
 import projectDirs
 import registerOrGetSkiaDirProvider
 import setupMjs
+import setupReexportMjs
 import skikoTestMjs
 import supportJs
 import supportWasm
@@ -219,19 +220,22 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
 
 abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
     val compilationName: String,
-    val outputFileProvider: (Project) -> File,
-    val prefixFileProvider: (Project) -> File
+    private val outputFileProvider: (Project) -> File,
+    private val prefixFileProvider: (Project) -> File,
+    private val reexportFileProvider: (Project) -> File
 ) : KotlinCompilerPluginSupportPlugin {
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
 
         val outputFile = outputFileProvider(project)
         val prefixFile = prefixFileProvider(project)
+        val reexportFile = reexportFileProvider(project)
 
         return project.provider {
             listOf(
                 SubpluginOption("import-generator-path", outputFile.normalize().absolutePath),
-                SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath)
+                SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath),
+                SubpluginOption("import-generator-reexport-path", reexportFile.normalize().absolutePath)
             )
         }
     }
@@ -250,13 +254,15 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
 class WasmImportsGeneratorCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
     KotlinCompilation.MAIN_COMPILATION_NAME,
     { it.setupMjs },
-    { it.projectDir.resolve("src/jsWasmMain/resources/pre-setup.mjs") }
+    { it.projectDir.resolve("src/jsWasmMain/resources/pre-setup.mjs") },
+    { it.setupReexportMjs }
 )
 
 class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
     KotlinCompilation.TEST_COMPILATION_NAME,
     { it.skikoTestMjs },
-    { it.projectDir.resolve("src/jsWasmMain/resources/pre-skiko-test.mjs") }
+    { it.projectDir.resolve("src/jsWasmMain/resources/pre-skiko-test.mjs") },
+    { it.setupReexportMjs }
 )
 
 fun KotlinWasmJsTargetDsl.setupImportsGeneratorPlugin() {

@@ -7,7 +7,8 @@ import java.io.File
 
 internal class ImportGeneratorExtension(
     private val path: String,
-    private val prefix: String?
+    private val prefix: String?,
+    private val reexportPath: String
 ) : IrGenerationExtension {
     override fun generate(
         moduleFragment: IrModuleFragment,
@@ -17,6 +18,7 @@ internal class ImportGeneratorExtension(
         outputFile.parentFile.mkdirs()
         val prefixFile = prefix?.let { File(it) }
         outputFile.writer().use { writer ->
+            writer.appendLine("// REEXPORT PATH ${reexportPath} ===>")
             prefixFile?.let { writer.appendLine(it.readText()) }
             moduleFragment.transformChildren(ImportGeneratorTransformer(pluginContext), writer)
         }

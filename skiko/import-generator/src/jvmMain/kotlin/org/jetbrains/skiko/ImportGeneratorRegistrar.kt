@@ -15,7 +15,8 @@ class ImportGeneratorRegistrar : CompilerPluginRegistrar() {
         IrGenerationExtension.registerExtension(
             ImportGeneratorExtension(
                 configuration.get(ImportGeneratorConfigurationKeys.PATH)!!,
-                configuration.get(ImportGeneratorConfigurationKeys.PREFIX)
+                configuration.get(ImportGeneratorConfigurationKeys.PREFIX),
+                configuration.get(ImportGeneratorConfigurationKeys.REEXPORT_PATH)!!
             )
         )
     }
