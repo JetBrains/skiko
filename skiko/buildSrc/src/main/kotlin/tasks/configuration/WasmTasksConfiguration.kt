@@ -197,7 +197,9 @@ fun SkikoProjectContext.createWasmLinkTasks(): LinkWasmTasks = with(this.project
         val wasmEsOutDir = linkWasmWithES6.map { it.outDir }
 //        val wasmD8OutDir = linkWasmD8WithES6.map { it.outDir }
 
-
+        from(setupReexportMjs.parentFile) {
+            include(setupReexportMjs.name)
+        }
 
         from(wasmOutDir) {
             include("*.wasm")
