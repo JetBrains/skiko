@@ -1,8 +1,5 @@
 package org.jetbrains.skia.impl
 
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
-
 internal actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
     private var callbacksInitialized = false

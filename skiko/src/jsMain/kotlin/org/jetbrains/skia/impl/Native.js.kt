@@ -1,37 +1,5 @@
 package org.jetbrains.skia.impl
 
-import org.khronos.webgl.ArrayBufferView
-
-internal external interface HEAP<T> {
-    fun set(src: T, dest: NativePointer)
-    fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
-}
-internal external object HEAPU8: HEAP<ByteArray> {
-    override fun set(src: ByteArray, dest: NativePointer)
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
-}
-
-internal external object HEAPU16: HEAP<ShortArray> {
-    override fun set(src: ShortArray, dest: NativePointer)
-    fun set(src: CharArray, dest: NativePointer)
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
-}
-
-internal external object HEAPU32: HEAP<IntArray> {
-    override fun set(src: IntArray, dest: NativePointer)
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
-}
-
-internal external object HEAPF32: HEAP<FloatArray> {
-    override fun set(src: FloatArray, dest: NativePointer)
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
-}
-
-internal external object HEAPF64: HEAP<DoubleArray> {
-    override fun set(src: DoubleArray, dest: NativePointer)
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
-}
-
 internal actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
     private var callbacksInitialized = false
