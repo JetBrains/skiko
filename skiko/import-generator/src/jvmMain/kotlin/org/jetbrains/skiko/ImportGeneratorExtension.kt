@@ -22,5 +22,13 @@ internal class ImportGeneratorExtension(
             prefixFile?.let { writer.appendLine(it.readText()) }
             moduleFragment.transformChildren(ImportGeneratorTransformer(pluginContext), writer)
         }
+
+        val reexportFile = File(reexportPath)
+        reexportFile.parentFile.mkdirs()
+
+        reexportFile.writer().use { reexportWriter ->
+            moduleFragment.transformChildren(ReexportGeneratorTransformer(pluginContext), reexportWriter)
+        }
     }
 }
+
