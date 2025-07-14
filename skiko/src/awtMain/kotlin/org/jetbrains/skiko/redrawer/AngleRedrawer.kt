@@ -43,7 +43,7 @@ internal class AngleRedrawer(
                 ?: throw RenderException("Failed to create ANGLE device.")
         }
         adapterName.let { adapterName ->
-            if (adapterName == null || !isVideoCardSupported(GraphicsApi.ANGLE, hostOs, adapterName)) {
+            if (adapterName != null && !isVideoCardSupported(GraphicsApi.ANGLE, hostOs, adapterName)) {
                 throw RenderException("Cannot create ANGLE redrawer.")
             }
             onDeviceChosen(adapterName)
