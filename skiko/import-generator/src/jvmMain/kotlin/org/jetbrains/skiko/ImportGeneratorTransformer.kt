@@ -11,14 +11,16 @@ import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.getValueArgument
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import java.io.OutputStreamWriter
 import kotlin.collections.plus
 
-internal class ImportGeneratorTransformer(private val pluginContext: IrPluginContext) : IrElementTransformer<OutputStreamWriter> {
+internal class ImportGeneratorTransformer(private val pluginContext: IrPluginContext) : IrElementTransformerVoid() {
+
+    private val exportSymbols = mutableListOf<String>()
+    fun getExportSymbols(): List<String> = exportSymbols
 
     @Suppress("UNCHECKED_CAST")
     private fun IrConstructorCall.getStringValue(value: String): String =
@@ -55,10 +57,8 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
         annotations += annotationCall
     }
 
-
-    override fun visitFunction(declaration: IrFunction, data: OutputStreamWriter): IrStatement {
-
-        return super.visitFunction(declaration, data).apply {
+    override fun visitFunction(declaration: IrFunction): IrStatement {
+        return super.visitFunction(declaration).apply {
             if (this !is IrFunction) return@apply
 
             val jsNameAnnotation = getAnnotation(FqName("kotlin.js.JsName"))
@@ -67,7 +67,7 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
             val name = jsNameAnnotation.getStringValue("name")
             addWasmImportAnnotation(name)
 
-            data.appendLine("export let ${name} = (...a) => ($name = loadedWasm._[\"${name}\"])(...a)")
+            exportSymbols.add(name)
         }
     }
 }
