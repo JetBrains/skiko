@@ -2,7 +2,6 @@
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
@@ -55,17 +54,13 @@ abstract class ManagedRunIterator<T> internal constructor(
 
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_ManagedRunIterator__1nGetFinalizer")
 private external fun _nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nConsume")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_ManagedRunIterator__1nConsume")
 internal external fun _nConsume(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nGetEndOfCurrentRun")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_ManagedRunIterator__1nGetEndOfCurrentRun")
 private external fun _nGetEndOfCurrentRun(ptr: NativePointer, textPtr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nIsAtEnd")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_ManagedRunIterator__1nIsAtEnd")
 private external fun _nIsAtEnd(ptr: NativePointer): Boolean

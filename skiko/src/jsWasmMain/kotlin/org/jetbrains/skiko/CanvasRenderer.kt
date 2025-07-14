@@ -4,7 +4,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.w3c.HTMLCanvasElement
 import org.jetbrains.skiko.w3c.window
-import org.jetbrains.skiko.wasm.createWebGLContext
+import org.jetbrains.skiko.wasm.ContextAttributes
 
 /**
  * CanvasRenderer takes an [HTMLCanvasElement] instance and initializes
@@ -30,7 +30,7 @@ internal abstract class CanvasRenderer(
         private set
 
     init {
-        makeGLContextCurrent(contextPointer)
+        GL.makeContextCurrent(contextPointer)
         context = DirectContext.makeGL()
         initCanvas()
     }
@@ -76,7 +76,7 @@ internal abstract class CanvasRenderer(
         redrawScheduled = true
         window.requestAnimationFrame { timestamp ->
             redrawScheduled = false
-            makeGLContextCurrent(contextPointer)
+            GL.makeContextCurrent(contextPointer)
             // `clear` and `resetMatrix` make canvas not accumulate previous effects
             canvas?.clear(Color.WHITE)
             canvas?.resetMatrix()
@@ -87,4 +87,9 @@ internal abstract class CanvasRenderer(
     }
 }
 
-internal expect fun makeGLContextCurrent(contextPointer: NativePointer)
+internal external interface GLInterface {
+    fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer
+    fun makeContextCurrent(contextPointer: NativePointer): Boolean;
+}
+
+internal expect val GL: GLInterface

@@ -46,17 +46,13 @@ class DynamicMemoryWStream() : WStream(DynamicMemoryWStream_nMake(), _FinalizerH
 }
 
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DynamicMemoryWStream__1nMake")
 private external fun DynamicMemoryWStream_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DynamicMemoryWStream__1nGetFinalizer")
 private external fun DynamicMemoryWStream_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nBytesWritten")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DynamicMemoryWStream__1nBytesWritten")
 private external fun _nBytesWritten(stream: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nRead")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DynamicMemoryWStream__1nRead")
 private external fun _nRead(stream: NativePointer, buffer: InteropPointer, offset: Int, size: Int): Boolean

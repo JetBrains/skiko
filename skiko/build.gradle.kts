@@ -4,7 +4,6 @@ import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
 import kotlin.collections.HashMap
-import declareSkiaTasks
 import com.android.build.gradle.LibraryExtension
 
 plugins {
@@ -118,14 +117,12 @@ kotlin {
             val main by compilations.getting
             val test by compilations.getting
 
-            val linkWasmTasks = skikoProjectContext.createWasmLinkTasks()
-            project.tasks.named<Copy>(test.processResourcesTaskName) {
-                from(linkWasmTasks.linkWasm!!) {
-                    include("*.wasm")
-                }
+            val linkWasmTask = skikoProjectContext.createWasmLinkTask()
 
-                from(linkWasmTasks.linkWasmWithES6!!) {
+            project.tasks.named<Copy>(test.processResourcesTaskName) {
+                from(linkWasmTask!!) {
                     include("*.mjs")
+                    include("*.wasm")
                 }
 
                 from(skikoTestMjs)
