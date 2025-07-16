@@ -40,11 +40,13 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
             constructorSymbol = ctor.symbol,
         )
 
+        val moduleName = if (name.startsWith("org_jetbrains_skiko_tests_")) "./skiko-test.mjs" else "./skiko.mjs"
+
         annotationCall.putValueArgument(0, IrConstImpl.string(
             startOffset,
             endOffset,
             pluginContext.irBuiltIns.stringType,
-            "./skiko.mjs"
+            moduleName
         ))
 
         annotationCall.putValueArgument(1, IrConstImpl.string(
