@@ -81,12 +81,14 @@ kotlin {
         }
     }
 
+    val linkWasmTask = skikoProjectContext.createWasmLinkTask()
+
     if (supportJs) {
         js(IR) {
             moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
-                    dependsOn("linkWasm")
+                    dependsOn(linkWasmTask!!)
                     useKarma {
                         useChromeHeadless()
                         useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
@@ -95,6 +97,18 @@ kotlin {
             }
             binaries.executable()
             generateVersion(OS.Wasm, Arch.Wasm, skiko)
+
+            val test by compilations.getting
+
+            project.tasks.named<Copy>(test.processResourcesTaskName) {
+                from(linkWasmTask!!) {
+                    include("*.mjs")
+                    include("*.wasm")
+                }
+
+                from(wasmImports)
+                dependsOn(test.compileTaskProvider)
+            }
         }
     }
 
@@ -104,7 +118,7 @@ kotlin {
             moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
-                    dependsOn("linkWasm")
+                    dependsOn(linkWasmTask!!)
                     useKarma {
                         this.webpackConfig.experiments.add("topLevelAwait")
                         useChromeHeadless()
@@ -114,10 +128,7 @@ kotlin {
             }
             generateVersion(OS.Wasm, Arch.Wasm, skiko)
 
-            val main by compilations.getting
             val test by compilations.getting
-
-            val linkWasmTask = skikoProjectContext.createWasmLinkTask()
 
             project.tasks.named<Copy>(test.processResourcesTaskName) {
                 from(linkWasmTask!!) {

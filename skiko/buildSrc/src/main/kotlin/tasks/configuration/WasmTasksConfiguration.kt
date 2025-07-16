@@ -197,21 +197,23 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
     val compilationName: String,
     private val outputFileProvider: (Project) -> File,
     private val prefixFileProvider: (Project) -> File,
-    private val reexportFileProvider: (Project) -> File
+    private val reexportFileProvider: ((Project) -> File)?
 ) : KotlinCompilerPluginSupportPlugin {
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
 
         val outputFile = outputFileProvider(project)
         val prefixFile = prefixFileProvider(project)
-        val reexportFile = reexportFileProvider(project)
+        val reexportFile = reexportFileProvider?.invoke(project)
 
         return project.provider {
-            listOf(
-                SubpluginOption("import-generator-path", outputFile.normalize().absolutePath),
-                SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath),
-                SubpluginOption("import-generator-reexport-path", reexportFile.normalize().absolutePath)
-            )
+            buildList {
+                add(SubpluginOption("import-generator-path", outputFile.normalize().absolutePath))
+                add(SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath),)
+                if (reexportFile != null) {
+                    add(SubpluginOption("import-generator-reexport-path", reexportFile.normalize().absolutePath))
+                }
+            }
         }
     }
 
@@ -221,7 +223,7 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
         SubpluginArtifact(SkikoArtifacts.groupId, IMPORT_GENERATOR)
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
-        return kotlinCompilation.platformType == KotlinPlatformType.wasm
+        return ((kotlinCompilation.platformType == KotlinPlatformType.wasm) || (kotlinCompilation.platformType == KotlinPlatformType.js))
                 && kotlinCompilation.name == compilationName
     }
 }
@@ -237,7 +239,7 @@ class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGen
     KotlinCompilation.TEST_COMPILATION_NAME,
     { it.skikoTestMjs },
     { it.projectDir.resolve("src/jsWasmMain/resources/pre-skiko-test.mjs") },
-    { it.setupReexportMjs }
+    null
 )
 
 fun KotlinWasmJsTargetDsl.setupImportsGeneratorPlugin() {

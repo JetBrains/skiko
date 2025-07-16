@@ -263,7 +263,3 @@ internal external interface CallbackDataInt { @JsName("value") var value: Int? }
 internal external interface CallbackDataNativePointer { @JsName("value") var value: NativePointer? }
 internal external interface CallbackDataInteropPointer { @JsName("value") var value: InteropPointer? }
 
-// See `setup.js`
-private external fun _registerCallback(cb: () -> Unit, data: Any?, global: Boolean): Int
-private external fun _createLocalCallbackScope()
-private external fun _releaseLocalCallbackScope()

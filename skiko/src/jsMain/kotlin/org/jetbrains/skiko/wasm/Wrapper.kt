@@ -14,8 +14,6 @@ actual fun onWasmReady(onReady: () -> Unit) {
     awaitSkiko.then { onReady() }
 }
 
-internal external val wasmSetup: Promise<Boolean>
-
 internal fun ContextAttributes.asJsObject(): dynamic {
     val jsObject = js("{}")
     alpha?.let { jsObject.alpha = alpha }

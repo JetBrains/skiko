@@ -9,7 +9,7 @@ import java.io.File
 internal class ImportGeneratorExtension(
     private val path: String,
     private val prefix: String?,
-    private val reexportPath: String
+    private val reexportPath: String?
 ) : IrGenerationExtension {
     override fun generate(
         moduleFragment: IrModuleFragment,
@@ -25,9 +25,15 @@ internal class ImportGeneratorExtension(
             moduleFragment.transformChildrenVoid(importGenerator)
 
             importGenerator.getExportSymbols().forEach { symbolName ->
-                writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
+                if (reexportPath != null) {
+                    writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
+                } else {
+                    writer.appendLine("window['${symbolName}'] = (...a) => loadedWasm._[\"${symbolName}\"](...a)")
+                }
             }
         }
+
+        if (reexportPath == null) return
 
         val reexportFile = File(reexportPath)
         reexportFile.parentFile.mkdirs()
