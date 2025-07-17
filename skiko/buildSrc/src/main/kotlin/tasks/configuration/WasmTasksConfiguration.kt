@@ -12,6 +12,7 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.provideDelegate
@@ -151,9 +152,11 @@ fun SkikoProjectContext.createWasmLinkTask(): TaskProvider<LinkSkikoWasmTask>? =
     }
 
     val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
-        val wasmJsTarget = kotlin.wasmJs()
-        val main by wasmJsTarget.compilations
-        dependsOn(main.compileTaskProvider)
+        dependsOn(
+            kotlin.wasmJs().compilations["main"].compileTaskProvider,
+            kotlin.js().compilations["main"].compileTaskProvider
+        )
+
         configureCommon(setupMjs.normalize().absolutePath, false)
     }
 

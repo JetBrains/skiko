@@ -112,6 +112,8 @@ kotlin {
 
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
             }
+
+            setupImportsGeneratorPlugin()
         }
     }
 
@@ -141,7 +143,8 @@ kotlin {
                 }
 
                 from(skikoTestMjs)
-                dependsOn(test.compileTaskProvider)
+
+                dependsOn(test.compileTaskProvider, tasks["compileTestKotlinJs"])
             }
 
             setupImportsGeneratorPlugin()
