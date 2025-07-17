@@ -169,7 +169,7 @@ fun SkikoProjectContext.createWasmLinkTask(): TaskProvider<LinkSkikoWasmTask>? =
         dependsOn(linkWasm)
         // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
         val wasmEsOutDir = linkWasm.map { it.outDir }
-//        val wasmD8OutDir = linkWasmD8WithES6.map { it.outDir }
+        val wasmD8OutDir = linkWasmD8WithES6.map { it.outDir }
 
         from(setupReexportMjs.parentFile) {
             include(setupReexportMjs.name)
@@ -180,9 +180,9 @@ fun SkikoProjectContext.createWasmLinkTask(): TaskProvider<LinkSkikoWasmTask>? =
             include("*.wasm")
             include("*.mjs")
         }
-//        from(wasmD8OutDir) {
-//            include("*.mjs")
-//        }
+        from(wasmD8OutDir) {
+            include("*.mjs")
+        }
 
         archiveBaseName.set("skiko-wasm")
         doLast {

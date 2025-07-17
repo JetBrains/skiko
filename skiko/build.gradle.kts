@@ -106,13 +106,17 @@ kotlin {
                     include("*.wasm")
                 }
 
-                from(wasmImports)
-                dependsOn(test.compileTaskProvider)
+                from(wasmImports) {
+                    include("*.mjs")
+                }
+
+                dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
             }
         }
     }
 
     if (supportWasm) {
+
         @OptIn(ExperimentalWasmDsl::class)
         wasmJs {
             moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
