@@ -161,9 +161,10 @@ fun SkikoProjectContext.createWasmLinkTask(): TaskProvider<LinkSkikoWasmTask>? =
     }
 
     val linkWasmD8WithES6 by tasks.registering(LinkSkikoWasmTask::class) {
-        val wasmJsTarget = kotlin.wasmJs()
-        val main by wasmJsTarget.compilations
-        dependsOn(main.compileTaskProvider)
+        dependsOn(
+            kotlin.wasmJs().compilations["main"].compileTaskProvider,
+            kotlin.js().compilations["main"].compileTaskProvider
+        )
         configureCommon(setupMjs.normalize().absolutePath, true)
     }
 
