@@ -60,11 +60,9 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
 }
 
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BackendTexture__1nGetFinalizer")
 private external fun BackendTexture_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nMakeGL")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BackendTexture__1nMakeGL")
 private external fun _nMakeGL(
     width: Int,
     height: Int,
@@ -75,5 +73,4 @@ private external fun _nMakeGL(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nGLTextureParametersModified")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_BackendTexture__1nGLTextureParametersModified")
 private external fun _nGLTextureParametersModified(backendTexturePtr: NativePointer)

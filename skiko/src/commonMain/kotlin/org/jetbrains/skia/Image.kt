@@ -484,7 +484,6 @@ private external fun _nReadPixelsBitmap(
 private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nAdoptTextureFrom")
 external fun _nAdoptTextureFrom(
     contextPtr: NativePointer,
     backendTexture: NativePointer,
