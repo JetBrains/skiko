@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skiko.GL
 import org.jetbrains.skiko.w3c.HTMLCanvasElement
 import kotlin.js.*
 
@@ -9,9 +10,9 @@ import kotlin.js.*
  * Calling onWasmReady after onRuntimeInitialized invokes [onReady] as well.
  * It's safe to call wasm functions within [onReady] callback, or after it was invoked.
  */
-external fun onWasmReady(onReady: () -> Unit)
-
-internal external val wasmSetup: Promise<Boolean>
+actual fun onWasmReady(onReady: () -> Unit) {
+    awaitSkiko.then { onReady() }
+}
 
 internal fun ContextAttributes.asJsObject(): dynamic {
     val jsObject = js("{}")
@@ -28,16 +29,6 @@ internal fun ContextAttributes.asJsObject(): dynamic {
     renderViaOffscreenBackBuffer?.let { jsObject.renderViaOffscreenBackBuffer = renderViaOffscreenBackBuffer }
     majorVersion?.let { jsObject.majorVersion = majorVersion }
     return jsObject
-}
-
-private external interface GLInterface {
-    fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer;
-    fun makeContextCurrent(contextPointer: NativePointer): Boolean;
-}
-
-internal external object GL : GLInterface {
-    override fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): Int = definedExternally
-    override fun makeContextCurrent(contextPointer: NativePointer): Boolean = definedExternally
 }
 
 internal actual fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes?): NativePointer {

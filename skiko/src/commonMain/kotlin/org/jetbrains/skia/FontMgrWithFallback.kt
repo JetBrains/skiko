@@ -15,5 +15,4 @@ class FontMgrWithFallback(
 ) : FontMgr(_nDefaultWithFallbackFontProvider(fallbackProvider._ptr))
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgrWithFallback__1nDefaultWithFallbackFontProvider")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_FontMgrWithFallback__1nDefaultWithFallbackFontProvider")
 private external fun _nDefaultWithFallbackFontProvider(fallbackPtr: NativePointer): NativePointer

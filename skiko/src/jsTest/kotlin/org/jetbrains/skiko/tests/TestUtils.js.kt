@@ -2,10 +2,7 @@ package org.jetbrains.skiko.tests
 
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.promise
-import org.jetbrains.skia.Data
-import org.jetbrains.skia.impl.InteropScope
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skiko.wasm.wasmSetup
+import org.jetbrains.skiko.wasm.awaitSkiko
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -20,7 +17,8 @@ actual typealias TestReturnType = Any
  * Awaits for `wasmSetup` and then runs the [block] in a coroutine.
  */
 actual fun runTest(block: suspend () -> Unit): TestReturnType = MainScope().promise {
-    wasmSetup.await()
+    awaitSkiko.await()
+    testSetup()
     block()
 }
 

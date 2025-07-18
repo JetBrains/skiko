@@ -4,7 +4,6 @@ import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
 import kotlin.collections.HashMap
-import declareSkiaTasks
 import com.android.build.gradle.LibraryExtension
 
 plugins {
@@ -82,12 +81,14 @@ kotlin {
         }
     }
 
+    val linkWasmTask = skikoProjectContext.createWasmLinkTask()
+
     if (supportJs) {
         js(IR) {
             moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
-                    dependsOn("linkWasm")
+                    dependsOn(linkWasmTask!!)
                     useKarma {
                         useChromeHeadless()
                         useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
@@ -96,16 +97,34 @@ kotlin {
             }
             binaries.executable()
             generateVersion(OS.Wasm, Arch.Wasm, skiko)
+
+            val test by compilations.getting
+
+            project.tasks.named<Copy>(test.processResourcesTaskName) {
+                from(linkWasmTask!!) {
+                    include("*.mjs")
+                    include("*.wasm")
+                }
+
+                from(wasmImports) {
+                    include("*.mjs")
+                }
+
+                dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
+            }
+
+            setupImportsGeneratorPlugin()
         }
     }
 
     if (supportWasm) {
+
         @OptIn(ExperimentalWasmDsl::class)
         wasmJs {
             moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
-                    dependsOn("linkWasm")
+                    dependsOn(linkWasmTask!!)
                     useKarma {
                         this.webpackConfig.experiments.add("topLevelAwait")
                         useChromeHeadless()
@@ -115,21 +134,17 @@ kotlin {
             }
             generateVersion(OS.Wasm, Arch.Wasm, skiko)
 
-            val main by compilations.getting
             val test by compilations.getting
 
-            val linkWasmTasks = skikoProjectContext.createWasmLinkTasks()
             project.tasks.named<Copy>(test.processResourcesTaskName) {
-                from(linkWasmTasks.linkWasm!!) {
+                from(linkWasmTask!!) {
+                    include("*.mjs")
                     include("*.wasm")
                 }
 
-                from(linkWasmTasks.linkWasmWithES6!!) {
-                    include("*.mjs")
-                }
-
                 from(skikoTestMjs)
-                dependsOn(test.compileTaskProvider)
+
+                dependsOn(test.compileTaskProvider, tasks["compileTestKotlinJs"])
             }
 
             setupImportsGeneratorPlugin()
