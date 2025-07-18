@@ -2071,9 +2071,6 @@ $dokka.location:org.jetbrains.skia/MipmapMode///PointingToDeclaration/skiko/org
 $dokka.location:org.jetbrains.skia/MipmapMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-mipmap-mode/entries.html
 $dokka.location:org.jetbrains.skia/MipmapMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-mipmap-mode/value-of.html
 $dokka.location:org.jetbrains.skia/MipmapMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-mipmap-mode/values.html
-$dokka.location:org.jetbrains.skia/ModuleImport///PointingToDeclaration/skiko/org.jetbrains.skia/-module-import/index.html
-$dokka.location:org.jetbrains.skia/ModuleImport/module/#/PointingToDeclaration/skiko/org.jetbrains.skia/-module-import/module.html
-$dokka.location:org.jetbrains.skia/ModuleImport/name/#/PointingToDeclaration/skiko/org.jetbrains.skia/-module-import/name.html
 $dokka.location:org.jetbrains.skia/OutputWStream.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/-companion/index.html
 $dokka.location:org.jetbrains.skia/OutputWStream///PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/index.html
 $dokka.location:org.jetbrains.skia/OutputWStream/OutputWStream/#[Error type: Unresolved type for OutputStream]?/PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/-output-w-stream.html
@@ -2824,7 +2821,7 @@ $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/removeNotify/#/Pointing
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/render-api.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/requestNativeFocusOnAccessible/#javax.accessibility.Accessible?/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/request-native-focus-on-accessible.html
 $dokka.location:org.jetbrains.skiko.wasm////PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/index.html
-$dokka.location:org.jetbrains.skiko.wasm//onWasmReady/#kotlin.Function0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/on-wasm-ready.html
+$dokka.location:org.jetbrains.skiko.wasm//awaitSkiko/#/PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/await-skiko.html
 $dokka.location:org.jetbrains.skiko.windows////PointingToDeclaration/skiko/org.jetbrains.skiko.windows/index.html
 $dokka.location:org.jetbrains.skiko.windows/JumpList///PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list/index.html
 $dokka.location:org.jetbrains.skiko.windows/JumpList/build/#kotlin.Function1[org.jetbrains.skiko.windows.JumpListBuilder,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list/build.html
