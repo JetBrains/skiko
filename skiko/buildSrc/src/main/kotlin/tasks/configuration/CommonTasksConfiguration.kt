@@ -28,6 +28,7 @@ fun skiaHeadersDirs(skiaDir: File): List<File> =
         skiaDir.resolve("include/utils"),
         skiaDir.resolve("include/codec"),
         skiaDir.resolve("include/svg"),
+        skiaDir.resolve("modules/jsonreader"),
         skiaDir.resolve("modules/skottie/include"),
         skiaDir.resolve("modules/skparagraph/include"),
         skiaDir.resolve("modules/skshaper/include"),
