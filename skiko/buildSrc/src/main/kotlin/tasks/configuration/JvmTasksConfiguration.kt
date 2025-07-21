@@ -286,6 +286,8 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "$skiaBinDir/libskunicode_core.a",
                 "$skiaBinDir/libskunicode_icu.a",
                 "$skiaBinDir/libskshaper.a",
+                "$skiaBinDir/libjsonreader.a",
+
             )
         }
         OS.Windows -> {

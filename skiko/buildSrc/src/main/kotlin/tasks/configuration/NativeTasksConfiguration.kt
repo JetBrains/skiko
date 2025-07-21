@@ -193,6 +193,7 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String, buildType: SkiaBu
         "libskparagraph.a",
         "libskia.a",
         "libicu.a",
+        "libjsonreader.a",
         "libskottie.a",
         "libsvg.a",
         "libpng.a",
