@@ -33,7 +33,7 @@ internal abstract class AWTRedrawer(
      * Should be called when the device name is known as early, as possible.
      */
     protected fun onDeviceChosen(deviceName: String?) {
-        require(!isDisposed) { "$javaClass is disposed" }
+        checkDisposed()
         require(deviceAnalytics == null) { "deviceAnalytics is not null" }
         rendererAnalytics.deviceChosen()
         deviceAnalytics = analytics.device(Version.skiko, hostOs, graphicsApi, deviceName)
@@ -44,13 +44,13 @@ internal abstract class AWTRedrawer(
      * Should be called when initialization of graphic context is ended. Only call it after [onDeviceChosen]
      */
     protected fun onContextInit() {
-        require(!isDisposed) { "$javaClass is disposed" }
+        checkDisposed()
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         deviceAnalytics?.contextInit()
     }
 
-    protected fun update(nanoTime: Long) {
-        require(!isDisposed) { "$javaClass is disposed" }
+    override fun update(nanoTime: Long) {
+        checkDisposed()
         layer.update(nanoTime)
     }
 
@@ -68,5 +68,9 @@ internal abstract class AWTRedrawer(
             deviceAnalytics?.afterFrameRender()
             isFirstFrameRendered = true
         }
+    }
+
+    protected fun checkDisposed() {
+        check(!isDisposed) { "${this.javaClass.simpleName} is disposed" }
     }
 }

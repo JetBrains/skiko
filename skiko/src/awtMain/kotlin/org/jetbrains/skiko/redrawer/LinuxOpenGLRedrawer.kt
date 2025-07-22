@@ -60,7 +60,7 @@ internal class LinuxOpenGLRedrawer(
     }
 
     override fun dispose() {
-        check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
+        checkDisposed()
         frameJob.cancel()
         layer.backedLayer.lockLinuxDrawingSurface {
             // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
@@ -72,15 +72,17 @@ internal class LinuxOpenGLRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw() {
-        check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
+    override fun needRedraw(throttledToVsync: Boolean) {
+        checkDisposed()
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
-        check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
-        update(System.nanoTime())
+    override fun redrawImmediately(updateNeeded: Boolean) = layer.backedLayer.lockLinuxDrawingSurface {
+        checkDisposed()
+        if (updateNeeded) {
+            update()
+        }
         inDrawScope {
             it.makeCurrent(context)
             contextHandler.draw()
@@ -116,7 +118,6 @@ internal class LinuxOpenGLRedrawer(
             toRedrawVisible.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
 
             val nanoTime = System.nanoTime()
-
             for (redrawer in toRedrawVisible) {
                 try {
                     redrawer.update(nanoTime)
