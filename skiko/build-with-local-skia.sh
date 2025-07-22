@@ -14,9 +14,11 @@ else
   skikoBuildType=Release
 fi
 
+hostArch=$(uname -m)
+
 case $SKIA_TARGET in
   "ios")
-    if [[ $(uname -m) == 'arm64' ]]; then
+    if [[ $hostArch == 'arm64' ]]; then
       SKIKO_TARGET_FLAGS="-Pskiko.native.ios.arm64.enabled=true -Pskiko.awt.enabled=false"
       skikoMachines=("arm64")
     else
@@ -25,7 +27,7 @@ case $SKIA_TARGET in
     fi
     ;;
   "iosSim")
-    if [[ $(uname -m) == 'arm64' ]]; then
+    if [[ $hostArch == 'arm64' ]]; then
       SKIKO_TARGET_FLAGS="-Pskiko.native.ios.simulatorArm64.enabled=true -Pskiko.awt.enabled=false"
       skikoMachines=("arm64")
     else
@@ -35,7 +37,7 @@ case $SKIA_TARGET in
     ;;
   "macos")
     SKIKO_TARGET_FLAGS="-Pskiko.awt.enabled=true"
-    if [[ $(uname -m) == 'arm64' ]]; then
+    if [[ $hostArch == 'arm64' ]]; then
       skikoMachines=("arm64" "x64") # bash arrays split elements by spaces
     else
       skikoMachines=("x64")
@@ -43,7 +45,7 @@ case $SKIA_TARGET in
     ;;
   "windows")
     SKIKO_TARGET_FLAGS="-Pskiko.awt.enabled=true"
-    if [[ $(uname -m) == 'arm64' ]]; then
+    if [[ $hostArch == 'arm64' ]]; then
       skikoMachines=("arm64")
     else
       skikoMachines=("x64")
@@ -51,7 +53,7 @@ case $SKIA_TARGET in
     ;;
   "linux")
     SKIKO_TARGET_FLAGS="-Pskiko.awt.enabled=true"
-    if [[ $(uname -m) == 'arm64' ]]; then
+    if [[ $hostArch == 'arm64' || $hostArch == 'aarch64' ]]; then
       skikoMachines=("arm64")
     else
       skikoMachines=("x64")
@@ -59,11 +61,7 @@ case $SKIA_TARGET in
     ;;
   "wasm")
     SKIKO_TARGET_FLAGS="-Pskiko.wasm.enabled=true -Pskiko.awt.enabled=false"
-    if [[ $(uname -m) == 'arm64' ]]; then
-      skikoMachines=("arm64")
-    else
-      skikoMachines=("x64")
-    fi
+    skikoMachines=("wasm")
     ;;
   *)
     echo "can't determine skia target"; exit 1
