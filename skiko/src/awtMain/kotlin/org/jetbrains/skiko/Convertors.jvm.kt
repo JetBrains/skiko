@@ -28,6 +28,7 @@ fun Bitmap.toBufferedImage(): BufferedImage {
 
     val order = when (this.colorInfo.colorType) {
         ColorType.RGB_888X -> intArrayOf(0, 1, 2, 3)
+        ColorType.RGBA_8888 -> intArrayOf(0, 1, 2, 3)
         ColorType.BGRA_8888 -> intArrayOf(2, 1, 0, 3)
         else -> throw UnsupportedOperationException("unsupported color type ${this.colorInfo.colorType}")
     }
