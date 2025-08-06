@@ -2,7 +2,6 @@ package org.jetbrains.skiko.node
 
 import org.jetbrains.skia.*
 import org.jetbrains.skia.tests.assertCloseEnough
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -80,7 +79,6 @@ class RenderNodeTest {
         context.close()
     }
 
-    @Ignore // TODO Should be fixed after https://github.com/JetBrains/skia/pull/11
     @Test
     fun pictureCullRect() {
         val context = RenderNodeContext(measureDrawBounds = true)
