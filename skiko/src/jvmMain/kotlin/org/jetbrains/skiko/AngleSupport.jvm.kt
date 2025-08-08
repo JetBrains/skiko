@@ -20,8 +20,8 @@ internal actual fun loadAngleLibrary() {
                         eglResult.file.absolutePath,
                         glesResult.file.absolutePath
                     )
-                } catch (e: Throwable) {
-                    throw OptionalRenderApiException("Failed to load ANGLE runtime: ${e.message}")
+                } catch (e: Exception) {
+                    throw OptionalRenderApiException("Failed to load ANGLE library: ${e}")
                 }
             }
             else -> Unit
