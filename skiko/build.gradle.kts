@@ -410,6 +410,7 @@ if (supportAndroid) {
     }
 }
 
+// TODO now it can be moved, move it if you change this
 // Can't be moved to buildSrc because of Checksum dependency
 fun createChecksumsTask(
     targetOs: OS,
@@ -447,8 +448,6 @@ afterEvaluate {
             }
         }
     }
-
-    project.includeAngleRuntimeInTestsOnWindows(skiko)
 
     tasks.named("clean").configure {
         doLast {
@@ -605,9 +604,6 @@ tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
     ?.dependsOn("publishWasmJsPublicationToComposeRepoRepository")
 tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
     ?.dependsOn("publishWasmJsPublicationToMavenLocal")
-
-project.ensureAnglePublishDependencies()
-
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583
