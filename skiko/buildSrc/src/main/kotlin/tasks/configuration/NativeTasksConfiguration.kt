@@ -256,6 +256,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 "-lfontconfig",
                 "-lGL",
                 // TODO: an ugly hack, Linux linker searches only unresolved symbols.
+                "$skiaBinDir/libskottie.a",
+                "$skiaBinDir/libjsonreader.a",
                 "$skiaBinDir/libsksg.a",
                 "$skiaBinDir/libskshaper.a",
                 "$skiaBinDir/libskunicode_core.a",
