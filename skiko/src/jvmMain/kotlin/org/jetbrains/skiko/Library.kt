@@ -9,10 +9,12 @@ import java.util.concurrent.atomic.AtomicBoolean
 object Library {
     private var copyDir: File? = null
 
+    internal data class LoadResult(val baseDir: File, val fromResourceCache: Boolean, val file: File)
+
     // A native library cannot be loaded in several classloaders, so we have to clone
     // the native library to allow Skiko loading to work properly in complex cases, i.e.,
     // several IDEA plugins.
-    private fun loadLibraryOrCopy(library: File) {
+    internal fun loadLibraryOrCopy(library: File) {
         try {
             System.load(library.absolutePath)
         } catch (e: UnsatisfiedLinkError) {
@@ -28,7 +30,7 @@ object Library {
         }
     }
 
-    private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
+    internal fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
         val file = File(dest, resourceName)
         if (!file.exists()) {
             val tempFile = File.createTempFile("skiko", "", dest)
@@ -41,6 +43,9 @@ object Library {
         }
         return file
     }
+
+    internal fun resourceFirstLineOrNull(path: String): String? =
+        Library::class.java.getResourceAsStream(path)?.use { it.bufferedReader().readLine() }
 
     private var loaded = AtomicBoolean(false)
 
@@ -76,48 +81,50 @@ object Library {
             return
         }
 
-        // First try: system property is set.
-        val skikoLibraryPath = SkikoProperties.libraryPath
-        if (skikoLibraryPath != null) {
-            val library = File(File(skikoLibraryPath), platformName)
-            loadLibraryOrCopy(library)
-            if (icu != null && copyDir != null)
-                unpackIfNeeded(copyDir!!, icu, true)
-            return
-        }
+        // Reuse generic finder for the main library (do not load yet)
+        val result = findAndLoadExact(platformName)
 
-        // Second try: load it from the bin/ or lib/ directory relative to the JVM home.
-        // The user might have placed the native files alongside the other JVM libraries
-        // for signing purposes, so we'll find it here if so.
-        val jvmFiles = File(System.getProperty("java.home"), if (hostOs.isWindows) "bin" else "lib")
-        val pathInJvm = jvmFiles.resolve(platformName)
-        if (pathInJvm.exists() && icu?.let { (jvmFiles.resolve(it)).exists() } != false) {
-            loadLibraryOrCopy(pathInJvm)
-            return
-        }
+        // Load the found library now
+        loadLibraryOrCopy(result.file)
 
-        // Third try: look up in or extract to a local cache directory.
-        // Key the cache by the hash of the library.
-        val hashResourceStream = Library::class.java.getResourceAsStream(
-            "/$platformName.sha256"
-        ) ?: throw LibraryLoadException(
-            "Cannot find $platformName.sha256, proper native dependency missing."
-        )
-        val hash = hashResourceStream.use { it.bufferedReader().readLine() }
-
-        val dataDir = File(File(SkikoProperties.dataPath), hash)
-        dataDir.mkdirs()
-        val library = unpackIfNeeded(dataDir, platformName, false)
-        loadLibraryOrCopy(library)
+        // Handle ICU on Windows similarly to the original logic
         if (icu != null) {
             if (copyDir != null) {
                 // We made a duplicate to resolve classloader conflicts.
                 unpackIfNeeded(copyDir!!, icu, true)
-            } else {
-                // Normal path where Skiko is loaded only once.
-                unpackIfNeeded(dataDir, icu, false)
+            } else if (result.fromResourceCache) {
+                // Normal path where Skiko is loaded only once and was extracted to cache.
+                unpackIfNeeded(result.baseDir, icu, false)
+            } // else: library was loaded from JVM bin/lib or explicit path; do nothing.
+        }
+    }
+
+    /**
+     * Fully reusable variant of the above loader for an arbitrary exact file name (with extension),
+     * using the same 3-step search strategy: skiko.library.path -> JVM bin/lib -> classpath resource cache.
+     */
+    internal fun findAndLoadExact(resourceFileName: String): LoadResult {
+        // Android path not used for ANGLE; keep consistent with desktop approach only.
+        // 1) System property path
+        SkikoProperties.libraryPath?.let { path ->
+            val file = File(File(path), resourceFileName)
+            if (file.exists()) {
+                return LoadResult(file.parentFile, false, file)
             }
         }
+        // 2) JVM home bin/lib
+        val jvmDir = File(System.getProperty("java.home"), if (hostOs.isWindows) "bin" else "lib")
+        val jvmFile = jvmDir.resolve(resourceFileName)
+        if (jvmFile.exists()) {
+            return LoadResult(jvmDir, false, jvmFile)
+        }
+        // 3) Resource cache, keyed by checksum
+        val hash = resourceFirstLineOrNull("/${resourceFileName}.sha256")
+            ?: throw LibraryLoadException("Cannot find ${resourceFileName}.sha256, proper native dependency missing.")
+        val dataDir = File(File(SkikoProperties.dataPath), hash)
+        dataDir.mkdirs()
+        val file = unpackIfNeeded(dataDir, resourceFileName, false)
+        return LoadResult(dataDir, true, file)
     }
 }
 

@@ -2,21 +2,12 @@
 
 #include <windows.h>
 #include <shlwapi.h>
+#include <string>
 #define GL_GLES_PROTOTYPES 0
 #define EGL_EGL_PROTOTYPES 0
 #include <GLES/gl.h>
 #include <EGL/egl.h>
 #include "exceptions_handler.h"
-
-#define THROW_IF_NULL(action)                                               \
-    do {                                                                    \
-        auto __result { action };                                           \
-        if (0 == __result) {                                                \
-            auto __code = GetLastError();                                   \
-            throwJavaRenderExceptionByErrorCode(env, __FUNCTION__, __code); \
-            return;                                                         \
-        }                                                                   \
-    } while ((void)0, 0)
 
 static HINSTANCE AngleEGLLibrary = nullptr;
 
@@ -76,20 +67,22 @@ extern "C" {
         return eglGetProcAddress(procname);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AngleSupport_1jvmKt_loadAngleLibraryWindows(JNIEnv *env, jobject obj) {
-        TCHAR basePath[MAX_PATH] = TEXT("");
-        TCHAR libEGL[MAX_PATH] = TEXT("");
-        TCHAR libGLESv2[MAX_PATH] = TEXT("");
-        HMODULE hmodule = nullptr;
-        THROW_IF_NULL(GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                                        (LPTSTR) &Java_org_jetbrains_skiko_AngleSupport_1jvmKt_loadAngleLibraryWindows,
-                                        &hmodule));
-        THROW_IF_NULL(GetModuleFileName(hmodule, basePath, sizeof(basePath)));
-        THROW_IF_NULL(PathRemoveFileSpec(basePath));
-        THROW_IF_NULL(PathCombine(libEGL, basePath, TEXT("libEGL.dll")));
-        THROW_IF_NULL(PathCombine(libGLESv2, basePath, TEXT("libGLESv2.dll")));
-        THROW_IF_NULL(AngleEGLLibrary = LoadLibrary(libEGL));
-        THROW_IF_NULL(LoadLibrary(libGLESv2));
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AngleSupport_1jvmKt_loadAngleLibraryWindows(JNIEnv *env, jobject, jstring jEglPath, jstring jGlesPath) {
+        const jchar* rawEgl = env->GetStringChars(jEglPath, nullptr);
+        const jchar* rawGles = env->GetStringChars(jGlesPath, nullptr);
+
+        HMODULE eglHandle = (HMODULE) LoadLibraryW(reinterpret_cast<LPCWSTR>(rawEgl));
+        HMODULE glesHandle = eglHandle ? (HMODULE) LoadLibraryW(reinterpret_cast<LPCWSTR>(rawGles)) : nullptr;
+
+        env->ReleaseStringChars(jEglPath, rawEgl);
+        env->ReleaseStringChars(jGlesPath, rawGles);
+
+        if (!eglHandle || !glesHandle) {
+            auto __code = GetLastError();
+            throwJavaRenderExceptionByErrorCode(env, __FUNCTION__, __code);
+            return;
+        }
+        AngleEGLLibrary = eglHandle;
     }
 }
 

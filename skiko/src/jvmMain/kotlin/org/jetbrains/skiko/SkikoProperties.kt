@@ -59,7 +59,7 @@ object SkikoProperties {
      *
      * If enabled, Windows uses it as a primary render API and fallbacks to the default APIs.
      */
-    val renderingAngleEnabled: Boolean get() = getProperty("skiko.rendering.angle.enabled")?.toBoolean() ?: false
+    val renderingAngleEnabled: Boolean get() = true
 
     /**
      * If vsync is enabled, but platform can't support it (Software renderer, Linux with uninstalled drivers),
