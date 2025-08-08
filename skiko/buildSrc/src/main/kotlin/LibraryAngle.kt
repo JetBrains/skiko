@@ -1,15 +1,17 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Project
-import org.gradle.api.publish.PublicationContainer
-import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.crypto.checksum.Checksum
-import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 
-fun Project.registerAngleBinariesPackaging(skiko: SkikoProperties) {
+class AngleProjectContext {
+    val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
+}
+
+fun Project.registerAngleBinariesPackaging(skiko: SkikoProperties): AngleProjectContext {
+    val context = AngleProjectContext()
     if (supportAwt && hostOs == OS.Windows) {
         val angleTag = property("dependencies.angle") as String
         val baseUrl = "https://github.com/JetBrains/angle-pack/releases/download/$angleTag"
@@ -68,7 +70,7 @@ fun Project.registerAngleBinariesPackaging(skiko: SkikoProperties) {
                 dependsOn(prepareTask)
             }
 
-            tasks.register<Jar>("skikoAngleRuntimeJar$taskSuffix") {
+            val jarTask = tasks.register<Jar>("skikoAngleRuntimeJar$taskSuffix") {
                 group = "Angle Binaries"
                 dependsOn(prepareTask, checksumEgl, checksumGles)
                 val target = targetId(targetOs, targetArch)
@@ -79,44 +81,11 @@ fun Project.registerAngleBinariesPackaging(skiko: SkikoProperties) {
                 from(checksumEgl.map { it.outputs.files.singleFile })
                 from(checksumGles.map { it.outputs.files.singleFile })
             }
-
-            afterEvaluate {
-                tasks.findByName("publishSkikoJvmRuntime${taskSuffix}PublicationToMavenLocal")
-                    ?.dependsOn("publishSkikoJvmRuntimeAngle${taskSuffix}PublicationToMavenLocal")
-                tasks.findByName("publishSkikoJvmRuntime${taskSuffix}PublicationToComposeRepoRepository")
-                    ?.dependsOn("publishSkikoJvmRuntimeAngle${taskSuffix}PublicationToComposeRepoRepository")
-            }
+            context.allJvmRuntimeJars[targetOs to targetArch] = jarTask
         }
 
         registerAngleTasksFor(OS.Windows, Arch.X64)
         registerAngleTasksFor(OS.Windows, Arch.Arm64)
     }
-}
-
-fun PublicationContainer.configureAnglePublications(
-    project: Project,
-    emptySourcesJar: TaskProvider<Jar>,
-    pomNameForPublication: MutableMap<String, String>
-) {
-    if (project.supportAwt && hostOs == OS.Windows) {
-        val angleWindowsX64Jar = project.tasks.named("skikoAngleRuntimeJarWindowsX64")
-        val angleWindowsArm64Jar = project.tasks.named("skikoAngleRuntimeJarWindowsArm64")
-
-        create<MavenPublication>("skikoJvmRuntimeAngleWindowsX64") {
-            pomNameForPublication[name] = "Skiko JVM ANGLE Runtime for Windows X64"
-            artifactId = "skiko-awt-runtime-angle-windows-x64"
-            project.afterEvaluate {
-                artifact(angleWindowsX64Jar.get())
-                artifact(emptySourcesJar)
-            }
-        }
-        create<MavenPublication>("skikoJvmRuntimeAngleWindowsArm64") {
-            pomNameForPublication[name] = "Skiko JVM ANGLE Runtime for Windows Arm64"
-            artifactId = "skiko-awt-runtime-angle-windows-arm64"
-            project.afterEvaluate {
-                artifact(angleWindowsArm64Jar.get())
-                artifact(emptySourcesJar)
-            }
-        }
-    }
+    return context
 }

@@ -432,7 +432,7 @@ if (supportAwt) {
     skikoProjectContext.setupJvmTestTask(skikoAwtJarForTests, targetOs, targetArch)
 }
 
-project.registerAngleBinariesPackaging(skiko)
+val angleProjectContext = project.registerAngleBinariesPackaging(skiko)
 
 afterEvaluate {
     tasks.configureEach {
@@ -548,7 +548,20 @@ publishing {
             }
         }
 
-        publications.configureAnglePublications(project, emptySourcesJar, pomNameForPublication)
+        // Configure ANGLE publications using tasks returned by angleProjectContext
+        angleProjectContext.allJvmRuntimeJars.forEach { (key, jarProvider) ->
+            val os = key.first
+            val arch = key.second
+            val pubName = "skikoJvmRuntimeAngle${toTitleCase(os.id)}${toTitleCase(arch.id)}"
+            create<MavenPublication>(pubName) {
+                pomNameForPublication[name] = "Skiko JVM ANGLE Runtime for ${toTitleCase(os.id)} ${toTitleCase(arch.id)}"
+                artifactId = "skiko-awt-runtime-angle-${os.id}-${arch.id}"
+                afterEvaluate {
+                    artifact(jarProvider.map { it.archiveFile.get() })
+                    artifact(emptySourcesJar)
+                }
+            }
+        }
 
         if (supportJs || supportWasm) {
             create<MavenPublication>("skikoWasmRuntime") {
@@ -604,6 +617,17 @@ tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
     ?.dependsOn("publishWasmJsPublicationToComposeRepoRepository")
 tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
     ?.dependsOn("publishWasmJsPublicationToMavenLocal")
+
+// Ensure JVM runtime publications depend on corresponding ANGLE publications
+angleProjectContext.allJvmRuntimeJars.forEach { (key, _) ->
+    val os = key.first
+    val arch = key.second
+    val suffix = toTitleCase(os.id) + toTitleCase(arch.id)
+    tasks.findByName("publishSkikoJvmRuntime${suffix}PublicationToMavenLocal")
+        ?.dependsOn("publishSkikoJvmRuntimeAngle${suffix}PublicationToMavenLocal")
+    tasks.findByName("publishSkikoJvmRuntime${suffix}PublicationToComposeRepoRepository")
+        ?.dependsOn("publishSkikoJvmRuntimeAngle${suffix}PublicationToComposeRepoRepository")
+}
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583
