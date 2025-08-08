@@ -59,7 +59,8 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     )
     sourceRoots.set(srcDirs)
     if (targetOs != OS.Android) includeHeadersNonRecursive(jdkHome.resolve("include"))
-    includeHeadersNonRecursive(skiaHeadersDirs(skiaJvmBindingsDir.get()))
+    val skiaDir = skiaJvmBindingsDir.get()
+    includeHeadersNonRecursive(skiaHeadersDirs(skiaDir))
     val projectDir = project.projectDir
     includeHeadersNonRecursive(projectDir.resolve("src/awtMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/common"))
@@ -98,6 +99,9 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         OS.Windows -> {
             includeHeadersNonRecursive(windowsSdkPaths.includeDirs)
             includeHeadersNonRecursive(jdkHome.resolve("include/win32"))
+            includeHeadersNonRecursive(skiaDir.resolve("third_party/externals/angle2/include"))
+            includeHeadersNonRecursive(skiaDir.resolve("include/gpu"))
+            includeHeadersNonRecursive(skiaDir.resolve("src/gpu"))
             val targetArgs = if (targetArch == Arch.Arm64) arrayOf("/clang:--target=arm64-windows") else arrayOf()
             osFlags = arrayOf(
                 "/nologo",
@@ -106,10 +110,6 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
                 "/GR-", // no-RTTI.
                 "/FS", // Due to an error when building in Teamcity. https://docs.microsoft.com/en-us/cpp/build/reference/fs-force-synchronous-pdb-writes
                 *targetArgs,
-                // LATER. Angle rendering arguments:
-                // "-I$skiaDir/third_party/externals/angle2/include",
-                // "-I$skiaDir/src/gpu",
-                // "-DSK_ANGLE",
             )
         }
         OS.Android -> {
@@ -311,6 +311,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                         "ole32.lib",
                         "Propsys.lib",
                         "shcore.lib",
+                        "Shlwapi.lib",
                         "user32.lib",
                     )
                 )

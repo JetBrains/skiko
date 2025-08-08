@@ -92,7 +92,8 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
             "-DWIN32_LEAN_AND_MEAN",
             "-DNOMINMAX",
             "-DSK_GAMMA_APPLY_TO_A8",
-            "-DSK_DIRECT3D"
+            "-DSK_DIRECT3D",
+            "-DSK_ANGLE"
         )
         OS.Linux -> listOf(
             "-DSK_BUILD_FOR_LINUX",
