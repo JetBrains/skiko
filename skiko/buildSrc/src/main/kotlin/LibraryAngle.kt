@@ -15,7 +15,7 @@ import org.gradle.kotlin.dsl.register
  * ANGLE binaries packaging (Windows)
  */
 fun Project.registerAngleBinariesPackaging(skiko: SkikoProperties) {
-    val angleTag = "7fea539cc9"
+    val angleTag = property("dependencies.angle") as String
     val baseUrl = "https://github.com/JetBrains/angle-pack/releases/download/$angleTag"
 
     fun registerAngleTasksFor(arch: Arch) {
