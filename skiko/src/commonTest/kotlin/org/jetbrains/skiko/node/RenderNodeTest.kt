@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 class RenderNodeTest {
     @Test
     fun verifyInterop() {
-        val surface = Surface.Companion.makeRasterN32Premul(16, 16)
+        val surface = Surface.makeRasterN32Premul(16, 16)
         val context = RenderNodeContext()
         val node = RenderNode(context)
 
@@ -75,6 +75,29 @@ class RenderNodeTest {
         node.drawInto(surface.canvas)
 
         surface.close()
+        node.close()
+        context.close()
+    }
+
+    @Test
+    fun pictureCullRect() {
+        val context = RenderNodeContext(measureDrawBounds = true)
+        val node = RenderNode(context)
+        node.bounds = Rect(0f, 0f, 100f, 100f)
+
+        val recordCanvas = node.beginRecording()
+        recordCanvas.drawRect(Rect(20f,20f,40f,40f), Paint())
+        node.endRecording()
+
+        val pictureRecorder = PictureRecorder()
+        val bbhFactory = RTreeFactory()
+        val pictureCanvas = pictureRecorder.beginRecording(Rect(0f, 0f, 100f, 100f), bbhFactory)
+        node.drawInto(pictureCanvas)
+        val picture = pictureRecorder.finishRecordingAsPicture()
+
+        assertEquals(Rect(20f, 20f, 40f, 40f), picture.cullRect)
+
+        picture.close()
         node.close()
         context.close()
     }
