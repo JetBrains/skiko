@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.tests.org.jetbrains.skiko.paragraph
+package org.jetbrains.skiko.paragraph
 
 import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.*
@@ -10,7 +10,7 @@ import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.junit.Rule
 import org.junit.Test
 
-class TextStyleTest {
+class TextStyleScreenshotTest {
     @get:Rule
     val screenshots = ScreenshotTestRule()
 
