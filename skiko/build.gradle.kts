@@ -432,7 +432,7 @@ if (supportAwt) {
     skikoProjectContext.setupJvmTestTask(skikoAwtJarForTests, targetOs, targetArch)
 }
 
-val angleProjectContext = project.registerAngleBinariesPackaging(skiko)
+val angleLibraryJars = project.registerAngleLibraryJars(skiko)
 
 afterEvaluate {
     tasks.configureEach {
@@ -548,16 +548,15 @@ publishing {
             }
         }
 
-        // Configure ANGLE publications using tasks returned by angleProjectContext
-        angleProjectContext.allJvmRuntimeJars.forEach { (key, jarProvider) ->
-            val os = key.first
-            val arch = key.second
+        angleLibraryJars.forEach { jar ->
+            val os = jar.os
+            val arch = jar.arch
             val pubName = "skikoJvmRuntimeAngle${toTitleCase(os.id)}${toTitleCase(arch.id)}"
             create<MavenPublication>(pubName) {
-                pomNameForPublication[name] = "Skiko JVM ANGLE Runtime for ${toTitleCase(os.id)} ${toTitleCase(arch.id)}"
-                artifactId = "skiko-awt-runtime-angle-${os.id}-${arch.id}"
+                pomNameForPublication[name] = "Skiko JVM ANGLE Runtime for ${os.name} ${arch.name}"
+                artifactId = SkikoArtifacts.jvmAngleRuntimeArtifactIdFor(os, arch)
                 afterEvaluate {
-                    artifact(jarProvider.map { it.archiveFile.get() })
+                    artifact(jar.task.map { it.archiveFile.get() })
                     artifact(emptySourcesJar)
                 }
             }
@@ -618,11 +617,8 @@ tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
 tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
     ?.dependsOn("publishWasmJsPublicationToMavenLocal")
 
-// Ensure JVM runtime publications depend on corresponding ANGLE publications
-angleProjectContext.allJvmRuntimeJars.forEach { (key, _) ->
-    val os = key.first
-    val arch = key.second
-    val suffix = toTitleCase(os.id) + toTitleCase(arch.id)
+angleLibraryJars.forEach { jar ->
+    val suffix = toTitleCase(jar.os.id) + toTitleCase(jar.arch.id)
     tasks.findByName("publishSkikoJvmRuntime${suffix}PublicationToMavenLocal")
         ?.dependsOn("publishSkikoJvmRuntimeAngle${suffix}PublicationToMavenLocal")
     tasks.findByName("publishSkikoJvmRuntime${suffix}PublicationToComposeRepoRepository")

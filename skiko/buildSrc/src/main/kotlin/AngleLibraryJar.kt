@@ -6,12 +6,14 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.crypto.checksum.Checksum
 import org.gradle.kotlin.dsl.register
 
-class AngleProjectContext {
-    val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
-}
+class AngleLibraryJar(
+    val os: OS,
+    val arch: Arch,
+    val task: TaskProvider<Jar>
+)
 
-fun Project.registerAngleBinariesPackaging(skiko: SkikoProperties): AngleProjectContext {
-    val context = AngleProjectContext()
+fun Project.registerAngleLibraryJars(skiko: SkikoProperties): List<AngleLibraryJar> {
+    val libraryTasks = mutableListOf<AngleLibraryJar>()
     if (supportAwt && hostOs == OS.Windows) {
         val angleTag = property("dependencies.angle") as String
         val baseUrl = "https://github.com/JetBrains/angle-pack/releases/download/$angleTag"
@@ -81,11 +83,11 @@ fun Project.registerAngleBinariesPackaging(skiko: SkikoProperties): AngleProject
                 from(checksumEgl.map { it.outputs.files.singleFile })
                 from(checksumGles.map { it.outputs.files.singleFile })
             }
-            context.allJvmRuntimeJars[targetOs to targetArch] = jarTask
+            libraryTasks += AngleLibraryJar(targetOs, targetArch, jarTask)
         }
 
         registerAngleTasksFor(OS.Windows, Arch.X64)
         registerAngleTasksFor(OS.Windows, Arch.Arm64)
     }
-    return context
+    return libraryTasks
 }
