@@ -4,18 +4,17 @@ const loadedWasm = {
     _: {}
 }
 
-let skikoGl = null;
+const GL = {
+    createContext: () => {},
+    makeContextCurrent: () => {}
+};
 
 export const awaitSkiko = loadSkikoWASM().then((module) => {
     loadedWasm._ = module.wasmExports;
-    skikoGl = module.GL;
+    let {createContext, makeContextCurrent} = module.GL;
+    GL.createContext = createContext;
+    GL.makeContextCurrent = makeContextCurrent;
     return module
 });
 
-export const GL = new Proxy({}, {
-    get(object, propName) {
-        return skikoGl[propName];
-    }
-})
-
-
+export {GL}
