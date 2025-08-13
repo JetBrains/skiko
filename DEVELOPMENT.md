@@ -7,7 +7,8 @@
     sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip multistrap libx11-dev
     ```
   * `Windows`
-    1. Download [Visual Studio Build Tools 2019](https://learn.microsoft.com/en-us/visualstudio/releases/2019/history) (search "BuildTools" on the page).
+
+    1. Download [Visual Studio Build Tools 2022]([https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-history](https://aka.ms/vs/17/release/vs_buildtools.exe)).
     2. During the installation, select "Desktop development with C++"
     3. Add an environment variable SKIKO_VSBT_PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools
        ```
