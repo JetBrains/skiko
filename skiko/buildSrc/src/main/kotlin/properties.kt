@@ -1,3 +1,4 @@
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import java.io.File
@@ -35,21 +36,26 @@ val OS.isCompatibleWithHost: Boolean
         OS.Android -> true
     }
 
-fun compilerForTarget(os: OS, arch: Arch): String =
+fun compilerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
     when (os) {
+        // TODO: Use clang++ for all Linux targets
         OS.Linux -> when (arch) {
             Arch.X64 -> "g++"
-            Arch.Arm64 -> "clang++"
+            Arch.Arm64 -> if (isJvm) {
+                "clang++"
+            } else {
+                if (hostArch == Arch.Arm64) "g++" else "aarch64-linux-gnu-g++"
+            }
             Arch.Wasm -> "Unexpected combination: $os & $arch"
         }
         OS.Android -> "clang++"
         OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
-        OS.Wasm -> "emcc"
+        OS.Wasm -> if (Os.isFamily(Os.FAMILY_WINDOWS)) "emcc.bat" else "emcc"
     }
 
-fun linkerForTarget(os: OS, arch: Arch): String =
-    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch)
+fun linkerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
+    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch, isJvm)
 
 val OS.dynamicLibExt: String
     get() = when (this) {

@@ -1,5 +1,5 @@
 @file:JsModule("./skiko.mjs")
-
+@file:JsQualifier("skikoApi")
 package org.jetbrains.skia.impl
 
 // See `setup.mjs`

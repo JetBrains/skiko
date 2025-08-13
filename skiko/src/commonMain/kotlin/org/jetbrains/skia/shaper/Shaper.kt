@@ -236,35 +236,27 @@ internal expect fun Shaper.doShape(
 
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nGetFinalizer")
 private external fun Shaper_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nMake")
 private external fun Shaper_nMake(fontMgrPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakePrimitive")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nMakePrimitive")
 private external fun _nMakePrimitive(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeShaperDrivenWrapper")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nMakeShaperDrivenWrapper")
 private external fun _nMakeShaperDrivenWrapper(fontMgrPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWrap")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWrap")
 private external fun _nMakeShapeThenWrap(fontMgrPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder")
 private external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeCoreText")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nMakeCoreText")
 private external fun _nMakeCoreText(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeBlob")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nShapeBlob")
 private external fun _nShapeBlob(
     ptr: NativePointer,
     text: NativePointer,
@@ -279,7 +271,6 @@ private external fun _nShapeBlob(
 
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeLine")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nShapeLine")
 private external fun _nShapeLine(
     ptr: NativePointer,
     text: NativePointer,
@@ -290,7 +281,6 @@ private external fun _nShapeLine(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShape")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper__1nShape")
 internal external fun Shaper_nShape(
     ptr: NativePointer,
     textPtr: NativePointer,
@@ -307,15 +297,12 @@ internal external fun Shaper_nShape(
 
 // Native/JS only
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunIterator_1nGetFinalizer")
 internal external fun RunIterator_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator")
 internal external fun RunIterator_nCreateRunIterator(type: Int, textPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator")
 internal external fun RunIterator_nInitRunIterator(
     ptr: NativePointer,
     type: Int,
@@ -326,15 +313,12 @@ internal external fun RunIterator_nInitRunIterator(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nCreate")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunHandler_1nCreate")
 internal external fun RunHandler_nCreate(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetFinalizer")
 internal external fun RunHandler_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nInit")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunHandler_1nInit")
 internal external fun RunHandler_nInit(
     ptr: NativePointer,
     onBeginLine: InteropPointer,
@@ -346,21 +330,16 @@ internal external fun RunHandler_nInit(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetGlyphs")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetGlyphs")
 internal external fun RunHandler_nGetGlyphs(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetClusters")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetClusters")
 internal external fun RunHandler_nGetClusters(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetPositions")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetPositions")
 internal external fun RunHandler_nGetPositions(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nSetOffset")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunHandler_1nSetOffset")
 internal external fun RunHandler_nSetOffset(ptr: NativePointer, x: Float, y: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetRunInfo")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetRunInfo")
 internal external fun RunHandler_nGetRunInfo(ptr: NativePointer, result: InteropPointer): NativePointer

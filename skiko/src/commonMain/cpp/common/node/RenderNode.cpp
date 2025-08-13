@@ -259,8 +259,7 @@ SkRect RenderNode::onGetBounds() {
 }
 
 sk_sp<SkPicture> RenderNode::onMakePictureSnapshot() {
-    const SkRect bounds = this->getBounds();
-    SkCanvas* canvas = this->recorder.beginRecording(bounds);
+    SkCanvas* canvas = this->beginRecording();
     UnrollDrawableCanvas unrollCanvas(canvas);
     this->draw(&unrollCanvas);
     return this->recorder.finishRecordingAsPicture();

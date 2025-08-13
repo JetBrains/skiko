@@ -67,7 +67,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
 
-    compiler.set(compilerForTarget(targetOs, targetArch))
+    compiler.set(compilerForTarget(targetOs, targetArch, isJvm = true))
 
     val osFlags: Array<String>
     when (targetOs) {
@@ -237,7 +237,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
     buildSuffix.set("jvm")
     buildTargetArch.set(targetArch)
     buildVariant.set(buildType)
-    linker.set(linkerForTarget(targetOs, targetArch))
+    linker.set(linkerForTarget(targetOs, targetArch, isJvm = true))
 
     when (targetOs) {
         OS.MacOS -> {
@@ -286,6 +286,8 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "$skiaBinDir/libskunicode_core.a",
                 "$skiaBinDir/libskunicode_icu.a",
                 "$skiaBinDir/libskshaper.a",
+                "$skiaBinDir/libjsonreader.a",
+
             )
         }
         OS.Windows -> {
@@ -516,8 +518,13 @@ fun SkikoProjectContext.setupJvmTestTask(skikoAwtJarForTests: TaskProvider<Jar>,
 }
 
 fun Project.androidHomePath(): Provider<String> {
-    val androidHomeFromSdkRoot: Provider<String> =
+    val androidHomeFromSdkHome: Provider<String> =
+        project.providers.environmentVariable("ANDROID_HOME")
+
+    // ANDROID_SDK_ROOT name is deprecated in favor of ANDROID_HOME
+    val deprecatedAndroidHomeFromSdkRoot: Provider<String> =
         project.providers.environmentVariable("ANDROID_SDK_ROOT")
+
     val androidHomeFromUserHome: Provider<String> =
         project.providers.systemProperty("user.home")
             .map { userHome ->
@@ -526,26 +533,7 @@ fun Project.androidHomePath(): Provider<String> {
                     .firstOrNull { File(it).exists() }
                     ?: error("Define Android SDK via ANDROID_SDK_ROOT")
             }
-    return androidHomeFromSdkRoot
+    return androidHomeFromSdkHome
+        .orElse(deprecatedAndroidHomeFromSdkRoot)
         .orElse(androidHomeFromUserHome)
 }
-fun Project.androidJar(askedVersion: String = ""): Provider<File> =
-    androidHomePath().map { androidHomePath ->
-        val androidHome = File(androidHomePath)
-        val version = if (askedVersion.isEmpty()) {
-            val platformsDir = androidHome.resolve("platforms")
-            val versions = platformsDir.list().orEmpty()
-            versions.maxByOrNull { name -> // possible name: "android-32", "android-33-ext4"
-                name.split("-").getOrNull(1)?.toIntOrNull() ?: 0
-            } ?: error(
-                buildString {
-                    appendLine("'$platformsDir' does not contain any directories matching expected 'android-NUMBER' format: ${versions}")
-                }
-            )
-        } else {
-            "android-$askedVersion"
-        }
-        androidHome.resolve("platforms/$version/android.jar").also {
-            println("Skiko task androidJar uses android SDK in $it")
-        }
-    }

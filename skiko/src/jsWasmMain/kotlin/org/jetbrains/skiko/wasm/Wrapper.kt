@@ -19,3 +19,5 @@ internal external interface ContextAttributes {
 }
 
 internal expect fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): NativePointer
+
+internal expect fun onWasmReady(onReady: () -> Unit)

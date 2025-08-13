@@ -15,6 +15,7 @@ import supportWasm
 import toTitleCase
 import java.io.File
 import skiaVersion
+import supportNativeLinux
 
 fun skiaHeadersDirs(skiaDir: File): List<File> =
     listOf(
@@ -27,6 +28,7 @@ fun skiaHeadersDirs(skiaDir: File): List<File> =
         skiaDir.resolve("include/utils"),
         skiaDir.resolve("include/codec"),
         skiaDir.resolve("include/svg"),
+        skiaDir.resolve("modules/jsonreader"),
         skiaDir.resolve("modules/skottie/include"),
         skiaDir.resolve("modules/skparagraph/include"),
         skiaDir.resolve("modules/skshaper/include"),
@@ -97,10 +99,10 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
             "-DSK_BUILD_FOR_LINUX",
             "-D_GLIBCXX_USE_CXX11_ABI=0"
         )
-        OS.Wasm -> mutableListOf<String>().apply {
-            add("-DSKIKO_WASM")
-            add("-sSUPPORT_LONGJMP=wasm")
-        }
+        OS.Wasm -> listOf(
+            "-DSKIKO_WASM",
+            "-sSUPPORT_LONGJMP=wasm"
+        )
         OS.Android -> listOf(
             "-DSK_BUILD_FOR_ANDROID"
         )
@@ -112,8 +114,7 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
 
 fun Project.configureSignAndPublishDependencies() {
     if (supportWasm) {
-        tasks.forEach { task ->
-            val name = task.name
+        tasks.configureEach {
             val publishJs = "publishJsPublicationTo"
             val publishWasm = "publishSkikoWasmRuntimePublicationTo"
             val publishWasmPub = "publishWasmJsPublicationTo"
@@ -122,19 +123,18 @@ fun Project.configureSignAndPublishDependencies() {
             val signWasmPub = "signWasmJsPublication"
 
             when {
-                name.startsWith(publishJs) -> task.dependsOn(signWasm, signWasmPub)
-                name.startsWith(publishWasm) -> task.dependsOn(signJs)
-                name.startsWith(publishWasmPub) -> task.dependsOn(signJs)
-                name.startsWith(signWasmPub) -> task.dependsOn(signWasm)
+                name.startsWith(publishJs) -> dependsOn(signWasm, signWasmPub)
+                name.startsWith(publishWasm) -> dependsOn(signJs)
+                name.startsWith(publishWasmPub) -> dependsOn(signJs)
+                name.startsWith(signWasmPub) -> dependsOn(signWasm)
             }
         }
     }
     if (supportAndroid) {
-        tasks.forEach { task ->
-            val name = task.name
-            val signAndroid = "signAndroidPublication"
-            val generateMetadata = "generateMetadataFileForAndroidPublication"
-            val publishAndroid = "publishAndroidPublicationTo"
+        tasks.configureEach {
+            val signAndroid = "signAndroidReleasePublication"
+            val generateMetadata = "generateMetadataFileForAndroidReleasePublication"
+            val publishAndroid = "publishAndroidReleasePublicationTo"
             val publishX64 = "publishSkikoJvmRuntimeAndroidX64PublicationTo"
             val publishArm64 = "publishSkikoJvmRuntimeAndroidArm64PublicationTo"
             val signX64 = "signSkikoJvmRuntimeAndroidX64Publication"
@@ -143,16 +143,37 @@ fun Project.configureSignAndPublishDependencies() {
 
             when {
                 name.startsWith(signAndroid) || name.startsWith(generateMetadata) -> {
-                    task.dependsOn(skikoAndroidJar)
+                    dependsOn(skikoAndroidJar)
                 }
                 name.startsWith(publishAndroid) -> {
-                    task.dependsOn(signX64, signArm64)
+                    dependsOn(signX64, signArm64)
                 }
                 name.startsWith(publishX64) -> {
-                    task.dependsOn(signAndroid, signArm64)
+                    dependsOn(signAndroid, signArm64)
                 }
                 name.startsWith(publishArm64) -> {
-                    task.dependsOn(signX64, signAndroid)
+                    dependsOn(signX64, signAndroid)
+                }
+            }
+        }
+    }
+
+    if (supportNativeLinux) {
+        val publishLinuxX64 = "publishLinuxX64PublicationTo"
+        val publishLinuxArm64 = "publishLinuxArm64PublicationTo"
+        val signLinuxArm64Publication = "signLinuxArm64Publication"
+        val signLinuxX64Publication = "signLinuxX64Publication"
+
+        tasks.configureEach {
+            when {
+                name.startsWith(publishLinuxX64) -> {
+                    dependsOn(signLinuxArm64Publication)
+                    dependsOn(signLinuxX64Publication)
+                }
+
+                name.startsWith(publishLinuxArm64) -> {
+                    dependsOn(signLinuxArm64Publication)
+                    dependsOn(signLinuxX64Publication)
                 }
             }
         }
@@ -162,7 +183,8 @@ fun Project.configureSignAndPublishDependencies() {
 fun KotlinTarget.generateVersion(
     targetOs: OS,
     targetArch: Arch,
-    skikoProperties: SkikoProperties
+    skikoProperties: SkikoProperties,
+    compilationName: String = "main"
 ) {
     val targetName = this.name
     val isUikitSim = isUikitSimulator()
@@ -195,9 +217,11 @@ fun KotlinTarget.generateVersion(
         }
     }
 
-    val compilation = compilations["main"] ?: error("Could not find 'main' compilation for target '$this'")
-    compilation.compileKotlinTaskProvider.configure {
-        dependsOn(generateVersionTask)
-        (this as KotlinCompileTool).source(generatedDir.get().asFile)
+    // Needs to be lazily loaded as android compilations are not available right away
+    compilations.matching { it.name == compilationName }.configureEach {
+        compileTaskProvider.configure {
+            dependsOn(generateVersionTask)
+            (this as KotlinCompileTool).source(generatedDir.get().asFile)
+        }
     }
 }

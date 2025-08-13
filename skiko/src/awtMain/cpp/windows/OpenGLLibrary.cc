@@ -12,6 +12,12 @@ extern "C" {
         glFinish();
     }
 
+    void glFlush(void) {
+        typedef void (*PROC_glFlush) (void);
+        static auto glFlush = (PROC_glFlush) GetProcAddress(OpenGL32Library, "glFlush");
+        glFlush();
+    }
+
     void glGetIntegerv(GLenum pname, GLint *data) {
         typedef void (*PROC_glGetIntegerv) (GLenum pname, GLint *data);
         static auto glGetIntegerv = (PROC_glGetIntegerv) GetProcAddress(OpenGL32Library, "glGetIntegerv");

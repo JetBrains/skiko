@@ -39,6 +39,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
     implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
+    implementation("org.jetbrains.runtime:jbr-api:1.5.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
@@ -55,8 +56,8 @@ val casualRun = tasks.named<JavaExec>("run") {
     systemProperty("skiko.hardwareInfo.enabled", "true")
     systemProperty("skiko.win.exception.logger.enabled", "true")
     systemProperty("skiko.win.exception.handler.enabled", "true")
-    jvmArgs?.add("-ea")
-    // jvmArgs?.add("-Xcheck:jni")
+    jvmArgs("-ea")
+    // jvmArgs("-Xcheck:jni")
     // Use systemProperty("skiko.library.path", "/tmp") to test loader.
     System.getProperties().entries
         .associate {

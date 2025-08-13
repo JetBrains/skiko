@@ -6,6 +6,14 @@
 #include "SkSize.h"
 #include "common.h"
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeWithLocalMatrix
+  (KNativePointer ptr, KFloat* localMatrixArr) {
+    SkShader* instance = reinterpret_cast<SkShader*>((ptr));
+    std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
+    SkShader* newPtr = instance->makeWithLocalMatrix(*localMatrix).release();
+    return reinterpret_cast<KNativePointer>(newPtr);
+}
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeWithColorFilter
   (KNativePointer ptr, KNativePointer filterPtr) {
     SkShader* instance = reinterpret_cast<SkShader*>((ptr));
@@ -13,7 +21,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeWithColorFilter
     SkShader* newPtr = instance->makeWithColorFilter(sk_ref_sp(filter)).release();
     return reinterpret_cast<KNativePointer>(newPtr);
 }
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeLinearGradient
   (KFloat x0, KFloat y0, KFloat x1, KFloat y1, KInt* colorsArray, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
@@ -25,7 +32,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeLinearGradient
     SkShader* ptr = SkGradientShader::MakeLinear(pts, colors, pos, count, tileMode, static_cast<uint32_t>(flags), localMatrix.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeLinearGradientCS
   (KFloat x0, KFloat y0, KFloat x1, KFloat y1, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {

@@ -1,13 +1,21 @@
-// This file is merged with skiko.mjs by emcc")
+// This file is merged with skiko.mjs by emcc
 
-export const {
-    _callCallback,
-    _registerCallback,
-    _releaseCallback,
-    _createLocalCallbackScope,
-    _releaseLocalCallbackScope
-} = SkikoCallbacks;
+const loadedWasm = {
+    _: {}
+}
 
-export const loadedWasm = await loadSkikoWASM();
+let skikoGl = null;
 
-export const { GL } = loadedWasm;
+export const awaitSkiko = loadSkikoWASM().then((module) => {
+    loadedWasm._ = module.wasmExports;
+    skikoGl = module.GL;
+    return module
+});
+
+export const GL = new Proxy({}, {
+    get(object, propName) {
+        return skikoGl[propName];
+    }
+})
+
+
