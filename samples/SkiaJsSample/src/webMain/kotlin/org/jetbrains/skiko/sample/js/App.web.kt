@@ -1,11 +1,13 @@
 package org.jetbrains.skiko.sample.js
 
+import kotlinx.browser.document
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerRenderDelegate
 import org.jetbrains.skiko.SkikoRenderDelegate
+import org.w3c.dom.Element
 
 private class DemoApp: SkikoRenderDelegate {
     private val paint = Paint()
@@ -35,7 +37,4 @@ internal fun runApp() {
     }
 }
 
-
-// Note: despite the actual implementation looks identical, it can't be common - there is no W3C common API
-// return type is Any because k/js and k/wasm don't have a common type for HTML elements
-expect fun findElementById(id: String): Any?
+fun findElementById(id: String): Element? = document.getElementById(id)

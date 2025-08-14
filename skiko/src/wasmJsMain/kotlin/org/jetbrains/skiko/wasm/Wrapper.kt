@@ -33,6 +33,9 @@ actual fun onWasmReady(onReady: () -> Unit) {
     awaitSkiko.then {
         onReady()
         null
-    }
+    }.catch<JsAny>({ s ->
+        println("HMMM $s")
+        s
+    })
 }
 
