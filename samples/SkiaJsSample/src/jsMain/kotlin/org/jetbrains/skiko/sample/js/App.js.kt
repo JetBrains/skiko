@@ -4,7 +4,10 @@ import kotlinx.browser.document
 import org.jetbrains.skiko.wasm.onWasmReady
 
 fun main() {
-    onWasmReady(::runApp)
+    onWasmReady {
+        val description = "Skiko running with ${getPlatform().name}"
+        document.title = description
+        findElementById("description")?.innerHTML = description
+        runApp()
+    }
 }
-
-actual fun findElementById(id: String): Any? = document.getElementById(id)

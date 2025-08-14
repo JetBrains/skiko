@@ -1,14 +1,6 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skiko.w3c.HTMLCanvasElement
-import org.jetbrains.skiko.wasm.ContextAttributes
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.UIEvent
-
-internal fun getEventTimestamp(e: UIEvent): Long {
-    return e.timeStamp.toLong()
-}
 
 internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {
     (component as? HTMLElement)?.style?.cursor = cursor

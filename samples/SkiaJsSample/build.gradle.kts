@@ -8,25 +8,25 @@ repositories {
     mavenLocal()
 }
 
-var version = "0.0.0-SNAPSHOT"
-if (project.hasProperty("skiko.version")) {
-    version = project.properties["skiko.version"] as String
-}
 
 val resourcesDir = "$buildDir/resources/"
 
-val skikoWasm by configurations.creating
-
 val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
 
+// When we build skiko locally we have no say in setting skiko.version in the included build.
+// That said, it is always built as "0.0.0-SNAPSHOT" and setting any other version not only is misleading,
+// but even can create conflict due to incompatibility of skiko runtime and skiko libs
+val skikoVersion = if (isCompositeBuild) "0.0.0-SNAPSHOT" else project.properties["skiko.version"]
+
+val skikoWasm by configurations.creating
 dependencies {
-    if (isCompositeBuild) {
-        val filePath = gradle.includedBuild("skiko").projectDir
-            .resolve("./build/libs/skiko-wasm-$version.jar")
-        skikoWasm(files(filePath))
-    } else {
-        skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
-    }
+    skikoWasm(
+        if (isCompositeBuild) files(
+            gradle.includedBuild("skiko")
+                .projectDir
+                .resolve("./build/libs/skiko-wasm-$skikoVersion.jar")
+        ) else libs.skiko.runtime
+    )
 }
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
@@ -34,8 +34,11 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
     from(skikoWasm.map { zipTree(it) })
 
     if (isCompositeBuild) {
-        val skikoWasmJarTask = gradle.includedBuild("skiko").task(":skikoWasmJar")
-        dependsOn(skikoWasmJarTask)
+        // we only can access the "skikoWasmJar" task from includedBuild as TaskReference
+        // so we don't have access to its output and have to copy it as a hardcoded path in dependencies
+        dependsOn(
+            gradle.includedBuild("skiko").task(":skikoWasmJar")
+        )
     }
 }
 
@@ -46,20 +49,18 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
 kotlin {
 
     js(IR) {
-        moduleName = "jsApp"
         browser {
             commonWebpackConfig {
-                outputFileName = "jsApp.js"
+                outputFileName = "webApp.js"
             }
         }
         binaries.executable()
     }
 
     wasmJs() {
-        moduleName = "wasmApp"
         browser {
             commonWebpackConfig {
-                outputFileName = "wasmApp.js"
+                outputFileName = "webApp.js"
             }
         }
         binaries.executable()
@@ -68,7 +69,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.skiko:skiko:$version")
+                implementation(libs.skiko)
             }
         }
 
@@ -85,6 +86,10 @@ kotlin {
 
         val wasmJsMain by getting {
             dependsOn(webMain)
+
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3")
+            }
         }
     }
 }
