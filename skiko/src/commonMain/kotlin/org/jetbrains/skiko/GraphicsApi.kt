@@ -17,6 +17,7 @@ enum class GraphicsApi {
 
     OPENGL,
     DIRECT3D,
+    ANGLE,
     VULKAN,
     METAL,
     WEBGL

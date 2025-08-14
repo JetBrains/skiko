@@ -222,3 +222,52 @@ JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_isOcc
     return false;
 }
 #endif
+
+
+#ifndef SK_ANGLE
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_createAngleDevice(
+    JNIEnv *env, jobject redrawer, jlong platformInfoPtr, jboolean transparency)
+{
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_createAngleDevice");
+    return 0;
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeCurrent(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
+{
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeCurrent");
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleContext(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
+{
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleContext");
+    return 0;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleRenderTarget(
+    JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
+{
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleRenderTarget");
+    return 0;
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_swapBuffers(
+    JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean waitForVsync)
+{
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_swapBuffers");
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_disposeDevice(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
+{
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_disposeDevice");
+}
+
+JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_AngleApi_glGetString(
+    JNIEnv *env, jobject object, jint value)
+{
+    skikoUnimplemented("Java_org_jetbrains_skiko_AngleApi_glGetString");
+    return 0;
+}
+#endif
