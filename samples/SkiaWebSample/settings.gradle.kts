@@ -25,7 +25,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SkiaJsSample"
+rootProject.name = "SkiaWebSample"
 
 if (extra.properties.getOrDefault("skiko.composite.build", "") == "1") {
     includeBuild("../../skiko") {
