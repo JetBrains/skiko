@@ -77,7 +77,9 @@ fun SkikoProjectContext.createWasmLinkTask(): TaskProvider<LinkSkikoWasmTask>? =
         buildVariant.set(buildType)
         if (isForD8) buildSuffix.set("d8") else buildSuffix.set("es6")
 
-        libFiles = project.fileTree(unpackedSkia) { include("**/*.a") }
+        val skiaBinSubdir = "$unpackedSkia/out/${buildType.id}-wasm-wasm"
+
+        libFiles = project.fileTree(skiaBinSubdir) { include("**/*.a") }
         objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
             include("**/*.o")
         }
