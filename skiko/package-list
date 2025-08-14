@@ -2960,6 +2960,7 @@ $dokka.location:org.jetbrains.skiko/GpuPriority/entries/#/PointingToDeclaration/
 $dokka.location:org.jetbrains.skiko/GpuPriority/value/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/value.html
 $dokka.location:org.jetbrains.skiko/GpuPriority/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/value-of.html
 $dokka.location:org.jetbrains.skiko/GpuPriority/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/values.html
+$dokka.location:org.jetbrains.skiko/GraphicsApi.ANGLE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-graphics-api/-a-n-g-l-e/index.html
 $dokka.location:org.jetbrains.skiko/GraphicsApi.DIRECT3D///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-graphics-api/-d-i-r-e-c-t3-d/index.html
 $dokka.location:org.jetbrains.skiko/GraphicsApi.METAL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-graphics-api/-m-e-t-a-l/index.html
 $dokka.location:org.jetbrains.skiko/GraphicsApi.OPENGL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-graphics-api/-o-p-e-n-g-l/index.html
@@ -3105,6 +3106,7 @@ $dokka.location:org.jetbrains.skiko/SkikoProperties/linuxWaitForVsyncOnRedrawImm
 $dokka.location:org.jetbrains.skiko/SkikoProperties/macOSWaitForPreviousFrameVsyncOnRedrawImmediately/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/mac-o-s-wait-for-previous-frame-vsync-on-redraw-immediately.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/macOsOpenGLEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/mac-os-open-g-l-enabled.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/render-api.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/renderingAngleEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/rendering-angle-enabled.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/vsyncEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/vsync-enabled.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/vsyncFramelimitFallbackEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/vsync-framelimit-fallback-enabled.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/windowsWaitForVsyncOnRedrawImmediately/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/windows-wait-for-vsync-on-redraw-immediately.html
