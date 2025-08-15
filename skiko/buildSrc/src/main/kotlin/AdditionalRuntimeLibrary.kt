@@ -9,7 +9,6 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.crypto.checksum.Checksum
 import org.gradle.kotlin.dsl.register
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.internal.extensions.stdlib.capitalized
 
 interface AdditionalRuntimeLibrary {
     val jarTask: TaskProvider<Jar>
@@ -31,9 +30,9 @@ fun Project.registerAdditionalRuntimeLibrary(
     archiveUrl: String,
     filesToInclude: List<String>,
 ): AdditionalRuntimeLibrary {
-    val visibleName = "${name.capitalized()} Runtime"
+    val visibleName = "${toTitleCase(name)} Runtime"
     val targetId = targetId(targetOs, targetArch)
-    val taskSuffix = "${name.capitalized()}${targetOs.id.capitalized()}${targetArch.id.capitalized()}"
+    val taskSuffix = "${toTitleCase(name)}${toTitleCase(targetOs.id)}${toTitleCase(targetArch.id)}"
 
     val archiveFileName = archiveUrl.substringAfterLast('/')
     val archiveDir = skikoProperties.dependenciesDir.resolve(name).resolve(archiveFileName.substringBefore("."))
@@ -96,7 +95,7 @@ fun Project.registerAdditionalRuntimeLibrary(
 
         override fun registerRuntimePublishTaskDependency(repos: List<String>) {
             repos.forEach { repo ->
-                val mainTaskSuffix = "${targetOs.id.capitalized()}${targetArch.id.capitalized()}"
+                val mainTaskSuffix = "${toTitleCase(targetOs.id)}${toTitleCase(targetArch.id)}"
                 project.tasks.findByName("publishSkikoJvmRuntime${mainTaskSuffix}PublicationTo${repo}")
                     ?.dependsOn("publishSkikoJvmRuntime${taskSuffix}PublicationTo${repo}")
             }
