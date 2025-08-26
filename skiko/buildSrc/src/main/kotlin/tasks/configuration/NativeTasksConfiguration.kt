@@ -6,6 +6,7 @@ import OS
 import SkiaBuildType
 import SkikoProjectContext
 import WriteCInteropDefFile
+import androidAr
 import compilerForTarget
 import hostArch
 import isCompatibleWithHost
@@ -146,6 +147,16 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                     *skiaPreprocessorFlags(OS.Linux, buildType)
                 ))
             }
+            OS.Android -> {
+                flags.set(listOf(
+                    *buildType.clangFlags,
+                    "-fPIC",
+                    "-fno-rtti",
+                    "-fno-exceptions",
+                    "-fvisibility=hidden",
+                    *skiaPreprocessorFlags(OS.Android, buildType)
+                ))
+            }
             else -> throw GradleException("$os not yet supported")
         }
 
@@ -270,6 +281,15 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             }
             mutableListOfLinkerOptions(options)
         }
+        OS.Android -> {
+            val options = mutableListOf(
+                "-lGLESv3",
+                "-lEGL",
+                "-llog",
+                "-landroid",
+            ) + allLibraries
+            mutableListOfLinkerOptions(options)
+        }
         else -> mutableListOf()
     }
     if (skiko.includeTestHelpers) {
@@ -310,6 +330,10 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             OS.Linux -> {
                 executable = "ar"
                 argumentProviders.add { listOf("-crs", staticLib) }
+            }
+            OS.Android -> {
+                executable = androidAr()
+                argumentProviders.add { listOf("rcs", staticLib) }
             }
             OS.MacOS, OS.IOS, OS.TVOS -> {
                 executable = "libtool"
