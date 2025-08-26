@@ -116,12 +116,20 @@ internal class MetalRedrawer(
         } else {
             // But if the layer isn't showing yet, we want to draw immediately,
             // so that if it shows before the next vsync, there is no background flash
-            performDraw()
+            inDrawScope {
+                if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                    performDraw()
+                }
+            }
         }
     }
 
     private suspend fun draw() {
-        performDraw()
+        inDrawScope {
+            withContext(dispatcherToBlockOn) {
+                performDraw()
+            }
+        }
         if (isDisposed) throw CancellationException()
 
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
@@ -141,12 +149,10 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun performDraw() = inDrawScope {
-        synchronized(drawLock) {
-            if (!isDisposed) {
-                autoreleasepool {
-                    contextHandler.draw()
-                }
+    private fun performDraw() = synchronized(drawLock) {
+        if (!isDisposed) {
+            autoreleasepool {
+                contextHandler.draw()
             }
         }
     }
