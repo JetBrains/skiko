@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:7.4.2")
+        classpath("com.android.tools.build:gradle:8.12.0")
     }
 }
 
@@ -18,7 +18,7 @@ repositories {
 }
 
 plugins {
-    id("com.android.application") version "7.4.2"
+    id("com.android.application") version "8.12.0"
     kotlin("android") version "1.9.21"
 }
 
@@ -43,11 +43,11 @@ kotlin {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 36
     namespace = "org.jetbrains.skiko.sample"
     defaultConfig {
         minSdk = 27
-        targetSdk = 31
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
