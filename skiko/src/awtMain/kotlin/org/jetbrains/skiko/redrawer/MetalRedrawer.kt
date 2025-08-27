@@ -121,6 +121,9 @@ internal class MetalRedrawer(
 
     private suspend fun draw() {
         inDrawScope {
+            // Move drawing to another thread to free the main thread
+            // It can be expensive to run it in the main thread and FPS can become unstable.
+            // This is visible by running [SkiaLayerPerformanceTest], standard deviation is increased significantly.
             withContext(dispatcherToBlockOn) {
                 performDraw()
             }
