@@ -1019,7 +1019,11 @@ class SkiaLayerTest {
 
     @Test
     fun `no window flash on hide or dispose while animation is running`() = uiTest {
-        assumeTrue(renderApi == GraphicsApi.METAL)  // Until the issue is fixed in other redrawers
+        assumeTrue(hostOs.isMacOS)
+        // Until the issue is fixed in other redrawers
+        // Don't use assumeTrue, as uiTest iterates over multiple renderers,
+        // and if one of them skipped, the whole test is skipped
+        if (renderApi != GraphicsApi.METAL) return@uiTest
 
         // Put up a large green window, and then repeatedly show and hide/dispose
         // a smaller black window on top of it while screenshotting the pixel at the center,
@@ -1117,8 +1121,11 @@ class SkiaLayerTest {
 
     @Test
     fun `temporary change is not visible`() = uiTest {
+        assumeTrue(hostOs.isMacOS)
         // The separation between update and draw is only implemented in MetalRedrawer at the moment
-        assumeTrue(renderApi == GraphicsApi.METAL)
+        // Don't use assumeTrue, as uiTest iterates over multiple renderers,
+        // and if one of them skipped, the whole test is skipped
+        if (renderApi != GraphicsApi.METAL) return@uiTest
 
         val color = Color.BLACK
         val tempColor = Color.WHITE
