@@ -22,6 +22,8 @@ class SkiaLayerProperties(
     val renderApi: GraphicsApi = SkikoProperties.renderApi,
     val adapterPriority: GpuPriority = SkikoProperties.gpuPriority,
 ) {
+    val clearColor: Int = clearColorFromSystem()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
 
@@ -55,5 +57,22 @@ class SkiaLayerProperties(
         result = 31 * result + renderApi.hashCode()
         result = 31 * result + adapterPriority.hashCode()
         return result
+    }
+
+    companion object {
+        var defaultClearColor: Int = org.jetbrains.skia.Color.WHITE
+
+        fun clearColorFromSystem(): Int {
+            val colorFromEnv = System.getProperty("SKIKO_CLEAR_COLOR")?.let {
+                try {
+                    if (it[0] == '#') {
+                        it.drop(1).toInt(16)
+                    } else {
+                        it.toInt()
+                    }
+                } catch (_: Exception) { null }
+            }
+            return colorFromEnv ?: defaultClearColor
+        }
     }
 }

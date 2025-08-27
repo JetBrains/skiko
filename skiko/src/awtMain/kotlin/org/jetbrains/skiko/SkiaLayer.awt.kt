@@ -30,6 +30,7 @@ actual open class SkiaLayer internal constructor(
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
 ) : JPanel() {
+    actual val clearColor: Int = properties.clearColor
 
     internal companion object {
         init {

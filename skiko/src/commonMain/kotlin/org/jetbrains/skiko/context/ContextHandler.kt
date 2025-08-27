@@ -41,7 +41,7 @@ internal abstract class ContextHandler(
         }
         initCanvas()
         canvas?.apply {
-            clear(if (isTransparentBackground()) Color.TRANSPARENT else Color.WHITE)
+            clear(if (isTransparentBackground()) Color.TRANSPARENT else layer.clearColor)
             drawContent()
         }
         flush()

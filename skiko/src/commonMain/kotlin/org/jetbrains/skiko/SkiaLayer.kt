@@ -44,6 +44,11 @@ expect open class SkiaLayer {
     var renderDelegate: SkikoRenderDelegate?
 
     /**
+     * Clear color for the canvas.
+     */
+    val clearColor: Int
+
+    /**
      * Attach this [SkikoRenderDelegate] to platform container.
      * Actual type of attach container is platform-specific.
      */

@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.cinterop.useContents
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Color
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skia.Surface
 import platform.UIKit.*
@@ -24,6 +25,8 @@ actual open class SkiaLayer {
     actual var transparency: Boolean
         get() = false
         set(_) { throw UnsupportedOperationException() }
+
+    actual val clearColor: Int = Color.WHITE
 
     actual fun needRedraw() {
         needRedrawCallback.invoke()
