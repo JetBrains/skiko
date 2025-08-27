@@ -78,12 +78,7 @@ internal class MetalRedrawer(
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private val frameDispatcher = MetalFrameDispatcher(
-        update = { update() },
-        draw = { draw() },
-        isShowing = { layer.isShowing },
-        waitForVSync = { vSyncer?.waitForVSync() }
-    )
+    private val frameDispatcher = FrameScheduler()
 
     init {
         onContextInit()
@@ -190,12 +185,7 @@ internal class MetalRedrawer(
      */
     private external fun setDisplaySyncEnabled(device: Long, enabled: Boolean)
 
-    private class MetalFrameDispatcher(
-        private val update: () -> Unit,
-        private val draw: suspend CoroutineScope.() -> Unit,
-        private val isShowing: () -> Boolean,
-        private val waitForVSync: suspend CoroutineScope.() -> Unit,
-    ) {
+    private inner class FrameScheduler {
         private var updateRequested = AtomicBoolean(false)
 
         private fun updateIfRequested() {
@@ -205,17 +195,17 @@ internal class MetalRedrawer(
         }
 
         private val updateDispatcher = FrameDispatcher(MainUIDispatcher) {
-            if (isShowing()) {
+            if (layer.isShowing) {
                 updateIfRequested()
             }
         }
 
         private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            if (isShowing()) {
+            if (layer.isShowing) {
                 updateIfRequested()
                 draw()
             }
-            waitForVSync()
+            vSyncer?.waitForVSync()
         }
 
         fun scheduleFrame(needUpdate: Boolean, throttledToVsync: Boolean) {
