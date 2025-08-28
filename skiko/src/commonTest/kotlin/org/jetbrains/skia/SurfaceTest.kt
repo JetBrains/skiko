@@ -115,13 +115,14 @@ class SurfaceTest {
             // TODO implement for other platforms and render targets
             return
         }
-        if (hostArch == Arch.Arm64) {
-            // TODO implement and test EGL on arm64
-            return
-        }
 
         val pixels = TestGlContext.run {
-            DirectContext.makeGL().useContext { ctx ->
+            val ctx = when (hostArch) {
+                Arch.X64 -> DirectContext.makeGL()
+                Arch.Arm64 -> DirectContext.makeEGL()
+                else -> error("Unsupported arch: $hostArch")
+            }
+            ctx.useContext {
                 val imageInfo = ImageInfo.makeN32Premul(16, 16)
                 val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
 
