@@ -105,7 +105,7 @@ internal class MetalRedrawer(
             update()
         }
         // Trying to draw immediately in Metal will result in lost (undrawn)
-        // frames if there's more than two between consecutive vsync events.
+        // frames if there are more than two between consecutive vsync events.
         if (layer.isShowing) {
             frameDispatcher.scheduleFrame(needUpdate = false, throttledToVsync = false)
         } else {
