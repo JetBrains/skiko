@@ -2909,7 +2909,7 @@ $dokka.location:org.jetbrains.skiko/CursorManager/setCursor/#kotlin.Any?#org.jet
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/-companion/index.html
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger.Companion/fromLevel/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/-companion/from-level.html
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger///PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/index.html
-$dokka.location:org.jetbrains.skiko/DefaultConsoleLogger/DefaultConsoleLogger/#kotlin.Boolean#kotlin.Boolean#kotlin.Boolean#kotlin.Boolean#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/-default-console-logger.html
+$dokka.location:org.jetbrains.skiko/DefaultConsoleLogger/DefaultConsoleLogger/#kotlin.Boolean#kotlin.Boolean#kotlin.Boolean#kotlin.Boolean#kotlin.Boolean#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/-default-console-logger.html
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger/debug/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/debug.html
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger/debug/#kotlin.Throwable#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/debug.html
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger/error/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/error.html
@@ -2942,8 +2942,8 @@ $dokka.location:org.jetbrains.skiko/FrameBuffering/entries/#/PointingToDeclarati
 $dokka.location:org.jetbrains.skiko/FrameBuffering/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-buffering/value-of.html
 $dokka.location:org.jetbrains.skiko/FrameBuffering/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-buffering/values.html
 $dokka.location:org.jetbrains.skiko/FrameDispatcher///PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/index.html
-$dokka.location:org.jetbrains.skiko/FrameDispatcher/FrameDispatcher/#kotlin.coroutines.CoroutineContext#kotlin.coroutines.SuspendFunction0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/-frame-dispatcher.html
-$dokka.location:org.jetbrains.skiko/FrameDispatcher/FrameDispatcher/#kotlinx.coroutines.CoroutineScope#kotlin.coroutines.SuspendFunction0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/-frame-dispatcher.html
+$dokka.location:org.jetbrains.skiko/FrameDispatcher/FrameDispatcher/#kotlin.coroutines.CoroutineContext#kotlin.coroutines.SuspendFunction1[kotlinx.coroutines.CoroutineScope,kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/-frame-dispatcher.html
+$dokka.location:org.jetbrains.skiko/FrameDispatcher/FrameDispatcher/#kotlinx.coroutines.CoroutineScope#kotlin.coroutines.SuspendFunction1[kotlinx.coroutines.CoroutineScope,kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/-frame-dispatcher.html
 $dokka.location:org.jetbrains.skiko/FrameDispatcher/cancel/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/cancel.html
 $dokka.location:org.jetbrains.skiko/FrameDispatcher/scheduleFrame/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/schedule-frame.html
 $dokka.location:org.jetbrains.skiko/FrameLimiter///PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/index.html
@@ -3033,7 +3033,7 @@ $dokka.location:org.jetbrains.skiko/SkiaLayer/detach/#/PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skiko/SkiaLayer/fullscreen/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/fullscreen.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/height/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/height.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/isShowing/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/is-showing.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/needRedraw/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/need-redraw.html
+$dokka.location:org.jetbrains.skiko/SkiaLayer/needRedraw/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/need-redraw.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/nsView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/ns-view.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/pixelGeometry/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/pixel-geometry.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/render-api.html
@@ -3103,7 +3103,6 @@ $dokka.location:org.jetbrains.skiko/SkikoProperties/frameBuffering/#/PointingToD
 $dokka.location:org.jetbrains.skiko/SkikoProperties/gpuPriority/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/gpu-priority.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/libraryPath/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/library-path.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/linuxWaitForVsyncOnRedrawImmediately/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/linux-wait-for-vsync-on-redraw-immediately.html
-$dokka.location:org.jetbrains.skiko/SkikoProperties/macOSWaitForPreviousFrameVsyncOnRedrawImmediately/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/mac-o-s-wait-for-previous-frame-vsync-on-redraw-immediately.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/macOsOpenGLEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/mac-os-open-g-l-enabled.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/render-api.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/renderingAngleEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/rendering-angle-enabled.html
