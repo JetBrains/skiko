@@ -13,11 +13,11 @@ import kotlin.coroutines.CoroutineContext
  */
 class FrameDispatcher(
     scope: CoroutineScope,
-    private val onFrame: suspend () -> Unit
+    private val onFrame: suspend CoroutineScope.() -> Unit
 ) {
     constructor(
         context: CoroutineContext,
-        onFrame: suspend () -> Unit
+        onFrame: suspend CoroutineScope.() -> Unit
     ) : this(
         CoroutineScope(context),
         onFrame
@@ -56,7 +56,7 @@ class FrameDispatcher(
     fun scheduleFrame() {
         if (!frameScheduled) {
             frameScheduled = true
-            frameChannel.trySend(Unit).isSuccess
+            frameChannel.trySend(Unit)
         }
     }
 }

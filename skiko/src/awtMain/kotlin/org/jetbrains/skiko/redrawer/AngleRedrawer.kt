@@ -1,6 +1,5 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
@@ -60,16 +59,20 @@ internal class AngleRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw() {
-        check(!isDisposed) { "ANGLE redrawer is disposed" }
+    override fun needRedraw(throttledToVsync: Boolean) {
+        checkDisposed()
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() {
-        check(!isDisposed) { "ANGLE redrawer is disposed" }
+    override fun redrawImmediately(updateNeeded: Boolean) {
+        checkDisposed()
+        if (updateNeeded) {
+            update()
+        }
         inDrawScope {
-            update(System.nanoTime())
-            drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
+            }
         }
     }
 

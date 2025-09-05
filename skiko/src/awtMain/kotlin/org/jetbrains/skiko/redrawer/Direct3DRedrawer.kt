@@ -46,7 +46,7 @@ internal class Direct3DRedrawer(
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
-            update(System.nanoTime())
+            update()
             draw()
         }
     }
@@ -63,16 +63,20 @@ internal class Direct3DRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw() {
-        check(!isDisposed) { "Direct3DRedrawer is disposed" }
+    override fun needRedraw(throttledToVsync: Boolean) {
+        checkDisposed()
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() {
-        check(!isDisposed) { "Direct3DRedrawer is disposed" }
+    override fun redrawImmediately(updateNeeded: Boolean) {
+        checkDisposed()
+        if (updateNeeded) {
+            update()
+        }
         inDrawScope {
-            update(System.nanoTime())
-            drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
+            }
         }
     }
 

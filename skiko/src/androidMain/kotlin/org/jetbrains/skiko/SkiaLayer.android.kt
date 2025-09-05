@@ -57,7 +57,7 @@ actual open class SkiaLayer {
         }
     }
 
-    actual fun needRedraw() {
+    actual fun needRedraw(throttledToVsync: Boolean) {
         glView?.apply {
             scheduleFrame()
         }
