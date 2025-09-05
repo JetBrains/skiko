@@ -81,14 +81,14 @@ kotlin {
         }
     }
 
-    val linkWasmTask = skikoProjectContext.createWasmLinkTask()
 
-    if (supportJs) {
-        js(IR) {
+    if (supportWeb) {
+        skikoProjectContext.declareWasmTasks()
+
+        js {
             moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
-                    dependsOn(linkWasmTask!!)
                     useKarma {
                         useChromeHeadless()
                         useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
@@ -101,32 +101,19 @@ kotlin {
             val test by compilations.getting
 
             project.tasks.named<Copy>(test.processResourcesTaskName) {
-                from(linkWasmTask!!) {
-                    include("*.mjs")
-                    include("*.wasm")
-                }
-
-                from(wasmImports) {
-                    include("*.mjs")
-                }
-
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
             }
 
             setupImportsGeneratorPlugin()
         }
-    }
 
-    if (supportWasm) {
 
         @OptIn(ExperimentalWasmDsl::class)
         wasmJs {
             moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
-                    dependsOn(linkWasmTask!!)
                     useKarma {
-                        this.webpackConfig.experiments.add("topLevelAwait")
                         useChromeHeadless()
                         useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
                     }
@@ -137,13 +124,6 @@ kotlin {
             val test by compilations.getting
 
             project.tasks.named<Copy>(test.processResourcesTaskName) {
-                from(linkWasmTask!!) {
-                    include("*.mjs")
-                    include("*.wasm")
-                }
-
-                from(skikoTestMjs)
-
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinJs"])
             }
 
@@ -237,7 +217,7 @@ kotlin {
             }
         }
 
-        if (supportJs || supportWasm || supportAnyNative) {
+        if (supportWeb || supportAnyNative) {
             val nativeJsMain by creating {
                 dependsOn(commonMain)
             }
@@ -246,35 +226,38 @@ kotlin {
                 dependsOn(commonTest)
             }
 
-            if (supportJs || supportWasm) {
-                val jsWasmMain by creating {
+            if (supportWeb) {
+                val webMain by creating {
                     dependsOn(nativeJsMain)
                 }
 
-                val jsWasmTest by creating {
+                val webTest by creating {
                     dependsOn(nativeJsTest)
+
+                    resources.srcDirs(
+                        tasks.named("linkWasm"),
+                        wasmImports
+                    )
                 }
 
-                if (supportJs) {
-                    val jsMain by getting {
-                        dependsOn(jsWasmMain)
-                    }
-
-                    val jsTest by getting {
-                        dependsOn(jsWasmTest)
-                    }
+                val jsMain by getting {
+                    dependsOn(webMain)
                 }
 
-                if (supportWasm) {
-                    val wasmJsMain by getting {
-                        dependsOn(jsWasmMain)
-                    }
-                    val wasmJsTest by getting {
-                        dependsOn(jsWasmTest)
+                val jsTest by getting {
+                    dependsOn(webTest)
 
-                        dependencies {
-                            implementation(kotlin("test-wasm-js"))
-                        }
+                }
+
+                val wasmJsMain by getting {
+                    dependsOn(webMain)
+                }
+
+                val wasmJsTest by getting {
+                    dependsOn(webTest)
+
+                    dependencies {
+                        implementation(kotlin("test-wasm-js"))
                     }
                 }
             }
@@ -597,7 +580,7 @@ publishing {
             }
         }
 
-        if (supportJs || supportWasm) {
+        if (supportWeb) {
             create<MavenPublication>("skikoWasmRuntime") {
                 pomNameForPublication[name] = "Skiko WASM Runtime"
                 artifactId = SkikoArtifacts.jsWasmArtifactId

@@ -6,12 +6,11 @@ import SkiaBuildType
 import SkikoProperties
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.get
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 import registerSkikoTask
 import supportAndroid
-import supportWasm
+import supportWeb
 import toTitleCase
 import java.io.File
 import skiaVersion
@@ -113,7 +112,7 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
 }
 
 fun Project.configureSignAndPublishDependencies() {
-    if (supportWasm) {
+    if (supportWeb) {
         tasks.configureEach {
             val publishJs = "publishJsPublicationTo"
             val publishWasm = "publishSkikoWasmRuntimePublicationTo"
