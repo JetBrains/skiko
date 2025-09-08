@@ -36,7 +36,7 @@ val OS.isCompatibleWithHost: Boolean
         OS.Android -> true
     }
 
-fun compilerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
+fun Project.compilerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
     when (os) {
         // TODO: Use clang++ for all Linux targets
         OS.Linux -> when (arch) {
@@ -48,13 +48,13 @@ fun compilerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
             }
             Arch.Wasm -> "Unexpected combination: $os & $arch"
         }
-        OS.Android -> "clang++"
+        OS.Android -> androidClang(arch)
         OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
         OS.Wasm -> if (Os.isFamily(Os.FAMILY_WINDOWS)) "emcc.bat" else "emcc"
     }
 
-fun linkerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
+fun Project.linkerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
     if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch, isJvm)
 
 val OS.dynamicLibExt: String

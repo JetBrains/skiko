@@ -145,8 +145,11 @@ val Project.supportNativeMac: Boolean
 val Project.supportNativeLinux: Boolean
     get() = supportAllNative || findProperty("skiko.native.linux.enabled") == "true" || isInIdea
 
+val Project.supportNativeAndroid: Boolean
+    get() = supportAllNative || findProperty("skiko.native.android.enabled") == "true" || isInIdea
+
 val Project.supportAnyNative: Boolean
-    get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
+    get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux || supportNativeAndroid
 
 val Project.supportWeb: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
