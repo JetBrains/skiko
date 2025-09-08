@@ -148,11 +148,8 @@ val Project.supportNativeLinux: Boolean
 val Project.supportAnyNative: Boolean
     get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
 
-val Project.supportWasm: Boolean
+val Project.supportWeb: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
-
-val Project.supportJs: Boolean
-    get() = findProperty("skiko.js.enabled") == "true" || supportWasm || isInIdea
 
 fun Project.skiaVersion(target: String): String {
     val platformSpecificVersion = "dependencies.skia.$target"
