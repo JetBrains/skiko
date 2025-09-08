@@ -180,8 +180,8 @@ $dokka.location:org.jetbrains.skia.impl/Native.Companion///PointingToDeclaration
 $dokka.location:org.jetbrains.skia.impl/Native.Companion/NullPointer/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/-companion/-null-pointer.html
 $dokka.location:org.jetbrains.skia.impl/Native///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/index.html
 $dokka.location:org.jetbrains.skia.impl/Native/Native/#org.jetbrains.skia.impl.NativePointer/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/-native.html
-$dokka.location:org.jetbrains.skia.impl/Native/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/[native]equals.html
-$dokka.location:org.jetbrains.skia.impl/Native/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/[native]hash-code.html
+$dokka.location:org.jetbrains.skia.impl/Native/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/[web]equals.html
+$dokka.location:org.jetbrains.skia.impl/Native/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/[web]hash-code.html
 $dokka.location:org.jetbrains.skia.impl/Native/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/to-string.html
 $dokka.location:org.jetbrains.skia.impl/NativePointer///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native-pointer/index.html
 $dokka.location:org.jetbrains.skia.impl/NativePointerArray.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native-pointer-array/-companion/index.html
@@ -196,7 +196,7 @@ $dokka.location:org.jetbrains.skia.impl/RefCnt.Companion/_nGetFinalizer/#/Pointi
 $dokka.location:org.jetbrains.skia.impl/RefCnt.Companion/_nGetRefCount/#kotlin.Long/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-ref-cnt/-companion/_n-get-ref-count.html
 $dokka.location:org.jetbrains.skia.impl/RefCnt///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-ref-cnt/index.html
 $dokka.location:org.jetbrains.skia.impl/RefCnt/refCount/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-ref-cnt/ref-count.html
-$dokka.location:org.jetbrains.skia.impl/RefCnt/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-ref-cnt/[native]to-string.html
+$dokka.location:org.jetbrains.skia.impl/RefCnt/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-ref-cnt/[web]to-string.html
 $dokka.location:org.jetbrains.skia.impl/Stats///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-stats/index.html
 $dokka.location:org.jetbrains.skia.impl/Stats/allocated/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-stats/[native]allocated.html
 $dokka.location:org.jetbrains.skia.impl/Stats/enabled/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-stats/[native]enabled.html
