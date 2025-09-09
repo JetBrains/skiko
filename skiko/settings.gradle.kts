@@ -17,7 +17,7 @@ pluginManagement {
             classpath("org.kohsuke:github-api:1.116")
 
             // Added dependency for Android Gradle plugin
-            classpath("com.android.tools.build:gradle:8.9.0")
+            classpath("com.android.tools.build:gradle:7.4.2")
         }
     }
 
@@ -26,7 +26,7 @@ pluginManagement {
         // the actual version is set in buildSrc/gradle.properties
         kotlin("jvm")
         kotlin("multiplatform")
-        id("com.android.library").version("8.9.0") apply false
+        id("com.android.library").version("7.4.2") apply false
     }
 }
 rootProject.name = "skiko"

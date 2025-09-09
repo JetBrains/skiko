@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
 import kotlin.collections.HashMap
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.LibraryPlugin
 
 plugins {
     kotlin("multiplatform")
@@ -15,7 +16,7 @@ plugins {
 }
 
 if (supportAndroid) {
-    apply<com.android.build.gradle.LibraryPlugin>()
+    apply<LibraryPlugin>()
 }
 
 apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
@@ -411,7 +412,7 @@ kotlin {
 if (supportAndroid) {
     // Android configuration, when available
     configure<LibraryExtension> {
-        compileSdk = 31
+        compileSdk = 33
         namespace = "org.jetbrains.skiko"
 
         defaultConfig.minSdk = 24
