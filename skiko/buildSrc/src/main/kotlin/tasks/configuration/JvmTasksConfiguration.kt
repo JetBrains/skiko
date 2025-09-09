@@ -39,8 +39,8 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
 ) = project.registerSkikoTask<CompileSkikoCppTask>("compileJvmBindings", targetOs, targetArch) {
     // Prefer 'java.home' system property to simplify overriding from Intellij.
     // When used from command-line, it is effectively equal to JAVA_HOME.
-    if (JavaVersion.current() < JavaVersion.VERSION_11) {
-        error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
+    if (JavaVersion.current() < JavaVersion.VERSION_17) {
+        error("JDK 17+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
                 "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
     }
     val jdkHome = File(System.getProperty("java.home") ?: error("'java.home' is null"))
