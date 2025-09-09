@@ -107,20 +107,18 @@ kotlin {
     }
 
     js(IR) {
-        moduleName = "clocks-js"
         browser {
             commonWebpackConfig {
-                outputFileName = "clocks-js.js"
+                outputFileName = "webApp.js"
             }
         }
         binaries.executable()
     }
 
     wasmJs {
-        moduleName = "clocks-wasm"
         browser {
             commonWebpackConfig {
-                outputFileName = "clocks-wasm.js"
+                outputFileName = "webApp.js"
             }
         }
         binaries.executable()
@@ -333,10 +331,6 @@ if (hostOs == "macos") {
             }
         }
     }
-}
-
-rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
 }
 
 apple {
