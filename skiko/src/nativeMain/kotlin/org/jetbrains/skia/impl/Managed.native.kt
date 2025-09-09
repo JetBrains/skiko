@@ -3,8 +3,9 @@ package org.jetbrains.skia.impl
 import kotlinx.cinterop.nativeNullPtr
 import org.jetbrains.skia.ExternalSymbolName
 import kotlin.concurrent.AtomicNativePtr
+import kotlin.experimental.ExperimentalNativeApi
 import kotlin.native.concurrent.freeze
-import kotlin.native.internal.createCleaner
+import kotlin.native.ref.createCleaner
 
 private class FinalizationThunk(private val finalizer: NativePointer, val className: String, obj: NativePointer) {
     private var obj = AtomicNativePtr(obj)
@@ -29,10 +30,11 @@ actual abstract class Managed actual constructor(
         require(finalizer != NullPointer) { "Managed finalizer is nullptr" }
         val className = this::class.simpleName ?: "<kotlin>"
         Stats.onAllocated(className)
-        FinalizationThunk(finalizer, className, ptr).freeze()
+        FinalizationThunk(finalizer, className, ptr)
     } else null
 
-    @OptIn(ExperimentalStdlibApi::class)
+    @Suppress("unused")
+    @OptIn(ExperimentalNativeApi::class)
     private val cleaner = if (managed) {
         createCleaner(thunk) {
             it?.clean()

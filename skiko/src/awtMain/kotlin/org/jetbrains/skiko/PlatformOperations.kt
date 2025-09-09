@@ -124,10 +124,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
             }
         }
-        OS.Android -> TODO()
-        OS.JS, OS.Ios, OS.Tvos, OS.Unknown -> {
-            TODO("Commonize me")
-        }
+        else -> throw UnsupportedOperationException()
     }
 }
 

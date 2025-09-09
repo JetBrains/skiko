@@ -1,5 +1,8 @@
+@file:OptIn(BetaInteropApi::class)
+
 package org.jetbrains.skiko.redrawer
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr

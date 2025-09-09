@@ -4,7 +4,7 @@ import org.jetbrains.skia.ManagedString
 
 expect class NativePointer
 
-expect class InteropPointer
+internal expect class InteropPointer
 
 expect abstract class Native(ptr: NativePointer) {
     internal var _ptr: NativePointer
@@ -157,6 +157,7 @@ internal inline fun withStringResult(block: () -> NativePointer): String {
     return ManagedString(block()).use { it.toString() }
 }
 
+@Suppress("NOTHING_TO_INLINE")
 internal inline fun withStringResult(pointer: NativePointer): String {
     return ManagedString(pointer).use { it.toString() }
 }

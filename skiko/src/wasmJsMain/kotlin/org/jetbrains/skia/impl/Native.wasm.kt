@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+
 package org.jetbrains.skia.impl
 
 internal actual class InteropScope actual constructor() {

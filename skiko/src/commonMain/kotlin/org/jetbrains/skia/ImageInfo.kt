@@ -284,7 +284,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
             return ImageInfo(ColorInfo(ColorType.UNKNOWN, ColorAlphaType.UNKNOWN, null), width, height)
         }
 
-        fun createUsing(
+        internal fun createUsing(
             _ptr: NativePointer,
             _nGetImageInfo: (_ptr: NativePointer, intArrayPointer: InteropPointer, nativePointerArrayPtr: InteropPointer) -> Unit
         ): ImageInfo {
