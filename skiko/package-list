@@ -157,7 +157,6 @@ $dokka.location:org.jetbrains.skia.impl//use/TypeParam(bounds=[org.jetbrains.ski
 $dokka.location:org.jetbrains.skia.impl/BufferUtil///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/index.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil/getByteBufferFromPointer/#kotlin.Long#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/get-byte-buffer-from-pointer.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil/getPointerFromByteBuffer/#[Error type: Unresolved type for ByteBuffer]/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/get-pointer-from-byte-buffer.html
-$dokka.location:org.jetbrains.skia.impl/InteropPointer///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-interop-pointer/index.html
 $dokka.location:org.jetbrains.skia.impl/Library.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-library/-companion/index.html
 $dokka.location:org.jetbrains.skia.impl/Library.Companion/_nAfterLoad/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-library/-companion/_n-after-load.html
 $dokka.location:org.jetbrains.skia.impl/Library.Companion/loaded/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-library/-companion/loaded.html
@@ -462,10 +461,6 @@ $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setHeightOverridden/#kot
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setLeading/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-leading.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setTopRatio/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-top-ratio.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/topRatio/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/top-ratio.html
-$dokka.location:org.jetbrains.skia.paragraph/TextBox.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/-companion/index.html
-$dokka.location:org.jetbrains.skia.paragraph/TextBox.Companion/disposeArray/#org.jetbrains.skia.impl.InteropPointer/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/-companion/dispose-array.html
-$dokka.location:org.jetbrains.skia.paragraph/TextBox.Companion/getArrayElement/#org.jetbrains.skia.impl.InteropPointer#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/-companion/get-array-element.html
-$dokka.location:org.jetbrains.skia.paragraph/TextBox.Companion/getArraySize/#org.jetbrains.skia.impl.InteropPointer/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/-companion/get-array-size.html
 $dokka.location:org.jetbrains.skia.paragraph/TextBox///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/index.html
 $dokka.location:org.jetbrains.skia.paragraph/TextBox/TextBox/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/-text-box.html
 $dokka.location:org.jetbrains.skia.paragraph/TextBox/TextBox/#org.jetbrains.skia.Rect#org.jetbrains.skia.paragraph.Direction/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/-text-box.html
@@ -1962,7 +1957,6 @@ $dokka.location:org.jetbrains.skia/ImageFilter.Companion/makeTile/#org.jetbrains
 $dokka.location:org.jetbrains.skia/ImageFilter///PointingToDeclaration/skiko/org.jetbrains.skia/-image-filter/index.html
 $dokka.location:org.jetbrains.skia/ImageInfo.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-image-info/-companion/index.html
 $dokka.location:org.jetbrains.skia/ImageInfo.Companion/DEFAULT/#/PointingToDeclaration/skiko/org.jetbrains.skia/-image-info/-companion/-d-e-f-a-u-l-t.html
-$dokka.location:org.jetbrains.skia/ImageInfo.Companion/createUsing/#org.jetbrains.skia.impl.NativePointer#kotlin.Function3[org.jetbrains.skia.impl.NativePointer,org.jetbrains.skia.impl.InteropPointer,org.jetbrains.skia.impl.InteropPointer,kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skia/-image-info/-companion/create-using.html
 $dokka.location:org.jetbrains.skia/ImageInfo.Companion/makeA8/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-image-info/-companion/make-a8.html
 $dokka.location:org.jetbrains.skia/ImageInfo.Companion/makeN32/#kotlin.Int#kotlin.Int#org.jetbrains.skia.ColorAlphaType#org.jetbrains.skia.ColorSpace?/PointingToDeclaration/skiko/org.jetbrains.skia/-image-info/-companion/make-n32.html
 $dokka.location:org.jetbrains.skia/ImageInfo.Companion/makeN32/#kotlin.Int#kotlin.Int#org.jetbrains.skia.ColorAlphaType/PointingToDeclaration/skiko/org.jetbrains.skia/-image-info/-companion/make-n32.html
