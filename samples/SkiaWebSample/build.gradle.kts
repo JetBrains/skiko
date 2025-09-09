@@ -30,7 +30,7 @@ dependencies {
     })
 }
 
-val unzipTask = tasks.register("unzipWasm", Copy::class) {
+val unpackWasmRuntime = tasks.register("unpackWasmRuntime", Copy::class) {
     destinationDir = file("$buildDir/resources/")
     from(skikoWasm.map { zipTree(it) })
 
@@ -40,7 +40,7 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
-    dependsOn(unzipTask)
+    dependsOn(unpackWasmRuntime)
 }
 
 kotlin {
@@ -73,7 +73,7 @@ kotlin {
         val webMain by creating {
             dependsOn(commonMain)
             resources.setSrcDirs(resources.srcDirs)
-            resources.srcDirs(unzipTask.map { it.destinationDir })
+            resources.srcDirs(unpackWasmRuntime.map { it.destinationDir })
         }
 
         val jsMain by getting {
