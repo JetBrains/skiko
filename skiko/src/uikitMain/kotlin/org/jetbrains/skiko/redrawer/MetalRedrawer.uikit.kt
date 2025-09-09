@@ -1,3 +1,5 @@
+@file:OptIn(BetaInteropApi::class)
+
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.*

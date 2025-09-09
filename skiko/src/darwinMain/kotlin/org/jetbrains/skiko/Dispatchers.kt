@@ -24,7 +24,7 @@ object SkikoDispatchers {
     )
 }
 
-@OptIn(InternalCoroutinesApi::class)
+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 internal class NsQueueDispatcher(
     private val dispatchQueue: dispatch_queue_t
 ) : CoroutineDispatcher(), Delay {
@@ -34,7 +34,6 @@ internal class NsQueueDispatcher(
         }
     }
 
-    @OptIn(InternalCoroutinesApi::class)
     override fun scheduleResumeAfterDelay(timeMillis: Long, continuation: CancellableContinuation<Unit>) {
         val timer = Timer()
         val timerBlock: TimerBlock = {
@@ -45,8 +44,6 @@ internal class NsQueueDispatcher(
         continuation.disposeOnCancellation(timer)
     }
 
-
-    @OptIn(InternalCoroutinesApi::class)
     override fun invokeOnTimeout(timeMillis: Long, block: Runnable, context: CoroutineContext): DisposableHandle {
         val timer = Timer()
         val timerBlock: TimerBlock = {

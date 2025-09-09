@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.getAnnotation
@@ -26,6 +27,7 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
     private fun IrConstructorCall.getStringValue(value: String): String =
         (getValueArgument(Name.identifier(value)) as IrConst<String>).value
 
+    @OptIn(UnsafeDuringIrConstructionAPI::class)
     private fun IrFunction.addWasmImportAnnotation(name: String) {
         val annotationClass = pluginContext.referenceClass(
             ClassId.fromString("kotlin/wasm/WasmImport") // Replace with your fully qualified annotation name
