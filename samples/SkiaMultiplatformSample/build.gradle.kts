@@ -42,37 +42,37 @@ var hostArch = when (osArch) {
 
 val host = "${hostOs}-${hostArch}"
 
-var version = "0.0.0-SNAPSHOT"
-if (project.hasProperty("skiko.version")) {
-    version = project.properties["skiko.version"] as String
+val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
+if (project.hasProperty("skiko.version") && isCompositeBuild) {
+    project.logger.warn("skiko.version property has no effect when skiko.composite.build is set")
 }
 
-val resourcesDir = "$buildDir/resources"
+
 val skikoWasm by configurations.creating
 
-val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
+dependencies {
+    skikoWasm(if (isCompositeBuild) {
+        // When we build skiko locally, we have no say in setting skiko.version in the included build.
+        // That said, it is always built as "0.0.0-SNAPSHOT" and setting any other version is misleading
+        // and can create conflict due to incompatibility of skiko runtime and skiko libs
+        files(gradle.includedBuild("skiko").projectDir.resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"))
+    } else {
+        libs.skiko.wasm.runtime
+    })
+}
 
-val unzipTask = tasks.register("unzipWasm", Copy::class) {
-    destinationDir = file(resourcesDir)
+val unpackWasmRuntime = tasks.register("unpackWasmRuntime", Copy::class) {
+    destinationDir = file("$buildDir/resources/")
     from(skikoWasm.map { zipTree(it) })
 
     if (isCompositeBuild) {
-        val skikoWasmJarTask = gradle.includedBuild("skiko").task(":skikoWasmJar")
-        dependsOn(skikoWasmJarTask)
+        dependsOn(gradle.includedBuild("skiko").task(":skikoWasmJar"))
     }
 }
 
-dependencies {
-    if (isCompositeBuild) {
-        val filePath = gradle.includedBuild("skiko").projectDir
-            .resolve("./build/libs/skiko-wasm-$version.jar")
-        skikoWasm(files(filePath))
-    } else {
-        skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
-    }
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    dependsOn(unpackWasmRuntime)
 }
-
-
 
 kotlin {
     if (hostOs == "macos") {
@@ -129,7 +129,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.skiko:skiko:$version")
+                implementation(libs.skiko)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
             }
         }
@@ -141,14 +141,14 @@ kotlin {
         val awtMain by getting {
             dependsOn(commonMain)
             dependencies {
-                implementation("org.jetbrains.skiko:skiko-awt-runtime-$hostOs-$hostArch:$version")
+                implementation(libs.skiko.awt.runtime)
             }
         }
 
         val webMain by creating {
             dependsOn(commonMain)
             resources.setSrcDirs(resources.srcDirs)
-            resources.srcDirs(unzipTask.map { it.destinationDir })
+            resources.srcDirs(unpackWasmRuntime.map { it.destinationDir })
         }
 
         val jsMain by getting {
@@ -256,9 +256,6 @@ project.tasks.register<JavaExec>("runAwt") {
     classpath(kotlin.jvm("awt").compilations["main"].runtimeDependencyFiles)
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
-    dependsOn(unzipTask)
-}
 
 enum class Target(val simulator: Boolean, val key: String) {
     WATCHOS_X86(true, "watchos"), 

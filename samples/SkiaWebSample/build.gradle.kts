@@ -8,9 +8,6 @@ repositories {
     mavenLocal()
 }
 
-
-val resourcesDir = "$buildDir/resources/"
-
 val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
 
 if (project.hasProperty("skiko.version") && isCompositeBuild) {
