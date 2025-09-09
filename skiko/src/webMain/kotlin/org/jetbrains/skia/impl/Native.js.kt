@@ -36,7 +36,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 internal actual fun reachabilityBarrier(obj: Any?) {}
 
 actual typealias NativePointer = Int
-actual typealias InteropPointer = Int
+internal actual typealias InteropPointer = Int
 
 private val INTEROP_SCOPE = InteropScope()
 private var interopScopeCounter = 0

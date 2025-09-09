@@ -4,7 +4,7 @@ import org.jetbrains.skia.ManagedString
 
 expect class NativePointer
 
-expect class InteropPointer
+internal expect class InteropPointer
 
 expect abstract class Native(ptr: NativePointer) {
     internal var _ptr: NativePointer

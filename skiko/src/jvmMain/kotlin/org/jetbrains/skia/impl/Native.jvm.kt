@@ -48,8 +48,7 @@ internal actual fun reachabilityBarrier(obj: Any?) {
 
 actual typealias NativePointer = Long
 
-@Suppress("ACTUAL_TYPE_ALIAS_TO_NULLABLE_TYPE")
-actual typealias InteropPointer = Any?
+internal actual typealias InteropPointer = Any
 
 internal object theScope: InteropScope()
 internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
@@ -57,47 +56,47 @@ internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
 }
 
 internal actual open class InteropScope actual constructor() {
-    actual fun toInterop(string: String?): InteropPointer = string
+    actual fun toInterop(string: String?): InteropPointer = string as Any
 
-    actual fun toInterop(array: ByteArray?): InteropPointer = array
+    actual fun toInterop(array: ByteArray?): InteropPointer = array as Any
     actual fun toInteropForResult(array: ByteArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: ByteArray) {}
 
-    actual fun toInterop(array: ShortArray?): InteropPointer = array
+    actual fun toInterop(array: ShortArray?): InteropPointer = array as Any
     actual fun toInteropForResult(array: ShortArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: ShortArray) {}
 
-    actual fun toInterop(array: IntArray?): InteropPointer = array
+    actual fun toInterop(array: IntArray?): InteropPointer = array as Any
     actual fun toInteropForResult(array: IntArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: IntArray) {}
 
-    actual fun toInterop(array: LongArray?): InteropPointer = array
+    actual fun toInterop(array: LongArray?): InteropPointer = array as Any
     actual fun InteropPointer.fromInterop(result: LongArray) {}
 
-    actual fun toInterop(array: FloatArray?): InteropPointer = array
+    actual fun toInterop(array: FloatArray?): InteropPointer = array as Any
     actual fun toInteropForResult(array: FloatArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: FloatArray) {}
 
-    actual fun toInterop(array: DoubleArray?): InteropPointer = array
+    actual fun toInterop(array: DoubleArray?): InteropPointer = array as Any
     actual fun toInteropForResult(array: DoubleArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: DoubleArray) {}
 
-    actual fun toInterop(array: NativePointerArray?): InteropPointer = array?.backing
+    actual fun toInterop(array: NativePointerArray?): InteropPointer = array?.backing as Any
     actual fun toInteropForResult(array: NativePointerArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: NativePointerArray) {}
 
-    actual fun toInterop(stringArray: Array<String>?): InteropPointer = stringArray
+    actual fun toInterop(stringArray: Array<String>?): InteropPointer = stringArray as Any
     actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray =
         NativePointerArray((this as LongArray).size, this)
     actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> =
         this@fromInterop as Array<T>
     actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer = interopPointers
 
-    actual fun callback(callback: (() -> Unit)?) = callback as Any?
-    actual fun intCallback(callback: (() -> Int)?) = callback as Any?
-    actual fun nativePointerCallback(callback: (() -> NativePointer)?) = callback as Any?
-    actual fun interopPointerCallback(callback: (() -> InteropPointer)?) = callback as Any?
-    actual fun booleanCallback(callback: (() -> Boolean)?) = callback as Any?
+    actual fun callback(callback: (() -> Unit)?) = callback as Any
+    actual fun intCallback(callback: (() -> Int)?) = callback as Any
+    actual fun nativePointerCallback(callback: (() -> NativePointer)?) = callback as Any
+    actual fun interopPointerCallback(callback: (() -> InteropPointer)?) = callback as Any
+    actual fun booleanCallback(callback: (() -> Boolean)?) = callback as Any
 
     actual fun virtual(method: () -> Unit) = callback(method)
     actual fun virtualInt(method: () -> Int) = intCallback(method)
