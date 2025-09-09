@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
 import kotlin.collections.HashMap
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.LibraryPlugin
 
 plugins {
     kotlin("multiplatform")
@@ -15,7 +16,7 @@ plugins {
 }
 
 if (supportAndroid) {
-    apply<com.android.build.gradle.LibraryPlugin>()
+    apply<LibraryPlugin>()
 }
 
 apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
@@ -411,7 +412,7 @@ kotlin {
 if (supportAndroid) {
     // Android configuration, when available
     configure<LibraryExtension> {
-        compileSdk = 31
+        compileSdk = 33
         namespace = "org.jetbrains.skiko"
 
         defaultConfig.minSdk = 24
@@ -452,9 +453,9 @@ fun createChecksumsTask(
     fileToChecksum: Provider<File>
 ) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
 
-    files = project.files(fileToChecksum)
-    algorithm = Checksum.Algorithm.SHA256
-    outputDir = file("$buildDir/checksums-${targetId(targetOs, targetArch)}")
+    inputFiles = project.files(fileToChecksum)
+    checksumAlgorithm = Checksum.Algorithm.SHA256
+    outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
 }
 
 
@@ -508,7 +509,7 @@ publishing {
         }
         maven {
             name = "BuildRepo"
-            url = uri("${rootProject.buildDir}/repo")
+            url = rootProject.layout.buildDirectory.dir("repo").get().asFile.toURI()
         }
         maven {
             name = "ComposeRepo"
