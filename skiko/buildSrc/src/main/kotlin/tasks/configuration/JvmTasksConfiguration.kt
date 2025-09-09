@@ -326,6 +326,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-lEGL",
                 "-llog",
                 "-landroid",
+                "-latomic",
                 // Hack to fix problem with linker not always finding certain declarations.
                 "$skiaBinDir/libskia.a",
             )
