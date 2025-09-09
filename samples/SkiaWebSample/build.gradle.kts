@@ -13,32 +13,29 @@ val resourcesDir = "$buildDir/resources/"
 
 val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
 
-// When we build skiko locally we have no say in setting skiko.version in the included build.
-// That said, it is always built as "0.0.0-SNAPSHOT" and setting any other version not only is misleading,
-// but even can create conflict due to incompatibility of skiko runtime and skiko libs
-val skikoVersion = if (isCompositeBuild) "0.0.0-SNAPSHOT" else project.properties["skiko.version"]
+if (project.hasProperty("skiko.version") && isCompositeBuild) {
+    project.logger.warn("skiko.version property has no effect when skiko.composite.build is set")
+}
 
 val skikoWasm by configurations.creating
+
 dependencies {
-    skikoWasm(
-        if (isCompositeBuild) files(
-            gradle.includedBuild("skiko")
-                .projectDir
-                .resolve("./build/libs/skiko-wasm-$skikoVersion.jar")
-        ) else libs.skiko.runtime
-    )
+    skikoWasm(if (isCompositeBuild) {
+        // When we build skiko locally, we have no say in setting skiko.version in the included build.
+        // That said, it is always built as "0.0.0-SNAPSHOT" and setting any other version is misleading
+        // and can create conflict due to incompatibility of skiko runtime and skiko libs
+        files(gradle.includedBuild("skiko").projectDir.resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"))
+    } else {
+        libs.skiko.runtime
+    })
 }
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
-    destinationDir = file(resourcesDir)
+    destinationDir = file("$buildDir/resources/")
     from(skikoWasm.map { zipTree(it) })
 
     if (isCompositeBuild) {
-        // we only can access the "skikoWasmJar" task from includedBuild as TaskReference
-        // so we don't have access to its output and have to copy it as a hardcoded path in dependencies
-        dependsOn(
-            gradle.includedBuild("skiko").task(":skikoWasmJar")
-        )
+        dependsOn(gradle.includedBuild("skiko").task(":skikoWasmJar"))
     }
 }
 
@@ -57,7 +54,6 @@ kotlin {
         binaries.executable()
     }
 
-    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs() {
         browser {
             commonWebpackConfig {
@@ -84,14 +80,8 @@ kotlin {
             dependsOn(webMain)
         }
 
-
         val wasmJsMain by getting {
             dependsOn(webMain)
-
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3")
-            }
         }
     }
 }
-
