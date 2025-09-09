@@ -6,6 +6,10 @@ import tasks.configuration.*
 import kotlin.collections.HashMap
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform")
@@ -59,7 +63,9 @@ kotlin {
     if (supportAwt) {
         jvm("awt") {
             compilations.all {
-                kotlinOptions.jvmTarget = "1.8"
+                compileTaskProvider.configure {
+                    compilerOptions.jvmTarget.set(JvmTarget.JVM_1_8)
+                }
             }
             generateVersion(targetOs, targetArch, skiko)
         }
@@ -70,7 +76,9 @@ kotlin {
             publishLibraryVariants("release")
 
             compilations.all {
-                kotlinOptions.jvmTarget = "1.8"
+                compileTaskProvider.configure {
+                    compilerOptions.jvmTarget.set(JvmTarget.JVM_1_8)
+                }
             }
 
             // Keep the previously defined attribute that was used to distinguish JVM and android variant
@@ -199,6 +207,7 @@ kotlin {
         }
 
         val jvmTest by creating {
+            dependsOn(commonTest)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test-junit"))
@@ -629,10 +638,10 @@ tasks.withType<JavaCompile> {
     sourceCompatibility = "1.8"
 }
 
-project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += listOf(
+project.tasks.withType<KotlinJsCompile>().configureEach {
+    compilerOptions.freeCompilerArgs.addAll(listOf(
         "-Xwasm-enable-array-range-checks", "-Xir-dce=true", "-Xskip-prerelease-check",
-    )
+    ))
 }
 
 tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
@@ -641,12 +650,12 @@ tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
     ?.dependsOn("publishWasmJsPublicationToMavenLocal")
 
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+tasks.withType<KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583
     compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
-    kotlinOptions.freeCompilerArgs += "-opt-in=kotlinx.cinterop.ExperimentalForeignApi"
+    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
-    kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+tasks.withType<KotlinCompilationTask<*>>().configureEach {
+    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
 }
