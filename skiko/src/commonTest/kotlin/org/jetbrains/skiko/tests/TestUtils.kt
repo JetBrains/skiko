@@ -10,13 +10,13 @@ expect fun runTest(block: suspend () -> Unit): TestReturnType
 
 internal expect fun InteropScope.allocateBytesForPixels(size: Int): NativePointer
 
-expect annotation class SkipNativeTarget
+expect annotation class SkipNativeTarget()
 
-expect annotation class SkipJsTarget
+expect annotation class SkipJsTarget()
 
-expect annotation class SkipWasmTarget
+expect annotation class SkipWasmTarget()
 
-expect annotation class SkipJvmTarget
+expect annotation class SkipJvmTarget()
 
 expect fun makeFromFileName(path: String?): Data
 
