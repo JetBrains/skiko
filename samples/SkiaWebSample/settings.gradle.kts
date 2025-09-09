@@ -1,14 +1,14 @@
 pluginManagement {
     repositories {
+        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
-        google()
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        maven {
+            url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
+        }
     }
-
     plugins {
         val kotlinVersion = extra["kotlin.version"] as String
-        kotlin("jvm").version(kotlinVersion)
         kotlin("multiplatform").version(kotlinVersion)
     }
 }
@@ -21,28 +21,11 @@ dependencyResolutionManagement {
             version("skiko", providers.gradleProperty("skiko.version").get())
             library("skiko", "org.jetbrains.skiko", "skiko").versionRef("skiko")
             library("skiko-wasm-runtime", "org.jetbrains.skiko", "skiko-js-wasm-runtime").versionRef("skiko")
-
-            val osName = System.getProperty("os.name")
-            val hostOs = when {
-                osName == "Mac OS X" -> "macos"
-                osName.startsWith("Win") -> "windows"
-                osName.startsWith("Linux") -> "linux"
-                else -> error("Unsupported OS: $osName")
-            }
-
-            val osArch = System.getProperty("os.arch")
-            var hostArch = when (osArch) {
-                "x86_64", "amd64" -> "x64"
-                "aarch64" -> "arm64"
-                else -> error("Unsupported arch: $osArch")
-            }
-
-            library("skiko-awt-runtime", "org.jetbrains.skiko", "skiko-awt-runtime-$hostOs-$hostArch").versionRef("skiko")
         }
     }
 }
 
-rootProject.name = "SkiaMultiplatformSample"
+rootProject.name = "SkiaWebSample"
 
 if (extra.properties.getOrDefault("skiko.composite.build", "") == "1") {
     includeBuild("../../skiko") {
