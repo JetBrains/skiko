@@ -61,16 +61,12 @@ internal class NsQueueDispatcher(
 
 internal typealias TimerBlock = (CFRunLoopTimerRef?) -> Unit
 
-@SharedImmutable
 private val TIMER_NEW = NativePtr.NULL
 
-@SharedImmutable
 private val TIMER_DISPOSED = NativePtr.NULL.plus(1)
 
 private class Timer : DisposableHandle {
     private val ref = AtomicNativePtr(TIMER_NEW)
-
-    init { freeze() }
 
     fun start(timeMillis: Long, timerBlock: TimerBlock) {
         val fireDate = CFAbsoluteTimeGetCurrent() + timeMillis / 1000.0
