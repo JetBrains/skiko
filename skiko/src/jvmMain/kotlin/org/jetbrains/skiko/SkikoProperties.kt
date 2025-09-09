@@ -127,12 +127,12 @@ object SkikoProperties {
     }
 
     private fun bestRenderApiForCurrentOS(): GraphicsApi {
-        when(hostOs) {
-            OS.MacOS -> return GraphicsApi.METAL
-            OS.Linux -> return GraphicsApi.OPENGL
-            OS.Windows -> return if (renderingAngleEnabled) GraphicsApi.ANGLE else GraphicsApi.DIRECT3D
-            OS.Android -> return GraphicsApi.OPENGL
-            OS.JS, OS.Ios, OS.Tvos, OS.Unknown -> TODO("commonize me")
+        return when(hostOs) {
+            OS.MacOS -> GraphicsApi.METAL
+            OS.Linux -> GraphicsApi.OPENGL
+            OS.Windows -> if (renderingAngleEnabled) GraphicsApi.ANGLE else GraphicsApi.DIRECT3D
+            OS.Android -> GraphicsApi.OPENGL
+            else -> GraphicsApi.UNKNOWN
         }
     }
 
@@ -146,7 +146,7 @@ object SkikoProperties {
                 else -> listOf(GraphicsApi.ANGLE, GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             }
             OS.Android -> return listOf(GraphicsApi.OPENGL)
-            OS.JS, OS.Ios, OS.Tvos, OS.Unknown -> TODO("commonize me")
+            else -> return listOf(GraphicsApi.UNKNOWN)
         }
 
         val indexOfInitialApi = fallbackApis.indexOf(initialApi)
