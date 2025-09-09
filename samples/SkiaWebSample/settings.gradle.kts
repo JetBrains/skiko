@@ -20,7 +20,7 @@ dependencyResolutionManagement {
         create("libs") {
             version("skiko", providers.gradleProperty("skiko.version").get())
             library("skiko", "org.jetbrains.skiko", "skiko").versionRef("skiko")
-            library("skiko-runtime", "org.jetbrains.skiko", "skiko-js-wasm-runtime").versionRef("skiko")
+            library("skiko-wasm-runtime", "org.jetbrains.skiko", "skiko-js-wasm-runtime").versionRef("skiko")
         }
     }
 }

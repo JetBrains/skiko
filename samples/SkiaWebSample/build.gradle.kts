@@ -23,7 +23,7 @@ dependencies {
         // and can create conflict due to incompatibility of skiko runtime and skiko libs
         files(gradle.includedBuild("skiko").projectDir.resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"))
     } else {
-        libs.skiko.runtime
+        libs.skiko.wasm.runtime
     })
 }
 
