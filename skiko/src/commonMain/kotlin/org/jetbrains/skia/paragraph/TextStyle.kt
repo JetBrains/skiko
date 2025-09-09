@@ -332,6 +332,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             reachabilityBarrier(this)
         }
         set(value) {
+            @Suppress("DEPRECATION")
             setHalfLeading(value)
         }
 

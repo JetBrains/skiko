@@ -23,6 +23,7 @@ package org.jetbrains.skia
  */
 class CubicResampler(val b: Float, val c: Float) : SamplingMode {
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun _pack(): Long = (0x8L shl 60) or ((b.toBits().toULong() shl 32) or c.toBits().toULong()).toLong()
 
     override fun _packedInt1(): Int = b.toBits() or (0x8 shl 28)

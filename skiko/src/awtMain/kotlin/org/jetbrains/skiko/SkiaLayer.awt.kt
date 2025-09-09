@@ -107,6 +107,7 @@ actual open class SkiaLayer internal constructor(
             @Suppress("OVERRIDE_DEPRECATION")
             override fun reshape(x: Int, y: Int, width: Int, height: Int) {
                 Logger.debug { "reshape(x=$x, y=$y, w=$width, h=$height) called on $this" }
+                @Suppress("DEPRECATION")
                 super.reshape(x, y, width, height)
 
                 redrawer?.syncBounds()
@@ -382,6 +383,7 @@ actual open class SkiaLayer internal constructor(
 
     @Suppress("OVERRIDE_DEPRECATION")
     override fun reshape(x: Int, y: Int, w: Int, h: Int) {
+        @Suppress("DEPRECATION")
         super.reshape(x, y, w, h)
 
         // Calling redrawImmediately as early as possible improves the situation with

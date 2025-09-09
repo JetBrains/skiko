@@ -219,6 +219,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
             reachabilityBarrier(this)
         }
         set(value) {
+            @Suppress("DEPRECATION")
             setHalfLeading(value)
         }
 

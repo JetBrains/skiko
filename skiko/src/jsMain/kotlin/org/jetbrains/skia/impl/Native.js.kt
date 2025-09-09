@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+
 package org.jetbrains.skia.impl
 
 internal actual class InteropScope actual constructor() {
@@ -242,6 +244,7 @@ internal actual class InteropScope actual constructor() {
         releaseCallbacks()
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     private inline fun initCallbacks() {
         if (!callbacksInitialized) {
             _createLocalCallbackScope()
@@ -249,6 +252,7 @@ internal actual class InteropScope actual constructor() {
         }
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     private inline fun releaseCallbacks() {
         if (callbacksInitialized) {
             _releaseLocalCallbackScope()

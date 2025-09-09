@@ -5,6 +5,7 @@ class FilterMipmap constructor(
     internal val mipmapMode: MipmapMode = MipmapMode.NONE
 ) : SamplingMode {
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun _pack() = filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong()
 
     override fun _packedInt1(): Int = filterMode.ordinal

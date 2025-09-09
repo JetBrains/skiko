@@ -157,6 +157,7 @@ internal inline fun withStringResult(block: () -> NativePointer): String {
     return ManagedString(block()).use { it.toString() }
 }
 
+@Suppress("NOTHING_TO_INLINE")
 internal inline fun withStringResult(pointer: NativePointer): String {
     return ManagedString(pointer).use { it.toString() }
 }

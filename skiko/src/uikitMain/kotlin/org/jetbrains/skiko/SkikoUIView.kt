@@ -11,7 +11,6 @@ import kotlin.native.ref.*
 
 internal expect fun UIView.skikoInitializeUIView(): Unit
 
-@Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
 class SkikoUIView : UIView {
     companion object : UIViewMeta() {
