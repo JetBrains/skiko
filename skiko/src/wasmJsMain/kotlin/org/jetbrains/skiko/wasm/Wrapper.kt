@@ -28,11 +28,3 @@ internal actual fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextA
     check(attr === null) { "TODO!" }
     return GL.createContext(canvas, createDefaultContextAttributes())
 }
-
-actual fun onWasmReady(onReady: () -> Unit) {
-    awaitSkiko.then {
-        onReady()
-        null
-    }
-}
-
