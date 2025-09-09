@@ -105,7 +105,6 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         OS.Android -> listOf(
             "-DSK_BUILD_FOR_ANDROID"
         )
-        else -> TODO("unsupported $os")
     }
 
     return (base + perOs).toTypedArray()

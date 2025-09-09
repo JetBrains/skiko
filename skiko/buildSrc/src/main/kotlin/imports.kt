@@ -1,7 +1,7 @@
 import org.gradle.api.Project
 
 val Project.wasmImports
-    get() = buildDir.resolve("imports")
+    get() = layout.buildDirectory.dir("imports").get().asFile
 
 val Project.setupMjs
     get() = wasmImports.resolve("setup.mjs")

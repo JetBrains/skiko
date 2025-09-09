@@ -88,7 +88,7 @@ val uploadSkikoArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask
 
 fun Project.skikoMavenModules(version: String): Provider<List<ModuleToUpload>> =
     provider {
-        val artifactsDir = buildDir.resolve("skiko-artifacts")
+        val artifactsDir = layout.buildDirectory.dir("skiko-artifacts").get().asFile
 
         skikoArtifactIds.map { artifactId ->
             val skikoGroupId = "org.jetbrains.skiko"

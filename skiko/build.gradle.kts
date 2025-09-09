@@ -452,9 +452,9 @@ fun createChecksumsTask(
     fileToChecksum: Provider<File>
 ) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
 
-    files = project.files(fileToChecksum)
-    algorithm = Checksum.Algorithm.SHA256
-    outputDir = file("$buildDir/checksums-${targetId(targetOs, targetArch)}")
+    inputFiles = project.files(fileToChecksum)
+    checksumAlgorithm = Checksum.Algorithm.SHA256
+    outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
 }
 
 
@@ -508,7 +508,7 @@ publishing {
         }
         maven {
             name = "BuildRepo"
-            url = uri("${rootProject.buildDir}/repo")
+            url = rootProject.layout.buildDirectory.dir("repo").get().asFile.toURI()
         }
         maven {
             name = "ComposeRepo"

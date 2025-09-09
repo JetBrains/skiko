@@ -148,7 +148,7 @@ fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<
         OS.Windows -> "windows-x86_64"
         else -> throw GradleException("unsupported $hostOs")
     }
-    val ndkPath = project.providers
+    val ndkPathProvider = project.providers
         .environmentVariable("ANDROID_NDK_HOME")
         .orEmpty()
         .map { ndkHomeEnv ->
@@ -163,7 +163,7 @@ fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<
                 "$androidHome/$ndkVersion"
             }
         }
-    return ndkPath.map { ndkPath ->
+    return ndkPathProvider.map { ndkPath ->
         var clangBinaryName = "$androidArch-linux-android$version-clang++"
         if (hostOs.isWindows) {
             clangBinaryName += ".cmd"
@@ -466,7 +466,7 @@ fun SkikoProjectContext.skikoRuntimeDirForTestsTask(
     from(project.zipTree(skikoJvmJar.flatMap { it.archiveFile }))
     from(project.zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile }))
     duplicatesStrategy = DuplicatesStrategy.WARN
-    destinationDir = project.buildDir.resolve("skiko-runtime-for-tests")
+    destinationDir = project.layout.buildDirectory.dir("skiko-runtime-for-tests").get().asFile
 }
 
 fun SkikoProjectContext.skikoJarForTestsTask(
