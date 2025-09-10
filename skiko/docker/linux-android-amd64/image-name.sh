@@ -1,1 +1,0 @@
-echo skiko-build-android-ubuntu-2004-amd64:latest
