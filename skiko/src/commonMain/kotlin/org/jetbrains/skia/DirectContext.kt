@@ -5,8 +5,20 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.loadOpenGLLibrary
 
-class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
+class DirectContext : RefCnt {
+
+    internal constructor(ptr: NativePointer) : super(ptr) {
+         DirectContext_nSetResourceCacheLimit(ptr, resourceCacheLimit)
+    }
+
     companion object {
+
+        /**
+         *  GPU resource cache limit in bytes used by DirectContext instances.
+         *  Set the property on the early startup of an application to take effect.
+         */
+        var resourceCacheLimit: Long = 256 * 1024 * 1024 // the same as Skia's default, see GrResourceCache.h, kDefaultMaxSize
+
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
             loadOpenGLLibrary()
@@ -138,6 +150,9 @@ private external fun DirectContext_nFlush(ptr: NativePointer, surfacePtr: Native
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushDefault")
 private external fun DirectContext_nFlushDefault(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSetResourceCacheLimit")
+private external fun DirectContext_nSetResourceCacheLimit(ptr: NativePointer, maxResourceBytes: Long)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
 private external fun _nMakeGL(): NativePointer
