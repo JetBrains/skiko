@@ -68,6 +68,13 @@ SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlush
     context->flush(skSurface);
 }
 
+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nSetResourceCacheLimit
+        (KNativePointer ptr, KLong maxResourceBytes) {
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(ptr);
+    context->setResourceCacheLimit((size_t) maxResourceBytes);
+}
+
+
 GrSyncCpu grSyncCpuFromBool(bool syncCpu) {
     if (syncCpu) return GrSyncCpu::kYes;
     return GrSyncCpu::kNo;
