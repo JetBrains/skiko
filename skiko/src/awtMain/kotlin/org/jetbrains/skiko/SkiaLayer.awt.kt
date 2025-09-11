@@ -103,6 +103,19 @@ actual open class SkiaLayer internal constructor(
         isOpaque = false
         layout = null
         backedLayer = object : HardwareLayer(externalAccessibleFactory) {
+            override fun paint(g: Graphics) {
+                Logger.debug { "Paint called on HardwareLayer $this" }
+                checkContentScale()
+
+                // 1. JPanel.paint is not always called (in rare cases).
+                //    For example if we call 'jframe.isResizable = false` on Ubuntu
+                //
+                // 2. HardwareLayer.paint is also not always called.
+                //    For example, on macOs when we resize window or change DPI
+                //
+                // 3. to avoid double paint in one single frame, use needRedraw instead of redrawImmediately
+                redrawer?.needRedraw(throttledToVsync = false)
+            }
 
             @Suppress("OVERRIDE_DEPRECATION")
             override fun reshape(x: Int, y: Int, width: Int, height: Int) {
@@ -111,22 +124,7 @@ actual open class SkiaLayer internal constructor(
                 super.reshape(x, y, width, height)
 
                 redrawer?.syncBounds()
-                // There's no reason for the render delegate to directly cause resizing SkiaLayer, but protect
-                // against it anyway.
-                if (!isRendering) {
-                    // When the layer isn't yet showing, paint will not be called,
-                    // but in order to avoid the background flashing when the layer
-                    // does show, we already draw to the native surface.
-                    redrawer?.redrawImmediately(updateNeeded = true)
-                } else {
-                    redrawer?.needRedraw(throttledToVsync = false)
-                }
-            }
-
-            override fun paint(g: Graphics) {
-                Logger.debug { "paint called on $this" }
-                val updateNeeded = checkContentScale()
-                redrawer?.redrawImmediately(updateNeeded = updateNeeded)
+                redrawer?.needRedraw(throttledToVsync = false)
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -414,6 +412,12 @@ actual open class SkiaLayer internal constructor(
             adjustSizeToContentScale(contentScale, height)
         )
         backedLayer.validate()
+    }
+
+    override fun paint(g: Graphics) {
+        Logger.debug { "paint called on SkiaLayer $this" }
+        val updateNeeded = checkContentScale()
+        redrawer?.redrawImmediately(updateNeeded = updateNeeded)
     }
 
     // Workaround for JBR-5274 and JBR-5305
