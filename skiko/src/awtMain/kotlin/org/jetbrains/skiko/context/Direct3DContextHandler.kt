@@ -20,9 +20,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
         try {
             if (context == null) {
                 context = directXRedrawer.makeContext()
-                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    Logger.info { "Renderer info:\n ${rendererInfo()}" }
-                }
+                onContextInitialized()
             }
         } catch (e: Exception) {
             Logger.warn(e) { "Failed to create Skia Direct3D context!" }

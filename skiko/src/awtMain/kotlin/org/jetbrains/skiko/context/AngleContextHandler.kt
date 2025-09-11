@@ -15,9 +15,7 @@ internal class AngleContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) 
         try {
             if (context == null) {
                 context = angleRedrawer.makeContext()
-                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    Logger.info { "Renderer info:\n ${rendererInfo()}" }
-                }
+                onContextInitialized()
             }
         } catch (e: Exception) {
             Logger.warn(e) { "Failed to create Skia ANGLE context!" }

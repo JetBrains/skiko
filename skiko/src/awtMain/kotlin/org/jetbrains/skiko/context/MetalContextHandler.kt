@@ -24,9 +24,7 @@ internal class MetalContextHandler(
         try {
             if (context == null) {
                 context = makeContext()
-                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    Logger.info { "Renderer info:\n ${rendererInfo()}" }
-                }
+                onContextInitialized()
             }
         } catch (e: Exception) {
             Logger.warn(e) { "Failed to create Skia Metal context!" }
