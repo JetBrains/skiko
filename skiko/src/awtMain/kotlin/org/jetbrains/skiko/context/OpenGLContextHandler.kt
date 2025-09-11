@@ -3,19 +3,9 @@ package org.jetbrains.skiko.context
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
-internal class OpenGLContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
-    override fun initContext(): Boolean {
-        try {
-            if (context == null) {
-                context = makeGLContext()
-                onContextInitialized()
-            }
-        } catch (e: Exception) {
-            Logger.warn(e) { "Failed to create Skia OpenGL context!" }
-            return false
-        }
-        return true
-    }
+internal class OpenGLContextHandler(layer: SkiaLayer) : ContextBasedContextHandler(layer, "OpenGL") {
+
+    override fun makeContext() = makeGLContext()
 
     private var currentWidth = 0
     private var currentHeight = 0

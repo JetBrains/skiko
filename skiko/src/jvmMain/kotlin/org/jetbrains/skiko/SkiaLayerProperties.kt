@@ -21,6 +21,7 @@ class SkiaLayerProperties(
     val frameBuffering: FrameBuffering = SkikoProperties.frameBuffering,
     val renderApi: GraphicsApi = SkikoProperties.renderApi,
     val adapterPriority: GpuPriority = SkikoProperties.gpuPriority,
+    val gpuResourceCacheLimit: Long = SkikoProperties.gpuResourceCacheLimit
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

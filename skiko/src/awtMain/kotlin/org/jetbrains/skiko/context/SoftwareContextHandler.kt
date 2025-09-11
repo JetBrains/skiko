@@ -9,7 +9,7 @@ import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.*
 
-internal class SoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
+internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHandler(layer) {
     override fun isTransparentBackground(): Boolean {
         // TODO: why Software rendering has another transparency logic from the begginning
         return hostOs == OS.MacOS && layer.transparency
@@ -26,16 +26,6 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
     var image: BufferedImage? = null
     var imageData: ByteArray? = null
     var raster: WritableRaster? = null
-    var isInited = false
-
-    override fun initContext(): Boolean {
-        // Raster does not need context
-        if (!isInited) {
-            isInited = true
-            onContextInitialized()
-        }
-        return isInited
-    }
 
     override fun initCanvas() {
         disposeCanvas()

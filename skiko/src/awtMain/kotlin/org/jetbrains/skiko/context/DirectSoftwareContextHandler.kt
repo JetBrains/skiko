@@ -5,9 +5,7 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AbstractDirectSoftwareRedrawer
 import java.lang.ref.Reference
 
-internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
-    var isInited = false
-
+internal class DirectSoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHandler(layer) {
     private val softwareRedrawer: AbstractDirectSoftwareRedrawer
         get() = layer.redrawer!! as AbstractDirectSoftwareRedrawer
 
@@ -20,14 +18,6 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandle
             return true
         }
         return false
-    }
-
-    override fun initContext(): Boolean {
-        if (!isInited) {
-            isInited = true
-            onContextInitialized()
-        }
-        return isInited
     }
 
     override fun initCanvas() {

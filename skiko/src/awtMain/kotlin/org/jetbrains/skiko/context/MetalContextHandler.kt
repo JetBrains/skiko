@@ -19,20 +19,7 @@ internal class MetalContextHandler(
     layer: SkiaLayer,
     private val device: MetalDevice,
     private val adapter: MetalAdapter
-) : JvmContextHandler(layer) {
-    override fun initContext(): Boolean {
-        try {
-            if (context == null) {
-                context = makeContext()
-                onContextInitialized()
-            }
-        } catch (e: Exception) {
-            Logger.warn(e) { "Failed to create Skia Metal context!" }
-            return false
-        }
-        return true
-    }
-
+) : ContextBasedContextHandler(layer, "Metal") {
     override fun initCanvas() {
         disposeCanvas()
 
@@ -77,7 +64,7 @@ internal class MetalContextHandler(
         makeMetalRenderTarget(device.ptr, width, height)
     )
 
-    private fun makeContext() = DirectContext(
+    override fun makeContext() = DirectContext(
         makeMetalContext(device.ptr)
     )
 
