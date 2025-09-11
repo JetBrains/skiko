@@ -11,8 +11,7 @@ RUN apt-get update -y && \
     update-alternatives --config gcc && \
     apt-get install gcc-9-aarch64-linux-gnu g++-9-aarch64-linux-gnu -y && \
     update-alternatives --install /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc-9 60 --slave /usr/bin/aarch64-linux-gnu-g++ aarch64-linux-gnu-g++ /usr/bin/aarch64-linux-gnu-g++-9 && \
-    update-alternatives --config aarch64-linux-gnu-gcc && \
-    rm -rf /var/lib/apt/lists/*
+    update-alternatives --config aarch64-linux-gnu-gcc
 
 # Install chromium tools
 ENV DEPOT_TOOLS=/usr/depot_tools
