@@ -28,7 +28,7 @@ import kotlin.math.floor
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
-    private val properties: SkiaLayerProperties,
+    val properties: SkiaLayerProperties,
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
