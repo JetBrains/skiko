@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
@@ -32,10 +31,8 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
     override fun initContext(): Boolean {
         // Raster does not need context
         if (!isInited) {
-            if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                Logger.info { "Renderer info:\n ${rendererInfo()}" }
-            }
             isInited = true
+            onContextInitialized()
         }
         return isInited
     }
