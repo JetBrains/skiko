@@ -46,6 +46,7 @@ val createGithubRelease by tasks.registering {
         val repo = gh.getRepository(GITHUB_REPO)
         val release = repo.createRelease("v$githubVersion")
             .name("Version $githubVersion")
+            .generateReleaseNotes(true)
             .commitish(githubCommit)
             .create()
 

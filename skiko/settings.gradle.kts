@@ -14,7 +14,7 @@ pluginManagement {
         dependencies {
             classpath("org.jetbrains.compose.internal.build-helpers:publishing:0.1.18")
 
-            classpath("org.kohsuke:github-api:1.116")
+            classpath("org.kohsuke:github-api:1.329")
 
             // Added dependency for Android Gradle plugin
             classpath("com.android.tools.build:gradle:7.4.2")
