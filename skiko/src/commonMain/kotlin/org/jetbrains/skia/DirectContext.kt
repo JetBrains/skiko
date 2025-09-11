@@ -5,20 +5,8 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.loadOpenGLLibrary
 
-class DirectContext : RefCnt {
-
-    internal constructor(ptr: NativePointer) : super(ptr) {
-         DirectContext_nSetResourceCacheLimit(ptr, resourceCacheLimit)
-    }
-
+class  DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
-
-        /**
-         *  GPU resource cache limit in bytes used by DirectContext instances.
-         *  Set the property on the early startup of an application to take effect.
-         */
-        var resourceCacheLimit: Long = 256 * 1024 * 1024 // the same as Skia's default, see GrResourceCache.h, kDefaultMaxSize
-
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
             loadOpenGLLibrary()
@@ -139,6 +127,20 @@ class DirectContext : RefCnt {
             reachabilityBarrier(this)
         }
     }
+
+    /**
+     * GPU resource cache limit. If the cache currently exceeds this limit,
+     * it will be purged (LRU) to keep the cache within the limit.
+     */
+    var resourceCacheLimit: Long
+        get() {
+            Stats.onNativeCall()
+            return DirectContext_nGetResourceCacheLimit(_ptr)
+        }
+        set(value) {
+            Stats.onNativeCall()
+            DirectContext_nSetResourceCacheLimit(_ptr, value)
+        }
 }
 
 fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
@@ -150,6 +152,9 @@ private external fun DirectContext_nFlush(ptr: NativePointer, surfacePtr: Native
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushDefault")
 private external fun DirectContext_nFlushDefault(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSetResourceCacheLimit")
+private external fun DirectContext_nGetResourceCacheLimit(ptr: NativePointer): Long
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSetResourceCacheLimit")
 private external fun DirectContext_nSetResourceCacheLimit(ptr: NativePointer, maxResourceBytes: Long)
