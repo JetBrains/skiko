@@ -242,6 +242,33 @@
     }
 }
 
+- (BOOL) isMaximized
+{
+    return [self.window isZoomed];
+}
+
+- (void) setMaximized: (BOOL) value
+{
+    if (self.isFullScreen)
+    {
+        [self performSelectorOnMainThread:@selector(toggleFullScreenAndZoom:) withObject:[NSNumber numberWithBool:value] waitUntilDone:NO];
+    }
+    else if (value != self.isMaximized)
+    {
+        [self.window performSelectorOnMainThread:@selector(zoom:) withObject:nil waitUntilDone:NO];
+    }
+}
+
+- (void) toggleFullScreenAndZoom: (NSNumber *) value {
+    [self.window toggleFullScreen:nil];
+
+    BOOL boolValue = [value boolValue];
+    if (boolValue != self.isMaximized)
+    {
+        [self.window zoom:nil];
+    }
+}
+
 @end
 
 NSMutableSet *layerStorage = nil;
@@ -354,6 +381,17 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetFulls
         if (layer != NULL)
         {
             [layer makeFullscreen:value];
+        }
+    }
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetMaximizedNative(JNIEnv *env, jobject properties, jobject component, jboolean value)
+{
+    @autoreleasepool {
+        LayerHandler *layer = findByObject(env, component);
+        if (layer != NULL)
+        {
+            [layer setMaximized:value];
         }
     }
 }
