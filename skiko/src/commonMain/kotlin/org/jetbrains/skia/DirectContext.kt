@@ -134,12 +134,20 @@ class  DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      */
     var resourceCacheLimit: Long
         get() {
-            Stats.onNativeCall()
-            return DirectContext_nGetResourceCacheLimit(_ptr)
+            try {
+                Stats.onNativeCall()
+                return DirectContext_nGetResourceCacheLimit(_ptr)
+            } finally {
+                reachabilityBarrier(this)
+            }
         }
         set(value) {
-            Stats.onNativeCall()
-            DirectContext_nSetResourceCacheLimit(_ptr, value)
+            try {
+                Stats.onNativeCall()
+                DirectContext_nSetResourceCacheLimit(_ptr, value)
+            } finally {
+                reachabilityBarrier(this)
+            }
         }
 }
 
@@ -153,7 +161,7 @@ private external fun DirectContext_nFlush(ptr: NativePointer, surfacePtr: Native
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushDefault")
 private external fun DirectContext_nFlushDefault(ptr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSetResourceCacheLimit")
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nGetResourceCacheLimit")
 private external fun DirectContext_nGetResourceCacheLimit(ptr: NativePointer): Long
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSetResourceCacheLimit")
