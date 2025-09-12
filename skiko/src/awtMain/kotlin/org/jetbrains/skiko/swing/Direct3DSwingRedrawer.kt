@@ -45,7 +45,7 @@ internal class Direct3DSwingRedrawer(
     private var bytesToDraw = ByteArray(0)
 
     init {
-        onContextInit()
+        onContextInit(context)
     }
 
     override fun dispose() {

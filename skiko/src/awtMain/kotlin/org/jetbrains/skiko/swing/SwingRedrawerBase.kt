@@ -68,11 +68,17 @@ internal abstract class SwingRedrawerBase(
                 "OS: ${hostOs.id} ${hostArch.id}\n"
     }
 
-    protected fun onContextInit() {
+    protected fun onContextInit(context: DirectContext?) {
         require(!isDisposed) { "$javaClass is disposed" }
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
             Logger.info { "Renderer info:\n ${rendererInfo()}" }
+        }
+        context?.run {
+            val gpuResourceCacheLimit = swingLayerProperties.gpuResourceCacheLimit
+            if (gpuResourceCacheLimit >= 0) {
+                resourceCacheLimit = gpuResourceCacheLimit
+            }
         }
         deviceAnalytics?.contextInit()
     }
