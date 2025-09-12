@@ -63,6 +63,8 @@ open class SkiaSwingLayer(
             get() = this@SkiaSwingLayer.graphicsConfiguration
         override val adapterPriority: GpuPriority
             get() = this@SkiaSwingLayer.properties.adapterPriority
+        override val gpuResourceCacheLimit: Long
+            get() = this@SkiaSwingLayer.properties.gpuResourceCacheLimit
     }
 
     private val redrawerManager = RedrawerManager<SwingRedrawer>(

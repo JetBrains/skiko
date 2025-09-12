@@ -2,29 +2,15 @@ package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.AngleApi
-import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AngleRedrawer
 
-internal class AngleContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
+internal class AngleContextHandler(layer: SkiaLayer) : ContextBasedContextHandler(layer, "ANGLE") {
     private val angleRedrawer: AngleRedrawer
         get() = layer.redrawer!! as AngleRedrawer
 
-    override fun initContext(): Boolean {
-        try {
-            if (context == null) {
-                context = angleRedrawer.makeContext()
-                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    Logger.info { "Renderer info:\n ${rendererInfo()}" }
-                }
-            }
-        } catch (e: Exception) {
-            Logger.warn(e) { "Failed to create Skia ANGLE context!" }
-            return false
-        }
-        return true
-    }
+    override fun makeContext() = angleRedrawer.makeContext()
 
     private var currentWidth = 0
     private var currentHeight = 0
