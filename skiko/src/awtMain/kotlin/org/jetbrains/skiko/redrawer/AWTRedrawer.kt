@@ -57,16 +57,17 @@ internal abstract class AWTRedrawer(
     protected inline fun inDrawScope(body: () -> Unit) {
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         if (!isDisposed) {
-            if (!isFirstFrameRendered) {
+            val isFirstFrame = !isFirstFrameRendered
+            isFirstFrameRendered = true
+            if (isFirstFrame) {
                 deviceAnalytics?.beforeFirstFrameRender()
             }
             deviceAnalytics?.beforeFrameRender()
             layer.inDrawScope(body)
-            if (!isFirstFrameRendered && !isDisposed) {
+            if (isFirstFrame && !isDisposed) {
                 deviceAnalytics?.afterFirstFrameRender()
             }
             deviceAnalytics?.afterFrameRender()
-            isFirstFrameRendered = true
         }
     }
 
