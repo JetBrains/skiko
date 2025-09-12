@@ -1,8 +1,18 @@
 package org.jetbrains.skia.impl
 
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry
+ */
 internal external class FinalizationRegistry(cleanup: (JsReference<FinalizationThunk>) -> Unit) {
-    fun register(obj: JsReference<Managed>, handle: JsReference<FinalizationThunk>)
-    fun unregister(obj: JsReference<Managed>)
+    /**
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry/register
+     */
+    fun register(obj: JsReference<Managed>, handle: JsReference<FinalizationThunk>, unregisterToken: JsReference<Managed>)
+
+    /**
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry/unregister
+     */
+    fun unregister(unregisterToken: JsReference<Managed>)
 }
 
 private val registry = FinalizationRegistry { thunk: JsReference<FinalizationThunk> ->
@@ -10,7 +20,8 @@ private val registry = FinalizationRegistry { thunk: JsReference<FinalizationThu
 }
 
 internal actual fun register(managed: Managed, thunk: FinalizationThunk) {
-    registry.register(managed.toJsReference(), thunk.toJsReference())
+    val managedRef = managed.toJsReference()
+    registry.register(managedRef, thunk.toJsReference(), managedRef)
 }
 
 internal actual fun unregister(managed: Managed) {
