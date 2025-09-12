@@ -42,7 +42,7 @@ internal class MetalSwingRedrawer(
     private var texturePtr: Long = 0
 
     init {
-        onContextInit()
+        onContextInit(context)
     }
 
     private val painter: SwingPainter = createSwingPainter(swingLayerProperties)
