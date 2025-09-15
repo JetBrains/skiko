@@ -183,7 +183,7 @@ class SkiaLayerTest {
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
 
-            assertEquals(window.layer.renderApi, renderApi)
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
@@ -214,7 +214,7 @@ class SkiaLayerTest {
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
 
-            assertEquals(layer.renderApi, renderApi)
+            assertRenderApiFor(layer)
         } finally {
             window.close()
         }
@@ -242,7 +242,7 @@ class SkiaLayerTest {
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
 
-            assertEquals(window.layer.renderApi, renderApi)
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
@@ -295,7 +295,7 @@ class SkiaLayerTest {
             delay(1000)
             assertEquals((40 * density).toInt(), renderedWidth)
 
-            assertEquals(layer.renderApi, renderApi)
+            assertRenderApiFor(layer)
         } finally {
             layer.dispose()
             window.close()
@@ -339,7 +339,7 @@ class SkiaLayerTest {
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
 
-            assertEquals(layer.renderApi, renderApi)
+            assertRenderApiFor(layer)
         } finally {
             layer.dispose()
             window.close()
@@ -363,7 +363,7 @@ class SkiaLayerTest {
 
             screenshots.assert(window.bounds)
 
-            assertEquals(window.layer.renderApi, renderApi)
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
@@ -399,9 +399,9 @@ class SkiaLayerTest {
             delay(1000)
             screenshots.assert(window3.bounds, "window3")
 
-            assertEquals(window1.layer.renderApi, renderApi)
-            assertEquals(window2.layer.renderApi, renderApi)
-            assertEquals(window3.layer.renderApi, renderApi)
+            assertRenderApiFor(window1.layer)
+            assertRenderApiFor(window2.layer)
+            assertRenderApiFor(window3.layer)
         } finally {
             window1.close()
             window2.close()
@@ -426,7 +426,7 @@ class SkiaLayerTest {
 
             delay(1000)
             assertEquals(true, stateRemainsFullscreen)
-            assertEquals(window.layer.renderApi, renderApi)
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
 
@@ -507,8 +507,9 @@ class SkiaLayerTest {
             if (delayCount > 0) {
                 delay(delayCount * 10)
             }
+
             openedWindows.forEach {
-                assertEquals(it.layer.renderApi, renderApi)
+                assertRenderApiFor(it.layer)
             }
         }
 
@@ -534,7 +535,7 @@ class SkiaLayerTest {
         repeat(100) {
             window.size = Dimension(200 + Random.nextInt(200), 200 + Random.nextInt(200))
             window.paint(window.graphics)
-            assertEquals(window.layer.renderApi, renderApi)
+            assertRenderApiFor(window.layer)
             yield()
         }
 
@@ -563,7 +564,7 @@ class SkiaLayerTest {
             window.layer.needRedraw()
             yield()
             window.paint(window.graphics)
-            assertEquals(window.layer.renderApi, renderApi)
+            assertRenderApiFor(window.layer)
             window.close()
         }
     }
@@ -712,7 +713,7 @@ class SkiaLayerTest {
             window.isVisible = true
 
             onDrawCompleted.await()
-            assertEquals(window.layer.renderApi, renderApi)
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
@@ -1000,7 +1001,7 @@ class SkiaLayerTest {
             assertEquals(0, lineMetrics.first().lineNumber)
 
             screenshots.assert(window.bounds)
-            assertEquals(window.layer.renderApi, renderApi)
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
