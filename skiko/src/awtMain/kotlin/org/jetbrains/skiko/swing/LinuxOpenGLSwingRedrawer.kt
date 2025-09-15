@@ -26,17 +26,14 @@ internal class LinuxOpenGLSwingRedrawer(
 
     private val storage = Bitmap()
 
-    private val context = makeGLContext()
-
     private var bytesToDraw = ByteArray(0)
 
     init {
-        onContextInit(context)
+        onContextInit(null)
     }
 
     override fun dispose() {
         bytesToDraw = ByteArray(0)
-        context.close()
         storage.close()
         disposeOffScreenBuffer(offScreenBufferPtr)
         disposeOffScreenContext(offScreenContextPtr)
@@ -67,8 +64,10 @@ internal class LinuxOpenGLSwingRedrawer(
                     FramebufferFormat.GR_GL_RGBA8
                 ).autoClose()
 
+                // TODO: may be it is possible to reuse [makeGLContext]
+                val directContext = makeGLContext().configureContext().autoClose()
                 val surface = Surface.makeFromBackendRenderTarget(
-                    context,
+                    directContext,
                     renderTarget,
                     SurfaceOrigin.TOP_LEFT,
                     SurfaceColorFormat.BGRA_8888,

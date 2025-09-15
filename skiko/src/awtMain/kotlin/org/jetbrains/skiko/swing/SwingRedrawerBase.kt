@@ -74,13 +74,16 @@ internal abstract class SwingRedrawerBase(
         if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
             Logger.info { "Renderer info:\n ${rendererInfo()}" }
         }
-        context?.run {
-            val gpuResourceCacheLimit = swingLayerProperties.gpuResourceCacheLimit
-            if (gpuResourceCacheLimit >= 0) {
-                resourceCacheLimit = gpuResourceCacheLimit
-            }
-        }
+        context?.configureContext()
         deviceAnalytics?.contextInit()
+    }
+
+    protected fun DirectContext.configureContext(
+        gpuResourceCacheLimit: Long = swingLayerProperties.gpuResourceCacheLimit
+    ): DirectContext = apply {
+        if (gpuResourceCacheLimit >= 0) {
+            resourceCacheLimit = gpuResourceCacheLimit
+        }
     }
 
     private inline fun inDrawScope(body: () -> Unit) {
