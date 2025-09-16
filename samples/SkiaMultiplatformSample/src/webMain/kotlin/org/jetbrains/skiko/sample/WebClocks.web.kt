@@ -8,7 +8,7 @@ import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.get
 
-class WebClocks(skiaLayer: SkiaLayer, canvas: HTMLCanvasElement) : Clocks(layer::renderApi) {
+class WebClocks(skiaLayer: SkiaLayer, canvas: HTMLCanvasElement) : Clocks(skiaLayer::renderApi) {
     init {
         val scale = window.devicePixelRatio.toFloat()
         val bounds = canvas.getBoundingClientRect()

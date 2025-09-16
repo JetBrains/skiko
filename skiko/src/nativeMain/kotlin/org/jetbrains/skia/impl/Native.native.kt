@@ -48,7 +48,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 }
 
 actual typealias NativePointer = NativePtr
-actual typealias InteropPointer = NativePtr
+internal actual typealias InteropPointer = NativePtr
 
 internal actual fun reachabilityBarrier(obj: Any?) {
     // TODO: implement native barrier

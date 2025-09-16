@@ -85,13 +85,13 @@ actual open class SkiaLayer {
         @ObjCAction
         fun frameDidChange(notification: NSNotification) {
             redrawer?.syncBounds()
-            redrawer?.redrawImmediately()
+            redrawer?.redrawImmediately(updateNeeded = true)
         }
 
         @ObjCAction
         fun windowDidChangeBackingProperties(notification: NSNotification) {
             redrawer?.syncBounds()
-            redrawer?.redrawImmediately()
+            redrawer?.redrawImmediately(updateNeeded = true)
         }
 
         fun addObserver() {
@@ -140,8 +140,8 @@ actual open class SkiaLayer {
     /**
      * Schedules a frame to an appropriate moment.
      */
-    actual fun needRedraw() {
-        redrawer?.needRedraw()
+    actual fun needRedraw(throttledToVsync: Boolean) {
+        redrawer?.needRedraw(throttledToVsync)
     }
 
     /**

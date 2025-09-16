@@ -1,5 +1,8 @@
+@file:OptIn(BetaInteropApi::class)
+
 package org.jetbrains.skiko.redrawer
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr
@@ -14,6 +17,7 @@ import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MacOsMetalContextHandler
+import org.jetbrains.skiko.currentNanoTime
 import platform.AppKit.NSWindowDidChangeOcclusionStateNotification
 import platform.AppKit.NSWindowOcclusionStateVisible
 import platform.CoreGraphics.CGColorCreate
@@ -28,7 +32,6 @@ import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCAGravityTopLeft
 import platform.QuartzCore.kCALayerHeightSizable
 import platform.QuartzCore.kCALayerWidthSizable
-import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSNotification
 import platform.Foundation.NSNotificationCenter
@@ -127,22 +130,33 @@ internal class MacOsMetalRedrawer(
         CATransaction.flush()
     }
 
+    private fun checkDisposed() {
+        check(!isDisposed) { "MetalRedrawer is disposed" }
+    }
+
     /**
      * Schedules a frame [draw] to an appropriate moment.
      */
-    override fun needRedraw() {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
+    override fun needRedraw(throttledToVsync: Boolean) {
+        checkDisposed()
         frameDispatcher.scheduleFrame()
+    }
+
+    override fun update(nanoTime: Long) {
+        checkDisposed()
+        skiaLayer.update(nanoTime)
     }
 
     /**
      * Invokes [draw] right away.
      */
-    override fun redrawImmediately() {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
+    override fun redrawImmediately(updateNeeded: Boolean) {
+        checkDisposed()
         autoreleasepool {
-            if (!isDisposed) {
-                skiaLayer.update(getTimeNanos())
+            if (!isDisposed && updateNeeded) {
+                update()
+            }
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 contextHandler.draw()
             }
         }
@@ -151,7 +165,7 @@ internal class MacOsMetalRedrawer(
     private suspend fun draw() {
         autoreleasepool {
             if (!isDisposed) {
-                skiaLayer.update(getTimeNanos())
+                update()
                 contextHandler.draw()
             }
         }
@@ -208,7 +222,7 @@ internal class MetalLayer : CAMetalLayer {
         this.framebufferOnly = false
         skiaLayer.nsView.layer = this
         skiaLayer.nsView.wantsLayer = true
-        this.contentsGravity = kCAGravityTopLeft;
+        this.contentsGravity = kCAGravityTopLeft
     }
 
     fun dispose() {
@@ -216,7 +230,7 @@ internal class MetalLayer : CAMetalLayer {
     }
 
     override fun drawInContext(ctx: CGContextRef?) {
-        skiaLayer.update(getTimeNanos())
+        skiaLayer.update(currentNanoTime())
         contextHandler.draw()
     }
 }

@@ -6,16 +6,23 @@ import SkiaBuildType
 import SkikoProperties
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.get
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 import registerSkikoTask
+import skiaVersion
 import supportAndroid
-import supportWasm
+import supportAwt
+import supportNativeIosArm64
+import supportNativeIosSimulatorArm64
+import supportNativeIosX64
+import supportNativeLinux
+import supportNativeMac
+import supportNativeTvosArm64
+import supportNativeTvosSimulatorArm64
+import supportNativeTvosX64
+import supportWeb
 import toTitleCase
 import java.io.File
-import skiaVersion
-import supportNativeLinux
 
 fun skiaHeadersDirs(skiaDir: File): List<File> =
     listOf(
@@ -106,14 +113,13 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         OS.Android -> listOf(
             "-DSK_BUILD_FOR_ANDROID"
         )
-        else -> TODO("unsupported $os")
     }
 
     return (base + perOs).toTypedArray()
 }
 
 fun Project.configureSignAndPublishDependencies() {
-    if (supportWasm) {
+    if (supportWeb) {
         tasks.configureEach {
             val publishJs = "publishJsPublicationTo"
             val publishWasm = "publishSkikoWasmRuntimePublicationTo"
@@ -175,6 +181,103 @@ fun Project.configureSignAndPublishDependencies() {
                     dependsOn(signLinuxArm64Publication)
                     dependsOn(signLinuxX64Publication)
                 }
+            }
+        }
+    }
+
+    if (supportNativeMac) {
+        val publishMacosArm64 = "publishMacosArm64PublicationTo"
+        val publishMacosX64 = "publishMacosX64PublicationTo"
+        val signMacosArm64 = "signMacosArm64Publication"
+        val signMacosX64 = "signMacosX64Publication"
+
+        tasks.configureEach {
+            when {
+                name.startsWith(publishMacosArm64) -> {
+                    dependsOn(signMacosArm64)
+                    dependsOn(signMacosX64)
+                }
+                name.startsWith(publishMacosX64) -> {
+                    dependsOn(signMacosArm64)
+                    dependsOn(signMacosX64)
+                }
+            }
+        }
+    }
+
+    // iOS family
+    if (supportNativeIosArm64 || supportNativeIosSimulatorArm64 || supportNativeIosX64) {
+        val publishIosArm64 = "publishIosArm64PublicationTo"
+        val publishIosSimArm64 = "publishIosSimulatorArm64PublicationTo"
+        val publishIosX64 = "publishIosX64PublicationTo"
+        val signIosArm64 = "signIosArm64Publication"
+        val signIosSimArm64 = "signIosSimulatorArm64Publication"
+        val signIosX64 = "signIosX64Publication"
+
+        tasks.configureEach {
+            when {
+                name.startsWith(publishIosArm64) -> {
+                    if (supportNativeIosArm64) dependsOn(signIosArm64)
+                    if (supportNativeIosSimulatorArm64) dependsOn(signIosSimArm64)
+                    if (supportNativeIosX64) dependsOn(signIosX64)
+                }
+                name.startsWith(publishIosSimArm64) -> {
+                    if (supportNativeIosArm64) dependsOn(signIosArm64)
+                    if (supportNativeIosSimulatorArm64) dependsOn(signIosSimArm64)
+                    if (supportNativeIosX64) dependsOn(signIosX64)
+                }
+                name.startsWith(publishIosX64) -> {
+                    if (supportNativeIosArm64) dependsOn(signIosArm64)
+                    if (supportNativeIosSimulatorArm64) dependsOn(signIosSimArm64)
+                    if (supportNativeIosX64) dependsOn(signIosX64)
+                }
+            }
+        }
+    }
+
+    // tvOS family
+    if (supportNativeTvosArm64 || supportNativeTvosSimulatorArm64 || supportNativeTvosX64) {
+        val publishTvosArm64 = "publishTvosArm64PublicationTo"
+        val publishTvosSimArm64 = "publishTvosSimulatorArm64PublicationTo"
+        val publishTvosX64 = "publishTvosX64PublicationTo"
+        val signTvosArm64 = "signTvosArm64Publication"
+        val signTvosSimArm64 = "signTvosSimulatorArm64Publication"
+        val signTvosX64 = "signTvosX64Publication"
+
+        tasks.configureEach {
+            when {
+                name.startsWith(publishTvosArm64) -> {
+                    if (supportNativeTvosArm64) dependsOn(signTvosArm64)
+                    if (supportNativeTvosSimulatorArm64) dependsOn(signTvosSimArm64)
+                    if (supportNativeTvosX64) dependsOn(signTvosX64)
+                }
+                name.startsWith(publishTvosSimArm64) -> {
+                    if (supportNativeTvosArm64) dependsOn(signTvosArm64)
+                    if (supportNativeTvosSimulatorArm64) dependsOn(signTvosSimArm64)
+                    if (supportNativeTvosX64) dependsOn(signTvosX64)
+                }
+                name.startsWith(publishTvosX64) -> {
+                    if (supportNativeTvosArm64) dependsOn(signTvosArm64)
+                    if (supportNativeTvosSimulatorArm64) dependsOn(signTvosSimArm64)
+                    if (supportNativeTvosX64) dependsOn(signTvosX64)
+                }
+            }
+        }
+    }
+
+    // Cross-publication pairs due to shared javadoc: KotlinMultiplatform <-> AWT
+    tasks.configureEach {
+        val publishKmp = "publishKotlinMultiplatformPublicationTo"
+        val publishAwt = "publishAwtPublicationTo"
+        val signKmp = "signKotlinMultiplatformPublication"
+        val signAwt = "signAwtPublication"
+
+        when {
+            name.startsWith(publishKmp) -> {
+                if (supportAwt) dependsOn(signAwt)
+            }
+            name.startsWith(publishAwt) -> {
+                dependsOn(signKmp)
             }
         }
     }

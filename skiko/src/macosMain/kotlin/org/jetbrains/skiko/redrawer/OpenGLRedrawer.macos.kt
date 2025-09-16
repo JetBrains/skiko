@@ -1,5 +1,8 @@
+@file:OptIn(BetaInteropApi::class)
+
 package org.jetbrains.skiko.redrawer
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.FrameDispatcher
@@ -7,6 +10,7 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MacOSOpenGLContextHandler
+import org.jetbrains.skiko.currentNanoTime
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp
@@ -15,7 +19,6 @@ import platform.OpenGLCommon.CGLPixelFormatObj
 import platform.OpenGLCommon.CGLSetCurrentContext
 import platform.QuartzCore.CAOpenGLLayer
 import platform.QuartzCore.*
-import kotlin.system.getTimeNanos
 
 /**
  * OpenGL [Redrawer] implementation for MacOs.
@@ -35,7 +38,7 @@ internal class MacOsOpenGLRedrawer(
     }
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
-        redrawImmediately()
+        redrawImmediately(updateNeeded = true)
     }
 
     override fun dispose() {
@@ -63,11 +66,15 @@ internal class MacOsOpenGLRedrawer(
         CATransaction.flush()
     }
 
-    override fun needRedraw() {
+    override fun update(nanoTime: Long) {
+        skiaLayer.update(nanoTime)
+    }
+
+    override fun needRedraw(throttledToVsync: Boolean) {
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() {
+    override fun redrawImmediately(updateNeeded: Boolean) {
         glLayer.setNeedsDisplay()
         skiaLayer.nsView.setNeedsDisplay(true)
     }
@@ -90,7 +97,7 @@ internal class MacosGLLayer : CAOpenGLLayer {
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
         skiaLayer.nsView.layer = this
         skiaLayer.nsView.wantsLayer = true
-        this.contentsGravity = kCAGravityTopLeft;
+        this.contentsGravity = kCAGravityTopLeft
     }
 
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
@@ -121,9 +128,9 @@ internal class MacosGLLayer : CAOpenGLLayer {
         forLayerTime: CFTimeInterval,
         displayTime: CPointer<CVTimeStamp>?
     ) {
-        CGLSetCurrentContext(ctx);
+        CGLSetCurrentContext(ctx)
         try {
-            skiaLayer.update(getTimeNanos())
+            skiaLayer.update(currentNanoTime())
             contextHandler.draw()
         } catch (e: Throwable) {
             e.printStackTrace()

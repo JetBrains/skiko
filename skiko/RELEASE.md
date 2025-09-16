@@ -2,13 +2,13 @@
 
 ## Teamcity
 
-Trigger a new deployment in [Publish release](https://buildserver.labs.intellij.net/buildConfiguration/Skiko_PublishRelease)
-build configuration.
-    1. Click "Deploy" button.
-    2. Specify the desired version in "Skiko Release Version" text field on the "Parameters" tab.
-    3. Choose the desired branch and commit on the "Changes" tab.
-    4. Optionally you can check "Put the build to the queue top" option in the "General" tab to speed up a deployment
-    (please be mindful about it!).
+To publish a version of Skiko:
+1. Open [Publish release](https://buildserver.labs.intellij.net/buildConfiguration/Skiko_PublishRelease).
+2. Click "Run" button.
+3. Specify the desired version in "Skiko Release Version" text field on the "Parameters" tab.
+4. Choose the desired branch and commit on the "Changes" tab.
+5. Optionally, you can check "Put the build to the queue top" option in the "General" tab to speed up a deployment
+   (please be mindful about it!).
 
 ## Publishing
 

@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import kotlin.time.Duration.Companion.nanoseconds
+
 interface SkikoLoggerInterface {
     val isTraceEnabled: Boolean
     val isDebugEnabled: Boolean
@@ -36,11 +38,14 @@ internal enum class LogLevel {
     }
 }
 
-class DefaultConsoleLogger(override val isTraceEnabled: Boolean = false,
-                           override val isDebugEnabled: Boolean = false,
-                           override val isInfoEnabled: Boolean = true,
-                           override val isWarnEnabled: Boolean = true,
-                           override val isErrorEnabled: Boolean = true): SkikoLoggerInterface {
+class DefaultConsoleLogger(
+    override val isTraceEnabled: Boolean = false,
+    override val isDebugEnabled: Boolean = false,
+    override val isInfoEnabled: Boolean = true,
+    override val isWarnEnabled: Boolean = true,
+    override val isErrorEnabled: Boolean = true,
+    private val logTimestamp: Boolean = false
+): SkikoLoggerInterface {
 
     companion object {
         fun fromLevel(level: String): DefaultConsoleLogger {
@@ -55,48 +60,52 @@ class DefaultConsoleLogger(override val isTraceEnabled: Boolean = false,
         }
     }
 
+    private fun logMessagePrefix() = if (logTimestamp) {
+        "[${currentNanoTime().nanoseconds.inWholeMilliseconds.mod(1_000)}]"
+    } else "[SKIKO]"
+
     override fun trace(message: String) {
-        println("[SKIKO] trace: $message")
+        println("${logMessagePrefix()} trace: $message")
     }
 
     override fun trace(t: Throwable, message: String) {
-        println("[SKIKO] trace: $message")
+        println("${logMessagePrefix()} trace: $message")
         println(t)
     }
 
     override fun debug(message: String) {
-        println("[SKIKO] debug: $message")
+        println("${logMessagePrefix()} debug: $message")
     }
 
     override fun debug(t: Throwable, message: String) {
-        println("[SKIKO] debug: $message")
+        println("${logMessagePrefix()} debug: $message")
         println(t)
     }
 
     override fun info(message: String) {
-        println("[SKIKO] info: $message")
+        println("${logMessagePrefix()} info: $message")
     }
 
     override fun info(t: Throwable, message: String) {
-        println("[SKIKO] info: $message")
+        println("${logMessagePrefix()} info: $message")
         println(t)
     }
 
     override fun warn(message: String) {
-        println("[SKIKO] warn: $message")
+        println("${logMessagePrefix()} warn: $message")
     }
 
     override fun warn(t: Throwable, message: String) {
-        println("[SKIKO] warn: $message")
+        println("${logMessagePrefix()} warn: $message")
         println(t)
     }
 
     override fun error(message: String) {
-        println("[SKIKO] error: $message")
+        println("${logMessagePrefix()} error: $message")
     }
 
     override fun error(t: Throwable, message: String) {
-        println("[SKIKO] error: $message")
+        println("${logMessagePrefix()} error: $message")
         println(t)
     }
 }

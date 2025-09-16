@@ -226,8 +226,9 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     val unpackedSkia = unzipper.get()
     val skiaDir = unpackedSkia.absolutePath
 
-    val bridgesLibrary = "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
-    val allLibraries = skiaStaticLibraries(skiaDir, targetString, buildType) + bridgesLibrary
+    val bridgesLibrary = layout.buildDirectory.file("nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a")
+    val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
+    val allLibraries = skiaStaticLibraries(skiaDir, targetString, buildType) + bridgesLibraryPath
 
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val linkerFlags = when (os) {
@@ -265,6 +266,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 "$skiaBinDir/libskia.a"
             )
             if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
+                val buildDir = project.layout.buildDirectory.get().asFile
                 options.add(0, "-L$buildDir/multistrap-arm64/usr/lib")
                 options.add(1, "-L$buildDir/multistrap-arm64/usr/lib/aarch64-linux-gnu")
             }
@@ -303,9 +305,9 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             include("**/*.o")
         }
         inputs.files(objectFiles)
-        val outDir = "$buildDir/nativeBridges/static/$targetString"
-        val staticLib = "$outDir/skiko-native-bridges-$targetString.a"
-        workingDir = File(outDir)
+        val outDir = layout.buildDirectory.dir("nativeBridges/static/$targetString").get().asFile
+        val staticLib = "skiko-native-bridges-$targetString.a"
+        workingDir = outDir
         when (os) {
             OS.Linux -> {
                 executable = "ar"
@@ -351,18 +353,18 @@ fun KotlinMultiplatformExtension.configureIOSTestsWithMetal(project: Project) {
     metalTestTargets.forEach { target: String ->
         if (targets.names.contains(target)) {
             val testBinary = targets.getByName<KotlinNativeTarget>(target).binaries.getTest("DEBUG")
-            project.tasks.create(target + "TestWithMetal") {
+            project.tasks.register(target + "TestWithMetal") {
                 dependsOn(testBinary.linkTask)
                 doLast {
                     val simulatorIdPropertyKey = "skiko.iosSimulatorUUID"
                     val simulatorId = project.findProperty(simulatorIdPropertyKey)?.toString()
                         ?: error("Property '$simulatorIdPropertyKey' not found. Pass it with -P$simulatorIdPropertyKey=...")
 
-                    project.exec { commandLine("xcrun", "simctl", "boot", simulatorId) }
+                    project.providers.exec { commandLine("xcrun", "simctl", "boot", simulatorId) }
                     try {
-                        project.exec { commandLine("xcrun", "simctl", "spawn", simulatorId, testBinary.outputFile) }
+                        project.providers.exec { commandLine("xcrun", "simctl", "spawn", simulatorId, testBinary.outputFile) }
                     } finally {
-                        project.exec { commandLine("xcrun", "simctl", "shutdown", simulatorId) }
+                        project.providers.exec { commandLine("xcrun", "simctl", "shutdown", simulatorId) }
                     }
                 }
             }

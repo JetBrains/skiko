@@ -48,6 +48,7 @@ val createGithubRelease by tasks.registering {
         val repo = gh.getRepository(GITHUB_REPO)
         val release = repo.createRelease("v$githubVersion")
             .name("Version $githubVersion")
+            .generateReleaseNotes(true)
             .commitish(githubCommit)
             .create()
 
@@ -90,7 +91,7 @@ val uploadSkikoArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask
 
 fun Project.skikoMavenModules(version: String): Provider<List<ModuleToUpload>> =
     provider {
-        val artifactsDir = buildDir.resolve("skiko-artifacts")
+        val artifactsDir = layout.buildDirectory.dir("skiko-artifacts").get().asFile
 
         skikoArtifactIds.map { artifactId ->
             val skikoGroupId = "org.jetbrains.skiko"

@@ -5,6 +5,11 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
 import kotlin.collections.HashMap
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.LibraryPlugin
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform")
@@ -14,7 +19,7 @@ plugins {
 }
 
 if (supportAndroid) {
-    apply<com.android.build.gradle.LibraryPlugin>()
+    apply<LibraryPlugin>()
 }
 
 apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
@@ -57,7 +62,9 @@ kotlin {
     if (supportAwt) {
         jvm("awt") {
             compilations.all {
-                kotlinOptions.jvmTarget = "1.8"
+                compileTaskProvider.configure {
+                    compilerOptions.jvmTarget.set(JvmTarget.JVM_1_8)
+                }
             }
             generateVersion(targetOs, targetArch, skiko)
         }
@@ -68,7 +75,9 @@ kotlin {
             publishLibraryVariants("release")
 
             compilations.all {
-                kotlinOptions.jvmTarget = "1.8"
+                compileTaskProvider.configure {
+                    compilerOptions.jvmTarget.set(JvmTarget.JVM_1_8)
+                }
             }
 
             // Keep the previously defined attribute that was used to distinguish JVM and android variant
@@ -80,14 +89,14 @@ kotlin {
         }
     }
 
-    val linkWasmTask = skikoProjectContext.createWasmLinkTask()
 
-    if (supportJs) {
-        js(IR) {
+    if (supportWeb) {
+        skikoProjectContext.declareWasmTasks()
+
+        js {
             moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
-                    dependsOn(linkWasmTask!!)
                     useKarma {
                         useChromeHeadless()
                         useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
@@ -100,32 +109,19 @@ kotlin {
             val test by compilations.getting
 
             project.tasks.named<Copy>(test.processResourcesTaskName) {
-                from(linkWasmTask!!) {
-                    include("*.mjs")
-                    include("*.wasm")
-                }
-
-                from(wasmImports) {
-                    include("*.mjs")
-                }
-
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
             }
 
             setupImportsGeneratorPlugin()
         }
-    }
 
-    if (supportWasm) {
 
         @OptIn(ExperimentalWasmDsl::class)
         wasmJs {
             moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
-                    dependsOn(linkWasmTask!!)
                     useKarma {
-                        this.webpackConfig.experiments.add("topLevelAwait")
                         useChromeHeadless()
                         useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
                     }
@@ -136,13 +132,6 @@ kotlin {
             val test by compilations.getting
 
             project.tasks.named<Copy>(test.processResourcesTaskName) {
-                from(linkWasmTask!!) {
-                    include("*.mjs")
-                    include("*.wasm")
-                }
-
-                from(skikoTestMjs)
-
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinJs"])
             }
 
@@ -182,7 +171,6 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                implementation("org.jetbrains.runtime:jbr-api:1.5.0")
             }
         }
         val commonTest by getting {
@@ -202,6 +190,9 @@ kotlin {
         if (supportAwt) {
             val awtMain by getting {
                 dependsOn(jvmMain)
+                dependencies {
+                    implementation("org.jetbrains.runtime:jbr-api:1.5.0")
+                }
             }
         }
 
@@ -215,6 +206,7 @@ kotlin {
         }
 
         val jvmTest by creating {
+            dependsOn(commonTest)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test-junit"))
@@ -234,7 +226,7 @@ kotlin {
             }
         }
 
-        if (supportJs || supportWasm || supportAnyNative) {
+        if (supportWeb || supportAnyNative) {
             val nativeJsMain by creating {
                 dependsOn(commonMain)
             }
@@ -243,35 +235,38 @@ kotlin {
                 dependsOn(commonTest)
             }
 
-            if (supportJs || supportWasm) {
-                val jsWasmMain by creating {
+            if (supportWeb) {
+                val webMain by creating {
                     dependsOn(nativeJsMain)
                 }
 
-                val jsWasmTest by creating {
+                val webTest by creating {
                     dependsOn(nativeJsTest)
+
+                    resources.srcDirs(
+                        tasks.named("linkWasm"),
+                        wasmImports
+                    )
                 }
 
-                if (supportJs) {
-                    val jsMain by getting {
-                        dependsOn(jsWasmMain)
-                    }
-
-                    val jsTest by getting {
-                        dependsOn(jsWasmTest)
-                    }
+                val jsMain by getting {
+                    dependsOn(webMain)
                 }
 
-                if (supportWasm) {
-                    val wasmJsMain by getting {
-                        dependsOn(jsWasmMain)
-                    }
-                    val wasmJsTest by getting {
-                        dependsOn(jsWasmTest)
+                val jsTest by getting {
+                    dependsOn(webTest)
 
-                        dependencies {
-                            implementation(kotlin("test-wasm-js"))
-                        }
+                }
+
+                val wasmJsMain by getting {
+                    dependsOn(webMain)
+                }
+
+                val wasmJsTest by getting {
+                    dependsOn(webTest)
+
+                    dependencies {
+                        implementation(kotlin("test-wasm-js"))
                     }
                 }
             }
@@ -425,7 +420,7 @@ kotlin {
 if (supportAndroid) {
     // Android configuration, when available
     configure<LibraryExtension> {
-        compileSdk = 31
+        compileSdk = 33
         namespace = "org.jetbrains.skiko"
 
         defaultConfig.minSdk = 24
@@ -467,9 +462,9 @@ fun createChecksumsTask(
     fileToChecksum: Provider<File>
 ) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
 
-    files = project.files(fileToChecksum)
-    algorithm = Checksum.Algorithm.SHA256
-    outputDir = file("$buildDir/checksums-${targetId(targetOs, targetArch)}")
+    inputFiles = project.files(fileToChecksum)
+    checksumAlgorithm = Checksum.Algorithm.SHA256
+    outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
 }
 
 val additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko)
@@ -529,7 +524,7 @@ publishing {
         }
         maven {
             name = "BuildRepo"
-            url = uri("${rootProject.buildDir}/repo")
+            url = rootProject.layout.buildDirectory.dir("repo").get().asFile.toURI()
         }
         maven {
             name = "ComposeRepo"
@@ -605,7 +600,7 @@ publishing {
             it.registerMavenPublication(this, emptySourcesJar, pomNameForPublication)
         }
 
-        if (supportJs || supportWasm) {
+        if (supportWeb) {
             create<MavenPublication>("skikoWasmRuntime") {
                 pomNameForPublication[name] = "Skiko WASM Runtime"
                 artifactId = SkikoArtifacts.jsWasmArtifactId
@@ -653,10 +648,10 @@ tasks.withType<JavaCompile> {
     sourceCompatibility = "1.8"
 }
 
-project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += listOf(
+project.tasks.withType<KotlinJsCompile>().configureEach {
+    compilerOptions.freeCompilerArgs.addAll(listOf(
         "-Xwasm-enable-array-range-checks", "-Xir-dce=true", "-Xskip-prerelease-check",
-    )
+    ))
 }
 
 tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
@@ -668,12 +663,12 @@ additionalRuntimeLibraries.forEach {
     it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+tasks.withType<KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583
     compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
-    kotlinOptions.freeCompilerArgs += "-opt-in=kotlinx.cinterop.ExperimentalForeignApi"
+    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
-    kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+tasks.withType<KotlinCompilationTask<*>>().configureEach {
+    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
 }

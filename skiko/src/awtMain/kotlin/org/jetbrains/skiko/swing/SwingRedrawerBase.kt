@@ -81,18 +81,17 @@ internal abstract class SwingRedrawerBase(
         check(SwingUtilities.isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         if (!isDisposed) {
-            if (!isFirstFrameRendered) {
+            val isFirstFrame = !isFirstFrameRendered
+            isFirstFrameRendered = true
+            if (isFirstFrame) {
                 deviceAnalytics?.beforeFirstFrameRender()
             }
             try {
                 body()
-            } catch (e: CancellationException) {
-                // ignore
-            }
-            if (!isFirstFrameRendered && !isDisposed) {
+            } catch (_: CancellationException) { }
+            if (isFirstFrame && !isDisposed) {
                 deviceAnalytics?.afterFirstFrameRender()
             }
-            isFirstFrameRendered = true
         }
     }
 }

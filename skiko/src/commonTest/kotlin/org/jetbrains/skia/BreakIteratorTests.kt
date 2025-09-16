@@ -1,6 +1,5 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.tests.*

@@ -24,7 +24,7 @@ object SkikoDispatchers {
     )
 }
 
-@OptIn(InternalCoroutinesApi::class)
+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 internal class NsQueueDispatcher(
     private val dispatchQueue: dispatch_queue_t
 ) : CoroutineDispatcher(), Delay {
@@ -34,7 +34,6 @@ internal class NsQueueDispatcher(
         }
     }
 
-    @OptIn(InternalCoroutinesApi::class)
     override fun scheduleResumeAfterDelay(timeMillis: Long, continuation: CancellableContinuation<Unit>) {
         val timer = Timer()
         val timerBlock: TimerBlock = {
@@ -45,8 +44,6 @@ internal class NsQueueDispatcher(
         continuation.disposeOnCancellation(timer)
     }
 
-
-    @OptIn(InternalCoroutinesApi::class)
     override fun invokeOnTimeout(timeMillis: Long, block: Runnable, context: CoroutineContext): DisposableHandle {
         val timer = Timer()
         val timerBlock: TimerBlock = {
@@ -61,20 +58,15 @@ internal class NsQueueDispatcher(
 
 internal typealias TimerBlock = (CFRunLoopTimerRef?) -> Unit
 
-@SharedImmutable
 private val TIMER_NEW = NativePtr.NULL
 
-@SharedImmutable
 private val TIMER_DISPOSED = NativePtr.NULL.plus(1)
 
 private class Timer : DisposableHandle {
     private val ref = AtomicNativePtr(TIMER_NEW)
 
-    init { freeze() }
-
     fun start(timeMillis: Long, timerBlock: TimerBlock) {
         val fireDate = CFAbsoluteTimeGetCurrent() + timeMillis / 1000.0
-        @Suppress("EXPERIMENTAL_UNSIGNED_LITERALS")
         val timer = CFRunLoopTimerCreateWithHandler(null, fireDate, 0.0, 0u, 0, timerBlock)!!
         CFRunLoopAddTimer(CFRunLoopGetMain(), timer, kCFRunLoopCommonModes)
         if (!ref.compareAndSet(TIMER_NEW, timer.rawValue)) {

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 package tasks.configuration
 
 import Arch
@@ -10,7 +12,6 @@ import compilerForTarget
 import linkerForTarget
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
@@ -18,43 +19,41 @@ import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import projectDirs
 import registerOrGetSkiaDirProvider
 import setupMjs
 import setupReexportMjs
 import skikoTestMjs
-import supportJs
-import supportWasm
+import supportWeb
 import java.io.File
 
-fun SkikoProjectContext.createWasmLinkTask(): TaskProvider<LinkSkikoWasmTask>? = with(this.project) {
-    if (!supportWasm && !supportJs) {
-        return null
+fun SkikoProjectContext.declareWasmTasks() {
+    if (!project.supportWeb) {
+        return
     }
 
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
-    val compileWasm by tasks.registering(CompileSkikoCppTask::class) {
-        val osArch = OS.Wasm to Arch.Wasm
-
+    val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
         dependsOn(skiaWasmDir)
 
         compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm, isJvm = false))
-        buildTargetOS.set(osArch.first)
-        buildTargetArch.set(osArch.second)
+        buildTargetOS.set(OS.Wasm)
+        buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
 
-        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsWasmMain/cpp", "src/nativeJsMain/cpp") +
+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/webMain/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
 
-        includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
-        includeHeadersNonRecursive(projectDir.resolve("src/jsWasmMain/cpp"))
-        includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
+        includeHeadersNonRecursive(project.projectDir.resolve("src/nativeJsMain/cpp"))
+        includeHeadersNonRecursive(project.projectDir.resolve("src/webMain/cpp"))
+        includeHeadersNonRecursive(project.projectDir.resolve("src/commonMain/cpp/common/include"))
         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
         flags.set(
-            mutableListOf<String?>().apply {
+            buildList {
                 addAll(skiaPreprocessorFlags(OS.Wasm, buildType))
                 addAll(buildType.clangFlags)
                 add("-fno-rtti")
@@ -64,38 +63,27 @@ fun SkikoProjectContext.createWasmLinkTask(): TaskProvider<LinkSkikoWasmTask>? =
         )
     }
 
-    val configureCommon: LinkSkikoWasmTask.(prefixPath: String, forD8: Boolean) -> Unit = { prefixPath, isForD8 ->
-        val osArch = OS.Wasm to Arch.Wasm
-
+    fun LinkSkikoWasmTask.configureCommon(prefixPath: String) {
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
-        val unpackedSkia = skiaWasmDir.get()
 
         linker.set(linkerForTarget(OS.Wasm, Arch.Wasm, isJvm = false))
-        buildTargetOS.set(osArch.first)
-        buildTargetArch.set(osArch.second)
+        buildTargetOS.set(OS.Wasm)
+        buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
-        if (isForD8) buildSuffix.set("d8") else buildSuffix.set("es6")
 
-        libFiles = project.fileTree(unpackedSkia) { include("**/*.a") }
+        libFiles = project.fileTree(skiaWasmDir.get()) { include("**/*.a") }
         objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
             include("**/*.o")
         }
 
-        val wasmFileName = if (isForD8) "skikod8.wasm" else "skiko.wasm"
-        val jsFileName = if (isForD8) "skikod8.mjs" else "skiko.mjs"
-
-        libOutputFileName.set(wasmFileName) // emcc ignores this, it names .wasm file identically to js output
-        jsOutputFileName.set(jsFileName) // this determines the name .wasm file too
-
         externPostJs.from(
             // the order matters
-            project.layout.projectDirectory.file("src/jsWasmMain/resources/skikoCallbacks.js"),
+            project.layout.projectDirectory.file("src/webMain/resources/skikoCallbacks.js"),
             project.layout.projectDirectory.file(prefixPath)
         )
 
-        @OptIn(kotlin.ExperimentalStdlibApi::class)
-        flags.set(mutableListOf<String?>().apply {
+        flags.addAll(buildList {
             addAll(
                 listOf(
                     "-l", "GL",
@@ -107,85 +95,79 @@ fun SkikoProjectContext.createWasmLinkTask(): TaskProvider<LinkSkikoWasmTask>? =
                     "-s", "MODULARIZE=1",
                     "-s", "EXPORT_NAME=loadSkikoWASM",
                     "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
+                    "-s", "SUPPORT_LONGJMP=wasm",
                     "--bind",
                     // -O2 saves 800kB for the output file, and ~100kB for transferred size.
                     // -O3 breaks the exports in js/mjs files. skiko.wasm size is the same though
                     "-O2"
                 )
             )
-            addAll(listOf("-s", "SUPPORT_LONGJMP=wasm"))
-            if (isForD8) {
-                addAll(listOf("-s", "ENVIRONMENT=shell"))
-            }
 
             if (skiko.isWasmBuildWithProfiling) add("--profiling")
         })
 
         doLast {
-            // skiko.js (and skiko.mjs) files are directly referenced in karma.config.d/*/config.js
+            // skiko.mjs is referenced in karma.config.d/*/config.js
             // so symbols must be replaced right after linking
-            val jsFiles = outDir.asFile.get().walk()
-                .filter { it.isFile && (it.name.endsWith(".js") || it.name.endsWith(".mjs")) }
+            val jsFile = outDir.asFile.get().walk().first { it.name == jsOutputFileName.get() }
 
             val isEnvironmentNodeCheckRegex = Regex(
-                // spaces are different in release and debug builds
+                // spacing is different in release and debug builds
                 """if\s*\(ENVIRONMENT_IS_NODE\)\s*\{"""
             )
 
-            for (jsFile in jsFiles) {
-                val originalContent = jsFile.readText()
-                val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
-                    .replace("skikod8.wasm", "skiko.wasm")
-                    .replace(isEnvironmentNodeCheckRegex, "if (false) {") // to make webpack erase this part
-                jsFile.writeText(newContent)
-
-                if (isForD8) {
-                    // delete this file as its presence can be confusing.
-                    // It's identical to skiko.wasm and we use skiko.wasm in `skikoWasmJar`task
-                    outDir.file(wasmFileName).get().asFile.delete()
-
-                    val renameTo = "skikod8.mjs"
-                    outDir.file(jsFileName).get().asFile.renameTo(outDir.asFile.get().resolve(renameTo))
-                }
-            }
+            val originalContent = jsFile.readText()
+            val newContent = originalContent
+                .replace(isEnvironmentNodeCheckRegex, "if (false) {") // to make webpack erase this part
+            jsFile.writeText(newContent)
         }
     }
 
-    val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
+    val linkWasm by project.tasks.registering(LinkSkikoWasmTask::class) {
         dependsOn(
             kotlin.wasmJs().compilations["main"].compileTaskProvider,
             kotlin.js().compilations["main"].compileTaskProvider
         )
 
-        configureCommon(setupMjs.normalize().absolutePath, false)
+        buildSuffix.set("es6")
+        jsOutputFileName.set("skiko.mjs") // this determines the name .wasm file too
+        libOutputFileName.set("skiko.wasm")
+
+        configureCommon(project.setupMjs.normalize().absolutePath)
     }
 
-    val linkWasmD8WithES6 by tasks.registering(LinkSkikoWasmTask::class) {
+    val linkWasmD8WithES6 by project.tasks.registering(LinkSkikoWasmTask::class) {
         dependsOn(
             kotlin.wasmJs().compilations["main"].compileTaskProvider,
             kotlin.js().compilations["main"].compileTaskProvider
         )
-        configureCommon(setupMjs.normalize().absolutePath, true)
+
+        buildSuffix.set("d8")
+        jsOutputFileName.set("skikod8.mjs") // this determines the name .wasm file too
+        libOutputFileName.set("skikod8.wasm")
+
+        flags.addAll(listOf("-s", "ENVIRONMENT=shell"))
+
+        configureCommon(project.setupMjs.normalize().absolutePath)
     }
 
     // skikoWasmJar is used by task name
     val skikoWasmJar by project.tasks.registering(Jar::class) {
-        dependsOn(linkWasm)
         // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-        val wasmEsOutDir = linkWasm.map { it.outDir }
-        val wasmD8OutDir = linkWasmD8WithES6.map { it.outDir }
-
-        from(setupReexportMjs.parentFile) {
-            include(setupReexportMjs.name)
+        from(project.setupReexportMjs.parentFile) {
+            include(project.setupReexportMjs.name)
         }
 
-        from(wasmEsOutDir) {
-            include("*.js")
+        from(linkWasm) {
             include("*.wasm")
             include("*.mjs")
         }
-        from(wasmD8OutDir) {
+
+        from(linkWasmD8WithES6) {
             include("*.mjs")
+            filesMatching("*.mjs") {
+                filter { it.replace("skikod8.wasm", "skiko.wasm") }
+            }
         }
 
         archiveBaseName.set("skiko-wasm")
@@ -193,8 +175,6 @@ fun SkikoProjectContext.createWasmLinkTask(): TaskProvider<LinkSkikoWasmTask>? =
             println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
         }
     }
-
-    return linkWasm
 }
 
 abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
@@ -235,14 +215,14 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
 class WasmImportsGeneratorCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
     KotlinCompilation.MAIN_COMPILATION_NAME,
     { it.setupMjs },
-    { it.projectDir.resolve("src/jsWasmMain/resources/pre-setup.mjs") },
+    { it.projectDir.resolve("src/webMain/resources/pre-setup.mjs") },
     { it.setupReexportMjs }
 )
 
 class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
     KotlinCompilation.TEST_COMPILATION_NAME,
     { it.skikoTestMjs },
-    { it.projectDir.resolve("src/jsWasmMain/resources/pre-skiko-test.mjs") },
+    { it.projectDir.resolve("src/webMain/resources/pre-skiko-test.mjs") },
     null
 )
 

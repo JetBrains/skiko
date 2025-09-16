@@ -39,8 +39,8 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
 ) = project.registerSkikoTask<CompileSkikoCppTask>("compileJvmBindings", targetOs, targetArch) {
     // Prefer 'java.home' system property to simplify overriding from Intellij.
     // When used from command-line, it is effectively equal to JAVA_HOME.
-    if (JavaVersion.current() < JavaVersion.VERSION_11) {
-        error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
+    if (JavaVersion.current() < JavaVersion.VERSION_17) {
+        error("JDK 17+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
                 "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
     }
     val jdkHome = File(System.getProperty("java.home") ?: error("'java.home' is null"))
@@ -148,7 +148,7 @@ fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<
         OS.Windows -> "windows-x86_64"
         else -> throw GradleException("unsupported $hostOs")
     }
-    val ndkPath = project.providers
+    val ndkPathProvider = project.providers
         .environmentVariable("ANDROID_NDK_HOME")
         .orEmpty()
         .map { ndkHomeEnv ->
@@ -163,7 +163,7 @@ fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<
                 "$androidHome/$ndkVersion"
             }
         }
-    return ndkPath.map { ndkPath ->
+    return ndkPathProvider.map { ndkPath ->
         var clangBinaryName = "$androidArch-linux-android$version-clang++"
         if (hostOs.isWindows) {
             clangBinaryName += ".cmd"
@@ -326,6 +326,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-lEGL",
                 "-llog",
                 "-landroid",
+                "-latomic",
                 // Hack to fix problem with linker not always finding certain declarations.
                 "$skiaBinDir/libskia.a",
             )
@@ -471,7 +472,7 @@ fun SkikoProjectContext.skikoRuntimeDirForTestsTask(
     }
     
     duplicatesStrategy = DuplicatesStrategy.WARN
-    destinationDir = project.buildDir.resolve("skiko-runtime-for-tests")
+    destinationDir = project.layout.buildDirectory.dir("skiko-runtime-for-tests").get().asFile
 }
 
 fun SkikoProjectContext.skikoJarForTestsTask(

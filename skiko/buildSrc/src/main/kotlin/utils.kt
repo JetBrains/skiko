@@ -38,7 +38,7 @@ fun joinToTitleCamelCase(vararg parts: String): String =
     parts.joinToString(separator = "") { toTitleCase(it) }
 
 fun toTitleCase(s: String): String =
-    s.capitalize(Locale.ROOT)
+    s.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
 
 fun Task.projectDirs(vararg relativePaths: String): List<Directory> {
     val projectDir = project.layout.projectDirectory
