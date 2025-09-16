@@ -33,7 +33,7 @@ internal class SoftwareSwingRedrawer(
     private val storage = Bitmap()
 
     init {
-        onContextInit()
+        onContextInit(null)
     }
 
     override fun dispose() {

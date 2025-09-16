@@ -62,6 +62,18 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_Direct
     context->flush(skSurface);
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nGetResourceCacheLimit
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
+     return (jlong) context->getResourceCacheLimit();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nSetResourceCacheLimit
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong maxResourceBytes) {
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
+    context->setResourceCacheLimit((size_t) maxResourceBytes);
+}
+
 GrSyncCpu grSyncCpuFromBool(bool syncCpu) {
   if (syncCpu) return GrSyncCpu::kYes;
   return GrSyncCpu::kNo;
