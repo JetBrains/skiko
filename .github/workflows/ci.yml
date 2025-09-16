@@ -286,7 +286,7 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
-      # OPENGL is ignored as it doesn't exist on GitHub actions agents
+      # OPENGL is ignored as it doesn't exist on the Windows GitHub agent
       - shell: bash
         name: 'Compile and run AWT tests'
         run: ./gradlew --stacktrace --info -Pskiko.test.onci=true -Pskiko.test.ui.renderApi.ignoreAssertsFor=OPENGL :skiko:awtTest
