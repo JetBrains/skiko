@@ -1407,6 +1407,7 @@ $dokka.location:org.jetbrains.skia/DirectContext/flushAndSubmit/#org.jetbrains.s
 $dokka.location:org.jetbrains.skia/DirectContext/resetAll/#/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/reset-all.html
 $dokka.location:org.jetbrains.skia/DirectContext/resetGL/#kotlin.Array[org.jetbrains.skia.GLBackendState]/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/reset-g-l.html
 $dokka.location:org.jetbrains.skia/DirectContext/resetGLAll/#/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/reset-g-l-all.html
+$dokka.location:org.jetbrains.skia/DirectContext/resourceCacheLimit/#/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/resource-cache-limit.html
 $dokka.location:org.jetbrains.skia/DirectContext/submit/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-direct-context/submit.html
 $dokka.location:org.jetbrains.skia/Drawable.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-drawable/-companion/index.html
 $dokka.location:org.jetbrains.skia/Drawable///PointingToDeclaration/skiko/org.jetbrains.skia/-drawable/index.html
@@ -3054,11 +3055,12 @@ $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics///PointingToDeclaration/
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics/device/#kotlin.String#org.jetbrains.skiko.OS#org.jetbrains.skiko.GraphicsApi#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/device.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerAnalytics/renderer/#kotlin.String#org.jetbrains.skiko.OS#org.jetbrains.skiko.GraphicsApi/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-analytics/renderer.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerProperties///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/index.html
-$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/SkiaLayerProperties/#kotlin.Boolean#kotlin.Boolean#org.jetbrains.skiko.FrameBuffering#org.jetbrains.skiko.GraphicsApi#org.jetbrains.skiko.GpuPriority/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/-skia-layer-properties.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/SkiaLayerProperties/#kotlin.Boolean#kotlin.Boolean#org.jetbrains.skiko.FrameBuffering#org.jetbrains.skiko.GraphicsApi#org.jetbrains.skiko.GpuPriority#kotlin.Long/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/-skia-layer-properties.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerProperties/adapterPriority/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/adapter-priority.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerProperties/copy/#kotlin.Boolean#kotlin.Boolean#org.jetbrains.skiko.GraphicsApi#org.jetbrains.skiko.GpuPriority/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/copy.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerProperties/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/equals.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerProperties/frameBuffering/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/frame-buffering.html
+$dokka.location:org.jetbrains.skiko/SkiaLayerProperties/gpuResourceCacheLimit/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/gpu-resource-cache-limit.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerProperties/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/hash-code.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerProperties/isVsyncEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/is-vsync-enabled.html
 $dokka.location:org.jetbrains.skiko/SkiaLayerProperties/isVsyncFramelimitFallbackEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer-properties/is-vsync-framelimit-fallback-enabled.html
@@ -3095,6 +3097,7 @@ $dokka.location:org.jetbrains.skiko/SkikoProperties/fpsLongFramesShow/#/Pointing
 $dokka.location:org.jetbrains.skiko/SkikoProperties/fpsPeriodSeconds/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-period-seconds.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/frameBuffering/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/frame-buffering.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/gpuPriority/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/gpu-priority.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/gpuResourceCacheLimit/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/gpu-resource-cache-limit.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/libraryPath/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/library-path.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/linuxWaitForVsyncOnRedrawImmediately/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/linux-wait-for-vsync-on-redraw-immediately.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/macOsOpenGLEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/mac-os-open-g-l-enabled.html
