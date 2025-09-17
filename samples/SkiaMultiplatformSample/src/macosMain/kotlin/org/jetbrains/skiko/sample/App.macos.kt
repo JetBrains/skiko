@@ -50,5 +50,6 @@ fun main() {
     val clocks = MacosClocks(skiaLayer, window)
     skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, clocks)
     window.makeKeyAndOrderFront(app)
+    skiaLayer.needRedraw()
     app.run()
 }
