@@ -164,7 +164,7 @@ jobs:
           sudo apt-get install gcc-9-aarch64-linux-gnu g++-9-aarch64-linux-gnu -y
           sudo update-alternatives --install /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc-9 60 --slave /usr/bin/aarch64-linux-gnu-g++ aarch64-linux-gnu-g++ /usr/bin/aarch64-linux-gnu-g++-9
           sudo update-alternatives --config aarch64-linux-gnu-gcc
-          sudo Xvfb :0 -screen 0 1280x720x24 &
+          sudo Xvfb :0 -screen 0 1280x720x24 +extension GLX &
 
       - shell: bash
         name: 'Compile and run Linux x64 tests'
@@ -238,7 +238,7 @@ jobs:
           sudo apt-get remove g++ -y
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-11 100
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-11 100
-          sudo Xvfb :0 -screen 0 1280x720x24 &
+          sudo Xvfb :0 -screen 0 1280x720x24 +extension GLX &
 
       - shell: bash
         name: 'Run Linux arm64 tests'
@@ -286,9 +286,10 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
+      # OPENGL is ignored as it doesn't exist on the Windows GitHub agent
       - shell: bash
         name: 'Compile and run AWT tests'
-        run: ./gradlew --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
+        run: ./gradlew --stacktrace --info -Pskiko.test.onci=true -Pskiko.test.ui.renderApi.ignoreAssertsFor=OPENGL :skiko:awtTest
 
       - shell: bash
         name: 'Publish to Maven Local, check AWT sample'
