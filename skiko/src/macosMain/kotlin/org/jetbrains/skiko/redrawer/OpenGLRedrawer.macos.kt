@@ -38,7 +38,7 @@ internal class MacOsOpenGLRedrawer(
     }
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
-        redrawImmediately(updateNeeded = true)
+        redrawImmediately()
     }
 
     override fun dispose() {
@@ -74,7 +74,7 @@ internal class MacOsOpenGLRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately(updateNeeded: Boolean) {
+    override fun redrawImmediately() {
         glLayer.setNeedsDisplay()
         skiaLayer.nsView.setNeedsDisplay(true)
     }

@@ -394,7 +394,7 @@ actual open class SkiaLayer internal constructor(
         // so apply this fix only for the Direct3D case.
         if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
             redrawer?.syncBounds()
-            redrawer?.redrawImmediately(updateNeeded = true)
+            redrawer?.redrawImmediately()
         }
 
         // Setting the bounds of children should be done only in the layout pass,
@@ -606,7 +606,7 @@ actual open class SkiaLayer internal constructor(
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
                 redrawerManager.findNextWorkingRenderApi()
-                redrawer?.redrawImmediately(updateNeeded = true)
+                redrawer?.redrawImmediately()
             }
         }
     }
