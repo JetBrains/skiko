@@ -99,11 +99,9 @@ internal class MetalRedrawer(
         frameDispatcher.scheduleFrame(needUpdate = true, throttledToVsync = throttledToVsync)
     }
 
-    override fun redrawImmediately(updateNeeded: Boolean) {
+    override fun redrawImmediately() {
         checkDisposed()
-        if (updateNeeded) {
-            update()
-        }
+        update()
         // Trying to draw immediately in Metal will result in lost (undrawn)
         // frames if there are more than two between consecutive vsync events.
         if (layer.isShowing) {

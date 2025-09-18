@@ -46,11 +46,9 @@ internal class SoftwareRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately(updateNeeded: Boolean) {
+    override fun redrawImmediately() {
         checkDisposed()
-        if (updateNeeded) {
-            update()
-        }
+        update()
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 contextHandler.draw()

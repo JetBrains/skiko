@@ -16,7 +16,7 @@ internal class AndroidOpenGLRedrawer(
 ) : Redrawer {
     override fun dispose() = TODO()
     override fun needRedraw(canUpdateImmediately: Boolean) = TODO()
-    override fun redrawImmediately(updateNeeded: Boolean) = TODO()
+    override fun redrawImmediately() = TODO()
     override fun update(nanoTime: Long) = TODO()
 
     override val renderInfo: String get() = "Android renderer"

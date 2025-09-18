@@ -106,11 +106,11 @@ class SkiaLayerTest {
                 override fun keyTyped(e: KeyEvent?) {
                     launch {
                         val redrawer = window.layer.redrawer as MetalRedrawer
-                        redrawer.redrawImmediately(updateNeeded = true)
+                        redrawer.redrawImmediately()
                         counter1 += 1
-                        redrawer.redrawImmediately(updateNeeded = true)
+                        redrawer.redrawImmediately()
                         counter2 += 1
-                        redrawer.redrawImmediately(updateNeeded = true)
+                        redrawer.redrawImmediately()
                     }
                 }
             })
@@ -571,11 +571,11 @@ class SkiaLayerTest {
 
     private abstract class BaseTestRedrawer(val layer: SkiaLayer): Redrawer {
         private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            redrawImmediately(updateNeeded = true)
+            redrawImmediately()
         }
         override fun dispose() = Unit
         override fun needRedraw(throttledToVsync: Boolean) = frameDispatcher.scheduleFrame()
-        override fun redrawImmediately(updateNeeded: Boolean) = Unit
+        override fun redrawImmediately() = Unit
         override fun update(nanoTime: Long) = layer.update(nanoTime)
 
         override val renderInfo: String
@@ -590,7 +590,7 @@ class SkiaLayerTest {
                     override fun initContext() = false
                     override fun initCanvas() = Unit
                 }
-                override fun redrawImmediately(updateNeeded: Boolean) = layer.inDrawScope(contextHandler::draw)
+                override fun redrawImmediately() = layer.inDrawScope(contextHandler::draw)
             }
         }
     }
@@ -604,7 +604,7 @@ class SkiaLayerTest {
     fun `fallback to software renderer, fail on draw`() = uiTest {
         testFallbackToSoftware { layer, _, _, _ ->
             object : BaseTestRedrawer(layer) {
-                override fun redrawImmediately(updateNeeded: Boolean) = layer.inDrawScope {
+                override fun redrawImmediately() = layer.inDrawScope {
                     throw RenderException()
                 }
             }
@@ -660,7 +660,7 @@ class SkiaLayerTest {
         val window = UiTestWindow(
             renderFactory = OverrideNonSoftwareRenderFactory { layer, _, _, _ ->
                 object : BaseTestRedrawer(layer) {
-                    override fun redrawImmediately(updateNeeded: Boolean) = layer.inDrawScope {
+                    override fun redrawImmediately() = layer.inDrawScope {
                         throw RenderException()
                     }
                 }

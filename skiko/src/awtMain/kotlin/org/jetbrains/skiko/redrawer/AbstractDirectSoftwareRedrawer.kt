@@ -35,10 +35,8 @@ internal abstract class AbstractDirectSoftwareRedrawer(
 
     protected open fun draw() = inDrawScope(contextHandler::draw)
 
-    override fun redrawImmediately(updateNeeded: Boolean) {
-        if (updateNeeded) {
-            update()
-        }
+    override fun redrawImmediately() {
+        update()
         if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
             draw()
         }

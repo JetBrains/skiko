@@ -150,10 +150,10 @@ internal class MacOsMetalRedrawer(
     /**
      * Invokes [draw] right away.
      */
-    override fun redrawImmediately(updateNeeded: Boolean) {
+    override fun redrawImmediately() {
         checkDisposed()
         autoreleasepool {
-            if (!isDisposed && updateNeeded) {
+            if (!isDisposed) {
                 update()
             }
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`

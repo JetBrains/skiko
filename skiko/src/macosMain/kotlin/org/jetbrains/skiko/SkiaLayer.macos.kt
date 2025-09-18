@@ -85,13 +85,13 @@ actual open class SkiaLayer {
         @ObjCAction
         fun frameDidChange(notification: NSNotification) {
             redrawer?.syncBounds()
-            redrawer?.redrawImmediately(updateNeeded = true)
+            redrawer?.redrawImmediately()
         }
 
         @ObjCAction
         fun windowDidChangeBackingProperties(notification: NSNotification) {
             redrawer?.syncBounds()
-            redrawer?.redrawImmediately(updateNeeded = true)
+            redrawer?.redrawImmediately()
         }
 
         fun addObserver() {

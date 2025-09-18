@@ -61,11 +61,9 @@ internal class WindowsOpenGLRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately(updateNeeded: Boolean) {
+    override fun redrawImmediately() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
-        if (updateNeeded) {
-            update()
-        }
+        update()
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 makeCurrent()
