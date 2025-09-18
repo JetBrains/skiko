@@ -416,21 +416,19 @@ actual open class SkiaLayer internal constructor(
 
     override fun paint(g: Graphics) {
         Logger.debug { "paint called on SkiaLayer $this" }
-        val updateNeeded = checkContentScale()
-        redrawer?.redrawImmediately(updateNeeded = updateNeeded)
+        checkContentScale()
+        redrawer?.needRedraw(throttledToVsync = false)
     }
 
     // Workaround for JBR-5274 and JBR-5305
-    fun checkContentScale(): Boolean {
+    fun checkContentScale() {
         val currentGraphicsContextScaleTransform = graphicsConfiguration.defaultTransform
-        return (currentGraphicsContextScaleTransform != latestReceivedGraphicsContextScaleTransform).also {
-            if (it) {
-                firePropertyChange(
-                    "graphicsContextScaleTransform",
-                    latestReceivedGraphicsContextScaleTransform,
-                    currentGraphicsContextScaleTransform
-                )
-            }
+        if (currentGraphicsContextScaleTransform != latestReceivedGraphicsContextScaleTransform) {
+            firePropertyChange(
+                "graphicsContextScaleTransform",
+                latestReceivedGraphicsContextScaleTransform,
+                currentGraphicsContextScaleTransform
+            )
         }
     }
 

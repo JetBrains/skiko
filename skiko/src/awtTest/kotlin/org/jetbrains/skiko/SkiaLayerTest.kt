@@ -570,8 +570,11 @@ class SkiaLayerTest {
     }
 
     private abstract class BaseTestRedrawer(val layer: SkiaLayer): Redrawer {
+        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
+            redrawImmediately(updateNeeded = true)
+        }
         override fun dispose() = Unit
-        override fun needRedraw(throttledToVsync: Boolean) = Unit
+        override fun needRedraw(throttledToVsync: Boolean) = frameDispatcher.scheduleFrame()
         override fun redrawImmediately(updateNeeded: Boolean) = Unit
         override fun update(nanoTime: Long) = layer.update(nanoTime)
 
@@ -1145,7 +1148,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `temporary change is not visible`() = uiTest {
+    fun `temporary change is not visible with needRedraw(throttledToVsync = false)`() = uiTest {
         assumeTrue(hostOs.isMacOS)
         // The separation between update and draw is only implemented in MetalRedrawer at the moment
         // Don't use assumeTrue, as uiTest iterates over multiple renderers,
