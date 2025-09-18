@@ -42,6 +42,10 @@ object SkikoProperties {
         }
     }
 
+    val macOSWaitForPreviousFrameVsyncOnRedrawImmediately: Boolean get() {
+        return getProperty("skiko.rendering.macos.waitForPreviousFrameVsyncOnRedrawImmediately")?.toBoolean() ?: true
+    }
+
     val windowsWaitForVsyncOnRedrawImmediately: Boolean get() {
         return getProperty("skiko.rendering.windows.waitForFrameVsyncOnRedrawImmediately")?.toBoolean() ?: false
     }
