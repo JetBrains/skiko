@@ -432,6 +432,13 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
+    /**
+     * Updates the layer and redraws synchronously.
+     */
+    fun updateAndDrawImmediately() {
+        redrawer?.redrawImmediately()
+    }
+
     // We need to delegate all event listeners to the Canvas (so and focus/input)
     // Canvas is heavyweight AWT component, JPanel is lightweight Swing component
     // Event handling doesn't properly work when we mix heavyweight and lightweight components.
