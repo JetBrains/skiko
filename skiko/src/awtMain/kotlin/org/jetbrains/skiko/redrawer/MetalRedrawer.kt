@@ -102,16 +102,15 @@ internal class MetalRedrawer(
     override fun redrawImmediately() {
         checkDisposed()
         update()
-        // Trying to draw immediately in Metal will result in lost (undrawn)
-        // frames if there are more than two between consecutive vsync events.
-        if (layer.isShowing) {
-            frameDispatcher.scheduleFrame(needUpdate = false, throttledToVsync = false)
-        } else {
-            // But if the layer isn't showing yet, we want to draw immediately,
-            // so that if it shows before the next vsync, there is no background flash
-            inDrawScope {
-                if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                    performDraw()
+        inDrawScope {
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                performDraw()
+                // Trying to draw immediately in Metal will result in lost (undrawn)
+                // frames if there are more than two between consecutive vsync events.
+                if (SkikoProperties.macOSWaitForPreviousFrameVsyncOnRedrawImmediately) {
+                    runBlocking {
+                        vSyncer?.waitForVSync()
+                    }
                 }
             }
         }
