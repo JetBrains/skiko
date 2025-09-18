@@ -6,7 +6,6 @@ import org.jetbrains.skiko.*
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeFalse
-import org.junit.Assume.assumeTrue
 import java.awt.GraphicsEnvironment
 import javax.swing.JFrame
 
@@ -15,7 +14,7 @@ internal fun uiTest(
     block: suspend UiTestScope.() -> Unit
 ) {
     assumeFalse(GraphicsEnvironment.isHeadless())
-    assumeTrue(System.getProperty("skiko.test.ui.enabled", "false") == "true")
+//    assumeTrue(System.getProperty("skiko.test.ui.enabled", "false") == "true")
 
     val renderApiProperty = System.getProperty("skiko.test.ui.renderApi", "all")
 
@@ -60,6 +59,15 @@ internal class UiTestScope(
 
         init {
             setupContent()
+        }
+
+        override fun setVisible(b: Boolean) {
+            super.setVisible(b)
+            if (b) {
+                // When several tests run in succession, sometimes new windows are not at the front, with system
+                // windows occluding them. This fixes that.
+                toFront()
+            }
         }
     }
 
