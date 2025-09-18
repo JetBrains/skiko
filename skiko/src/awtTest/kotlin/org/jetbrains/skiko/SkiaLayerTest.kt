@@ -1283,6 +1283,51 @@ class SkiaLayerTest {
         }
     }
 
+    @Test
+    fun `updateAndDrawImmediately updates and draws synchronously`() = uiTest {
+        // Check that calling both needRedraw(true) and needRedraw(false) causes only one render and one draw call
+        var renderCalls = 0
+        val renderChannel = Channel<Unit>(Channel.CONFLATED)
+
+        var drawCalls = 0
+        val deviceAnalytics = object : SkiaLayerAnalytics.DeviceAnalytics {
+            override fun beforeFrameRender() {
+                drawCalls++
+            }
+        }
+        val analytics = object : SkiaLayerAnalytics {
+            @ExperimentalSkikoApi
+            override fun device(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi,
+                deviceName: String?
+            ): SkiaLayerAnalytics.DeviceAnalytics {
+                return deviceAnalytics
+            }
+        }
+        val window = UiTestWindow(analytics = analytics) {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            layer.renderDelegate = object: SkikoRenderDelegate {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    renderCalls++
+                    renderChannel.trySend(Unit)
+                }
+            }
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+        window.pack()
+
+        val initRenderCalls = renderCalls
+        val initDrawCalls = drawCalls
+        window.layer.updateAndDrawImmediately()
+        // Can't check renderCalls == initRenderCalls+1 because if drawing fails, render will be called again with
+        // the fallback renderer.
+        assertTrue(renderCalls > initRenderCalls)
+        assertTrue(drawCalls > initDrawCalls)
+    }
+
     private class RectRenderer(
         private val getContentScale: () -> Float,
         var rectWidth: Int,
