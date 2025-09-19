@@ -77,8 +77,13 @@ SCRIPT_DIR="$(pwd)"
 
 git clone https://github.com/JetBrains/skia-pack.git || echo "skia-pack exists. You can remove it or update by hands with git pull"
 cd skia-pack
-[ -d "skia" ] && echo "skip cript/checkout.py, because directory skia-pack/skia already exists"
+git checkout edc396534c551a5bdcf21eaee5af659cd4cd3dae
+[ -d "skia" ] && echo "skip script/checkout.py, because directory skia-pack/skia already exists"
 [ ! -d "skia" ] && python3 script/checkout.py --version "$SKIA_VERSION"
+
+python3 script/patch_sources.py --sources skiko
+python3 script/patch_sources.py --sources ../src
+
 for skikoMachine in ${skikoMachines[@]}; do
   python3 script/build.py --target "$SKIA_TARGET" --machine "$skikoMachine" --build-type "$skikoBuildType"
   python3 script/archive.py --version "$SKIA_VERSION" --target "$SKIA_TARGET" --machine "$skikoMachine" --build-type "$skikoBuildType"
