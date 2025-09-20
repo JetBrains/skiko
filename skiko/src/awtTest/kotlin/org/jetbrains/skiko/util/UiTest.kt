@@ -15,7 +15,7 @@ internal fun uiTest(
     block: suspend UiTestScope.() -> Unit
 ) {
     assumeFalse(GraphicsEnvironment.isHeadless())
-    assumeTrue(System.getProperty("skiko.test.ui.enabled", "false") == "true")
+//    assumeTrue(System.getProperty("skiko.test.ui.enabled", "false") == "true")
 
     val renderApiProperty = System.getProperty("skiko.test.ui.renderApi", "all")
 
