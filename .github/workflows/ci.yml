@@ -234,10 +234,8 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y
-          sudo apt-get install clang-11 -y
+          sudo apt-get install clang -y
           sudo apt-get remove g++ -y
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-11 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-11 100
           sudo Xvfb :0 -screen 0 1280x720x24 +extension GLX &
 
       - shell: bash
