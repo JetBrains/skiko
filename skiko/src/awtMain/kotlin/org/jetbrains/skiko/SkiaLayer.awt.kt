@@ -394,7 +394,7 @@ actual open class SkiaLayer internal constructor(
         // so apply this fix only for the Direct3D case.
         if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
             redrawer?.syncBounds()
-            redrawer?.redrawImmediately(updateNeeded = true)
+            redrawer?.redrawImmediately()
         }
 
         // Setting the bounds of children should be done only in the layout pass,
@@ -416,22 +416,27 @@ actual open class SkiaLayer internal constructor(
 
     override fun paint(g: Graphics) {
         Logger.debug { "paint called on SkiaLayer $this" }
-        val updateNeeded = checkContentScale()
-        redrawer?.redrawImmediately(updateNeeded = updateNeeded)
+        checkContentScale()
+        redrawer?.needRedraw(throttledToVsync = false)
     }
 
     // Workaround for JBR-5274 and JBR-5305
-    fun checkContentScale(): Boolean {
+    fun checkContentScale() {
         val currentGraphicsContextScaleTransform = graphicsConfiguration.defaultTransform
-        return (currentGraphicsContextScaleTransform != latestReceivedGraphicsContextScaleTransform).also {
-            if (it) {
-                firePropertyChange(
-                    "graphicsContextScaleTransform",
-                    latestReceivedGraphicsContextScaleTransform,
-                    currentGraphicsContextScaleTransform
-                )
-            }
+        if (currentGraphicsContextScaleTransform != latestReceivedGraphicsContextScaleTransform) {
+            firePropertyChange(
+                "graphicsContextScaleTransform",
+                latestReceivedGraphicsContextScaleTransform,
+                currentGraphicsContextScaleTransform
+            )
         }
+    }
+
+    /**
+     * Updates the layer and redraws synchronously.
+     */
+    fun updateAndDrawImmediately() {
+        redrawer?.redrawImmediately()
     }
 
     // We need to delegate all event listeners to the Canvas (so and focus/input)
@@ -608,7 +613,7 @@ actual open class SkiaLayer internal constructor(
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
                 redrawerManager.findNextWorkingRenderApi()
-                redrawer?.redrawImmediately(updateNeeded = true)
+                redrawer?.redrawImmediately()
             }
         }
     }
