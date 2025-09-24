@@ -19,12 +19,12 @@ RUN mkdir -p $CMD_TOOLS_ROOT && \
     unzip cmd-tools.zip && \
     rm cmd-tools.zip && \
     mv cmdline-tools/* $CMD_TOOLS_ROOT/
-ARG ANDROID_PLATFORM=android-33
+ARG ANDROID_PLATFORM=android-35
 RUN yes | $SDK_MANAGER --licenses && \
     $SDK_MANAGER "platforms;$ANDROID_PLATFORM" && \
     cd $ANDROID_SDK_ROOT/platforms/$ANDROID_PLATFORM && \
     ls -1 | grep -v android.jar | xargs rm -rf
-ARG NDK_VERSION=21.4.7075529
+ARG NDK_VERSION=27.3.13750724
 RUN $SDK_MANAGER "ndk;$NDK_VERSION" && \
     cd $ANDROID_SDK_ROOT/ndk/$NDK_VERSION && \
     ls -1 | grep -v toolchains | xargs rm -rf
