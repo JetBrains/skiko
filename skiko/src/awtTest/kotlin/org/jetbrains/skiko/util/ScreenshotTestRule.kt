@@ -59,7 +59,7 @@ class ScreenshotTestRule : TestRule {
         }
         if (expectedFile.exists()) {
             val expected = Image.makeFromEncoded(expectedFile.readBytes())
-            // macOs screenshots can have different color on different configurations
+            // macOS screenshots can have different color on different configurations
             if (!isContentSame(expected, actual, sensitivity = 0.25)) {
                 actualFile.writeBytes(actual.encodeToData()!!.bytes)
                 throw AssertionError(
