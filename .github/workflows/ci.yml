@@ -26,11 +26,11 @@ jobs:
 
       - shell: bash
         name: 'Compile and run AWT tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:awtTest
+        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Dskiko.test.onci=true :skiko:awtTest
 
       - shell: bash
         name: 'Compile and run macOS x64 tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:macosX64Test
+        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Dskiko.test.onci=true :skiko:macosX64Test
 
       - shell: bash
         name: 'Publish to Maven Local, check AWT sample'
@@ -84,12 +84,12 @@ jobs:
           max_attempts: 10
           timeout_minutes: 60
           shell: bash
-          command: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" :skiko:iosX64TestWithMetal
+          command: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Dskiko.test.onci=true -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" :skiko:iosX64TestWithMetal
 
       # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
       - shell: bash
         name: 'Compile iOS arm64 tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosSimulatorArm64Test
+        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Dskiko.test.onci=true :skiko:iosSimulatorArm64Test
 
       # TODO run iOS specific tests on iPhone simulator
       - shell: bash
@@ -117,9 +117,9 @@ jobs:
           java-version: '11'
       - shell: bash
         run: |
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:tvosX64Test
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Dskiko.test.onci=true :skiko:tvosX64Test
           # tvosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:tvosSimulatorArm64Test
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Dskiko.test.onci=true :skiko:tvosSimulatorArm64Test
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -174,19 +174,19 @@ jobs:
         name: 'Compile and run Linux x64 tests'
         run: |
           export DISPLAY=:0
-          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:linuxX64Test
+          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Dskiko.test.onci=true :skiko:linuxX64Test
 
       # Linux arm64 tests are executed on a separate runner
       - shell: bash
         name: 'Compile Linux arm64 tests'
         run: |
-          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:linkDebugTestLinuxArm64
+          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Dskiko.test.onci=true :skiko:linkDebugTestLinuxArm64
 
       - shell: bash
         name: 'Compile and run AWT tests'
         run: |
           export DISPLAY=:0
-          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:awtTest
+          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Dskiko.test.onci=true :skiko:awtTest
         timeout-minutes: 25
 
       - shell: bash
@@ -262,7 +262,7 @@ jobs:
         name: 'Compile and run AWT tests'
         run: |
           export DISPLAY=:0
-          ./gradlew --no-daemon --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
+          ./gradlew --no-daemon --stacktrace --info -Dskiko.test.onci=true :skiko:awtTest
         timeout-minutes: 25
 
       - shell: bash
@@ -298,7 +298,7 @@ jobs:
 
       - shell: bash
         name: 'Compile and run AWT tests'
-        run: ./gradlew --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
+        run: ./gradlew --stacktrace --info -Dskiko.test.onci=true :skiko:awtTest
 
       - shell: bash
         name: 'Publish to Maven Local, check AWT sample'
