@@ -48,14 +48,14 @@ internal actual fun reachabilityBarrier(obj: Any?) {
 
 actual typealias NativePointer = Long
 
-@Suppress("ACTUAL_TYPE_ALIAS_TO_NULLABLE_TYPE")
-actual typealias InteropPointer = Any?
+internal actual typealias InteropPointer = java.lang.Object
 
 internal object theScope: InteropScope()
 internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     return theScope.block()
 }
 
+@Suppress("RETURN_TYPE_MISMATCH") // Hack to pass nulls as InteropPointer
 internal actual open class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer = string
 
@@ -93,11 +93,11 @@ internal actual open class InteropScope actual constructor() {
         this@fromInterop as Array<T>
     actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer = interopPointers
 
-    actual fun callback(callback: (() -> Unit)?) = callback as Any?
-    actual fun intCallback(callback: (() -> Int)?) = callback as Any?
-    actual fun nativePointerCallback(callback: (() -> NativePointer)?) = callback as Any?
-    actual fun interopPointerCallback(callback: (() -> InteropPointer)?) = callback as Any?
-    actual fun booleanCallback(callback: (() -> Boolean)?) = callback as Any?
+    actual fun callback(callback: (() -> Unit)?): InteropPointer = callback
+    actual fun intCallback(callback: (() -> Int)?): InteropPointer = callback
+    actual fun nativePointerCallback(callback: (() -> NativePointer)?): InteropPointer = callback
+    actual fun interopPointerCallback(callback: (() -> InteropPointer)?): InteropPointer = callback
+    actual fun booleanCallback(callback: (() -> Boolean)?): InteropPointer = callback
 
     actual fun virtual(method: () -> Unit) = callback(method)
     actual fun virtualInt(method: () -> Int) = intCallback(method)

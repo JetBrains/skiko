@@ -42,10 +42,6 @@ object SkikoProperties {
         }
     }
 
-    val macOSWaitForPreviousFrameVsyncOnRedrawImmediately: Boolean get() {
-        return getProperty("skiko.rendering.macos.waitForPreviousFrameVsyncOnRedrawImmediately")?.toBoolean() ?: true
-    }
-
     val windowsWaitForVsyncOnRedrawImmediately: Boolean get() {
         return getProperty("skiko.rendering.windows.waitForFrameVsyncOnRedrawImmediately")?.toBoolean() ?: false
     }
@@ -91,6 +87,22 @@ object SkikoProperties {
 
     val macOsOpenGLEnabled: Boolean get() = getProperty("skiko.macos.opengl.enabled")?.toBoolean() ?: false
 
+    val gpuResourceCacheLimit: Long get() = parseSize(getProperty("skiko.gpu.resourceCacheLimit"))
+
+    private fun parseSize(size: String?): Long {
+        if (size == null) return -1L
+        val size = size.uppercase()
+        val multiplier = when {
+            size.endsWith("K") -> 1024L
+            size.endsWith("M") -> 1024L * 1024L
+            size.endsWith("G") -> 1024L * 1024L * 1024L
+            else -> 1L
+        }
+        val numericPart = if (multiplier != 1L) size.substring(0, size.length - 1) else size
+        return numericPart.toLongOrNull()?.times(multiplier)
+            ?: throw IllegalArgumentException("Invalid size format: $size")
+    }
+
     private val properties = run {
         val resourcePropertiesEnabled = System.getProperty("skiko.resource.properties.enabled")?.toBoolean() ?: false
         val resources = if (resourcePropertiesEnabled) {
@@ -105,52 +117,69 @@ object SkikoProperties {
     private fun getProperty(key: String): String? = properties.getProperty(key)
 
     internal fun parseRenderApi(text: String?): GraphicsApi {
-        when(text) {
+        when (text) {
             "SOFTWARE_COMPAT" -> return GraphicsApi.SOFTWARE_COMPAT
             "SOFTWARE_FAST", "DIRECT_SOFTWARE" -> return GraphicsApi.SOFTWARE_FAST
             "SOFTWARE" -> return if (hostOs == OS.MacOS) GraphicsApi.SOFTWARE_COMPAT else GraphicsApi.SOFTWARE_FAST
             "OPENGL" -> {
                 // Skia isn't properly tested on OpenGL and Windows ARM (https://groups.google.com/g/skia-discuss/c/McoclAhLpvg?pli=1)
                 return if (hostOs != OS.Windows || hostArch != Arch.Arm64) GraphicsApi.OPENGL
-                    else throw Exception("$hostOs-$hostArch does not support OpenGL rendering API.")
+                else throw Exception("$hostOs-$hostArch does not support OpenGL rendering API.")
             }
+
             "ANGLE" -> {
                 return if (hostOs == OS.Windows) GraphicsApi.ANGLE
-                    else throw Exception("$hostOs does not support ANGLE rendering API.")
+                else throw Exception("$hostOs does not support ANGLE rendering API.")
             }
+
             "DIRECT3D" -> {
                 return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D
-                    else throw Exception("$hostOs does not support DirectX rendering API.")
+                else throw Exception("$hostOs does not support DirectX rendering API.")
             }
+
             "METAL" -> {
                 return if (hostOs == OS.MacOS) GraphicsApi.METAL
-                    else throw Exception("$hostOs does not support Metal rendering API.")
+                else throw Exception("$hostOs does not support Metal rendering API.")
             }
+
             else -> return bestRenderApiForCurrentOS()
         }
     }
 
     private fun bestRenderApiForCurrentOS(): GraphicsApi {
-        when(hostOs) {
-            OS.MacOS -> return GraphicsApi.METAL
-            OS.Linux -> return GraphicsApi.OPENGL
-            OS.Windows -> return if (renderingAngleEnabled) GraphicsApi.ANGLE else GraphicsApi.DIRECT3D
-            OS.Android -> return GraphicsApi.OPENGL
-            OS.JS, OS.Ios, OS.Tvos, OS.Unknown -> TODO("commonize me")
+        return when (hostOs) {
+            OS.MacOS -> GraphicsApi.METAL
+            OS.Linux -> GraphicsApi.OPENGL
+            OS.Windows -> if (renderingAngleEnabled) GraphicsApi.ANGLE else GraphicsApi.DIRECT3D
+            OS.Android -> GraphicsApi.OPENGL
+            else -> GraphicsApi.UNKNOWN
         }
     }
 
-    internal fun fallbackRenderApiQueue(initialApi: GraphicsApi) : List<GraphicsApi> {
+    internal fun fallbackRenderApiQueue(initialApi: GraphicsApi): List<GraphicsApi> {
         var fallbackApis = when (hostOs) {
             OS.Linux -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE_COMPAT)
             OS.Windows -> when (hostArch) {
                 // Skia isn't properly tested on OpenGL and Windows ARM (https://groups.google.com/g/skia-discuss/c/McoclAhLpvg?pli=1)
-                Arch.Arm64 -> listOf(GraphicsApi.ANGLE, GraphicsApi.DIRECT3D, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
-                else -> listOf(GraphicsApi.ANGLE, GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
+                Arch.Arm64 -> listOf(
+                    GraphicsApi.ANGLE,
+                    GraphicsApi.DIRECT3D,
+                    GraphicsApi.SOFTWARE_FAST,
+                    GraphicsApi.SOFTWARE_COMPAT
+                )
+
+                else -> listOf(
+                    GraphicsApi.ANGLE,
+                    GraphicsApi.DIRECT3D,
+                    GraphicsApi.OPENGL,
+                    GraphicsApi.SOFTWARE_FAST,
+                    GraphicsApi.SOFTWARE_COMPAT
+                )
             }
+
             OS.Android -> return listOf(GraphicsApi.OPENGL)
-            OS.JS, OS.Ios, OS.Tvos, OS.Unknown -> TODO("commonize me")
+            else -> return listOf(GraphicsApi.UNKNOWN)
         }
 
         val indexOfInitialApi = fallbackApis.indexOf(initialApi)

@@ -3,6 +3,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Paint
@@ -12,6 +13,7 @@ import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.context.JvmContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
+import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
@@ -36,9 +38,10 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 import kotlin.concurrent.thread
+import kotlin.math.absoluteValue
 import kotlin.random.Random
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration
 
@@ -103,11 +106,11 @@ class SkiaLayerTest {
                 override fun keyTyped(e: KeyEvent?) {
                     launch {
                         val redrawer = window.layer.redrawer as MetalRedrawer
-                        redrawer.redrawImmediately()
+                        redrawer.redrawImmediately(updateNeeded = true)
                         counter1 += 1
-                        redrawer.redrawImmediately()
+                        redrawer.redrawImmediately(updateNeeded = true)
                         counter2 += 1
-                        redrawer.redrawImmediately()
+                        redrawer.redrawImmediately(updateNeeded = true)
                     }
                 }
             })
@@ -179,6 +182,8 @@ class SkiaLayerTest {
             window.layer.needRedraw()
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
+
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
@@ -208,6 +213,8 @@ class SkiaLayerTest {
             layer.repaint()
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
+
+            assertRenderApiFor(layer)
         } finally {
             window.close()
         }
@@ -234,6 +241,8 @@ class SkiaLayerTest {
             window.layer.needRedraw()
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
+
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
@@ -273,21 +282,20 @@ class SkiaLayerTest {
 
             renderedWidth = -1
             layer.size = Dimension(30, 40)
-            layer.needRedraw()
             delay(1000)
             assertEquals((30 * density).toInt(), renderedWidth)
 
             renderedWidth = -1
             layer.size = Dimension(0, 0)
-            layer.needRedraw()
             delay(1000)
             assertEquals(0, renderedWidth)
 
             renderedWidth = -1
             layer.size = Dimension(40, 40)
-            layer.needRedraw()
             delay(1000)
             assertEquals((40 * density).toInt(), renderedWidth)
+
+            assertRenderApiFor(layer)
         } finally {
             layer.dispose()
             window.close()
@@ -330,6 +338,8 @@ class SkiaLayerTest {
             box.setBounds(100, 0, 100, 100)
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
+
+            assertRenderApiFor(layer)
         } finally {
             layer.dispose()
             window.close()
@@ -352,6 +362,8 @@ class SkiaLayerTest {
             delay(1000)
 
             screenshots.assert(window.bounds)
+
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
@@ -386,6 +398,10 @@ class SkiaLayerTest {
             window3.toFront()
             delay(1000)
             screenshots.assert(window3.bounds, "window3")
+
+            assertRenderApiFor(window1.layer)
+            assertRenderApiFor(window2.layer)
+            assertRenderApiFor(window3.layer)
         } finally {
             window1.close()
             window2.close()
@@ -410,6 +426,7 @@ class SkiaLayerTest {
 
             delay(1000)
             assertEquals(true, stateRemainsFullscreen)
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
 
@@ -490,6 +507,10 @@ class SkiaLayerTest {
             if (delayCount > 0) {
                 delay(delayCount * 10)
             }
+
+            openedWindows.forEach {
+                assertRenderApiFor(it.layer)
+            }
         }
 
         openedWindows.forEach(JFrame::close)
@@ -514,6 +535,7 @@ class SkiaLayerTest {
         repeat(100) {
             window.size = Dimension(200 + Random.nextInt(200), 200 + Random.nextInt(200))
             window.paint(window.graphics)
+            assertRenderApiFor(window.layer)
             yield()
         }
 
@@ -542,14 +564,17 @@ class SkiaLayerTest {
             window.layer.needRedraw()
             yield()
             window.paint(window.graphics)
+            assertRenderApiFor(window.layer)
             window.close()
         }
     }
 
-    private abstract class BaseTestRedrawer: Redrawer {
+    private abstract class BaseTestRedrawer(val layer: SkiaLayer): Redrawer {
         override fun dispose() = Unit
-        override fun needRedraw() = Unit
-        override fun redrawImmediately() = Unit
+        override fun needRedraw(throttledToVsync: Boolean) = Unit
+        override fun redrawImmediately(updateNeeded: Boolean) = Unit
+        override fun update(nanoTime: Long) = layer.update(nanoTime)
+
         override val renderInfo: String
             get() = ""
     }
@@ -557,12 +582,12 @@ class SkiaLayerTest {
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on init context`() = uiTest {
         testFallbackToSoftware { layer, _, _, _ ->
-            object : BaseTestRedrawer() {
+            object : BaseTestRedrawer(layer) {
                 private val contextHandler = object : JvmContextHandler(layer) {
                     override fun initContext() = false
                     override fun initCanvas() = Unit
                 }
-                override fun redrawImmediately() = layer.inDrawScope(contextHandler::draw)
+                override fun redrawImmediately(updateNeeded: Boolean) = layer.inDrawScope(contextHandler::draw)
             }
         }
     }
@@ -575,8 +600,8 @@ class SkiaLayerTest {
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on draw`() = uiTest {
         testFallbackToSoftware { layer, _, _, _ ->
-            object : BaseTestRedrawer() {
-                override fun redrawImmediately() = layer.inDrawScope {
+            object : BaseTestRedrawer(layer) {
+                override fun redrawImmediately(updateNeeded: Boolean) = layer.inDrawScope {
                     throw RenderException()
                 }
             }
@@ -631,8 +656,8 @@ class SkiaLayerTest {
     fun `renderApi change callback is invoked on fallback`() = uiTest {
         val window = UiTestWindow(
             renderFactory = OverrideNonSoftwareRenderFactory { layer, _, _, _ ->
-                object : BaseTestRedrawer() {
-                    override fun redrawImmediately() = layer.inDrawScope {
+                object : BaseTestRedrawer(layer) {
+                    override fun redrawImmediately(updateNeeded: Boolean) = layer.inDrawScope {
                         throw RenderException()
                     }
                 }
@@ -688,6 +713,7 @@ class SkiaLayerTest {
             window.isVisible = true
 
             onDrawCompleted.await()
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
@@ -975,6 +1001,7 @@ class SkiaLayerTest {
             assertEquals(0, lineMetrics.first().lineNumber)
 
             screenshots.assert(window.bounds)
+            assertRenderApiFor(window.layer)
         } finally {
             window.close()
         }
@@ -1017,14 +1044,27 @@ class SkiaLayerTest {
 
     @Test
     fun `no window flash on hide or dispose while animation is running`() = uiTest {
-        assumeTrue(hostOs == OS.MacOS)  // Until the issue is fixed on Windows and Linux
+        assumeTrue(hostOs.isMacOS)
+        // Until the issue is fixed in other redrawers
+        // Don't use assumeTrue, as uiTest iterates over multiple renderers,
+        // and if one of them skipped, the whole test is skipped
+        if (renderApi != GraphicsApi.METAL) return@uiTest
 
         // Put up a large green window, and then repeatedly show and hide/dispose
         // a smaller black window on top of it while screenshotting the pixel at the center,
         // and making sure that pixel is always either black or green.
 
-        val bgColor = Color.GREEN  // Green
-        val fgColor = Color.BLACK  // Black
+        // We can't compare colors exactly because java.awt.Robot can return a slightly different color due to
+        // system color profile
+        fun Color.closeTo(other: Color): Boolean {
+            val diffLimit = 10
+            return (red - other.red).absoluteValue < diffLimit
+                    && (green - other.green).absoluteValue < diffLimit
+                    && (blue - other.blue).absoluteValue < diffLimit
+        }
+
+        val bgColor = Color.GREEN
+        val fgColor = Color.BLACK
         val backgroundWindow = JFrame().also {
             it.size = Dimension(1000, 1000)
             it.location = Point(200, 200)
@@ -1051,10 +1091,10 @@ class SkiaLayerTest {
             Point(it.x + it.width/2, it.y + it.height/2)
         }
 
-        var nonBlackPixelDetected = false
+        var nonBlackPixelDetected: Color? = null
         val stopThread = AtomicBoolean(false)
         // This semaphore ensures that screenshots are only taken when the window is becoming hidden/disposed.
-        // It's needed because the window can (and does, with SOFTWARE_COMPAT) also flash when becoming visible.
+        // It's necessary because the window can (and does, with SOFTWARE_COMPAT) also flash when becoming visible.
         val semaphore = Semaphore(1, true)
         val t = thread {
             val robot = Robot()
@@ -1062,36 +1102,37 @@ class SkiaLayerTest {
                 semaphore.acquire()
                 val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
                 semaphore.release()
-                if ((pixel != fgColor) && (pixel != bgColor)) {
-                    println("window is visible: ${window.isVisible}")
-                    nonBlackPixelDetected = true
+                if (!pixel.closeTo(fgColor) && !pixel.closeTo(bgColor)) {
+                    nonBlackPixelDetected = pixel
                     return@thread
                 }
             }
         }
 
         try {
+            // Check with `window.isVisible = false`
             repeat(20) {
                 delay(200)
                 window.isVisible = false
                 delay(300)
-                assertFalse(nonBlackPixelDetected, "Detected a non-black pixel when hiding window")
+                assertNull(nonBlackPixelDetected, "Detected a non-black pixel when hiding window")
                 // Acquire the semaphore while making the window visible, to disable screenshotting
                 semaphore.acquire()
                 window.isVisible = true
-                delay(1000)
+                delay(500)
                 semaphore.release()
             }
 
+            // Check with `window.dispose()`
             repeat(20) {
                 delay(200)
                 window.dispose()
                 delay(300)
-                assertFalse(nonBlackPixelDetected, "Detected a non-black pixel when disposing window")
+                assertNull(nonBlackPixelDetected, "Detected a non-black pixel when disposing window")
                 // Acquire the semaphore while making the window visible, to disable screenshotting
                 semaphore.acquire()
                 window.isVisible = true
-                delay(1000)
+                delay(500)
                 semaphore.release()
             }
         } finally {
@@ -1100,6 +1141,142 @@ class SkiaLayerTest {
 
             window.dispose()
             backgroundWindow.dispose()
+        }
+    }
+
+    @Test
+    fun `temporary change is not visible`() = uiTest {
+        assumeTrue(hostOs.isMacOS)
+        // The separation between update and draw is only implemented in MetalRedrawer at the moment
+        // Don't use assumeTrue, as uiTest iterates over multiple renderers,
+        // and if one of them skipped, the whole test is skipped
+        if (renderApi != GraphicsApi.METAL) return@uiTest
+
+        val color = Color.BLACK
+        val tempColor = Color.WHITE
+        lateinit var renderDelegate: SolidColorRenderer
+        val renderChannel = Channel<Unit>(Channel.CONFLATED)
+        val window = UiTestWindow {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            renderDelegate = object: SolidColorRenderer(
+                layer = layer,
+                color = color,
+                continuousRedraw = true
+            ) {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    super.onRender(canvas, width, height, nanoTime)
+                    assertTrue(renderChannel.trySend(Unit).isSuccess)
+                }
+            }
+            layer.renderDelegate = renderDelegate
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+
+        window.isVisible = true
+        delay(1500)
+        val pixelLocation = window.bounds.let {
+            Point(it.x + it.width/2, it.y + it.height/2)
+        }
+        val robot = Robot()
+
+        var tempColorVisibleCount = 0
+        try {
+            repeat(50) {
+                // Wait for just after the next vsync, so we have plenty of time until the one after it
+                val vSyncer = MetalVSyncer(window.layer.windowHandle)
+                vSyncer.waitForVSync()
+
+                // Set the color to temp, then immediately back to normal
+                renderDelegate.color = tempColor
+                renderDelegate.layer.needRedraw(throttledToVsync = false)
+                renderChannel.receive()  // Wait until render is actually called
+                renderDelegate.color = color
+                renderDelegate.layer.needRedraw(throttledToVsync = false)
+
+                // Check whether the temp color was visible
+                val startTime = System.currentTimeMillis()
+                while (System.currentTimeMillis() - startTime < 400) {
+                    val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
+                    if (pixel != color) {
+                        tempColorVisibleCount++
+                    }
+                }
+            }
+
+            // Because the temp color can theoretically be visible if the JVM hiccups and a vsync happens before the
+            // color is reverted, we allow a small percentage of the tries to fail. This way the flakiness of the test
+            // is reduced.
+            // Note that in practice, however, this test had never failed on an M1 Ultra machine with a 60Hz monitor.
+            assertTrue(tempColorVisibleCount < 5)
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @Test
+    fun `needRedraw throttled and regular calls render and draw once`() = uiTest {
+        // Check that calling both needRedraw(true) and needRedraw(false) causes only one render and one draw call
+        var renderCalls = 0
+        val renderChannel = Channel<Unit>(Channel.CONFLATED)
+
+        var drawCalls = 0
+        val deviceAnalytics = object : SkiaLayerAnalytics.DeviceAnalytics {
+            override fun beforeFrameRender() {
+                drawCalls++
+            }
+        }
+        val analytics = object : SkiaLayerAnalytics {
+            @ExperimentalSkikoApi
+            override fun device(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi,
+                deviceName: String?
+            ): SkiaLayerAnalytics.DeviceAnalytics {
+                return deviceAnalytics
+            }
+        }
+        val window = UiTestWindow(analytics = analytics) {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            layer.renderDelegate = object: SkikoRenderDelegate {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    renderCalls++
+                    renderChannel.trySend(Unit)
+                }
+            }
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+        window.isVisible = true
+
+        // Wait for things to settle down, specifically the workaround for JBR-5259, which moves
+        // the backed layer when graphicsContextScaleTransform changes
+        delay(100)
+
+        try {
+            renderChannel.receive()
+            renderCalls = 0
+            drawCalls = 0
+            withContext(MainUIDispatcher) {
+                window.layer.needRedraw(true)
+                window.layer.needRedraw(false)
+            }
+            delay(100)
+            assertEquals("Render was called more than once on needRedraw(true), needRedraw(false)", 1, renderCalls)
+            assertEquals("Draw was called more than once on needRedraw(true), needRedraw(false)", 1, drawCalls)
+
+            renderCalls = 0
+            drawCalls = 0
+            withContext(MainUIDispatcher) {
+                window.layer.needRedraw(false)
+                window.layer.needRedraw(true)
+            }
+            delay(100)
+            assertEquals("Render was called more than once on needRedraw(false), needRedraw(true)", 1, renderCalls)
+            assertEquals("Draw was called more than once on needRedraw(true), needRedraw(true)", 1, drawCalls)
+        } finally {
+            window.dispose()
         }
     }
 
@@ -1139,6 +1316,8 @@ class SkiaLayerTest {
         }
     }
 
+
+
     private class AnimatedBoxRenderer(
         private val layer: SkiaLayer,
         private val pixelsPerSecond: Double,
@@ -1166,7 +1345,7 @@ class SkiaLayerTest {
         }
     }
 
-    private class SolidColorRenderer(
+    private open class SolidColorRenderer(
         val layer: SkiaLayer,
         color: Color,
         continuousRedraw: Boolean = false
@@ -1175,11 +1354,18 @@ class SkiaLayerTest {
         var continuousRedraw = continuousRedraw
             set(value) {
                 if (value)
-                    layer.needRedraw()
+                    layer.needRedraw(throttledToVsync = true)
                 field = value
             }
 
-        val paint = Paint().also { it.color = color.rgb }
+        var color = color
+            set(value) {
+                Logger.debug { "Color set to $value" }
+                field = value
+                paint.color = color.rgb
+            }
+
+        private var paint = Paint().also { it.color = color.rgb }
 
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), paint)

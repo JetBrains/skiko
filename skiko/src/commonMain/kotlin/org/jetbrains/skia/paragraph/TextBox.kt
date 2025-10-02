@@ -40,7 +40,7 @@ class TextBox(val rect: Rect, direction: Direction) {
         _direction = direction
     }
 
-    companion object : ArrayInteropDecoder<TextBox> {
+    internal companion object : ArrayInteropDecoder<TextBox> {
         override fun getArrayElement(array: InteropPointer, index: Int): TextBox {
             val rect = FloatArray(4)
             val direction = IntArray(1)

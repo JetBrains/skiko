@@ -29,7 +29,7 @@ internal class LinuxOpenGLSwingRedrawer(
     private var bytesToDraw = ByteArray(0)
 
     init {
-        onContextInit()
+        onContextInit(null)
     }
 
     override fun dispose() {
@@ -65,7 +65,7 @@ internal class LinuxOpenGLSwingRedrawer(
                 ).autoClose()
 
                 // TODO: may be it is possible to reuse [makeGLContext]
-                val directContext = makeGLContext().autoClose()
+                val directContext = makeGLContext().configureContext().autoClose()
                 val surface = Surface.makeFromBackendRenderTarget(
                     directContext,
                     renderTarget,

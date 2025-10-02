@@ -162,6 +162,7 @@ class FontMetrics(
     companion object
 }
 
+@Suppress("NOTHING_TO_INLINE")
 private inline fun Float.asNumberOrNull(): Float? = if (isNaN()) null else this
 
 private fun FontMetrics.Companion.fromRawData(rawData: FloatArray) = FontMetrics(

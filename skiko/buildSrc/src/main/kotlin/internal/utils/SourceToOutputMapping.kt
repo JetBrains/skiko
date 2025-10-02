@@ -21,13 +21,13 @@ internal fun mapSourceFilesToOutputFiles(
     sourceFileExt: String,
     outputFileExt: String
 ): SourceToOutputMapping {
-    val sourceRoots = sourceRoots.map { it.absoluteFile }
+    val sourceRootsAbs = sourceRoots.map { it.absoluteFile }
     val sourceRootCache = HashMap<File, File>()
     fun findSourceRootFor(sourceFile: File): File? {
         val parentDir = sourceFile.parentFile ?: return null
         return sourceRootCache.getOrPut(parentDir) {
-            sourceRoots.firstOrNull { root -> parentDir.path.startsWith(root.path) }
-                ?: throw UnknownSourceRootException(sourceFile, sourceRoots)
+            sourceRootsAbs.firstOrNull { root -> parentDir.path.startsWith(root.path) }
+                ?: throw UnknownSourceRootException(sourceFile, sourceRootsAbs)
         }
     }
 

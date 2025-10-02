@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.SwingUtilities.*
 
 /**
@@ -24,7 +25,6 @@ internal value class MetalDevice(val ptr: Long)
  *
  * This [MetalRedrawer] draws content on-screen for maximum efficiency,
  * but it may prevent for using it in embedded components (such as interop with Swing).
- * For off-screen implementation see [MetalOffScreenRedrawer]
  *
  * Content to draw is provided by [SkiaLayer.draw].
  *
@@ -34,7 +34,7 @@ internal value class MetalDevice(val ptr: Long)
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
-    private val properties: SkiaLayerProperties
+    properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.METAL) {
     private val contextHandler: MetalContextHandler
 
@@ -60,7 +60,7 @@ internal class MetalRedrawer(
         }
 
     private val adapter = chooseMetalAdapter(properties.adapterPriority)
-    private val displayLinkThrottler = DisplayLinkThrottler(layer.windowHandle)
+    private val vSyncer = if (properties.isVsyncEnabled) MetalVSyncer(layer.windowHandle) else null
 
     private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
     @Volatile private var isWindowOccluded = false
@@ -78,12 +78,7 @@ internal class MetalRedrawer(
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing) {
-            update(System.nanoTime())
-            draw()
-        }
-    }
+    private val frameDispatcher = FrameScheduler()
 
     init {
         onContextInit()
@@ -94,39 +89,41 @@ internal class MetalRedrawer(
         contextHandler.dispose()
         disposeDevice(device.ptr)
         adapter.dispose()
-        displayLinkThrottler.dispose()
+        vSyncer?.dispose()
         _device = null
         super.dispose()
     }
 
-    override fun needRedraw() {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
-        frameDispatcher.scheduleFrame()
+    override fun needRedraw(throttledToVsync: Boolean) {
+        checkDisposed()
+        frameDispatcher.scheduleFrame(needUpdate = true, throttledToVsync = throttledToVsync)
     }
 
-    override fun redrawImmediately() {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
-        inDrawScope {
-            update(System.nanoTime())
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw(waitVsync = SkikoProperties.macOSWaitForPreviousFrameVsyncOnRedrawImmediately)
+    override fun redrawImmediately(updateNeeded: Boolean) {
+        checkDisposed()
+        if (updateNeeded) {
+            update()
+        }
+        // Trying to draw immediately in Metal will result in lost (undrawn)
+        // frames if there are more than two between consecutive vsync events.
+        if (layer.isShowing) {
+            frameDispatcher.scheduleFrame(needUpdate = false, throttledToVsync = false)
+        } else {
+            // But if the layer isn't showing yet, we want to draw immediately,
+            // so that if it shows before the next vsync, there is no background flash
+            inDrawScope {
+                if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                    performDraw()
+                }
             }
         }
     }
 
     private suspend fun draw() {
-        // 2,3 GHz 8-Core Intel Core i9
-        //
-        // Test1. 8 windows, multiple clocks, 800x600
-        //
-        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 20 FPS, 130% CPU
-        // Dispatchers.IO: 58 FPS, 460% CPU
-        //
-        // Test2. 60 windows, single clock, 800x600
-        //
-        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
-        // Dispatchers.IO: 50 FPS, 200% CPU
         inDrawScope {
+            // Move drawing to another thread to free the main thread
+            // It can be expensive to run it in the main thread and FPS can become unstable.
+            // This is visible by running [SkiaLayerPerformanceTest], standard deviation is increased significantly.
             withContext(dispatcherToBlockOn) {
                 performDraw()
             }
@@ -150,14 +147,8 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun performDraw(waitVsync: Boolean = true) = synchronized(drawLock) {
+    private fun performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
-            if (waitVsync) {
-                // Wait for vsync because:
-                // - macOS drops the second/next drawables if they are sent in the same vsync
-                // - it makes frames consistent and limits FPS
-                displayLinkThrottler.waitVSync()
-            }
             autoreleasepool {
                 contextHandler.draw()
             }
@@ -178,7 +169,7 @@ internal class MetalRedrawer(
     }
 
     override fun setVisible(isVisible: Boolean) {
-        Logger.debug { "MetalRedrawer#setVisible $this $isVisible" }
+        Logger.debug { "MetalRedrawer#setVisible($isVisible)" }
         setLayerVisible(device.ptr, isVisible)
     }
 
@@ -196,4 +187,44 @@ internal class MetalRedrawer(
      * @note see https://developer.apple.com/documentation/quartzcore/cametallayer/2887087-displaysyncenabled
      */
     private external fun setDisplaySyncEnabled(device: Long, enabled: Boolean)
+
+    private inner class FrameScheduler {
+        private var updateRequested = AtomicBoolean(false)
+
+        private fun updateIfRequested() {
+            if (updateRequested.getAndSet(false)) {
+                update()
+            }
+        }
+
+        private val updateDispatcher = FrameDispatcher(MainUIDispatcher) {
+            if (layer.isShowing) {
+                updateIfRequested()
+            }
+        }
+
+        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
+            if (layer.isShowing) {
+                updateIfRequested()
+                draw()
+            }
+            vSyncer?.waitForVSync()
+        }
+
+        fun scheduleFrame(needUpdate: Boolean, throttledToVsync: Boolean) {
+            if (needUpdate) {
+                updateRequested.set(true)
+
+                if (!throttledToVsync) {
+                    updateDispatcher.scheduleFrame()
+                }
+            }
+            frameDispatcher.scheduleFrame()
+        }
+
+        fun cancel() {
+            updateDispatcher.cancel()
+            frameDispatcher.cancel()
+        }
+    }
 }

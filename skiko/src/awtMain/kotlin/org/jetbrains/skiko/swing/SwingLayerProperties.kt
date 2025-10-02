@@ -11,6 +11,8 @@ internal interface SwingLayerProperties {
     val graphicsConfiguration: GraphicsConfiguration
 
     val adapterPriority: GpuPriority
+
+    val gpuResourceCacheLimit: Long
 }
 
 internal val SwingLayerProperties.scale: Float get() = graphicsConfiguration.defaultTransform.scaleX.toFloat()

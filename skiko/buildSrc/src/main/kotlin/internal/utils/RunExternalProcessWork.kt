@@ -67,7 +67,7 @@ internal class BufferedLog() {
 }
 
 internal class LineBufferingOutputStream(private val processLine: (String) -> Unit) : OutputStream() {
-    private val newLine = '\n'.toInt()
+    private val newLine = '\n'.code
     private val buffer = ByteArrayOutputStream()
     private var closed = false
 

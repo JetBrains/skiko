@@ -1,1 +1,0 @@
-echo skiko-build-ubuntu-2004-aarch64:latest
