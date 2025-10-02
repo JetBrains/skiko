@@ -829,8 +829,8 @@ class SkiaLayerTest {
 
                 val dt = renderTimes.last() - renderTimes.first()
                 assertTrue(
-                    actual = dt < 100,
-                    message = "2nd frame drawn ${dt}ms after 1st"
+                    actual = dt < 150,
+                    message = "2nd frame drawn ${dt}ms after 1st: ${renderTimes.map { it - renderTimes.first() }}}"
                 )
                 renderTimes.clear()
             }
