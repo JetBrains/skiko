@@ -11,7 +11,7 @@ import platform.AppKit.NSViewHeightSizable
 import platform.AppKit.NSViewWidthSizable
 import platform.AppKit.NSWindow
 
-class MacosClocks(skiaLayer: SkiaLayer, window: NSWindow) : Clocks(layer::renderApi) {
+class MacosClocks(layer: SkiaLayer, window: NSWindow) : Clocks(layer::renderApi) {
     init {
         val nsView = object : NSView(window.frame) {
             private var trackingArea : NSTrackingArea? = null
@@ -39,6 +39,6 @@ class MacosClocks(skiaLayer: SkiaLayer, window: NSWindow) : Clocks(layer::render
         val contentView = window.contentView!!
         nsView.autoresizingMask = NSViewHeightSizable or NSViewWidthSizable
         contentView.addSubview(nsView)
-        skiaLayer.attachTo(nsView)
+        layer.attachTo(nsView)
     }
 }
