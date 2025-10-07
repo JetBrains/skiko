@@ -185,6 +185,10 @@ jobs:
           ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Dskiko.test.onci=true -Dskiko.test.performance.enabled=false :skiko:awtTest
         timeout-minutes: 25
 
+      - name: Clean Gradle cache to recover disk space
+        run: |
+          rm -rf ~/.gradle/caches
+          
       - shell: bash
         name: 'Publish to Maven Local, check AWT sample'
         env:
