@@ -146,7 +146,7 @@ jobs:
         name: 'Set up Android NDK'
         id: setup-ndk
         with:
-          ndk-version: r21e
+          ndk-version: r29
 
       - uses: android-actions/setup-android@v2
         name: 'Set up Android SDK'

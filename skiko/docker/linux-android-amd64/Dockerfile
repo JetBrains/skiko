@@ -24,7 +24,7 @@ RUN yes | $SDK_MANAGER --licenses && \
     $SDK_MANAGER "platforms;$ANDROID_PLATFORM" && \
     cd $ANDROID_SDK_ROOT/platforms/$ANDROID_PLATFORM && \
     ls -1 | grep -v android.jar | xargs rm -rf
-ARG NDK_VERSION=21.4.7075529
+ARG NDK_VERSION=29.0.14206865
 RUN $SDK_MANAGER "ndk;$NDK_VERSION" && \
     cd $ANDROID_SDK_ROOT/ndk/$NDK_VERSION && \
     ls -1 | grep -v toolchains | xargs rm -rf
