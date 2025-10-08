@@ -166,6 +166,18 @@ jobs:
           sudo update-alternatives --config aarch64-linux-gnu-gcc
           sudo Xvfb :0 -screen 0 1280x720x24 +extension GLX &
 
+      # We have only ~4.5G left after installing everything required, and sometimes it's not enough to correctly run
+      # skiko compilation and publishing. Removing unused software from the agent to free up space.
+      - name: Free up space on GitHub image
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          sudo docker builder prune -a
+          df -h
+
       - shell: bash
         name: 'Compile and run Linux x64 tests'
         run: |
@@ -185,10 +197,6 @@ jobs:
           ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Dskiko.test.onci=true -Dskiko.test.performance.enabled=false :skiko:awtTest
         timeout-minutes: 25
 
-      - name: Clean Gradle cache to recover disk space
-        run: |
-          rm -rf ~/.gradle/caches
-          
       - shell: bash
         name: 'Publish to Maven Local, check AWT sample'
         env:
