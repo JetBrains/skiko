@@ -168,6 +168,7 @@ jobs:
 
       # We have only ~4.5G left after installing everything required, and sometimes it's not enough to correctly run
       # skiko compilation and publishing. Removing unused software from the agent to free up space.
+      # (it gives us ~13G)
       - name: Free up space on GitHub image
         run: |
           df -h
