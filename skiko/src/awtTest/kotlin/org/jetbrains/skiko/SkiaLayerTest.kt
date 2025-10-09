@@ -1184,8 +1184,9 @@ class SkiaLayerTest {
         val robot = Robot()
 
         var tempColorVisibleCount = 0
+        val testCount = 50
         try {
-            repeat(50) {
+            repeat(testCount) {
                 // Wait for just after the next vsync, so we have plenty of time until the one after it
                 val vSyncer = MetalVSyncer(window.layer.windowHandle)
                 vSyncer.waitForVSync()
@@ -1211,7 +1212,7 @@ class SkiaLayerTest {
             // color is reverted, we allow a small percentage of the tries to fail. This way the flakiness of the test
             // is reduced.
             // Note that in practice, however, this test had never failed on an M1 Ultra machine with a 60Hz monitor.
-            assertTrue(tempColorVisibleCount < 5)
+            assertTrue(tempColorVisibleCount < 5, "Temp color was visible $tempColorVisibleCount/$testCount times")
         } finally {
             window.dispose()
         }
