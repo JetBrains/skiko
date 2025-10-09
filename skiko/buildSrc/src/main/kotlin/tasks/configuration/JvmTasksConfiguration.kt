@@ -514,6 +514,7 @@ fun SkikoProjectContext.setupJvmTestTask(
             )
             systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", canRunUiTests.toString()))
             systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
+            systemProperty("skiko.test.ui.renderApi.ignoreAssertsFor", System.getProperty("skiko.test.ui.renderApi.ignoreAssertsFor", "OPENGL"))
             systemProperty("skiko.test.debug", buildType == SkiaBuildType.DEBUG)
 
             // Tests should be deterministic, so disable scaling.

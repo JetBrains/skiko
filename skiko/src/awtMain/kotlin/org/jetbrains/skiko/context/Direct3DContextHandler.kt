@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.context
 
+import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.getPtr
@@ -8,7 +9,7 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
 
-internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
+internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHandler(layer, "Direct3D") {
     private val bufferCount = 2
     private var surfaces: Array<Surface?> = arrayOfNulls(bufferCount)
     private fun isSurfacesNull() = surfaces.all { it == null }
@@ -16,20 +17,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
     private val directXRedrawer: Direct3DRedrawer
         get() = layer.redrawer!! as Direct3DRedrawer
 
-    override fun initContext(): Boolean {
-        try {
-            if (context == null) {
-                context = directXRedrawer.makeContext()
-                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    Logger.info { "Renderer info:\n ${rendererInfo()}" }
-                }
-            }
-        } catch (e: Exception) {
-            Logger.warn(e) { "Failed to create Skia Direct3D context!" }
-            return false
-        }
-        return true
-    }
+    override fun makeContext(): DirectContext = directXRedrawer.makeContext()
 
     private var currentWidth = 0
     private var currentHeight = 0
