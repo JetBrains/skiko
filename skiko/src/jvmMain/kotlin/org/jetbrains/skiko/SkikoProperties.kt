@@ -50,18 +50,6 @@ object SkikoProperties {
         return getProperty("skiko.rendering.linux.waitForFrameVsyncOnRedrawImmediately")?.toBoolean() ?: false
     }
 
-    /**
-     * Is experimental ANGLE renderer API enabled (https://skia.org/docs/user/special/angle/).
-     *
-     * If enabled, Windows uses it as a primary render API and fallbacks to the default APIs.
-     *
-     * Other OSes are not supported yet.
-     *
-     * If it is enabled, make sure that either:
-     * - `org.jetbrains.skiko:skiko-awt-runtime-angle-$target:$version` added as a dependency
-     * - The `skiko.library.path` property is defined and the directory has libEGL, libGLESv2 from
-     *   https://github.com/JetBrains/angle-pack/releases
-     */
     val renderingAngleEnabled: Boolean get() = getProperty("skiko.rendering.angle.enabled")?.toBoolean() ?: false
 
     /**
@@ -168,7 +156,7 @@ object SkikoProperties {
         }
     }
 
-    internal fun fallbackRenderApiQueue(initialApi: GraphicsApi?): List<GraphicsApi> {
+    internal fun fallbackRenderApiQueue(initialApi: GraphicsApi): List<GraphicsApi> {
         var fallbackApis = when (hostOs) {
             OS.Linux -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE_COMPAT)
@@ -194,16 +182,12 @@ object SkikoProperties {
             else -> return listOf(GraphicsApi.UNKNOWN)
         }
 
-        return if (initialApi != null) {
-            val indexOfInitialApi = fallbackApis.indexOf(initialApi)
-            require(indexOfInitialApi >= 0) {
-                "$hostOs does not support $initialApi rendering API."
-            }
-            fallbackApis = fallbackApis.drop(indexOfInitialApi + 1)
-
-            listOf(initialApi) + fallbackApis
-        } else {
-            fallbackApis
+        val indexOfInitialApi = fallbackApis.indexOf(initialApi)
+        require(indexOfInitialApi >= 0) {
+            "$hostOs does not support $initialApi rendering API."
         }
+        fallbackApis = fallbackApis.drop(indexOfInitialApi + 1)
+
+        return listOf(initialApi) + fallbackApis
     }
 }

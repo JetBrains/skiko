@@ -40,9 +40,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
     implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
     implementation("org.jetbrains.runtime:jbr-api:1.5.0")
-    if (System.getProperty("os.name").startsWith("Win")) {
-        implementation("org.jetbrains.skiko:skiko-awt-runtime-angle-$target:$version")
-    }
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
@@ -71,26 +68,17 @@ val casualRun = tasks.named<JavaExec>("run") {
     additionalArguments.forEach { systemProperty(it.key, it.value) }
 }
 
-tasks.register("runWithSoftwareRenderer") {
+tasks.register("runSoftware") {
     additionalArguments += mapOf("skiko.renderApi" to "DIRECT_SOFTWARE")
     dependsOn(casualRun)
 }
 
-// Use Angle as a primary renderer for Windows. Renderers for the other OSes are not changing yet
-tasks.register("runWithAngleEnabled") {
-    group = "application"
-    additionalArguments += mapOf("skiko.rendering.angle.enabled" to "true")
-    dependsOn(casualRun)
-}
-
 tasks.register("runWithTransparency") {
-    group = "application"
     additionalArguments += mapOf("skiko.transparency" to "true")
     dependsOn(casualRun)
 }
 
 tasks.register("runInterop") {
-    group = "application"
     additionalArguments += mapOf("skiko.swing.interop" to "true")
     dependsOn(casualRun)
 }
