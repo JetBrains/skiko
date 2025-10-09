@@ -1,6 +1,5 @@
 package tasks.configuration
 
-import AdditionalRuntimeLibrary
 import Arch
 import CompileSkikoCppTask
 import CompileSkikoObjCTask
@@ -25,6 +24,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.withType
+import org.gradle.util.internal.VersionNumber
 import projectDirs
 import registerOrGetSkiaDirProvider
 import registerSkikoTask
@@ -461,16 +461,11 @@ fun SkikoProjectContext.skikoRuntimeDirForTestsTask(
     targetOs: OS,
     targetArch: Arch,
     skikoJvmJar: Provider<Jar>,
-    skikoJvmRuntimeJar: Provider<Jar>,
-    additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
+    skikoJvmRuntimeJar: Provider<Jar>
 ) = project.registerSkikoTask<Copy>("skikoRuntimeDirForTests", targetOs, targetArch) {
     dependsOn(skikoJvmJar, skikoJvmRuntimeJar)
     from(project.zipTree(skikoJvmJar.flatMap { it.archiveFile }))
     from(project.zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile }))
-    additionalRuntimeLibraries.forEach { lib ->
-        from(project.zipTree(lib.jarTask.flatMap { it.archiveFile }))
-    }
-    
     duplicatesStrategy = DuplicatesStrategy.WARN
     destinationDir = project.layout.buildDirectory.dir("skiko-runtime-for-tests").get().asFile
 }
@@ -483,14 +478,9 @@ fun SkikoProjectContext.skikoJarForTestsTask(
     archiveFileName.set("skiko-runtime-for-tests.jar")
 }
 
-fun SkikoProjectContext.setupJvmTestTask(
-    skikoAwtJarForTests: TaskProvider<Jar>,
-    additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
-    targetOs: OS,
-    targetArch: Arch
-) = with(project) {
+fun SkikoProjectContext.setupJvmTestTask(skikoAwtJarForTests: TaskProvider<Jar>, targetOs: OS, targetArch: Arch) = with(project) {
     val skikoAwtRuntimeJarForTests = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJarForTests)
-    val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests, additionalRuntimeLibraries)
+    val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests)
     val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
     tasks.withType<Test>().configureEach {

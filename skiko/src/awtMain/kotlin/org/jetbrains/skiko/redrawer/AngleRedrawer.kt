@@ -11,11 +11,7 @@ internal class AngleRedrawer(
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.ANGLE) {
     init {
-        try {
-            loadAngleLibrary()
-        } catch (e: Exception) {
-            throw RenderException("Failed to load ANGLE library", cause = e)
-        }
+        loadAngleLibrary()
     }
 
     private val contextHandler = AngleContextHandler(layer)

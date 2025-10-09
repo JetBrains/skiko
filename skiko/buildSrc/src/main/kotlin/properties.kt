@@ -211,8 +211,6 @@ object SkikoArtifacts {
             "skiko-android-runtime-${arch.id}"
         else
             "skiko-awt-runtime-${targetId(os, arch)}"
-    fun jvmAdditionalRuntimeArtifactIdFor(name: String, os: OS, arch: Arch) =
-        "skiko-awt-runtime-$name-${os.id}-${arch.id}"
     // Using custom name like skiko-<Os>-<Arch> (with a dash)
     // does not seem possible (at least without adding a dash to a target's tasks),
     // so we're using the default naming pattern instead.
