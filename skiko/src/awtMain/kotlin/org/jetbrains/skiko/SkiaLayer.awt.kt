@@ -557,6 +557,8 @@ actual open class SkiaLayer internal constructor(
         redrawer?.needRender(throttledToVsync)
     }
 
+    actual fun needRedraw() = needRender()
+
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }

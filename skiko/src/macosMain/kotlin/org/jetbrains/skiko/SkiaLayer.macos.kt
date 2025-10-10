@@ -144,6 +144,8 @@ actual open class SkiaLayer {
         redrawer?.needRender(throttledToVsync)
     }
 
+    actual fun needRedraw() = needRender()
+
     /**
      * Updates the [picture] according to current [nanoTime]
      */

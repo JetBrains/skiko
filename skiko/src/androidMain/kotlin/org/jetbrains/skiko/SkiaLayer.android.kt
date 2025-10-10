@@ -63,6 +63,8 @@ actual open class SkiaLayer {
         }
     }
 
+    actual fun needRedraw() = needRender()
+
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
 

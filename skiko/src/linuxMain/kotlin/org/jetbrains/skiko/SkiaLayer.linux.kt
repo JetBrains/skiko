@@ -20,6 +20,7 @@ actual open class SkiaLayer  {
     actual fun needRender(throttledToVsync: Boolean) {
         TODO("unimplemented")
     }
+    actual fun needRedraw() = needRender()
     actual fun attachTo(container: Any) {
         TODO("unimplemented")
     }

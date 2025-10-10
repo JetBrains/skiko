@@ -52,6 +52,8 @@ actual open class SkiaLayer {
         state?.needRedraw()
     }
 
+    actual fun needRedraw() = needRender()
+
     /**
      * An implementation of [SkikoRenderDelegate] with content rendering and
      * event processing logic.

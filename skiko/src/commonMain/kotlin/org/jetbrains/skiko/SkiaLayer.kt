@@ -63,6 +63,12 @@ expect open class SkiaLayer {
      */
     fun needRender(throttledToVsync: Boolean = true)
 
+    @Deprecated(
+        "Use needRender(throttledToVsync) instead",
+        replaceWith = ReplaceWith("needRender(throttledToVsync)")
+    )
+    fun needRedraw()  // TODO: Remove this sometime after 2026-07
+
     /**
      * Drawing function.
      */

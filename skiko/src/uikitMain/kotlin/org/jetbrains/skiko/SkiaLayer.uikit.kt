@@ -27,6 +27,8 @@ actual open class SkiaLayer {
         needRedrawCallback.invoke()
     }
 
+    actual fun needRedraw() = needRender()
+
     actual val component: Any?
         get() = this.view
 
