@@ -105,7 +105,7 @@ class SurfaceTest {
 
     @Test
     fun canMakeRenderTarget() {
-        if (!TestGlContext.isAvailabale()) return
+        if (!TestGlContext.isAvailable()) return
 
         val pixels = TestGlContext.run {
             DirectContext.makeGL().useContext { ctx ->
