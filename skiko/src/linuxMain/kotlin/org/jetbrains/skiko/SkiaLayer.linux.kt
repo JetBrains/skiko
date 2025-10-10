@@ -17,7 +17,7 @@ actual open class SkiaLayer  {
         set(value) {}
     actual val component: Any?
         get() = TODO("Not yet implemented")
-    actual fun needRedraw(throttledToVsync: Boolean) {
+    actual fun needRender(throttledToVsync: Boolean) {
         TODO("unimplemented")
     }
     actual fun attachTo(container: Any) {

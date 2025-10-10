@@ -48,7 +48,7 @@ actual open class SkiaLayer {
     /**
      * Schedules a drawFrame to the appropriate moment.
      */
-    actual fun needRedraw(throttledToVsync: Boolean) {
+    actual fun needRender(throttledToVsync: Boolean) {
         state?.needRedraw()
     }
 

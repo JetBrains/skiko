@@ -23,7 +23,7 @@ actual open class SkiaLayer {
         get() = false
         set(_) { throw UnsupportedOperationException() }
 
-    actual fun needRedraw(throttledToVsync: Boolean) {
+    actual fun needRender(throttledToVsync: Boolean) {
         needRedrawCallback.invoke()
     }
 

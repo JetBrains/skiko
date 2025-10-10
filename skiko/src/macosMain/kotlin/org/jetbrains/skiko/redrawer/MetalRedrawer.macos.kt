@@ -137,7 +137,7 @@ internal class MacOsMetalRedrawer(
     /**
      * Schedules a frame [draw] to an appropriate moment.
      */
-    override fun needRedraw(throttledToVsync: Boolean) {
+    override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
         frameDispatcher.scheduleFrame()
     }
@@ -150,7 +150,7 @@ internal class MacOsMetalRedrawer(
     /**
      * Invokes [draw] right away.
      */
-    override fun redrawImmediately() {
+    override fun renderImmediately() {
         checkDisposed()
         autoreleasepool {
             if (!isDisposed) {

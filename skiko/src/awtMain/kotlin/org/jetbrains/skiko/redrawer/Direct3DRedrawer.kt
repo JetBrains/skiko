@@ -63,12 +63,12 @@ internal class Direct3DRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw(throttledToVsync: Boolean) {
+    override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() {
+    override fun renderImmediately() {
         checkDisposed()
         update()
         inDrawScope {

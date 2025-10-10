@@ -47,7 +47,7 @@ actual open class SkiaLayer {
 
         view.setFocusableInTouchMode(true)
 
-        needRedraw()
+        needRender()
     }
 
     actual fun detach() {
@@ -57,7 +57,7 @@ actual open class SkiaLayer {
         }
     }
 
-    actual fun needRedraw(throttledToVsync: Boolean) {
+    actual fun needRender(throttledToVsync: Boolean) {
         glView?.apply {
             scheduleFrame()
         }

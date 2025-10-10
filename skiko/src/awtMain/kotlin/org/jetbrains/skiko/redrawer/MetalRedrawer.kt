@@ -94,12 +94,12 @@ internal class MetalRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw(throttledToVsync: Boolean) {
+    override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
         frameDispatcher.scheduleFrame(needUpdate = true, throttledToVsync = throttledToVsync)
     }
 
-    override fun redrawImmediately() {
+    override fun renderImmediately() {
         checkDisposed()
         update()
         inDrawScope {

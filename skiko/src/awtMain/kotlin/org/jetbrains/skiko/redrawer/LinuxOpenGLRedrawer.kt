@@ -72,13 +72,13 @@ internal class LinuxOpenGLRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw(throttledToVsync: Boolean) {
+    override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
+    override fun renderImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
         checkDisposed()
         update()
         inDrawScope {

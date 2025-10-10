@@ -29,13 +29,13 @@ internal abstract class AbstractDirectSoftwareRedrawer(
 
     protected var device = 0L
 
-    override fun needRedraw(throttledToVsync: Boolean) {
+    override fun needRender(throttledToVsync: Boolean) {
         frameDispatcher.scheduleFrame()
     }
 
     protected open fun draw() = inDrawScope(contextHandler::draw)
 
-    override fun redrawImmediately() {
+    override fun renderImmediately() {
         update()
         if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
             draw()

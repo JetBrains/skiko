@@ -59,7 +59,7 @@ class SkiaLayerPerformanceTest {
                     if (canCollect && frameTimes.size < frameCount) {
                         frameTimes.add(System.nanoTime()) // we check the real time, not the time provided by the argument
                     }
-                    window.layer.needRedraw()
+                    window.layer.needRender()
                 }
             }
             window.isUndecorated = true
