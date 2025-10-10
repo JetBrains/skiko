@@ -8,7 +8,7 @@ class DirectContextNativeTest {
 
     @Test
     fun resourceCacheLimitTest() {
-        if (!TestGlContext.isAvailabale()) return
+        if (!TestGlContext.isAvailable()) return
 
         TestGlContext.run {
             DirectContext.makeGL().useContext { context ->
