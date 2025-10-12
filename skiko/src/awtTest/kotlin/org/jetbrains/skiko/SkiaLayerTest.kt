@@ -1285,7 +1285,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `updateAndDrawImmediately updates and draws synchronously`() = uiTest {
+    fun `renderImmediately updates and draws synchronously`() = uiTest {
         // Check that calling both needRender(true) and needRender(false) causes only one render and one draw call
         var renderCalls = 0
         val renderChannel = Channel<Unit>(Channel.CONFLATED)
@@ -1322,7 +1322,7 @@ class SkiaLayerTest {
 
         val initRenderCalls = renderCalls
         val initDrawCalls = drawCalls
-        window.layer.updateAndDrawImmediately()
+        window.layer.renderImmediately()
         // Can't check renderCalls == initRenderCalls+1 because if drawing fails, render will be called again with
         // the fallback renderer.
         assertTrue(renderCalls > initRenderCalls)

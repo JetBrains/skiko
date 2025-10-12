@@ -27,6 +27,10 @@ actual open class SkiaLayer {
         needRedrawCallback.invoke()
     }
 
+    @Deprecated(
+        message = "Use needRender() instead",
+        replaceWith = ReplaceWith("needRender()")
+    )
     actual fun needRedraw() = needRender()
 
     actual val component: Any?
