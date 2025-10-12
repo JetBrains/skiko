@@ -85,13 +85,13 @@ actual open class SkiaLayer {
         @ObjCAction
         fun frameDidChange(notification: NSNotification) {
             redrawer?.syncBounds()
-            redrawer?.redrawImmediately(updateNeeded = true)
+            redrawer?.renderImmediately()
         }
 
         @ObjCAction
         fun windowDidChangeBackingProperties(notification: NSNotification) {
             redrawer?.syncBounds()
-            redrawer?.redrawImmediately(updateNeeded = true)
+            redrawer?.renderImmediately()
         }
 
         fun addObserver() {
@@ -127,7 +127,7 @@ actual open class SkiaLayer {
         nsViewObserver.addObserver()
         redrawer = createNativeRedrawer(this, renderApi).apply {
             syncBounds()
-            needRedraw()
+            needRender()
         }
     }
 
@@ -140,9 +140,11 @@ actual open class SkiaLayer {
     /**
      * Schedules a frame to an appropriate moment.
      */
-    actual fun needRedraw(throttledToVsync: Boolean) {
-        redrawer?.needRedraw(throttledToVsync)
+    actual fun needRender(throttledToVsync: Boolean) {
+        redrawer?.needRender(throttledToVsync)
     }
+
+    actual fun needRedraw() = needRender()
 
     /**
      * Updates the [picture] according to current [nanoTime]

@@ -15,8 +15,8 @@ internal class AndroidOpenGLRedrawer(
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     override fun dispose() = TODO()
-    override fun needRedraw(canUpdateImmediately: Boolean) = TODO()
-    override fun redrawImmediately(updateNeeded: Boolean) = TODO()
+    override fun needRender(canUpdateImmediately: Boolean) = TODO()
+    override fun renderImmediately() = TODO()
     override fun update(nanoTime: Long) = TODO()
 
     override val renderInfo: String get() = "Android renderer"

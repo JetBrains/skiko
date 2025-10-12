@@ -106,11 +106,11 @@ class SkiaLayerTest {
                 override fun keyTyped(e: KeyEvent?) {
                     launch {
                         val redrawer = window.layer.redrawer as MetalRedrawer
-                        redrawer.redrawImmediately(updateNeeded = true)
+                        redrawer.renderImmediately()
                         counter1 += 1
-                        redrawer.redrawImmediately(updateNeeded = true)
+                        redrawer.renderImmediately()
                         counter2 += 1
-                        redrawer.redrawImmediately(updateNeeded = true)
+                        redrawer.renderImmediately()
                     }
                 }
             })
@@ -179,7 +179,7 @@ class SkiaLayerTest {
             screenshots.assert(window.bounds, "frame1")
 
             app.rectWidth = 100
-            window.layer.needRedraw()
+            window.layer.needRender()
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
 
@@ -238,7 +238,7 @@ class SkiaLayerTest {
             screenshots.assert(window.bounds, "frame1")
 
             app.rectWidth = 100
-            window.layer.needRedraw()
+            window.layer.needRender()
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
 
@@ -271,12 +271,12 @@ class SkiaLayerTest {
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             window.isUndecorated = true
             window.isVisible = true
-            layer.needRedraw()
+            layer.needRender()
             delay(1000)
             assertEquals(0, renderedWidth)
 
             renderedWidth = -1
-            layer.needRedraw()
+            layer.needRender()
             delay(1000)
             assertEquals(0, renderedWidth)
 
@@ -439,7 +439,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `should call onRender after init, after resize, and only once after needRedraw`() = uiTest {
+    fun `should call onRender after init, after resize, and only once after needRender`() = uiTest {
         var renderCount = 0
 
         val window = UiTestWindow()
@@ -464,7 +464,7 @@ class SkiaLayerTest {
             assertTrue(renderCount > 0)
             renderCount = 0
 
-            window.layer.needRedraw()
+            window.layer.needRender()
             delay(1000)
             assertEquals(1, renderCount)
         } finally {
@@ -561,7 +561,7 @@ class SkiaLayerTest {
             delay(100)
             val window = openWindow()
             window.isVisible = true
-            window.layer.needRedraw()
+            window.layer.needRender()
             yield()
             window.paint(window.graphics)
             assertRenderApiFor(window.layer)
@@ -570,9 +570,12 @@ class SkiaLayerTest {
     }
 
     private abstract class BaseTestRedrawer(val layer: SkiaLayer): Redrawer {
+        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
+            renderImmediately()
+        }
         override fun dispose() = Unit
-        override fun needRedraw(throttledToVsync: Boolean) = Unit
-        override fun redrawImmediately(updateNeeded: Boolean) = Unit
+        override fun needRender(throttledToVsync: Boolean) = frameDispatcher.scheduleFrame()
+        override fun renderImmediately() = Unit
         override fun update(nanoTime: Long) = layer.update(nanoTime)
 
         override val renderInfo: String
@@ -587,7 +590,7 @@ class SkiaLayerTest {
                     override fun initContext() = false
                     override fun initCanvas() = Unit
                 }
-                override fun redrawImmediately(updateNeeded: Boolean) = layer.inDrawScope(contextHandler::draw)
+                override fun renderImmediately() = layer.inDrawScope(contextHandler::draw)
             }
         }
     }
@@ -601,7 +604,7 @@ class SkiaLayerTest {
     fun `fallback to software renderer, fail on draw`() = uiTest {
         testFallbackToSoftware { layer, _, _, _ ->
             object : BaseTestRedrawer(layer) {
-                override fun redrawImmediately(updateNeeded: Boolean) = layer.inDrawScope {
+                override fun renderImmediately() = layer.inDrawScope {
                     throw RenderException()
                 }
             }
@@ -625,7 +628,7 @@ class SkiaLayerTest {
             screenshots.assert(window.bounds, "frame1", "testFallbackToSoftware")
 
             app.rectWidth = 100
-            window.layer.needRedraw()
+            window.layer.needRender()
             delay(1000)
             screenshots.assert(window.bounds, "frame2", "testFallbackToSoftware")
 
@@ -657,7 +660,7 @@ class SkiaLayerTest {
         val window = UiTestWindow(
             renderFactory = OverrideNonSoftwareRenderFactory { layer, _, _, _ ->
                 object : BaseTestRedrawer(layer) {
-                    override fun redrawImmediately(updateNeeded: Boolean) = layer.inDrawScope {
+                    override fun renderImmediately() = layer.inDrawScope {
                         throw RenderException()
                     }
                 }
@@ -703,7 +706,7 @@ class SkiaLayerTest {
                     drawCount++
 
                     if (drawCount < targetDrawCount) {
-                        window.layer.needRedraw()
+                        window.layer.needRender()
                     } else {
                         onDrawCompleted.complete(Unit)
                     }
@@ -823,7 +826,7 @@ class SkiaLayerTest {
             repeat(10) {
                 window.isVisible = true
                 delay(16)
-                window.layer.needRedraw()
+                window.layer.needRender()
                 delay(500)
                 window.isVisible = false
 
@@ -1145,7 +1148,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `temporary change is not visible`() = uiTest {
+    fun `temporary change is not visible with needRender(throttledToVsync = false)`() = uiTest {
         assumeTrue(hostOs.isMacOS)
         // The separation between update and draw is only implemented in MetalRedrawer at the moment
         // Don't use assumeTrue, as uiTest iterates over multiple renderers,
@@ -1181,18 +1184,19 @@ class SkiaLayerTest {
         val robot = Robot()
 
         var tempColorVisibleCount = 0
+        val testCount = 50
         try {
-            repeat(50) {
+            repeat(testCount) {
                 // Wait for just after the next vsync, so we have plenty of time until the one after it
                 val vSyncer = MetalVSyncer(window.layer.windowHandle)
                 vSyncer.waitForVSync()
 
                 // Set the color to temp, then immediately back to normal
                 renderDelegate.color = tempColor
-                renderDelegate.layer.needRedraw(throttledToVsync = false)
+                renderDelegate.layer.needRender(throttledToVsync = false)
                 renderChannel.receive()  // Wait until render is actually called
                 renderDelegate.color = color
-                renderDelegate.layer.needRedraw(throttledToVsync = false)
+                renderDelegate.layer.needRender(throttledToVsync = false)
 
                 // Check whether the temp color was visible
                 val startTime = System.currentTimeMillis()
@@ -1208,15 +1212,15 @@ class SkiaLayerTest {
             // color is reverted, we allow a small percentage of the tries to fail. This way the flakiness of the test
             // is reduced.
             // Note that in practice, however, this test had never failed on an M1 Ultra machine with a 60Hz monitor.
-            assertTrue(tempColorVisibleCount < 5)
+            assertTrue(tempColorVisibleCount < 5, "Temp color was visible $tempColorVisibleCount/$testCount times")
         } finally {
             window.dispose()
         }
     }
 
     @Test
-    fun `needRedraw throttled and regular calls render and draw once`() = uiTest {
-        // Check that calling both needRedraw(true) and needRedraw(false) causes only one render and one draw call
+    fun `needRender throttled and regular calls render and draw once`() = uiTest {
+        // Check that calling both needRender(true) and needRender(false) causes only one render and one draw call
         var renderCalls = 0
         val renderChannel = Channel<Unit>(Channel.CONFLATED)
 
@@ -1259,25 +1263,70 @@ class SkiaLayerTest {
             renderCalls = 0
             drawCalls = 0
             withContext(MainUIDispatcher) {
-                window.layer.needRedraw(true)
-                window.layer.needRedraw(false)
+                window.layer.needRender(true)
+                window.layer.needRender(false)
             }
             delay(100)
-            assertEquals("Render was called more than once on needRedraw(true), needRedraw(false)", 1, renderCalls)
-            assertEquals("Draw was called more than once on needRedraw(true), needRedraw(false)", 1, drawCalls)
+            assertEquals("Render was called more than once on needRender(true), needRender(false)", 1, renderCalls)
+            assertEquals("Draw was called more than once on needRender(true), needRender(false)", 1, drawCalls)
 
             renderCalls = 0
             drawCalls = 0
             withContext(MainUIDispatcher) {
-                window.layer.needRedraw(false)
-                window.layer.needRedraw(true)
+                window.layer.needRender(false)
+                window.layer.needRender(true)
             }
             delay(100)
-            assertEquals("Render was called more than once on needRedraw(false), needRedraw(true)", 1, renderCalls)
-            assertEquals("Draw was called more than once on needRedraw(true), needRedraw(true)", 1, drawCalls)
+            assertEquals("Render was called more than once on needRender(false), needRender(true)", 1, renderCalls)
+            assertEquals("Draw was called more than once on needRender(true), needRender(true)", 1, drawCalls)
         } finally {
             window.dispose()
         }
+    }
+
+    @Test
+    fun `updateAndDrawImmediately updates and draws synchronously`() = uiTest {
+        // Check that calling both needRender(true) and needRender(false) causes only one render and one draw call
+        var renderCalls = 0
+        val renderChannel = Channel<Unit>(Channel.CONFLATED)
+
+        var drawCalls = 0
+        val deviceAnalytics = object : SkiaLayerAnalytics.DeviceAnalytics {
+            override fun beforeFrameRender() {
+                drawCalls++
+            }
+        }
+        val analytics = object : SkiaLayerAnalytics {
+            @ExperimentalSkikoApi
+            override fun device(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi,
+                deviceName: String?
+            ): SkiaLayerAnalytics.DeviceAnalytics {
+                return deviceAnalytics
+            }
+        }
+        val window = UiTestWindow(analytics = analytics) {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            layer.renderDelegate = object: SkikoRenderDelegate {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    renderCalls++
+                    renderChannel.trySend(Unit)
+                }
+            }
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+        window.pack()
+
+        val initRenderCalls = renderCalls
+        val initDrawCalls = drawCalls
+        window.layer.updateAndDrawImmediately()
+        // Can't check renderCalls == initRenderCalls+1 because if drawing fails, render will be called again with
+        // the fallback renderer.
+        assertTrue(renderCalls > initRenderCalls)
+        assertTrue(drawCalls > initDrawCalls)
     }
 
     private class RectRenderer(
@@ -1341,7 +1390,7 @@ class SkiaLayerTest {
                 color = Color.RED.rgb
             })
 
-            layer.needRedraw()
+            layer.needRender()
         }
     }
 
@@ -1354,7 +1403,7 @@ class SkiaLayerTest {
         var continuousRedraw = continuousRedraw
             set(value) {
                 if (value)
-                    layer.needRedraw(throttledToVsync = true)
+                    layer.needRender(throttledToVsync = true)
                 field = value
             }
 
@@ -1370,7 +1419,7 @@ class SkiaLayerTest {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), paint)
             if (continuousRedraw) {
-                layer.needRedraw()
+                layer.needRender()
             }
         }
     }

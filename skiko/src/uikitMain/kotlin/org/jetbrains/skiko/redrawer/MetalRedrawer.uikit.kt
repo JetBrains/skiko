@@ -190,7 +190,7 @@ internal class MetalRedrawer(
         context.close()
     }
 
-    internal fun needRedraw() {
+    internal fun needRender() {
         displayLinkConditions.needsRedrawOnNextVsync = true
     }
 

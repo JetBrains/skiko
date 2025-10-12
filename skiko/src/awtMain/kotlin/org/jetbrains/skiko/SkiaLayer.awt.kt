@@ -113,8 +113,8 @@ actual open class SkiaLayer internal constructor(
                 // 2. HardwareLayer.paint is also not always called.
                 //    For example, on macOs when we resize window or change DPI
                 //
-                // 3. to avoid double paint in one single frame, use needRedraw instead of redrawImmediately
-                redrawer?.needRedraw(throttledToVsync = false)
+                // 3. to avoid double paint in one single frame, use needRender instead of renderImmediately
+                redrawer?.needRender(throttledToVsync = false)
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
@@ -124,7 +124,7 @@ actual open class SkiaLayer internal constructor(
                 super.reshape(x, y, width, height)
 
                 redrawer?.syncBounds()
-                redrawer?.needRedraw(throttledToVsync = false)
+                redrawer?.needRender(throttledToVsync = false)
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -384,7 +384,7 @@ actual open class SkiaLayer internal constructor(
         @Suppress("DEPRECATION")
         super.reshape(x, y, w, h)
 
-        // Calling redrawImmediately as early as possible improves the situation with
+        // Calling renderImmediately as early as possible improves the situation with
         // the visual glitch when the drawn content is scaled during window resize.
         // Note, however, that this actually causes the reverse glitch (content appears
         // scaled in the other direction from the window size), but this seems to
@@ -394,7 +394,7 @@ actual open class SkiaLayer internal constructor(
         // so apply this fix only for the Direct3D case.
         if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
             redrawer?.syncBounds()
-            redrawer?.redrawImmediately(updateNeeded = true)
+            redrawer?.renderImmediately()
         }
 
         // Setting the bounds of children should be done only in the layout pass,
@@ -416,22 +416,27 @@ actual open class SkiaLayer internal constructor(
 
     override fun paint(g: Graphics) {
         Logger.debug { "paint called on SkiaLayer $this" }
-        val updateNeeded = checkContentScale()
-        redrawer?.redrawImmediately(updateNeeded = updateNeeded)
+        checkContentScale()
+        redrawer?.needRender(throttledToVsync = false)
     }
 
     // Workaround for JBR-5274 and JBR-5305
-    fun checkContentScale(): Boolean {
+    fun checkContentScale() {
         val currentGraphicsContextScaleTransform = graphicsConfiguration.defaultTransform
-        return (currentGraphicsContextScaleTransform != latestReceivedGraphicsContextScaleTransform).also {
-            if (it) {
-                firePropertyChange(
-                    "graphicsContextScaleTransform",
-                    latestReceivedGraphicsContextScaleTransform,
-                    currentGraphicsContextScaleTransform
-                )
-            }
+        if (currentGraphicsContextScaleTransform != latestReceivedGraphicsContextScaleTransform) {
+            firePropertyChange(
+                "graphicsContextScaleTransform",
+                latestReceivedGraphicsContextScaleTransform,
+                currentGraphicsContextScaleTransform
+            )
         }
+    }
+
+    /**
+     * Updates the layer and redraws synchronously.
+     */
+    fun updateAndDrawImmediately() {
+        redrawer?.renderImmediately()
     }
 
     // We need to delegate all event listeners to the Canvas (so and focus/input)
@@ -546,11 +551,13 @@ actual open class SkiaLayer internal constructor(
     /**
      * Redraw on the next animation Frame (on vsync signal if vsync is enabled).
      */
-    actual fun needRedraw(throttledToVsync: Boolean) {
+    actual fun needRender(throttledToVsync: Boolean) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
-        redrawer?.needRedraw(throttledToVsync)
+        redrawer?.needRender(throttledToVsync)
     }
+
+    actual fun needRedraw() = needRender()
 
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
@@ -608,7 +615,7 @@ actual open class SkiaLayer internal constructor(
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
                 redrawerManager.findNextWorkingRenderApi()
-                redrawer?.redrawImmediately(updateNeeded = true)
+                redrawer?.renderImmediately()
             }
         }
     }
