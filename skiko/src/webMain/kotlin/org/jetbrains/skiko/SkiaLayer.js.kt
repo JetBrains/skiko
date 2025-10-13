@@ -52,6 +52,10 @@ actual open class SkiaLayer {
         state?.needRedraw()
     }
 
+    @Deprecated(
+        message = "Use needRender() instead",
+        replaceWith = ReplaceWith("needRender()")
+    )
     actual fun needRedraw() = needRender()
 
     /**

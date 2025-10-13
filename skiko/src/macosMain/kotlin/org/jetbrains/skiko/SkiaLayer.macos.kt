@@ -144,6 +144,10 @@ actual open class SkiaLayer {
         redrawer?.needRender(throttledToVsync)
     }
 
+    @Deprecated(
+        message = "Use needRender() instead",
+        replaceWith = ReplaceWith("needRender()")
+    )
     actual fun needRedraw() = needRender()
 
     /**

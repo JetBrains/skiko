@@ -432,13 +432,6 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    /**
-     * Updates the layer and redraws synchronously.
-     */
-    fun updateAndDrawImmediately() {
-        redrawer?.renderImmediately()
-    }
-
     // We need to delegate all event listeners to the Canvas (so and focus/input)
     // Canvas is heavyweight AWT component, JPanel is lightweight Swing component
     // Event handling doesn't properly work when we mix heavyweight and lightweight components.
@@ -557,7 +550,18 @@ actual open class SkiaLayer internal constructor(
         redrawer?.needRender(throttledToVsync)
     }
 
+    @Deprecated(
+        message = "Use needRender() instead",
+        replaceWith = ReplaceWith("needRender()")
+    )
     actual fun needRedraw() = needRender()
+
+    /**
+     * Updates the layer and redraws synchronously.
+     */
+    fun renderImmediately() {
+        redrawer?.renderImmediately()
+    }
 
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }

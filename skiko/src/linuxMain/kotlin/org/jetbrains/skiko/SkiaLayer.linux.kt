@@ -20,6 +20,10 @@ actual open class SkiaLayer  {
     actual fun needRender(throttledToVsync: Boolean) {
         TODO("unimplemented")
     }
+    @Deprecated(
+        message = "Use needRender() instead",
+        replaceWith = ReplaceWith("needRender()")
+    )
     actual fun needRedraw() = needRender()
     actual fun attachTo(container: Any) {
         TODO("unimplemented")
