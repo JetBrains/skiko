@@ -327,9 +327,6 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-llog",
                 "-landroid",
                 "-latomic",
-                "-Wl",
-                "-z",
-                "max-page-size=16384",
                 // Hack to fix problem with linker not always finding certain declarations.
                 "$skiaBinDir/libskia.a",
             )
