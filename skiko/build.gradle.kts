@@ -205,12 +205,6 @@ kotlin {
         implementation(kotlin("test-wasm-js"))
     }
 
-    sourceSets.nativeMain.dependencies {
-        // TODO: remove this explicit dependency on atomicfu
-        // after this is fixed https://jetbrains.slack.com/archives/C3TNY2MM5/p1701462109621819
-        implementation(libs.atomicFu)
-    }
-
     if (supportAnyNative) {
         sourceSets.all {
             // Really ugly, see https://youtrack.jetbrains.com/issue/KT-46649 why it is required,

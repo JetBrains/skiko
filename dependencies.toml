@@ -1,7 +1,6 @@
 [versions]
 kotlin = "2.0.10"
 coroutines = "1.8.0"
-atomicFu = "0.23.2"
 jetbrainsRuntime-api = "1.5.0"
 
 androidGradlePlugin = "7.4.2"
@@ -18,7 +17,6 @@ coroutines-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
-atomicFu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicFu"}
 
 jetbrainsRuntime-api = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jetbrainsRuntime-api" }
 
