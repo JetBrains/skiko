@@ -15,10 +15,10 @@ import tasks.configuration.*
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.dokka") version "1.9.10"
+    org.jetbrains.dokka
     `maven-publish`
     signing
-    id("org.gradle.crypto.checksum") version "1.4.0"
+    org.gradle.crypto.checksum
 }
 
 if (supportAndroid) {
@@ -28,14 +28,10 @@ if (supportAndroid) {
 apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
 apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
 
-val coroutinesVersion = "1.8.0"
-val atomicfuVersion = "0.23.2"
-
 val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
 val targetOs = hostOs
 val targetArch = skiko.targetArch
-
 
 val skikoProjectContext = SkikoProjectContext(
     project = project,
@@ -172,7 +168,7 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         implementation(kotlin("stdlib"))
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+        implementation(libs.coroutines.core)
     }
 
     sourceSets.commonTest.dependencies {
@@ -182,19 +178,19 @@ kotlin {
 
     skikoProjectContext.jvmMainSourceSet.dependencies {
         implementation(kotlin("stdlib"))
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:$coroutinesVersion")
+        implementation(libs.coroutines.core.jvm)
     }
 
     skikoProjectContext.awtMainSourceSet?.dependencies {
-        implementation("org.jetbrains.runtime:jbr-api:1.5.0")
+        implementation(libs.jetbrainsRuntime.api)
     }
 
     skikoProjectContext.androidMainSourceSet?.dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}")
+        implementation(libs.coroutines.android)
     }
 
     skikoProjectContext.jvmTestSourceSet.dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+        implementation(libs.coroutines.test)
         implementation(kotlin("test-junit"))
         implementation(kotlin("test"))
     }
@@ -212,7 +208,7 @@ kotlin {
     sourceSets.nativeMain.dependencies {
         // TODO: remove this explicit dependency on atomicfu
         // after this is fixed https://jetbrains.slack.com/archives/C3TNY2MM5/p1701462109621819
-        implementation("org.jetbrains.kotlinx:atomicfu:${atomicfuVersion}")
+        implementation(libs.atomicFu)
     }
 
     if (supportAnyNative) {

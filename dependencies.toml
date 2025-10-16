@@ -1,0 +1,30 @@
+[versions]
+kotlin = "2.0.10"
+coroutines = "1.8.0"
+atomicFu = "0.23.2"
+jetbrainsRuntime-api = "1.5.0"
+
+androidGradlePlugin = "7.4.2"
+dokka = "1.9.10"
+
+buildHelpers-publishing = "0.1.18"
+githubApi = "1.329"
+gradleDownloadTask = "5.5.0"
+cryptoChecksumPlugin = "1.4.0"
+
+[libraries]
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+
+atomicFu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicFu"}
+
+jetbrainsRuntime-api = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jetbrainsRuntime-api" }
+
+android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
+dokka-gradlePlugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+gradleDownloadTask-gradlePlugin = { module = "de.undercouch:gradle-download-task", version.ref = "gradleDownloadTask" }
+githubApi = { module = "org.kohsuke:github-api", version.ref = "githubApi" }
+buildHelpers-publishing-gradlePlugin = { module = "org.jetbrains.compose.internal.build-helpers:publishing", version.ref = "buildHelpers-publishing" }
+crypto-checksum-gradlePlugin = { module = "gradle.plugin.org.gradle.crypto:checksum", version.ref = "cryptoChecksumPlugin" }
