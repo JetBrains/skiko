@@ -6,5 +6,4 @@ pluginManagement {
     }
 
 }
-
 rootProject.name = "SkiaAndroidSample"
