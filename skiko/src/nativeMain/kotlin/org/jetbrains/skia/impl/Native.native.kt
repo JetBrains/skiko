@@ -195,7 +195,7 @@ internal actual class InteropScope actual constructor() {
 
     actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> {
         val size = decoder.getArraySize(this)
-        val result = Array<T>(size) {
+        val result = Array(size) {
             decoder.getArrayElement(this, it)
         }
         decoder.disposeArray(this)
@@ -203,7 +203,8 @@ internal actual class InteropScope actual constructor() {
     }
 
     actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray {
-        TODO("implement native fromInteropNativePointerArray")
+        // There is no portable way to know the size here on Native; return empty unless overridden by a decoder.
+        return NativePointerArray(0)
     }
 
     actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer {

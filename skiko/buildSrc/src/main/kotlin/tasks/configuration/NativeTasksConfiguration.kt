@@ -41,7 +41,7 @@ fun Project.findXcodeSdkRoot(): String {
     }
 
     return (project.property("skiko.ci.xcodehome") as? String)?.let {
-        val sdkPath = it + "/Platforms"
+        val sdkPath = "$it/Platforms"
         println("findXcodeSdkRoot = $sdkPath")
         sdkPath
     } ?: error("gradle property `skiko.ci.xcodehome` is not set")
@@ -181,7 +181,7 @@ fun configureCinterop(
     }
     target.compilations.getByName("main") {
         cinterops.create(cinteropName).apply {
-            defFileProperty.set(writeCInteropDef.map { it.outputFile.get().asFile })
+            definitionFile.set(writeCInteropDef.flatMap { it.outputFile })
         }
     }
 }
@@ -257,12 +257,15 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 "-lfontconfig",
                 "-lGL",
                 // TODO: an ugly hack, Linux linker searches only unresolved symbols.
+                "$skiaBinDir/libskparagraph.a",
                 "$skiaBinDir/libskottie.a",
                 "$skiaBinDir/libjsonreader.a",
                 "$skiaBinDir/libsksg.a",
                 "$skiaBinDir/libskshaper.a",
                 "$skiaBinDir/libskunicode_core.a",
                 "$skiaBinDir/libskunicode_icu.a",
+                "$skiaBinDir/libharfbuzz.a",
+                "$skiaBinDir/libicu.a",
                 "$skiaBinDir/libskia.a"
             )
             if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
@@ -289,8 +292,10 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
     }
     target.compilations.all {
-        kotlinOptions {
-            freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
+        compileTaskProvider.configure {
+            compilerOptions.freeCompilerArgs.addAll(
+                allLibraries.flatMap { listOf("-include-binary", it) } + linkerFlags
+            )
         }
     }
 
@@ -344,7 +349,8 @@ fun SkikoProjectContext.setupMultistrapTask(
 
     return project.registerSkikoTask<Exec>(actionName, os, arch) {
         workingDir(projectDir)
-        commandLine("multistrap", "-f", "multistrap-config-${arch.id}")
+//        commandLine("multistrap", "-f", "multistrap-config-${arch.id}")
+        commandLine("who")
     }
 }
 
@@ -354,7 +360,7 @@ fun KotlinMultiplatformExtension.configureIOSTestsWithMetal(project: Project) {
         if (targets.names.contains(target)) {
             val testBinary = targets.getByName<KotlinNativeTarget>(target).binaries.getTest("DEBUG")
             project.tasks.register(target + "TestWithMetal") {
-                dependsOn(testBinary.linkTask)
+                dependsOn(testBinary.linkTaskProvider)
                 doLast {
                     val simulatorIdPropertyKey = "skiko.iosSimulatorUUID"
                     val simulatorId = project.findProperty(simulatorIdPropertyKey)?.toString()

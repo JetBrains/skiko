@@ -3,42 +3,45 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
 
-actual open class SkiaLayer  {
-    actual var renderApi: GraphicsApi
-        get() = TODO("Not yet implemented")
-        set(value) {}
+actual open class SkiaLayer {
+    actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
+
     actual val contentScale: Float
-        get() = TODO("Not yet implemented")
-    actual var fullscreen: Boolean
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    actual var transparency: Boolean
-        get() = TODO("Not yet implemented")
-        set(value) {}
+        get() = 1.0f
+
+    actual var fullscreen: Boolean = false
+
+    actual var transparency: Boolean = false
+
     actual val component: Any?
-        get() = TODO("Not yet implemented")
+        get() = null
+
     actual fun needRender(throttledToVsync: Boolean) {
-        TODO("unimplemented")
+        // No scheduling on the minimal Linux native path; the sample drives rendering.
     }
+
     @Deprecated(
         message = "Use needRender() instead",
         replaceWith = ReplaceWith("needRender()")
     )
     actual fun needRedraw() = needRender()
+
     actual fun attachTo(container: Any) {
-        TODO("unimplemented")
+        // No-op for minimal Linux implementation
     }
+
     actual fun detach() {
-        TODO("unimplemented")
+        // No-op for minimal Linux implementation
     }
 
     internal actual fun draw(canvas: Canvas) {
-        TODO("unimplemented")
+        // Not used in the minimal Linux implementation
     }
 
     actual var renderDelegate: SkikoRenderDelegate? = null
+
     actual val pixelGeometry: PixelGeometry
-        get() = TODO("Not yet implemented")
+        get() = PixelGeometry.UNKNOWN
 }
 
 actual val currentSystemTheme: SystemTheme

@@ -1,4 +1,10 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import java.util.Locale
 
 buildscript {
     repositories {
@@ -25,6 +31,38 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+val defDir = projectDir.resolve("src/nativeInterop/cinterop").apply { mkdirs() }
+val libDestination = layout.buildDirectory.dir("interopLib").get().apply {
+    asFile.mkdirs()
+}
+val tmpBuildDir = layout.buildDirectory.dir("tmp").get().apply {
+    asFile.mkdirs()
+}
+
+// Provide a real storage for __libc_single_threaded to avoid ld --defsym hack causing segfaults
+val shimDir = layout.buildDirectory.dir("shim").get().asFile
+val buildShim by tasks.registering(Exec::class) {
+    doFirst {
+        if (!shimDir.exists()) shimDir.mkdirs()
+        val cFile = shimDir.resolve("libc_single_threaded_shim.c")
+        cFile.writeText(
+            """
+            // Minimal shim to provide __libc_single_threaded variable expected by
+            // libstdc++/Skia builds on some Linux distributions.
+            // Defining real storage prevents the dynamic loader from writing to address 0.
+            __attribute__((visibility("default"))) int __libc_single_threaded = 1;
+            """.trimIndent()
+        )
+    }
+    workingDir = shimDir
+    // Compile and archive into a static library
+    commandLine = listOf("bash", "-lc", "gcc -c -fPIC libc_single_threaded_shim.c -o libc_single_threaded_shim.o && ar rcs libshim.a libc_single_threaded_shim.o")
+    outputs.files(shimDir.resolve("libshim.a"))
+}
+
+val kotlinNativeDataPath = System.getenv("KONAN_DATA_DIR")?.let { File(it) }
+    ?: File(System.getProperty("user.home")).resolve(".konan")
+
 val osName = System.getProperty("os.name")
 val hostOs = when {
     osName == "Mac OS X" -> "macos"
@@ -47,7 +85,6 @@ if (project.hasProperty("skiko.version") && isCompositeBuild) {
     project.logger.warn("skiko.version property has no effect when skiko.composite.build is set")
 }
 
-
 val skikoWasm by configurations.creating
 
 dependencies {
@@ -62,7 +99,7 @@ dependencies {
 }
 
 val unpackWasmRuntime = tasks.register("unpackWasmRuntime", Copy::class) {
-    destinationDir = file("$buildDir/resources/")
+    destinationDir = layout.buildDirectory.dir("resources").get().asFile
     from(skikoWasm.map { zipTree(it) })
 
     if (isCompositeBuild) {
@@ -75,34 +112,72 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
 }
 
 kotlin {
+    if (hostOs == "linux") {
+        linuxX64 {
+            binaries.executable {
+                entryPoint = "org.jetbrains.skiko.sample.main"
+                // Ensure shim is built before linking
+                project.tasks.named(linkTaskName).configure { dependsOn(buildShim) }
+                linkerOpts(
+                    // System library paths
+                    "-L/usr/lib",
+                    "-L/usr/lib64",
+
+                    // Link shim providing __libc_single_threaded storage to satisfy libstdc++/Skia
+                    "-L${shimDir.absolutePath}",
+                    "-lshim",
+
+                    // Libraries required by RGFW/KGFW and Skia
+                    "-Wl,--allow-shlib-undefined",
+                    "-lX11",
+                    "-lXext",
+                    "-lXrandr",
+                    "-lXcursor",
+                    "-lXi",
+                    "-lXinerama",
+                    "-lGL",
+                    "-lstdc++",
+                    "-lfontconfig",
+                    "-lfreetype",
+                    "-lpthread",
+                    "-lc",
+                    // Avoid linking system harfbuzz/icu to prevent version mismatches; Skia pack provides required deps
+                    // "-lharfbuzz",
+                    // "-licui18n",
+                    "-ldl"
+                )
+            }
+        }
+    }
+
     if (hostOs == "macos") {
-        macosX64() {
+        macosX64 {
             configureToLaunchFromXcode()
         }
-        macosArm64() {
+        macosArm64 {
             configureToLaunchFromXcode()
         }
-        iosSimulatorArm64() {
+        iosSimulatorArm64 {
             configureToLaunchFromAppCode()
             configureToLaunchFromXcode()
         }
-        tvosX64() {
+        tvosX64 {
             configureToLaunchFromAppCode()
             configureToLaunchFromXcode()
         }
-        tvosArm64() {
+        tvosArm64 {
             configureToLaunchFromAppCode()
             configureToLaunchFromXcode() 
         }
-        tvosSimulatorArm64() {
+        tvosSimulatorArm64 {
             configureToLaunchFromAppCode()
             configureToLaunchFromXcode()
         }
     }
 
     jvm("awt") {
-        compilations.all {
-            kotlinOptions.jvmTarget = "11"
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 
@@ -134,6 +209,9 @@ kotlin {
 
         val nativeMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                implementation("io.github.drulysses:kgfw:1.0.0")
+            }
         }
 
         val awtMain by getting {
@@ -157,12 +235,22 @@ kotlin {
             dependsOn(webMain)
         }
 
+        val linuxMain by creating {
+            dependsOn(nativeMain)
+        }
+
         val darwinMain by creating {
             dependsOn(nativeMain)
         }
 
         val macosMain by creating {
             dependsOn(darwinMain)
+        }
+
+        if (hostOs == "linux") {
+            val linuxX64Main by getting {
+                dependsOn(linuxMain)
+            }
         }
 
         if (hostOs == "macos") {
@@ -195,12 +283,14 @@ kotlin {
             }
         }
     }
+
+    compilerOptions.optIn.add("kotlinx.cinterop.ExperimentalForeignApi")
 }
 
 if (hostOs == "macos") {
     project.tasks.register<Exec>("runIosSim") {
         val device = "iPhone 11"
-        workingDir = project.buildDir
+        workingDir = layout.buildDirectory.get().asFile
         val linkExecutableTaskName = when (host) {
             "macos-x64" -> "linkReleaseExecutableIosX64"
             "macos-arm64" -> "linkReleaseExecutableIosSimulatorArm64"
@@ -254,7 +344,6 @@ project.tasks.register<JavaExec>("runAwt") {
     classpath(kotlin.jvm("awt").compilations["main"].runtimeDependencyFiles)
 }
 
-
 enum class Target(val simulator: Boolean, val key: String) {
     WATCHOS_X86(true, "watchos"), 
     WATCHOS_ARM64(false, "watchos"),
@@ -265,7 +354,6 @@ enum class Target(val simulator: Boolean, val key: String) {
     TVOS_ARM64(true, "tvosArm64"),
     TVOS_SIMULATOR_ARM64(true, "tvosSimulatorArm64"),
 }
-
 
 if (hostOs == "macos") {
 // Create Xcode integration tasks.
@@ -294,10 +382,10 @@ if (hostOs == "macos") {
     val targetBuildDir: String? = System.getenv("TARGET_BUILD_DIR")
     val executablePath: String? = System.getenv("EXECUTABLE_PATH")
     val buildType = System.getenv("CONFIGURATION")?.let {
-        org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.valueOf(it.toUpperCase())
-    } ?: org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.DEBUG
+        NativeBuildType.valueOf(it.uppercase(Locale.getDefault()))
+    } ?: NativeBuildType.DEBUG
 
-    val currentTarget = kotlin.targets[target.key] as org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+    val currentTarget = kotlin.targets[target.key] as KotlinNativeTarget
     val kotlinBinary = currentTarget.binaries.getExecutable(buildType)
     val xcodeIntegrationGroup = "Xcode integration"
 
@@ -310,7 +398,7 @@ if (hostOs == "macos") {
     } else {
         // Otherwise copy the executable into the Xcode output directory.
         tasks.create("packForXCode", Copy::class.java) {
-            dependsOn(kotlinBinary.linkTask)
+            dependsOn(kotlinBinary.linkTaskProvider)
             
             println("Packing for XCode: ${kotlinBinary.target}")
 
@@ -366,12 +454,5 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
                 "-linker-option", "-framework", "-linker-option", "CoreGraphics"
             )
         }
-    }
-}
-
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
-    kotlinOptions {
-        freeCompilerArgs += "-opt-in=kotlinx.cinterop.ExperimentalForeignApi"
     }
 }

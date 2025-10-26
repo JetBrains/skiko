@@ -6,13 +6,11 @@ import kotlinx.coroutines.launch
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.FontMgrWithFallback
-import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.paragraph.TypefaceFontProviderWithFallback
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerRenderDelegate
 import org.jetbrains.skiko.wasm.onWasmReady
 import org.w3c.dom.HTMLCanvasElement
-
 
 fun main() {
     onWasmReady {

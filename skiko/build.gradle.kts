@@ -1,11 +1,13 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import tasks.configuration.*
 import kotlin.collections.HashMap
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
@@ -95,7 +97,7 @@ kotlin {
         skikoProjectContext.declareWasmTasks()
 
         js {
-            moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
+            outputModuleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
                     useKarma {
@@ -116,10 +118,8 @@ kotlin {
             setupImportsGeneratorPlugin()
         }
 
-
-        @OptIn(ExperimentalWasmDsl::class)
         wasmJs {
-            moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
+            outputModuleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
                     useKarma {
@@ -146,7 +146,7 @@ kotlin {
     }
     if (supportNativeLinux) {
         skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
-        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
+//        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
     }
     if (supportNativeIosArm64) {
         skikoProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())
@@ -303,12 +303,12 @@ kotlin {
                     val linuxX64Test by getting {
                         dependsOn(linuxTest)
                     }
-                    val linuxArm64Main by getting {
-                        dependsOn(linuxMain)
-                    }
-                    val linuxArm64Test by getting {
-                        dependsOn(linuxTest)
-                    }
+//                    val linuxArm64Main by getting {
+//                        dependsOn(linuxMain)
+//                    }
+//                    val linuxArm64Test by getting {
+//                        dependsOn(linuxTest)
+//                    }
                 }
                 if (supportAnyNativeIos || supportNativeMac) {
                     val darwinMain by creating {
@@ -461,12 +461,10 @@ fun createChecksumsTask(
     targetArch: Arch,
     fileToChecksum: Provider<File>
 ) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
-
     inputFiles = project.files(fileToChecksum)
     checksumAlgorithm = Checksum.Algorithm.SHA256
     outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
 }
-
 
 if (supportAwt) {
     val skikoAwtJarForTests by project.tasks.registering(Jar::class) {
@@ -652,7 +650,7 @@ tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
 
 tasks.withType<KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583
-    compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
+    // Removed ImplicitSignedToUnsignedIntegerConversion which is test-only in modern Kotlin
     compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
 }
 
