@@ -2,7 +2,7 @@ FROM --platform=linux/arm64 amazonlinux:2.0.20250929.2
 
 # Update binutils, g++, gcc
 RUN yum update -y && \
-    yum install -y gcc gcc-c++ binutils make
+    yum install -y gcc gcc-c++ binutils make clang
 
 # Install libs & tools
 ENV DEPOT_TOOLS=/usr/depot_tools
