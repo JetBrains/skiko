@@ -11,7 +11,7 @@ on:
 
 jobs:
   macOS:
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -51,7 +51,7 @@ jobs:
           retention-days: 5
 
   iOS:
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -104,7 +104,7 @@ jobs:
           retention-days: 5
 
   tvOS:
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
