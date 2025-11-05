@@ -41,11 +41,7 @@ fun compilerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
         // TODO: Use clang++ for all Linux targets
         OS.Linux -> when (arch) {
             Arch.X64 -> "g++"
-            Arch.Arm64 -> if (isJvm) {
-                "clang++"
-            } else {
-                if (hostArch == Arch.Arm64) "g++" else "aarch64-linux-gnu-g++"
-            }
+            Arch.Arm64 -> if (hostArch == Arch.Arm64) "g++" else "aarch64-linux-gnu-g++"
             Arch.Wasm -> "Unexpected combination: $os & $arch"
         }
         OS.Android -> "clang++"

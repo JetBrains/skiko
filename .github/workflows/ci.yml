@@ -163,17 +163,10 @@ jobs:
 
       - shell: bash
         name: 'Set up Linux build environment'
-        env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
-          sudo apt-get update -y
-          sudo apt-get install libglu1-mesa-dev libxrandr-dev libdbus-1-dev multistrap -y
-          sudo apt-get install gcc-9 g++-9 -y
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
-          sudo update-alternatives --config gcc
-          sudo apt-get install gcc-9-aarch64-linux-gnu g++-9-aarch64-linux-gnu -y
-          sudo update-alternatives --install /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc-9 60 --slave /usr/bin/aarch64-linux-gnu-g++ aarch64-linux-gnu-g++ /usr/bin/aarch64-linux-gnu-g++-9
-          sudo update-alternatives --config aarch64-linux-gnu-gcc
+          sudo apt update -y
+          sudo apt install libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y
+          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu -y
           sudo Xvfb :0 -screen 0 1280x720x24 +extension GLX &
 
       # We have only ~4.5G left after installing everything required, and sometimes it's not enough to correctly run
@@ -262,10 +255,8 @@ jobs:
       - shell: bash
         name: 'Set up Linux build environment'
         run: |
-          sudo apt-get update -y
-          sudo apt-get install libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y
-          sudo apt-get install clang -y
-          sudo apt-get remove g++ -y
+          sudo apt update -y
+          sudo apt install libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y
           sudo Xvfb :0 -screen 0 1280x720x24 +extension GLX &
 
       - shell: bash
