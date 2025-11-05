@@ -16,7 +16,6 @@ plugins {
     id("org.jetbrains.dokka") version "1.9.10"
     `maven-publish`
     signing
-    id("org.gradle.crypto.checksum") version "1.4.0"
 }
 
 if (supportAndroid) {
@@ -455,6 +454,7 @@ if (supportAndroid) {
     }
 }
 
+// TODO now it can be moved, move it if you change this
 // Can't be moved to buildSrc because of Checksum dependency
 fun createChecksumsTask(
     targetOs: OS,
@@ -467,13 +467,19 @@ fun createChecksumsTask(
     outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
 }
 
+val additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko)
 
 if (supportAwt) {
     val skikoAwtJarForTests by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-awt-test")
         from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
     }
-    skikoProjectContext.setupJvmTestTask(skikoAwtJarForTests, targetOs, targetArch)
+    skikoProjectContext.setupJvmTestTask(
+        skikoAwtJarForTests,
+        additionalRuntimeLibraries,
+        targetOs,
+        targetArch,
+    )
 }
 
 afterEvaluate {
@@ -590,6 +596,10 @@ publishing {
             }
         }
 
+        additionalRuntimeLibraries.forEach {
+            it.registerMavenPublication(this, emptySourcesJar, pomNameForPublication)
+        }
+
         if (supportWeb) {
             create<MavenPublication>("skikoWasmRuntime") {
                 pomNameForPublication[name] = "Skiko WASM Runtime"
@@ -649,6 +659,9 @@ tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
 tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
     ?.dependsOn("publishWasmJsPublicationToMavenLocal")
 
+additionalRuntimeLibraries.forEach {
+    it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))
+}
 
 tasks.withType<KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583

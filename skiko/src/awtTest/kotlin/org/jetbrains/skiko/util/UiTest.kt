@@ -21,7 +21,7 @@ internal fun uiTest(
 
     runBlocking(MainUIDispatcher) {
         if (renderApiProperty == "all") {
-            for (renderApi in SkikoProperties.fallbackRenderApiQueue(SkikoProperties.renderApi)) {
+            for (renderApi in SkikoProperties.fallbackRenderApiQueue(initialApi = null)) {
                 if (renderApi in excludeRenderApis) {
                     println("Skipping $renderApi renderApi")
                     continue
