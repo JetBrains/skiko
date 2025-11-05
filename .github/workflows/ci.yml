@@ -11,7 +11,10 @@ on:
 
 jobs:
   macOS:
-    runs-on: macos-15
+    # On `macos-15` UI tests blocked by a system popup with
+    # "bash" is requesting to bypass the system private window picker and directly access your screen and audio.
+    # TODO: Update once resolved
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -74,7 +77,6 @@ jobs:
       - name: 'Print the devices list'
         run: xcrun simctl list devices available --json
 
-      # install jq - cli tool for json querying
       # retrieve the device .udid to use in tests and store it in env var
       - name: 'Set Up Simulator UUID'
         run: |
