@@ -52,19 +52,11 @@ fun SkikoProjectContext.compileNativeBridgesTask(
 ): TaskProvider<CompileSkikoCppTask> = with (this.project) {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isUikitSim = isUikitSim)
 
-    val setupMultistrapTask = if (os == OS.Linux && arch == Arch.Arm64 && hostArch != Arch.Arm64) {
-        setupMultistrapTask(os, arch, isUikitSim = isUikitSim)
-    } else {
-        null
-    }
-
     val actionName = "compileNativeBridges".withSuffix(isUikitSim = isUikitSim)
 
     return project.registerSkikoTask<CompileSkikoCppTask>(actionName, os, arch) {
         dependsOn(skiaNativeDir)
         val unpackedSkia = skiaNativeDir.get()
-
-        setupMultistrapTask?.let { dependsOn(it) }
 
         compiler.set(compilerForTarget(os, arch, isJvm = false))
         buildTargetOS.set(os)
@@ -135,7 +127,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 ))
             }
             OS.Linux -> {
-                flags.set(listOfNotNull(
+                val linuxFlags = mutableListOf(
                     *buildType.clangFlags,
                     "-fPIC",
                     "-fno-rtti",
@@ -144,7 +136,12 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                     "-fvisibility-inlines-hidden",
                     "-D_GLIBCXX_USE_CXX11_ABI=0",
                     *skiaPreprocessorFlags(OS.Linux, buildType)
-                ))
+                )
+                // Add sysroot for ARM64 cross-compilation
+                if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
+                    linuxFlags.add(0, "--sysroot=/opt/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/aarch64-none-linux-gnu/libc")
+                }
+                flags.set(linuxFlags)
             }
             else -> throw GradleException("$os not yet supported")
         }
@@ -265,10 +262,11 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 "$skiaBinDir/libskunicode_icu.a",
                 "$skiaBinDir/libskia.a"
             )
+            // When cross-compiling for ARM64 from x64, use the ARM toolchain sysroot
             if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
-                val buildDir = project.layout.buildDirectory.get().asFile
-                options.add(0, "-L$buildDir/multistrap-arm64/usr/lib")
-                options.add(1, "-L$buildDir/multistrap-arm64/usr/lib/aarch64-linux-gnu")
+                // ARM GNU toolchain sysroot paths
+                options.add(0, "-L/opt/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/aarch64-none-linux-gnu/libc/lib64")
+                options.add(1, "-L/opt/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/aarch64-none-linux-gnu/libc/usr/lib64")
             }
             mutableListOfLinkerOptions(options)
         }
@@ -330,23 +328,6 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     }
 }
 
-/**
- * This installs dependencies needed for cross compiling Skiko on Linux.
- * https://youtrack.jetbrains.com/issue/KT-36871
- */
-fun SkikoProjectContext.setupMultistrapTask(
-    os: OS, arch: Arch, isUikitSim: Boolean
-): TaskProvider<Exec> = with (this.project) {
-    require(os == OS.Linux)
-    require(arch == Arch.Arm64)
-
-    val actionName = "setupMultistrap".withSuffix(isUikitSim = isUikitSim)
-
-    return project.registerSkikoTask<Exec>(actionName, os, arch) {
-        workingDir(projectDir)
-        commandLine("multistrap", "-f", "multistrap-config-${arch.id}")
-    }
-}
 
 fun KotlinMultiplatformExtension.configureIOSTestsWithMetal(project: Project) {
     val metalTestTargets = listOf("iosX64", "iosSimulatorArm64")
