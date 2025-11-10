@@ -12,3 +12,4 @@ deploy.bat
 skiko/src/jvmMain/java
 .cache
 .clangd
+.gradle-cache
