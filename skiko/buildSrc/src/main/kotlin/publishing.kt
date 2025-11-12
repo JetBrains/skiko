@@ -163,10 +163,10 @@ private fun SkikoPublishingContext.configureAllJvmRuntimeJarPublications() = pub
  *
  * ```
  * org.jetbrains.skiko:skiko-awt-runtime
- *     - variant jvmRuntimeElements-macos-arm64
+ *     - variant awtRuntimeElements-macos-arm64
  *          - depends on org.jetbrains.skiko:skiko-awt-runtime-macos-arm64
  *
- *     - variant jvmRuntimeElements-macos-x64
+ *     - variant awtRuntimeElements-macos-x64
  *          - depends on org.jetbrains.skiko:skiko-awt-runtime-macos-x64
  * ...
  * ```
@@ -214,7 +214,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
                         OS.Linux -> OperatingSystemFamily.LINUX
                         OS.Windows -> OperatingSystemFamily.WINDOWS
                         OS.MacOS -> OperatingSystemFamily.MACOS
-                        else -> error("Unsupported OS for jvmRuntimeElements: $os")
+                        else -> error("Unsupported OS for awtRuntimeElements: $os")
                     }
                 )
             )
@@ -225,7 +225,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
                     when (arch) {
                         Arch.X64 -> MachineArchitecture.X86_64
                         Arch.Arm64 -> MachineArchitecture.ARM64
-                        else -> error("Unsupported arch for jvmRuntimeElements: $arch")
+                        else -> error("Unsupported arch for awtRuntimeElements: $arch")
                     }
                 )
             )
@@ -244,7 +244,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
     }
 
     /* Create a new software component and add all variants */
-    val component = project.serviceOf<SoftwareComponentFactory>().adhoc("jvmRuntimeElements")
+    val component = project.serviceOf<SoftwareComponentFactory>().adhoc("awtRuntimeElements")
     allJvmRuntimeVariants.forEach { variant ->
         component.addVariantsFromConfiguration(variant) {
             mapToMavenScope("runtime")
@@ -253,7 +253,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
 
     /* Create the actual publication for this */
     publications {
-        create("jvmRuntimeElements", MavenPublication::class.java) {
+        create("awtRuntimeElements", MavenPublication::class.java) {
             from(component)
             pomNameForPublication[name] = "Skiko JVM Runtime"
             groupId = SkikoArtifacts.groupId
