@@ -269,10 +269,8 @@ fun Project.configureSignAndPublishDependencies() {
     tasks.configureEach {
         val publishKmp = "publishKotlinMultiplatformPublicationTo"
         val publishAwt = "publishAwtPublicationTo"
-        val publishAwtRuntimeElements = "publishAwtRuntimeElementsPublicationTo"
         val signKmp = "signKotlinMultiplatformPublication"
         val signAwt = "signAwtPublication"
-        val signAwtRuntimeElements = "signAwtRuntimeElements"
 
         when {
             name.startsWith(publishKmp) -> {
@@ -280,9 +278,6 @@ fun Project.configureSignAndPublishDependencies() {
             }
             name.startsWith(publishAwt) -> {
                 dependsOn(signKmp)
-            }
-            name.startsWith(publishAwtRuntimeElements) -> {
-                dependsOn(signAwtRuntimeElements)
             }
         }
     }
