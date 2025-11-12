@@ -11,7 +11,10 @@ on:
 
 jobs:
   macOS:
-    runs-on: macos-13
+    # On `macos-15` UI tests blocked by a system popup with
+    # "bash" is requesting to bypass the system private window picker and directly access your screen and audio.
+    # TODO: Update once resolved
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -42,16 +45,24 @@ jobs:
         run: |
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal -Pskiko.debug=true
 
-      - uses: actions/upload-artifact@v4
-        name: 'Save test results as artifact'
-        if: always()
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: test-reports-macos
-          path: ./skiko/build/reports/tests
+          path: |
+            ./skiko/build/reports/tests
+            ./skiko/src/jvmTest/screenshots/*_actual.png
           retention-days: 5
 
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: "./skiko/build/test-results/**/TEST-*.xml"
+        if: always()
+
   iOS:
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -66,12 +77,10 @@ jobs:
       - name: 'Print the devices list'
         run: xcrun simctl list devices available --json
 
-      # install jq - cli tool for json querying
       # retrieve the device .udid to use in tests and store it in env var
       - name: 'Set Up Simulator UUID'
         run: |
-          brew install jq &&
-          IOS_SIM_UUID=$(xcrun simctl list devices available --json | jq -r '.devices."com.apple.CoreSimulator.SimRuntime.iOS-17-0"[] | select(.name == "iPhone 14") | .udid') &&
+          IOS_SIM_UUID=$(xcrun simctl list devices available --json | jq -r '.devices."com.apple.CoreSimulator.SimRuntime.iOS-18-4"[] | select(.name == "iPhone 16") | .udid') &&
           echo "IOS_SIM_UUID=$IOS_SIM_UUID" >> $GITHUB_ENV
 
       - name: 'Print Selected UUID'
@@ -95,16 +104,16 @@ jobs:
         name: 'Publish to Maven Local'
         run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
 
-      - uses: actions/upload-artifact@v4
-        name: 'Save test results as artifact'
-        if: always()
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: test-reports-ios
           path: ./skiko/build/reports/tests
           retention-days: 5
 
   tvOS:
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -122,8 +131,9 @@ jobs:
           # tvosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Dskiko.test.onci=true -Dskiko.test.performance.enabled=false :skiko:tvosSimulatorArm64Test
 
-      - uses: actions/upload-artifact@v4
-        if: always()
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: test-reports-tvos
           path: ./skiko/build/reports/tests
@@ -208,20 +218,27 @@ jobs:
           ./gradlew --no-daemon -Pskiko.android.enabled=true :skiko:publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal :skiko:publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal :skiko:publishAndroidReleasePublicationToMavenLocal
 
       - uses: actions/upload-artifact@v4
-        name: 'Save test results as artifact'
-        if: always()
-        with:
-          name: test-reports-linux
-          path: ./skiko/build/reports/tests
-          retention-days: 5
-
-      - uses: actions/upload-artifact@v4
         name: 'Save linuxArm64 test binary as artifact'
         with:
           name: test-binary-linuxArm64
           path: ./skiko/build/bin/linuxArm64
           if-no-files-found: error
           retention-days: 5
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-reports-linux
+          path: |
+            ./skiko/build/reports/tests
+            ./skiko/src/jvmTest/screenshots/*_actual.png
+
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: "./skiko/build/test-results/**/TEST-*.xml"
+        if: always()
 
   linux-arm:
     needs: linux
@@ -272,13 +289,21 @@ jobs:
           ./gradlew --no-daemon --stacktrace --info :skiko:publishToMavenLocal
           ./gradlew --no-daemon --stacktrace --info :SkiaAwtSample:installDist
 
-      - uses: actions/upload-artifact@v4
-        name: 'Save test results as artifact'
-        if: always()
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: test-reports-linux-arm
-          path: ./skiko/build/reports/tests
+          path: |
+            ./skiko/build/reports/tests
+            ./skiko/src/jvmTest/screenshots/*_actual.png
           retention-days: 5
+
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: "./skiko/build/test-results/**/TEST-*.xml"
+        if: always()
 
   windows:
     runs-on: windows-2022
@@ -308,11 +333,18 @@ jobs:
           ./gradlew --stacktrace --info :skiko:publishToMavenLocal
           ./gradlew --stacktrace --info :SkiaAwtSample:installDist
 
-      - uses: actions/upload-artifact@v4
-        name: 'Save test results as artifact'
-        if: always()
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: test-reports-windows
-          path: ./skiko/build/reports/tests
+          path: |
+            ./skiko/build/reports/tests
+            ./skiko/src/jvmTest/screenshots/*_actual.png
           retention-days: 5
 
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: "./skiko/build/test-results/**/TEST-*.xml"
+        if: always()
