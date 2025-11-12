@@ -176,7 +176,7 @@ kotlin {
         implementation(kotlin("test-annotations-common"))
     }
 
-    skikoProjectContext.jvmMainSourceSet.dependencies {
+    skikoProjectContext.jvmMainSourceSet?.dependencies {
         implementation(kotlin("stdlib"))
         implementation(libs.coroutines.core.jvm)
     }
@@ -189,7 +189,7 @@ kotlin {
         implementation(libs.coroutines.android)
     }
 
-    skikoProjectContext.jvmTestSourceSet.dependencies {
+    skikoProjectContext.jvmTestSourceSet?.dependencies {
         implementation(libs.coroutines.test)
         implementation(kotlin("test-junit"))
         implementation(kotlin("test"))

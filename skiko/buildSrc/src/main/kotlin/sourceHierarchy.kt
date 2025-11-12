@@ -3,9 +3,9 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinHierarchyTemplate
 
-val SkikoProjectContext.jvmMainSourceSet get() = kotlin.sourceSets.getByName("jvmMain")
+val SkikoProjectContext.jvmMainSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("jvmMain") else null
 
-val SkikoProjectContext.jvmTestSourceSet get() = kotlin.sourceSets.getByName("jvmTest")
+val SkikoProjectContext.jvmTestSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("jvmTest") else null
 
 val SkikoProjectContext.awtMainSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("awtMain") else null
 
