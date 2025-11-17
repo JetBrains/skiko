@@ -5,6 +5,9 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 object Library {
     private var copyDir: File? = null
@@ -42,27 +45,37 @@ object Library {
         return file
     }
 
-    private var loaded = AtomicBoolean(false)
+    /**
+     * Holds a reference to the lock which has to be acquired when loading the native library,
+     * or to wait for the loading to finish.
+     * The reference will resolve to `null` if loading is done and callers do not need to wait anymore.
+     */
+    private val loadingLock = AtomicReference(ReentrantLock())
 
     // This function does the following: on request to load given resource,
     // it checks if resource with given name is found in content-derived directory
     // in Skiko's home, and if not - unpacks it. It could also load additional
     // localization resources, on platforms where it is needed.
-    @Synchronized
     fun load() {
-        if (!loaded.compareAndSet(false, true)) return
+        val lock = loadingLock.get() ?: return
+        lock.withLock {
+            // We entered the critical section, but another thread might have already entered and finished
+            if (loadingLock.get() !== lock) return
 
-        // Find/unpack a usable copy of the native library.
-        findAndLoad()
+            // Find/unpack a usable copy of the native library.
+            findAndLoad()
 
-        // TODO move properties to SkikoProperties
-        Setup.init()
+            // TODO move properties to SkikoProperties
+            Setup.init()
 
-        try {
-            // Init code executed after library was loaded.
-            org.jetbrains.skia.impl.Library._nAfterLoad()
-        } catch (t: Throwable) {
-            t.printStackTrace()
+            try {
+                // Init code executed after library was loaded.
+                org.jetbrains.skia.impl.Library._nAfterLoad()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            } finally {
+                loadingLock.compareAndSet(lock, null)
+            }
         }
     }
 
