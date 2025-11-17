@@ -293,6 +293,9 @@ kotlin {
                 if (supportNativeLinux) {
                     val linuxMain by creating {
                         dependsOn(nativeMain)
+                        dependencies {
+                            implementation("io.github.drulysses:kgfw:1.1.0")
+                        }
                     }
                     val linuxTest by creating {
                         dependsOn(nativeTest)

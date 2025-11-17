@@ -4,7 +4,6 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
 
-
 fun Animation.Companion.makeFromFile(path: String): Animation {
     Stats.onNativeCall()
     interopScope {

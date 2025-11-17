@@ -254,8 +254,24 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         OS.Linux -> {
             val options = mutableListOf(
                 "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
-                "-lfontconfig",
+                // Libraries required by RGFW/KGFW and Skia
+                "-Wl,--allow-shlib-undefined",
+                "-lX11",
+                "-lXext",
+                "-lXrandr",
+                "-lXcursor",
+                "-lXi",
+                "-lXinerama",
                 "-lGL",
+                "-lstdc++",
+                "-lfontconfig",
+                "-lfreetype",
+                "-lpthread",
+                "-lc",
+                // Avoid linking system harfbuzz/icu to prevent version mismatches; Skia pack provides required deps
+                // "-lharfbuzz",
+                // "-licui18n",
+                "-ldl",
                 // TODO: an ugly hack, Linux linker searches only unresolved symbols.
                 "$skiaBinDir/libskparagraph.a",
                 "$skiaBinDir/libskottie.a",
