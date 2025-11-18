@@ -515,6 +515,7 @@ fun SkikoProjectContext.setupJvmTestTask(skikoAwtJarForTests: TaskProvider<Jar>,
             }
         }
 
+        classpath += files(skikoAwtRuntimeJarForTests)
         jvmArgs = listOf("--add-opens", "java.desktop/sun.font=ALL-UNNAMED")
     }
 }
