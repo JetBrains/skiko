@@ -13,4 +13,5 @@ dependencies {
     implementation(libs.gradleDownloadTask.gradlePlugin)
     implementation(libs.githubApi)
     implementation(libs.crypto.checksum.gradlePlugin)
+    implementation(libs.kotlinx.benchmark.gradlePlugin)
 }
