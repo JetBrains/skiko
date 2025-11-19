@@ -69,10 +69,11 @@ internal inline fun <T> withFileLock(path: Path, action: () -> T): T {
             }
         }
 
-        path.createParentDirectories()
-        var attempts = 0
-
         try {
+
+            path.createParentDirectories()
+            var attempts = 0
+
             while (true) {
                 try {
                     return FileChannel.open(path, READ, WRITE, CREATE).use { channel ->
