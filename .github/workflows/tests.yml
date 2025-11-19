@@ -1,0 +1,436 @@
+name: Skiko Tests
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  macos:
+    name: 'macOS'
+    # On `macos-15` UI tests blocked by a system popup with
+    # "bash" is requesting to bypass the system private window picker and directly access your screen and audio.
+    # TODO: Update once resolved
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Run AWT Tests'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            -Dskiko.test.onci=true \
+            -Dskiko.test.performance.enabled=false \
+            :skiko:awtTest
+
+      - shell: bash
+        name: 'Run macOS Tests'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            -Dskiko.test.onci=true \
+            -Dskiko.test.performance.enabled=false \
+            :skiko:macosArm64Test
+
+      - uses: actions/upload-artifact@v4
+        name: 'Upload Test Results'
+        if: failure()
+        with:
+          name: test-reports-macos
+          path: |
+            ./skiko/build/reports/tests
+            ./skiko/src/jvmTest/screenshots/*_actual.png
+          retention-days: 5
+
+      - uses: test-summary/action@v2
+        name: 'Test Summary'
+        with:
+          paths: "./skiko/build/test-results/**/TEST-*.xml"
+        if: always()
+
+  ios:
+    name: 'iOS'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      # Retrieve the device .udid to use in tests and store it in env var
+      - shell: bash
+        name: 'Set Up Simulator UUID'
+        run: |
+          IOS_SIM_LIST=$(xcrun simctl list devices available --json)
+          IOS_SIM_UUID=$(echo $IOS_SIM_LIST | jq -r '.devices."com.apple.CoreSimulator.SimRuntime.iOS-18-4"[] | select(.name == "iPhone 16") | .udid')
+          echo "IOS_SIM_UUID=$IOS_SIM_UUID" >> $GITHUB_ENV
+
+      - uses: nick-fields/retry@v2
+        name: 'Run iOS (x64) tests'
+        with:
+          max_attempts: 10
+          timeout_minutes: 60
+          shell: bash
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.native.enabled=true \
+              -Dskiko.test.onci=true \
+              -Dskiko.test.performance.enabled=false \
+              -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" \
+              :skiko:iosX64TestWithMetal
+
+      # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
+      - shell: bash
+        name: 'Compile iOS (arm64) tests'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            -Dskiko.test.onci=true \
+            -Dskiko.test.performance.enabled=false \
+            :skiko:iosSimulatorArm64Test
+
+      # TODO run iOS specific tests on iPhone simulator
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-reports-ios
+          path: ./skiko/build/reports/tests
+          retention-days: 5
+
+  tvos:
+    name: 'tvOS'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Run tvOS Tests'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            -Dskiko.test.onci=true \
+            -Dskiko.test.performance.enabled=false \
+            :skiko:tvosX64Test
+          
+          # tvosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            -Dskiko.test.onci=true \
+            -Dskiko.test.performance.enabled=false \
+            :skiko:tvosSimulatorArm64Test
+
+      - uses: actions/upload-artifact@v4
+        name: 'Upload Test Results'
+        if: failure()
+        with:
+          name: test-reports-tvos
+          path: ./skiko/build/reports/tests
+          retention-days: 5
+
+  linux-amd64:
+    name: 'Linux (x64)'
+    runs-on: ubuntu-24.04
+    container:
+      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-amd64:ubuntu-2004
+      credentials:
+        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Start X Server'
+        run: |
+          Xvfb :1 -screen 0 1920x1080x24 -extension RANDR +extension GLX &
+          echo "DISPLAY=:1.0" >> $GITHUB_ENV
+
+      - shell: bash
+        name: 'Run Linux (x64) Tests'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            -Dskiko.test.onci=true \
+            -Dskiko.test.performance.enabled=false \
+            :skiko:linuxX64Test
+
+      - shell: bash
+        name: 'Run AWT Tests'
+        timeout-minutes: 25
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            -Dskiko.test.onci=true \
+            -Dskiko.test.performance.enabled=false \
+            :skiko:awtTest
+
+      - uses: actions/upload-artifact@v4
+        name: 'Upload Test Results'
+        if: failure()
+        with:
+          name: test-reports-linux
+          path: |
+            ./skiko/build/reports/tests
+            ./skiko/src/jvmTest/screenshots/*_actual.png
+
+      - uses: test-summary/action@v2
+        name: 'Test Summary'
+        with:
+          paths: "./skiko/build/test-results/**/TEST-*.xml"
+        if: always()
+
+  linux-cross-compile:
+    name: 'Cross-compile Linux (arm) on x64'
+    runs-on: ubuntu-24.04
+    container:
+      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-amd64:ubuntu-2004
+      credentials:
+        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Compile Linux (arm64) Tests'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.arch=x64 \
+            -Pskiko.native.linux.enabled=true \
+            :skiko:linkDebugTestLinuxArm64
+
+      - uses: actions/upload-artifact@v4
+        name: 'Upload linuxArm64 test binary as artifact'
+        with:
+          name: test-binary-linuxArm64
+          path: ./skiko/build/bin/linuxArm64
+          if-no-files-found: error
+          retention-days: 5
+
+  linux-arm:
+    name: 'Linux (arm64)'
+    needs: linux-cross-compile
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-arm64:ubuntu-2004
+      credentials:
+        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Start X Server'
+        run: |
+          Xvfb :1 -screen 0 1920x1080x24 -extension RANDR +extension GLX &
+          echo "DISPLAY=:1.0" >> $GITHUB_ENV
+
+      - uses: actions/download-artifact@v4
+        name: 'Download precompiled linuxArm64 test binary'
+        with:
+          name: test-binary-linuxArm64
+          path: ./skiko/build/bin/linuxArm64
+
+      - shell: bash
+        name: 'Run Linux (arm64) Tests'
+        working-directory: skiko
+        run: |
+          chmod +x ./build/bin/linuxArm64/debugTest/test.kexe
+          ./build/bin/linuxArm64/debugTest/test.kexe
+
+      - shell: bash
+        name: 'Run AWT Tests'
+        timeout-minutes: 25
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            -Dskiko.test.onci=true \
+            -Dskiko.test.performance.enabled=false \
+            :skiko:awtTest
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-reports-linux-arm
+          path: |
+            ./skiko/build/reports/tests
+            ./skiko/src/jvmTest/screenshots/*_actual.png
+          retention-days: 5
+
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: "./skiko/build/test-results/**/TEST-*.xml"
+        if: always()
+
+  windows:
+    name: 'Windows'
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: microsoft/setup-msbuild@v1
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      # OPENGL is ignored as it doesn't exist on the Windows GitHub agent
+      - shell: bash
+        name: 'Run AWT tests'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Dskiko.test.onci=true \
+            -Dskiko.test.performance.enabled=false \
+            -Dskiko.test.ui.renderApi.ignoreAssertsFor=OPENGL \
+            :skiko:awtTest
+
+      - uses: actions/upload-artifact@v4
+        name: 'Upload Test Results'
+        if: failure()
+        with:
+          name: test-reports-windows
+          path: |
+            ./skiko/build/reports/tests
+            ./skiko/src/jvmTest/screenshots/*_actual.png
+          retention-days: 5
+
+      - uses: test-summary/action@v2
+        name: 'Test Summary'
+        with:
+          paths: "./skiko/build/test-results/**/TEST-*.xml"
+        if: always()
+
+  web-wasm:
+    name: 'Web (WASM)'
+    runs-on: ubuntu-24.04
+    container:
+      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-emscripten-amd64:ubuntu-2004
+      credentials:
+        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - uses: browser-actions/setup-chrome@v2
+        name: 'Setup Google Chrome'
+        id: setup-chrome
+        with:
+          chrome-version: stable
+          install-chromedriver: true
+          install-dependencies: true
+
+      - shell: bash
+        name: 'Run WASM Tests'
+        working-directory: skiko
+        run: |
+          source /usr/emsdk/emsdk_env.sh
+          export CHROME_BIN=${{ steps.setup-chrome.outputs.chrome-path }}
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.wasm.enabled=true \
+            -Pskiko.js.enabled=true \
+            -Pskiko.test.onci=true \
+            wasmJsTest
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports-wasm
+          path: ./skiko/build/reports/tests
+          retention-days: 5
+
+  web-js:
+    name: 'Web (JS)'
+    runs-on: ubuntu-24.04
+    container:
+      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-emscripten-amd64:ubuntu-2004
+      credentials:
+        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - uses: browser-actions/setup-chrome@v2
+        name: 'Setup Google Chrome'
+        id: setup-chrome
+        with:
+          chrome-version: stable
+          install-chromedriver: true
+          install-dependencies: true
+
+      - shell: bash
+        name: 'Run JS Tests'
+        working-directory: skiko
+        run: |
+          source /usr/emsdk/emsdk_env.sh
+          export CHROME_BIN=${{ steps.setup-chrome.outputs.chrome-path }}
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.wasm.enabled=true \
+            -Pskiko.js.enabled=true \
+            -Pskiko.test.onci=true \
+            jsTest
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports-js
+          path: ./skiko/build/reports/tests
+          retention-days: 5
