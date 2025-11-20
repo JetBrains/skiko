@@ -58,7 +58,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
         dependsOn(skiaNativeDir)
         val unpackedSkia = skiaNativeDir.get()
 
-        compiler.set(compilerForTarget(os, arch, isJvm = false))
+        compiler.set(compilerForTarget(os, arch))
         buildTargetOS.set(os)
         if (isUikitSim) {
             buildSuffix.set("sim")
