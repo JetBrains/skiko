@@ -25,6 +25,14 @@ config.files = [
     {pattern: path.resolve(basePath, "kotlin", "**/*.json"), included: false, served: true, watched: false},
 ].concat(config.files);
 
+config.customLaunchers = {
+    ChromeForSkikoTests: {
+        base: "ChromeHeadless",
+        flags: ["--no-sandbox"]
+    }
+}
+config.browsers = ["ChromeForSkikoTests"];
+
 function KarmaWebpackOutputFramework(config) {
     // This controller is instantiated and set during the preprocessor phase.
     const controller = config.__karmaWebpackController;

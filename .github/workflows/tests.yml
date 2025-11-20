@@ -352,7 +352,7 @@ jobs:
         if: always()
 
   web-wasm:
-    name: 'Web (WASM)'
+    name: 'Web'
     runs-on: ubuntu-24.04
     container:
       image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-emscripten-amd64:ubuntu-2004
@@ -386,36 +386,6 @@ jobs:
             -Pskiko.test.onci=true \
             wasmJsTest
 
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-reports-wasm
-          path: ./skiko/build/reports/tests
-          retention-days: 5
-
-  web-js:
-    name: 'Web (JS)'
-    runs-on: ubuntu-24.04
-    container:
-      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-emscripten-amd64:ubuntu-2004
-      credentials:
-        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
-        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
-    steps:
-      - uses: actions/checkout@v3
-        name: 'Check out code'
-
-      - uses: ./.github/actions/setup-prerequisites
-        name: 'Setup Prerequisites'
-
-      - uses: browser-actions/setup-chrome@v2
-        name: 'Setup Google Chrome'
-        id: setup-chrome
-        with:
-          chrome-version: stable
-          install-chromedriver: true
-          install-dependencies: true
-
       - shell: bash
         name: 'Run JS Tests'
         working-directory: skiko
@@ -429,8 +399,14 @@ jobs:
             jsTest
 
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with:
-          name: test-reports-js
+          name: test-reports-web
           path: ./skiko/build/reports/tests
           retention-days: 5
+
+      - uses: test-summary/action@v2
+        name: 'Test Summary'
+        with:
+          paths: "./skiko/build/test-results/**/TEST-*.xml"
+        if: always()
