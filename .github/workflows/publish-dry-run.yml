@@ -28,6 +28,13 @@ jobs:
             -Pskiko.android.enabled=true \
             :skiko:publishToMavenLocal
 
+      - shell: bash
+        name: 'Check Android Sample'
+        working-directory: samples/SkiaAndroidSample
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            packageRelease
+
   Web:
     runs-on: ubuntu-24.04
     container:
