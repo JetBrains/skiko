@@ -353,33 +353,44 @@ jobs:
 
   web-wasm:
     name: 'Web'
-    runs-on: ubuntu-24.04
-    container:
-      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-emscripten-amd64:ubuntu-2004
-      credentials:
-        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
-        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
 
-      - uses: ./.github/actions/setup-prerequisites
-        name: 'Setup Prerequisites'
+      - uses: actions/setup-java@v3
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'adopt'
+          cache: 'gradle'
 
-      - uses: browser-actions/setup-chrome@v2
+      - uses: browser-actions/setup-chrome@v1
         name: 'Setup Google Chrome'
-        id: setup-chrome
         with:
           chrome-version: stable
-          install-chromedriver: true
-          install-dependencies: true
+
+      - name: 'Install emscripten'
+        shell: bash
+        working-directory: skiko
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install libdbus-1-dev
+          if [ -d ./emsdk ]; then
+            cd ./emsdk
+            git pull
+          else
+            git clone https://github.com/emscripten-core/emsdk.git
+            cd ./emsdk
+          fi
+          ./emsdk install 3.1.50
+          ./emsdk activate 3.1.50
 
       - shell: bash
         name: 'Run WASM Tests'
         working-directory: skiko
         run: |
-          source /usr/emsdk/emsdk_env.sh
-          export CHROME_BIN=${{ steps.setup-chrome.outputs.chrome-path }}
+          source ./emsdk/emsdk_env.sh
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.wasm.enabled=true \
             -Pskiko.js.enabled=true \
@@ -390,8 +401,7 @@ jobs:
         name: 'Run JS Tests'
         working-directory: skiko
         run: |
-          source /usr/emsdk/emsdk_env.sh
-          export CHROME_BIN=${{ steps.setup-chrome.outputs.chrome-path }}
+          source ./emsdk/emsdk_env.sh
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.wasm.enabled=true \
             -Pskiko.js.enabled=true \

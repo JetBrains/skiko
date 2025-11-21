@@ -49,11 +49,3 @@ config.files = [
     {pattern: path.resolve(basePath, "kotlin", "**/*.txt"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.json"), included: false, served: true, watched: false},
 ].concat(config.files);
-
-config.customLaunchers = {
-    ChromeForSkikoTests: {
-        base: "ChromeHeadless",
-        flags: ["--no-sandbox"]
-    }
-}
-config.browsers = ["ChromeForSkikoTests"];
