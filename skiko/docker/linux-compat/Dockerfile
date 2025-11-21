@@ -6,7 +6,9 @@ ARG TARGETARCH
 
 # Install basic & development tools
 RUN yum install -y tar xz git wget curl zip gzip && \
-    yum install -y gcc gcc-c++ binutils make && \
+    yum install -y gcc10 gcc10-c++ gcc10-binutils make && \
+    ln -sf /usr/bin/gcc10-gcc /usr/bin/gcc && \
+    ln -sf /usr/bin/gcc10-g++ /usr/bin/g++ && \
     yum clean all
 
 # Install libraries
@@ -37,7 +39,7 @@ ENV PATH=$DEPOT_TOOLS:$PATH
 RUN git clone 'https://chromium.googlesource.com/chromium/tools/depot_tools.git' $DEPOT_TOOLS
 
 # Install cross-compilation toolchain for ARM64
-ENV ARM_TOOLCHAIN_VERSION=9.2-2019.12
+ENV ARM_TOOLCHAIN_VERSION=10.3-2021.07
 ENV ARM_TOOLCHAIN_NAME=gcc-arm-${ARM_TOOLCHAIN_VERSION}-x86_64-aarch64-none-linux-gnu
 ENV ARM_TOOLCHAIN_PATH=/opt/arm-gnu-toolchain
 ENV PATH="/usr/local/bin:$ARM_TOOLCHAIN_PATH/bin:$PATH"
