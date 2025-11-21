@@ -2,9 +2,18 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.Bitmap
 import java.io.File
+import java.nio.channels.FileChannel
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
-import java.util.concurrent.atomic.AtomicBoolean
+import java.nio.file.StandardOpenOption.*
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
+import kotlin.io.bufferedReader
+import kotlin.io.path.createParentDirectories
+import kotlin.io.resolve
+import kotlin.use
 
 object Library {
     private var copyDir: File? = null
@@ -31,38 +40,66 @@ object Library {
     private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
         val file = File(dest, resourceName)
         if (!file.exists()) {
-            val tempFile = File.createTempFile("skiko", "", dest)
-            if (deleteOnExit)
-                file.deleteOnExit()
-            Library::class.java.getResourceAsStream("/$resourceName").use { input ->
-                Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            withFileLock(dest.resolve(".lock").toPath()) {
+                if (file.exists()) return file
+                val tempFile = File.createTempFile("skiko", "", dest)
+                if (deleteOnExit)
+                    file.deleteOnExit()
+                Library::class.java.getResourceAsStream("/$resourceName").use { input ->
+                    Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                }
+                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
             }
-            Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
         }
         return file
     }
 
-    private var loaded = AtomicBoolean(false)
+    /**
+     * Holds a reference to the lock which has to be acquired when loading the native library,
+     * or to wait for the loading to finish.
+     * The reference will resolve to `null` if loading is done and callers do not need to wait anymore.
+     */
+    private val loadingLock = AtomicReference(ReentrantLock())
 
     // This function does the following: on request to load given resource,
     // it checks if resource with given name is found in content-derived directory
     // in Skiko's home, and if not - unpacks it. It could also load additional
     // localization resources, on platforms where it is needed.
-    @Synchronized
     fun load() {
-        if (!loaded.compareAndSet(false, true)) return
+        /**
+         * If there is no more loading lock available, then the loading has finished
+         * and we can just return as normal, assuming that the library was successfully loaded.
+         */
+        val lock = loadingLock.get() ?: return
 
-        // Find/unpack a usable copy of the native library.
-        findAndLoad()
+        /**
+         * If the lock is held by the current thread, then this indicates a recursive call to load.
+         * Methods like `_nAfterLoad()` might trigger additional Class loading, where .clinit (static init methods)
+         * trigger further calls to Library.staticLoad() -> Library.load() while holding the current lock.
+         *
+         * It is fine, in such cases, to return eagerly and assume that the Library is successfully loaded and
+         * the recursion is a result of callbacks indicating the successful load.
+         */
+        if (lock.isHeldByCurrentThread) return
 
-        // TODO move properties to SkikoProperties
-        Setup.init()
+        lock.withLock {
+            // We entered the critical section, but another thread might have already entered and finished
+            if (loadingLock.get() !== lock) return
 
-        try {
-            // Init code executed after library was loaded.
-            org.jetbrains.skia.impl.Library._nAfterLoad()
-        } catch (t: Throwable) {
-            t.printStackTrace()
+            // Find/unpack a usable copy of the native library.
+            findAndLoad()
+
+            // TODO move properties to SkikoProperties
+            Setup.init()
+
+            try {
+                // Init code executed after library was loaded.
+                org.jetbrains.skia.impl.Library._nAfterLoad()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            } finally {
+                loadingLock.compareAndSet(lock, null)
+            }
         }
     }
 
@@ -126,5 +163,21 @@ internal class LibraryTestImpl() {
     fun run(): Long {
         val bitmap = Bitmap()
         return bitmap._ptr
+    }
+}
+
+
+/**
+ * Simple lockfile utility which ensures that the lockfile at the given [path] exists and is locked properly.
+ * Note: This method cannot be re-entered recusrively
+ * Note: The same process can only take a given lock once
+ */
+internal inline fun <T> withFileLock(path: Path, action: () -> T): T {
+    path.createParentDirectories()
+    return FileChannel.open(path, READ, WRITE, CREATE).use { channel ->
+        val lock = channel.lock()
+        lock.use {
+            action()
+        }
     }
 }
