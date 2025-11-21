@@ -9,6 +9,7 @@ RUN yum install -y tar xz git wget curl zip gzip && \
     yum install -y gcc10 gcc10-c++ gcc10-binutils make && \
     ln -sf /usr/bin/gcc10-gcc /usr/bin/gcc && \
     ln -sf /usr/bin/gcc10-g++ /usr/bin/g++ && \
+    ln -sf /usr/bin/gcc10-ar /usr/bin/ar && \
     yum clean all
 
 # Install libraries
