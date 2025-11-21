@@ -32,6 +32,11 @@ object SkikoProperties {
      */
     val dataPath: String get() = getProperty("skiko.data.path") ?: "${getProperty("user.home")}/.skiko/"
 
+    /**
+     * Purge data inside the [dataPath] if it is not used/older than this 'days'
+     */
+    val dataCleanupDays: Int get() = getProperty("skiko.data.cleanup.days")?.toInt() ?: 31
+
     val vsyncEnabled: Boolean get() = getProperty("skiko.vsync.enabled")?.toBoolean() ?: true
 
     val frameBuffering: FrameBuffering get() {
