@@ -127,6 +127,10 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 ))
             }
             OS.Linux -> {
+                val archFlags = if (arch == Arch.Arm64) arrayOf(
+                    // Always inline atomics for ARM64 to prevent linking incompatibility issues after updating GCC to 10
+                    "-mno-outline-atomics",
+                ) else arrayOf()
                 val linuxFlags = mutableListOf(
                     *buildType.clangFlags,
                     "-fPIC",
@@ -134,6 +138,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                     "-fno-exceptions",
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
+                    *archFlags,
                     *skiaPreprocessorFlags(OS.Linux, buildType)
                 )
                 // Add sysroot for ARM64 cross-compilation

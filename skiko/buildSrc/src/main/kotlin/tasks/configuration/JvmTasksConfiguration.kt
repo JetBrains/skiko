@@ -85,6 +85,10 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         OS.Linux -> {
             includeHeadersNonRecursive(jdkHome.resolve("include/linux"))
             includeHeadersNonRecursive(runPkgConfig("dbus-1"))
+            val archFlags = if (targetArch == Arch.Arm64) arrayOf(
+                // Always inline atomics for ARM64 to prevent linking incompatibility issues after updating GCC to 10
+                "-mno-outline-atomics",
+            ) else arrayOf()
             osFlags = arrayOf(
                 *buildType.clangFlags,
                 "-DGL_GLEXT_PROTOTYPES",
@@ -92,7 +96,8 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
                 "-fno-rtti",
                 "-fno-exceptions",
                 "-fvisibility=hidden",
-                "-fvisibility-inlines-hidden"
+                "-fvisibility-inlines-hidden",
+                *archFlags,
             )
         }
         OS.Windows -> {

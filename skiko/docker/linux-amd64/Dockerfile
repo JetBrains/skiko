@@ -6,6 +6,9 @@ RUN apt update -y && \
     apt install zip unzip git python curl wget xvfb -y && \
     apt install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
     apt install openjdk-21-jdk -y && \
+    apt install gcc-10 g++-10 -y && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 60 --slave /usr/bin/g++ g++ /usr/bin/g++-10 && \
+    update-alternatives --config gcc && \
     rm -rf /var/lib/apt/lists/*
 
 # Install chromium tools
@@ -29,7 +32,7 @@ RUN dpkg --add-architecture arm64 && echo \
     rm -rf /var/lib/apt/lists/*
 
 # Install cross-compilation toolchain for ARM64
-ENV ARM_TOOLCHAIN_VERSION=9.2-2019.12
+ENV ARM_TOOLCHAIN_VERSION=10.3-2021.07
 ENV ARM_TOOLCHAIN_NAME=gcc-arm-${ARM_TOOLCHAIN_VERSION}-x86_64-aarch64-none-linux-gnu
 ENV ARM_TOOLCHAIN_PATH=/opt/arm-gnu-toolchain
 ENV ARM_TOOLCHAIN_SYSROOT=$ARM_TOOLCHAIN_PATH/aarch64-none-linux-gnu/libc
