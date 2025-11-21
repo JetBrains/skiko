@@ -24,7 +24,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.withType
-import org.gradle.util.internal.VersionNumber
 import projectDirs
 import registerOrGetSkiaDirProvider
 import registerSkikoTask
@@ -67,7 +66,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
 
-    compiler.set(compilerForTarget(targetOs, targetArch, isJvm = true))
+    compiler.set(compilerForTarget(targetOs, targetArch))
 
     val osFlags: Array<String>
     when (targetOs) {
@@ -237,7 +236,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
     buildSuffix.set("jvm")
     buildTargetArch.set(targetArch)
     buildVariant.set(buildType)
-    linker.set(linkerForTarget(targetOs, targetArch, isJvm = true))
+    linker.set(linkerForTarget(targetOs, targetArch))
 
     when (targetOs) {
         OS.MacOS -> {
