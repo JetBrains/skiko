@@ -17,9 +17,14 @@ actual open class SkiaLayer  {
         set(value) {}
     actual val component: Any?
         get() = TODO("Not yet implemented")
-    actual fun needRedraw(throttledToVsync: Boolean) {
+    actual fun needRender(throttledToVsync: Boolean) {
         TODO("unimplemented")
     }
+    @Deprecated(
+        message = "Use needRender() instead",
+        replaceWith = ReplaceWith("needRender()")
+    )
+    actual fun needRedraw() = needRender()
     actual fun attachTo(container: Any) {
         TODO("unimplemented")
     }

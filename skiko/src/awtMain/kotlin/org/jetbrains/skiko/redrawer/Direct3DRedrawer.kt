@@ -63,16 +63,14 @@ internal class Direct3DRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw(throttledToVsync: Boolean) {
+    override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately(updateNeeded: Boolean) {
+    override fun renderImmediately() {
         checkDisposed()
-        if (updateNeeded) {
-            update()
-        }
+        update()
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)

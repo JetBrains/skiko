@@ -65,7 +65,7 @@ class SkikoUIView : UIView {
             }
         )
 
-        skiaLayer.needRedrawCallback = _redrawer::needRedraw
+        skiaLayer.needRedrawCallback = _redrawer::needRender
         skiaLayer.view = this
     }
 

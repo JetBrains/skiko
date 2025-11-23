@@ -55,17 +55,15 @@ internal class WindowsOpenGLRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw(throttledToVsync: Boolean) {
+    override fun needRender(throttledToVsync: Boolean) {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately(updateNeeded: Boolean) {
+    override fun renderImmediately() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
-        if (updateNeeded) {
-            update()
-        }
+        update()
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 makeCurrent()

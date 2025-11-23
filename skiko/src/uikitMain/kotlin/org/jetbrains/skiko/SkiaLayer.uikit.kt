@@ -23,9 +23,15 @@ actual open class SkiaLayer {
         get() = false
         set(_) { throw UnsupportedOperationException() }
 
-    actual fun needRedraw(throttledToVsync: Boolean) {
+    actual fun needRender(throttledToVsync: Boolean) {
         needRedrawCallback.invoke()
     }
+
+    @Deprecated(
+        message = "Use needRender() instead",
+        replaceWith = ReplaceWith("needRender()")
+    )
+    actual fun needRedraw() = needRender()
 
     actual val component: Any?
         get() = this.view

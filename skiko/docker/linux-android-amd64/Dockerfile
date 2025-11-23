@@ -1,11 +1,11 @@
 FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update -y && \
-    apt-get install binutils build-essential software-properties-common -y && \
-    apt-get install zip unzip git python curl wget -y && \
-    apt-get install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
-    apt-get install openjdk-21-jdk -y && \
+RUN apt update -y && \
+    apt install binutils build-essential software-properties-common -y && \
+    apt install zip unzip git python curl wget -y && \
+    apt install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
+    apt install openjdk-21-jdk -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Android SDK
@@ -24,7 +24,7 @@ RUN yes | $SDK_MANAGER --licenses && \
     $SDK_MANAGER "platforms;$ANDROID_PLATFORM" && \
     cd $ANDROID_SDK_ROOT/platforms/$ANDROID_PLATFORM && \
     ls -1 | grep -v android.jar | xargs rm -rf
-ARG NDK_VERSION=21.4.7075529
+ARG NDK_VERSION=29.0.14206865
 RUN $SDK_MANAGER "ndk;$NDK_VERSION" && \
     cd $ANDROID_SDK_ROOT/ndk/$NDK_VERSION && \
     ls -1 | grep -v toolchains | xargs rm -rf

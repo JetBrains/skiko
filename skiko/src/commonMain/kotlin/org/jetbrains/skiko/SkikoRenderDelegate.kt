@@ -15,6 +15,6 @@ open class SkiaLayerRenderDelegate(
         canvas.scale(contentScale, contentScale)
         renderDelegate.onRender(canvas, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
         // Request next frame immediately.
-        layer.needRedraw()
+        layer.needRender()
     }
 }

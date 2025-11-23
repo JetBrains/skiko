@@ -42,15 +42,13 @@ internal class SoftwareRedrawer(
         super.dispose()
     }
 
-    override fun needRedraw(throttledToVsync: Boolean) {
+    override fun needRender(throttledToVsync: Boolean) {
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately(updateNeeded: Boolean) {
+    override fun renderImmediately() {
         checkDisposed()
-        if (updateNeeded) {
-            update()
-        }
+        update()
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 contextHandler.draw()

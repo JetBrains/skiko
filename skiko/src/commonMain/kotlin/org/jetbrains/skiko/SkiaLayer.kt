@@ -61,7 +61,13 @@ expect open class SkiaLayer {
      * @param throttledToVsync Whether to throttle calling [renderDelegate]'s [SkikoRenderDelegate.onRender] to at most
      * once between vsync signals (if vsync is enabled).
      */
-    fun needRedraw(throttledToVsync: Boolean = true)
+    fun needRender(throttledToVsync: Boolean = true)
+
+    @Deprecated(
+        message = "Use needRender() instead",
+        replaceWith = ReplaceWith("needRender()")
+    )
+    fun needRedraw()  // TODO: Remove this sometime after 2026-07
 
     /**
      * Drawing function.
