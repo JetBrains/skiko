@@ -272,7 +272,7 @@ fun Project.configureSignAndPublishDependencies() {
         val publishAwtRuntimeElements = "publishAwtRuntimeElementsPublicationTo"
         val signKmp = "signKotlinMultiplatformPublication"
         val signAwt = "signAwtPublication"
-        val signAwtRuntimeElements = "signAwtRuntimeElements"
+        val signAwtRuntimeElements = "signAwtRuntimeElementsPublication"
 
         when {
             name.startsWith(publishKmp) -> {
