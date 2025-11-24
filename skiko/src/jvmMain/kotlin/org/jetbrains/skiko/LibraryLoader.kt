@@ -1,15 +1,11 @@
 package org.jetbrains.skiko
 
 import java.io.File
-import java.nio.channels.FileChannel
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.StandardCopyOption
-import java.nio.file.StandardOpenOption.*
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
-import kotlin.io.path.createParentDirectories
 
 internal class LibraryLoader(
     /**
@@ -53,7 +49,7 @@ internal class LibraryLoader(
     private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
         val file = File(dest, resourceName)
         if (!file.exists()) {
-            withFileLock(dest.resolve(".lock").toPath()) {
+            withSikoDataDirectoryLock {
                 if (file.exists()) return file
                 val tempFile = File.createTempFile("skiko", "", dest)
                 if (deleteOnExit)
@@ -152,6 +148,8 @@ internal class LibraryLoader(
 
         val dataDir = File(File(SkikoProperties.dataPath), hash)
         dataDir.mkdirs()
+        dataDir.toPath().updateLastAccessTime()
+
         val library = unpackIfNeeded(dataDir, platformName, false)
         val copyDir = loadLibraryOrCopy(library)
         if (additionalFile != null) {
@@ -163,20 +161,7 @@ internal class LibraryLoader(
                 unpackIfNeeded(dataDir, additionalFile, false)
             }
         }
-    }
-}
 
-/**
- * Simple lockfile utility which ensures that the lockfile at the given [path] exists and is locked properly.
- * Note: This method cannot be re-entered recusrively
- * Note: The same process can only take a given lock once
- */
-internal inline fun <T> withFileLock(path: Path, action: () -> T): T {
-    path.createParentDirectories()
-    return FileChannel.open(path, READ, WRITE, CREATE).use { channel ->
-        val lock = channel.lock()
-        lock.use {
-            action()
-        }
+        launchSkikoDataDirCleanupIfNecessary()
     }
 }
