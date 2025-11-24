@@ -36,16 +36,12 @@ val OS.isCompatibleWithHost: Boolean
         OS.Android -> true
     }
 
-fun compilerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
+fun compilerForTarget(os: OS, arch: Arch): String =
     when (os) {
         // TODO: Use clang++ for all Linux targets
         OS.Linux -> when (arch) {
             Arch.X64 -> "g++"
-            Arch.Arm64 -> if (isJvm) {
-                "clang++"
-            } else {
-                if (hostArch == Arch.Arm64) "g++" else "aarch64-linux-gnu-g++"
-            }
+            Arch.Arm64 -> if (hostArch == Arch.Arm64) "g++" else "aarch64-linux-gnu-g++"
             Arch.Wasm -> "Unexpected combination: $os & $arch"
         }
         OS.Android -> "clang++"
@@ -54,8 +50,8 @@ fun compilerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
         OS.Wasm -> if (Os.isFamily(Os.FAMILY_WINDOWS)) "emcc.bat" else "emcc"
     }
 
-fun linkerForTarget(os: OS, arch: Arch, isJvm: Boolean = false): String =
-    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch, isJvm)
+fun linkerForTarget(os: OS, arch: Arch): String =
+    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch)
 
 val OS.dynamicLibExt: String
     get() = when (this) {
@@ -211,6 +207,8 @@ object SkikoArtifacts {
             "skiko-android-runtime-${arch.id}"
         else
             "skiko-awt-runtime-${targetId(os, arch)}"
+    fun jvmAdditionalRuntimeArtifactIdFor(name: String, os: OS, arch: Arch) =
+        "skiko-awt-runtime-$name-${os.id}-${arch.id}"
     // Using custom name like skiko-<Os>-<Arch> (with a dash)
     // does not seem possible (at least without adding a dash to a target's tasks),
     // so we're using the default naming pattern instead.

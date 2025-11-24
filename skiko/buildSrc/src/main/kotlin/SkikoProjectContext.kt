@@ -15,7 +15,8 @@ class SkikoProjectContext(
     val skiko: SkikoProperties,
     val kotlin: KotlinMultiplatformExtension,
     val windowsSdkPathProvider: () -> WindowsSdkPaths,
-    val createChecksumsTask: (OS, Arch, Provider<File>) -> TaskProvider<*>
+    val createChecksumsTask: (OS, Arch, Provider<File>) -> TaskProvider<*>,
+    val additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
 ) {
 
     val buildType = skiko.buildType

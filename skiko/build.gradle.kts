@@ -43,7 +43,8 @@ val skikoProjectContext = SkikoProjectContext(
     },
     createChecksumsTask = { targetOs: OS, targetArch: Arch, fileToChecksum: Provider<File> ->
         createChecksumsTask(targetOs, targetArch, fileToChecksum)
-    }
+    },
+    additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko)
 )
 
 allprojects {
@@ -272,6 +273,7 @@ if (supportAndroid) {
     }
 }
 
+// TODO now it can be moved, move it if you change this
 // Can't be moved to buildSrc because of Checksum dependency
 fun createChecksumsTask(
     targetOs: OS,
@@ -353,6 +355,9 @@ tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
 tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
     ?.dependsOn("publishWasmJsPublicationToMavenLocal")
 
+skikoProjectContext.additionalRuntimeLibraries.forEach {
+    it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))
+}
 
 tasks.withType<KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583

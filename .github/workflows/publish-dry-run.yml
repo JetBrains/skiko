@@ -1,0 +1,144 @@
+name: Skiko Publish Dry Run
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  Android:
+    runs-on: ubuntu-24.04
+    container:
+      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-android-amd64:ubuntu-2004
+      credentials:
+        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Publish Maven Local'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.android.enabled=true \
+            :skiko:publishToMavenLocal
+
+      - shell: bash
+        name: 'Check Android Sample'
+        working-directory: samples/SkiaAndroidSample
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            packageRelease
+
+  Web:
+    runs-on: ubuntu-24.04
+    container:
+      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-emscripten-amd64:ubuntu-2004
+      credentials:
+        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Publish Maven Local'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.wasm.enabled=true \
+            :skiko:publishToMavenLocal
+
+  Linux:
+    runs-on: ubuntu-24.04
+    container:
+      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-amd64:ubuntu-2004
+      credentials:
+        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Publish Maven Local'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            :skiko:publishToMavenLocal
+
+      - shell: bash
+        name: 'Check AWT Sample'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            :SkiaAwtSample:installDist
+
+  macOS:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Publish Maven Local'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+            :skiko:publishToMavenLocal
+
+      - shell: bash
+        name: 'Check AWT Sample'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            :SkiaAwtSample:installDist
+
+  Windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v3
+        name: 'Check out code'
+
+      - uses: microsoft/setup-msbuild@v1
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Publish Maven Local'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true \
+             :skiko:publishToMavenLocal
+
+      - shell: bash
+        name: 'Check AWT Sample'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            :SkiaAwtSample:installDist

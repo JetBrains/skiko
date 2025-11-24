@@ -38,7 +38,7 @@ fun SkikoProjectContext.declareWasmTasks() {
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
         dependsOn(skiaWasmDir)
 
-        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm, isJvm = false))
+        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -67,7 +67,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
 
-        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm, isJvm = false))
+        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
