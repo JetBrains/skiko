@@ -272,17 +272,14 @@ fun SkikoProjectContext.createLinkJvmBindings(
         OS.Linux -> {
             osFlags = arrayOf(
                 "-shared",
-                "-static-libstdc++",
+                // `libstdc++.so.6.*` binaries are forward-compatible and used from GCC 3.4 to 16+,
+                // so do not use `-static-libstdc++` to avoid issues with complex setup.
                 "-static-libgcc",
                 "-lGL",
                 "-lX11",
                 "-lfontconfig",
-                // A fix for https://github.com/JetBrains/compose-jb/issues/413.
-                // Dynamic position independent linking uses PLT thunks relying on jump targets in GOT (Global Offsets Table).
-                // GOT entries marked as (for example) R_X86_64_JUMP_SLOT in the relocation table. So, if there's code loading
-                // platform libstdc++.so, lazy resolve code will resolve GOT entries to platform libstdc++.so on first invocation,
-                // and so further execution will break, as those two libstdc++ are not compatible.
-                // To fix it we enforce resolve of all GOT entries at library load time, and make it read-only afterwards.
+                // Enforce immediate symbol resolution at library load time to prevent
+                // lazy-binding issues and make GOT read-only afterwards.
                 "-Wl,-z,relro,-z,now",
                 // Hack to fix problem with linker not always finding certain declarations.
                 "$skiaBinDir/libsksg.a",
