@@ -1,8 +1,15 @@
 package org.jetbrains.skiko
 
 import java.io.File
+import java.nio.channels.FileChannel
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import java.nio.file.StandardOpenOption.*
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
+import kotlin.io.path.createParentDirectories
 
 internal class LibraryLoader(
     /**
@@ -46,18 +53,26 @@ internal class LibraryLoader(
     private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
         val file = File(dest, resourceName)
         if (!file.exists()) {
-            val tempFile = File.createTempFile("skiko", "", dest)
-            if (deleteOnExit)
-                file.deleteOnExit()
-            Library::class.java.getResourceAsStream("/$resourceName").use { input ->
-                Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            withFileLock(dest.resolve(".lock").toPath()) {
+                if (file.exists()) return file
+                val tempFile = File.createTempFile("skiko", "", dest)
+                if (deleteOnExit)
+                    file.deleteOnExit()
+                Library::class.java.getResourceAsStream("/$resourceName").use { input ->
+                    Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                }
+                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
             }
-            Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
         }
         return file
     }
 
-    private var isLoaded = false
+    /**
+     * Holds a reference to the lock which has to be acquired when loading the native library,
+     * or to wait for the loading to finish.
+     * The reference will resolve to `null` if loading is done and callers do not need to wait anymore.
+     */
+    private val loadingLock = AtomicReference(ReentrantLock())
 
     /**
      * Load a native library finding it in multiple sources:
@@ -68,12 +83,33 @@ internal class LibraryLoader(
      * @throws LibraryLoadException if library wasn't loaded successfully.
      *         Calling this function again retries the loading.
      */
-    @Synchronized
     fun loadOnce() {
-        if (!isLoaded) {
-            findAndLoadLibrary(name, additionalFile)
-            init()
-            isLoaded = true
+        /**
+         * If there is no more loading lock available, then the loading has finished
+         * and we can just return as normal, assuming that the library was successfully loaded.
+         */
+        val lock = loadingLock.get() ?: return
+
+        /**
+         * If the lock is held by the current thread, then this indicates a recursive call to load.
+         * Methods like `_nAfterLoad()` might trigger additional Class loading, where .clinit (static init methods)
+         * trigger further calls to Library.staticLoad() -> Library.load() while holding the current lock.
+         *
+         * It is fine, in such cases, to return eagerly and assume that the Library is successfully loaded and
+         * the recursion is a result of callbacks indicating the successful load.
+         */
+        if (lock.isHeldByCurrentThread) return
+
+        lock.withLock {
+            // We entered the critical section, but another thread might have already entered and finished
+            if (loadingLock.get() !== lock) return
+
+            try {
+                findAndLoadLibrary(name, additionalFile)
+                init()
+            } finally {
+                loadingLock.compareAndSet(lock, null)
+            }
         }
     }
 
@@ -126,6 +162,21 @@ internal class LibraryLoader(
                 // Normal path where Skiko is loaded only once.
                 unpackIfNeeded(dataDir, additionalFile, false)
             }
+        }
+    }
+}
+
+/**
+ * Simple lockfile utility which ensures that the lockfile at the given [path] exists and is locked properly.
+ * Note: This method cannot be re-entered recusrively
+ * Note: The same process can only take a given lock once
+ */
+internal inline fun <T> withFileLock(path: Path, action: () -> T): T {
+    path.createParentDirectories()
+    return FileChannel.open(path, READ, WRITE, CREATE).use { channel ->
+        val lock = channel.lock()
+        lock.use {
+            action()
         }
     }
 }
