@@ -24,6 +24,7 @@ private class SkikoPublishingContext(
     val project = projectContext.project
     val kotlin = projectContext.kotlin
     val skiko = projectContext.skiko
+    val additionalRuntimeLibraries = projectContext.additionalRuntimeLibraries
 
     val pomNameForPublication: MutableMap<String, String> = HashMap()
 
@@ -42,6 +43,7 @@ fun SkikoProjectContext.declarePublications() {
     ctx.configurePublicationDefaults()
     ctx.configureAllJvmRuntimeJarPublications()
     ctx.configureAwtRuntimeJarPublication()
+    ctx.configureAdditionalRuntimeLibrariesPublication()
     ctx.configureWebPublication()
     ctx.configureAndroidPublication()
 
@@ -273,6 +275,12 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
                 }
             }
         }
+    }
+}
+
+private fun SkikoPublishingContext.configureAdditionalRuntimeLibrariesPublication() = publications {
+    additionalRuntimeLibraries.forEach {
+        it.registerMavenPublication(this, emptySourcesJar, pomNameForPublication)
     }
 }
 

@@ -9,8 +9,14 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoRenderDelegate, MouseMotionListener {
-    constructor(layer: SkiaLayer) : this({ layer.contentScale })
+open class ClocksAwt(
+    private val scaleProvider: () -> Float,
+    private val renderProvider: () -> GraphicsApi = { GraphicsApi.UNKNOWN }
+) : SkikoRenderDelegate, MouseMotionListener {
+    constructor(layer: SkiaLayer) : this(
+        { layer.contentScale },
+        { layer.renderApi }
+    )
 
     private val typeface = FontMgr.default.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 13f).apply {
@@ -88,7 +94,7 @@ open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoRenderDelega
         }
         val paragraph = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("JRE: ${System.getProperty("java.vendor")}, ${System.getProperty("java.runtime.version")} $currentSystemTheme")
+            .addText("Graphic API: ${renderProvider()}, JRE: ${System.getProperty("java.vendor")}, ${System.getProperty("java.runtime.version")} $currentSystemTheme")
             .popStyle()
             .build()
         paragraph.layout(Float.POSITIVE_INFINITY)

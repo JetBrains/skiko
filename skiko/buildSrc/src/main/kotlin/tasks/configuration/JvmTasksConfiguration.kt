@@ -1,5 +1,6 @@
 package tasks.configuration
 
+import AdditionalRuntimeLibrary
 import Arch
 import CompileSkikoCppTask
 import CompileSkikoObjCTask
@@ -465,11 +466,16 @@ fun SkikoProjectContext.skikoRuntimeDirForTestsTask(
     targetOs: OS,
     targetArch: Arch,
     skikoJvmJar: Provider<Jar>,
-    skikoJvmRuntimeJar: Provider<Jar>
+    skikoJvmRuntimeJar: Provider<Jar>,
+    additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
 ) = project.registerSkikoTask<Copy>("skikoRuntimeDirForTests", targetOs, targetArch) {
     dependsOn(skikoJvmJar, skikoJvmRuntimeJar)
     from(project.zipTree(skikoJvmJar.flatMap { it.archiveFile }))
     from(project.zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile }))
+    additionalRuntimeLibraries.forEach { lib ->
+        from(project.zipTree(lib.jarTask.flatMap { it.archiveFile }))
+    }
+    
     duplicatesStrategy = DuplicatesStrategy.WARN
     destinationDir = project.layout.buildDirectory.dir("skiko-runtime-for-tests").get().asFile
 }
@@ -482,9 +488,13 @@ fun SkikoProjectContext.skikoJarForTestsTask(
     archiveFileName.set("skiko-runtime-for-tests.jar")
 }
 
-fun SkikoProjectContext.setupJvmTestTask(skikoAwtJarForTests: TaskProvider<Jar>, targetOs: OS, targetArch: Arch) = with(project) {
+fun SkikoProjectContext.setupJvmTestTask(
+    skikoAwtJarForTests: TaskProvider<Jar>,
+    targetOs: OS,
+    targetArch: Arch
+) = with(project) {
     val skikoAwtRuntimeJarForTests = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJarForTests)
-    val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests)
+    val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests, additionalRuntimeLibraries)
     val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
     tasks.withType<Test>().configureEach {
