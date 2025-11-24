@@ -2,20 +2,21 @@ import SkikoArtifacts.jvmAdditionalRuntimeArtifactIdFor
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.provider.Provider
 import org.gradle.api.publish.PublicationContainer
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.crypto.checksum.Checksum
 import org.gradle.kotlin.dsl.register
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.jvm.tasks.Jar
 
 interface AdditionalRuntimeLibrary {
     val jarTask: TaskProvider<Jar>
 
     fun registerMavenPublication(
         container: PublicationContainer,
-        emptySourcesJar: TaskProvider<Jar>,
+        emptySourcesJar: Provider<Jar>,
         pomNameForPublication: MutableMap<String, String>
     )
 
@@ -80,7 +81,7 @@ fun Project.registerAdditionalRuntimeLibrary(
         
         override fun registerMavenPublication(
             container: PublicationContainer,
-            emptySourcesJar: TaskProvider<Jar>,
+            emptySourcesJar: Provider<Jar>,
             pomNameForPublication: MutableMap<String, String>
         ) {
             container.create("skikoJvmRuntime$taskSuffix", MavenPublication::class.java) {

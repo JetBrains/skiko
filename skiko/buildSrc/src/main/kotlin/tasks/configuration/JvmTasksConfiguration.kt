@@ -490,7 +490,6 @@ fun SkikoProjectContext.skikoJarForTestsTask(
 
 fun SkikoProjectContext.setupJvmTestTask(
     skikoAwtJarForTests: TaskProvider<Jar>,
-    additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
     targetOs: OS,
     targetArch: Arch
 ) = with(project) {
