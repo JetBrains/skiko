@@ -265,6 +265,24 @@ fun Project.configureSignAndPublishDependencies() {
         }
     }
 
+    if (supportAwt) {
+        val publishJvmRuntimeAngleX64 = "publishSkikoJvmRuntimeAngleWindowsX64PublicationToComposeRepoRepository"
+        val publishJvmRuntimeAngleArm64 = "publishSkikoJvmRuntimeAngleWindowsArm64PublicationToComposeRepoRepository"
+        val signJvmRuntimeX64 = "signSkikoJvmRuntimeWindowsX64Publication"
+        val signJvmRuntimeArm64 = "signSkikoJvmRuntimeWindowsArm64Publication"
+
+        tasks.configureEach {
+            when {
+                name.startsWith(publishJvmRuntimeAngleX64) -> {
+                    dependsOn(signJvmRuntimeX64)
+                }
+                name.startsWith(publishJvmRuntimeAngleArm64) -> {
+                    dependsOn(signJvmRuntimeArm64)
+                }
+            }
+        }
+    }
+
     // Cross-publication pairs due to shared javadoc: KotlinMultiplatform <-> AWT
     tasks.configureEach {
         val publishKmp = "publishKotlinMultiplatformPublicationTo"
