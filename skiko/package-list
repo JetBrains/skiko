@@ -2981,7 +2981,7 @@ $dokka.location:org.jetbrains.skiko/KotlinBackend/values/#/PointingToDeclaration
 $dokka.location:org.jetbrains.skiko/Library///PointingToDeclaration/skiko/org.jetbrains.skiko/-library/index.html
 $dokka.location:org.jetbrains.skiko/Library/load/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-library/load.html
 $dokka.location:org.jetbrains.skiko/LibraryLoadException///PointingToDeclaration/skiko/org.jetbrains.skiko/-library-load-exception/index.html
-$dokka.location:org.jetbrains.skiko/LibraryLoadException/LibraryLoadException/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-library-load-exception/-library-load-exception.html
+$dokka.location:org.jetbrains.skiko/LibraryLoadException/LibraryLoadException/#kotlin.String#kotlin.Throwable?/PointingToDeclaration/skiko/org.jetbrains.skiko/-library-load-exception/-library-load-exception.html
 $dokka.location:org.jetbrains.skiko/OS.Android///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-android/index.html
 $dokka.location:org.jetbrains.skiko/OS.Ios///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-ios/index.html
 $dokka.location:org.jetbrains.skiko/OS.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-j-s/index.html
