@@ -276,13 +276,16 @@ fun Project.configureSignAndPublishDependencies() {
 
         when {
             name.startsWith(publishKmp) -> {
-                if (supportAwt) dependsOn(signAwt)
+                if (supportAwt) {
+                    dependsOn(signAwt)
+                    dependsOn(signAwtRuntimeElements)
+                }
             }
             name.startsWith(publishAwt) -> {
                 dependsOn(signKmp)
             }
             name.startsWith(publishAwtRuntimeElements) -> {
-                dependsOn(signAwtRuntimeElements)
+                dependsOn(signKmp)
             }
         }
     }
