@@ -283,6 +283,7 @@ fun Project.configureSignAndPublishDependencies() {
             }
             name.startsWith(publishAwt) -> {
                 dependsOn(signKmp)
+                dependsOn(signAwtRuntimeElements)
             }
             name.startsWith(publishAwtRuntimeElements) -> {
                 dependsOn(signAwt)
