@@ -1,12 +1,14 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.Bitmap
-import java.util.concurrent.atomic.AtomicBoolean
 
 object Library {
+    internal val name: String = "skiko-$hostId"
+
     private var loader = LibraryLoader(
-        name = "skiko-$hostId",
+        name = name,
         additionalFile = if (hostOs.isWindows) "icudtl.dat" else null,
+        lockFile = LockFile.skiko,
         init = {
             Setup.init()
 

@@ -11,6 +11,8 @@ githubApi = "1.329"
 gradleDownloadTask = "5.5.0"
 cryptoChecksumPlugin = "1.4.0"
 
+kotlinxBenchmark = "0.4.14"
+
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
@@ -26,3 +28,5 @@ gradleDownloadTask-gradlePlugin = { module = "de.undercouch:gradle-download-task
 githubApi = { module = "org.kohsuke:github-api", version.ref = "githubApi" }
 buildHelpers-publishing-gradlePlugin = { module = "org.jetbrains.compose.internal.build-helpers:publishing", version.ref = "buildHelpers-publishing" }
 crypto-checksum-gradlePlugin = { module = "gradle.plugin.org.gradle.crypto:checksum", version.ref = "cryptoChecksumPlugin" }
+kotlinx-benchmark-gradlePlugin = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-plugin", version.ref = "kotlinxBenchmark" }
+kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinxBenchmark"}

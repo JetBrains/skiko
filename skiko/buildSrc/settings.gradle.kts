@@ -30,6 +30,7 @@ dependencyResolutionManagement {
             content {
                 includeGroupByRegex(".*com\\.gradle.*")
                 includeGroupByRegex(".*org\\.gradle.*")
+                includeModule("org.jetbrains.kotlinx", "kotlinx-benchmark-plugin")
             }
         }
 
