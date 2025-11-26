@@ -19,6 +19,7 @@ plugins {
     `maven-publish`
     signing
     org.gradle.crypto.checksum
+    org.jetbrains.kotlinx.benchmark
 }
 
 if (supportAndroid) {
@@ -186,6 +187,10 @@ kotlin {
         implementation(libs.jetbrainsRuntime.api)
     }
 
+    skikoProjectContext.awtTestSourceSet?.dependencies {
+        implementation(libs.kotlinx.benchmark.runtime)
+    }
+
     skikoProjectContext.androidMainSourceSet?.dependencies {
         implementation(libs.coroutines.android)
     }
@@ -215,6 +220,21 @@ kotlin {
         configureIOSTestsWithMetal(project)
     }
 }
+
+/**
+ * Setup JVM benchmarks
+ */
+if (supportAwt) {
+    benchmark {
+        targets.register("awtTest")
+    }
+
+    /* Ensure that the benchmark task has the same classpath as the regular test task */
+    tasks.withType<JavaExec>().named { it == "awtTestBenchmark" }.configureEach {
+        classpath = project.files({ tasks.withType<Test>().named("awtTest").get().classpath })
+    }
+}
+
 
 if (supportAndroid) {
     // Android configuration, when available

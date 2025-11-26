@@ -1,15 +1,11 @@
 package org.jetbrains.skiko
 
 import java.io.File
-import java.nio.channels.FileChannel
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.StandardCopyOption
-import java.nio.file.StandardOpenOption.*
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
-import kotlin.io.path.createParentDirectories
 
 internal class LibraryLoader(
     /**
@@ -23,6 +19,11 @@ internal class LibraryLoader(
      * Currently only one file is supported, but it can be extended to support multiple ones.
      */
     private val additionalFile: String? = null,
+
+    /**
+     * The lock file which shall be acquired if modifications on disk shall be synchronized across processes.
+     */
+    private val lockFile: LockFile,
 
     /**
      * Additional code that is called after successfully loading
@@ -53,7 +54,7 @@ internal class LibraryLoader(
     private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
         val file = File(dest, resourceName)
         if (!file.exists()) {
-            withFileLock(dest.resolve(".lock").toPath()) {
+            lockFile.withLock {
                 if (file.exists()) return file
                 val tempFile = File.createTempFile("skiko", "", dest)
                 if (deleteOnExit)
@@ -72,7 +73,7 @@ internal class LibraryLoader(
      * or to wait for the loading to finish.
      * The reference will resolve to `null` if loading is done and callers do not need to wait anymore.
      */
-    private val loadingLock = AtomicReference(ReentrantLock())
+    private val loadingLock: AtomicReference<ReentrantLock?> = AtomicReference(ReentrantLock())
 
     /**
      * Load a native library finding it in multiple sources:
@@ -150,33 +151,24 @@ internal class LibraryLoader(
         )
         val hash = hashResourceStream.use { it.bufferedReader().readLine() }
 
-        val dataDir = File(File(SkikoProperties.dataPath), hash)
-        dataDir.mkdirs()
-        val library = unpackIfNeeded(dataDir, platformName, false)
-        val copyDir = loadLibraryOrCopy(library)
-        if (additionalFile != null) {
-            if (copyDir != null) {
-                // We made a duplicate to resolve classloader conflicts.
-                unpackIfNeeded(copyDir, additionalFile, true)
-            } else {
-                // Normal path where Skiko is loaded only once.
-                unpackIfNeeded(dataDir, additionalFile, false)
+        lockFile.withLock {
+            val dataDir = File(File(SkikoProperties.dataPath), "$name-$hash")
+            dataDir.mkdirs()
+            dataDir.toPath().updateLastAccessTime()
+            val library = unpackIfNeeded(dataDir, platformName, false)
+
+            val copyDir = loadLibraryOrCopy(library)
+            if (additionalFile != null) {
+                if (copyDir != null) {
+                    // We made a duplicate to resolve classloader conflicts.
+                    unpackIfNeeded(copyDir, additionalFile, true)
+                } else {
+                    // Normal path where Skiko is loaded only once.
+                    unpackIfNeeded(dataDir, additionalFile, false)
+                }
             }
         }
-    }
-}
 
-/**
- * Simple lockfile utility which ensures that the lockfile at the given [path] exists and is locked properly.
- * Note: This method cannot be re-entered recusrively
- * Note: The same process can only take a given lock once
- */
-internal inline fun <T> withFileLock(path: Path, action: () -> T): T {
-    path.createParentDirectories()
-    return FileChannel.open(path, READ, WRITE, CREATE).use { channel ->
-        val lock = channel.lock()
-        lock.use {
-            action()
-        }
+        enqueueSkikoDataDirCleanupIfNecessary(lockFile, "$name-*")
     }
 }
