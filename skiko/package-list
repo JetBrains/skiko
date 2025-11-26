@@ -3090,6 +3090,7 @@ $dokka.location:org.jetbrains.skiko/SkikoLoggerInterface/trace/#kotlin.Throwable
 $dokka.location:org.jetbrains.skiko/SkikoLoggerInterface/warn/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-logger-interface/warn.html
 $dokka.location:org.jetbrains.skiko/SkikoLoggerInterface/warn/#kotlin.Throwable#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-logger-interface/warn.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/index.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/dataCleanupDays/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/data-cleanup-days.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/dataPath/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/data-path.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/fpsEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-enabled.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties/fpsLongFramesMillis/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-long-frames-millis.html
