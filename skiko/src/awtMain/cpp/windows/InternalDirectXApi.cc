@@ -198,11 +198,10 @@ extern "C"
         }
         gr_cp<IDXGIAdapter1> adapter((IDXGIAdapter1 *) adapterPtr);
 
-        D3D_FEATURE_LEVEL maxSupportedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
+        D3D_FEATURE_LEVEL maxSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
         D3D_FEATURE_LEVEL featureLevels[] = {
             D3D_FEATURE_LEVEL_12_1,
-            D3D_FEATURE_LEVEL_12_0,
-            D3D_FEATURE_LEVEL_11_1
+            D3D_FEATURE_LEVEL_12_0
         };
 
         for (int i = 0; i < _countof(featureLevels); i++) {
