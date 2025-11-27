@@ -15,7 +15,6 @@ private val notSupportedAdapters: List<NotSupportedAdapter> by lazy {
             NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("Intel(R) HD Graphics 520")),
             NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("Intel(R) HD Graphics 530")),
             NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("Intel(R) HD Graphics 4400")),
-            NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("Intel(R) HD Graphics 4600")),
 
             NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("NVIDIA GeForce GTX 750 Ti")),
             NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("NVIDIA GeForce GTX 960M")),
