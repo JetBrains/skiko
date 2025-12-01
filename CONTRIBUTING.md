@@ -39,24 +39,20 @@ which will help keep your pull request simple and easy to apply.
 Most of these rules are originated from the [How to Write a Git Commit Message](https://chris.beams.io/posts/git-commit/)
 article, and it's highly recommended to read it.
 
-### Rules on commit messages' content
+### Rules on pull requests' description
 
-1. Use the body to explain what and why vs. how
+1. Explain what and why vs. how
     * Please make an extra effort to explain why changes are needed for every non-trivial modification.
-2. Significant commits must mention relevant [YouTrack](https://youtrack.jetbrains.com/issues/SKIKO) issues in their messages
+    * Describe how you tested your changes
+    * Add Release Notes
+2. Mention relevant [YouTrack](https://youtrack.jetbrains.com/issues/SKIKO) issues in their messages
 3. Commit changes together with the corresponding tests, unless the resulting commit becomes too unwieldy to grasp
-4. Keep the subject (first line of the commit message) clean and readable. All additional information and directives for external tools
-   should be moved to the message body.
 
-### Rules on commit messages' style/formatting
+### Rules on PR messages style/formatting
 
-1. Separate subject from body with a blank line
-2. Capitalize the subject line
-3. Do not end the subject line with a period
-4. Use the imperative mood in the subject line
-5. Limit the commit messages lines to 72 characters
-    * Use “Commit Message Inspections” in IntelliJ IDE *Settings -> Version Control -> Commit*
-    * vim: ```autocmd FileType gitcommit setlocal textwidth=72```
+1. Capitalize the title
+2. Do not end the title with a period
+3. Use the imperative mood in the title
 
 ## Checklist
 
