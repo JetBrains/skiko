@@ -1127,6 +1127,7 @@ $dokka.location:org.jetbrains.skia/Canvas/clipRRect/#org.jetbrains.skia.RRect#ko
 $dokka.location:org.jetbrains.skia/Canvas/clipRRect/#org.jetbrains.skia.RRect#org.jetbrains.skia.ClipMode#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/clip-r-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/clipRRect/#org.jetbrains.skia.RRect#org.jetbrains.skia.ClipMode/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/clip-r-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/clipRRect/#org.jetbrains.skia.RRect/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/clip-r-rect.html
+$dokka.location:org.jetbrains.skia/Canvas/clipRect/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#org.jetbrains.skia.ClipMode#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/clip-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/clipRect/#org.jetbrains.skia.Rect#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/clip-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/clipRect/#org.jetbrains.skia.Rect#org.jetbrains.skia.ClipMode#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/clip-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/clipRect/#org.jetbrains.skia.Rect#org.jetbrains.skia.ClipMode/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/clip-rect.html
@@ -1144,6 +1145,7 @@ $dokka.location:org.jetbrains.skia/Canvas/drawDrawable/#org.jetbrains.skia.Drawa
 $dokka.location:org.jetbrains.skia/Canvas/drawImage/#org.jetbrains.skia.Image#kotlin.Float#kotlin.Float#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-image.html
 $dokka.location:org.jetbrains.skia/Canvas/drawImage/#org.jetbrains.skia.Image#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-image.html
 $dokka.location:org.jetbrains.skia/Canvas/drawImageNine/#org.jetbrains.skia.Image#org.jetbrains.skia.IRect#org.jetbrains.skia.Rect#org.jetbrains.skia.FilterMode#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-image-nine.html
+$dokka.location:org.jetbrains.skia/Canvas/drawImageRect/#org.jetbrains.skia.Image#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#org.jetbrains.skia.SamplingMode#org.jetbrains.skia.Paint?#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-image-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/drawImageRect/#org.jetbrains.skia.Image#org.jetbrains.skia.Rect#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-image-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/drawImageRect/#org.jetbrains.skia.Image#org.jetbrains.skia.Rect#org.jetbrains.skia.Rect#org.jetbrains.skia.Paint?#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-image-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/drawImageRect/#org.jetbrains.skia.Image#org.jetbrains.skia.Rect#org.jetbrains.skia.Rect#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-image-rect.html
@@ -1153,6 +1155,7 @@ $dokka.location:org.jetbrains.skia/Canvas/drawImageRect/#org.jetbrains.skia.Imag
 $dokka.location:org.jetbrains.skia/Canvas/drawLine/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-line.html
 $dokka.location:org.jetbrains.skia/Canvas/drawLines/#kotlin.Array[org.jetbrains.skia.Point]#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-lines.html
 $dokka.location:org.jetbrains.skia/Canvas/drawLines/#kotlin.FloatArray#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-lines.html
+$dokka.location:org.jetbrains.skia/Canvas/drawOval/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-oval.html
 $dokka.location:org.jetbrains.skia/Canvas/drawOval/#org.jetbrains.skia.Rect#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-oval.html
 $dokka.location:org.jetbrains.skia/Canvas/drawPaint/#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-paint.html
 $dokka.location:org.jetbrains.skia/Canvas/drawPatch/#kotlin.Array[org.jetbrains.skia.Point]#kotlin.IntArray#kotlin.Array[org.jetbrains.skia.Point]?#org.jetbrains.skia.BlendMode#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-patch.html
@@ -1163,7 +1166,9 @@ $dokka.location:org.jetbrains.skia/Canvas/drawPoints/#kotlin.Array[org.jetbrains
 $dokka.location:org.jetbrains.skia/Canvas/drawPoints/#kotlin.FloatArray#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-points.html
 $dokka.location:org.jetbrains.skia/Canvas/drawPolygon/#kotlin.Array[org.jetbrains.skia.Point]#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-polygon.html
 $dokka.location:org.jetbrains.skia/Canvas/drawPolygon/#kotlin.FloatArray#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-polygon.html
+$dokka.location:org.jetbrains.skia/Canvas/drawRRect/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.FloatArray#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-r-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/drawRRect/#org.jetbrains.skia.RRect#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-r-rect.html
+$dokka.location:org.jetbrains.skia/Canvas/drawRect/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/drawRect/#org.jetbrains.skia.Rect#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-rect.html
 $dokka.location:org.jetbrains.skia/Canvas/drawRectShadow/#org.jetbrains.skia.Rect#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-rect-shadow.html
 $dokka.location:org.jetbrains.skia/Canvas/drawRectShadow/#org.jetbrains.skia.Rect#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/draw-rect-shadow.html
