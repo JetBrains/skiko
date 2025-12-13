@@ -8,6 +8,8 @@ import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
@@ -146,8 +148,16 @@ kotlin {
         skikoProjectContext.configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
     }
     if (supportNativeLinux) {
-        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
-        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
+        val targetConfig = { target: KotlinNativeTarget ->
+            target.compilations["main"].cinterops {
+                val gtk by creating {
+                    definitionFile.set(project.file("src/linuxMain/cinterop/gtk.def"))
+                    packageName("org.gtk")
+                }
+            }
+        }
+        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64(), targetConfig)
+        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64(), targetConfig)
     }
     if (supportNativeIosArm64) {
         skikoProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())

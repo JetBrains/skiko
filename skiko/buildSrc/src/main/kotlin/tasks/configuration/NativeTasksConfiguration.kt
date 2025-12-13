@@ -12,11 +12,13 @@ import isCompatibleWithHost
 import joinToTitleCamelCase
 import listOfFrameworks
 import mutableListOfLinkerOptions
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByName
+import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -215,7 +217,7 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String, buildType: SkiaBu
     }
 }
 
-fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) = with(this.project) {
+fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget, targetConfiguration: Action<KotlinNativeTarget>? = null) = with(this.project) {
     if (!os.isCompatibleWithHost) return
 
     target.generateVersion(os, arch, skiko)
@@ -286,6 +288,12 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         })
     }
 
+    if(OS.Linux == os) {
+        linkerFlags.addAll(listOf(
+            "-linker-option", "--unresolved-symbols=ignore-in-object-files"
+        ))
+    }
+
     // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
     target.binaries.all {
         freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
@@ -330,6 +338,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             dependsOn(linkTask)
         }
     }
+    targetConfiguration?.invoke(target)
+    Unit
 }
 
 
