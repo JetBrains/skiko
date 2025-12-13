@@ -17,6 +17,8 @@ val SkikoProjectContext.webTestSourceSet get() = if (project.supportWeb) kotlin.
 
 val SkikoProjectContext.wasmJsTest get() = if (project.supportWeb) kotlin.sourceSets.getByName("wasmJsTest") else null
 
+val SkikoProjectContext.linuxMainSourceSet get() = if(project.supportNativeLinux) kotlin.sourceSets.getByName("linuxMain") else null
+
 val skikoSourceSetHierarchyTemplate = KotlinHierarchyTemplate {
     common {
         group("jvm") {
