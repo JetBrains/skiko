@@ -16,7 +16,7 @@ fun main() {
             "VULKAN" -> GraphicsApi.VULKAN
             "SOFTWARE", "SOFTWARE_FAST" -> GraphicsApi.SOFTWARE_FAST
             "SOFTWARE_COMPAT" -> GraphicsApi.SOFTWARE_COMPAT
-            else -> GraphicsApi.VULKAN
+            else -> GraphicsApi.OPENGL
         }
     }
     val clocks = LinuxClocks(layer)
