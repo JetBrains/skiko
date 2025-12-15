@@ -1,0 +1,4 @@
+headers = X11/Xlib.h X11/Xutil.h X11/cursorfont.h X11/keysym.h X11/extensions/Xrandr.h GL/gl.h GL/glx.h
+package = org.jetbrains.skiko.internal.x11
+compilerOpts = -I/usr/include -I/usr/include/x86_64-linux-gnu
+linkerOpts = -L/usr/lib/x86_64-linux-gnu -lX11 -lXrandr -lGL

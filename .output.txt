@@ -1,0 +1,487 @@
+### skiko/src/linuxMain/kotlin/org/jetbrains/skiko/Actuals.linux.kt
+diff --git a/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/Actuals.linux.kt b/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/Actuals.linux.kt
+index c70ee13..d84ff1e 100644
+--- a/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/Actuals.linux.kt
++++ b/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/Actuals.linux.kt
+@@ -1,14 +1,86 @@
++@file:OptIn(ExperimentalForeignApi::class)
++
+ package org.jetbrains.skiko
+
+-actual fun URIHandler_openUri(uri: String) {
+-    TODO("Implement URIHandler_openUri() on Linux")
++import kotlinx.cinterop.*
++import platform.posix.*
++
++private fun shellEscapeSingleQuotes(value: String): String = value.replace("'", "'\"'\"'")
++
++internal actual fun URIHandler_openUri(uri: String) {
++    // Keep this dependency-free and best-effort. Prefer xdg-open; fall back to gio/open.
++    val escapedUri = shellEscapeSingleQuotes(uri)
++    val candidates = listOf(
++        "xdg-open",
++        "gio open",
++        "gnome-open",
++        "kde-open",
++    )
++    for (cmd in candidates) {
++        val status = system("$cmd '$escapedUri' >/dev/null 2>&1")
++        if (status == 0) return
++    }
++}
++
++private fun pipeWrite(command: String, bytes: ByteArray): Boolean {
++    val pipe = popen(command, "w") ?: return false
++    val ok = bytes.isEmpty() || bytes.usePinned { pinned ->
++        fwrite(pinned.addressOf(0), 1.convert(), bytes.size.convert(), pipe) == bytes.size.convert<size_t>()
++    }
++    val exitCode = pclose(pipe)
++    return ok && exitCode == 0
++}
++
++private fun pipeRead(command: String): String? {
++    val pipe = popen(command, "r") ?: return null
++    val builder = ByteArrayBuilder()
++    val buffer = ByteArray(8 * 1024)
++    while (true) {
++        val read = buffer.usePinned { pinned ->
++            fread(pinned.addressOf(0), 1.convert(), buffer.size.convert(), pipe).toInt()
++        }
++        if (read <= 0) break
++        builder.append(buffer, read)
++    }
++    val exitCode = pclose(pipe)
++    if (exitCode != 0) return null
++    return builder.toByteArray().decodeToString().takeIf { it.isNotEmpty() }
++}
++
++private class ByteArrayBuilder(initialCapacity: Int = 1024) {
++    private var data = ByteArray(initialCapacity)
++    private var size = 0
++
++    fun append(source: ByteArray, count: Int) {
++        if (count <= 0) return
++        ensureCapacity(size + count)
++        source.copyInto(data, destinationOffset = size, startIndex = 0, endIndex = count)
++        size += count
++    }
++
++    fun toByteArray(): ByteArray = data.copyOf(size)
++
++    private fun ensureCapacity(required: Int) {
++        if (required <= data.size) return
++        var newSize = data.size.coerceAtLeast(1)
++        while (newSize < required) newSize *= 2
++        data = data.copyOf(newSize)
++    }
+ }
+
+ internal actual fun ClipboardManager_setText(text: String) {
+-    TODO("Implement ClipboardManager_setText() on Linux")
++    val bytes = text.encodeToByteArray()
++
++    // Wayland (wl-clipboard), then X11 (xclip/xsel). Best-effort.
++    if (pipeWrite("wl-copy", bytes)) return
++    if (pipeWrite("xclip -selection clipboard -in", bytes)) return
++    pipeWrite("xsel --clipboard --input", bytes)
+ }
+
+ internal actual fun ClipboardManager_getText(): String? {
+-    TODO("Implement ClipboardManager_getText() on Linux")
++    // Wayland (wl-clipboard), then X11 (xclip/xsel).
++    return pipeRead("wl-paste --no-newline")
++        ?: pipeRead("xclip -selection clipboard -out")
++        ?: pipeRead("xsel --clipboard --output")
+ }
+
+@@ -17,17 +89,20 @@ internal actual fun ClipboardManager_hasText(): Boolean = !ClipboardManager_getT
+ actual typealias Cursor = Any
+
++/**
++ * Optional cursor hook for native Linux hosts. If the underlying component implements this interface,
++ * [CursorManager] APIs will update/query its cursor.
++ */
++interface LinuxCursorHost {
++    var cursor: Cursor?
++}
++
+ internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {
+-    TODO("Implement CursorManager_setCursor on Linux")
++    (component as? LinuxCursorHost)?.cursor = cursor
+ }
+
+ internal actual fun CursorManager_getCursor(component: Any): Cursor? {
+-    TODO("Implement CursorManager_getCursor on Linux")
++    return (component as? LinuxCursorHost)?.cursor
+ }
+
+ internal actual fun getCursorById(id: PredefinedCursorsId): Cursor =
+-    when (id) {
+-        PredefinedCursorsId.DEFAULT -> Any()
+-        PredefinedCursorsId.CROSSHAIR -> Any()
+-        PredefinedCursorsId.HAND -> Any()
+-        PredefinedCursorsId.TEXT -> Any()
+-    }
+\ No newline at end of file
++    id
+### skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
+diff --git a/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt b/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
+index f8356b3..6ecf1d1 100644
+--- a/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
++++ b/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
+@@ -2,23 +2,38 @@ package org.jetbrains.skiko
+
+ import org.jetbrains.skia.Canvas
++import org.jetbrains.skia.PictureRecorder
+ import org.jetbrains.skia.PixelGeometry
++import org.jetbrains.skia.Rect
++import org.jetbrains.skiko.Logger
++import org.jetbrains.skiko.redrawer.Redrawer
++
++/**
++ * SkiaLayer implementation for Kotlin/Native Linux.
++ *
++ * Rendering is driven by a platform [Redrawer] (OpenGL/Vulkan/software) created in [attachTo].
++ * Content is recorded into a [org.jetbrains.skia.Picture] in [update] and then drawn by the redrawer via [draw],
++ */
++actual open class SkiaLayer {
++    internal var x11Window: X11SkikoWindow? = null
++        private set
++
++    internal var redrawer: Redrawer? = null
++        private set
++
++    actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
+
+-actual open class SkiaLayer  {
+-    actual var renderApi: GraphicsApi
+-        get() = TODO("Not yet implemented")
+-        set(value) {}
+     actual val contentScale: Float
+-        get() = TODO("Not yet implemented")
+-    actual var fullscreen: Boolean
+-        get() = TODO("Not yet implemented")
+-        set(value) {}
+-    actual var transparency: Boolean
+-        get() = TODO("Not yet implemented")
+-        set(value) {}
++        get() = x11Window?.contentScale ?: 1f
++
++    actual var fullscreen: Boolean = false
++    actual var transparency: Boolean = false
++
+     actual val component: Any?
+-        get() = TODO("Not yet implemented")
++        get() = x11Window
++
+     actual fun needRender(throttledToVsync: Boolean) {
+-        TODO("unimplemented")
++        redrawer?.needRender(throttledToVsync)
+     }
++
+     @Deprecated(
+         message = "Use needRender() instead",
+@@ -26,20 +41,80 @@ actual open class SkiaLayer  {
+     )
+     actual fun needRedraw() = needRender()
++
++    actual var renderDelegate: SkikoRenderDelegate? = null
++
++    internal var picture: PictureHolder? = null
++        private set
++    private val pictureRecorder = PictureRecorder()
++
+     actual fun attachTo(container: Any) {
+-        TODO("unimplemented")
++        check(redrawer == null) { "SkiaLayer is already attached" }
++        check(container is X11SkikoWindow) { "Linux SkiaLayer expects X11SkikoWindow, got: ${container::class}" }
++        x11Window = container
++
++        redrawer = createNativeRedrawer(this, renderApi).apply {
++            syncBounds()
++            needRender(throttledToVsync = true)
++        }
+     }
++
+     actual fun detach() {
+-        TODO("unimplemented")
++        redrawer?.dispose()
++        redrawer = null
++
++        picture?.instance?.close()
++        picture = null
++        x11Window = null
++        renderDelegate = null
++    }
++
++    internal fun tryFallbackFromRenderFailure(cause: Throwable): Boolean {
++        val currentApi = renderApi
++        val nextApi = when (currentApi) {
++            GraphicsApi.VULKAN -> GraphicsApi.OPENGL
++            GraphicsApi.OPENGL -> GraphicsApi.SOFTWARE_FAST
++            GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT -> return false
++            else -> return false
++        }
++
++        Logger.warn(cause) { "Render failed with $currentApi, falling back to $nextApi" }
++
++        val old = redrawer
++        return try {
++            renderApi = nextApi
++            val replacement = createNativeRedrawer(this, nextApi).also { it.syncBounds() }
++            old?.dispose()
++            redrawer = replacement
++            redrawer?.needRender(throttledToVsync = true)
++            true
++        } catch (fallbackError: Throwable) {
++            renderApi = currentApi
++            Logger.error(fallbackError) { "Failed to fallback from $currentApi to $nextApi" }
++            false
++        }
++    }
++
++    internal fun update(nanoTime: Long) {
++        val x11Window = x11Window ?: return
++
++        val pictureWidth = (x11Window.width * contentScale).toInt().coerceAtLeast(0)
++        val pictureHeight = (x11Window.height * contentScale).toInt().coerceAtLeast(0)
++
++        val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
++        val canvas = pictureRecorder.beginRecording(bounds)
++        renderDelegate?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
++
++        picture?.instance?.close()
++        val picture = pictureRecorder.finishRecordingAsPicture()
++        this.picture = PictureHolder(picture, pictureWidth, pictureHeight)
+     }
+
+     internal actual fun draw(canvas: Canvas) {
+-        TODO("unimplemented")
++        picture?.also {
++            canvas.drawPicture(it.instance)
++        }
+     }
+
+-    actual var renderDelegate: SkikoRenderDelegate? = null
+     actual val pixelGeometry: PixelGeometry
+-        get() = TODO("Not yet implemented")
++        get() = PixelGeometry.UNKNOWN
+ }
+-
+-actual val currentSystemTheme: SystemTheme
+-    get() = SystemTheme.UNKNOWN
+\ No newline at end of file
+### skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
+diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
+index 419e753..b465961 100644
+--- a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
++++ b/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
+@@ -224,4 +224,17 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
+     val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"
+
++    if (os == OS.Linux) {
++        target.compilations.getByName("main") {
++            cinterops.create("x11") {
++                val def = when (arch) {
++                    Arch.X64 -> "x11-linux-x64.def"
++                    Arch.Arm64 -> "x11-linux-arm64.def"
++                    else -> error("Unsupported arch for X11 cinterop: $arch")
++                }
++                defFile(project.file("src/nativeInterop/cinterop/$def"))
++            }
++        }
++    }
++
+     val unzipper = registerOrGetSkiaDirProvider(os, arch, isUikitSim)
+     val unpackedSkia = unzipper.get()
+@@ -258,4 +271,5 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
+                 "-lfontconfig",
+                 "-lGL",
++                "-ldl",
+                 // TODO: an ugly hack, Linux linker searches only unresolved symbols.
+                 "$skiaBinDir/libskottie.a",
+@@ -273,4 +287,6 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
+                 options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
+             }
++            // Export Linux linker options to consumers via an (empty) cinterop.
++            configureCinterop("skiko", os, arch, target, targetString, options)
+             mutableListOfLinkerOptions(options)
+         }
+@@ -356,3 +372,3 @@ fun KotlinMultiplatformExtension.configureIOSTestsWithMetal(project: Project) {
+         }
+     }
+-}
+\ No newline at end of file
++}
+### skiko/buildSrc/src/main/kotlin/SkikoProjectContext.kt
+diff --git a/skiko/buildSrc/src/main/kotlin/SkikoProjectContext.kt b/skiko/buildSrc/src/main/kotlin/SkikoProjectContext.kt
+index 667d680..1a0bf75 100644
+--- a/skiko/buildSrc/src/main/kotlin/SkikoProjectContext.kt
++++ b/skiko/buildSrc/src/main/kotlin/SkikoProjectContext.kt
+@@ -145,5 +145,12 @@ val Project.supportNativeMac: Boolean
+
+ val Project.supportNativeLinux: Boolean
+-    get() = supportAllNative || findProperty("skiko.native.linux.enabled") == "true" || isInIdea
++    get() {
++        val enabledProp = findProperty("skiko.native.linux.enabled")?.toString()?.lowercase()
++        return supportAllNative || isInIdea || when (enabledProp) {
++            "true" -> true
++            "false" -> false
++            else -> hostOs == OS.Linux
++        }
++    }
+
+ val Project.supportAnyNative: Boolean
+@@ -161,3 +168,3 @@ fun Project.skiaVersion(target: String): String {
+         property("dependencies.skia") as String
+     }
+-}
+\ No newline at end of file
++}
+### skiko/build.gradle.kts
+diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
+index d1e7ac0..e67fc3a 100644
+--- a/skiko/build.gradle.kts
++++ b/skiko/build.gradle.kts
+@@ -147,6 +147,9 @@ kotlin {
+     }
+     if (supportNativeLinux) {
+-        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
+-        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
++        when (targetArch) {
++            Arch.X64 -> skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
++            Arch.Arm64 -> skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
++            else -> error("Unsupported arch: $targetArch")
++        }
+     }
+     if (supportNativeIosArm64) {
+### samples/SkiaMultiplatformSample/build.gradle.kts
+diff --git a/samples/SkiaMultiplatformSample/build.gradle.kts b/samples/SkiaMultiplatformSample/build.gradle.kts
+index bd85327..40e3531 100644
+--- a/samples/SkiaMultiplatformSample/build.gradle.kts
++++ b/samples/SkiaMultiplatformSample/build.gradle.kts
+@@ -43,7 +43,7 @@ var hostArch = when (osArch) {
+ val host = "${hostOs}-${hostArch}"
+
+-val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
++val isCompositeBuild = gradle.includedBuilds.any { it.name == "skiko" }
+ if (project.hasProperty("skiko.version") && isCompositeBuild) {
+-    project.logger.warn("skiko.version property has no effect when skiko.composite.build is set")
++    project.logger.warn("skiko.version property has no effect when building against the included skiko build")
+ }
+
+@@ -101,4 +101,15 @@ kotlin {
+     }
+
++    if (hostOs == "linux") {
++        val linuxTarget = when (hostArch) {
++            "x64" -> linuxX64()
++            "arm64" -> linuxArm64()
++            else -> error("Unsupported arch: $hostArch")
++        }
++        linuxTarget.binaries.executable {
++            entryPoint = "org.jetbrains.skiko.sample.main"
++        }
++    }
++
+     jvm("awt") {
+         compilations.all {
+@@ -137,4 +148,8 @@ kotlin {
+         }
+
++        val linuxMain by creating {
++            dependsOn(nativeMain)
++        }
++
+         val awtMain by getting {
+             dependsOn(commonMain)
+@@ -158,13 +173,29 @@ kotlin {
+         }
+
+-        val darwinMain by creating {
+-            dependsOn(nativeMain)
+-        }
+-
+-        val macosMain by creating {
+-            dependsOn(darwinMain)
++        if (hostOs == "linux") {
++            when (hostArch) {
++                "x64" -> {
++                    val linuxX64Main by getting {
++                        dependsOn(linuxMain)
++                    }
++                }
++                "arm64" -> {
++                    val linuxArm64Main by getting {
++                        dependsOn(linuxMain)
++                    }
++                }
++                else -> error("Unsupported arch: $hostArch")
++            }
+         }
+
+         if (hostOs == "macos") {
++            val darwinMain by creating {
++                dependsOn(nativeMain)
++            }
++
++            val macosMain by creating {
++                dependsOn(darwinMain)
++            }
++
+             val macosX64Main by getting {
+                 dependsOn(macosMain)
+@@ -235,4 +266,23 @@ if (hostOs == "macos") {
+ }
+
++if (hostOs == "linux") {
++    project.tasks.register<Exec>("runNative") {
++        workingDir = project.buildDir
++        val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
++        dependsOn(binTask)
++        if (System.getenv("SKIKO_FPS_ENABLED") == null) {
++            environment("SKIKO_FPS_ENABLED", "true")
++        }
++        if (System.getenv("SKIKO_FPS_PERIOD_SECONDS") == null) {
++            environment("SKIKO_FPS_PERIOD_SECONDS", "2.0")
++        }
++        commandLine = listOf("bash", "-c")
++        argumentProviders.add {
++            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
++            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
++        }
++    }
++}
++
+ project.tasks.register<JavaExec>("runAwt") {
+     val kotlinTask = project.tasks.named("compileKotlinAwt")
+### samples/SkiaMultiplatformSample/settings.gradle.kts
+diff --git a/samples/SkiaMultiplatformSample/settings.gradle.kts b/samples/SkiaMultiplatformSample/settings.gradle.kts
+index 887fa06..79f26ee 100644
+--- a/samples/SkiaMultiplatformSample/settings.gradle.kts
++++ b/samples/SkiaMultiplatformSample/settings.gradle.kts
+@@ -45,5 +45,13 @@ dependencyResolutionManagement {
+ rootProject.name = "SkiaMultiplatformSample"
+
+-if (extra.properties.getOrDefault("skiko.composite.build", "") == "1") {
++val compositeBuildProp = providers.gradleProperty("skiko.composite.build").orNull
++val isLinuxHost = System.getProperty("os.name").startsWith("Linux")
++val useCompositeBuild = when (compositeBuildProp) {
++    "1" -> true
++    "0" -> false
++    else -> isLinuxHost && file("../../skiko").exists()
++}
++
++if (useCompositeBuild) {
+     includeBuild("../../skiko") {
+         dependencySubstitution {
+### samples/SkiaMultiplatformSample/gradle.properties
+diff --git a/samples/SkiaMultiplatformSample/gradle.properties b/samples/SkiaMultiplatformSample/gradle.properties
+index 610c951..96e1f5e 100644
+--- a/samples/SkiaMultiplatformSample/gradle.properties
++++ b/samples/SkiaMultiplatformSample/gradle.properties
+@@ -1,3 +1,4 @@
+ kotlin.code.style=official
++kotlin.mpp.applyDefaultHierarchyTemplate=false
+ org.gradle.jvmargs=-Xmx3G -XX:MaxMetaspaceSize=512m
+ kotlin.version=2.0.10

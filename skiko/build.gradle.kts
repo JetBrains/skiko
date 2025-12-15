@@ -146,8 +146,11 @@ kotlin {
         skikoProjectContext.configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
     }
     if (supportNativeLinux) {
-        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
-        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
+        when (targetArch) {
+            Arch.X64 -> skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
+            Arch.Arm64 -> skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
+            else -> error("Unsupported arch: $targetArch")
+        }
     }
     if (supportNativeIosArm64) {
         skikoProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())

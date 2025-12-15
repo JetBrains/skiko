@@ -44,7 +44,15 @@ dependencyResolutionManagement {
 
 rootProject.name = "SkiaMultiplatformSample"
 
-if (extra.properties.getOrDefault("skiko.composite.build", "") == "1") {
+val compositeBuildProp = providers.gradleProperty("skiko.composite.build").orNull
+val isLinuxHost = System.getProperty("os.name").startsWith("Linux")
+val useCompositeBuild = when (compositeBuildProp) {
+    "1" -> true
+    "0" -> false
+    else -> isLinuxHost && file("../../skiko").exists()
+}
+
+if (useCompositeBuild) {
     includeBuild("../../skiko") {
         dependencySubstitution {
             substitute(module("org.jetbrains.skiko:skiko")).using(project(":"))
