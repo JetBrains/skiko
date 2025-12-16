@@ -270,7 +270,6 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
                 "-lfontconfig",
                 "-lGL",
-                "-ldl",
                 // TODO: an ugly hack, Linux linker searches only unresolved symbols.
                 "$skiaBinDir/libskottie.a",
                 "$skiaBinDir/libjsonreader.a",

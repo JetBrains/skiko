@@ -25,6 +25,5 @@ Choose "Open as Project".
  - `./gradlew runNative`
 
 ## run desktop on native Linux (X11)
- - Build deps (e.g. Debian/Ubuntu): `sudo apt-get install libx11-dev libxrandr-dev libgl1-mesa-dev libvulkan-dev`.
- - Run (default: OpenGL): `./gradlew runNative`
- - Run with Vulkan (falls back if unavailable): `SKIKO_RENDER_API=VULKAN ./gradlew runNative`
+ - Build deps (e.g. Debian/Ubuntu): `sudo apt-get install libx11-dev libxrandr-dev libgl1-mesa-dev`.
+ - Run: `./gradlew runNative`

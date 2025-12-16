@@ -69,7 +69,7 @@ class X11SkikoWindow(
 
     init {
         val (createdWindow, fbConfig, createdColormap) = try {
-            // Create a GLX-capable window when possible, so we can fall back to OpenGL if Vulkan isn't available.
+            // Create a GLX-capable window when possible to support OpenGL rendering.
             createGlxWindow(display, screen, rootWindow, width, height)
         } catch (_: Throwable) {
             Triple(

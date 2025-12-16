@@ -10,7 +10,7 @@ import org.jetbrains.skiko.redrawer.Redrawer
 /**
  * SkiaLayer implementation for Kotlin/Native Linux.
  *
- * Rendering is driven by a platform [Redrawer] (OpenGL/Vulkan/software) created in [attachTo].
+ * Rendering is driven by a platform [Redrawer] (OpenGL/software) created in [attachTo].
  * Content is recorded into a [org.jetbrains.skia.Picture] in [update] and then drawn by the redrawer via [draw],
  */
 actual open class SkiaLayer {
@@ -71,10 +71,9 @@ actual open class SkiaLayer {
     internal fun tryFallbackFromRenderFailure(cause: Throwable): Boolean {
         val currentApi = renderApi
         val nextApi = when (currentApi) {
-            GraphicsApi.VULKAN -> GraphicsApi.OPENGL
             GraphicsApi.OPENGL -> GraphicsApi.SOFTWARE_FAST
             GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT -> return false
-            else -> return false
+            else -> GraphicsApi.OPENGL
         }
 
         Logger.warn(cause) { "Render failed with $currentApi, falling back to $nextApi" }

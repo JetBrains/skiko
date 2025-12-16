@@ -13,7 +13,6 @@ fun main() {
     val renderApiEnv = getenv("SKIKO_RENDER_API")?.toKString()?.uppercase()
     val layer = SkiaLayer().apply {
         renderApi = when (renderApiEnv) {
-            "VULKAN" -> GraphicsApi.VULKAN
             "SOFTWARE", "SOFTWARE_FAST" -> GraphicsApi.SOFTWARE_FAST
             "SOFTWARE_COMPAT" -> GraphicsApi.SOFTWARE_COMPAT
             else -> GraphicsApi.OPENGL
