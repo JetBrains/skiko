@@ -195,24 +195,17 @@ actual open class SkiaLayer internal constructor(
 
     actual var transparency: Boolean = false
 
-    /**
-     * The background color of the layer when transparent background is not supported.
-     */
-    private var _opaqueBackground: Int? = null
-    actual var opaqueBackground: Int
-        get() = _opaqueBackground ?: background.rgb
+    actual var backgroundColor: Int
+        get() = background.rgb
         set(value) {
-            _opaqueBackground = value
-            needRender()
+            background = Color(value, true)
         }
 
     override fun setBackground(bg: Color?) {
         // Note that SkiaLayer itself doesn't draw its background; only backedLayer does, as it's heavyweight
         super.setBackground(bg)
         backedLayer.background = bg
-        if (_opaqueBackground == null) {
-            needRender()
-        }
+        needRender()
     }
 
     // Override to make final, because it's called it in the init block

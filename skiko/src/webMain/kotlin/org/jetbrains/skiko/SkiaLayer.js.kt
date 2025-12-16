@@ -49,7 +49,7 @@ actual open class SkiaLayer {
     /**
      * The background color of the layer, as transparency is not supported.
      */
-    actual var opaqueBackground: Int = Color.WHITE
+    actual var backgroundColor: Int = Color.WHITE
         set(value) {
             field = value
             needRender()

@@ -41,11 +41,12 @@ internal abstract class ContextHandler(
         }
         initCanvas()
         canvas?.apply {
+            val layerBg = layer.backgroundColor
             clear(
-                if (layer.transparency && isTransparentBackgroundSupported()) {
-                    Color.TRANSPARENT
+                if (isTransparentBackgroundSupported()) {
+                    layerBg
                 } else {
-                    layer.opaqueBackground
+                    layerBg or 0xFF000000.toInt()
                 }
             )
             drawContent()
