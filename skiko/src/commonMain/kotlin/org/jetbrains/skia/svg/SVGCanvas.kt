@@ -22,7 +22,41 @@ object SVGCanvas {
      * @return                    new Canvas
      */
     fun make(bounds: Rect, out: WStream): Canvas {
-        return make(bounds, out, false, true)
+        return make(bounds, out, convertTextToPaths = false, prettyXML = true)
+    }
+
+    /**
+     * Returns a new canvas that will generate SVG commands from its draw calls, and send
+     * them to the provided stream. Ownership of the stream is not transfered, and it must
+     * remain valid for the lifetime of the returned canvas.
+     *
+     * The canvas may buffer some drawing calls, so the output is not guaranteed to be valid
+     * or complete until the canvas instance is deleted.
+     *
+     * @param left                left coordinate of an initial SVG viewport (viewBox attribute on the root SVG element).
+     * @param top                 top coordinate of an initial SVG viewport (viewBox attribute on the root SVG element).
+     * @param right               right coordinate of an initial SVG viewport (viewBox attribute on the root SVG element).
+     * @param bottom              bottom coordinate of an initial SVG viewport (viewBox attribute on the root SVG element).
+     * @param out                 stream SVG commands will be written to
+     * @param convertTextToPaths  emit text as &lt;path&gt;s
+     * @param prettyXML           add newlines and tabs in output
+     * @return                    new Canvas
+     */
+    fun make(left: Float, top: Float, right: Float, bottom: Float, out: WStream, convertTextToPaths: Boolean, prettyXML: Boolean): Canvas {
+        Stats.onNativeCall()
+        val ptr = try {
+            _nMake(
+                left,
+                top,
+                right,
+                bottom,
+                getPtr(out),
+                0 or (if (convertTextToPaths) 1 else 0) or if (prettyXML) 0 else 2
+            )
+        } finally {
+            reachabilityBarrier(out)
+        }
+        return Canvas(ptr, true, out)
     }
 
     /**

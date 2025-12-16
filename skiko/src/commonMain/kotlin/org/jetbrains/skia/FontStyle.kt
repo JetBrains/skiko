@@ -26,7 +26,7 @@ class FontStyle {
     }
 
     val slant: FontSlant
-        get() = FontSlant.values()[_value shr 24 and 255]
+        get() = FontSlant.entries[_value shr 24 and 255]
 
     fun withSlant(slant: FontSlant): FontStyle {
         return FontStyle(weight, width, slant)

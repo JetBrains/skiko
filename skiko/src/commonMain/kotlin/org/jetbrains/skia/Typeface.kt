@@ -133,6 +133,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun makeClone(variation: FontVariation): Typeface {
         return makeClone(arrayOf(variation), 0)
     }
+
     /**
      * Return a new typeface based on this typeface but parameterized as specified in the
      * variations. If the variations does not supply an argument for a parameter

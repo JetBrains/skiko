@@ -11,7 +11,7 @@ class TextBox(val rect: Rect, direction: Direction) {
 
     constructor(l: Float, t: Float, r: Float, b: Float, direction: Int) : this(
         Rect.makeLTRB(l, t, r, b),
-        Direction.values().get(direction)
+        Direction.entries[direction]
     )
 
     val direction: Direction

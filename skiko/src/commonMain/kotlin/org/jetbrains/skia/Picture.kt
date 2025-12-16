@@ -40,6 +40,29 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
             return Picture(_nMakePlaceholder(cull.left, cull.top, cull.right, cull.bottom))
         }
 
+        /**
+         *
+         * Returns a placeholder Picture. Result does not draw, and contains only
+         * cull Rect, a hint of its bounds. Result is immutable; it cannot be changed
+         * later. Result identifier is unique.
+         *
+         *
+         * Returned placeholder can be intercepted during playback to insert other
+         * commands into Canvas draw stream.
+         *
+         * @param left    placeholder left coordinate
+         * @param top     placeholder top coordinate
+         * @param right   placeholder right coordinate
+         * @param bottom  placeholder bottom coordinate
+         * @return      placeholder with unique identifier
+         *
+         * @see [https://fiddle.skia.org/c/@Picture_MakePlaceholder](https://fiddle.skia.org/c/@Picture_MakePlaceholder)
+         */
+        fun makePlaceholder(left: Float, top: Float, right: Float, bottom: Float): Picture {
+            Stats.onNativeCall()
+            return Picture(_nMakePlaceholder(left, top, right, bottom))
+        }
+
         init {
             staticLoad()
         }

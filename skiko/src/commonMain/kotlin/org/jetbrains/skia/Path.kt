@@ -320,7 +320,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     var fillMode: PathFillMode
         get() = try {
             Stats.onNativeCall()
-            PathFillMode.values().get(_nGetFillMode(_ptr))
+            PathFillMode.entries[_nGetFillMode(_ptr)]
         } finally {
             reachabilityBarrier(this)
         }
@@ -685,9 +685,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
                     out?.let { ptr.fromInterop(it) }
                 }
             }
-            if (verbs != null) for (i in 0 until minOf(count, max)) verbs[i] = PathVerb.values().get(
-                out!![i].toInt()
-            )
+            if (verbs != null) for (i in 0 until minOf(count, max)) verbs[i] = PathVerb.entries[out!![i].toInt()]
             count
         } finally {
             reachabilityBarrier(this)
@@ -1259,6 +1257,35 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
 
     /**
      *
+     * Appends arc to Path. Arc added is part of ellipse
+     * bounded by oval, from startAngle through sweepAngle. Both startAngle and
+     * sweepAngle are measured in degrees, where zero degrees is aligned with the
+     * positive x-axis, and positive sweeps extends arc clockwise.
+     *
+     *
+     * arcTo() adds line connecting Path last Point to initial arc Point if forceMoveTo
+     * is false and Path is not empty. Otherwise, added contour begins with first point
+     * of arc. Angles greater than -360 and less than 360 are treated modulo 360.
+     *
+     * @param left         left edge of oval bounding ellipse
+     * @param top          top edge of oval bounding ellipse
+     * @param right        right edge of oval bounding ellipse
+     * @param bottom       bottom edge of oval bounding ellipse
+     * @param startAngle   starting angle of arc in degrees
+     * @param sweepAngle   sweep, in degrees. Positive is clockwise; treated modulo 360
+     * @param forceMoveTo  true to start a new contour with arc
+     * @return             reference to Path
+     *
+     * @see [https://fiddle.skia.org/c/@Path_arcTo](https://fiddle.skia.org/c/@Path_arcTo)
+     */
+    fun arcTo(left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float, forceMoveTo: Boolean): Path {
+        Stats.onNativeCall()
+        _nArcTo(_ptr, left, top, right, bottom, startAngle, sweepAngle, forceMoveTo)
+        return this
+    }
+
+    /**
+     *
      * Appends arc to Path, after appending line if needed. Arc is implemented by conic
      * weighted to describe part of circle. Arc is contained by tangent from
      * last Path point to (x1, y1), and tangent from (x1, y1) to (x2, y2). Arc
@@ -1504,16 +1531,6 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     /**
      * Adds Rect to Path, appending [PathVerb.MOVE], three [PathVerb.LINE], and [PathVerb.CLOSE],
      * starting with top-left corner of Rect; followed by top-right, bottom-right,
-     * and bottom-left.
-     *
-     * @param rect  Rect to add as a closed contour
-     * @return      reference to Path
-     *
-     * @see [https://fiddle.skia.org/c/@Path_addRect](https://fiddle.skia.org/c/@Path_addRect)
-     */
-    /**
-     * Adds Rect to Path, appending [PathVerb.MOVE], three [PathVerb.LINE], and [PathVerb.CLOSE],
-     * starting with top-left corner of Rect; followed by top-right, bottom-right,
      * and bottom-left if dir is [PathDirection.CLOCKWISE]; or followed by bottom-left,
      * bottom-right, and top-right if dir is [PathDirection.COUNTER_CLOCKWISE].
      *
@@ -1526,6 +1543,27 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun addRect(rect: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 0): Path {
         Stats.onNativeCall()
         _nAddRect(_ptr, rect.left, rect.top, rect.right, rect.bottom, dir.ordinal, start)
+        return this
+    }
+
+    /**
+     * Adds Rect to Path, appending [PathVerb.MOVE], three [PathVerb.LINE], and [PathVerb.CLOSE],
+     * starting with top-left corner of Rect; followed by top-right, bottom-right,
+     * and bottom-left if dir is [PathDirection.CLOCKWISE]; or followed by bottom-left,
+     * bottom-right, and top-right if dir is [PathDirection.COUNTER_CLOCKWISE].
+     *
+     * @param left    left edge of Rect to add as a closed contour
+     * @param top     top edge of Rect to add as a closed contour
+     * @param right   right edge of Rect to add as a closed contour
+     * @param bottom  bottom edge of Rect to add as a closed contour
+     * @param dir   Direction to wind added contour
+     * @return      reference to Path
+     *
+     * @see [https://fiddle.skia.org/c/@Path_addRect](https://fiddle.skia.org/c/@Path_addRect)
+     */
+    fun addRect(left: Float, top: Float, right: Float, bottom: Float, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 0): Path {
+        Stats.onNativeCall()
+        _nAddRect(_ptr, left, top, right, bottom, dir.ordinal, start)
         return this
     }
     /**
@@ -1548,20 +1586,6 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * Oval is upright ellipse bounded by Rect oval with radii equal to half oval width
      * and half oval height. Oval begins at (oval.fRight, oval.centerY()) and continues
-     * clockwise.
-     *
-     * @param oval  bounds of ellipse added
-     * @return      reference to Path
-     *
-     * @see [https://fiddle.skia.org/c/@Path_addOval](https://fiddle.skia.org/c/@Path_addOval)
-     */
-    /**
-     *
-     * Adds oval to path, appending [PathVerb.MOVE], four [PathVerb.CONIC], and [PathVerb.CLOSE].
-     *
-     *
-     * Oval is upright ellipse bounded by Rect oval with radii equal to half oval width
-     * and half oval height. Oval begins at (oval.fRight, oval.centerY()) and continues
      * clockwise if dir is [PathDirection.CLOCKWISE], counterclockwise if dir is [PathDirection.COUNTER_CLOCKWISE].
      *
      * @param oval  bounds of ellipse added
@@ -1573,6 +1597,30 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun addOval(oval: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 1): Path {
         Stats.onNativeCall()
         _nAddOval(_ptr, oval.left, oval.top, oval.right, oval.bottom, dir.ordinal, start)
+        return this
+    }
+
+    /**
+     *
+     * Adds oval to path, appending [PathVerb.MOVE], four [PathVerb.CONIC], and [PathVerb.CLOSE].
+     *
+     *
+     * Oval is upright ellipse bounded by Rect oval with radii equal to half oval width
+     * and half oval height. Oval begins at (oval.fRight, oval.centerY()) and continues
+     * clockwise if dir is [PathDirection.CLOCKWISE], counterclockwise if dir is [PathDirection.COUNTER_CLOCKWISE].
+     *
+     * @param left    left edge of oval bounding ellipse
+     * @param top     top edge of oval bounding ellipse
+     * @param right   right edge of oval bounding ellipse
+     * @param bottom  bottom edge of oval bounding ellipse
+     * @param dir   Direction to wind ellipse
+     * @return      reference to Path
+     *
+     * @see [https://fiddle.skia.org/c/@Path_addOval](https://fiddle.skia.org/c/@Path_addOval)
+     */
+    fun addOval(left: Float, top: Float, right: Float, bottom: Float, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 1): Path {
+        Stats.onNativeCall()
+        _nAddOval(_ptr, left, top, right, bottom, dir.ordinal, start)
         return this
     }
     /**
@@ -1640,7 +1688,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * winds clockwise; if dir is [PathDirection.COUNTER_CLOCKWISE], rrect winds counterclockwise.
      * start determines the first point of rrect to add.
      *
-     * @param rrect  bounds and radii of rounded rectangle
+     * @param left        left edge of rounded rectangle
+     * @param top         top edge of rounded rectangle
+     * @param right       right edge of rounded rectangle
+     * @param bottom      bottom edge of rounded rectangle
      * @param dir    Direction to wind RRect
      * @param start  index of initial point of RRect. 0 for top-right end of the arc at top left,
      * 1 for top-left end of the arc at top right, 2 for bottom-right end of top right arc, etc.
@@ -1648,6 +1699,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_addRRect_2](https://fiddle.skia.org/c/@Path_addRRect_2)
      */
+    fun addArc(left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float): Path {
+        Stats.onNativeCall()
+        _nAddArc(_ptr, left, top, right, bottom, startAngle, sweepAngle)
+        return this
+    }
+
     /**
      *
      * Adds rrect to Path, creating a new closed contour. RRect starts at top-left of the lower-left corner and
@@ -1665,6 +1722,32 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         Stats.onNativeCall()
         interopScope {
             _nAddRRect(_ptr, rrect.left, rrect.top, rrect.right, rrect.bottom, toInterop(rrect.radii), rrect.radii.size, dir.ordinal, start)
+        }
+        return this
+    }
+
+    /**
+     *
+     * Adds rrect to Path, creating a new closed contour. RRect starts at top-left of the lower-left corner and
+     * winds clockwise.
+     *
+     *
+     * After appending, Path may be empty, or may contain: Rect, Oval, or RRect.
+     *
+     * @param left    left edge of rounded rectangle
+     * @param top     top edge of rounded rectangle
+     * @param right   right edge of rounded rectangle
+     * @param bottom  bottom edge of rounded rectangle
+     * @param radii   array of 8 radius values, 2 for each corner
+     * @param dir     Direction to wind rounded rectangle
+     * @return       reference to Path
+     *
+     * @see [https://fiddle.skia.org/c/@Path_addRRect](https://fiddle.skia.org/c/@Path_addRRect)
+     */
+    fun addRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 6): Path {
+        Stats.onNativeCall()
+        interopScope {
+            _nAddRRect(_ptr, left, top, right, bottom, toInterop(radii), radii.size, dir.ordinal, start)
         }
         return this
     }

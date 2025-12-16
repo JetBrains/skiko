@@ -37,6 +37,38 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        fun makeArithmetic(
+            k1: Float,
+            k2: Float,
+            k3: Float,
+            k4: Float,
+            enforcePMColor: Boolean,
+            bg: ImageFilter?,
+            fg: ImageFilter?,
+            crop: IntArray?
+        ): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                interopScope {
+                    ImageFilter(
+                        _nMakeArithmetic(
+                            k1,
+                            k2,
+                            k3,
+                            k4,
+                            enforcePMColor,
+                            getPtr(bg),
+                            getPtr(fg),
+                            toInterop(crop)
+                        )
+                    )
+                }
+            } finally {
+                reachabilityBarrier(bg)
+                reachabilityBarrier(fg)
+            }
+        }
+
         fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -47,6 +79,25 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                             getPtr(bg),
                             getPtr(fg),
                             toInterop(crop?.serializeToIntArray())
+                        )
+                    )
+                }
+            } finally {
+                reachabilityBarrier(bg)
+                reachabilityBarrier(fg)
+            }
+        }
+
+        fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IntArray?): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                interopScope {
+                    ImageFilter(
+                        _nMakeBlend(
+                            blendMode.ordinal,
+                            getPtr(bg),
+                            getPtr(fg),
+                            toInterop(crop)
                         )
                     )
                 }
@@ -81,6 +132,31 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        fun makeBlur(
+            sigmaX: Float,
+            sigmaY: Float,
+            mode: FilterTileMode,
+            input: ImageFilter? = null,
+            crop: IntArray? = null
+        ): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                interopScope {
+                    ImageFilter(
+                        _nMakeBlur(
+                            sigmaX,
+                            sigmaY,
+                            mode.ordinal,
+                            getPtr(input),
+                            toInterop(crop)
+                        )
+                    )
+                }
+            } finally {
+                reachabilityBarrier(input)
+            }
+        }
+
         fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -89,6 +165,23 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                         _nMakeColorFilter(
                             getPtr(f), getPtr(input),
                             toInterop(crop?.serializeToIntArray())
+                        )
+                    )
+                }
+            } finally {
+                reachabilityBarrier(f)
+                reachabilityBarrier(input)
+            }
+        }
+
+        fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IntArray?): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                interopScope {
+                    ImageFilter(
+                        _nMakeColorFilter(
+                            getPtr(f), getPtr(input),
+                            toInterop(crop)
                         )
                     )
                 }
@@ -131,6 +224,34 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                             getPtr(displacement),
                             getPtr(color),
                             toInterop(crop?.serializeToIntArray())
+                        )
+                    )
+                }
+            } finally {
+                reachabilityBarrier(displacement)
+                reachabilityBarrier(color)
+            }
+        }
+
+        fun makeDisplacementMap(
+            x: ColorChannel,
+            y: ColorChannel,
+            scale: Float,
+            displacement: ImageFilter?,
+            color: ImageFilter?,
+            crop: IntArray?
+        ): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                interopScope {
+                    ImageFilter(
+                        _nMakeDisplacementMap(
+                            x.ordinal,
+                            y.ordinal,
+                            scale,
+                            getPtr(displacement),
+                            getPtr(color),
+                            toInterop(crop)
                         )
                     )
                 }
@@ -199,8 +320,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         fun makeImage(image: Image): ImageFilter {
-            val r: Rect = Rect.makeWH(image.width.toFloat(), image.height.toFloat())
-            return makeImage(image, r, r, SamplingMode.DEFAULT)
+            return makeImage(
+                image,
+                0f,
+                0f,
+                image.width.toFloat(),
+                image.height.toFloat(),
+                0f,
+                0f,
+                image.width.toFloat(),
+                image.height.toFloat(),
+                SamplingMode.DEFAULT
+            )
         }
 
         fun makeImage(image: Image?, src: Rect, dst: Rect, mode: SamplingMode): ImageFilter {
@@ -217,6 +348,40 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                         dst.top,
                         dst.right,
                         dst.bottom,
+                        mode._packedInt1(),
+                        mode._packedInt2()
+                    )
+                )
+            } finally {
+                reachabilityBarrier(image)
+            }
+        }
+
+        fun makeImage(
+            image: Image?,
+            srcLeft: Float,
+            srcTop: Float,
+            srcRight: Float,
+            srcBottom: Float,
+            dstLeft: Float,
+            dstTop: Float,
+            dstRight: Float,
+            dstBottom: Float,
+            mode: SamplingMode
+        ): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                ImageFilter(
+                    _nMakeImage(
+                        getPtr(image),
+                        srcLeft,
+                        srcTop,
+                        srcRight,
+                        srcBottom,
+                        dstLeft,
+                        dstTop,
+                        dstRight,
+                        dstBottom,
                         mode._packedInt1(),
                         mode._packedInt2()
                     )
@@ -412,6 +577,37 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                         dst.top,
                         dst.right,
                         dst.bottom,
+                        getPtr(input)
+                    )
+                )
+            } finally {
+                reachabilityBarrier(input)
+            }
+        }
+
+        fun makeTile(
+            srcLeft: Float,
+            srcTop: Float,
+            srcRight: Float,
+            srcBottom: Float,
+            dstLeft: Float,
+            dstTop: Float,
+            dstRight: Float,
+            dstBottom: Float,
+            input: ImageFilter?
+        ): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                ImageFilter(
+                    _nMakeTile(
+                        srcLeft,
+                        srcTop,
+                        srcRight,
+                        srcBottom,
+                        dstLeft,
+                        dstTop,
+                        dstRight,
+                        dstBottom,
                         getPtr(input)
                     )
                 )

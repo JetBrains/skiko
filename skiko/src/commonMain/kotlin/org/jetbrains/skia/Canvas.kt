@@ -124,7 +124,13 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+                _nDrawPoints(
+                    _ptr,
+                    0 /* SkCanvas::PointMode::kPoints_PointMode */,
+                    coords.size,
+                    toInterop(coords),
+                    getPtr(paint)
+                )
             }
         } finally {
             reachabilityBarrier(paint)
@@ -187,7 +193,13 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, coords.size, toInterop(coords),getPtr(paint))
+                _nDrawPoints(
+                    _ptr,
+                    1 /* SkCanvas::PointMode::kLines_PointMode */,
+                    coords.size,
+                    toInterop(coords),
+                    getPtr(paint)
+                )
             }
         } finally {
             reachabilityBarrier(paint)
@@ -248,7 +260,13 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+                _nDrawPoints(
+                    _ptr,
+                    2 /* SkCanvas::PointMode::kPolygon_PointMode */,
+                    coords.size,
+                    toInterop(coords),
+                    getPtr(paint)
+                )
             }
         } finally {
             reachabilityBarrier(this)
@@ -1090,7 +1108,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return this
     }
 
-    fun clipRect(left : Float, top : Float, right: Float, bottom : Float, mode: ClipMode, antiAlias: Boolean): Canvas {
+    fun clipRect(left: Float, top: Float, right: Float, bottom: Float, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
         _nClipRect(_ptr, left, top, right, bottom, mode.ordinal, antiAlias)
         return this
@@ -1104,6 +1122,10 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return clipRect(r, ClipMode.INTERSECT, antiAlias)
     }
 
+    fun clipRect(left: Float, top: Float, right: Float, bottom: Float, antiAlias: Boolean): Canvas {
+        return clipRect(left, top, right, bottom, ClipMode.INTERSECT, antiAlias)
+    }
+
     fun clipRect(r: Rect): Canvas {
         return clipRect(r, ClipMode.INTERSECT, false)
     }
@@ -1111,7 +1133,33 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun clipRRect(r: RRect, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
         interopScope {
-            _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, mode.ordinal, antiAlias)
+            _nClipRRect(
+                _ptr,
+                r.left,
+                r.top,
+                r.right,
+                r.bottom,
+                toInterop(r.radii),
+                r.radii.size,
+                mode.ordinal,
+                antiAlias
+            )
+        }
+        return this
+    }
+
+    fun clipRRect(
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float,
+        radii: FloatArray,
+        mode: ClipMode,
+        antiAlias: Boolean
+    ): Canvas {
+        Stats.onNativeCall()
+        interopScope {
+            _nClipRRect(_ptr, left, top, right, bottom, toInterop(radii), radii.size, mode.ordinal, antiAlias)
         }
         return this
     }
@@ -1120,12 +1168,20 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return clipRRect(r, mode, false)
     }
 
+    fun clipRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, mode: ClipMode): Canvas {
+        return clipRRect(left, top, right, bottom, radii, mode, false)
+    }
+
     fun clipRRect(r: RRect, antiAlias: Boolean): Canvas {
         return clipRRect(r, ClipMode.INTERSECT, antiAlias)
     }
 
-    fun clipRRect(r: RRect): Canvas {
-        return clipRRect(r, ClipMode.INTERSECT, false)
+    fun clipRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, antiAlias: Boolean): Canvas {
+        return clipRRect(left, top, right, bottom, radii, ClipMode.INTERSECT, antiAlias)
+    }
+
+    fun clipRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray): Canvas {
+        return clipRRect(left, top, right, bottom, radii, ClipMode.INTERSECT, false)
     }
 
     fun clipPath(p: Path, mode: ClipMode, antiAlias: Boolean): Canvas {

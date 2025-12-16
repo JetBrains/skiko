@@ -12,7 +12,7 @@ class SVGLength(val value: Float, val unit: SVGLengthUnit) {
             }
     }
 
-    internal constructor(value: Float, unit: Int) : this(value, SVGLengthUnit.values()[unit])
+    internal constructor(value: Float, unit: Int) : this(value, SVGLengthUnit.entries[unit])
 
     constructor(value: Float) : this(value, SVGLengthUnit.NUMBER) {}
 

@@ -775,6 +775,40 @@ class Surface : RefCnt {
 
     /**
      *
+     * Like the no-parameter version, this returns an image of the current surface contents.
+     *
+     *
+     * This variant takes a rectangle specifying the subset of the surface that is of interest.
+     * These bounds will be sanitized before being used.
+     *
+     *
+     *  * If bounds extends beyond the surface, it will be trimmed to just the intersection of it and the surface.
+     *  * If bounds does not intersect the surface, then this returns null.
+     *  * If bounds == the surface, then this is the same as calling the no-parameter variant.
+     *
+     *
+     * @return Image initialized with Surface contents or null
+     * @see [https://fiddle.skia.org/c/@Surface_makeImageSnapshot_2](https://fiddle.skia.org/c/@Surface_makeImageSnapshot_2)
+     */
+    fun makeImageSnapshot(left: Int, top: Int, right: Int, bottom: Int): Image? {
+        return try {
+            Stats.onNativeCall()
+            Image(
+                _nMakeImageSnapshotR(
+                    _ptr,
+                    left,
+                    top,
+                    right,
+                    bottom
+                )
+            )
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
+    /**
+     *
      * Draws Surface contents to canvas, with its top-left corner at (x, y).
      *
      *

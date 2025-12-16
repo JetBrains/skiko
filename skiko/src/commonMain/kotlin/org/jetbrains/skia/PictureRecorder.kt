@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
@@ -58,6 +59,38 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                     bounds.top,
                     bounds.right,
                     bounds.bottom,
+                    getPtr(bbh)
+                ), false, this
+            )
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
+    /**
+     * Returns the canvas that records the drawing commands.
+     *
+     * @param left   the left side of the cull rect used when recording this picture. Any drawing
+     *               that falls outside of this rect is undefined and may be drawn, or it may not.
+     * @param top    the top side of the cull rect used when recording this picture. Any drawing
+     *               that falls outside of this rect is undefined and may be drawn, or it may not.
+     * @param right  the right side of the cull rect used when recording this picture. Any drawing
+     *               that falls outside of this rect is undefined and may be drawn, or it may not.
+     * @param bottom the bottom side of the cull rect used when recording this picture. Any drawing
+     *               that falls outside of this rect is undefined and may be drawn, or it may not.
+     * @param bbh    optional acceleration structure
+     * @return the canvas.
+     */
+    fun beginRecording(left: Float, top: Float, right: Float, bottom: Float, bbh: BBHFactory? = null): Canvas {
+        return try {
+            Stats.onNativeCall()
+            Canvas(
+                _nBeginRecording(
+                    _ptr,
+                    left,
+                    top,
+                    right,
+                    bottom,
                     getPtr(bbh)
                 ), false, this
             )
