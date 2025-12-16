@@ -34,6 +34,14 @@ expect open class SkiaLayer {
     var transparency: Boolean
 
     /**
+     * When the layer's background is not transparent, this color (in ARGB format) will be used to clear the layer.
+     *
+     * @see transparency
+     * @see org.jetbrains.skiko.context.ContextHandler.isTransparentBackgroundSupported
+     */
+    var opaqueBackground: Int
+
+    /**
      * Underlying platform component.
      */
     val component: Any?

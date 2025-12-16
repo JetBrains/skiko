@@ -15,6 +15,9 @@ actual open class SkiaLayer  {
     actual var transparency: Boolean
         get() = TODO("Not yet implemented")
         set(value) {}
+    actual var opaqueBackground: Int
+        get() = TODO("Not yet implemented")
+        set(value) {}
     actual val component: Any?
         get() = TODO("Not yet implemented")
     actual fun needRender(throttledToVsync: Boolean) {

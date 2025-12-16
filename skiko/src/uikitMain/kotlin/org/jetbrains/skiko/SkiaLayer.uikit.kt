@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.cinterop.useContents
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Color
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skia.Surface
 
@@ -22,6 +23,15 @@ actual open class SkiaLayer {
     actual var transparency: Boolean
         get() = false
         set(_) { throw UnsupportedOperationException() }
+
+    /**
+     * The background color of the layer, as transparency is not supported.
+     */
+    actual var opaqueBackground: Int = Color.WHITE
+        set(value) {
+            field = value
+            needRender()
+        }
 
     actual fun needRender(throttledToVsync: Boolean) {
         needRedrawCallback.invoke()

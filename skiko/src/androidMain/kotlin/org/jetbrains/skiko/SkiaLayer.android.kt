@@ -25,6 +25,15 @@ actual open class SkiaLayer {
             if (value) throw IllegalArgumentException("transparency unsupported")
         }
 
+    /**
+     * The background color of the layer, as transparency is not supported.
+     */
+    actual var opaqueBackground: Int = Color.WHITE
+        set(value) {
+            field = value
+            needRender()
+        }
+
     actual var renderDelegate: SkikoRenderDelegate? = null
 
     actual fun attachTo(container: Any) {

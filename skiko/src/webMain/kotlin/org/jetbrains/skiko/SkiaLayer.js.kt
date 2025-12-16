@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Color
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.w3c.HTMLCanvasElement
 import org.jetbrains.skiko.w3c.window
@@ -43,6 +44,15 @@ actual open class SkiaLayer {
         get() = false
         set(value) {
             if (value) throw Exception("Transparency is not supported!")
+        }
+
+    /**
+     * The background color of the layer, as transparency is not supported.
+     */
+    actual var opaqueBackground: Int = Color.WHITE
+        set(value) {
+            field = value
+            needRender()
         }
 
     /**

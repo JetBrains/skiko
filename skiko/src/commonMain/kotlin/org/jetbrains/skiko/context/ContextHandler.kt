@@ -41,22 +41,25 @@ internal abstract class ContextHandler(
         }
         initCanvas()
         canvas?.apply {
-            clear(if (isTransparentBackground()) Color.TRANSPARENT else Color.WHITE)
+            clear(
+                if (layer.transparency && isTransparentBackgroundSupported()) {
+                    Color.TRANSPARENT
+                } else {
+                    layer.opaqueBackground
+                }
+            )
             drawContent()
         }
         flush()
     }
 
-    protected open fun isTransparentBackground(): Boolean {
+    protected open fun isTransparentBackgroundSupported(): Boolean {
         if (hostOs == OS.MacOS) {
             // MacOS transparency is always supported
             return true
         }
-        if (layer.fullscreen) {
-            // for non-MacOS in fullscreen transparency is not supported
-            return false
-        }
-        // for non-MacOS in non-fullscreen transparency provided by [layer]
-        return layer.transparency
+
+        // for non-MacOS in fullscreen transparency is not supported
+        return !layer.fullscreen
     }
 }

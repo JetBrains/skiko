@@ -59,6 +59,15 @@ actual open class SkiaLayer {
         }
 
     /**
+     * The background color of the layer.
+     */
+    actual var opaqueBackground: Int = Color.WHITE
+        set(value) {
+            field = value
+            needRender()
+        }
+
+    /**
      * Underlying [NSView]
      */
     lateinit var nsView: NSView
