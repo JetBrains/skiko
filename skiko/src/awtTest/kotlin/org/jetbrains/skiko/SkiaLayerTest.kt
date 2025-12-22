@@ -1057,15 +1057,6 @@ class SkiaLayerTest {
         // a smaller black window on top of it while screenshotting the pixel at the center,
         // and making sure that pixel is always either black or green.
 
-        // We can't compare colors exactly because java.awt.Robot can return a slightly different color due to
-        // system color profile
-        fun Color.closeTo(other: Color): Boolean {
-            val diffLimit = 10
-            return (red - other.red).absoluteValue < diffLimit
-                    && (green - other.green).absoluteValue < diffLimit
-                    && (blue - other.blue).absoluteValue < diffLimit
-        }
-
         val bgColor = Color.GREEN
         val fgColor = Color.BLACK
         val backgroundWindow = JFrame().also {
@@ -1329,6 +1320,51 @@ class SkiaLayerTest {
         assertTrue(drawCalls > initDrawCalls)
     }
 
+    private suspend fun  UiTestScope.testLayerBackground(
+        initLayer: SkiaLayer.() -> Unit = {}
+    ) {
+        val window = UiTestWindow()
+        try {
+            window.setLocation(200, 200)
+            window.setSize(300, 300)
+            val layer = window.layer
+            layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ -> }
+            initLayer(layer)
+            layer.background = Color.RED
+            window.isVisible = true
+            delay(1000)
+
+            val robot = Robot()
+            val windowBounds = window.bounds
+
+            fun assertLayerIs(color: Color) {
+                val pixel = robot.getPixelColor(windowBounds.centerX.toInt(), windowBounds.centerY.toInt())
+                assertTrue(pixel.closeTo(color))
+            }
+            assertLayerIs(Color.RED)
+
+            layer.background = Color.BLUE
+            delay(100)
+            assertLayerIs(Color.BLUE)
+
+            layer.background = Color.GREEN
+            delay(100)
+            assertLayerIs(Color.GREEN)
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @Test
+    fun `layer background is drawn correctly`() = uiTest {
+        testLayerBackground()
+    }
+
+    @Test
+    fun `layer background is drawn correctly with transparency`() = uiTest {
+        testLayerBackground { transparency = true }
+    }
+
     private class RectRenderer(
         private val getContentScale: () -> Float,
         var rectWidth: Int,
@@ -1364,8 +1400,6 @@ class SkiaLayerTest {
             })
         }
     }
-
-
 
     private class AnimatedBoxRenderer(
         private val layer: SkiaLayer,
@@ -1424,6 +1458,16 @@ class SkiaLayerTest {
         }
     }
 
+    /**
+     * Compares two colors, within a certain tolerance.
+     * We can't compare colors exactly because java.awt.Robot can return a slightly different color due to
+     * system color profile
+     */
+    fun Color.closeTo(other: Color, diffLimit: Int = 10): Boolean {
+        return (red - other.red).absoluteValue < diffLimit
+                && (green - other.green).absoluteValue < diffLimit
+                && (blue - other.blue).absoluteValue < diffLimit
+    }
 }
 
 private fun JFrame.close() = dispatchEvent(WindowEvent(this, WindowEvent.WINDOW_CLOSING))
