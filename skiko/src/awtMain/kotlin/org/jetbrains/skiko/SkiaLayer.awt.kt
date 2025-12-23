@@ -5,6 +5,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.clipRectBy
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
@@ -359,7 +360,9 @@ actual open class SkiaLayer internal constructor(
 
     private fun notifyChange(kind: PropertyKind) {
         stateChangeListeners[kind]?.let { handlers ->
-            handlers.forEach { it(this) }
+            for (index in handlers.indices) {
+                handlers[index].invoke(this)
+            }
         }
     }
 
@@ -582,8 +585,9 @@ actual open class SkiaLayer internal constructor(
         val canvas = pictureRecorder.beginRecording(bounds)
 
         // clipping
-        for (component in clipComponents) {
-            canvas.clipRectBy(component, contentScale)
+        for (index in clipComponents.indices) {
+            val item = clipComponents[index]
+            canvas.clipRectBy(item, contentScale)
         }
 
         try {
@@ -692,17 +696,15 @@ internal fun defaultFPSCounter(
         logOnTick = true
     )
 }
-
-internal fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
     clipRect(
-        Rect.makeLTRB(
-            rectangle.x * scale,
-            rectangle.y * scale,
-            (rectangle.x + rectangle.width) * scale,
-            (rectangle.y + rectangle.height) * scale
-        ),
-        ClipMode.DIFFERENCE,
-        true
+        left = rectangle.x * scale,
+        top = rectangle.y * scale,
+        right = (rectangle.x + rectangle.width) * scale,
+        bottom = (rectangle.y + rectangle.height) * scale,
+        mode = ClipMode.DIFFERENCE,
+        antiAlias = true
     )
 }
 

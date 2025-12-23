@@ -47,8 +47,9 @@ open class SkiaSwingLayer(
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val scale = graphicsConfiguration.defaultTransform.scaleX.toFloat()
             // clipping
-            for (component in clipComponents) {
-                canvas.clipRectBy(component, scale)
+            for (index in clipComponents.indices) {
+                val item = clipComponents[index]
+                canvas.clipRectBy(item, scale)
             }
             renderDelegate.onRender(canvas, width, height, nanoTime)
         }
