@@ -12,10 +12,7 @@ actual abstract class RefCnt : Managed {
             return _nGetRefCount(_ptr)
         }
 
-    override fun toString(): String {
-        val s = super.toString()
-        return s.substring(0, s.length - 1) + ", refCount=" + refCount + ")"
-    }
+    override fun toString() = refCntToString(super.toString(), 0)
 }
 
 private object _FinalizerHolder {

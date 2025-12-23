@@ -14,10 +14,7 @@ actual abstract class RefCnt : Managed {
             Reference.reachabilityFence(this)
         }
 
-    override fun toString(): String {
-        val s = super.toString()
-        return s.substring(0, s.length - 1) + ", refCount=" + refCount + ")"
-    }
+    override fun toString() = refCntToString(super.toString(), 0L)
 
     private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
