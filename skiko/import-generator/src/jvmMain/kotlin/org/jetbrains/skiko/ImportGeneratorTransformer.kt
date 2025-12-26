@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -7,6 +8,7 @@ import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
@@ -16,7 +18,6 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import kotlin.collections.plus
 
 internal class ImportGeneratorTransformer(private val pluginContext: IrPluginContext) : IrElementTransformerVoid() {
 
@@ -25,9 +26,12 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
 
     @Suppress("UNCHECKED_CAST")
     private fun IrConstructorCall.getStringValue(value: String): String =
-        (getValueArgument(Name.identifier(value)) as IrConst<String>).value
+        (getValueArgument(Name.identifier(value)) as IrConst).value as String
 
-    @OptIn(UnsafeDuringIrConstructionAPI::class)
+    @OptIn(
+        DeprecatedForRemovalCompilerApi::class,
+        UnsafeDuringIrConstructionAPI::class,
+    )
     private fun IrFunction.addWasmImportAnnotation(name: String) {
         val annotationClass = pluginContext.referenceClass(
             ClassId.fromString("kotlin/wasm/WasmImport") // Replace with your fully qualified annotation name

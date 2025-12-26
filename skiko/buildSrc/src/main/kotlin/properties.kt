@@ -47,7 +47,41 @@ fun compilerForTarget(os: OS, arch: Arch): String =
         OS.Android -> "clang++"
         OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
-        OS.Wasm -> if (Os.isFamily(Os.FAMILY_WINDOWS)) "emcc.bat" else "emcc"
+        OS.Wasm -> {
+            val emccExe = if (Os.isFamily(Os.FAMILY_WINDOWS)) "emcc.bat" else "emcc"
+
+            // Prefer an explicitly configured Emscripten SDK, if present.
+            // The official Skiko docker image uses `EMSDK_DIR` and puts `upstream/emscripten` on PATH.
+            val emsdkDirFromEnv = listOf("SKIKO_EMSDK_DIR", "EMSDK_DIR", "EMSDK")
+                .firstNotNullOfOrNull { System.getenv(it)?.takeIf(String::isNotBlank) }
+
+            // Fallback for local builds: if the user has a repo-local EMSDK checkout (e.g. `./.emsdk`),
+            // use it automatically so that Gradle tasks (including publishToMavenLocal) work out of the box.
+            // Intentionally keep the search shallow and relative to Gradle's current working dir.
+            val emsdkDirFromLocalCheckout = run {
+                val userDir = System.getProperty("user.dir")?.takeIf(String::isNotBlank)?.let(::File)
+                val rootsToCheck = listOfNotNull(userDir, userDir?.parentFile, userDir?.parentFile?.parentFile)
+                rootsToCheck
+                    .asSequence()
+                    .map { it.resolve(".emsdk") }
+                    .firstOrNull { it.isDirectory }
+                    ?.absolutePath
+            }
+
+            val emsdkDir = emsdkDirFromEnv ?: emsdkDirFromLocalCheckout
+
+            val upstreamEmcc = emsdkDir
+                ?.let { File(it).resolve("upstream/emscripten").resolve(emccExe) }
+
+            val legacyEmcc = emsdkDir
+                ?.let { File(it).resolve("emscripten").resolve(emccExe) }
+
+            when {
+                upstreamEmcc?.exists() == true -> upstreamEmcc.absolutePath
+                legacyEmcc?.exists() == true -> legacyEmcc.absolutePath
+                else -> emccExe
+            }
+        }
     }
 
 fun linkerForTarget(os: OS, arch: Arch): String =
