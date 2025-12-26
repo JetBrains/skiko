@@ -96,7 +96,7 @@ kotlin {
         skikoProjectContext.declareWasmTasks()
 
         js {
-            moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
+            outputModuleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
                     useKarma {
@@ -120,7 +120,7 @@ kotlin {
 
         @OptIn(ExperimentalWasmDsl::class)
         wasmJs {
-            moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
+            outputModuleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
                     useKarma {
@@ -147,7 +147,7 @@ kotlin {
     }
     if (supportNativeLinux) {
         skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
-        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
+//        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
     }
     if (supportNativeIosArm64) {
         skikoProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())
@@ -181,6 +181,10 @@ kotlin {
     skikoProjectContext.jvmMainSourceSet?.dependencies {
         implementation(kotlin("stdlib"))
         implementation(libs.coroutines.core.jvm)
+    }
+
+    skikoProjectContext.linuxMainSourceSet?.dependencies {
+        implementation(libs.kgfw)
     }
 
     skikoProjectContext.awtMainSourceSet?.dependencies {
@@ -360,8 +364,6 @@ skikoProjectContext.additionalRuntimeLibraries.forEach {
 }
 
 tasks.withType<KotlinNativeCompile>().configureEach {
-    // https://youtrack.jetbrains.com/issue/KT-56583
-    compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
     compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
 }
 

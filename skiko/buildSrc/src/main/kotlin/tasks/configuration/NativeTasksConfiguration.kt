@@ -52,12 +52,6 @@ fun SkikoProjectContext.compileNativeBridgesTask(
 ): TaskProvider<CompileSkikoCppTask> = with (this.project) {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isUikitSim = isUikitSim)
 
-    val setupMultistrapTask = if (os == OS.Linux && arch == Arch.Arm64 && hostArch != Arch.Arm64) {
-        setupMultistrapTask(os, arch, isUikitSim = isUikitSim)
-    } else {
-        null
-    }
-
     val actionName = "compileNativeBridges".withSuffix(isUikitSim = isUikitSim)
 
     return project.registerSkikoTask<CompileSkikoCppTask>(actionName, os, arch) {
@@ -313,7 +307,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
 
     // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
     target.binaries.all {
-        freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
+        freeCompilerArgs += allLibraries.flatMap { listOf("-include-binary", it) } + linkerFlags
     }
     target.compilations.all {
         compileTaskProvider.configure {
@@ -366,7 +360,7 @@ fun KotlinMultiplatformExtension.configureIOSTestsWithMetal(project: Project) {
         if (targets.names.contains(target)) {
             val testBinary = targets.getByName<KotlinNativeTarget>(target).binaries.getTest("DEBUG")
             project.tasks.register(target + "TestWithMetal") {
-                dependsOn(testBinary.linkTask)
+                dependsOn(testBinary.linkTaskProvider)
                 doLast {
                     val simulatorIdPropertyKey = "skiko.iosSimulatorUUID"
                     val simulatorId = project.findProperty(simulatorIdPropertyKey)?.toString()

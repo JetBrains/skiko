@@ -1,7 +1,8 @@
 [versions]
-kotlin = "2.0.10"
+kotlin = "2.2.0"
 coroutines = "1.8.0"
 jetbrainsRuntime-api = "1.5.0"
+kgfw = "1.2.0"
 
 androidGradlePlugin = "7.4.2"
 dokka = "1.9.10"
@@ -22,6 +23,7 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 
 jetbrainsRuntime-api = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jetbrainsRuntime-api" }
 
+kgfw = { module = "io.github.drulysses:kgfw", version.ref = "kgfw"  }
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 dokka-gradlePlugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradleDownloadTask-gradlePlugin = { module = "de.undercouch:gradle-download-task", version.ref = "gradleDownloadTask" }

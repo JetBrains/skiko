@@ -5,6 +5,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinHierarchyTemplate
 
 val SkikoProjectContext.jvmMainSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("jvmMain") else null
 
+val SkikoProjectContext.linuxMainSourceSet get() = if (project.supportNativeLinux) kotlin.sourceSets.getByName("linuxMain") else null
+
 val SkikoProjectContext.jvmTestSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("jvmTest") else null
 
 val SkikoProjectContext.awtMainSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("awtMain") else null
