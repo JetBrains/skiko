@@ -288,6 +288,17 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return this
     }
 
+    fun drawRect(left: Float, top: Float, right: Float, bottom: Float, paint: Paint): Canvas {
+        Stats.onNativeCall()
+        try {
+            _nDrawRect(_ptr, left, top, right, bottom, getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(paint)
+        }
+        return this
+    }
+
     fun drawRect(r: Rect, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
@@ -295,6 +306,17 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(paint)
+        }
+        return this
+    }
+
+    fun drawOval(left: Float, top: Float, right: Float, bottom: Float, paint: Paint): Canvas {
+        Stats.onNativeCall()
+        try {
+            _nDrawOval(_ptr, left, top, right, bottom, getPtr(paint))
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
         }
         return this
     }
@@ -314,6 +336,19 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             _nDrawOval(_ptr, x - radius, y - radius, x + radius, y + radius, getPtr(paint))
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
+        }
+        return this
+    }
+
+    fun drawRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, paint: Paint): Canvas {
+        Stats.onNativeCall()
+        try {
+            interopScope {
+                _nDrawRRect(_ptr, left, top, right, bottom, toInterop(radii), radii.size, getPtr(paint))
+            }
         } finally {
             reachabilityBarrier(paint)
             reachabilityBarrier(this)
@@ -454,6 +489,46 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawImageRect(image: Image, src: Rect, dst: Rect, paint: Paint?, strict: Boolean): Canvas {
         return drawImageRect(image, src, dst, SamplingMode.DEFAULT, paint, strict)
+    }
+
+    fun drawImageRect(
+        image: Image,
+        srcLeft: Float,
+        srcTop: Float,
+        srcRight: Float,
+        srcBottom: Float,
+        dstLeft: Float,
+        dstTop: Float,
+        dstRight: Float,
+        dstBottom: Float,
+        samplingMode: SamplingMode,
+        paint: Paint?,
+        strict: Boolean
+    ): Canvas {
+        Stats.onNativeCall()
+        try {
+            _nDrawImageRect(
+                _ptr,
+                getPtr(image),
+                srcLeft,
+                srcTop,
+                srcRight,
+                srcBottom,
+                dstLeft,
+                dstTop,
+                dstRight,
+                dstBottom,
+                samplingMode._packedInt1(),
+                samplingMode._packedInt2(),
+                getPtr(paint),
+                strict
+            )
+        } finally {
+            reachabilityBarrier(image)
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
+        }
+        return this
     }
 
     fun drawImageRect(
@@ -1012,6 +1087,12 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun clipRect(r: Rect, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
         _nClipRect(_ptr, r.left, r.top, r.right, r.bottom, mode.ordinal, antiAlias)
+        return this
+    }
+
+    fun clipRect(left : Float, top : Float, right: Float, bottom : Float, mode: ClipMode, antiAlias: Boolean): Canvas {
+        Stats.onNativeCall()
+        _nClipRect(_ptr, left, top, right, bottom, mode.ordinal, antiAlias)
         return this
     }
 

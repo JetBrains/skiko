@@ -1,15 +1,11 @@
 FROM arm64v8/ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update -y && \
-    apt-get install binutils build-essential software-properties-common -y && \
-    apt-get install zip unzip git python curl wget -y && \
-    apt-get install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
-    apt-get install openjdk-21-jdk -y && \
-    apt-get install clang-11 -y && \
-    apt-get remove g++ -y && \
-    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-11 100 && \
-    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-11 100 && \
+RUN apt update -y && \
+    apt install binutils build-essential software-properties-common -y && \
+    apt install zip unzip git python curl wget xvfb -y && \
+    apt install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
+    apt install openjdk-21-jdk -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Install chromium tools

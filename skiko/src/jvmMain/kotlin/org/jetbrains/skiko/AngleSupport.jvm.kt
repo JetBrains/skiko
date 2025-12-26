@@ -2,25 +2,26 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.impl.Library
 
-private external fun loadAngleLibraryWindows()
+private external fun initAngleLibraryWindows(libraryName: String): Boolean
 
-private var isLoaded = false
+private const val libEGLName = "libEGL"
 
-@Synchronized
-internal actual fun loadAngleLibrary() {
-    if (!isLoaded) {
-        when {
-            hostOs.isWindows -> {
-                Library.staticLoad()
-                try {
-                    loadAngleLibraryWindows()
-                }
-                catch (e: Exception) {
-                    throw OptionalRenderApiException("Failed to load ANGLE library: ${e}")
-                }
-            }
-            else -> Unit
+private var loader = LibraryLoader(
+    libEGLName,
+    // libGLESv2 is not loaded explicitly in Skiko, it is loaded by libEGL
+    additionalFile = System.mapLibraryName("libGLESv2"),
+    lockFile = LockFile.angle,
+    init = {
+        Library.staticLoad()
+        if (!initAngleLibraryWindows(libEGLName)) {
+            throw LibraryLoadException("Failed to load ANGLE library $libEGLName")
         }
-        isLoaded = true
+    }
+)
+
+internal actual fun loadAngleLibrary() {
+    when {
+        hostOs.isWindows -> loader.loadOnce()
+        else -> Unit
     }
 }

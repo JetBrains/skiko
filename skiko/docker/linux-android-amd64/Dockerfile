@@ -1,11 +1,11 @@
 FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update -y && \
-    apt-get install binutils build-essential software-properties-common -y && \
-    apt-get install zip unzip git python curl wget -y && \
-    apt-get install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
-    apt-get install openjdk-21-jdk -y && \
+RUN apt update -y && \
+    apt install binutils build-essential software-properties-common -y && \
+    apt install zip unzip git python curl wget -y && \
+    apt install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
+    apt install openjdk-21-jdk -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Android SDK

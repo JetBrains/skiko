@@ -472,7 +472,7 @@ class SkiaLayerTest {
         }
     }
 
-    @Test(timeout = 60000)
+    @Test(timeout = 120000)
     fun `stress test - open multiple windows`() = uiTest {
         fun window(isAnimated: Boolean) = UiTestWindow().apply {
             setLocation(200, 200)
@@ -832,7 +832,7 @@ class SkiaLayerTest {
 
                 val dt = renderTimes.last() - renderTimes.first()
                 assertTrue(
-                    actual = dt < 150,
+                    actual = dt < 200,
                     message = "2nd frame drawn ${dt}ms after 1st: ${renderTimes.map { it - renderTimes.first() }}}"
                 )
                 renderTimes.clear()

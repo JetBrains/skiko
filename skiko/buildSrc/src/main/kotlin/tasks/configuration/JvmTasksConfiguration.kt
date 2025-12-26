@@ -1,5 +1,6 @@
 package tasks.configuration
 
+import AdditionalRuntimeLibrary
 import Arch
 import CompileSkikoCppTask
 import CompileSkikoObjCTask
@@ -24,7 +25,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.withType
-import org.gradle.util.internal.VersionNumber
 import projectDirs
 import registerOrGetSkiaDirProvider
 import registerSkikoTask
@@ -67,7 +67,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
 
-    compiler.set(compilerForTarget(targetOs, targetArch, isJvm = true))
+    compiler.set(compilerForTarget(targetOs, targetArch))
 
     val osFlags: Array<String>
     when (targetOs) {
@@ -86,6 +86,10 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         OS.Linux -> {
             includeHeadersNonRecursive(jdkHome.resolve("include/linux"))
             includeHeadersNonRecursive(runPkgConfig("dbus-1"))
+            val archFlags = if (targetArch == Arch.Arm64) arrayOf(
+                // Always inline atomics for ARM64 to prevent linking incompatibility issues after updating GCC to 10
+                "-mno-outline-atomics",
+            ) else arrayOf()
             osFlags = arrayOf(
                 *buildType.clangFlags,
                 "-DGL_GLEXT_PROTOTYPES",
@@ -93,7 +97,8 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
                 "-fno-rtti",
                 "-fno-exceptions",
                 "-fvisibility=hidden",
-                "-fvisibility-inlines-hidden"
+                "-fvisibility-inlines-hidden",
+                *archFlags,
             )
         }
         OS.Windows -> {
@@ -237,7 +242,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
     buildSuffix.set("jvm")
     buildTargetArch.set(targetArch)
     buildVariant.set(buildType)
-    linker.set(linkerForTarget(targetOs, targetArch, isJvm = true))
+    linker.set(linkerForTarget(targetOs, targetArch))
 
     when (targetOs) {
         OS.MacOS -> {
@@ -268,17 +273,14 @@ fun SkikoProjectContext.createLinkJvmBindings(
         OS.Linux -> {
             osFlags = arrayOf(
                 "-shared",
-                "-static-libstdc++",
+                // `libstdc++.so.6.*` binaries are forward-compatible and used from GCC 3.4 to 16+,
+                // so do not use `-static-libstdc++` to avoid issues with complex setup.
                 "-static-libgcc",
                 "-lGL",
                 "-lX11",
                 "-lfontconfig",
-                // A fix for https://github.com/JetBrains/compose-jb/issues/413.
-                // Dynamic position independent linking uses PLT thunks relying on jump targets in GOT (Global Offsets Table).
-                // GOT entries marked as (for example) R_X86_64_JUMP_SLOT in the relocation table. So, if there's code loading
-                // platform libstdc++.so, lazy resolve code will resolve GOT entries to platform libstdc++.so on first invocation,
-                // and so further execution will break, as those two libstdc++ are not compatible.
-                // To fix it we enforce resolve of all GOT entries at library load time, and make it read-only afterwards.
+                // Enforce immediate symbol resolution at library load time to prevent
+                // lazy-binding issues and make GOT read-only afterwards.
                 "-Wl,-z,relro,-z,now",
                 // Hack to fix problem with linker not always finding certain declarations.
                 "$skiaBinDir/libsksg.a",
@@ -461,11 +463,16 @@ fun SkikoProjectContext.skikoRuntimeDirForTestsTask(
     targetOs: OS,
     targetArch: Arch,
     skikoJvmJar: Provider<Jar>,
-    skikoJvmRuntimeJar: Provider<Jar>
+    skikoJvmRuntimeJar: Provider<Jar>,
+    additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
 ) = project.registerSkikoTask<Copy>("skikoRuntimeDirForTests", targetOs, targetArch) {
     dependsOn(skikoJvmJar, skikoJvmRuntimeJar)
     from(project.zipTree(skikoJvmJar.flatMap { it.archiveFile }))
     from(project.zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile }))
+    additionalRuntimeLibraries.forEach { lib ->
+        from(project.zipTree(lib.jarTask.flatMap { it.archiveFile }))
+    }
+    
     duplicatesStrategy = DuplicatesStrategy.WARN
     destinationDir = project.layout.buildDirectory.dir("skiko-runtime-for-tests").get().asFile
 }
@@ -478,9 +485,13 @@ fun SkikoProjectContext.skikoJarForTestsTask(
     archiveFileName.set("skiko-runtime-for-tests.jar")
 }
 
-fun SkikoProjectContext.setupJvmTestTask(skikoAwtJarForTests: TaskProvider<Jar>, targetOs: OS, targetArch: Arch) = with(project) {
+fun SkikoProjectContext.setupJvmTestTask(
+    skikoAwtJarForTests: TaskProvider<Jar>,
+    targetOs: OS,
+    targetArch: Arch
+) = with(project) {
     val skikoAwtRuntimeJarForTests = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJarForTests)
-    val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests)
+    val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests, additionalRuntimeLibraries)
     val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
     tasks.withType<Test>().configureEach {
@@ -515,6 +526,7 @@ fun SkikoProjectContext.setupJvmTestTask(skikoAwtJarForTests: TaskProvider<Jar>,
             }
         }
 
+        classpath += files(skikoAwtRuntimeJarForTests)
         jvmArgs = listOf("--add-opens", "java.desktop/sun.font=ALL-UNNAMED")
     }
 }

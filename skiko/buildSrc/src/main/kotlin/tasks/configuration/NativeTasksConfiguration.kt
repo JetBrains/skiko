@@ -64,9 +64,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
         dependsOn(skiaNativeDir)
         val unpackedSkia = skiaNativeDir.get()
 
-        setupMultistrapTask?.let { dependsOn(it) }
-
-        compiler.set(compilerForTarget(os, arch, isJvm = false))
+        compiler.set(compilerForTarget(os, arch))
         buildTargetOS.set(os)
         if (isUikitSim) {
             buildSuffix.set("sim")
@@ -135,16 +133,25 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 ))
             }
             OS.Linux -> {
-                flags.set(listOfNotNull(
+                val archFlags = if (arch == Arch.Arm64) arrayOf(
+                    // Always inline atomics for ARM64 to prevent linking incompatibility issues after updating GCC to 10
+                    "-mno-outline-atomics",
+                ) else arrayOf()
+                val linuxFlags = mutableListOf(
                     *buildType.clangFlags,
                     "-fPIC",
                     "-fno-rtti",
                     "-fno-exceptions",
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
-                    "-D_GLIBCXX_USE_CXX11_ABI=0",
+                    *archFlags,
                     *skiaPreprocessorFlags(OS.Linux, buildType)
-                ))
+                )
+                // Add sysroot for ARM64 cross-compilation
+                if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
+                    linuxFlags.add(0, "--sysroot=/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc")
+                }
+                flags.set(linuxFlags)
             }
             else -> throw GradleException("$os not yet supported")
         }
@@ -284,10 +291,11 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 "$skiaBinDir/libicu.a",
                 "$skiaBinDir/libskia.a"
             )
+            // When cross-compiling for ARM64 from x64, use the ARM toolchain sysroot
             if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
-                val buildDir = project.layout.buildDirectory.get().asFile
-                options.add(0, "-L$buildDir/multistrap-arm64/usr/lib")
-                options.add(1, "-L$buildDir/multistrap-arm64/usr/lib/aarch64-linux-gnu")
+                // ARM GNU toolchain sysroot paths
+                options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
+                options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
             }
             mutableListOfLinkerOptions(options)
         }
@@ -331,7 +339,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         workingDir = outDir
         when (os) {
             OS.Linux -> {
-                executable = "ar"
+                executable = if (arch == Arch.Arm64 && hostArch != Arch.Arm64) "aarch64-linux-gnu-ar" else "ar"
                 argumentProviders.add { listOf("-crs", staticLib) }
             }
             OS.MacOS, OS.IOS, OS.TVOS -> {
@@ -351,24 +359,6 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     }
 }
 
-/**
- * This installs dependencies needed for cross compiling Skiko on Linux.
- * https://youtrack.jetbrains.com/issue/KT-36871
- */
-fun SkikoProjectContext.setupMultistrapTask(
-    os: OS, arch: Arch, isUikitSim: Boolean
-): TaskProvider<Exec> = with (this.project) {
-    require(os == OS.Linux)
-    require(arch == Arch.Arm64)
-
-    val actionName = "setupMultistrap".withSuffix(isUikitSim = isUikitSim)
-
-    return project.registerSkikoTask<Exec>(actionName, os, arch) {
-        workingDir(projectDir)
-//        commandLine("multistrap", "-f", "multistrap-config-${arch.id}")
-        commandLine("who")
-    }
-}
 
 fun KotlinMultiplatformExtension.configureIOSTestsWithMetal(project: Project) {
     val metalTestTargets = listOf("iosX64", "iosSimulatorArm64")
@@ -376,7 +366,7 @@ fun KotlinMultiplatformExtension.configureIOSTestsWithMetal(project: Project) {
         if (targets.names.contains(target)) {
             val testBinary = targets.getByName<KotlinNativeTarget>(target).binaries.getTest("DEBUG")
             project.tasks.register(target + "TestWithMetal") {
-                dependsOn(testBinary.linkTaskProvider)
+                dependsOn(testBinary.linkTask)
                 doLast {
                     val simulatorIdPropertyKey = "skiko.iosSimulatorUUID"
                     val simulatorId = project.findProperty(simulatorIdPropertyKey)?.toString()
