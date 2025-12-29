@@ -44,7 +44,7 @@ class TextBlobBuilderTest {
             text = "Привет!Hello!",
             x = 0f,
             y = 0f,
-            bounds = Rect(0f, 0f, 50f, 40f)
+            bounds = floatArrayOf(0f, 0f, 50f, 40f)
         ).build()!!
 
         assertContentEquals(
@@ -68,9 +68,9 @@ class TextBlobBuilderTest {
         val textBlob = TextBlobBuilder().appendRunPosH(
             font = font,
             glyphs = glyphs,
-            bounds = Rect(0f, 0f, 50f, 40f),
             xs = FloatArray(glyphs.size) { (it + 1) * 10f },
-            y = 5f
+            y = 5f,
+            bounds = floatArrayOf(0f, 0f, 50f, 40f)
         ).build()!!
 
         assertContentEquals(
@@ -103,8 +103,8 @@ class TextBlobBuilderTest {
         val textBlob = TextBlobBuilder().appendRunPos(
             font = font,
             glyphs = glyphs,
-            bounds = Rect(0f, 0f, 150f, 40f),
-            pos = positions
+            pos = positions,
+            bounds = floatArrayOf(0f, 0f, 150f, 40f),
         ).build()!!
 
         assertContentEquals(

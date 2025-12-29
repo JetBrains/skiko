@@ -160,8 +160,7 @@ actual open class SkiaLayer {
         val pictureWidth = (width * contentScale).coerceAtLeast(0.0)
         val pictureHeight = (height * contentScale).coerceAtLeast(0.0)
 
-        val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
-        val canvas = pictureRecorder.beginRecording(bounds)
+        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth.toFloat(), pictureHeight.toFloat())
         renderDelegate?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
 
         val picture = pictureRecorder.finishRecordingAsPicture()

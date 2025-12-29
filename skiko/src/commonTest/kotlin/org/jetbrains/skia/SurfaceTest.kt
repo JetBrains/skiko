@@ -44,7 +44,7 @@ class SurfaceTest {
             assertEquals(200, newSurface2.width)
             assertEquals(400, newSurface2.height)
 
-            val image = surface.makeImageSnapshot(IRect(0, 0, 20, 30))!!
+            val image = surface.makeImageSnapshot(0, 0, 20, 30)!!
             assertEquals(20, image.width)
             assertEquals(30, image.height)
 

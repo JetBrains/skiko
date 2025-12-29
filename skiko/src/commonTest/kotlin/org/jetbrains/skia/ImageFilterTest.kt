@@ -47,27 +47,26 @@ class ImageFilterTest {
     fun arithmetic() = imageFilterTest {
         ImageFilter.makeArithmetic(
             k1 = 0.5f, k2 = 0.5f, k3 = 0.5f, k4 = 0.5f, enforcePMColor = true,
-            bg = null, fg = null, crop = null
+            bg = null, fg = null
         )
     }
 
     @Test
     fun blend() = imageFilterTest {
         val region = Region().apply {
-            setRect(IRect(5, 5, 10, 10))
+            setRect(5, 5, 10, 10)
         }
         ImageFilter.makeBlend(
             blendMode = BlendMode.COLOR,
             bg = ImageFilter.makeBlur(2f, 2f, mode = FilterTileMode.CLAMP),
             fg = ImageFilter.makeBlur(1f, 3f, mode = FilterTileMode.CLAMP),
-            crop = null
         )
     }
 
     @Test
     fun blur() = imageFilterTest {
         ImageFilter.makeBlur(
-            1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
+            1f, 1f, FilterTileMode.CLAMP, crop = intArrayOf(5, 5, 10, 10)
         )
     }
 
@@ -75,18 +74,18 @@ class ImageFilterTest {
     fun colorFilter() = imageFilterTest {
         ImageFilter.makeColorFilter(
             f = ColorFilter.luma,
-            input = null, crop = null
+            input = null
         )
     }
 
     @Test
     fun compose() = imageFilterTest {
         val inner = ImageFilter.makeBlur(
-            1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
+            1f, 1f, FilterTileMode.CLAMP, crop = intArrayOf(5, 5, 10, 10)
         )
         val outer = ImageFilter.makeColorFilter(
             f = ColorFilter.luma,
-            input = null, crop = null
+            input = null
         )
         ImageFilter.makeCompose(
             inner = inner,
@@ -98,15 +97,14 @@ class ImageFilterTest {
     fun displacementMap() = imageFilterTest {
         val colorFilter = ImageFilter.makeColorFilter(
             f = ColorFilter.luma,
-            input = null, crop = null
+            input = null
         )
         ImageFilter.makeDisplacementMap(
             x = ColorChannel.R,
             y = ColorChannel.G,
             scale = 2f,
             displacement = null,
-            color = colorFilter,
-            crop = null
+            color = colorFilter
         )
     }
 
@@ -188,12 +186,12 @@ class ImageFilterTest {
 
         val filter2 = ImageFilter.makeColorFilter(
             f = ColorFilter.luma,
-            input = null, crop = null
+            input = null
         )
 
-        val filter3 = ImageFilter.makeBlur(
-            1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
-        )
+        val filter3 =
+            ImageFilter.makeBlur(
+                1f, 1f, FilterTileMode.CLAMP, null, intArrayOf(5, 5, 10, 10))
 
         ImageFilter.makeMerge(
             filters = arrayOf(filter1, filter2, filter3),
@@ -215,7 +213,7 @@ class ImageFilterTest {
     @Test
     fun makeRuntimeShader() = imageFilterTest {
         // A simple Skia shader that bumps up the red channel of every non-transparent
-        // pixel to full intensity, and leaves green and blue channels unchanged.
+        // pixel to full intensity and leaves green and blue channels unchanged.
         val sksl = """
             uniform shader content;
             vec4 main(vec2 coord) {
@@ -476,7 +474,10 @@ class ImageFilterTest {
 
         val runtimeEffect = RuntimeEffect.makeForShader(sksl)
         val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
-        shaderBuilder.uniform("matrix4x4", Matrix44(0.2f, 0.3f, 0.2f, 0.1f, 0.4f, 0.1f, 0.2f, 0.1f, 0.1f, 0.3f, 0.2f, 0.1f, 0.2f, 0.2f, 0.2f, 0.3f))
+        shaderBuilder.uniform(
+            "matrix4x4",
+            Matrix44(0.2f, 0.3f, 0.2f, 0.1f, 0.4f, 0.1f, 0.2f, 0.1f, 0.1f, 0.3f, 0.2f, 0.1f, 0.2f, 0.2f, 0.2f, 0.3f)
+        )
 
         ImageFilter.makeRuntimeShader(
             runtimeShaderBuilder = shaderBuilder,
@@ -488,10 +489,10 @@ class ImageFilterTest {
     @Test
     fun makeRuntimeShaderFromArrays() = imageFilterTest {
         // A Skia shader that has two children shaders - one that applies our custom shader logic
-        // on the underlying render node content, and another that is the built in blur. This
-        // shader also has a float uniform that is used to decide which one of these two children
+        // on the underlying render node content, and another that is the built-in blur. This
+        // shader also has a float uniform used to decide which one of these two children
         // shaders to apply on a given pixel, based on the X coordinate.
-        // This test covers not only ImageFilter.makeRuntimeShader API, but also
+        // This test covers not only ImageFilter.makeRuntimeShader API but also
         // RuntimeShaderBuilder.uniform.
         val compositeSksl = """
             uniform shader content;
@@ -547,7 +548,7 @@ class ImageFilterTest {
         compositeShaderBuilder.uniform("cutoff", 100.0f)
         compositeShaderBuilder.child(
             "gradient",
-            Shader.Companion.makeLinearGradient(
+            Shader.makeLinearGradient(
                 x0 = 0.0f, y0 = 0.0f,
                 x1 = 200.0f, y1 = 0.0f,
                 colors = intArrayOf(Color.RED, Color.BLUE),
@@ -599,8 +600,14 @@ class ImageFilterTest {
     @Test
     fun makeTile() = imageFilterTest {
         ImageFilter.makeTile(
-            src = Rect(0f, 0f, 3f, 3f),
-            dst = Rect(5f, 5f, 19f, 19f),
+            0f,
+            0f,
+            3f,
+            3f,
+            5f,
+            5f,
+            19f,
+            19f,
             input = null
         )
     }

@@ -5,7 +5,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.clipRectBy
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
@@ -577,12 +576,13 @@ actual open class SkiaLayer internal constructor(
         // If this approach will be changed, create an issue in https://youtrack.jetbrains.com/issues/CMP for changing it in
         // https://github.com/JetBrains/compose-multiplatform/blob/e4e2d329709cded91a09cc612d4defbce37aad96/benchmarks/multiplatform/benchmarks/src/commonMain/kotlin/MeasureComposable.kt#L151 as well
 
-        val pictureWidth = (backedLayer.width * contentScale).toInt().coerceAtLeast(0)
-        val pictureHeight = (backedLayer.height * contentScale).toInt().coerceAtLeast(0)
+        val pictureWidth = (backedLayer.width * contentScale).coerceAtLeast(0f)
+        val pictureHeight = (backedLayer.height * contentScale).coerceAtLeast(0f)
+        val intWidth = pictureWidth.toInt()
+        val intHeight = pictureHeight.toInt()
 
-        val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val pictureRecorder = pictureRecorder!!
-        val canvas = pictureRecorder.beginRecording(bounds)
+        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight)
 
         // clipping
         for (index in clipComponents.indices) {
@@ -592,7 +592,7 @@ actual open class SkiaLayer internal constructor(
 
         try {
             isRendering = true
-            renderDelegate?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
+            renderDelegate?.onRender(canvas, intWidth, intHeight, nanoTime)
         } finally {
             isRendering = false
         }
@@ -603,7 +603,7 @@ actual open class SkiaLayer internal constructor(
             synchronized(pictureLock) {
                 picture?.instance?.close()
                 val picture = pictureRecorder.finishRecordingAsPicture()
-                this.picture = PictureHolder(picture, pictureWidth, pictureHeight)
+                this.picture = PictureHolder(picture, intWidth, intHeight)
             }
         }
     }

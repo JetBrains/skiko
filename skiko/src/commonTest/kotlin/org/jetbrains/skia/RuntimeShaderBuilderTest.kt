@@ -14,7 +14,7 @@ class RuntimeShaderBuilderTest {
             }
 
             val region = Region().apply {
-                op(IRect(3, 3, 18, 18), Region.Op.UNION)
+                op(3, 3, 18, 18, Region.Op.UNION)
             }
 
             paint.shader = shader

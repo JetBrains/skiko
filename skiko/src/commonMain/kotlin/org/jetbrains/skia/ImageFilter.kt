@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.*
 
 class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
+        @Deprecated("Use overload with IntArray crop parameter", ReplaceWith("makeArithmetic(k1, k2, k3, k4, enforcePMColor, bg, fg, crop?.toIntArray())"))
         fun makeArithmetic(
             k1: Float,
             k2: Float,
@@ -45,7 +46,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             enforcePMColor: Boolean,
             bg: ImageFilter?,
             fg: ImageFilter?,
-            crop: IntArray?
+            crop: IntArray? = null
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -69,6 +70,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @Deprecated("Use overload with IntArray crop parameter", ReplaceWith("makeBlend(blendMode, bg, fg, crop?.toIntArray())"))
         fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -88,7 +90,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
-        fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IntArray?): ImageFilter {
+        fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IntArray? = null): ImageFilter {
             return try {
                 Stats.onNativeCall()
                 interopScope {
@@ -106,13 +108,13 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 reachabilityBarrier(fg)
             }
         }
-
+        @Deprecated("Use overload with IntArray crop parameter", ReplaceWith("makeBlur(sigmaX, sigmaY, mode, input, crop?.toIntArray())"))
         fun makeBlur(
             sigmaX: Float,
             sigmaY: Float,
             mode: FilterTileMode,
             input: ImageFilter? = null,
-            crop: IRect? = null
+            crop: IRect?
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -157,6 +159,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @Deprecated("Use overload with IntArray crop parameter", ReplaceWith("makeColorFilter(f, input, crop?.toIntArray())"))
         fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -174,7 +177,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
-        fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IntArray?): ImageFilter {
+        fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IntArray? = null): ImageFilter {
             return try {
                 Stats.onNativeCall()
                 interopScope {
@@ -204,7 +207,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 reachabilityBarrier(inner)
             }
         }
-
+        @Deprecated("Use overload with IntArray crop parameter", ReplaceWith("makeDisplacementMap(x, y, scale, displacement, color, crop?.toIntArray())"))
         fun makeDisplacementMap(
             x: ColorChannel,
             y: ColorChannel,
@@ -239,7 +242,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             scale: Float,
             displacement: ImageFilter?,
             color: ImageFilter?,
-            crop: IntArray?
+            crop: IntArray? = null
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()

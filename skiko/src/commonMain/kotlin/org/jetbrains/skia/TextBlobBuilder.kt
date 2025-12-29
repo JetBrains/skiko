@@ -54,7 +54,8 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param bounds  optional run bounding box
      * @return        this
      */
-    fun appendRun(font: Font, text: String, x: Float, y: Float, bounds: Rect? = null): TextBlobBuilder {
+    @Deprecated("Use appendRun with FloatArray bounds parameter", ReplaceWith("appendRun(font, text, x, y, bounds?.serializeToFloatArray())"))
+    fun appendRun(font: Font, text: String, x: Float, y: Float, bounds: Rect?): TextBlobBuilder {
         return appendRun(font, font.getStringGlyphs(text), x, y, bounds)
     }
 
@@ -90,6 +91,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param bounds  optional run bounding box
      * @return        this
      */
+    @Deprecated("Use appendRun with FloatArray bounds parameter", ReplaceWith("appendRun(font, glyphs, x, y, bounds?.serializeToFloatArray())"))
     fun appendRun(font: Font?, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?): TextBlobBuilder {
         return try {
             Stats.onNativeCall()
@@ -128,7 +130,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param bounds  optional run bounding box
      * @return        this
      */
-    fun appendRun(font: Font?, glyphs: ShortArray?, x: Float, y: Float, bounds: FloatArray?): TextBlobBuilder {
+    fun appendRun(font: Font?, glyphs: ShortArray?, x: Float, y: Float, bounds: FloatArray? = null): TextBlobBuilder {
         return try {
             Stats.onNativeCall()
             interopScope {
@@ -174,12 +176,13 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param y       vertical offset within the blob
      * @return        this
      */
+    @Deprecated("Use appendRunPosH with FloatArray bounds parameter", ReplaceWith("appendRunPosH(font, glyphs, xs, y, bounds?.serializeToFloatArray())"))
     fun appendRunPosH(
         font: Font?,
         glyphs: ShortArray,
         xs: FloatArray,
         y: Float,
-        bounds: Rect? = null
+        bounds: Rect?
     ): TextBlobBuilder {
         return try {
             require(glyphs.size == xs.size) { "glyphs.length " + glyphs.size + " != xs.length " + xs.size }
@@ -265,7 +268,8 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param pos     positions of glyphs within the blob
      * @return        this
      */
-    fun appendRunPos(font: Font?, glyphs: ShortArray, pos: Array<Point>, bounds: Rect? = null): TextBlobBuilder {
+    @Deprecated("Use appendRunPos with FloatArray bounds parameter", ReplaceWith("appendRunPos(font, glyphs, pos, bounds?.serializeToFloatArray())"))
+    fun appendRunPos(font: Font?, glyphs: ShortArray, pos: Array<Point>, bounds: Rect?): TextBlobBuilder {
         return try {
             require(glyphs.size == pos.size) { "glyphs.length " + glyphs.size + " != pos.length " + pos.size }
             val floatPos = FloatArray(pos.size * 2)
