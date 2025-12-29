@@ -14,7 +14,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
         DIFFERENCE, INTERSECT, UNION, XOR, REVERSE_DIFFERENCE, REPLACE;
 
         companion object {
-            internal val _values = values()
+            internal val _values = Op.entries.toTypedArray()
         }
     }
 

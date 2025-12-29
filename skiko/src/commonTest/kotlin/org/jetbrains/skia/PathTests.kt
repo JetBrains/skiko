@@ -69,7 +69,7 @@ class PathTests {
 
     @Test
     fun isShapeTest() {
-        for (dir in PathDirection.values()) {
+        for (dir in PathDirection.entries) {
             for (start in 0..3) {
                 Path().addRect(Rect.makeLTRB(0f, 0f, 40f, 20f), dir, start).use { p ->
                     assertEquals(Rect.makeLTRB(0f, 0f, 40f, 20f), p.isRect)
@@ -78,7 +78,7 @@ class PathTests {
                 }
             }
         }
-        for (dir in PathDirection.values()) {
+        for (dir in PathDirection.entries) {
             for (start in 0..3) {
                 Path().addOval(Rect.makeLTRB(0f, 0f, 40f, 20f), dir, start).use { p ->
                     assertNull(p.isRect)
@@ -87,14 +87,14 @@ class PathTests {
                 }
             }
         }
-        for (dir in PathDirection.values()) {
+        for (dir in PathDirection.entries) {
             Path().addCircle(20f, 20f, 20f, dir).use { p ->
                 assertNull(p.isRect)
                 assertEquals(Rect.makeLTRB(0f, 0f, 40f, 40f), p.isOval)
                 assertNull(p.isRRect)
             }
         }
-        for (dir in PathDirection.values()) {
+        for (dir in PathDirection.entries) {
             for (start in 0..7) {
                 Path().addRRect(RRect.makeLTRB(0f, 0f, 40f, 20f, 5f), dir, start).use { p ->
                     assertNull(p.isRect)
