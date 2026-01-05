@@ -42,9 +42,9 @@ var hostArch = when (osArch) {
 
 val host = "${hostOs}-${hostArch}"
 
-val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
+val isCompositeBuild = gradle.includedBuilds.any { it.name == "skiko" }
 if (project.hasProperty("skiko.version") && isCompositeBuild) {
-    project.logger.warn("skiko.version property has no effect when skiko.composite.build is set")
+    project.logger.warn("skiko.version property has no effect when building against the included skiko build")
 }
 
 
@@ -100,6 +100,17 @@ kotlin {
         }
     }
 
+    if (hostOs == "linux") {
+        val linuxTarget = when (hostArch) {
+            "x64" -> linuxX64()
+            "arm64" -> linuxArm64()
+            else -> error("Unsupported arch: $hostArch")
+        }
+        linuxTarget.binaries.executable {
+            entryPoint = "org.jetbrains.skiko.sample.main"
+        }
+    }
+
     jvm("awt") {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
@@ -136,6 +147,10 @@ kotlin {
             dependsOn(commonMain)
         }
 
+        val linuxMain by creating {
+            dependsOn(nativeMain)
+        }
+
         val awtMain by getting {
             dependsOn(commonMain)
             dependencies {
@@ -157,15 +172,31 @@ kotlin {
             dependsOn(webMain)
         }
 
-        val darwinMain by creating {
-            dependsOn(nativeMain)
-        }
-
-        val macosMain by creating {
-            dependsOn(darwinMain)
+        if (hostOs == "linux") {
+            when (hostArch) {
+                "x64" -> {
+                    val linuxX64Main by getting {
+                        dependsOn(linuxMain)
+                    }
+                }
+                "arm64" -> {
+                    val linuxArm64Main by getting {
+                        dependsOn(linuxMain)
+                    }
+                }
+                else -> error("Unsupported arch: $hostArch")
+            }
         }
 
         if (hostOs == "macos") {
+            val darwinMain by creating {
+                dependsOn(nativeMain)
+            }
+
+            val macosMain by creating {
+                dependsOn(darwinMain)
+            }
+
             val macosX64Main by getting {
                 dependsOn(macosMain)
             }
@@ -229,6 +260,25 @@ if (hostOs == "macos") {
         argumentProviders.add {
             val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
             println("Run $out")
+            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+        }
+    }
+}
+
+if (hostOs == "linux") {
+    project.tasks.register<Exec>("runNative") {
+        workingDir = project.buildDir
+        val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
+        dependsOn(binTask)
+        if (System.getenv("SKIKO_FPS_ENABLED") == null) {
+            environment("SKIKO_FPS_ENABLED", "true")
+        }
+        if (System.getenv("SKIKO_FPS_PERIOD_SECONDS") == null) {
+            environment("SKIKO_FPS_PERIOD_SECONDS", "2.0")
+        }
+        commandLine = listOf("bash", "-c")
+        argumentProviders.add {
+            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
             listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
         }
     }

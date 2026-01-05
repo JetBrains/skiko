@@ -223,6 +223,19 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
 
     val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"
 
+    if (os == OS.Linux) {
+        target.compilations.getByName("main") {
+            cinterops.create("x11") {
+                val def = when (arch) {
+                    Arch.X64 -> "x11-linux-x64.def"
+                    Arch.Arm64 -> "x11-linux-arm64.def"
+                    else -> error("Unsupported arch for X11 cinterop: $arch")
+                }
+                defFile(project.file("src/nativeInterop/cinterop/$def"))
+            }
+        }
+    }
+
     val unzipper = registerOrGetSkiaDirProvider(os, arch, isUikitSim)
     val unpackedSkia = unzipper.get()
     val skiaDir = unpackedSkia.absolutePath
@@ -272,6 +285,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
                 options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
             }
+            // Export Linux linker options to consumers via an (empty) cinterop.
+            configureCinterop("skiko", os, arch, target, targetString, options)
             mutableListOfLinkerOptions(options)
         }
         else -> mutableListOf()

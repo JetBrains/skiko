@@ -144,7 +144,14 @@ val Project.supportNativeMac: Boolean
     get() = supportAllNative || findProperty("skiko.native.mac.enabled") == "true" || isInIdea
 
 val Project.supportNativeLinux: Boolean
-    get() = supportAllNative || findProperty("skiko.native.linux.enabled") == "true" || isInIdea
+    get() {
+        val enabledProp = findProperty("skiko.native.linux.enabled")?.toString()?.lowercase()
+        return supportAllNative || isInIdea || when (enabledProp) {
+            "true" -> true
+            "false" -> false
+            else -> hostOs == OS.Linux
+        }
+    }
 
 val Project.supportAnyNative: Boolean
     get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
