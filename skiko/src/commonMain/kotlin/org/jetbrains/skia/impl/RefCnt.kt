@@ -13,4 +13,18 @@ expect abstract class RefCnt : Managed {
     val refCount: Int
 }
 
+internal fun RefCnt.refCntToString(managedString: String, nullPointer: NativePointer) = buildString {
+    append(managedString)
+    setLength(length - 1)  // remove trailing ')'
+
+    if (_ptr == nullPointer) {
+        append(", disposed")
+    } else {
+        append(", refCount=")
+        append(refCount)
+    }
+
+    append(')')
+}
+
 internal expect fun RefCnt_nGetFinalizer(): NativePointer
