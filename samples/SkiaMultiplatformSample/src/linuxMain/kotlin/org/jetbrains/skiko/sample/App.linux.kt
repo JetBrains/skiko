@@ -16,6 +16,9 @@ const val SCREEN_HEIGHT = 450
 @OptIn(ExperimentalTime::class)
 fun main() {
     println("[LinuxApp] Starting main()")
+    var windowWidth = SCREEN_WIDTH
+    var windowHeight = SCREEN_HEIGHT
+
     var mouseX = 0.0
     var mouseY = 0.0
 
@@ -28,13 +31,17 @@ fun main() {
 
     window(
         name = "Skiko example",
-        width = SCREEN_WIDTH,
-        height = SCREEN_HEIGHT,
+        width = windowWidth,
+        height = windowHeight,
         onEvent = { event ->
             when (event) {
                 is Event.MousePosChanged -> {
                     mouseX = event.x.toDouble()
                     mouseY = event.y.toDouble()
+                }
+                is Event.WindowResized -> {
+                    windowWidth = event.width
+                    windowHeight = event.height
                 }
                 else -> { /* ignore */ }
             }
@@ -50,8 +57,8 @@ fun main() {
                 println("[LinuxApp] Creating BackendRenderTarget and Surface...")
                 // Use the default framebuffer (id = 0) provided by the window
                 renderTarget = BackendRenderTarget.makeGL(
-                    width = SCREEN_WIDTH,
-                    height = SCREEN_HEIGHT,
+                    width = windowWidth,
+                    height = windowHeight,
                     sampleCnt = 0,
                     stencilBits = 8,
                     fbId = 0, // default framebuffer
@@ -75,7 +82,7 @@ fun main() {
             app.ypos = mouseY
 
             val nanoTime = now().toEpochMilliseconds() * 1_000_000L
-            app.onRender(canvas, SCREEN_WIDTH, SCREEN_HEIGHT, nanoTime)
+            app.onRender(canvas, windowWidth, windowHeight, nanoTime)
 
             surface.flushAndSubmit(syncCpu = true)
         } catch (t: Throwable) {

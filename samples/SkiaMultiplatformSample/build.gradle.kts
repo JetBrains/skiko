@@ -210,7 +210,7 @@ kotlin {
         val nativeMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation("io.github.drulysses:kgfw:1.2.0")
+                implementation("io.github.drulysses:kgfw:1.4.0")
             }
         }
 
