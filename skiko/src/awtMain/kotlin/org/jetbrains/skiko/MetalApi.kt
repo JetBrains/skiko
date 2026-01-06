@@ -1,7 +1,5 @@
 package org.jetbrains.skiko
 
-import javax.accessibility.Accessible
-
 /**
  * Provides [MetalAdapter] that holds pointer to native [MTLDevice](https://developer.apple.com/documentation/metal/mtldevice)
  * chosen using [adapterPriority]
@@ -17,16 +15,18 @@ internal fun chooseMetalAdapter(adapterPriority: GpuPriority): MetalAdapter {
 
     val adapterName = getAdapterName(adapter)
     val adapterMemorySize = getAdapterMemorySize(adapter)
+    val adapterMaxTextureSize = getAdapterMaxTextureSize(adapter)
 
-    return MetalAdapter(adapter, adapterName, adapterMemorySize)
+    return MetalAdapter(adapter, adapterName, adapterMemorySize, adapterMaxTextureSize)
 }
 
 /**
  * @param ptr pointer for native [MTLDevice](https://developer.apple.com/documentation/metal/mtldevice)
  * @param name the full name of the vendor device.
  * @param memorySize approximation of how much memory this device can use with good performance.
+ * @param maxTextureSize maximum width and height supported for 2D textures.
  */
-internal data class MetalAdapter(val ptr: Long, val name: String, val memorySize: Long)
+internal data class MetalAdapter(val ptr: Long, val name: String, val memorySize: Long, val maxTextureSize: Int)
 
 internal fun MetalAdapter.dispose() {
     disposeAdapter(ptr)
@@ -49,6 +49,7 @@ private external fun chooseAdapter(adapterPriority: Int): Long
 private external fun disposeAdapter(adapter: Long)
 private external fun getAdapterName(adapter: Long): String
 private external fun getAdapterMemorySize(adapter: Long): Long
+private external fun getAdapterMaxTextureSize(adapter: Long): Int
 
 @Suppress("SpellCheckingInspection")
 private external fun openAutoreleasepool(): Long

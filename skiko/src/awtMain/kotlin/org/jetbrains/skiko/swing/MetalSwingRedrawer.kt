@@ -60,6 +60,10 @@ internal class MetalSwingRedrawer(
             return
         }
 
+        if (width > adapter.maxTextureSize || height > adapter.maxTextureSize) {
+            return
+        }
+
         autoreleasepool {
             autoCloseScope {
                 texturePtr = makeMetalTexture(adapter.ptr, texturePtr, width, height)
