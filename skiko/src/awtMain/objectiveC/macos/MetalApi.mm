@@ -147,6 +147,9 @@ JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_MetalApiKt_getAdapterMaxTextureS
         id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
         // Query GPU family to determine max 2D texture dimension
         // See: https://developer.apple.com/metal/Metal-Feature-Set-Tables.pdf
+        if ([adapter supportsFamily:MTLGPUFamilyApple10]) {
+            return 32768;
+        }
         if ([adapter supportsFamily:MTLGPUFamilyApple3] ||
             [adapter supportsFamily:MTLGPUFamilyMac1]) {
             return 16384;
