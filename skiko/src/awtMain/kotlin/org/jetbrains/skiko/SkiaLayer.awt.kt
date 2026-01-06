@@ -193,18 +193,40 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    actual var transparency: Boolean = false
-
-    actual var backgroundColor: Int
-        get() = background.rgb
+    private var _transparency: Boolean = false
+    actual var transparency: Boolean
+        get() = _transparency
         set(value) {
-            background = Color(value, true)
+            configureBackground(value, _background)
         }
 
+    actual var backgroundColor: Int
+        get() = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
+        set(value) {
+            configureBackground(_transparency, Color(value, true))
+        }
+
+    // This is needed because after setBackground(null), getBackground() will not return null, but an ancestor's
+    // non-null background. But we need to preserve the null value when modifying `transparency`.
+    private var _background: Color? = null
+
     override fun setBackground(bg: Color?) {
-        // Note that SkiaLayer itself doesn't draw its background; only backedLayer does, as it's heavyweight
+        configureBackground(_transparency, bg)
+    }
+
+    private fun configureBackground(transparency: Boolean, bg: Color?) {
+        _transparency = transparency
+        _background = bg
+
+        // Note that SkiaLayer itself doesn't draw its background; only backedLayer does, as it's heavyweight.
+        // We set the property just so it can be read back correctly, and also for the case when bg==null, as that
+        // indicates the parent's background should be used (getBackground() calls parent.getBackground() if own
+        // background is null).
         super.setBackground(bg)
-        backedLayer.background = bg
+
+        // To enable transparency, the backedLayer's background must be transparent (also the window background).
+        backedLayer.background = if (transparency) Color(0, 0, 0, 0) else bg
+
         needRender()
     }
 

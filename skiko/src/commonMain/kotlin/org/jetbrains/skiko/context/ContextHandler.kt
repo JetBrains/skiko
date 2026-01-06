@@ -43,7 +43,7 @@ internal abstract class ContextHandler(
         canvas?.apply {
             val layerBg = layer.backgroundColor
             clear(
-                if (isTransparentBackgroundSupported()) {
+                if (layer.transparency && isTransparentBackgroundSupported()) {
                     layerBg
                 } else {
                     layerBg or 0xFF000000.toInt()

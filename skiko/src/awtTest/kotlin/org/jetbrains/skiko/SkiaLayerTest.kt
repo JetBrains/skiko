@@ -1321,7 +1321,7 @@ class SkiaLayerTest {
     }
 
     private suspend fun  UiTestScope.testLayerBackground(
-        initLayer: SkiaLayer.() -> Unit = {}
+        initLayer: UiTestWindow.() -> Unit = {}
     ) {
         val window = UiTestWindow()
         try {
@@ -1329,7 +1329,7 @@ class SkiaLayerTest {
             window.setSize(300, 300)
             val layer = window.layer
             layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ -> }
-            initLayer(layer)
+            initLayer(window)
             layer.background = Color.RED
             window.isVisible = true
             delay(1000)
@@ -1362,7 +1362,12 @@ class SkiaLayerTest {
 
     @Test
     fun `layer background is drawn correctly with transparency`() = uiTest {
-        testLayerBackground { transparency = true }
+        testLayerBackground {
+            layer.transparency = true
+            layer.background = Color(0, 0, 0, 0)
+            isUndecorated = true
+            background = Color(0, 0, 0, 0)
+        }
     }
 
     private class RectRenderer(
