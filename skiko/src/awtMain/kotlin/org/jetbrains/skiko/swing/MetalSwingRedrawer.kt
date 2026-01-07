@@ -60,6 +60,10 @@ internal class MetalSwingRedrawer(
             return
         }
 
+        require(width <= adapter.maxTextureSize && height <= adapter.maxTextureSize) {
+            "Texture dimensions must be less than maximum allowed size: ${adapter.maxTextureSize}, got $width x $height"
+        }
+
         autoreleasepool {
             autoCloseScope {
                 texturePtr = makeMetalTexture(adapter.ptr, texturePtr, width, height)
