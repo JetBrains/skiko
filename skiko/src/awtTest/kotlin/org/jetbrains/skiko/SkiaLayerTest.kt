@@ -1339,7 +1339,7 @@ class SkiaLayerTest {
 
             fun assertLayerIs(color: Color) {
                 val pixel = robot.getPixelColor(windowBounds.centerX.toInt(), windowBounds.centerY.toInt())
-                assertTrue(pixel.closeTo(color))
+                assertTrue(pixel.closeTo(color), "Actual pixel $pixel not close to expected $color")
             }
             assertLayerIs(Color.RED)
 
@@ -1362,11 +1362,15 @@ class SkiaLayerTest {
 
     @Test
     fun `layer background is drawn correctly with transparency`() = uiTest {
+        if (renderApi == GraphicsApi.ANGLE) return@uiTest  // See https://youtrack.jetbrains.com/issue/SKIKO-1089
+
         testLayerBackground {
             layer.transparency = true
             layer.background = Color(0, 0, 0, 0)
             isUndecorated = true
-            background = Color(0, 0, 0, 0)
+
+            val transparentWindowHack = (hostOs == OS.Windows) && (renderApi != GraphicsApi.DIRECT3D)
+            background = if (transparentWindowHack) null else Color(0, 0, 0, 0)
         }
     }
 
