@@ -17,11 +17,11 @@ import java.awt.im.InputMethodRequests
 import java.beans.PropertyChangeListener
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
+import javax.accessibility.AccessibleContext
+import javax.accessibility.AccessibleRole
 import javax.swing.JComponent
-import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.isEventDispatchThread
-import javax.swing.UIManager
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 import kotlin.math.floor
@@ -32,7 +32,7 @@ actual open class SkiaLayer internal constructor(
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
-) : JPanel() {
+) : JComponent(), Accessible {
 
     internal companion object {
         init {
@@ -44,18 +44,6 @@ actual open class SkiaLayer internal constructor(
         Renderer,
         ContentScale,
     }
-
-    private var _transparency: Boolean = false
-    actual var transparency: Boolean
-        get() = _transparency
-        set(value) {
-            _transparency = value
-            if (!value) {
-                background = UIManager.getColor("Panel.background")
-            } else {
-                background = Color(0, 0, 0, 0)
-            }
-        }
 
     internal val backedLayer: HardwareLayer
 
@@ -100,7 +88,6 @@ actual open class SkiaLayer internal constructor(
     private var latestReceivedGraphicsContextScaleTransform: AffineTransform? = null
 
     init {
-        isOpaque = false
         layout = null
         backedLayer = object : HardwareLayer(externalAccessibleFactory) {
             override fun paint(g: Graphics) {
@@ -204,6 +191,43 @@ actual open class SkiaLayer internal constructor(
                 }
             }
         }
+    }
+
+    private var _transparency: Boolean = false
+    actual var transparency: Boolean
+        get() = _transparency
+        set(value) {
+            configureBackground(value, _background)
+        }
+
+    actual var backgroundColor: Int
+        get() = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
+        set(value) {
+            configureBackground(_transparency, Color(value, true))
+        }
+
+    // This is needed because after setBackground(null), getBackground() will not return null, but an ancestor's
+    // non-null background. But we need to preserve the null value when modifying `transparency`.
+    private var _background: Color? = null
+
+    override fun setBackground(bg: Color?) {
+        configureBackground(_transparency, bg)
+    }
+
+    private fun configureBackground(transparency: Boolean, bg: Color?) {
+        _transparency = transparency
+        _background = bg
+
+        // Note that SkiaLayer itself doesn't draw its background; only backedLayer does, as it's heavyweight.
+        // We set the property just so it can be read back correctly, and also for the case when bg==null, as that
+        // indicates the parent's background should be used (getBackground() calls parent.getBackground() if own
+        // background is null).
+        super.setBackground(bg)
+
+        // To enable transparency, the backedLayer's background must be transparent (also the window background).
+        backedLayer.background = if (transparency) Color(0, 0, 0, 0) else bg
+
+        needRender()
     }
 
     // Override to make final, because it's called it in the init block
@@ -662,10 +686,24 @@ actual open class SkiaLayer internal constructor(
     fun requestNativeFocusOnAccessible(accessible: Accessible?) {
         backedLayer.requestNativeFocusOnAccessible(accessible)
     }
+
+    override fun getAccessibleContext(): AccessibleContext {
+        if (accessibleContext == null) {
+            accessibleContext = AccessibleSkiaLayer()
+        }
+        return accessibleContext
+    }
+
+    @Suppress("RedundantInnerClassModifier")
+    protected inner class AccessibleSkiaLayer : AccessibleJComponent() {
+        override fun getAccessibleRole(): AccessibleRole {
+            return AccessibleRole.PANEL
+        }
+    }
 }
 
 /**
- * Disable showing window title bar.
+ * Disable showing the window title bar.
  */
 fun SkiaLayer.disableTitleBar(customHeaderHeight: Float) {
     backedLayer.disableTitleBar(customHeaderHeight)

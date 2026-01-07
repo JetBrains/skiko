@@ -2,7 +2,7 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.Canvas
 
-interface SkikoRenderDelegate {
+fun interface SkikoRenderDelegate {
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
 }
 
