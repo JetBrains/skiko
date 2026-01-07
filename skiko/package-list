@@ -3026,6 +3026,7 @@ $dokka.location:org.jetbrains.skiko/PredefinedCursorsId/values/#/PointingToDecla
 $dokka.location:org.jetbrains.skiko/SkiaLayer///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/index.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/SkiaLayer/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/-skia-layer.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#kotlin.Any/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
+$dokka.location:org.jetbrains.skiko/SkiaLayer/backgroundColor/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/background-color.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/component/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/component.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/contentScale/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/content-scale.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/detach/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/detach.html
