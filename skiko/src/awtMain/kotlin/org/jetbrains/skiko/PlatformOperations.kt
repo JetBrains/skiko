@@ -129,7 +129,28 @@ internal val platformOperations: PlatformOperations by lazy {
 }
 
 // OSX
-external private fun osxIsFullscreenNative(component: Component): Boolean
-external private fun osxSetFullscreenNative(component: Component, value: Boolean)
-external private fun osxDisableTitleBar(component: Component, headerHeight: Float)
-external private fun osxOrderEmojiAndSymbolsPopup()
+private external fun osxIsFullscreenNative(component: Component): Boolean
+private external fun osxSetFullscreenNative(component: Component, value: Boolean)
+private external fun osxDisableTitleBar(component: Component, headerHeight: Float)
+private external fun osxOrderEmojiAndSymbolsPopup()
+
+// Transparent window hack
+private val TRANSPARENT_COLOR = java.awt.Color(0, 0, 0, 0)
+
+/**
+ * Returns the color that should be set as the [Window.background] for transparent windows.
+ *
+ * Note that this is a workaround for an implementation detail of OpenGL and Software
+ * (and possibly other) renderers on Windows. As such, it may be removed in the future.
+ */
+@DelicateSkikoApi
+fun transparentWindowBackgroundHack(renderApi: GraphicsApi): java.awt.Color? {
+    // There is a hack inside OpenGL and Software redrawers for Windows that makes the
+    // window transparent without setting the `background` of the AWT window. It is done
+    // by getting the native component parent and calling `DwmEnableBlurBehindWindow`.
+    //
+    // FIXME: Make OpenGL work inside transparent window (background == Color(0, 0, 0, 0)) without this hack.
+    // See `enableTransparentWindow` (skiko/src/awtMain/cpp/windows/window_util.cc)
+    val skikoTransparentWindowHack = hostOs == OS.Windows && renderApi != GraphicsApi.DIRECT3D
+    return if (skikoTransparentWindowHack) null else TRANSPARENT_COLOR
+}

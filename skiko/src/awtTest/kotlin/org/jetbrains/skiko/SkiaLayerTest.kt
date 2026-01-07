@@ -1368,9 +1368,7 @@ class SkiaLayerTest {
             layer.transparency = true
             layer.background = Color(0, 0, 0, 0)
             isUndecorated = true
-
-            val transparentWindowHack = (hostOs == OS.Windows) && (renderApi != GraphicsApi.DIRECT3D)
-            background = if (transparentWindowHack) null else Color(0, 0, 0, 0)
+            background = transparentWindowBackgroundHack(renderApi)
         }
     }
 
