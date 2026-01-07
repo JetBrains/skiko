@@ -2873,6 +2873,7 @@ $dokka.location:org.jetbrains.skiko//setupSkikoLoggerFactory/#kotlin.Function0[o
 $dokka.location:org.jetbrains.skiko//toBitmap/java.awt.image.BufferedImage#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-bitmap.html
 $dokka.location:org.jetbrains.skiko//toBufferedImage/[Error type: Unresolved type for Bitmap]#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-buffered-image.html
 $dokka.location:org.jetbrains.skiko//toImage/java.awt.image.BufferedImage#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-image.html
+$dokka.location:org.jetbrains.skiko//transparentWindowBackgroundHack/#[Error type: Unresolved type for GraphicsApi]/PointingToDeclaration/skiko/org.jetbrains.skiko/transparent-window-background-hack.html
 $dokka.location:org.jetbrains.skiko/Arch.Arm64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-arm64/index.html
 $dokka.location:org.jetbrains.skiko/Arch.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-j-s/index.html
 $dokka.location:org.jetbrains.skiko/Arch.Unknown///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-unknown/index.html
