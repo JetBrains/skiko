@@ -34,6 +34,11 @@ expect open class SkiaLayer {
     var transparency: Boolean
 
     /**
+     * The color, in ARGB format, with which the layer is cleared before rendering.
+     */
+    var backgroundColor: Int
+
+    /**
      * Underlying platform component.
      */
     val component: Any?

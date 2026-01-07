@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
+import org.jetbrains.skia.Color
 
 actual open class SkiaLayer {
     private var glView: SkikoSurfaceView? = null
@@ -23,6 +24,15 @@ actual open class SkiaLayer {
         get() = false
         set(value) {
             if (value) throw IllegalArgumentException("transparency unsupported")
+        }
+
+    /**
+     * The background color of the layer.
+     */
+    actual var backgroundColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            needRender()
         }
 
     actual var renderDelegate: SkikoRenderDelegate? = null

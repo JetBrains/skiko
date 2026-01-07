@@ -10,9 +10,9 @@ import java.awt.color.ColorSpace
 import java.awt.image.*
 
 internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHandler(layer) {
-    override fun isTransparentBackground(): Boolean {
-        // TODO: why Software rendering has another transparency logic from the begginning
-        return hostOs == OS.MacOS && layer.transparency
+    override fun isTransparentBackgroundSupported(): Boolean {
+        // TODO: why Software rendering has another transparency logic from the beginning
+        return hostOs == OS.MacOS
     }
 
     val colorModel = ComponentColorModel(
