@@ -1360,6 +1360,7 @@ class SkiaLayerTest {
         testLayerBackground()
     }
 
+    @OptIn(DelicateSkikoApi::class)
     @Test
     fun `layer background is drawn correctly with transparency`() = uiTest {
         if (renderApi == GraphicsApi.ANGLE) return@uiTest  // See https://youtrack.jetbrains.com/issue/SKIKO-1089
