@@ -2810,7 +2810,7 @@ $dokka.location:org.jetbrains.skiko.node/RenderNodeContext/RenderNodeContext/#ko
 $dokka.location:org.jetbrains.skiko.node/RenderNodeContext/setLightingInfo/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skiko.node/-render-node-context/set-lighting-info.html
 $dokka.location:org.jetbrains.skiko.swing////PointingToDeclaration/skiko/org.jetbrains.skiko.swing/index.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer///PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/index.html
-$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/SkiaSwingLayer/#[Error type: Unresolved type for SkikoRenderDelegate]#[Error type: Unresolved type for SkiaLayerAnalytics]#kotlin.Function1[java.awt.Component,javax.accessibility.Accessible]?#org.jetbrains.skiko.SkiaLayerProperties/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/-skia-swing-layer.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/SkiaSwingLayer/#[Error type: Unresolved type for SkikoRenderDelegate]#[Error type: Unresolved type for SkiaLayerAnalytics]#kotlin.Function1[java.awt.Component,javax.accessibility.AccessibleContext]?#org.jetbrains.skiko.SkiaLayerProperties/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/-skia-swing-layer.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/addNotify/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/add-notify.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/clipComponents/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/clip-components.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/dispose/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/dispose.html
@@ -2818,7 +2818,6 @@ $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/getAccessibleContext/#/
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/paint/#java.awt.Graphics/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/paint.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/removeNotify/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/remove-notify.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/render-api.html
-$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/requestNativeFocusOnAccessible/#javax.accessibility.Accessible?/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/request-native-focus-on-accessible.html
 $dokka.location:org.jetbrains.skiko.wasm////PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/index.html
 $dokka.location:org.jetbrains.skiko.wasm//awaitSkiko/#/PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/await-skiko.html
 $dokka.location:org.jetbrains.skiko.windows////PointingToDeclaration/skiko/org.jetbrains.skiko.windows/index.html
@@ -2863,9 +2862,9 @@ $dokka.location:org.jetbrains.skiko//hostArch/#/PointingToDeclaration/skiko/org
 $dokka.location:org.jetbrains.skiko//hostId/#/PointingToDeclaration/skiko/org.jetbrains.skiko/host-id.html
 $dokka.location:org.jetbrains.skiko//hostOSVersion/#/PointingToDeclaration/skiko/org.jetbrains.skiko/host-o-s-version.html
 $dokka.location:org.jetbrains.skiko//hostOs/#/PointingToDeclaration/skiko/org.jetbrains.skiko/host-os.html
+$dokka.location:org.jetbrains.skiko//initializeCAccessible/#javax.accessibility.Accessible/PointingToDeclaration/skiko/org.jetbrains.skiko/initialize-c-accessible.html
 $dokka.location:org.jetbrains.skiko//kotlinBackend/#/PointingToDeclaration/skiko/org.jetbrains.skiko/kotlin-backend.html
 $dokka.location:org.jetbrains.skiko//loadBytesFromPath/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/load-bytes-from-path.html
-$dokka.location:org.jetbrains.skiko//nativeInitializeAccessible/#javax.accessibility.Accessible/PointingToDeclaration/skiko/org.jetbrains.skiko/native-initialize-accessible.html
 $dokka.location:org.jetbrains.skiko//numberOfBuffers/org.jetbrains.skiko.FrameBuffering#/PointingToDeclaration/skiko/org.jetbrains.skiko/number-of-buffers.html
 $dokka.location:org.jetbrains.skiko//orderEmojiAndSymbolsPopup/#/PointingToDeclaration/skiko/org.jetbrains.skiko/order-emoji-and-symbols-popup.html
 $dokka.location:org.jetbrains.skiko//setSystemLookAndFeel/#/PointingToDeclaration/skiko/org.jetbrains.skiko/set-system-look-and-feel.html
