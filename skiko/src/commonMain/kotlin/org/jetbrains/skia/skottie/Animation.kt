@@ -65,7 +65,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @return        this
      */
     fun render(canvas: Canvas, offset: Point): Animation {
-        return render(canvas, offset.x, offset.y)
+        return render(canvas, offset.x, offset.y, offset.x + width, offset.y + height)
     }
 
     /**
@@ -99,16 +99,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @return             this
      */
     fun render(canvas: Canvas, dst: Rect, vararg renderFlags: RenderFlag): Animation {
-        return try {
-            Stats.onNativeCall()
-            var flags = 0
-            for (flag in renderFlags) flags = flags or flag._flag
-            _nRender(_ptr, getPtr(canvas), dst.left, dst.top, dst.right, dst.bottom, flags)
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(canvas)
-        }
+        return render(canvas, dst.left, dst.top, dst.right, dst.bottom, renderFlags = renderFlags)
     }
 
     /**
