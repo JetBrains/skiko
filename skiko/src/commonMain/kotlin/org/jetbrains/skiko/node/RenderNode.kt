@@ -253,6 +253,7 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
             antiAlias = antiAlias
         )
     }
+
     fun setClipRect(left: Float, top: Float, right: Float, bottom: Float, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
         Stats.onNativeCall()
         RenderNode_nSetClipRect(
@@ -282,6 +283,7 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
             )
         }
     }
+
     fun setClipRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
         Stats.onNativeCall()
         interopScope {

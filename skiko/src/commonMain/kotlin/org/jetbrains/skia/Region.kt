@@ -99,6 +99,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
     }
+
     fun setRect(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
@@ -159,6 +160,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
     }
+
     fun intersects(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
@@ -189,6 +191,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
     }
+
     fun contains(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
@@ -320,6 +323,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(r)
         }
     }
+
     fun op(left: Int, top: Int, right: Int, bottom: Int, r: Region?, op: Op): Boolean {
         return try {
             Stats.onNativeCall()

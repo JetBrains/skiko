@@ -82,7 +82,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @return        this
      */
     fun render(canvas: Canvas, left: Float, top: Float): Animation {
-        return render(canvas, left, top, width, height)
+        return render(canvas, left, top, left + width, top + height)
     }
 
     /**
