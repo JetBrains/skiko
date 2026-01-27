@@ -1,12 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native.Companion.NullPointer
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -50,21 +45,13 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @return the canvas.
      */
     fun beginRecording(bounds: Rect, bbh: BBHFactory? = null): Canvas {
-        return try {
-            Stats.onNativeCall()
-            Canvas(
-                _nBeginRecording(
-                    _ptr,
-                    bounds.left,
-                    bounds.top,
-                    bounds.right,
-                    bounds.bottom,
-                    getPtr(bbh)
-                ), false, this
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+        return beginRecording(
+            bounds.left,
+            bounds.top,
+            bounds.right,
+            bounds.bottom,
+            bbh
+        )
     }
 
     /**
@@ -142,15 +129,41 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @return the picture containing the recorded content.
      */
     fun finishRecordingAsPicture(cull: Rect): Picture {
+        return finishRecordingAsPicture(
+            cull.left,
+            cull.top,
+            cull.right,
+            cull.bottom
+        )
+    }
+
+    /**
+     * Finalizes the recording of the drawing commands and creates an immutable picture object
+     * that encapsulates the recorded content. The cull rect provided defines the boundaries
+     * for the recorded content and can be used for bounding box hierarchy (BBH) generation
+     * and subsequent culling operations. After this call, the canvas returned by any
+     * `beginRecording` or `getRecordingCanvas` method becomes invalid.
+     *
+     * @param cullLeft The left side of the cull rect defining the visible bounds of the recording.
+     *                 Any drawing outside this boundary may or may not be included in the result.
+     * @param cullTop The top side of the cull rect defining the visible bounds of the recording.
+     *                Any drawing outside this boundary may or may not be included in the result.
+     * @param cullRight The right side of the cull rect defining the visible bounds of the recording.
+     *                  Any drawing outside this boundary may or may not be included in the result.
+     * @param cullBottom The bottom side of the cull rect defining the visible bounds of the recording.
+     *                   Any drawing outside this boundary may or may not be included in the result.
+     * @return An immutable [Picture] object that contains the recorded drawing commands.
+     */
+    fun finishRecordingAsPicture(cullLeft: Float, cullTop: Float, cullRight: Float, cullBottom: Float): Picture {
         return try {
             Stats.onNativeCall()
             Picture(
                 _nFinishRecordingAsPictureWithCull(
                     _ptr,
-                    cull.left,
-                    cull.top,
-                    cull.right,
-                    cull.bottom
+                    cullLeft,
+                    cullTop,
+                    cullRight,
+                    cullBottom
                 )
             )
         } finally {

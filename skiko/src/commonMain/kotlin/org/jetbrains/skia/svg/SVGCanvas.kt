@@ -22,7 +22,7 @@ object SVGCanvas {
      * @return                    new Canvas
      */
     fun make(bounds: Rect, out: WStream): Canvas {
-        return make(bounds, out, convertTextToPaths = false, prettyXML = true)
+        return make(bounds.left, bounds.top, bounds.right, bounds.bottom, out, convertTextToPaths = false, prettyXML = true)
     }
 
     /**
@@ -74,20 +74,7 @@ object SVGCanvas {
      * @return                    new Canvas
      */
     fun make(bounds: Rect, out: WStream, convertTextToPaths: Boolean, prettyXML: Boolean): Canvas {
-        Stats.onNativeCall()
-        val ptr = try {
-            _nMake(
-                bounds.left,
-                bounds.top,
-                bounds.right,
-                bounds.bottom,
-                getPtr(out),
-                0 or (if (convertTextToPaths) 1 else 0) or if (prettyXML) 0 else 2
-            )
-        } finally {
-            reachabilityBarrier(out)
-        }
-        return Canvas(ptr, true, out)
+        return make(bounds.left, bounds.top, bounds.right, bounds.bottom, out, convertTextToPaths, prettyXML)
     }
 
     init {

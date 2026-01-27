@@ -92,12 +92,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun setRect(rect: IRect): Boolean {
-        return try {
-            Stats.onNativeCall()
-            Region_nSetRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        return setRect(rect.left, rect.top, rect.right, rect.bottom)
     }
 
     fun setRect(left: Int, top: Int, right: Int, bottom: Int): Boolean {
@@ -153,12 +148,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun intersects(rect: IRect): Boolean {
-        return try {
-            Stats.onNativeCall()
-            Region_nIntersectsIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        return intersects(rect.left, rect.top, rect.right, rect.bottom)
     }
 
     fun intersects(left: Int, top: Int, right: Int, bottom: Int): Boolean {
@@ -202,12 +192,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     operator fun contains(rect: IRect): Boolean {
-        return try {
-            Stats.onNativeCall()
-            Region_nContainsIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        return contains(rect.left, rect.top, rect.right, rect.bottom)
     }
 
     operator fun contains(r: Region?): Boolean {
@@ -221,18 +206,24 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun quickContains(rect: IRect): Boolean {
+        return quickContains(rect.left, rect.top, rect.right, rect.bottom)
+    }
+    fun quickContains(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            Region_nQuickContains(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nQuickContains(_ptr, left, top, right, bottom)
         } finally {
             reachabilityBarrier(this)
         }
     }
 
     fun quickReject(rect: IRect): Boolean {
+        return quickReject(rect.left, rect.top, rect.right, rect.bottom)
+    }
+    fun quickReject(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            Region_nQuickRejectIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nQuickRejectIRect(_ptr, left, top, right, bottom)
         } finally {
             reachabilityBarrier(this)
         }
@@ -261,19 +252,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun op(rect: IRect, op: Op): Boolean {
-        return try {
-            Stats.onNativeCall()
-            Region_nOpIRect(
-                _ptr,
-                rect.left,
-                rect.top,
-                rect.right,
-                rect.bottom,
-                op.ordinal
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+        return op(rect.left, rect.top, rect.right, rect.bottom, op)
     }
 
     fun op(left: Int, top: Int, right: Int, bottom: Int, op: Op): Boolean {
@@ -307,21 +286,14 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun op(rect: IRect, r: Region?, op: Op): Boolean {
-        return try {
-            Stats.onNativeCall()
-            Region_nOpIRectRegion(
-                _ptr,
-                rect.left,
-                rect.top,
-                rect.right,
-                rect.bottom,
-                getPtr(r),
-                op.ordinal
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(r)
-        }
+        return op(
+            rect.left,
+            rect.top,
+            rect.right,
+            rect.bottom,
+            r,
+            op
+        )
     }
 
     fun op(left: Int, top: Int, right: Int, bottom: Int, r: Region?, op: Op): Boolean {
@@ -343,21 +315,14 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun op(r: Region?, rect: IRect, op: Op): Boolean {
-        return try {
-            Stats.onNativeCall()
-            Region_nOpRegionIRect(
-                _ptr,
-                getPtr(r),
-                rect.left,
-                rect.top,
-                rect.right,
-                rect.bottom,
-                op.ordinal
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(r)
-        }
+        return op(
+            r,
+            rect.left,
+            rect.top,
+            rect.right,
+            rect.bottom,
+            op
+        )
     }
 
     fun op(r: Region?, left: Int, top: Int, right: Int, bottom: Int, op: Op): Boolean {

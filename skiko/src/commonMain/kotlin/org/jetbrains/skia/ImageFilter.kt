@@ -336,26 +336,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         fun makeImage(image: Image?, src: Rect, dst: Rect, mode: SamplingMode): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeImage(
-                        getPtr(image),
-                        src.left,
-                        src.top,
-                        src.right,
-                        src.bottom,
-                        dst.left,
-                        dst.top,
-                        dst.right,
-                        dst.bottom,
-                        mode._packedInt1(),
-                        mode._packedInt2()
-                    )
-                )
-            } finally {
-                reachabilityBarrier(image)
-            }
+            return makeImage(
+                image,
+                src.left,
+                src.top,
+                src.right,
+                src.bottom,
+                dst.left,
+                dst.top,
+                dst.right,
+                dst.bottom,
+                mode
+            )
         }
 
         fun makeImage(
@@ -566,24 +558,17 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         fun makeTile(src: Rect, dst: Rect, input: ImageFilter?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeTile(
-                        src.left,
-                        src.top,
-                        src.right,
-                        src.bottom,
-                        dst.left,
-                        dst.top,
-                        dst.right,
-                        dst.bottom,
-                        getPtr(input)
-                    )
-                )
-            } finally {
-                reachabilityBarrier(input)
-            }
+            return makeTile(
+                src.left,
+                src.top,
+                src.right,
+                src.bottom,
+                dst.left,
+                dst.top,
+                dst.right,
+                dst.bottom,
+                input
+            )
         }
 
         fun makeTile(

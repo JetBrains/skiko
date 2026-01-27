@@ -1250,9 +1250,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_arcTo](https://fiddle.skia.org/c/@Path_arcTo)
      */
     fun arcTo(oval: Rect, startAngle: Float, sweepAngle: Float, forceMoveTo: Boolean): Path {
-        Stats.onNativeCall()
-        _nArcTo(_ptr, oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle, forceMoveTo)
-        return this
+        return arcTo(oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle, forceMoveTo)
     }
 
     /**
@@ -1541,9 +1539,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_addRect](https://fiddle.skia.org/c/@Path_addRect)
      */
     fun addRect(rect: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 0): Path {
-        Stats.onNativeCall()
-        _nAddRect(_ptr, rect.left, rect.top, rect.right, rect.bottom, dir.ordinal, start)
-        return this
+        return addRect(rect.left, rect.top, rect.right, rect.bottom, dir, start)
     }
 
     /**
@@ -1595,9 +1591,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_addOval](https://fiddle.skia.org/c/@Path_addOval)
      */
     fun addOval(oval: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 1): Path {
-        Stats.onNativeCall()
-        _nAddOval(_ptr, oval.left, oval.top, oval.right, oval.bottom, dir.ordinal, start)
-        return this
+        return addOval(oval.left, oval.top, oval.right, oval.bottom, dir, start)
     }
 
     /**
@@ -1677,9 +1671,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_addArc](https://fiddle.skia.org/c/@Path_addArc)
      */
     fun addArc(oval: Rect, startAngle: Float, sweepAngle: Float): Path {
-        Stats.onNativeCall()
-        _nAddArc(_ptr, oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle)
-        return this
+        return addArc(oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle)
     }
 
     /**
@@ -1719,11 +1711,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_addRRect](https://fiddle.skia.org/c/@Path_addRRect)
      */
     fun addRRect(rrect: RRect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 6): Path {
-        Stats.onNativeCall()
-        interopScope {
-            _nAddRRect(_ptr, rrect.left, rrect.top, rrect.right, rrect.bottom, toInterop(rrect.radii), rrect.radii.size, dir.ordinal, start)
-        }
-        return this
+        return addRRect(rrect.left, rrect.top, rrect.right, rrect.bottom, rrect.radii, dir, start)
     }
 
     /**

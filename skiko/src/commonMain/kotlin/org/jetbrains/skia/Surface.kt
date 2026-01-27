@@ -2,7 +2,6 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skiko.RenderException
 
 class Surface : RefCnt {
     companion object {
@@ -757,20 +756,7 @@ class Surface : RefCnt {
      * @see [https://fiddle.skia.org/c/@Surface_makeImageSnapshot_2](https://fiddle.skia.org/c/@Surface_makeImageSnapshot_2)
      */
     fun makeImageSnapshot(area: IRect): Image? {
-        return try {
-            Stats.onNativeCall()
-            Image(
-                _nMakeImageSnapshotR(
-                    _ptr,
-                    area.left,
-                    area.top,
-                    area.right,
-                    area.bottom
-                )
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+        return makeImageSnapshot(area.left, area.top, area.right, area.bottom)
     }
 
     /**

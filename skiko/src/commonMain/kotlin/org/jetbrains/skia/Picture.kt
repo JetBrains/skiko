@@ -36,8 +36,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
          * @see [https://fiddle.skia.org/c/@Picture_MakePlaceholder](https://fiddle.skia.org/c/@Picture_MakePlaceholder)
          */
         fun makePlaceholder(cull: Rect): Picture {
-            Stats.onNativeCall()
-            return Picture(_nMakePlaceholder(cull.left, cull.top, cull.right, cull.bottom))
+            return makePlaceholder(cull.left, cull.top, cull.right, cull.bottom)
         }
 
         /**
