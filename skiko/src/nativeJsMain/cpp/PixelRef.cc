@@ -13,6 +13,12 @@ SKIKO_EXPORT KInt org_jetbrains_skia_PixelRef__1nGetHeight
     return instance->height();
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_PixelRef__1nGetPixels
+  (KNativePointer ptr) {
+    SkPixelRef* instance = reinterpret_cast<SkPixelRef*>((ptr));
+    return instance->pixels();
+}
+
 SKIKO_EXPORT KInt org_jetbrains_skia_PixelRef__1nGetRowBytes
   (KNativePointer ptr) {
     SkPixelRef* instance = reinterpret_cast<SkPixelRef*>((ptr));

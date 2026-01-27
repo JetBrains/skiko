@@ -14,7 +14,13 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixelRefKt__1nGetHeigh
     return instance->height();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PixelRefKt_PixelRef_1nGetRowBytes
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PixelRefKt_PixelRef_1nGetPixels
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPixelRef* instance = reinterpret_cast<SkPixelRef*>(static_cast<uintptr_t>(ptr));
+    return reinterpret_cast<jlong>(instance->pixels());
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixelRefKt_PixelRef_1nGetRowBytes
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPixelRef* instance = reinterpret_cast<SkPixelRef*>(static_cast<uintptr_t>(ptr));
     return instance->rowBytes();
