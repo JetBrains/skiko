@@ -2357,6 +2357,7 @@ $dokka.location:org.jetbrains.skia/PixelRef/generationId/#/PointingToDeclaration
 $dokka.location:org.jetbrains.skia/PixelRef/height/#/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-ref/height.html
 $dokka.location:org.jetbrains.skia/PixelRef/isImmutable/#/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-ref/is-immutable.html
 $dokka.location:org.jetbrains.skia/PixelRef/notifyPixelsChanged/#/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-ref/notify-pixels-changed.html
+$dokka.location:org.jetbrains.skia/PixelRef/pixels/#/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-ref/pixels.html
 $dokka.location:org.jetbrains.skia/PixelRef/rowBytes/#/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-ref/row-bytes.html
 $dokka.location:org.jetbrains.skia/PixelRef/setImmutable/#/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-ref/set-immutable.html
 $dokka.location:org.jetbrains.skia/PixelRef/width/#/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-ref/width.html
