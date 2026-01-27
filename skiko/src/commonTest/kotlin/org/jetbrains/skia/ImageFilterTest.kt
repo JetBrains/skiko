@@ -47,7 +47,7 @@ class ImageFilterTest {
     fun arithmetic() = imageFilterTest {
         ImageFilter.makeArithmetic(
             k1 = 0.5f, k2 = 0.5f, k3 = 0.5f, k4 = 0.5f, enforcePMColor = true,
-            bg = null, fg = null
+            bg = null, fg = null, crop = null
         )
     }
 
@@ -60,13 +60,14 @@ class ImageFilterTest {
             blendMode = BlendMode.COLOR,
             bg = ImageFilter.makeBlur(2f, 2f, mode = FilterTileMode.CLAMP),
             fg = ImageFilter.makeBlur(1f, 3f, mode = FilterTileMode.CLAMP),
+            crop = null
         )
     }
 
     @Test
     fun blur() = imageFilterTest {
         ImageFilter.makeBlur(
-            1f, 1f, FilterTileMode.CLAMP, crop = intArrayOf(5, 5, 10, 10)
+            1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
         )
     }
 
@@ -74,18 +75,18 @@ class ImageFilterTest {
     fun colorFilter() = imageFilterTest {
         ImageFilter.makeColorFilter(
             f = ColorFilter.luma,
-            input = null
+            input = null, crop = null
         )
     }
 
     @Test
     fun compose() = imageFilterTest {
         val inner = ImageFilter.makeBlur(
-            1f, 1f, FilterTileMode.CLAMP, crop = intArrayOf(5, 5, 10, 10)
+            1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
         )
         val outer = ImageFilter.makeColorFilter(
             f = ColorFilter.luma,
-            input = null
+            input = null, crop = null
         )
         ImageFilter.makeCompose(
             inner = inner,
@@ -97,14 +98,15 @@ class ImageFilterTest {
     fun displacementMap() = imageFilterTest {
         val colorFilter = ImageFilter.makeColorFilter(
             f = ColorFilter.luma,
-            input = null
+            input = null, crop = null
         )
         ImageFilter.makeDisplacementMap(
             x = ColorChannel.R,
             y = ColorChannel.G,
             scale = 2f,
             displacement = null,
-            color = colorFilter
+            color = colorFilter,
+            crop = null
         )
     }
 
@@ -186,12 +188,12 @@ class ImageFilterTest {
 
         val filter2 = ImageFilter.makeColorFilter(
             f = ColorFilter.luma,
-            input = null
+            input = null, crop = null
         )
 
-        val filter3 =
-            ImageFilter.makeBlur(
-                1f, 1f, FilterTileMode.CLAMP, null, intArrayOf(5, 5, 10, 10))
+        val filter3 = ImageFilter.makeBlur(
+            1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
+        )
 
         ImageFilter.makeMerge(
             filters = arrayOf(filter1, filter2, filter3),
