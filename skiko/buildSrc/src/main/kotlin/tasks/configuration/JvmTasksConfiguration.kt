@@ -271,26 +271,32 @@ fun SkikoProjectContext.createLinkJvmBindings(
             )
         }
         OS.Linux -> {
-            osFlags = arrayOf(
-                "-shared",
-                // `libstdc++.so.6.*` binaries are forward-compatible and used from GCC 3.4 to 16+,
-                // so do not use `-static-libstdc++` to avoid issues with complex setup.
-                "-static-libgcc",
-                "-lGL",
-                "-lX11",
-                "-lfontconfig",
-                // Enforce immediate symbol resolution at library load time to prevent
-                // lazy-binding issues and make GOT read-only afterwards.
-                "-Wl,-z,relro,-z,now",
-                // Hack to fix problem with linker not always finding certain declarations.
-                "$skiaBinDir/libsksg.a",
-                "$skiaBinDir/libskia.a",
-                "$skiaBinDir/libskunicode_core.a",
-                "$skiaBinDir/libskunicode_icu.a",
-                "$skiaBinDir/libskshaper.a",
-                "$skiaBinDir/libjsonreader.a",
-
-            )
+            osFlags = mutableListOf<String>().apply {
+                addAll(
+                    arrayOf(
+                        "-shared",
+                        // `libstdc++.so.6.*` binaries are forward-compatible and used from GCC 3.4 to 16+,
+                        // so do not use `-static-libstdc++` to avoid issues with complex setup.
+                        "-static-libgcc",
+                        "-lGL",
+                        "-lX11",
+                        "-lfontconfig",
+                        // Enforce immediate symbol resolution at library load time to prevent
+                        // lazy-binding issues and make GOT read-only afterwards.
+                        "-Wl,-z,relro,-z,now",
+                        // Hack to fix problem with linker not always finding certain declarations.
+                        "$skiaBinDir/libsksg.a",
+                        "$skiaBinDir/libskia.a",
+                        "$skiaBinDir/libskunicode_core.a",
+                        "$skiaBinDir/libskunicode_icu.a",
+                        "$skiaBinDir/libskshaper.a",
+                        "$skiaBinDir/libjsonreader.a"
+                    )
+                )
+                if (targetArch == Arch.Arm64) {
+                    add("-lEGL")
+                }
+            }.toTypedArray()
         }
         OS.Windows -> {
             libDirs.set(windowsSdkPaths.libDirs)
