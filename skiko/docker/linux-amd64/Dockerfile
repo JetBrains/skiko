@@ -4,7 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update -y && \
     apt install binutils build-essential software-properties-common -y && \
     apt install zip unzip git python curl wget xvfb -y && \
-    apt install fontconfig libfontconfig1-dev libglu1-mesa-dev libegl1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
+    apt install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
     apt install openjdk-21-jdk -y && \
     apt install gcc-10 g++-10 -y && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 60 --slave /usr/bin/g++ g++ /usr/bin/g++-10 && \
@@ -28,7 +28,7 @@ RUN dpkg --add-architecture arm64 && echo \
     | tee /etc/apt/sources.list.d/arm-cross-compile-sources.list && \
     sed -i -E "s/(deb)\ (http:.+)/\1\ [arch=amd64]\ \2/" /etc/apt/sources.list && \
     apt update -y && \
-    apt install libfontconfig1-dev:arm64 libglu1-mesa-dev:arm64 libegl1-mesa-dev:arm64 libxrandr-dev:arm64 libdbus-1-dev:arm64 -y && \
+    apt install libfontconfig1-dev:arm64 libglu1-mesa-dev:arm64 libxrandr-dev:arm64 libdbus-1-dev:arm64 -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Install cross-compilation toolchain for ARM64
@@ -50,8 +50,7 @@ RUN mkdir -p $ARM_TOOLCHAIN_SYSROOT/usr/include && \
     cp -r /usr/include/freetype2 $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
     cp -r /usr/include/GL $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
     cp -r /usr/include/X11 $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
-    cp -r /usr/include/KHR $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
-    cp -r /usr/include/EGL $ARM_TOOLCHAIN_SYSROOT/usr/include/
+    cp -r /usr/include/KHR $ARM_TOOLCHAIN_SYSROOT/usr/include/
 
 # Use UTF-8 by default
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
