@@ -13,7 +13,7 @@ RUN yum install -y tar xz git wget curl zip gzip && \
     yum clean all
 
 # Install libraries
-RUN yum install -y fontconfig fontconfig-devel mesa-libGLU-devel libXrandr-devel dbus-devel && \
+RUN yum install -y fontconfig fontconfig-devel mesa-libGLU-devel mesa-libEGL-devel libXrandr-devel dbus-devel && \
     yum clean all
 
 # Install Java (architecture-specific)
@@ -61,7 +61,8 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     cp -r /usr/include/freetype2 $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
     cp -r /usr/include/GL $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
     cp -r /usr/include/X11 $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
-    cp -r /usr/include/KHR $ARM_TOOLCHAIN_SYSROOT/usr/include/;  \
+    cp -r /usr/include/KHR $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
+    cp -r /usr/include/EGL $ARM_TOOLCHAIN_SYSROOT/usr/include/;  \
     fi
 
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
