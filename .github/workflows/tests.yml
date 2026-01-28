@@ -162,10 +162,7 @@ jobs:
     name: 'Linux (x64)'
     runs-on: ubuntu-24.04
     container:
-      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-amd64:ubuntu-2004
-      credentials:
-        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
-        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+      image: ghcr.io/jetbrains/skiko/linux-amd64:ubuntu-2004
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -217,10 +214,7 @@ jobs:
     name: 'Cross-compile Linux (arm) on x64'
     runs-on: ubuntu-24.04
     container:
-      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-amd64:ubuntu-2004
-      credentials:
-        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
-        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+      image: ghcr.io/jetbrains/skiko/linux-amd64:ubuntu-2004
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -249,10 +243,7 @@ jobs:
     needs: linux-cross-compile
     runs-on: ubuntu-24.04-arm
     container:
-      image: registry.jetbrains.team/p/ui/skiko-docker/skiko-build-linux-arm64:ubuntu-2004
-      credentials:
-        username: ${{ secrets.SPACE_DOCKER_REGISTRY_USER }}
-        password: ${{ secrets.SPACE_DOCKER_REGISTRY_TOKEN }}
+      image: ghcr.io/jetbrains/skiko/linux-arm64:ubuntu-2004
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
