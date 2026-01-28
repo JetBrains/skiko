@@ -1,69 +1,17 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.*
-import java.awt.Component
-import java.awt.KeyboardFocusManager
-import java.awt.event.FocusEvent
-import java.beans.PropertyChangeEvent
 import javax.accessibility.Accessible
-import javax.accessibility.AccessibleContext
 
 /**
- * See [nativeInitializeAccessible] doc for details
+ * Calls `sun.lwawt.macosx.CAccessible.getCAccessible(Accessible)` on the given [accessible] object; does nothing
+ * if running on a non-Mac platform or in a JVM where there is no `CAccessible` class.
+ *
+ * Ideally, this and nativeInitializeAccessible should be in Compose, not Skiko.
+ * Unfortunately, Compose doesn't currently allow native code, and implementing it via reflection is not
+ * possible due to java.desktop module access restrictions:
+ * > class androidx.compose.ui.platform.a11y.AccessibilityKt cannot access class sun.lwawt.macosx.CAccessible
+ * > (in module java.desktop) because module java.desktop does not export sun.lwawt.macosx to unnamed module
+ *
+ * As such, this function is not to be considered public Skiko API.
  */
-internal external fun initializeCAccessible(accessible: Accessible)
-
-/**
- * A helper class for implementing requesting accessibility focus on a given accessible.
- */
-internal class NativeAccessibleFocusHelper(
-    private val component: Component,
-    private val externalAccessible: Accessible?,
-) {
-
-    private var focusedAccessible: Accessible? = null
-
-    val accessibleContext: AccessibleContext?
-        get() = (focusedAccessible ?: externalAccessible)?.accessibleContext
-
-    private var resetFocusAccessibleJob: Job? = null
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun requestNativeFocusOnAccessible(accessible: Accessible?) {
-        focusedAccessible = accessible
-
-        when (hostOs) {
-            OS.Windows -> requestAccessBridgeFocusOnAccessible()
-            OS.MacOS -> requestMacOSFocusOnAccessible(accessible)
-            else -> {
-                focusedAccessible = null
-                return
-            }
-        }
-
-        // Listener spawns asynchronous notification post procedure, reading current focus owner
-        // and its accessibility context. This timeout is used to deal with concurrency
-        // TODO Find more reliable procedure
-        resetFocusAccessibleJob?.cancel()
-        resetFocusAccessibleJob = GlobalScope.launch(MainUIDispatcher) {
-            delay(100)
-            focusedAccessible = null
-        }
-    }
-
-    private fun requestAccessBridgeFocusOnAccessible() {
-        val focusEvent = FocusEvent(component, FocusEvent.FOCUS_GAINED)
-        component.focusListeners.forEach { it.focusGained(focusEvent) }
-    }
-
-    private fun requestMacOSFocusOnAccessible(accessible: Accessible?) {
-        val focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager()
-        val listeners = focusManager.getPropertyChangeListeners("focusOwner")
-        val event = PropertyChangeEvent(focusManager, "focusOwner", null, accessible)
-        listeners.forEach { it.propertyChange(event) }
-    }
-
-    fun dispose() {
-        resetFocusAccessibleJob?.cancel()
-    }
-}
+external fun initializeCAccessible(accessible: Accessible)

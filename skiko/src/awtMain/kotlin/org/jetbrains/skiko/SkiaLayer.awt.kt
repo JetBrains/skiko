@@ -27,7 +27,7 @@ import javax.swing.event.AncestorListener
 import kotlin.math.floor
 
 actual open class SkiaLayer internal constructor(
-    externalAccessibleFactory: ((Component) -> Accessible)? = null,
+    accessibleContextProvider: ((Component) -> AccessibleContext)? = null,
     val properties: SkiaLayerProperties,
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
@@ -48,7 +48,7 @@ actual open class SkiaLayer internal constructor(
     internal val backedLayer: HardwareLayer
 
     constructor(
-        externalAccessibleFactory: ((Component) -> Accessible)? = null,
+        accessibleContextProvider: ((Component) -> AccessibleContext)? = null,
         isVsyncEnabled: Boolean = SkikoProperties.vsyncEnabled,
         isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
         frameBuffering: FrameBuffering = SkikoProperties.frameBuffering,
@@ -56,7 +56,7 @@ actual open class SkiaLayer internal constructor(
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
         pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
     ) : this(
-        externalAccessibleFactory,
+        accessibleContextProvider,
         SkiaLayerProperties(
             isVsyncEnabled,
             isVsyncFramelimitFallbackEnabled,
@@ -69,12 +69,12 @@ actual open class SkiaLayer internal constructor(
     )
 
     constructor(
-        externalAccessibleFactory: ((Component) -> Accessible)? = null,
+        accessibleContextProvider: ((Component) -> AccessibleContext)? = null,
         properties: SkiaLayerProperties,
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
         pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
     ) : this(
-        externalAccessibleFactory,
+        accessibleContextProvider,
         properties,
         RenderFactory.Default,
         analytics,
@@ -89,7 +89,7 @@ actual open class SkiaLayer internal constructor(
 
     init {
         layout = null
-        backedLayer = object : HardwareLayer(externalAccessibleFactory) {
+        backedLayer = object : HardwareLayer(accessibleContextProvider) {
             override fun paint(g: Graphics) {
                 Logger.debug { "Paint called on HardwareLayer $this" }
                 checkContentScale()
@@ -685,10 +685,6 @@ actual open class SkiaLayer internal constructor(
             store.setImmutable()
             store
         }
-    }
-
-    fun requestNativeFocusOnAccessible(accessible: Accessible?) {
-        backedLayer.requestNativeFocusOnAccessible(accessible)
     }
 
     override fun getAccessibleContext(): AccessibleContext {

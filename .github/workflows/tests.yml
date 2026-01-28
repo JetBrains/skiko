@@ -81,7 +81,7 @@ jobs:
         name: 'Set Up Simulator UUID'
         run: |
           IOS_SIM_LIST=$(xcrun simctl list devices available --json)
-          IOS_SIM_UUID=$(echo $IOS_SIM_LIST | jq -r '.devices."com.apple.CoreSimulator.SimRuntime.iOS-18-4"[] | select(.name == "iPhone 16") | .udid')
+          IOS_SIM_UUID=$(echo $IOS_SIM_LIST | jq -r '.devices."com.apple.CoreSimulator.SimRuntime.iOS-18-6"[] | select(.name == "iPhone 16") | .udid')
           echo "IOS_SIM_UUID=$IOS_SIM_UUID" >> $GITHUB_ENV
 
       - uses: nick-fields/retry@v2

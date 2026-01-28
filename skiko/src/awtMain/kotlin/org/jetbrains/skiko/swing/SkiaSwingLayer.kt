@@ -7,7 +7,6 @@ import java.awt.Component
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.GraphicsConfiguration
-import javax.accessibility.Accessible
 import javax.accessibility.AccessibleContext
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
@@ -27,7 +26,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 open class SkiaSwingLayer(
     renderDelegate: SkikoRenderDelegate,
     analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
-    externalAccessibleFactory: ((Component) -> Accessible)? = null,
+    private val accessibleContextProvider: ((Component) -> AccessibleContext)? = null,
     private val properties: SkiaLayerProperties = SkiaLayerProperties()
 ) : JPanel() {
     internal companion object {
@@ -127,17 +126,7 @@ open class SkiaSwingLayer(
         }
     }
 
-    @Suppress("LeakingThis")
-    private val nativeAccessibleFocusHelper = NativeAccessibleFocusHelper(
-        component = this,
-        externalAccessible = externalAccessibleFactory?.invoke(this)
-    )
-
     override fun getAccessibleContext(): AccessibleContext? {
-        return nativeAccessibleFocusHelper.accessibleContext ?: super.getAccessibleContext()
-    }
-
-    fun requestNativeFocusOnAccessible(accessible: Accessible?) {
-        nativeAccessibleFocusHelper.requestNativeFocusOnAccessible(accessible)
+        return accessibleContextProvider?.invoke(this) ?: super.getAccessibleContext()
     }
 }
