@@ -82,7 +82,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     var direction: Direction
         get() = try {
             Stats.onNativeCall()
-            Direction.values()[_nGetDirection(_ptr)]
+            Direction.entries[_nGetDirection(_ptr)]
         } finally {
             reachabilityBarrier(this)
         }
@@ -97,7 +97,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     var alignment: Alignment
         get() = try {
             Stats.onNativeCall()
-            Alignment.values()[_nGetAlignment(_ptr)]
+            Alignment.entries[_nGetAlignment(_ptr)]
         } finally {
             reachabilityBarrier(this)
         }
@@ -157,7 +157,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     var heightMode: HeightMode
         get() = try {
             Stats.onNativeCall()
-            HeightMode.values()[_nGetHeightMode(_ptr)]
+            HeightMode.entries[_nGetHeightMode(_ptr)]
         } finally {
             reachabilityBarrier(this)
         }
@@ -171,7 +171,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     val effectiveAlignment: Alignment
         get() = try {
             Stats.onNativeCall()
-            Alignment.values()[_nGetEffectiveAlignment(_ptr)]
+            Alignment.entries[_nGetEffectiveAlignment(_ptr)]
         } finally {
             reachabilityBarrier(this)
         }
@@ -193,9 +193,9 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     var fontRastrSettings: FontRastrSettings
         get() = try {
             Stats.onNativeCall()
-            val edging = FontEdging.values()[_nGetEdging(_ptr)]
+            val edging = FontEdging.entries[_nGetEdging(_ptr)]
             Stats.onNativeCall()
-            val hinting = FontHinting.values()[_nGetHinting(_ptr)]
+            val hinting = FontHinting.entries[_nGetHinting(_ptr)]
             Stats.onNativeCall()
             // by some obscure reason kotlinjs makes difference between number encoded booleans returned from `_nGetSubpixel` and regular booleans
             // AssertionError: Expected <FontRastrSettings(edging=ALIAS, hinting=NONE, subpixel=false)>, actual <FontRastrSettings(edging=ALIAS, hinting=NONE, subpixel=0)>

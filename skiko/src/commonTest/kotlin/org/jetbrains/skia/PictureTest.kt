@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 class PictureTest {
     @Test
     fun canMakeShader() {
-        val pic = Picture.makePlaceholder(Rect(0.0f, 0.0f, 32.0f, 32.0f))
+        val pic = Picture.makePlaceholder(0.0f, 0.0f, 32.0f, 32.0f)
         val localMatrix = Matrix33(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f)
         val tile = Rect(0.0f, 0.0f, 16.0f, 16.0f)
         pic.makeShader(FilterTileMode.MIRROR, FilterTileMode.MIRROR, FilterMode.LINEAR)

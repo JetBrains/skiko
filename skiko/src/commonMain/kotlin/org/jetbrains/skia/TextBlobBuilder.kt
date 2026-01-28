@@ -54,7 +54,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param bounds  optional run bounding box
      * @return        this
      */
-    fun appendRun(font: Font, text: String, x: Float, y: Float, bounds: Rect? = null): TextBlobBuilder {
+   fun appendRun(font: Font, text: String, x: Float, y: Float, bounds: Rect? = null): TextBlobBuilder {
         return appendRun(font, font.getStringGlyphs(text), x, y, bounds)
     }
 
@@ -95,6 +95,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
             reachabilityBarrier(font)
         }
     }
+
     /**
      *
      * Glyphs are positioned on a baseline at y, using x-axis positions from xs.
@@ -148,6 +149,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
             reachabilityBarrier(font)
         }
     }
+
     /**
      *
      * Glyphs are positioned at positions from pos.
@@ -172,7 +174,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param pos     positions of glyphs within the blob
      * @return        this
      */
-    fun appendRunPos(font: Font?, glyphs: ShortArray, pos: Array<Point>, bounds: Rect? = null): TextBlobBuilder {
+   fun appendRunPos(font: Font?, glyphs: ShortArray, pos: Array<Point>, bounds: Rect? = null): TextBlobBuilder {
         return try {
             require(glyphs.size == pos.size) { "glyphs.length " + glyphs.size + " != pos.length " + pos.size }
             val floatPos = FloatArray(pos.size * 2)

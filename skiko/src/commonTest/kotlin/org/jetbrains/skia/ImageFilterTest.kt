@@ -54,7 +54,7 @@ class ImageFilterTest {
     @Test
     fun blend() = imageFilterTest {
         val region = Region().apply {
-            setRect(IRect(5, 5, 10, 10))
+            setRect(5, 5, 10, 10)
         }
         ImageFilter.makeBlend(
             blendMode = BlendMode.COLOR,
@@ -215,7 +215,7 @@ class ImageFilterTest {
     @Test
     fun makeRuntimeShader() = imageFilterTest {
         // A simple Skia shader that bumps up the red channel of every non-transparent
-        // pixel to full intensity, and leaves green and blue channels unchanged.
+        // pixel to full intensity and leaves green and blue channels unchanged.
         val sksl = """
             uniform shader content;
             vec4 main(vec2 coord) {
@@ -476,7 +476,10 @@ class ImageFilterTest {
 
         val runtimeEffect = RuntimeEffect.makeForShader(sksl)
         val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
-        shaderBuilder.uniform("matrix4x4", Matrix44(0.2f, 0.3f, 0.2f, 0.1f, 0.4f, 0.1f, 0.2f, 0.1f, 0.1f, 0.3f, 0.2f, 0.1f, 0.2f, 0.2f, 0.2f, 0.3f))
+        shaderBuilder.uniform(
+            "matrix4x4",
+            Matrix44(0.2f, 0.3f, 0.2f, 0.1f, 0.4f, 0.1f, 0.2f, 0.1f, 0.1f, 0.3f, 0.2f, 0.1f, 0.2f, 0.2f, 0.2f, 0.3f)
+        )
 
         ImageFilter.makeRuntimeShader(
             runtimeShaderBuilder = shaderBuilder,
@@ -488,10 +491,10 @@ class ImageFilterTest {
     @Test
     fun makeRuntimeShaderFromArrays() = imageFilterTest {
         // A Skia shader that has two children shaders - one that applies our custom shader logic
-        // on the underlying render node content, and another that is the built in blur. This
-        // shader also has a float uniform that is used to decide which one of these two children
+        // on the underlying render node content, and another that is the built-in blur. This
+        // shader also has a float uniform used to decide which one of these two children
         // shaders to apply on a given pixel, based on the X coordinate.
-        // This test covers not only ImageFilter.makeRuntimeShader API, but also
+        // This test covers not only ImageFilter.makeRuntimeShader API but also
         // RuntimeShaderBuilder.uniform.
         val compositeSksl = """
             uniform shader content;
@@ -547,7 +550,7 @@ class ImageFilterTest {
         compositeShaderBuilder.uniform("cutoff", 100.0f)
         compositeShaderBuilder.child(
             "gradient",
-            Shader.Companion.makeLinearGradient(
+            Shader.makeLinearGradient(
                 x0 = 0.0f, y0 = 0.0f,
                 x1 = 200.0f, y1 = 0.0f,
                 colors = intArrayOf(Color.RED, Color.BLUE),
@@ -599,8 +602,14 @@ class ImageFilterTest {
     @Test
     fun makeTile() = imageFilterTest {
         ImageFilter.makeTile(
-            src = Rect(0f, 0f, 3f, 3f),
-            dst = Rect(5f, 5f, 19f, 19f),
+            0f,
+            0f,
+            3f,
+            3f,
+            5f,
+            5f,
+            19f,
+            19f,
             input = null
         )
     }

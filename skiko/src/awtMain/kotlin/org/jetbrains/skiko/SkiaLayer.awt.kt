@@ -383,7 +383,9 @@ actual open class SkiaLayer internal constructor(
 
     private fun notifyChange(kind: PropertyKind) {
         stateChangeListeners[kind]?.let { handlers ->
-            handlers.forEach { it(this) }
+            for (index in handlers.indices) {
+                handlers[index].invoke(this)
+            }
         }
     }
 
@@ -598,21 +600,23 @@ actual open class SkiaLayer internal constructor(
         // If this approach will be changed, create an issue in https://youtrack.jetbrains.com/issues/CMP for changing it in
         // https://github.com/JetBrains/compose-multiplatform/blob/e4e2d329709cded91a09cc612d4defbce37aad96/benchmarks/multiplatform/benchmarks/src/commonMain/kotlin/MeasureComposable.kt#L151 as well
 
-        val pictureWidth = (backedLayer.width * contentScale).toInt().coerceAtLeast(0)
-        val pictureHeight = (backedLayer.height * contentScale).toInt().coerceAtLeast(0)
+        val pictureWidth = (backedLayer.width * contentScale).coerceAtLeast(0f)
+        val pictureHeight = (backedLayer.height * contentScale).coerceAtLeast(0f)
+        val intWidth = pictureWidth.toInt()
+        val intHeight = pictureHeight.toInt()
 
-        val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val pictureRecorder = pictureRecorder!!
-        val canvas = pictureRecorder.beginRecording(bounds)
+        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight)
 
         // clipping
-        for (component in clipComponents) {
-            canvas.clipRectBy(component, contentScale)
+        for (index in clipComponents.indices) {
+            val item = clipComponents[index]
+            canvas.clipRectBy(item, contentScale)
         }
 
         try {
             isRendering = true
-            renderDelegate?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
+            renderDelegate?.onRender(canvas, intWidth, intHeight, nanoTime)
         } finally {
             isRendering = false
         }
@@ -623,7 +627,7 @@ actual open class SkiaLayer internal constructor(
             synchronized(pictureLock) {
                 picture?.instance?.close()
                 val picture = pictureRecorder.finishRecordingAsPicture()
-                this.picture = PictureHolder(picture, pictureWidth, pictureHeight)
+                this.picture = PictureHolder(picture, intWidth, intHeight)
             }
         }
     }
@@ -726,17 +730,15 @@ internal fun defaultFPSCounter(
         logOnTick = true
     )
 }
-
-internal fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
     clipRect(
-        Rect.makeLTRB(
-            rectangle.x * scale,
-            rectangle.y * scale,
-            (rectangle.x + rectangle.width) * scale,
-            (rectangle.y + rectangle.height) * scale
-        ),
-        ClipMode.DIFFERENCE,
-        true
+        left = rectangle.x * scale,
+        top = rectangle.y * scale,
+        right = (rectangle.x + rectangle.width) * scale,
+        bottom = (rectangle.y + rectangle.height) * scale,
+        mode = ClipMode.DIFFERENCE,
+        antiAlias = true
     )
 }
 

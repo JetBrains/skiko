@@ -42,8 +42,8 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
     internal constructor(width: Int, height: Int, colorType: Int, alphaType: Int, colorSpace: NativePointer) : this(
         width,
         height,
-        ColorType.values()[colorType],
-        ColorAlphaType.values()[alphaType],
+        ColorType.entries[colorType],
+        ColorAlphaType.entries[alphaType],
         if (colorSpace == Native.NullPointer) null else ColorSpace(colorSpace)
     )
 

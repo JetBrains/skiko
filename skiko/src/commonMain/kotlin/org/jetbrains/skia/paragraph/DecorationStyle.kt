@@ -30,7 +30,7 @@ class DecorationStyle(
         lineThrough,
         gaps,
         color,
-        DecorationLineStyle.values()[lineStyle],
+        DecorationLineStyle.entries[lineStyle],
         thicknessMultiplier
     ) {
     }

@@ -110,10 +110,10 @@ class AnimationFrameInfo(
         requiredFrame,
         duration,
         fullyReceived,
-        ColorAlphaType.values()[alphaTypeOrdinal],
+        ColorAlphaType.entries[alphaTypeOrdinal],
         hasAlphaWithinBounds,
-        AnimationDisposalMode.values()[disposalMethodOrdinal],
-        BlendMode.values()[blendModeOrdinal],
+        AnimationDisposalMode.entries[disposalMethodOrdinal],
+        BlendMode.entries[blendModeOrdinal],
         frameRect
     )
 

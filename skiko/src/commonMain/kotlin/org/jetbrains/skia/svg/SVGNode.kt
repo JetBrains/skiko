@@ -17,7 +17,7 @@ abstract class SVGNode internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val tag: SVGTag
         get() = try {
             Stats.onNativeCall()
-            SVGTag.values()[SVGNode_nGetTag(_ptr)]
+            SVGTag.entries[SVGNode_nGetTag(_ptr)]
         } finally {
             reachabilityBarrier(this)
         }

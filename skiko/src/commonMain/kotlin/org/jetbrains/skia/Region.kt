@@ -14,7 +14,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
         DIFFERENCE, INTERSECT, UNION, XOR, REVERSE_DIFFERENCE, REPLACE;
 
         companion object {
-            internal val _values = values()
+            internal val _values = Op.entries.toTypedArray()
         }
     }
 
@@ -92,9 +92,13 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun setRect(rect: IRect): Boolean {
+        return setRect(rect.left, rect.top, rect.right, rect.bottom)
+    }
+
+    fun setRect(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            Region_nSetRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nSetRect(_ptr, left, top, right, bottom)
         } finally {
             reachabilityBarrier(this)
         }
@@ -144,9 +148,13 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun intersects(rect: IRect): Boolean {
+        return intersects(rect.left, rect.top, rect.right, rect.bottom)
+    }
+
+    fun intersects(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            Region_nIntersectsIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nIntersectsIRect(_ptr, left, top, right, bottom)
         } finally {
             reachabilityBarrier(this)
         }
@@ -174,13 +182,17 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    operator fun contains(rect: IRect): Boolean {
+    fun contains(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            Region_nContainsIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nContainsIRect(_ptr, left, top, right, bottom)
         } finally {
             reachabilityBarrier(this)
         }
+    }
+
+    operator fun contains(rect: IRect): Boolean {
+        return contains(rect.left, rect.top, rect.right, rect.bottom)
     }
 
     operator fun contains(r: Region?): Boolean {
@@ -194,18 +206,24 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun quickContains(rect: IRect): Boolean {
+        return quickContains(rect.left, rect.top, rect.right, rect.bottom)
+    }
+    fun quickContains(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            Region_nQuickContains(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nQuickContains(_ptr, left, top, right, bottom)
         } finally {
             reachabilityBarrier(this)
         }
     }
 
     fun quickReject(rect: IRect): Boolean {
+        return quickReject(rect.left, rect.top, rect.right, rect.bottom)
+    }
+    fun quickReject(left: Int, top: Int, right: Int, bottom: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            Region_nQuickRejectIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nQuickRejectIRect(_ptr, left, top, right, bottom)
         } finally {
             reachabilityBarrier(this)
         }
@@ -234,14 +252,18 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun op(rect: IRect, op: Op): Boolean {
+        return op(rect.left, rect.top, rect.right, rect.bottom, op)
+    }
+
+    fun op(left: Int, top: Int, right: Int, bottom: Int, op: Op): Boolean {
         return try {
             Stats.onNativeCall()
             Region_nOpIRect(
                 _ptr,
-                rect.left,
-                rect.top,
-                rect.right,
-                rect.bottom,
+                left,
+                top,
+                right,
+                bottom,
                 op.ordinal
             )
         } finally {
@@ -264,14 +286,25 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun op(rect: IRect, r: Region?, op: Op): Boolean {
+        return op(
+            rect.left,
+            rect.top,
+            rect.right,
+            rect.bottom,
+            r,
+            op
+        )
+    }
+
+    fun op(left: Int, top: Int, right: Int, bottom: Int, r: Region?, op: Op): Boolean {
         return try {
             Stats.onNativeCall()
             Region_nOpIRectRegion(
                 _ptr,
-                rect.left,
-                rect.top,
-                rect.right,
-                rect.bottom,
+                left,
+                top,
+                right,
+                bottom,
                 getPtr(r),
                 op.ordinal
             )
@@ -282,15 +315,26 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 
     fun op(r: Region?, rect: IRect, op: Op): Boolean {
+        return op(
+            r,
+            rect.left,
+            rect.top,
+            rect.right,
+            rect.bottom,
+            op
+        )
+    }
+
+    fun op(r: Region?, left: Int, top: Int, right: Int, bottom: Int, op: Op): Boolean {
         return try {
             Stats.onNativeCall()
             Region_nOpRegionIRect(
                 _ptr,
                 getPtr(r),
-                rect.left,
-                rect.top,
-                rect.right,
-                rect.bottom,
+                left,
+                top,
+                right,
+                bottom,
                 op.ordinal
             )
         } finally {

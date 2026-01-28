@@ -124,7 +124,13 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+                _nDrawPoints(
+                    _ptr,
+                    0 /* SkCanvas::PointMode::kPoints_PointMode */,
+                    coords.size,
+                    toInterop(coords),
+                    getPtr(paint)
+                )
             }
         } finally {
             reachabilityBarrier(paint)
@@ -187,7 +193,13 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, coords.size, toInterop(coords),getPtr(paint))
+                _nDrawPoints(
+                    _ptr,
+                    1 /* SkCanvas::PointMode::kLines_PointMode */,
+                    coords.size,
+                    toInterop(coords),
+                    getPtr(paint)
+                )
             }
         } finally {
             reachabilityBarrier(paint)
@@ -248,7 +260,13 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         Stats.onNativeCall()
         try {
             interopScope {
-                _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+                _nDrawPoints(
+                    _ptr,
+                    2 /* SkCanvas::PointMode::kPolygon_PointMode */,
+                    coords.size,
+                    toInterop(coords),
+                    getPtr(paint)
+                )
             }
         } finally {
             reachabilityBarrier(this)
@@ -300,14 +318,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 
     fun drawRect(r: Rect, paint: Paint): Canvas {
-        Stats.onNativeCall()
-        try {
-            _nDrawRect(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(paint)
-        }
-        return this
+        return drawRect(r.left, r.top, r.right, r.bottom, paint)
     }
 
     fun drawOval(left: Float, top: Float, right: Float, bottom: Float, paint: Paint): Canvas {
@@ -322,14 +333,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 
     fun drawOval(r: Rect, paint: Paint): Canvas {
-        Stats.onNativeCall()
-        try {
-            _nDrawOval(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
-        } finally {
-            reachabilityBarrier(paint)
-            reachabilityBarrier(this)
-        }
-        return this
+        return drawOval(r.left, r.top, r.right, r.bottom, paint)
     }
 
     fun drawCircle(x: Float, y: Float, radius: Float, paint: Paint): Canvas {
@@ -357,16 +361,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 
     fun drawRRect(r: RRect, paint: Paint): Canvas {
-        Stats.onNativeCall()
-        try {
-            interopScope {
-                _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, getPtr(paint))
-            }
-        } finally {
-            reachabilityBarrier(paint)
-            reachabilityBarrier(this)
-        }
-        return this
+        return drawRRect(r.left, r.top, r.right, r.bottom, r.radii, paint)
     }
 
     fun drawDRRect(outer: RRect, inner: RRect, paint: Paint): Canvas {
@@ -437,58 +432,121 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawImage(image: Image, left: Float, top: Float): Canvas {
         return drawImageRect(
-            image,
-            Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
-            Rect.makeXYWH(left, top, image.width.toFloat(), image.height.toFloat()),
-            SamplingMode.DEFAULT,
-            null,
-            true
+            image = image,
+            srcLeft = 0f,
+            srcTop = 0f,
+            srcRight = image.width.toFloat(),
+            srcBottom = image.height.toFloat(),
+            dstLeft = left,
+            dstTop = top,
+            dstRight = left + image.width.toFloat(),
+            dstBottom = top + image.height.toFloat(),
+            samplingMode = SamplingMode.DEFAULT,
+            paint = null,
+            strict = true
         )
     }
 
     fun drawImage(image: Image, left: Float, top: Float, paint: Paint?): Canvas {
         return drawImageRect(
-            image,
-            Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
-            Rect.makeXYWH(left, top, image.width.toFloat(), image.height.toFloat()),
-            SamplingMode.DEFAULT,
-            paint,
-            true
+            image = image,
+            srcLeft = 0f,
+            srcTop = 0f,
+            srcRight = image.width.toFloat(),
+            srcBottom = image.height.toFloat(),
+            dstLeft = left,
+            dstTop = top,
+            dstRight = left + image.width.toFloat(),
+            dstBottom = top + image.height.toFloat(),
+            samplingMode = SamplingMode.DEFAULT,
+            paint = paint,
+            strict = true
         )
     }
 
     fun drawImageRect(image: Image, dst: Rect): Canvas {
         return drawImageRect(
-            image,
-            Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
-            dst,
-            SamplingMode.DEFAULT,
-            null,
-            true
+            image = image,
+            srcLeft = 0f,
+            srcTop = 0f,
+            srcRight = image.width.toFloat(),
+            srcBottom = image.height.toFloat(),
+            dstLeft = dst.left,
+            dstTop = dst.top,
+            dstRight = dst.right,
+            dstBottom = dst.bottom,
+            samplingMode = SamplingMode.DEFAULT,
+            paint = null,
+            strict = true
         )
     }
 
     fun drawImageRect(image: Image, dst: Rect, paint: Paint?): Canvas {
         return drawImageRect(
-            image,
-            Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
-            dst,
-            SamplingMode.DEFAULT,
-            paint,
-            true
+            image = image,
+            srcLeft = 0f,
+            srcTop = 0f,
+            srcRight = image.width.toFloat(),
+            srcBottom = image.height.toFloat(),
+            dstLeft = dst.left,
+            dstTop = dst.top,
+            dstRight = dst.right,
+            dstBottom = dst.bottom,
+            samplingMode = SamplingMode.DEFAULT,
+            paint = paint,
+            strict = true
         )
     }
 
     fun drawImageRect(image: Image, src: Rect, dst: Rect): Canvas {
-        return drawImageRect(image, src, dst, SamplingMode.DEFAULT, null, true)
+        return drawImageRect(
+            image = image,
+            srcLeft = src.left,
+            srcTop = src.top,
+            srcRight = src.right,
+            srcBottom = src.bottom,
+            dstLeft = dst.left,
+            dstTop = dst.top,
+            dstRight = dst.right,
+            dstBottom = dst.bottom,
+            samplingMode = SamplingMode.DEFAULT,
+            paint = null,
+            strict = true
+        )
     }
 
     fun drawImageRect(image: Image, src: Rect, dst: Rect, paint: Paint?): Canvas {
-        return drawImageRect(image, src, dst, SamplingMode.DEFAULT, paint, true)
+        return drawImageRect(
+            image = image,
+            srcLeft = src.left,
+            srcTop = src.top,
+            srcRight = src.right,
+            srcBottom = src.bottom,
+            dstLeft = dst.left,
+            dstTop = dst.top,
+            dstRight = dst.right,
+            dstBottom = dst.bottom,
+            samplingMode = SamplingMode.DEFAULT,
+            paint = paint,
+            strict = true
+        )
     }
 
     fun drawImageRect(image: Image, src: Rect, dst: Rect, paint: Paint?, strict: Boolean): Canvas {
-        return drawImageRect(image, src, dst, SamplingMode.DEFAULT, paint, strict)
+        return drawImageRect(
+            image = image,
+            srcLeft = src.left,
+            srcTop = src.top,
+            srcRight = src.right,
+            srcBottom = src.bottom,
+            dstLeft = dst.left,
+            dstTop = dst.top,
+            dstRight = dst.right,
+            dstBottom = dst.bottom,
+            samplingMode = SamplingMode.DEFAULT,
+            paint = paint,
+            strict = strict
+        )
     }
 
     fun drawImageRect(
@@ -539,30 +597,20 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         paint: Paint?,
         strict: Boolean
     ): Canvas {
-        Stats.onNativeCall()
-        try {
-            _nDrawImageRect(
-                _ptr,
-                getPtr(image),
-                src.left,
-                src.top,
-                src.right,
-                src.bottom,
-                dst.left,
-                dst.top,
-                dst.right,
-                dst.bottom,
-                samplingMode._packedInt1(),
-                samplingMode._packedInt2(),
-                getPtr(paint),
-                strict
-            )
-        } finally {
-            reachabilityBarrier(image)
-            reachabilityBarrier(paint)
-            reachabilityBarrier(this)
-        }
-        return this
+        return drawImageRect(
+            image = image,
+            srcLeft = src.left,
+            srcTop = src.top,
+            srcRight = src.right,
+            srcBottom = src.bottom,
+            dstLeft = dst.left,
+            dstTop = dst.top,
+            dstRight = dst.right,
+            dstBottom = dst.bottom,
+            samplingMode = samplingMode,
+            paint = paint,
+            strict = strict
+        )
     }
 
     fun drawImageNine(image: Image, center: IRect, dst: Rect, filterMode: FilterMode, paint: Paint?): Canvas {
@@ -1085,47 +1133,69 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         get() = localToDevice.asMatrix33()
 
     fun clipRect(r: Rect, mode: ClipMode, antiAlias: Boolean): Canvas {
-        Stats.onNativeCall()
-        _nClipRect(_ptr, r.left, r.top, r.right, r.bottom, mode.ordinal, antiAlias)
-        return this
+      return clipRect(r.left, r.top, r.right, r.bottom, mode, antiAlias)
     }
 
-    fun clipRect(left : Float, top : Float, right: Float, bottom : Float, mode: ClipMode, antiAlias: Boolean): Canvas {
+    fun clipRect(left: Float, top: Float, right: Float, bottom: Float, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
         _nClipRect(_ptr, left, top, right, bottom, mode.ordinal, antiAlias)
         return this
     }
 
     fun clipRect(r: Rect, mode: ClipMode): Canvas {
-        return clipRect(r, mode, false)
+        return clipRect(r.left, r.top, r.right, r.bottom, mode, false)
     }
 
     fun clipRect(r: Rect, antiAlias: Boolean): Canvas {
-        return clipRect(r, ClipMode.INTERSECT, antiAlias)
+        return clipRect(r.left, r.top, r.right, r.bottom, ClipMode.INTERSECT, antiAlias)
+    }
+
+    fun clipRect(left: Float, top: Float, right: Float, bottom: Float, antiAlias: Boolean): Canvas {
+        return clipRect(left, top, right, bottom, ClipMode.INTERSECT, antiAlias)
     }
 
     fun clipRect(r: Rect): Canvas {
-        return clipRect(r, ClipMode.INTERSECT, false)
+        return clipRect(r.left, r.top, r.right, r.bottom, ClipMode.INTERSECT, false)
     }
 
     fun clipRRect(r: RRect, mode: ClipMode, antiAlias: Boolean): Canvas {
+        return clipRRect(r.left, r.top, r.right, r.bottom, r.radii, mode, antiAlias)
+    }
+
+    fun clipRRect(
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float,
+        radii: FloatArray,
+        mode: ClipMode,
+        antiAlias: Boolean
+    ): Canvas {
         Stats.onNativeCall()
         interopScope {
-            _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, mode.ordinal, antiAlias)
+            _nClipRRect(_ptr, left, top, right, bottom, toInterop(radii), radii.size, mode.ordinal, antiAlias)
         }
         return this
     }
 
     fun clipRRect(r: RRect, mode: ClipMode): Canvas {
-        return clipRRect(r, mode, false)
+        return clipRRect(r.left, r.top, r.right, r.bottom, r.radii, mode, false)
+    }
+
+    fun clipRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, mode: ClipMode): Canvas {
+        return clipRRect(left, top, right, bottom, radii, mode, false)
     }
 
     fun clipRRect(r: RRect, antiAlias: Boolean): Canvas {
-        return clipRRect(r, ClipMode.INTERSECT, antiAlias)
+        return clipRRect(r.left, r.top, r.right, r.bottom, r.radii, ClipMode.INTERSECT, antiAlias)
     }
 
-    fun clipRRect(r: RRect): Canvas {
-        return clipRRect(r, ClipMode.INTERSECT, false)
+    fun clipRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, antiAlias: Boolean): Canvas {
+        return clipRRect(left, top, right, bottom, radii, ClipMode.INTERSECT, antiAlias)
+    }
+
+    fun clipRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray): Canvas {
+        return clipRRect(left, top, right, bottom, radii, ClipMode.INTERSECT, false)
     }
 
     fun clipPath(p: Path, mode: ClipMode, antiAlias: Boolean): Canvas {

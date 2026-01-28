@@ -63,7 +63,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
             val fontStyleData = withResult(IntArray(3)) {
                 _nGetFontStyle(_ptr, it)
             }
-            FontStyle(fontStyleData[0], fontStyleData[1], FontSlant.values()[fontStyleData[2]])
+            FontStyle(fontStyleData[0], fontStyleData[1], FontSlant.entries[fontStyleData[2]])
         } finally {
             reachabilityBarrier(this)
         }

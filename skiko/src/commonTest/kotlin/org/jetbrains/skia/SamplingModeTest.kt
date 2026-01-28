@@ -8,8 +8,8 @@ class SamplingModeTest {
 
     @Test
     fun packFilterMipmap() = runTest {
-        FilterMode.values().forEach { filterMode ->
-            MipmapMode.values().forEach { mipmapMode ->
+        FilterMode.entries.forEach { filterMode ->
+            MipmapMode.entries.forEach { mipmapMode ->
                 val samplingMode = FilterMipmap(filterMode, mipmapMode)
 
                 val long = samplingMode._pack() // we treat it as expected since it was used initially

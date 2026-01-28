@@ -49,7 +49,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @return        this
      */
     fun render(canvas: Canvas): Animation {
-        return render(canvas, Rect.Companion.makeXYWH(0f, 0f, width, height))
+        return render(canvas, 0f, 0f, width, height)
     }
 
     /**
@@ -65,7 +65,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @return        this
      */
     fun render(canvas: Canvas, offset: Point): Animation {
-        return render(canvas, offset.x, offset.y)
+        return render(canvas, offset.x, offset.y, offset.x + width, offset.y + height)
     }
 
     /**
@@ -82,7 +82,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @return        this
      */
     fun render(canvas: Canvas, left: Float, top: Float): Animation {
-        return render(canvas, Rect.Companion.makeXYWH(left, top, width, height))
+        return render(canvas, left, top, left + width, top + height)
     }
 
     /**
@@ -99,11 +99,31 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @return             this
      */
     fun render(canvas: Canvas, dst: Rect, vararg renderFlags: RenderFlag): Animation {
+        return render(canvas, dst.left, dst.top, dst.right, dst.bottom, renderFlags = renderFlags)
+    }
+
+    /**
+     *
+     * Draws the current animation frame
+     *
+     *
+     * It is undefined behavior to call render() on a newly created Animation
+     * before specifying an initial frame via one of the seek() variants.
+     *
+     * @param canvas       destination canvas
+     * @param left         destination left
+     * @param top          destination top
+     * @param right        destination right
+     * @param bottom       destination bottom
+     * @param renderFlags  render flags
+     * @return             this
+     */
+    fun render(canvas: Canvas, left: Float, top: Float, right: Float, bottom: Float, vararg renderFlags: RenderFlag): Animation {
         return try {
             Stats.onNativeCall()
             var flags = 0
             for (flag in renderFlags) flags = flags or flag._flag
-            _nRender(_ptr, getPtr(canvas), dst.left, dst.top, dst.right, dst.bottom, flags)
+            _nRender(_ptr, getPtr(canvas), left, top, right, bottom, flags)
             this
         } finally {
             reachabilityBarrier(this)

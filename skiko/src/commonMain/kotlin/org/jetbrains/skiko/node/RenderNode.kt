@@ -242,29 +242,37 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
         }
 
     fun setClipRect(r: Rect, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
+        setClipRect(r.left, r.top, r.right, r.bottom, mode, antiAlias)
+    }
+
+    fun setClipRect(left: Float, top: Float, right: Float, bottom: Float, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
         Stats.onNativeCall()
         RenderNode_nSetClipRect(
             ptr = _ptr,
-            left = r.left,
-            top = r.top,
-            right = r.right,
-            bottom = r.bottom,
+            left = left,
+            top = top,
+            right = right,
+            bottom = bottom,
             mode = mode.ordinal,
             antiAlias = antiAlias
         )
     }
 
     fun setClipRRect(r: RRect, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
+        setClipRRect(r.left, r.top, r.right, r.bottom, r.radii, mode, antiAlias)
+    }
+
+    fun setClipRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
         Stats.onNativeCall()
         interopScope {
             RenderNode_nSetClipRRect(
                 ptr = _ptr,
-                left = r.left,
-                top = r.top,
-                right = r.right,
-                bottom = r.bottom,
-                radii = toInterop(r.radii),
-                radiiSize = r.radii.size,
+                left = left,
+                top = top,
+                right = right,
+                bottom = bottom,
+                radii = toInterop(radii),
+                radiiSize = radii.size,
                 mode = mode.ordinal,
                 antiAlias = antiAlias
             )

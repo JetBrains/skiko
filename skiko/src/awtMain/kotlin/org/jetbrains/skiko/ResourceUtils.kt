@@ -33,8 +33,9 @@ internal fun autoCloseScope(body: CloseScope.() -> Unit) {
     try {
         scope.body()
     } finally {
-        resources.asReversed().forEach {
-            it.close()
+        for (index in resources.indices.reversed()) {
+            val item = resources[index]
+            item.close()
         }
     }
 }

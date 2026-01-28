@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.*
 
 class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
+
         fun makeArithmetic(
             k1: Float,
             k2: Float,
@@ -199,24 +200,60 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         fun makeImage(image: Image): ImageFilter {
-            val r: Rect = Rect.makeWH(image.width.toFloat(), image.height.toFloat())
-            return makeImage(image, r, r, SamplingMode.DEFAULT)
+            return makeImage(
+                image,
+                0f,
+                0f,
+                image.width.toFloat(),
+                image.height.toFloat(),
+                0f,
+                0f,
+                image.width.toFloat(),
+                image.height.toFloat(),
+                SamplingMode.DEFAULT
+            )
         }
 
         fun makeImage(image: Image?, src: Rect, dst: Rect, mode: SamplingMode): ImageFilter {
+            return makeImage(
+                image,
+                src.left,
+                src.top,
+                src.right,
+                src.bottom,
+                dst.left,
+                dst.top,
+                dst.right,
+                dst.bottom,
+                mode
+            )
+        }
+
+        fun makeImage(
+            image: Image?,
+            srcLeft: Float,
+            srcTop: Float,
+            srcRight: Float,
+            srcBottom: Float,
+            dstLeft: Float,
+            dstTop: Float,
+            dstRight: Float,
+            dstBottom: Float,
+            mode: SamplingMode
+        ): ImageFilter {
             return try {
                 Stats.onNativeCall()
                 ImageFilter(
                     _nMakeImage(
                         getPtr(image),
-                        src.left,
-                        src.top,
-                        src.right,
-                        src.bottom,
-                        dst.left,
-                        dst.top,
-                        dst.right,
-                        dst.bottom,
+                        srcLeft,
+                        srcTop,
+                        srcRight,
+                        srcBottom,
+                        dstLeft,
+                        dstTop,
+                        dstRight,
+                        dstBottom,
                         mode._packedInt1(),
                         mode._packedInt2()
                     )
@@ -400,18 +437,42 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         fun makeTile(src: Rect, dst: Rect, input: ImageFilter?): ImageFilter {
+            return makeTile(
+                src.left,
+                src.top,
+                src.right,
+                src.bottom,
+                dst.left,
+                dst.top,
+                dst.right,
+                dst.bottom,
+                input
+            )
+        }
+
+        fun makeTile(
+            srcLeft: Float,
+            srcTop: Float,
+            srcRight: Float,
+            srcBottom: Float,
+            dstLeft: Float,
+            dstTop: Float,
+            dstRight: Float,
+            dstBottom: Float,
+            input: ImageFilter?
+        ): ImageFilter {
             return try {
                 Stats.onNativeCall()
                 ImageFilter(
                     _nMakeTile(
-                        src.left,
-                        src.top,
-                        src.right,
-                        src.bottom,
-                        dst.left,
-                        dst.top,
-                        dst.right,
-                        dst.bottom,
+                        srcLeft,
+                        srcTop,
+                        srcRight,
+                        srcBottom,
+                        dstLeft,
+                        dstTop,
+                        dstRight,
+                        dstBottom,
                         getPtr(input)
                     )
                 )
