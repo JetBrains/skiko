@@ -1971,12 +1971,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * Path is replaced by transformed data.
      *
      * @param matrix                matrix to apply to Path
-     * @param applyPerspectiveClip  whether to apply perspective clipping
      * @return                      this
      */
-    fun transform(matrix: Matrix33, applyPerspectiveClip: Boolean): Path {
-        return transform(matrix, null, applyPerspectiveClip)
+    fun transform(matrix: Matrix33): Path {
+        return transform(matrix, null)
     }
+
     /**
      * Transforms verb array, Point array, and weight by matrix.
      * transform may change verbs and increase their number.
@@ -1985,40 +1985,18 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @param matrix                matrix to apply to Path
      * @param dst                   overwritten, transformed copy of Path; may be null
-     * @param applyPerspectiveClip  whether to apply perspective clipping
      * @return                      this
      *
      * @see [https://fiddle.skia.org/c/@Path_transform](https://fiddle.skia.org/c/@Path_transform)
      */
-    /**
-     * Transforms verb array, Point array, and weight by matrix.
-     * transform may change verbs and increase their number.
-     * Path is replaced by transformed data.
-     *
-     * @param matrix  matrix to apply to Path
-     * @return  this
-     */
-    /**
-     * Transforms verb array, Point array, and weight by matrix.
-     * transform may change verbs and increase their number.
-     * Transformed Path replaces dst; if dst is null, original data
-     * is replaced.
-     *
-     * @param matrix  matrix to apply to Path
-     * @param dst     overwritten, transformed copy of Path; may be null
-     * @return        this
-     *
-     * @see [https://fiddle.skia.org/c/@Path_transform](https://fiddle.skia.org/c/@Path_transform)
-     */
-    fun transform(matrix: Matrix33, dst: Path? = null, applyPerspectiveClip: Boolean = true): Path {
+    fun transform(matrix: Matrix33, dst: Path? = null): Path {
         return try {
             Stats.onNativeCall()
             interopScope {
                 _nTransform(
                     _ptr,
                     toInterop(matrix.mat),
-                    getPtr(dst),
-                    applyPerspectiveClip
+                    getPtr(dst)
                 )
             }
             this
@@ -2503,7 +2481,7 @@ private external fun _nReverseAddPath(ptr: NativePointer, srcPtr: NativePointer)
 private external fun _nOffset(ptr: NativePointer, dx: Float, dy: Float, dst: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nTransform")
-private external fun _nTransform(ptr: NativePointer, matrix: InteropPointer, dst: NativePointer, applyPerspectiveClip: Boolean)
+private external fun _nTransform(ptr: NativePointer, matrix: InteropPointer, dst: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetLastPt")
 private external fun _nGetLastPt(ptr: NativePointer, result: InteropPointer): Boolean
