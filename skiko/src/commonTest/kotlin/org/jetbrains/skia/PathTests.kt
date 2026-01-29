@@ -16,7 +16,7 @@ import kotlin.test.assertNull
 class PathTests {
     @Test
     fun iterTest() = runTest {
-        Path().moveTo(10f, 10f).lineTo(20f, 0f).lineTo(20f, 20f).closePath().use { p ->
+        PathBuilder().moveTo(10f, 10f).lineTo(20f, 0f).lineTo(20f, 20f).closePath().detach().use { p ->
             p.iterator().use { i ->
                 assertTrue(i.hasNext())
 
@@ -60,8 +60,8 @@ class PathTests {
 
     @Test
     fun convexityTest() = runTest {
-        Path().lineTo(40f, 20f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p -> assertTrue(p.isConvex) }
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
+        PathBuilder().lineTo(40f, 20f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach().use { p -> assertTrue(p.isConvex) }
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach().use { p ->
             assertFalse(p.isConvex)
         }
     }
@@ -71,7 +71,7 @@ class PathTests {
     fun isShapeTest() {
         for (dir in PathDirection.entries) {
             for (start in 0..3) {
-                Path().addRect(Rect.makeLTRB(0f, 0f, 40f, 20f), dir, start).use { p ->
+                PathBuilder().addRect(Rect.makeLTRB(0f, 0f, 40f, 20f), dir, start).detach().use { p ->
                     assertEquals(Rect.makeLTRB(0f, 0f, 40f, 20f), p.isRect)
                     assertNull(p.isOval)
                     assertNull(p.isRRect)
@@ -80,7 +80,7 @@ class PathTests {
         }
         for (dir in PathDirection.entries) {
             for (start in 0..3) {
-                Path().addOval(Rect.makeLTRB(0f, 0f, 40f, 20f), dir, start).use { p ->
+                PathBuilder().addOval(Rect.makeLTRB(0f, 0f, 40f, 20f), dir, start).detach().use { p ->
                     assertNull(p.isRect)
                     assertEquals(Rect.makeLTRB(0f, 0f, 40f, 20f), p.isOval)
                     assertNull(p.isRRect)
@@ -88,7 +88,7 @@ class PathTests {
             }
         }
         for (dir in PathDirection.entries) {
-            Path().addCircle(20f, 20f, 20f, dir).use { p ->
+            PathBuilder().addCircle(20f, 20f, 20f, dir).detach().use { p ->
                 assertNull(p.isRect)
                 assertEquals(Rect.makeLTRB(0f, 0f, 40f, 40f), p.isOval)
                 assertNull(p.isRRect)
@@ -96,24 +96,24 @@ class PathTests {
         }
         for (dir in PathDirection.entries) {
             for (start in 0..7) {
-                Path().addRRect(RRect.makeLTRB(0f, 0f, 40f, 20f, 5f), dir, start).use { p ->
+                PathBuilder().addRRect(RRect.makeLTRB(0f, 0f, 40f, 20f, 5f), dir, start).detach().use { p ->
                     assertNull(p.isRect)
                     assertNull(p.isOval)
                     assertEquals(RRect.makeLTRB(0f, 0f, 40f, 20f, 5f), p.isRRect)
                 }
-                Path().addRRect(RRect.makeLTRB(0f, 0f, 40f, 20f, 0f), dir, start).use { p ->
+                PathBuilder().addRRect(RRect.makeLTRB(0f, 0f, 40f, 20f, 0f), dir, start).detach().use { p ->
                     assertEquals(Rect.makeLTRB(0f, 0f, 40f, 20f), p.isRect)
                     assertNull(p.isOval)
                     assertNull(p.isRRect)
                 }
-                Path().addRRect(RRect.makeLTRB(0f, 0f, 40f, 20f, 20f, 10f), dir, start).use { p ->
+                PathBuilder().addRRect(RRect.makeLTRB(0f, 0f, 40f, 20f, 20f, 10f), dir, start).detach().use { p ->
                     assertNull(p.isRect)
                     assertEquals(Rect.makeLTRB(0f, 0f, 40f, 20f), p.isOval)
                     assertNull(p.isRRect)
                 }
             }
         }
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach().use { p ->
             assertNull(p.isRect)
             assertNull(p.isOval)
             assertNull(p.isRRect)
@@ -122,43 +122,42 @@ class PathTests {
 
     @Test
     fun checksTest() {
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach().use { p ->
             assertFalse(p.isEmpty)
-            p.reset()
+        }
+        Path().use { p ->
             assertTrue(p.isEmpty)
         }
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
-            assertFalse(p.isEmpty)
-            p.rewind()
-            assertTrue(p.isEmpty)
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).detach().use { p ->
+            assertFalse(p.isLastContourClosed)
         }
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).use { p ->
-            assertFalse(p.isLastContourClosed)
-            p.closePath()
-            assertTrue(p.isLastContourClosed)
-            p.moveTo(100f, 100f).lineTo(140f, 140f).lineTo(140f, 100f).lineTo(100f, 140f)
-            assertFalse(p.isLastContourClosed)
-            p.closePath()
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach().use { p ->
             assertTrue(p.isLastContourClosed)
         }
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).use { p -> assertTrue(p.isFinite) }
-        Path().lineTo(40f, 40f).lineTo(Float.POSITIVE_INFINITY, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
+        PathBuilder().moveTo(100f, 100f).lineTo(140f, 140f).lineTo(140f, 100f).lineTo(100f, 140f).detach().use { p ->
+            assertFalse(p.isLastContourClosed)
+        }
+        PathBuilder().moveTo(100f, 100f).lineTo(140f, 140f).lineTo(140f, 100f).lineTo(100f, 140f).closePath().detach().use { p ->
+            assertTrue(p.isLastContourClosed)
+        }
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).detach().use { p -> assertTrue(p.isFinite) }
+        PathBuilder().lineTo(40f, 40f).lineTo(Float.POSITIVE_INFINITY, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach().use { p ->
             assertEquals(
                 false,
                 p.isFinite
             )
         }
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).use { p ->
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).detach().use { p ->
             assertFalse(p.isVolatile)
             p.setVolatile(true)
             assertTrue(p.isVolatile)
             p.setVolatile(false)
             assertFalse(p.isVolatile)
         }
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach().use { p ->
             assertNull(p.asLine)
         }
-        Path().moveTo(20f, 20f).lineTo(40f, 40f).use { p ->
+        PathBuilder().moveTo(20f, 20f).lineTo(40f, 40f).detach().use { p ->
             assertContentEquals(
                 arrayOf(
                     Point(20f, 20f),
@@ -170,18 +169,18 @@ class PathTests {
 
     @Test
     fun swapTest() {
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p1 ->
-            Path().lineTo(0f, 0f).lineTo(20f, 20f).use { p2 ->
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach().use { p1 ->
+            PathBuilder().lineTo(0f, 0f).lineTo(20f, 20f).detach().use { p2 ->
                 p1.swap(p2)
-                assertEquals(Path().lineTo(0f, 0f).lineTo(20f, 20f), p1)
-                assertEquals(Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath(), p2)
+                assertEquals(PathBuilder().lineTo(0f, 0f).lineTo(20f, 20f).detach(), p1)
+                assertEquals(PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach(), p2)
             }
         }
     }
 
     @Test
     fun containsTest() {
-        Path().addRRect(RRect.makeLTRB(10f, 20f, 54f, 120f, 10f, 20f)).use { p ->
+        PathBuilder().addRRect(RRect.makeLTRB(10f, 20f, 54f, 120f, 10f, 20f)).detach().use { p ->
             assertTrue(p.conservativelyContainsRect(Rect.makeLTRB(10f, 40f, 54f, 80f)))
             assertTrue(p.conservativelyContainsRect(Rect.makeLTRB(25f, 20f, 39f, 120f)))
             assertTrue(p.conservativelyContainsRect(Rect.makeLTRB(15f, 25f, 49f, 115f)))
@@ -215,20 +214,20 @@ class PathTests {
             ),
             Path.convertConicToQuads(Point(0f, 20f), Point(20f, 0f), Point(40f, 20f), 0.5f, 2)
         )
-        Path().lineTo(40f, 40f).use { p ->
+        PathBuilder().lineTo(40f, 40f).detach().use { p ->
             val g1 = p.generationId
-            p.lineTo(10f, 40f)
-            val g2 = p.generationId
+            val p2 = PathBuilder(p).lineTo(10f, 40f).detach()
+            val g2 = p2.generationId
             assertNotEquals(g1, g2)
-            p.fillMode = PathFillMode.EVEN_ODD
-            val g3 = p.generationId
-            assertEquals(g2, g3)
+            p2.fillMode = PathFillMode.EVEN_ODD
+            val g3 = p2.generationId
+            assertNotEquals(g2, g3)
         }
     }
 
     @Test
     fun serializeTest() {
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
+        PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach().use { p ->
             val p2: Path = Path.makeFromBytes(p.serializeToBytes())
             assertEquals(p, p2)
         }

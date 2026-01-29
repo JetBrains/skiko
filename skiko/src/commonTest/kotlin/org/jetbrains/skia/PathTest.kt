@@ -11,10 +11,16 @@ class PathTest {
 
     @Test
     fun storageTest() {
-        val subpath: Path = Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath()
+        val subpath: Path = PathBuilder()
+            .lineTo(40f, 40f)
+            .lineTo(40f, 0f)
+            .lineTo(0f, 40f)
+            .lineTo(0f, 0f)
+            .closePath()
+            .detach()
         for (p in arrayOf(
-            Path().addPath(subpath),
-            Path().incReserve(10).addPath(subpath).closePath()
+            PathBuilder().addPath(subpath).detach(),
+            PathBuilder().incReserve(10).addPath(subpath).closePath().detach()
         )) {
             val p0 = Point(0f, 0f)
             val p1 = Point(40f, 40f)
@@ -29,9 +35,10 @@ class PathTest {
             assertEquals(p3, p.getPoint(3))
             assertEquals(p4, p.getPoint(4))
             assertEquals(p4, p.lastPt)
-            p.lastPt = p5
-            assertEquals(p5, p.getPoint(4))
-            assertEquals(p5, p.lastPt)
+            // lastPt is now read-only, test setLastPt through PathBuilder
+            val pModified = PathBuilder(p).setLastPt(p5.x, p5.y).detach()
+            assertEquals(p5, pModified.getPoint(4))
+            assertEquals(p5, pModified.lastPt)
             assertEquals(5, p.getPoints(null, 0))
             var pts = arrayOfNulls<Point?>(5)
             p.getPoints(pts, 5)
@@ -88,7 +95,7 @@ class PathTest {
 
     @Test
     fun canGetBounds() {
-        val path = Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath()
+        val path = PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach()
         val bounds = Rect(0.0f, 0.0f, 40.0f, 40.0f)
         assertCloseEnough(bounds, path.bounds)
         assertCloseEnough(bounds, path.computeTightBounds())

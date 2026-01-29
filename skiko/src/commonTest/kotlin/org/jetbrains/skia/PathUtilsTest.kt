@@ -13,7 +13,7 @@ class PathUtilsTest {
             strokeWidth = 10f
             mode = PaintMode.STROKE
         }
-        val path = Path().lineTo(40f, 40f)
+        val path = PathBuilder().lineTo(40f, 40f).detach()
 
         val fillPath = PathUtils.fillPathWithPaint(path, paint)
 
@@ -29,7 +29,7 @@ class PathUtilsTest {
             strokeWidth = 10f
             mode = PaintMode.STROKE
         }
-        val path = Path().arcTo(0f, 0f, 40f, 40f, 0f, 90f, false)
+        val path = PathBuilder().arcTo(0f, 0f, 40f, 40f, 0f, 90f, false).detach()
 
         val fillPath1 = PathUtils.fillPathWithPaint(path, paint,null, 1f)
         val fillPath001 = PathUtils.fillPathWithPaint(path, paint,null, 0.01f)
