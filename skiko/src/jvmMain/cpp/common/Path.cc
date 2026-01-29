@@ -168,7 +168,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nGetPoint(JNI
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetPoints(JNIEnv* env, jclass jclass, jlong ptr, jfloatArray pointsArray, jint max) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     jfloat* points = pointsArray == nullptr ? nullptr : env->GetFloatArrayElements(pointsArray, 0);
-    int count = instance->getPoints(reinterpret_cast<SkPoint*>(points), max);
+    int count = instance->getPoints({reinterpret_cast<SkPoint*>(points), max});
     if (pointsArray != nullptr) {
         env->ReleaseFloatArrayElements(pointsArray, points, 0);
     }
@@ -183,7 +183,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nCountVerbs(J
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetVerbs(JNIEnv* env, jclass jclass, jlong ptr, jbyteArray verbsArray, jint max) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     jbyte* verbs = verbsArray == nullptr ? nullptr : env->GetByteArrayElements(verbsArray, 0);
-    int count = instance->getVerbs(reinterpret_cast<uint8_t *>(verbs), max);
+    int count = instance->getVerbs({reinterpret_cast<uint8_t *>(verbs), max});
     if (verbsArray != nullptr)
         env->ReleaseByteArrayElements(verbsArray, verbs, 0);
     return count;
@@ -361,7 +361,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nAddPoly
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     jsize len = env->GetArrayLength(coords);
     jfloat* arr = env->GetFloatArrayElements(coords, 0);
-    instance->addPoly(reinterpret_cast<SkPoint*>(arr), len / 2, close);
+    instance->addPoly({reinterpret_cast<SkPoint*>(arr), len / 2}, close);
     env->ReleaseFloatArrayElements(coords, arr, 0);
 }
 
