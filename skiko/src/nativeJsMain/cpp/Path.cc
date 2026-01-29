@@ -405,12 +405,11 @@ SKIKO_EXPORT void org_jetbrains_skia_Path__1nOffset
 
 
 SKIKO_EXPORT void org_jetbrains_skia_Path__1nTransform
-  (KNativePointer ptr, KFloat* matrixArr, KNativePointer dstPtr, KBoolean pcBool) {
+  (KNativePointer ptr, KFloat* matrixArr, KNativePointer dstPtr) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
     SkPath* dst = reinterpret_cast<SkPath*>((dstPtr));
     std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
-    SkApplyPerspectiveClip pc = pcBool ? SkApplyPerspectiveClip::kYes : SkApplyPerspectiveClip::kNo;
-    instance->transform(*matrix, dst, pc);
+    instance->transform(*matrix, dst);
 }
 
 
