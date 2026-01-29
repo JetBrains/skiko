@@ -1,4 +1,5 @@
 #include <SkNWayCanvas.h>
+#include <SkPathBuilder.h>
 #include <SkPicture.h>
 #include <SkShadowUtils.h>
 #include "node/RenderNode.h"
@@ -306,9 +307,9 @@ void RenderNode::updateMatrix() {
 void RenderNode::drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo) {
     SkPath tmpPath, *path = &tmpPath;
     if (this->clipRect) {
-        tmpPath.addRect(*this->clipRect);
+        tmpPath = SkPathBuilder().addRect(*this->clipRect).detach();
     } else if (this->clipRRect) {
-        tmpPath.addRRect(*this->clipRRect);
+        tmpPath = SkPathBuilder().addRRect(*this->clipRRect).detach();
     } else if (this->clipPath) {
         path = &*this->clipPath;
     } else {
