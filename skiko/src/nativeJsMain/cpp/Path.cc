@@ -171,7 +171,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Path__1nGetPoint(KNativePointer ptr, KInt i
 SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetPoints(KNativePointer ptr, KInteropPointer pointsArray, KInt max) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
     SkPoint* points = reinterpret_cast<SkPoint*>(pointsArray);
-    return instance->getPoints(points, max);
+    return instance->getPoints({points, max});
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nCountVerbs(KNativePointer ptr) {
@@ -181,7 +181,7 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nCountVerbs(KNativePointer ptr) {
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetVerbs(KNativePointer ptr, KByte* verbsArray, KInt max) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
-    return instance->getVerbs(reinterpret_cast<uint8_t *>(verbsArray), max);
+    return instance->getVerbs({reinterpret_cast<uint8_t *>(verbsArray), max});
 }
 
 
@@ -358,7 +358,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddRRect
 SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddPoly
   (KNativePointer ptr, KFloat* coords, KInt count, KBoolean close) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
-    instance->addPoly(reinterpret_cast<SkPoint*>(coords), count, close);
+    instance->addPoly({reinterpret_cast<SkPoint*>(coords), count}, close);
 }
 
 
