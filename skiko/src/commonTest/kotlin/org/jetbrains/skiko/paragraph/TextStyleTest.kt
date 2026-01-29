@@ -2,12 +2,7 @@ package org.jetbrains.skiko.paragraph
 
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.use
-import org.jetbrains.skia.jbMonoPath
-import org.jetbrains.skia.paragraph.DecorationLineStyle
-import org.jetbrains.skia.paragraph.DecorationStyle
-import org.jetbrains.skia.paragraph.Shadow
-import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skia.paragraph.TextStyleAttribute
+import org.jetbrains.skia.paragraph.*
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.KotlinBackend
@@ -153,6 +148,33 @@ class TextStyleTest {
     }
 
     @Test
+    fun textStyleFontEdgingTest() {
+        TextStyle().use { textStyle ->
+            assertEquals(FontEdging.ANTI_ALIAS, textStyle.fontEdging)
+            textStyle.fontEdging = FontEdging.SUBPIXEL_ANTI_ALIAS
+            assertEquals(FontEdging.SUBPIXEL_ANTI_ALIAS, textStyle.fontEdging)
+        }
+    }
+
+    @Test
+    fun textStyleSubpixelTest() {
+        TextStyle().use { textStyle ->
+            assertEquals(true, textStyle.subpixel)
+            textStyle.subpixel = false
+            assertEquals(false, textStyle.subpixel)
+        }
+    }
+
+    @Test
+    fun textStyleFontHintingTest() {
+        TextStyle().use { textStyle ->
+            assertEquals(FontHinting.SLIGHT, textStyle.fontHinting)
+            textStyle.fontHinting = FontHinting.FULL
+            assertEquals(FontHinting.FULL, textStyle.fontHinting)
+        }
+    }
+
+    @Test
     fun textStyleMetricsContainsMeaningfulValues() = runTest {
         val jbMono = Typeface.makeFromResource(jbMonoPath)
         TextStyle().use { textStyle ->
@@ -171,5 +193,4 @@ class TextStyleTest {
             assertTrue(!textStyle.fontMetrics.ascent.isNaN())
         }
     }
-
 }
