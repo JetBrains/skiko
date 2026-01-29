@@ -10,6 +10,7 @@
 #endif
 
 #if (defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)) && !defined(SKIKO_WASM)
+#include "core/SkFontScanner.h"
 #include "ports/SkFontMgr_fontconfig.h"
 #endif
 
@@ -36,7 +37,7 @@ sk_sp<SkFontMgr> SkFontMgrSkikoDefault() {
 #endif
 
 #if (defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)) && !defined(SKIKO_WASM)
-    return SkFontMgr_New_FontConfig(nullptr);
+    return SkFontMgr_New_FontConfig(nullptr, nullptr);
 #endif
 
 #ifdef SK_BUILD_FOR_ANDROID
