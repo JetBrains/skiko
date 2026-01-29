@@ -287,9 +287,12 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetXPositions
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetPath
   (KNativePointer ptr, KShort glyph) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    SkPath* path = new SkPath();
-    instance->getPath(glyph, path);
-    return reinterpret_cast<KNativePointer>(path);
+    std::optional<SkPath> pathOpt = instance->getPath(glyph);
+    if (pathOpt.has_value()) {
+        SkPath* path = new SkPath(pathOpt.value());
+        return reinterpret_cast<KNativePointer>(path);
+    }
+    return 0;
 }
 
 
@@ -304,8 +307,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetPaths
     instance->getPaths({reinterpret_cast<SkGlyphID*>(glyphs), count}, [](const SkPath* orig, const SkMatrix& mx, void* voidCtx) {
         Ctx* ctx = static_cast<Ctx*>(voidCtx);
         if (orig) {
-            SkPath* path = new SkPath();
-            orig->transform(mx, path);
+            SkPath* path = new SkPath(orig->makeTransform(mx));
             ctx->paths->push_back(reinterpret_cast<KNativePointer>(path));
         }
     }, &ctx);

@@ -400,18 +400,16 @@ SKIKO_EXPORT void org_jetbrains_skia_Path__1nOffset
   (KNativePointer ptr, KFloat dx, KFloat dy, KNativePointer dstPtr) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
     SkPath* dst = reinterpret_cast<SkPath*>((dstPtr));
-    instance->offset(dx, dy, dst);
+    *dst = instance->makeOffset(dx, dy);
 }
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Path__1nTransform
   (KNativePointer ptr, KFloat* matrixArr, KNativePointer dstPtr) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
     SkPath* dst = reinterpret_cast<SkPath*>((dstPtr));
     std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
-    instance->transform(*matrix, dst);
+    *dst = instance->makeTransform(*matrix);
 }
-
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Path__1nGetLastPt
   (KNativePointer ptr, KInteropPointer resultArray) {
@@ -456,7 +454,6 @@ SKIKO_EXPORT void org_jetbrains_skia_Path__1nDumpHex
     instance->dumpHex();
 }
 
-
 SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nSerializeToBytes
   (KNativePointer ptr, KInteropPointer dst) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
@@ -467,7 +464,6 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nSerializeToBytes
         return count;
     }
 }
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeCombining
   (KNativePointer aPtr, KNativePointer bPtr, KInt jop) {
@@ -481,19 +477,17 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeCombining
         return 0;
 }
 
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromBytes
   (KByte* bytesArray, KInt size) {
-    SkPath* instance = new SkPath();
     void* bytes = reinterpret_cast<void*>(bytesArray);
-    if (instance->readFromMemory(bytes, size)) {
+    std::optional<SkPath> pathOpt = SkPath::ReadFromMemory(bytes, size);
+    if (pathOpt.has_value()) {
+        SkPath* instance = new SkPath(pathOpt.value());
         return reinterpret_cast<KNativePointer>(instance);
     } else {
-        delete instance;
         return 0;
     }
 }
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetGenerationId
   (KNativePointer ptr) {
