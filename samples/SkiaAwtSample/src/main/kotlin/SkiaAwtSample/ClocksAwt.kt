@@ -89,9 +89,7 @@ open class ClocksAwt(
         val y = ypos.toFloat()
         canvas.drawString(text, x, y, font, paint)
 
-        val style = ParagraphStyle().apply {
-            fontRastrSettings = FontRastrSettings(FontEdging.SUBPIXEL_ANTI_ALIAS, FontHinting.SLIGHT, true)
-        }
+        val style = ParagraphStyle()
         val paragraph = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
             .addText("Graphic API: ${renderProvider()}, JRE: ${System.getProperty("java.vendor")}, ${System.getProperty("java.runtime.version")} $currentSystemTheme")
