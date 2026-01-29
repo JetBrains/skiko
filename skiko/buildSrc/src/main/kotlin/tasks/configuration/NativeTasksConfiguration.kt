@@ -266,6 +266,9 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 "$skiaBinDir/libskunicode_icu.a",
                 "$skiaBinDir/libskia.a"
             )
+            if (arch == Arch.Arm64) {
+                options.add("-lEGL")
+            }
             // When cross-compiling for ARM64 from x64, use the ARM toolchain sysroot
             if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
                 // ARM GNU toolchain sysroot paths
