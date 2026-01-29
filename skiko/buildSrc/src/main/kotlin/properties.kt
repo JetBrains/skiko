@@ -10,7 +10,7 @@ enum class OS(
     Linux("linux", arrayOf()),
     Android("android", arrayOf()),
     Windows("windows", arrayOf()),
-    MacOS("macos", arrayOf("-mmacosx-version-min=10.15")),
+    MacOS("macos", arrayOf("-mmacosx-version-min=11.0")),
     Wasm("wasm", arrayOf()),
     IOS("ios", arrayOf()),
     TVOS("tvos", arrayOf())
