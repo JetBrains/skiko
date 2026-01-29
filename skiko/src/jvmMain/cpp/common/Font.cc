@@ -304,9 +304,12 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetXPosition
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPath
   (JNIEnv* env, jclass jclass, jlong ptr, jshort glyph) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    SkPath* path = new SkPath();
-    instance->getPath(glyph, path);
-    return reinterpret_cast<jlong>(path);
+    std::optional<SkPath> pathOpt = instance->getPath(glyph);
+    if (pathOpt.has_value()) {
+        SkPath* path = new SkPath(pathOpt.value());
+        return reinterpret_cast<jlong>(path);
+    }
+    return 0;
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPaths
@@ -322,8 +325,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPaths
     instance->getPaths({reinterpret_cast<SkGlyphID*>(glyphs), count}, [](const SkPath* orig, const SkMatrix& mx, void* voidCtx) {
         Ctx* ctx = static_cast<Ctx*>(voidCtx);
         if (orig) {
-            SkPath* path = new SkPath();
-            orig->transform(mx, path);
+            SkPath* path = new SkPath(orig->makeTransform(mx));
             ctx->paths->push_back(reinterpret_cast<jlong>(path));
         }
     }, &ctx);

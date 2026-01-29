@@ -57,7 +57,8 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Region__1nComputeRegionComplexity(KNativePo
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nGetBoundaryPath(KNativePointer ptr, KNativePointer pathPtr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>((ptr));
     SkPath* path = reinterpret_cast<SkPath*>((pathPtr));
-    return instance->getBoundaryPath(path);
+    *path = instance->getBoundaryPath();
+    return true;
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nSetEmpty(KNativePointer ptr) {

@@ -53,7 +53,8 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nComp
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nGetBoundaryPath(JNIEnv* env, jclass jclass, jlong ptr, jlong pathPtr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(ptr));
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
-    return instance->getBoundaryPath(path);
+    *path = instance->getBoundaryPath();
+    return true;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nSetEmpty(JNIEnv* env, jclass jclass, jlong ptr) {

@@ -401,7 +401,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nOffset
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat dx, jfloat dy, jlong dstPtr) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     SkPath* dst = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(dstPtr));
-    instance->offset(dx, dy, dst);
+    *dst = instance->makeOffset(dx, dy);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nTransform
@@ -409,7 +409,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nTransform
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     SkPath* dst = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(dstPtr));
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
-    instance->transform(*matrix, dst);
+    *dst = instance->makeTransform(*matrix);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nGetLastPt
@@ -484,15 +484,14 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeCombini
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromBytes
   (JNIEnv* env, jclass jclass, jbyteArray bytesArray, jint _size) {
-    SkPath* instance = new SkPath();
     int count = env->GetArrayLength(bytesArray);
     jbyte* bytes = env->GetByteArrayElements(bytesArray, 0);
-    if (instance->readFromMemory(bytes, count)) {
-        env->ReleaseByteArrayElements(bytesArray, bytes, 0);
+    std::optional<SkPath> pathOpt = SkPath::ReadFromMemory(bytes, count);
+    env->ReleaseByteArrayElements(bytesArray, bytes, 0);
+    if (pathOpt.has_value()) {
+        SkPath* instance = new SkPath(pathOpt.value());
         return reinterpret_cast<jlong>(instance);
     } else {
-        env->ReleaseByteArrayElements(bytesArray, bytes, 0);
-        delete instance;
         return 0;
     }
 }
