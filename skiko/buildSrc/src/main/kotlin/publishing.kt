@@ -18,6 +18,12 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 private val SkikoProjectContext.publishing get() = project.extensions.getByType(PublishingExtension::class.java)
 
+private val awtRuntimeTargets = listOf(
+    OS.MacOS to Arch.X64, OS.MacOS to Arch.Arm64,
+    OS.Linux to Arch.X64, OS.Linux to Arch.Arm64,
+    OS.Windows to Arch.X64, OS.Windows to Arch.Arm64
+)
+
 private class SkikoPublishingContext(
     val projectContext: SkikoProjectContext,
 ) {
@@ -43,6 +49,7 @@ fun SkikoProjectContext.declarePublications() {
     ctx.configurePublicationDefaults()
     ctx.configureAllJvmRuntimeJarPublications()
     ctx.configureAwtRuntimeJarPublication()
+    ctx.configureAwtPublicationConstraints()
     ctx.configureAdditionalRuntimeLibrariesPublication()
     ctx.configureWebPublication()
     ctx.configureAndroidPublication()
@@ -87,7 +94,7 @@ private fun SkikoPublishingContext.configurePublishingRepositories() {
 }
 
 private fun SkikoPublishingContext.configurePublicationDefaults() {
-    pomNameForPublication["kotlinMultiplatform"] = "Skiko MPP"
+    pomNameForPublication["kotlinMultiplatform"] = "Skiko KMP"
     kotlin.targets.forEach {
         pomNameForPublication[it.name] = "Skiko ${toTitleCase(it.name)}"
     }
@@ -144,7 +151,7 @@ private fun SkikoPublishingContext.configureAllJvmRuntimeJarPublications() = pub
                     .appendNode("dependency").apply {
                         appendNode("groupId", SkikoArtifacts.groupId)
                         appendNode("artifactId", SkikoArtifacts.jvmArtifactId)
-                        appendNode("version", skiko.deployVersion)
+                        appendNode("version", "[${skiko.deployVersion}]")
                         appendNode("scope", "compile")
                     }
             }
@@ -183,16 +190,7 @@ private fun SkikoPublishingContext.configureAllJvmRuntimeJarPublications() = pub
  * which resolves the correct artifact for the current platform.
  */
 private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
-    /*
-    Defines all the child targets that this uber publication can point to
-     */
-    val childAwtRuntimeTargets = listOf(
-        OS.MacOS to Arch.X64, OS.MacOS to Arch.Arm64,
-        OS.Linux to Arch.X64, OS.Linux to Arch.Arm64,
-        OS.Windows to Arch.X64, OS.Windows to Arch.Arm64
-    )
-
-    val allJvmRuntimeVariants = childAwtRuntimeTargets.map { (os, arch) ->
+    val allJvmRuntimeVariants = awtRuntimeTargets.map { (os, arch) ->
         project.configurations.create("awtRuntimeElements-${targetId(os, arch)}").apply {
 
             /* Setup default attributes */
@@ -273,6 +271,32 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
                         dependencyNodes.item(i).parentNode.removeChild(dependencyNodes.item(i))
                     }
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Adds dependency constraints from the skiko-awt (Kotlin) publication to all skiko-awt-runtime-* (JNI) artifacts.
+ * This ensures compatibility between the Kotlin and native runtime artifacts.
+ * 
+ * Constraints are added to the awt target's configurations, which automatically propagates them to both:
+ * - Maven POM (via dependencyManagement section)
+ * - Gradle Module Metadata (via dependencyConstraints in variants)
+ */
+private fun SkikoPublishingContext.configureAwtPublicationConstraints() {
+    // Add constraints to Gradle configurations
+    // This will automatically generate both POM dependencyManagement and Gradle Module Metadata dependencyConstraints
+    listOf("awtApiElements", "awtRuntimeElements").forEach { configName ->
+        project.configurations.findByName(configName)?.let { config ->
+            awtRuntimeTargets.forEach { (os, arch) ->
+                config.dependencyConstraints.add(
+                    // Note: "!!" suffix is used to enforce a strict version
+                    // See https://docs.gradle.org/current/userguide/dependency_versions.html#sec:rich-version-constraints
+                    project.dependencies.constraints.create(
+                        "${SkikoArtifacts.groupId}:${SkikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)}:${skiko.deployVersion}!!"
+                    )
+                )
             }
         }
     }
