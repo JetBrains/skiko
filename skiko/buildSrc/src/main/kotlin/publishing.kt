@@ -257,7 +257,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
             from(component)
             pomNameForPublication[name] = "Skiko JVM Runtime"
             groupId = SkikoArtifacts.groupId
-            artifactId = "skiko-awt-runtime"
+            artifactId = SkikoArtifacts.jvmRuntimeArtifactId
             version = skiko.deployVersion
 
             /*
@@ -295,7 +295,7 @@ private fun SkikoPublishingContext.configureAwtPublicationConstraints() {
             // Add constraint for the uber runtime artifact
             config.dependencyConstraints.add(
                 project.dependencies.constraints.create(
-                    "${SkikoArtifacts.groupId}:skiko-awt-runtime:${skiko.deployVersion}!!"
+                    "${SkikoArtifacts.groupId}:${SkikoArtifacts.jvmRuntimeArtifactId}:${skiko.deployVersion}!!"
                 )
             )
             
