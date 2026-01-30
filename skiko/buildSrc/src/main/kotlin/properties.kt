@@ -196,6 +196,7 @@ object SkikoArtifacts {
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
     val commonArtifactId = "skiko"
     val jvmArtifactId = "skiko-awt"
+    val jvmRuntimeArtifactId = "skiko-awt-runtime"
     // an artifact (klib) for k/js targets
     val jsArtifactId = "skiko-js"
     // an artifact (klib) for k/wasm targets
