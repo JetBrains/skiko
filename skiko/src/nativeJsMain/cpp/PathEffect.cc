@@ -54,7 +54,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakeCorner
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakeDash
   (KFloat* intervalsArray, KInt count, KFloat phase) {
-    SkPathEffect* ptr = SkDashPathEffect::Make(reinterpret_cast<float*>(intervalsArray), count, phase).release();
+    SkPathEffect* ptr = SkDashPathEffect::Make({reinterpret_cast<float*>(intervalsArray), count}, phase).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
