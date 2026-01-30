@@ -34,7 +34,7 @@ val skikoArtifactIds: List<String> =
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
     modulesToDownload.set(skikoMavenModules(skiko.deployVersion))
-    spaceRepoUrl.set("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    spaceRepoUrl.set("https://packages.jetbrains.team/maven/p/cmp/dev")
 }
 
 val createGithubRelease by tasks.registering {
