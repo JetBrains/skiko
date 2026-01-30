@@ -289,10 +289,19 @@ private fun SkikoPublishingContext.configureAwtPublicationConstraints() {
     // This will automatically generate both POM dependencyManagement and Gradle Module Metadata dependencyConstraints
     listOf("awtApiElements", "awtRuntimeElements").forEach { configName ->
         project.configurations.findByName(configName)?.let { config ->
+            // Note: "!!" suffix is used to enforce a strict version
+            // See https://docs.gradle.org/current/userguide/dependency_versions.html#sec:rich-version-constraints
+
+            // Add constraint for the uber runtime artifact
+            config.dependencyConstraints.add(
+                project.dependencies.constraints.create(
+                    "${SkikoArtifacts.groupId}:skiko-awt-runtime:${skiko.deployVersion}!!"
+                )
+            )
+            
+            // Add constraints for platform-specific runtime artifacts
             awtRuntimeTargets.forEach { (os, arch) ->
                 config.dependencyConstraints.add(
-                    // Note: "!!" suffix is used to enforce a strict version
-                    // See https://docs.gradle.org/current/userguide/dependency_versions.html#sec:rich-version-constraints
                     project.dependencies.constraints.create(
                         "${SkikoArtifacts.groupId}:${SkikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)}:${skiko.deployVersion}!!"
                     )
