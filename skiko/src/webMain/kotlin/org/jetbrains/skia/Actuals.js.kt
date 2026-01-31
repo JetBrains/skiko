@@ -28,7 +28,7 @@ actual class Matcher constructor(private val regex: Regex, private val input: Ch
 @Suppress("RedundantNullableReturnType")
 val LANG: String by lazy {
     val lang: String? = window.navigator.language
-    if (lang == null || lang.isEmpty()) { "en-US" } else { lang }
+    if (lang.isNullOrEmpty()) { "en-US" } else { lang }
 }
 
 actual fun defaultLanguageTag(): String = LANG

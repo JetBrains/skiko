@@ -150,9 +150,12 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      */
     fun makeClone(variations: Array<FontVariation>, collectionIndex: Int = 0): Typeface {
         return try {
-            if (variations.size == 0) return this
+            if (variations.isEmpty()) return this
             Stats.onNativeCall()
-            val variationsData = variations.asList().flatMap { listOf(it._tag, it.value.toRawBits()) }.toIntArray()
+            val variationsData = IntArray(variations.size * 2) { i ->
+                val variation = variations[i / 2]
+                if (i % 2 == 0) variation._tag else variation.value.toRawBits()
+            }
             val ptr =
                 interopScope { _nMakeClone(_ptr, toInterop(variationsData), 2 * variations.size, collectionIndex) }
             require(ptr != NullPointer) {

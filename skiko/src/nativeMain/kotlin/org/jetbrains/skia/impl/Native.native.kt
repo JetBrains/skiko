@@ -180,13 +180,11 @@ internal actual class InteropScope actual constructor() {
     actual fun InteropPointer.fromInterop(result: NativePointerArray) {}
 
     actual fun toInterop(stringArray: Array<String>?): InteropPointer {
-        if (stringArray == null || stringArray.isEmpty()) return NativePtr.NULL
-
-        val pins = stringArray.toList()
-            .map { convertToZeroTerminatedString(it).pin() }
+        if (stringArray.isNullOrEmpty()) return NativePtr.NULL
 
         val nativePointerArray = NativePointerArray(stringArray.size)
-        pins.forEachIndexed { index, pin ->
+        stringArray.forEachIndexed { index, str ->
+            val pin = convertToZeroTerminatedString(str).pin()
             elements.add(pin)
             nativePointerArray[index] = pin.addressOf(0).rawValue
         }
@@ -207,7 +205,8 @@ internal actual class InteropScope actual constructor() {
     }
 
     actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer {
-        return toInterop(interopPointers.map { it.toLong() }.toLongArray())
+        if (interopPointers.isEmpty()) return NativePtr.NULL
+        return toInterop(LongArray(interopPointers.size) { interopPointers[it].toLong() })
     }
 
     actual fun callback(callback: (() -> Unit)?) = callbackImpl(callback)
@@ -222,9 +221,9 @@ internal actual class InteropScope actual constructor() {
     actual fun virtualInteropPointer(method: () -> InteropPointer) = callbackImpl(method)
     actual fun virtualBoolean(method: () -> Boolean) = callbackImpl(method)
 
-    actual fun release()  {
-        elements.forEach {
-            it.unpin()
+    actual fun release() {
+        for (index in elements.indices) {
+            elements[index].unpin()
         }
     }
 
