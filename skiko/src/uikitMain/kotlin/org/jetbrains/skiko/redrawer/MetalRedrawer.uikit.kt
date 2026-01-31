@@ -154,9 +154,9 @@ internal class MetalRedrawer(
         if (!isApplicationActive) {
             // If application goes background, synchronously schedule all inflightCommandBuffers, as per
             // https://developer.apple.com/documentation/metal/gpu_devices_and_work_submission/preparing_your_metal_app_to_run_in_the_background?language=objc
-            inflightCommandBuffers.forEach {
+            for (index in inflightCommandBuffers.indices) {
                 // Will immediately return for MTLCommandBuffer's which are not in `Commited` status
-                it.waitUntilScheduled()
+                inflightCommandBuffers[index].waitUntilScheduled()
             }
         }
     }

@@ -1,9 +1,5 @@
 package org.jetbrains.skiko
 
-import kotlin.system.measureNanoTime
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.nanoseconds
-
 internal data class NotSupportedAdapter(
     val os: OS,
     val api: GraphicsApi,
@@ -30,7 +26,9 @@ private val notSupportedAdapters: List<NotSupportedAdapter> by lazy {
 }
 
 internal fun isVideoCardSupported(api: GraphicsApi, hostOs: OS, name: String): Boolean {
-    return notSupportedAdapters.any { entry ->
-        entry.os == hostOs && entry.api == api && entry.pattern.matches(name)
-    }.not()
+    for (index in notSupportedAdapters.indices) {
+        val adapter = notSupportedAdapters[index]
+        if (adapter.os == hostOs && adapter.api == api && adapter.pattern.matches(name)) return false
+    }
+    return true
 }
