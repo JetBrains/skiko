@@ -88,17 +88,15 @@ class SkiaLayerTest {
             window.setLocation(200, 200)
             window.setSize(400, 600)
             window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
-            window.layer.renderDelegate = object : SkikoRenderDelegate {
-                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                    val c1 = counter1
-                    val c2 = counter2
+            window.layer.renderDelegate = SkikoRenderDelegate { canvas, width, height, _ ->
+                val c1 = counter1
+                val c2 = counter2
 
-                    paint.color = colors[c1.mod(colors.size)].rgb
-                    canvas.drawRect(Rect(0f, 0f, width.toFloat(), height / 2f), paint)
+                paint.color = colors[c1.mod(colors.size)].rgb
+                canvas.drawRect(Rect(0f, 0f, width.toFloat(), height / 2f), paint)
 
-                    paint.color = colors[c2.mod(colors.size)].rgb
-                    canvas.drawRect(Rect(0f, height / 2f, width.toFloat(), height.toFloat()), paint)
-                }
+                paint.color = colors[c2.mod(colors.size)].rgb
+                canvas.drawRect(Rect(0f, height / 2f, width.toFloat(), height.toFloat()), paint)
             }
             window.isVisible = true
 
@@ -255,11 +253,7 @@ class SkiaLayerTest {
             properties = SkiaLayerProperties(renderApi = renderApi)
         )
         var renderedWidth = -1
-        layer.renderDelegate = object : SkikoRenderDelegate {
-            override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                renderedWidth = width
-            }
-        }
+        layer.renderDelegate = SkikoRenderDelegate { _, width, _, _ -> renderedWidth = width }
         layer.size = Dimension(0, 0)
         val density = window.graphicsConfiguration.defaultTransform.scaleX
         try {
@@ -309,12 +303,11 @@ class SkiaLayerTest {
             properties = SkiaLayerProperties(renderApi = renderApi)
         )
 
-        layer.renderDelegate = object : SkikoRenderDelegate {
-            override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
-                    color = Color.RED.rgb
-                })
-            }
+        layer.renderDelegate = SkikoRenderDelegate { canvas, width, height, _ ->
+            canvas.drawRect(
+                r = Rect(0f, 0f, width.toFloat(), height.toFloat()),
+                paint = Paint().apply { color = Color.RED.rgb }
+            )
         }
         layer.size = Dimension(100, 100)
         val box = Box.createVerticalBox().apply {
@@ -416,7 +409,7 @@ class SkiaLayerTest {
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             window.layer.fullscreen = true
             var stateRemainsFullscreen = true
-            window.addComponentListener(object: ComponentAdapter(){
+            window.addComponentListener(object: ComponentAdapter() {
                 override fun componentResized(e: ComponentEvent?) {
                     if (!window.layer.fullscreen)
                         stateRemainsFullscreen = false
@@ -430,7 +423,7 @@ class SkiaLayerTest {
         } finally {
             window.close()
 
-            // Delay before starting next test to let the window animation to complete, and allow the next window
+            // Delay before starting the next test to let the window animation complete and allow the next window
             // to become fullscreen
             if (hostOs == OS.MacOS) {
                 delay(1000)
@@ -447,11 +440,7 @@ class SkiaLayerTest {
             window.setLocation(200, 200)
             window.setSize(40, 20)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.renderDelegate = object : SkikoRenderDelegate {
-                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                    renderCount++
-                }
-            }
+            window.layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ -> renderCount++ }
             window.isUndecorated = true
             window.isVisible = true
 
@@ -497,7 +486,7 @@ class SkiaLayerTest {
                 if (needOpen) {
                     val window = window(isAnimated = random.nextDouble() > 0.5f)
                     openedWindows.add(window)
-                } else if (openedWindows.size > 0) {
+                } else if (openedWindows.isNotEmpty()) {
                     val index = (random.nextDouble() * (openedWindows.size - 1)).toInt()
                     openedWindows.removeAt(index).close()
                 }
@@ -551,10 +540,7 @@ class SkiaLayerTest {
             setSize(400, 200)
             preferredSize = Dimension(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.renderDelegate = object : SkikoRenderDelegate {
-                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                }
-            }
+            layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ -> }
         }
 
         repeat(30) {
@@ -701,15 +687,13 @@ class SkiaLayerTest {
             window.setLocation(200, 200)
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.renderDelegate = object : SkikoRenderDelegate {
-                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                    drawCount++
+            window.layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ ->
+                drawCount++
 
-                    if (drawCount < targetDrawCount) {
-                        window.layer.needRender()
-                    } else {
-                        onDrawCompleted.complete(Unit)
-                    }
+                if (drawCount < targetDrawCount) {
+                    window.layer.needRender()
+                } else {
+                    onDrawCompleted.complete(Unit)
                 }
             }
             window.isUndecorated = true
@@ -734,12 +718,10 @@ class SkiaLayerTest {
         try {
             window.setLocation(200, 200)
             window.setSize(400, 400)
-            window.layer.renderDelegate = object : SkikoRenderDelegate {
-                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                    window.dispose()
-                    SwingUtilities.invokeLater {
-                        onDrawCompleted.complete(Unit)
-                    }
+            window.layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ ->
+                window.dispose()
+                SwingUtilities.invokeLater {
+                    onDrawCompleted.complete(Unit)
                 }
             }
             window.isVisible = true
@@ -812,10 +794,8 @@ class SkiaLayerTest {
         assumeTrue(hostOs == OS.MacOS) // since the test has 'metal' in its name (it is flaky on Windows)
 
         val renderTimes = mutableListOf<Long>()
-        val renderer = object: SkikoRenderDelegate {
-            override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                renderTimes.add(System.currentTimeMillis())
-            }
+        val renderer = SkikoRenderDelegate { _, _, _, _ ->
+            renderTimes.add(System.currentTimeMillis())
         }
         val window = UiTestWindow {
             layer.renderDelegate = renderer
@@ -981,12 +961,10 @@ class SkiaLayerTest {
 
             val paragraph by lazy { paragraph(window.layer.contentScale * 40, "=-+Нп") }
 
-            window.layer.renderDelegate = object : SkikoRenderDelegate {
-                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                    canvas.clear(Color.WHITE.rgb)
-                    paragraph.layout(Float.POSITIVE_INFINITY)
-                    paragraph.paint(canvas, 0f, 0f)
-                }
+            window.layer.renderDelegate = SkikoRenderDelegate { canvas, _, _, _ ->
+                canvas.clear(Color.WHITE.rgb)
+                paragraph.layout(Float.POSITIVE_INFINITY)
+                paragraph.paint(canvas, 0f, 0f)
             }
 
             window.isUndecorated = true
@@ -1036,7 +1014,7 @@ class SkiaLayerTest {
 
             // Ideally, layoutCount would be just 1, but Swing appears to call layout one extra time, so it ends up being 2.
             // Compare to 3 just to avoid a false-failure if there's another layout for whatever reason.
-            // What we're interested to validate is that there's no layout occurring on every window move.
+            // What we're interested in validating is that there's no layout occurring on every window move.
             assert(layoutCount <= 3) {
                 "Layout count: $layoutCount"
             }
@@ -1054,7 +1032,7 @@ class SkiaLayerTest {
         if (renderApi != GraphicsApi.METAL) return@uiTest
 
         // Put up a large green window, and then repeatedly show and hide/dispose
-        // a smaller black window on top of it while screenshotting the pixel at the center,
+        // a smaller black window on top of it while screenshotting the pixel at the center
         // and making sure that pixel is always either black or green.
 
         val bgColor = Color.GREEN
@@ -1195,6 +1173,7 @@ class SkiaLayerTest {
                     val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
                     if (pixel != color) {
                         tempColorVisibleCount++
+                        break
                     }
                 }
             }
@@ -1235,11 +1214,9 @@ class SkiaLayerTest {
         val window = UiTestWindow(analytics = analytics) {
             size = Dimension(600, 600)
             location = Point(400, 400)
-            layer.renderDelegate = object: SkikoRenderDelegate {
-                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                    renderCalls++
-                    renderChannel.trySend(Unit)
-                }
+            layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ ->
+                renderCalls++
+                renderChannel.trySend(Unit)
             }
             contentPane.add(layer, BorderLayout.CENTER)
         }
@@ -1301,11 +1278,9 @@ class SkiaLayerTest {
         val window = UiTestWindow(analytics = analytics) {
             size = Dimension(600, 600)
             location = Point(400, 400)
-            layer.renderDelegate = object: SkikoRenderDelegate {
-                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                    renderCalls++
-                    renderChannel.trySend(Unit)
-                }
+            layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ ->
+                renderCalls++
+                renderChannel.trySend(Unit)
             }
             contentPane.add(layer, BorderLayout.CENTER)
         }
