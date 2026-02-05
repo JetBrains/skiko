@@ -44,6 +44,11 @@ expect open class SkiaLayer {
     val component: Any?
 
     /**
+     * A list of rectangles to cut out from the rendered content; No content will be drawn inside them.
+     */
+    val cutoutRectangles: List<ClipRectangle>
+
+    /**
      * Current view used for rendering.
      */
     var renderDelegate: SkikoRenderDelegate?

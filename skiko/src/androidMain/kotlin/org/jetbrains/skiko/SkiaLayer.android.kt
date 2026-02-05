@@ -81,5 +81,8 @@ actual open class SkiaLayer {
     actual val component: Any?
         get() = this.container
 
+    actual val cutoutRectangles: List<ClipRectangle>
+        get() = emptyList()
+
     internal actual fun draw(canvas: Canvas): Unit = TODO()
 }

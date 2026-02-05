@@ -46,6 +46,9 @@ actual open class SkiaLayer {
     actual val component: Any?
         get() = this.view
 
+    actual val cutoutRectangles: List<ClipRectangle>
+        get() = emptyList()
+
     val width: Float
        get() = view!!.frame.useContents {
            return@useContents size.width.toFloat()

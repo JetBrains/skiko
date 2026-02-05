@@ -20,6 +20,8 @@ actual open class SkiaLayer  {
         set(value) {}
     actual val component: Any?
         get() = TODO("Not yet implemented")
+    actual val cutoutRectangles: List<ClipRectangle>
+        get() = emptyList()
     actual fun needRender(throttledToVsync: Boolean) {
         TODO("unimplemented")
     }

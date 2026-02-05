@@ -27,11 +27,13 @@ import org.junit.Rule
 import org.junit.Test
 import java.awt.*
 import java.awt.Color
+import java.awt.Graphics
 import java.awt.Point
 import java.awt.event.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.Box
+import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
 import javax.swing.JPanel
@@ -1345,6 +1347,66 @@ class SkiaLayerTest {
             layer.background = Color(0, 0, 0, 0)
             isUndecorated = true
             background = transparentWindowBackgroundHack(renderApi)
+        }
+    }
+
+    @Test
+    fun `layer background is clipped`() = uiTest {
+        val window = JFrame()
+        try {
+            // Simulate how Swing Interop in Compose for Desktop works
+            val layeredPane = JLayeredPane()
+            layeredPane.layout = null
+            val swingComponent = object : JComponent() {
+                override fun paint(g: Graphics) {
+                    g.color = Color.GREEN
+                    g.fillRect(0, 0, width, height)
+                }
+            }
+
+            val layer = SkiaLayer(
+                properties = SkiaLayerProperties(renderApi = renderApi),
+            )
+            layer.bounds = Rectangle(0, 0, 300, 300)
+            layer.background = Color.YELLOW
+            val layerContentPaint = Paint().also { it.color = Color.RED.rgb }
+            layer.renderDelegate = SkikoRenderDelegate { canvas, width, height, _ ->
+                canvas.drawRect(Rect(0f, 0f, width.toFloat(), height/3f), layerContentPaint)
+            }
+
+            swingComponent.bounds = Rectangle(0, 200, 300, 100)
+            layer.clipComponents.add(
+                ClipRectangle(
+                    x = swingComponent.x.toFloat(),
+                    y = swingComponent.y.toFloat(),
+                    width = swingComponent.width.toFloat(),
+                    height = swingComponent.height.toFloat()
+                )
+            )
+
+            layeredPane.add(layer, BorderLayout.CENTER)
+            layeredPane.add(swingComponent, BorderLayout.CENTER, 0)
+
+            window.contentPane.layout = BorderLayout()
+            window.contentPane.add(layeredPane, BorderLayout.CENTER)
+            window.setLocation(200, 200)
+            window.size = layer.size
+
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.isUndecorated = true
+            window.isVisible = true
+
+            withContext(Dispatchers.Default) {
+                Robot().waitForIdle()
+            }
+
+            // Expect to see three layers:
+            // - Red, from the layer content
+            // - Yellow, from the layer background
+            // - Green, from the Swing component
+            screenshots.assert(window.bounds, "frame")
+        } finally {
+            window.close()
         }
     }
 

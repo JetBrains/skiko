@@ -88,6 +88,9 @@ actual open class SkiaLayer {
     actual val component: Any?
         get() = this.htmlCanvas
 
+    actual val cutoutRectangles: List<ClipRectangle>
+        get() = emptyList()
+
     private var htmlCanvas: HTMLCanvasElement? = null
 
     /**

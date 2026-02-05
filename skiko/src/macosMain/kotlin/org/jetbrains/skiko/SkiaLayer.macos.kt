@@ -76,6 +76,9 @@ actual open class SkiaLayer {
     actual val component: Any?
         get() = this.nsView
 
+    actual val cutoutRectangles: List<ClipRectangle>
+        get() = emptyList()
+
     /**
      * Implements rendering logic and events processing.
      */

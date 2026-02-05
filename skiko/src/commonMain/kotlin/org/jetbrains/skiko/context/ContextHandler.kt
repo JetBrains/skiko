@@ -41,6 +41,13 @@ internal abstract class ContextHandler(
         }
         initCanvas()
         canvas?.apply {
+            clear(Color.TRANSPARENT)
+
+            val scale = layer.contentScale
+            for (clip in layer.cutoutRectangles) {
+                cutoutFromClip(clip, scale)
+            }
+
             val layerBg = layer.backgroundColor
             clear(
                 if (layer.transparency && isTransparentBackgroundSupported()) {
@@ -49,6 +56,7 @@ internal abstract class ContextHandler(
                     layerBg or 0xFF000000.toInt()
                 }
             )
+
             drawContent()
         }
         flush()
@@ -56,11 +64,23 @@ internal abstract class ContextHandler(
 
     protected open fun isTransparentBackgroundSupported(): Boolean {
         if (hostOs == OS.MacOS) {
-            // MacOS transparency is always supported
+            // macOS transparency is always supported
             return true
         }
 
-        // for non-MacOS in fullscreen transparency is not supported
+        // for non-macOS in fullscreen transparency is not supported
         return !layer.fullscreen
     }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun Canvas.cutoutFromClip(rectangle: ClipRectangle, scale: Float) {
+    clipRect(
+        left = rectangle.x * scale,
+        top = rectangle.y * scale,
+        right = (rectangle.x + rectangle.width) * scale,
+        bottom = (rectangle.y + rectangle.height) * scale,
+        mode = ClipMode.DIFFERENCE,
+        antiAlias = true
+    )
 }
