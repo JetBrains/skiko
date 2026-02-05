@@ -5,4 +5,4 @@ package org.jetbrains.skiko.wasm
 
 import kotlin.js.Promise
 
-external val awaitSkiko: Promise<Unit>
+internal external val awaitSkiko: Promise<Any>
