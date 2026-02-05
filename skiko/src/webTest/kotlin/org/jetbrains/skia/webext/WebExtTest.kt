@@ -55,7 +55,6 @@ class WebExtTest {
 
         val info = ImageInfo(width, height, ColorType.RGBA_8888, ColorAlphaType.PREMUL)
         val bitmap = Bitmap()
-//        bitmap.setImageInfo(info)
 
         val success = bitmap.installPixelsFromArrayBuffer(info, ba.buffer, width * bytesPerPixel)
 
