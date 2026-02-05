@@ -1,6 +1,5 @@
 package org.jetbrains.skiko.swing
 
-import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Component
@@ -42,16 +41,14 @@ open class SkiaSwingLayer(
 
     val clipComponents: MutableList<ClipRectangle> get() = mutableListOf()
 
-    private val renderDelegateWithClipping = object : SkikoRenderDelegate by renderDelegate {
-        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-            val scale = graphicsConfiguration.defaultTransform.scaleX.toFloat()
-            // clipping
-            for (index in clipComponents.indices) {
-                val item = clipComponents[index]
-                canvas.clipRectBy(item, scale)
-            }
-            renderDelegate.onRender(canvas, width, height, nanoTime)
+    private val renderDelegateWithClipping = SkikoRenderDelegate { canvas, width, height, nanoTime ->
+        val scale = graphicsConfiguration.defaultTransform.scaleX.toFloat()
+        // clipping
+        for (index in clipComponents.indices) {
+            val item = clipComponents[index]
+            canvas.clipRectBy(item, scale)
         }
+        renderDelegate.onRender(canvas, width, height, nanoTime)
     }
 
     private val swingLayerProperties = object : SwingLayerProperties {
