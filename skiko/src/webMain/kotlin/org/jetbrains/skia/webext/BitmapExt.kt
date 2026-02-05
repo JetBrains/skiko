@@ -3,6 +3,7 @@ package org.jetbrains.skia.webext
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skiko.ExperimentalSkikoApi
@@ -14,8 +15,9 @@ suspend fun Bitmap.installPixelsFromArrayBuffer(
     rowBytes: Int
 ): Boolean {
     val pixelsPtr = copyBufferToSkiko(pixelsArrayBuffer)
+    if (pixelsPtr == Native.NullPointer) return false
     return _nInstallPixelsFromPointer(
-        this._ptr,
+        _ptr,
         info.width,
         info.height,
         info.colorInfo.colorType.ordinal,

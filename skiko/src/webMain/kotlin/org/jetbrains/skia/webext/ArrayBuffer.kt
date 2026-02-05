@@ -2,6 +2,7 @@
 
 package org.jetbrains.skia.webext
 
+import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl._malloc
 import org.jetbrains.skiko.ExperimentalSkikoApi
@@ -22,8 +23,10 @@ internal suspend fun copyBufferToSkiko(
     src: WebArrayBufferExt
 ): NativePointer {
     val ptr = _malloc(src.byteLength)
-    val skikoArrayBuffer = skikoArrayBuffer(getSkikoWasm())
-    copyBuffer(src, skikoArrayBuffer, src.byteLength, ptr)
+    if (ptr != Native.NullPointer) {
+        val skikoArrayBuffer = skikoArrayBuffer(getSkikoWasm())
+        copyBuffer(src, skikoArrayBuffer, src.byteLength, ptr)
+    }
     return ptr
 }
 
