@@ -56,10 +56,14 @@ class WebExtTest {
         val info = ImageInfo(width, height, ColorType.RGBA_8888, ColorAlphaType.PREMUL)
         val bitmap = Bitmap()
 
-        val success = bitmap.installPixelsFromArrayBuffer(info, ba.buffer, width * bytesPerPixel)
+        val success = measureTimedValue {
+            bitmap.installPixelsFromArrayBuffer(info, ba.buffer, width * bytesPerPixel)
+        }
+
+        println("installPixelsFromArrayBuffer took ${success.duration}\n")
 
         @Suppress("RedundantIf") // Weird? Yes. on js success is not a boolean, it's = 1
-        assertEquals(true, if (success) true else false)
+        assertEquals(true, if (success.value) true else false)
 
         // Check some specific pixels
         // (0,0) -> R=0, G=0, B=0, A=255 -> 0xFF000000
