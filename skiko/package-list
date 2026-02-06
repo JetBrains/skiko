@@ -927,6 +927,11 @@ $dokka.location:org.jetbrains.skia.svg/SVGTag/valueOf/#kotlin.String/PointingToD
 $dokka.location:org.jetbrains.skia.svg/SVGTag/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-tag/values.html
 $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-transformable-node/-companion/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-transformable-node/index.html
+$dokka.location:org.jetbrains.skia.webext////PointingToDeclaration/skiko/org.jetbrains.skia.webext/index.html
+$dokka.location:org.jetbrains.skia.webext//installPixelsFromArrayBuffer/org.jetbrains.skia.Bitmap#org.jetbrains.skia.ImageInfo#org.jetbrains.skia.webext.WebArrayBufferExt#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.webext/install-pixels-from-array-buffer.html
+$dokka.location:org.jetbrains.skia.webext/WebArrayBufferExt///PointingToDeclaration/skiko/org.jetbrains.skia.webext/-web-array-buffer-ext/index.html
+$dokka.location:org.jetbrains.skia.webext/WebArrayBufferExt/byteLength/#/PointingToDeclaration/skiko/org.jetbrains.skia.webext/-web-array-buffer-ext/byte-length.html
+$dokka.location:org.jetbrains.skia.webext/WebArrayBufferExt/set/#kotlin.Int#kotlin.Byte/PointingToDeclaration/skiko/org.jetbrains.skia.webext/-web-array-buffer-ext/set.html
 $dokka.location:org.jetbrains.skia////PointingToDeclaration/skiko/org.jetbrains.skia/index.html
 $dokka.location:org.jetbrains.skia//LANG/#/PointingToDeclaration/skiko/org.jetbrains.skia/-l-a-n-g.html
 $dokka.location:org.jetbrains.skia//_nAdoptTextureFrom/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/_n-adopt-texture-from.html
@@ -2846,8 +2851,7 @@ $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/getAccessibleContext/#/
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/paint/#java.awt.Graphics/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/paint.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/removeNotify/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/remove-notify.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/render-api.html
-$dokka.location:org.jetbrains.skiko.wasm////PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/index.html
-$dokka.location:org.jetbrains.skiko.wasm//awaitSkiko/#/PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/await-skiko.html
+$dokka.location:org.jetbrains.skiko.wasm////PointingToDeclaration/skiko/org.jetbrains.skiko.wasm.html
 $dokka.location:org.jetbrains.skiko.windows////PointingToDeclaration/skiko/org.jetbrains.skiko.windows/index.html
 $dokka.location:org.jetbrains.skiko.windows/JumpList///PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list/index.html
 $dokka.location:org.jetbrains.skiko.windows/JumpList/build/#kotlin.Function1[org.jetbrains.skiko.windows.JumpListBuilder,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skiko.windows/-jump-list/build.html
@@ -3180,6 +3184,7 @@ org.jetbrains.skia.shaper
 org.jetbrains.skia.skottie
 org.jetbrains.skia.sksg
 org.jetbrains.skia.svg
+org.jetbrains.skia.webext
 org.jetbrains.skiko
 org.jetbrains.skiko.graphicapi
 org.jetbrains.skiko.ios
