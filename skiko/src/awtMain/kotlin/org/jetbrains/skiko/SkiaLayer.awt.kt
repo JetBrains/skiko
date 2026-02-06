@@ -200,7 +200,7 @@ actual open class SkiaLayer internal constructor(
             configureBackground(value, _background)
         }
 
-    actual var backgroundColor: Int
+    internal actual var backgroundColor: Int
         get() = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
         set(value) {
             configureBackground(_transparency, Color(value, true))
@@ -335,7 +335,7 @@ actual open class SkiaLayer internal constructor(
 
     val clipComponents = mutableListOf<ClipRectangle>()
 
-    actual val cutoutRectangles: List<ClipRectangle>
+    internal actual val cutoutRectangles: List<ClipRectangle>
         get() = clipComponents
 
     @Volatile

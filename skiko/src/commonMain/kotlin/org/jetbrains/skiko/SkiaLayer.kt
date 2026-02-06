@@ -36,7 +36,7 @@ expect open class SkiaLayer {
     /**
      * The color, in ARGB format, with which the layer is cleared before rendering.
      */
-    var backgroundColor: Int
+    internal var backgroundColor: Int
 
     /**
      * Underlying platform component.
@@ -46,7 +46,7 @@ expect open class SkiaLayer {
     /**
      * A list of rectangles to cut out from the rendered content; No content will be drawn inside them.
      */
-    val cutoutRectangles: List<ClipRectangle>
+    internal val cutoutRectangles: List<ClipRectangle>
 
     /**
      * Current view used for rendering.

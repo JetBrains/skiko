@@ -61,7 +61,7 @@ actual open class SkiaLayer {
     /**
      * The background color of the layer.
      */
-    actual var backgroundColor: Int = Color.WHITE
+    internal actual var backgroundColor: Int = Color.WHITE
         set(value) {
             field = value
             needRender()
@@ -76,7 +76,7 @@ actual open class SkiaLayer {
     actual val component: Any?
         get() = this.nsView
 
-    actual val cutoutRectangles: List<ClipRectangle>
+    internal actual val cutoutRectangles: List<ClipRectangle>
         get() = emptyList()
 
     /**
