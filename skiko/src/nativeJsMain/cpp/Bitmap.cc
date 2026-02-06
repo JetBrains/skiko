@@ -159,6 +159,20 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nInstallPixels
   return instance->installPixels(imageInfo, copy, rowBytes, deletePixelsBytes, nullptr);
 }
 
+// Currently for web only:
+SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nInstallPixelsFromPointer
+  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KNativePointer pixelsPtr, KInt rowBytes) {
+  SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
+  SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(colorSpacePtr);
+  SkImageInfo imageInfo = SkImageInfo::Make(width,
+                                            height,
+                                            static_cast<SkColorType>(colorType),
+                                            static_cast<SkAlphaType>(alphaType),
+                                            sk_ref_sp<SkColorSpace>(colorSpace));
+
+  return instance->installPixels(imageInfo, pixelsPtr, rowBytes, deletePixelsBytes, nullptr);
+}
+
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nAllocPixels
   (KNativePointer ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>((ptr));
