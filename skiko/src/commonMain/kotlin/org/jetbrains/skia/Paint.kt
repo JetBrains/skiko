@@ -448,6 +448,32 @@ class Paint : Managed {
         }
 
     /**
+     * @param blender  how geometry is filled with color; if null, color is used instead
+     *
+     * @see [https://fiddle.skia.org/c/@Color_Filter_Methods](https://fiddle.skia.org/c/@Color_Filter_Methods)
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setShader](https://fiddle.skia.org/c/@Paint_setShader)
+     *
+     * @return  [Shader] or null
+     * @see [https://fiddle.skia.org/c/@Paint_refShader](https://fiddle.skia.org/c/@Paint_refShader)
+     */
+    var blender: Blender?
+        get() = try {
+            Stats.onNativeCall()
+            val blenderPtr = _nGetBlender(_ptr)
+            if (blenderPtr == NullPointer) null else Blender(blenderPtr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetBlender(_ptr, getPtr(value))
+        } finally {
+            reachabilityBarrier(value)
+            reachabilityBarrier(this)
+        }
+
+    /**
      * @return  true if BlendMode is BlendMode.SRC_OVER, the default.
      */
     val isSrcOver: Boolean
@@ -664,6 +690,12 @@ private external fun _nGetImageFilter(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetImageFilter")
 private external fun _nSetImageFilter(ptr: NativePointer, filterPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlender")
+private external fun _nGetBlender(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Paint__1nSetBlender")
+private external fun _nSetBlender(ptr: NativePointer, shaderPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nHasNothingToDraw")
 private external fun _nHasNothingToDraw(ptr: NativePointer): Boolean

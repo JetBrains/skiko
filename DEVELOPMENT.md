@@ -37,7 +37,7 @@ Add `-Dskiko.test.ui.enabled=true` to enable UI tests (integration tests, which 
 
 For example, if we want to include UI tests when we test JVM target, call this:
 ```
-./gradlew awtTest -Dskiko.test.ui.enabled=true
+./gradlew :skiko:awtTest -Dskiko.test.ui.enabled=true
 ```
 Don't run any background tasks, click mouse, or press keys during the tests. Otherwise, they probably fail.
 
