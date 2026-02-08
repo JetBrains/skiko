@@ -10,7 +10,6 @@ jobs:
     uses: ./.github/workflows/docker-publish.yml
     with:
       publish: false
-      base_ref: ${{ github.event.pull_request.base.sha }}
     permissions:
       contents: read
       packages: write # Is not used in case of dry run, but required to avoid "The workflow is not valid" error
@@ -18,19 +17,14 @@ jobs:
   tests:
     name: 'Tests'
     uses: ./.github/workflows/tests.yml
-    with:
-      base_ref: ${{ github.event.pull_request.base.sha }}
 
-  publish-dry-run:
+  skiko-publish:
     name: 'Skiko Publish (Dry Run)'
     uses: ./.github/workflows/publish-dry-run.yml
-    with:
-      base_ref: ${{ github.event.pull_request.base.sha }}
 
-  docs:
+  docs-publish:
     name: 'Documentation Publish (Dry Run)'
     uses: ./.github/workflows/docs.yml
     with:
       publish: false
-      base_ref: ${{ github.event.pull_request.base.sha }}
     secrets: inherit

@@ -7,13 +7,16 @@ on:
       - master
       - 'release/*'
 
+concurrency:
+  group: post-merge-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   docker-publish:
     name: 'Docker Publish'
     uses: ./.github/workflows/docker-publish.yml
     with:
       publish: true
-      base_ref: ${{ github.event.before }}
     permissions:
       contents: read
       packages: write
@@ -22,15 +25,11 @@ jobs:
     name: 'Tests'
     needs: docker-publish
     uses: ./.github/workflows/tests.yml
-    with:
-      base_ref: ${{ github.event.before }}
 
   skiko-publish:
     name: 'Skiko Publish (Dry Run)'
     needs: docker-publish
     uses: ./.github/workflows/publish-dry-run.yml
-    with:
-      base_ref: ${{ github.event.before }}
 
   docs-publish:
     name: 'Documentation Publish'
@@ -38,5 +37,4 @@ jobs:
     uses: ./.github/workflows/docs.yml
     with:
       publish: true
-      base_ref: ${{ github.event.before }}
     secrets: inherit

@@ -16,10 +16,6 @@ inputs:
     description: 'Enable virtual display for UI testing (enables e2e UI interaction tests with real windows)'
     required: false
     default: 'false'
-  base_ref:
-    description: 'Base ref/sha for change detection (defaults to auto-detect)'
-    required: false
-    default: ''
 
 runs:
   using: 'composite'
@@ -28,7 +24,7 @@ runs:
       id: filter
       uses: dorny/paths-filter@v3
       with:
-        base: ${{ inputs.base_ref || github.event.pull_request.base.sha || github.event.before || 'master' }}
+        base: ${{ github.event.pull_request.base.sha || github.event.before || 'master' }}
         filters: |
           docker_changed:
             - '.github/actions/docker-skiko-publish/**'
@@ -45,10 +41,11 @@ runs:
         # Determine which tag to use
         # github.base_ref is set for PRs regardless of event type (pull_request or workflow_call)
         if [[ -n "${{ github.base_ref }}" && "${{ steps.filter.outputs.docker_changed }}" != "true" ]]; then
-          # For PRs without docker changes, use base branch tag (pre-built image)
+          # For PRs without docker changes, use the base (target) branch name as the docker tag.
+          # Most of the time it points to an already built-image.
           TAG="${{ github.base_ref }}"
         else
-          # For PRs with docker changes or non-PRs, use current branch tag
+          # For PRs with docker changes or non-PRs, use the current branch name as the docker tag
           TAG="${GITHUB_REF_NAME}"
         fi
         TAG="${TAG//\//-}"

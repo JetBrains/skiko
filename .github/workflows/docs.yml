@@ -7,10 +7,6 @@ on:
         description: 'Publish documentation (if false, only dry-run build)'
         required: true
         type: boolean
-      base_ref:
-        description: 'Base ref/sha for change detection (defaults to auto-detect)'
-        required: false
-        type: string
     secrets:
       ACCESS_TOKEN:
         description: 'GitHub token for deploying to gh-pages (required when publish is true)'
@@ -31,7 +27,6 @@ jobs:
         name: 'Build Dokka Documentation'
         with:
           image_name: linux-compat
-          base_ref: ${{ inputs.base_ref }}
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \

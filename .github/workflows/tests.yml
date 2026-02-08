@@ -2,11 +2,6 @@ name: Skiko Tests
 
 on:
   workflow_call: # Allow being called by other workflows
-    inputs:
-      base_ref:
-        description: 'Base ref/sha for change detection (defaults to auto-detect)'
-        required: false
-        type: string
 
 jobs:
   macos:
@@ -176,7 +171,6 @@ jobs:
         with:
           image_name: linux-compat
           virtual-display: true
-          base_ref: ${{ inputs.base_ref }}
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
@@ -190,7 +184,6 @@ jobs:
         with:
           image_name: linux-compat
           virtual-display: true
-          base_ref: ${{ inputs.base_ref }}
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
@@ -228,7 +221,6 @@ jobs:
         name: 'Compile Linux (arm64) Tests'
         with:
           image_name: linux-amd64
-          base_ref: ${{ inputs.base_ref }}
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.arch=x64 \
@@ -266,7 +258,6 @@ jobs:
           image_name: linux-compat
           working_directory: skiko
           virtual-display: true
-          base_ref: ${{ inputs.base_ref }}
           command: |
             chmod +x ./build/bin/linuxArm64/debugTest/test.kexe
             ./build/bin/linuxArm64/debugTest/test.kexe
@@ -277,7 +268,6 @@ jobs:
         with:
           image_name: linux-compat
           virtual-display: true
-          base_ref: ${{ inputs.base_ref }}
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \

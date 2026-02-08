@@ -8,20 +8,12 @@ on:
         required: false
         type: boolean
         default: true
-      base_ref:
-        description: 'Base ref/sha for change detection (defaults to auto-detect)'
-        required: false
-        type: string
   workflow_call: # Allow being called by other workflows
     inputs:
       publish:
         description: 'Publish to registry (if false, only dry-run build)'
         required: true
         type: boolean
-      base_ref:
-        description: 'Base ref/sha for change detection (defaults to auto-detect)'
-        required: false
-        type: string
 
 jobs:
   changes:
@@ -40,7 +32,7 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: filter
         with:
-          base: ${{ inputs.base_ref || github.event.pull_request.base.sha || github.event.before || 'master' }}
+          base: ${{ github.event.pull_request.base.sha || github.event.before || 'master' }}
           filters: |
             docker_workflow:
               - '.github/actions/docker-skiko-publish/**'
