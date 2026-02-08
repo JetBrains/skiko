@@ -1,46 +1,46 @@
-# Build Skiko documentation
-name: Doc
+name: Skiko Documentation
 
 on:
-  push:
-    branches: [ master ]
-  # Temporary, for testing. Remove!
-  #pull_request:
-  #  branches: [ master ]
-
-  workflow_dispatch:
+  workflow_call: # Allow being called by other workflows
+    inputs:
+      publish:
+        description: 'Publish documentation (if false, only dry-run build)'
+        required: true
+        type: boolean
+      base_ref:
+        description: 'Base ref/sha for change detection (defaults to auto-detect)'
+        required: false
+        type: string
+    secrets:
+      ACCESS_TOKEN:
+        description: 'GitHub token for deploying to gh-pages (required when publish is true)'
+        required: false
 
 jobs:
   dokka:
-    runs-on: ubuntu-22.04
+    name: 'Build and Publish Documentation'
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
-      - uses: actions/setup-java@v3
-        name: 'Set up JDK 21'
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Build Dokka Documentation'
         with:
-          distribution: 'adopt'
-          java-version: '21'
-          cache: 'gradle'
+          image_name: linux-compat
+          base_ref: ${{ inputs.base_ref }}
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.native.enabled=true \
+              -Pskiko.wasm.enabled=true \
+              -Pskiko.android.enabled=true \
+              :skiko:dokkaHtml
 
-      - shell: bash
-        name: 'Set up Linux build environment'
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install libglu1-mesa-dev libxrandr-dev libdbus-1-dev multistrap -y
-          sudo apt-get install gcc-9 g++-9 -y
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
-          sudo update-alternatives --config gcc
-          sudo apt-get install gcc-9-aarch64-linux-gnu g++-9-aarch64-linux-gnu -y
-          sudo update-alternatives --install /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc-9 60 --slave /usr/bin/aarch64-linux-gnu-g++ aarch64-linux-gnu-g++ /usr/bin/aarch64-linux-gnu-g++-9
-          sudo update-alternatives --config aarch64-linux-gnu-gcc
-          sudo Xvfb :0 -screen 0 1280x720x24 &
-
-      - name: 'Build Dokka documentation'
-        run: bash -c 'JAVA_OPTS="-Xmx4g" ./gradlew --no-daemon -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -Pskiko.android.enabled=true :skiko:dokkaHtml'
-
-      - name: 'Publish documentation'
+      - name: 'Publish Documentation'
+        if: ${{ inputs.publish }}
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}

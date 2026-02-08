@@ -1,0 +1,36 @@
+name: Pull Request CI
+
+on:
+  workflow_dispatch: # Allow manual triggering
+  pull_request: # Trigger on all pull requests
+
+jobs:
+  docker-publish:
+    name: 'Docker Publish (Dry Run)'
+    uses: ./.github/workflows/docker-publish.yml
+    with:
+      publish: false
+      base_ref: ${{ github.event.pull_request.base.sha }}
+    permissions:
+      contents: read
+      packages: write # Is not used in case of dry run, but required to avoid "The workflow is not valid" error
+
+  tests:
+    name: 'Tests'
+    uses: ./.github/workflows/tests.yml
+    with:
+      base_ref: ${{ github.event.pull_request.base.sha }}
+
+  publish-dry-run:
+    name: 'Skiko Publish (Dry Run)'
+    uses: ./.github/workflows/publish-dry-run.yml
+    with:
+      base_ref: ${{ github.event.pull_request.base.sha }}
+
+  docs:
+    name: 'Documentation Publish (Dry Run)'
+    uses: ./.github/workflows/docs.yml
+    with:
+      publish: false
+      base_ref: ${{ github.event.pull_request.base.sha }}
+    secrets: inherit
