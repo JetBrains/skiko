@@ -5,6 +5,10 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
 
+/**
+ * Blender represents a custom blend function in the Skia pipeline.  A blender combines a source
+ * color (the result of our paint) and destination color (from the canvas) into a final color.
+*/
 class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
 

@@ -1,13 +1,8 @@
 #include <iostream>
 #include <jni.h>
-#include "SkSamplingOptions.h"
 #include "interop.hh"
-#include "SkColorFilter.h"
 #include "SkBlender.h"
 #include "SkBlenders.h"
-#include "SkPoint3.h"
-#include "SkRect.h"
-#include "interop.hh"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BlenderKt__1nMakeArithmetic
   (JNIEnv* env, jclass jclass, jfloat k1, jfloat k2, jfloat k3, jfloat k4, jboolean enforcePMColor) {

@@ -1,9 +1,6 @@
 #include <iostream>
-#include "SkColorFilter.h"
 #include "SkBlender.h"
 #include "SkBlenders.h"
-#include "SkPoint3.h"
-#include "SkRect.h"
 #include "common.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Blender__1nMakeArithmetic
