@@ -200,7 +200,7 @@ actual open class SkiaLayer internal constructor(
             configureBackground(value, _background)
         }
 
-    actual var backgroundColor: Int
+    internal actual var backgroundColor: Int
         get() = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
         set(value) {
             configureBackground(_transparency, Color(value, true))
@@ -334,6 +334,9 @@ actual open class SkiaLayer internal constructor(
     }
 
     val clipComponents = mutableListOf<ClipRectangle>()
+
+    internal actual val cutoutRectangles: List<ClipRectangle>
+        get() = clipComponents
 
     @Volatile
     private var isDisposed = false
@@ -608,12 +611,6 @@ actual open class SkiaLayer internal constructor(
         val pictureRecorder = pictureRecorder!!
         val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight)
 
-        // clipping
-        for (index in clipComponents.indices) {
-            val item = clipComponents[index]
-            canvas.clipRectBy(item, contentScale)
-        }
-
         try {
             isRendering = true
             renderDelegate?.onRender(canvas, intWidth, intHeight, nanoTime)
@@ -728,17 +725,6 @@ internal fun defaultFPSCounter(
         showLongFrames = fpsLongFramesShow,
         getLongFrameMillis = { fpsLongFramesMillis ?: (1.5 * 1000 / refreshRate) },
         logOnTick = true
-    )
-}
-@Suppress("NOTHING_TO_INLINE")
-internal inline fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
-    clipRect(
-        left = rectangle.x * scale,
-        top = rectangle.y * scale,
-        right = (rectangle.x + rectangle.width) * scale,
-        bottom = (rectangle.y + rectangle.height) * scale,
-        mode = ClipMode.DIFFERENCE,
-        antiAlias = true
     )
 }
 

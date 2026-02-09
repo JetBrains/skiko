@@ -49,7 +49,7 @@ actual open class SkiaLayer {
     /**
      * The background color of the layer, as transparency is not supported.
      */
-    actual var backgroundColor: Int = Color.WHITE
+    internal actual var backgroundColor: Int = Color.WHITE
         set(value) {
             field = value
             needRender()
@@ -87,6 +87,9 @@ actual open class SkiaLayer {
 
     actual val component: Any?
         get() = this.htmlCanvas
+
+    internal actual val cutoutRectangles: List<ClipRectangle>
+        get() = emptyList()
 
     private var htmlCanvas: HTMLCanvasElement? = null
 
