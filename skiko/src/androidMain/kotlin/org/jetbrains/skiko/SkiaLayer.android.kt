@@ -29,7 +29,7 @@ actual open class SkiaLayer {
     /**
      * The background color of the layer.
      */
-    actual var backgroundColor: Int = Color.WHITE
+    actual internal var backgroundColor: Int = Color.WHITE
         set(value) {
             field = value
             needRender()
@@ -80,6 +80,9 @@ actual open class SkiaLayer {
 
     actual val component: Any?
         get() = this.container
+
+    actual internal val cutoutRectangles: List<ClipRectangle>
+        get() = emptyList()
 
     internal actual fun draw(canvas: Canvas): Unit = TODO()
 }
