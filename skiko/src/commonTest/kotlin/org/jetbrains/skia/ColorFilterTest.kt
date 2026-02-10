@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 
 class ColorFilterTest {
     @Test
@@ -10,7 +11,7 @@ class ColorFilterTest {
         ColorFilter.makeHighContrast(true, InversionMode.LIGHTNESS, 0.5f)
         ColorFilter.makeOverdraw(intArrayOf(127, 127, 127, 127, 127, 127))
 
-        val colorMatrix = ColorMatrix(*FloatArray(20) { 0.5f })
+        val colorMatrix = ColorMatrix(FloatArray(20) { 0.5f })
         ColorFilter.makeMatrix(colorMatrix)
         ColorFilter.makeHSLAMatrix(colorMatrix)
 
@@ -23,5 +24,15 @@ class ColorFilterTest {
 
         ColorFilter.makeComposed(src, dst)
         ColorFilter.makeLerp(dst, src, 0.4f)
+    }
+
+    @Test
+    fun failsColorMatrixConstruction() {
+        assertFailsWith<IllegalArgumentException>("Expected 20 elements, got 21") {
+            ColorMatrix(FloatArray(21) { 1.0f })
+        }
+        assertFailsWith<IllegalArgumentException>("Expected 20 elements, got 19") {
+            ColorMatrix(FloatArray(19) { 1.0f })
+        }
     }
 }
