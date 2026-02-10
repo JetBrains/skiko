@@ -1320,9 +1320,8 @@ $dokka.location:org.jetbrains.skia/ColorInfo/withAlphaType/#org.jetbrains.skia.C
 $dokka.location:org.jetbrains.skia/ColorInfo/withColorSpace/#org.jetbrains.skia.ColorSpace?/PointingToDeclaration/skiko/org.jetbrains.skia/-color-info/with-color-space.html
 $dokka.location:org.jetbrains.skia/ColorInfo/withColorType/#org.jetbrains.skia.ColorType/PointingToDeclaration/skiko/org.jetbrains.skia/-color-info/with-color-type.html
 $dokka.location:org.jetbrains.skia/ColorMatrix///PointingToDeclaration/skiko/org.jetbrains.skia/-color-matrix/index.html
+$dokka.location:org.jetbrains.skia/ColorMatrix/ColorMatrix/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-color-matrix/-color-matrix.html
 $dokka.location:org.jetbrains.skia/ColorMatrix/ColorMatrix/#kotlin.FloatArray/PointingToDeclaration/skiko/org.jetbrains.skia/-color-matrix/-color-matrix.html
-$dokka.location:org.jetbrains.skia/ColorMatrix/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia/-color-matrix/equals.html
-$dokka.location:org.jetbrains.skia/ColorMatrix/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia/-color-matrix/hash-code.html
 $dokka.location:org.jetbrains.skia/ColorMatrix/mat/#/PointingToDeclaration/skiko/org.jetbrains.skia/-color-matrix/mat.html
 $dokka.location:org.jetbrains.skia/ColorMatrix/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia/-color-matrix/to-string.html
 $dokka.location:org.jetbrains.skia/ColorSpace.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-color-space/-companion/index.html
