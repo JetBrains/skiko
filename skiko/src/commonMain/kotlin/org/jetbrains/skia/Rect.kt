@@ -113,9 +113,14 @@ open class Rect constructor(val left: Float, val top: Float, val right: Float, v
 
         internal fun fromInteropPointer(size: Int, block: InteropScope.(InteropPointer) -> Unit): Array<Rect> {
             val result = withResult(FloatArray(size), block)
-            return result.toList().chunked(4).map { (left, top, right, bottom) ->
-                Rect(left, right, top, bottom)
-            }.toTypedArray()
+            return Array(size / 4) { i ->
+                val offset = i * 4
+                val left = result[offset]
+                val top = result[offset + 1]
+                val right = result[offset + 2]
+                val bottom = result[offset + 3]
+                Rect(left = left, top = top, right = right, bottom = bottom)
+            }
         }
 
         internal fun fromInteropPointerNullable(block: (InteropPointer) -> Boolean): Rect? {
