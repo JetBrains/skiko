@@ -1,10 +1,7 @@
 name: Skiko Tests
+
 on:
-  workflow_dispatch:
-  pull_request:
-  push:
-    branches:
-      - master
+  workflow_call: # Allow being called by other workflows
 
 jobs:
   macos:
@@ -14,7 +11,7 @@ jobs:
     # TODO: Update once resolved
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: actions/setup-java@v4
@@ -52,6 +49,7 @@ jobs:
           path: |
             ./skiko/build/reports/tests
             ./skiko/src/jvmTest/screenshots/*_actual.png
+            ./skiko/hs_err_pid*.log
           retention-days: 5
 
       - uses: test-summary/action@v2
@@ -64,7 +62,7 @@ jobs:
     name: 'iOS'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: actions/setup-java@v4
@@ -122,7 +120,7 @@ jobs:
     name: 'tvOS'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: actions/setup-java@v4
@@ -161,39 +159,37 @@ jobs:
   linux-amd64:
     name: 'Linux (x64)'
     runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/jetbrains/skiko/linux-amd64:ubuntu-2004
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - shell: bash
-        name: 'Start X Server'
-        run: |
-          Xvfb :1 -screen 0 1920x1080x24 -extension RANDR +extension GLX &
-          echo "DISPLAY=:1.0" >> $GITHUB_ENV
-
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Run Linux (x64) Tests'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            -Pskiko.native.enabled=true \
-            -Dskiko.test.onci=true \
-            -Dskiko.test.performance.enabled=false \
-            :skiko:linuxX64Test
+        with:
+          image_name: linux-compat
+          virtual-display: true
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.native.enabled=true \
+              -Dskiko.test.onci=true \
+              -Dskiko.test.performance.enabled=false \
+              :skiko:linuxX64Test
 
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Run AWT Tests'
         timeout-minutes: 25
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            -Pskiko.native.enabled=true \
-            -Dskiko.test.onci=true \
-            -Dskiko.test.performance.enabled=false \
-            :skiko:awtTest
+        with:
+          image_name: linux-compat
+          virtual-display: true
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.native.enabled=true \
+              -Dskiko.test.onci=true \
+              -Dskiko.test.performance.enabled=false \
+              :skiko:awtTest
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Test Results'
@@ -203,6 +199,7 @@ jobs:
           path: |
             ./skiko/build/reports/tests
             ./skiko/src/jvmTest/screenshots/*_actual.png
+            ./skiko/hs_err_pid*.log
 
       - uses: test-summary/action@v2
         name: 'Test Summary'
@@ -213,22 +210,22 @@ jobs:
   linux-cross-compile:
     name: 'Cross-compile Linux (arm) on x64'
     runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/jetbrains/skiko/linux-amd64:ubuntu-2004
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Compile Linux (arm64) Tests'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            -Pskiko.arch=x64 \
-            -Pskiko.native.linux.enabled=true \
-            :skiko:linkDebugTestLinuxArm64
+        with:
+          image_name: linux-amd64
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.arch=x64 \
+              -Pskiko.native.linux.enabled=true \
+              :skiko:linkDebugTestLinuxArm64
 
       - uses: actions/upload-artifact@v4
         name: 'Upload linuxArm64 test binary as artifact'
@@ -242,20 +239,12 @@ jobs:
     name: 'Linux (arm64)'
     needs: linux-cross-compile
     runs-on: ubuntu-24.04-arm
-    container:
-      image: ghcr.io/jetbrains/skiko/linux-arm64:ubuntu-2004
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
-
-      - shell: bash
-        name: 'Start X Server'
-        run: |
-          Xvfb :1 -screen 0 1920x1080x24 -extension RANDR +extension GLX &
-          echo "DISPLAY=:1.0" >> $GITHUB_ENV
 
       - uses: actions/download-artifact@v4
         name: 'Download precompiled linuxArm64 test binary'
@@ -263,22 +252,28 @@ jobs:
           name: test-binary-linuxArm64
           path: ./skiko/build/bin/linuxArm64
 
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Run Linux (arm64) Tests'
-        working-directory: skiko
-        run: |
-          chmod +x ./build/bin/linuxArm64/debugTest/test.kexe
-          ./build/bin/linuxArm64/debugTest/test.kexe
+        with:
+          image_name: linux-compat
+          working_directory: skiko
+          virtual-display: true
+          command: |
+            chmod +x ./build/bin/linuxArm64/debugTest/test.kexe
+            ./build/bin/linuxArm64/debugTest/test.kexe
 
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Run AWT Tests'
         timeout-minutes: 25
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            -Pskiko.native.enabled=true \
-            -Dskiko.test.onci=true \
-            -Dskiko.test.performance.enabled=false \
-            :skiko:awtTest
+        with:
+          image_name: linux-compat
+          virtual-display: true
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.native.enabled=true \
+              -Dskiko.test.onci=true \
+              -Dskiko.test.performance.enabled=false \
+              :skiko:awtTest
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
@@ -288,6 +283,7 @@ jobs:
           path: |
             ./skiko/build/reports/tests
             ./skiko/src/jvmTest/screenshots/*_actual.png
+            ./skiko/hs_err_pid*.log
           retention-days: 5
 
       - name: Test Summary
@@ -300,7 +296,7 @@ jobs:
     name: 'Windows'
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: microsoft/setup-msbuild@v1
@@ -334,6 +330,7 @@ jobs:
           path: |
             ./skiko/build/reports/tests
             ./skiko/src/jvmTest/screenshots/*_actual.png
+            ./skiko/hs_err_pid*.log
           retention-days: 5
 
       - uses: test-summary/action@v2
@@ -344,24 +341,29 @@ jobs:
 
   web-wasm:
     name: 'Web'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
-      - uses: actions/setup-java@v3
+      # Setup environment directly instead of using docker image
+      # because of instability of running tests inside docker
+
+      - uses: actions/setup-java@v4
         name: 'Setup JDK 21'
         with:
           java-version: '21'
-          distribution: 'adopt'
-          cache: 'gradle'
+          distribution: 'corretto'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
 
       - uses: browser-actions/setup-chrome@v1
         name: 'Setup Google Chrome'
         with:
           chrome-version: stable
 
-      - name: 'Install emscripten'
+      - name: 'Install Emscripten'
         shell: bash
         working-directory: skiko
         run: |

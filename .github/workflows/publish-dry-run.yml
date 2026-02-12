@@ -1,83 +1,88 @@
 name: Skiko Publish Dry Run
+
 on:
-  workflow_dispatch:
-  pull_request:
-  push:
-    branches:
-      - master
+  workflow_call: # Allow being called by other workflows
 
 jobs:
   Android:
+    name: 'Android Publish Dry Run'
     runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/jetbrains/skiko/linux-android-amd64:ubuntu-2004
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Maven Local'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            -Pskiko.android.enabled=true \
-            :skiko:publishToMavenLocal
+        with:
+          image_name: linux-compat
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.android.enabled=true \
+              :skiko:publishToMavenLocal
 
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Check Android Sample'
-        working-directory: samples/SkiaAndroidSample
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            packageRelease
+        with:
+          image_name: linux-compat
+          working_directory: samples/SkiaAndroidSample
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              packageRelease
 
   Web:
+    name: 'Web Publish Dry Run'
     runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/jetbrains/skiko/linux-emscripten-amd64:ubuntu-2004
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Maven Local'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            -Pskiko.wasm.enabled=true \
-            :skiko:publishToMavenLocal
+        with:
+          image_name: linux-emscripten-amd64
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.wasm.enabled=true \
+              :skiko:publishToMavenLocal
 
   Linux:
+    name: 'Linux Publish Dry Run'
     runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/jetbrains/skiko/linux-amd64:ubuntu-2004
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Maven Local'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            -Pskiko.native.enabled=true \
-            :skiko:publishToMavenLocal
+        with:
+          image_name: linux-compat
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.native.enabled=true \
+              :skiko:publishToMavenLocal
 
-      - shell: bash
+      - uses: ./.github/actions/docker-skiko-run
         name: 'Check AWT Sample'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            :SkiaAwtSample:installDist
+        with:
+          image_name: linux-compat
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              :SkiaAwtSample:installDist
 
   macOS:
+    name: 'macOS Publish Dry Run'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: actions/setup-java@v4
@@ -103,9 +108,10 @@ jobs:
             :SkiaAwtSample:installDist
 
   Windows:
+    name: 'Windows Publish Dry Run'
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: 'Check out code'
 
       - uses: microsoft/setup-msbuild@v1

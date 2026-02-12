@@ -45,12 +45,11 @@ RUN cd /tmp && mkdir -p $ARM_TOOLCHAIN_PATH && \
     ln -s $ARM_TOOLCHAIN_PATH/bin/aarch64-none-linux-gnu-ar /usr/local/bin/aarch64-linux-gnu-ar
 
 # Copy development headers to ARM64 sysroot
+ENV ARM_SYSROOT_HEADERS="fontconfig freetype2 GL X11 KHR"
 RUN mkdir -p $ARM_TOOLCHAIN_SYSROOT/usr/include && \
-    cp -r /usr/include/fontconfig $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
-    cp -r /usr/include/freetype2 $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
-    cp -r /usr/include/GL $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
-    cp -r /usr/include/X11 $ARM_TOOLCHAIN_SYSROOT/usr/include/ && \
-    cp -r /usr/include/KHR $ARM_TOOLCHAIN_SYSROOT/usr/include/
+    for dir in $ARM_SYSROOT_HEADERS; do \
+        cp -r /usr/include/$dir $ARM_TOOLCHAIN_SYSROOT/usr/include/ || exit 1; \
+    done
 
 # Use UTF-8 by default
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8

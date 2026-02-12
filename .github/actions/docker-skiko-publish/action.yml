@@ -1,0 +1,68 @@
+name: 'Docker Skiko Publish'
+description: 'Build and optionally publish a Docker image to ghcr.io for skiko'
+
+inputs:
+  image_name:
+    description: 'Image name (e.g., linux-compat)'
+    required: true
+  platforms:
+    description: 'Target platforms (e.g., linux/amd64 or linux/amd64,linux/arm64). If not specified, uses runner architecture.'
+    required: false
+  tag:
+    description: 'Image tag (e.g., latest)'
+    required: true
+  load:
+    description: 'Whether to load the image into the local Docker daemon'
+    required: false
+    default: 'false'
+  should_publish:
+    description: 'Whether to push the image to the registry'
+    required: true
+  github_token:
+    description: 'GitHub token for authentication (required only if should_publish is true)'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Set Variables'
+      id: vars
+      shell: bash
+      run: |
+        echo "image_namespace=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+        
+        # Normalize tag: replace invalid docker tag characters
+        TAG="${{ inputs.tag }}"
+        TAG="${TAG//\//-}"
+        echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+    - name: 'Set up Docker Buildx'
+      uses: docker/setup-buildx-action@v3
+
+    - name: 'Log into registry'
+      if: inputs.should_publish == 'true'
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.github_token }}
+
+    - name: 'Extract metadata'
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ steps.vars.outputs.image_namespace }}/${{ inputs.image_name }}
+        tags: |
+          type=raw,value=${{ steps.vars.outputs.tag }}
+
+    - name: 'Build and push'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./skiko/docker/${{ inputs.image_name }}
+        platforms: ${{ inputs.platforms }}
+        push: ${{ inputs.should_publish == 'true' }}
+        load: ${{ inputs.load == 'true' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
