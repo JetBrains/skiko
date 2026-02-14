@@ -2,6 +2,7 @@ package org.jetbrains.skia.impl
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skiko.internal.fastForEach
 import kotlin.native.internal.NativePtr
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
@@ -222,8 +223,8 @@ internal actual class InteropScope actual constructor() {
     actual fun virtualBoolean(method: () -> Boolean) = callbackImpl(method)
 
     actual fun release() {
-        for (index in elements.indices) {
-            elements[index].unpin()
+        elements.fastForEach {
+            it.unpin()
         }
     }
 

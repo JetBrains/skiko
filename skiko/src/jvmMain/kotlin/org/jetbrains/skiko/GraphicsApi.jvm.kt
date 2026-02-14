@@ -1,11 +1,13 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skiko.internal.fastNone
+
 internal data class NotSupportedAdapter(
     val os: OS,
     val api: GraphicsApi,
     val pattern: String,
     /** If true, the adapter name should match the pattern exactly. If false, the patters should be the start of the adapter name. */
-    val exactPattern : Boolean = true
+    val exactPattern: Boolean = true
 )
 
 private val notSupportedAdapters: List<NotSupportedAdapter> by lazy {
@@ -28,14 +30,10 @@ private val notSupportedAdapters: List<NotSupportedAdapter> by lazy {
 }
 
 internal fun isVideoCardSupported(api: GraphicsApi, hostOs: OS, name: String): Boolean {
-    for (index in notSupportedAdapters.indices) {
-        val adapter = notSupportedAdapters[index]
-        if (
-            adapter.os == hostOs
-            && adapter.api == api
-            && ((adapter.exactPattern && adapter.pattern == name)
-                    || (!adapter.exactPattern && name.startsWith(adapter.pattern)))
-        ) return false
+    return notSupportedAdapters.fastNone { adapter ->
+        if ((adapter.os != hostOs) || (adapter.api != api)) return@fastNone false
+
+        val matchesPattern = if (adapter.exactPattern) (adapter.pattern == name) else name.startsWith(adapter.pattern)
+        matchesPattern
     }
-    return true
 }

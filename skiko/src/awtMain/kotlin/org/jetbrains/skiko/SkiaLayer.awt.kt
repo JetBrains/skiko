@@ -5,6 +5,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.internal.fastForEach
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
@@ -386,8 +387,8 @@ actual open class SkiaLayer internal constructor(
 
     private fun notifyChange(kind: PropertyKind) {
         stateChangeListeners[kind]?.let { handlers ->
-            for (index in handlers.indices) {
-                handlers[index].invoke(this)
+            handlers.fastForEach { handler ->
+                handler.invoke(this)
             }
         }
     }
