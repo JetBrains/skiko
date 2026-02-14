@@ -269,7 +269,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetBounds
 
     for (int i = 0; i < count; ++i) {
         SkRect b = bounds[i];
-        float r[4] = {b.left(), b.right(), b.top(), b.bottom()};
+        float r[4] = {b.left(), b.top(), b.right(), b.bottom()};
         env->SetFloatArrayRegion(res, 4*i, 4, r);
     }
 }

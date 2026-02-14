@@ -259,8 +259,8 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetBounds
     for (int i = 0; i < count; ++i) {
         SkRect b = bounds[i];
         res[4*i] = b.left();
-        res[4*i + 1] = b.right();
-        res[4*i + 2] = b.top();
+        res[4*i + 1] = b.top();
+        res[4*i + 2] = b.right();
         res[4*i + 3] = b.bottom();
     }
 }

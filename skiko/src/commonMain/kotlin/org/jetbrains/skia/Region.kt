@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.internal.unpackTo
 
 class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     companion object {
@@ -107,11 +108,13 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun setRects(rects: Array<IRect>): Boolean {
         return try {
             val arr = IntArray(rects.size * 4)
-            for (i in rects.indices) {
-                arr[i * 4] = rects[i].left
-                arr[i * 4 + 1] = rects[i].top
-                arr[i * 4 + 2] = rects[i].right
-                arr[i * 4 + 3] = rects[i].bottom
+            rects.unpackTo(arr) { rect, destination, i ->
+                destination[i] = rect.left
+                destination[i + 1] = rect.top
+                destination[i + 2] = rect.right
+                destination[i + 3] = rect.bottom
+                //Stepping 4 places for the next rect
+                i + 4
             }
             Stats.onNativeCall()
             interopScope {

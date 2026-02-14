@@ -2,6 +2,8 @@
 
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skiko.internal.fastForEach
+
 internal actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
     private var callbacksInitialized = false
@@ -149,14 +151,12 @@ internal actual class InteropScope actual constructor() {
     }
 
     actual fun toInterop(stringArray: Array<String>?): InteropPointer {
-        return if (stringArray != null && stringArray.isNotEmpty()) {
-            val ptrs = stringArray.map {
-                toInterop(it)
-            }.toIntArray()
-
+        return if (stringArray.isNullOrEmpty()) 0
+        else {
+            val ptrs = IntArray(stringArray.size) { i ->
+                toInterop(stringArray[i])
+            }
             toInterop(ptrs)
-        } else {
-            0
         }
     }
 
@@ -174,7 +174,7 @@ internal actual class InteropScope actual constructor() {
     }
 
     actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer {
-        return toInterop(interopPointers.toIntArray())
+        return toInterop(IntArray(interopPointers.size) { index -> interopPointers[index] })
     }
 
     actual fun booleanCallback(callback: (() -> Boolean)?): NativePointer {
@@ -237,7 +237,7 @@ internal actual class InteropScope actual constructor() {
     }
 
     actual fun release()  {
-        elements.forEach {
+        elements.fastForEach {
             _free(it)
         }
         elements.clear()
