@@ -2,6 +2,8 @@
 
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skiko.internal.fastForEach
+
 internal actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
     private var callbacksInitialized = false
@@ -235,8 +237,8 @@ internal actual class InteropScope actual constructor() {
     }
 
     actual fun release()  {
-        for (index in elements.indices) {
-            _free(elements[index])
+        elements.fastForEach {
+            _free(it)
         }
         elements.clear()
         releaseCallbacks()

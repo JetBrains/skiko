@@ -5,6 +5,7 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.Logger
+import org.jetbrains.skiko.internal.fastForEach
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
@@ -154,9 +155,9 @@ internal class MetalRedrawer(
         if (!isApplicationActive) {
             // If application goes background, synchronously schedule all inflightCommandBuffers, as per
             // https://developer.apple.com/documentation/metal/gpu_devices_and_work_submission/preparing_your_metal_app_to_run_in_the_background?language=objc
-            for (index in inflightCommandBuffers.indices) {
+            inflightCommandBuffers.fastForEach { commandBuffer ->
                 // Will immediately return for MTLCommandBuffer's which are not in `Commited` status
-                inflightCommandBuffers[index].waitUntilScheduled()
+                commandBuffer.waitUntilCompleted()
             }
         }
     }
