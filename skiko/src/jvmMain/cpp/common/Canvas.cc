@@ -37,7 +37,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoints
     SkCanvas::PointMode skMode = static_cast<SkCanvas::PointMode>(mode);
     jsize len = env->GetArrayLength(coords);
     jfloat* arr = static_cast<jfloat*>(env->GetPrimitiveArrayCritical(coords, 0));
-    canvas->drawPoints(skMode, len / 2, reinterpret_cast<SkPoint*>(arr), *paint);
+    canvas->drawPoints(skMode, {reinterpret_cast<SkPoint*>(arr), len / 2}, *paint);
     env->ReleasePrimitiveArrayCritical(coords, arr, 0);
 }
 

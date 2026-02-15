@@ -376,8 +376,8 @@ jobs:
             git clone https://github.com/emscripten-core/emsdk.git
             cd ./emsdk
           fi
-          ./emsdk install 3.1.50
-          ./emsdk activate 3.1.50
+          ./emsdk install 4.0.7
+          ./emsdk activate 4.0.7
 
       - shell: bash
         name: 'Run WASM Tests'

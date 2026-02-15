@@ -10,7 +10,7 @@ RUN apt update -y && \
 
 # Install emscripten
 ENV EMSDK_DIR=/usr/emsdk
-ENV EMSDK_VER=3.1.50
+ENV EMSDK_VER=4.0.7
 ENV PATH=$EMSDK_DIR/upstream/emscripten:$PATH
 RUN git clone https://github.com/emscripten-core/emsdk.git $EMSDK_DIR && \
     $EMSDK_DIR/emsdk install $EMSDK_VER && \

@@ -20,7 +20,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Typeface__1nIsFixedPitch
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetVariationsCount
   (KNativePointer ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
-    return instance->getVariationDesignPosition(nullptr, 0);
+    return instance->getVariationDesignPosition({});
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariations
@@ -28,7 +28,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariations
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     if (count > 0) {
         std::vector<SkFontArguments::VariationPosition::Coordinate> coords(count);
-        instance->getVariationDesignPosition(coords.data(), count);
+        instance->getVariationDesignPosition({coords.data(), count});
         for (int i=0; i < count; ++i) {
              res[2*i] = static_cast<KInt>(coords[i].axis);
              res[2*i + 1] = rawBits(coords[i].value);
@@ -39,7 +39,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariations
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetVariationAxesCount
   (KNativePointer ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
-    return instance->getVariationDesignParameters(nullptr, 0);
+    return instance->getVariationDesignParameters({});
 }
 
 
@@ -48,7 +48,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariationAxes
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     if (count > 0) {
         std::vector<SkFontParameters::Variation::Axis> params(count);
-        instance->getVariationDesignParameters(params.data(), count);
+        instance->getVariationDesignParameters({params.data(), count});
         for (int i = 0,  j = 0; i < count; ++i) {
             int p[5] = { static_cast<int>(params[i].tag), rawBits(params[i].min), rawBits(params[i].def), rawBits(params[i].max), params[i].isHidden()};
             memcpy(axis + 5 * i, p, sizeof p);
@@ -90,7 +90,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeClone
 SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
   (KNativePointer ptr, KInt* uni, KInt count, KShort* res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
-    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(res));
+    instance->unicharsToGlyphs({reinterpret_cast<SkUnichar*>(uni), count}, {reinterpret_cast<SkGlyphID*>(res), count});
 }
 
 SKIKO_EXPORT KShort org_jetbrains_skia_Typeface__1nGetUTF32Glyph
@@ -120,9 +120,9 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetTableTagsCount
 SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetTableTags
   (KNativePointer ptr, KInt* res, KInt count) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
-    std::vector<int> tags(count);
-    instance->getTableTags(reinterpret_cast<SkFontTableTag*>(tags.data()));
-    memcpy(res, tags.data(), tags.size() * sizeof(KInt));
+    std::vector<SkFontTableTag> tags(count);
+    int actualCount = instance->readTableTags({tags.data(), count});
+    memcpy(res, tags.data(), actualCount * sizeof(KInt));
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetTableSize
@@ -149,10 +149,9 @@ SKIKO_EXPORT bool org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
   (KNativePointer ptr, KInteropPointer glyphs, KInt count, KInt* res) {
   SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
   if (count > 0) {
-      std::vector<int> adjustments(count);
       return instance->getKerningPairAdjustments(
-        reinterpret_cast<SkGlyphID*>(glyphs), count,
-        reinterpret_cast<int32_t*>(res)
+        {reinterpret_cast<SkGlyphID*>(glyphs), count},
+        {reinterpret_cast<int32_t*>(res), count}
       );
   }
 

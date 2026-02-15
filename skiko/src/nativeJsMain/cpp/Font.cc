@@ -204,8 +204,8 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetUTF32Glyphs
   (KNativePointer ptr, KInt* uniArr, KInt uniArrLen, KShort* resultGlyphs) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     instance->unicharsToGlyphs(
-        reinterpret_cast<SkUnichar*>(uniArr), uniArrLen,
-        reinterpret_cast<SkGlyphID*>(resultGlyphs)
+        {reinterpret_cast<SkUnichar*>(uniArr), uniArrLen},
+        {reinterpret_cast<SkGlyphID*>(resultGlyphs), uniArrLen}
     );
 }
 
@@ -246,7 +246,7 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nMeasureTextWidth
 SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetWidths
   (KNativePointer ptr, KShort* glyphs, KInt count, KFloat* widths) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    instance->getWidths(reinterpret_cast<SkGlyphID*>(glyphs), count, widths);
+    instance->getWidths({reinterpret_cast<SkGlyphID*>(glyphs), count}, {widths, count});
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetBounds
@@ -254,7 +254,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetBounds
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     SkPaint* paint = reinterpret_cast<SkPaint*>(paintPtr);
     std::vector<SkRect> bounds(count);
-    instance->getBounds(reinterpret_cast<SkGlyphID*>(glyphs), count, bounds.data(), paint);
+    instance->getBounds({reinterpret_cast<SkGlyphID*>(glyphs), count}, {bounds.data(), count}, paint);
 
     for (int i = 0; i < count; ++i) {
         SkRect b = bounds[i];
@@ -270,7 +270,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetPositions
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
 
     std::vector<SkPoint> positions(count);
-    instance->getPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), {dx, dy});
+    instance->getPos({reinterpret_cast<SkGlyphID*>(glyphs), count}, {positions.data(), count}, {dx, dy});
 
     for (int i = 0; i < count; i++) {
         res[2*i] = positions[i].fX;
@@ -281,15 +281,18 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetPositions
 SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetXPositions
   (KNativePointer ptr, KShort* glyphs, KFloat dx, KInt count, KFloat* positions) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    instance->getXPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions, dx);
+    instance->getXPos({reinterpret_cast<SkGlyphID*>(glyphs), count}, {positions, count}, dx);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetPath
   (KNativePointer ptr, KShort glyph) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    SkPath* path = new SkPath();
-    instance->getPath(glyph, path);
-    return reinterpret_cast<KNativePointer>(path);
+    std::optional<SkPath> pathOpt = instance->getPath(glyph);
+    if (pathOpt.has_value()) {
+        SkPath* path = new SkPath(pathOpt.value());
+        return reinterpret_cast<KNativePointer>(path);
+    }
+    return 0;
 }
 
 
@@ -301,11 +304,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetPaths
         std::vector<KNativePointer>* paths;
     } ctx = { new std::vector<KNativePointer>() };
 
-    instance->getPaths(reinterpret_cast<SkGlyphID*>(glyphs), count, [](const SkPath* orig, const SkMatrix& mx, void* voidCtx) {
+    instance->getPaths({reinterpret_cast<SkGlyphID*>(glyphs), count}, [](const SkPath* orig, const SkMatrix& mx, void* voidCtx) {
         Ctx* ctx = static_cast<Ctx*>(voidCtx);
         if (orig) {
-            SkPath* path = new SkPath();
-            orig->transform(mx, path);
+            SkPath* path = new SkPath(orig->makeTransform(mx));
             ctx->paths->push_back(reinterpret_cast<KNativePointer>(path));
         }
     }, &ctx);

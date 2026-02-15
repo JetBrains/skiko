@@ -11,10 +11,12 @@
 
 #if (defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)) && !defined(SKIKO_WASM)
 #include "ports/SkFontMgr_fontconfig.h"
+#include "ports/SkFontScanner_FreeType.h"
 #endif
 
 #ifdef SK_BUILD_FOR_ANDROID
 #include "ports/SkFontMgr_android.h"
+#include "ports/SkFontScanner_FreeType.h"
 #endif
 
 #ifdef SKIKO_WASM
@@ -36,11 +38,11 @@ sk_sp<SkFontMgr> SkFontMgrSkikoDefault() {
 #endif
 
 #if (defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)) && !defined(SKIKO_WASM)
-    return SkFontMgr_New_FontConfig(nullptr);
+    return SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_FreeType());
 #endif
 
 #ifdef SK_BUILD_FOR_ANDROID
-    return SkFontMgr_New_Android(nullptr);
+    return SkFontMgr_New_Android(nullptr, SkFontScanner_Make_FreeType());
 #endif
 
 #ifdef SKIKO_WASM

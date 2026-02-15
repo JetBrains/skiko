@@ -390,3 +390,39 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetPlaceholder
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
     instance->setPlaceholder();
 }
+
+SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TextStyle__1nGetFontEdging
+  (KNativePointer ptr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    return static_cast<KInt>(instance->getFontEdging());
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontEdging
+  (KNativePointer ptr, KInt fontEdging) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    instance->setFontEdging(static_cast<SkFont::Edging>(fontEdging));
+}
+
+SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_TextStyle__1nGetSubpixel
+  (KNativePointer ptr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    return instance->getSubpixel();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetSubpixel
+  (KNativePointer ptr, KBoolean subpixel) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    instance->setSubpixel(subpixel);
+}
+
+SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TextStyle__1nGetFontHinting
+  (KNativePointer ptr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    return static_cast<KInt>(instance->getFontHinting());
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontHinting
+  (KNativePointer ptr, KInt fontHinting) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    instance->setFontHinting(static_cast<SkFontHinting>(fontHinting));
+}
