@@ -219,8 +219,8 @@ class PathTests {
             val p2 = PathBuilder(p).lineTo(10f, 40f).detach()
             val g2 = p2.generationId
             assertNotEquals(g1, g2)
-            p2.fillMode = PathFillMode.EVEN_ODD
-            val g3 = p2.generationId
+            val p3 = PathBuilder(p2).lineTo(20f, 20f).detach()
+            val g3 = p3.generationId
             assertNotEquals(g2, g3)
         }
     }
