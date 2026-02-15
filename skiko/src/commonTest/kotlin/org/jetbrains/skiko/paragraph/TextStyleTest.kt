@@ -159,9 +159,9 @@ class TextStyleTest {
     @Test
     fun textStyleSubpixelTest() {
         TextStyle().use { textStyle ->
-            assertEquals(true, textStyle.subpixel)
+            assertTrue(textStyle.subpixel)
             textStyle.subpixel = false
-            assertEquals(false, textStyle.subpixel)
+            assertFalse(textStyle.subpixel)
         }
     }
 
