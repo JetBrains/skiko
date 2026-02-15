@@ -102,55 +102,55 @@ internal val Project.isInIdea: Boolean
     }
 
 val Project.supportAndroid: Boolean
-    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
+    get() = findProperty(SkikoGradleProperties.ANDROID_ENABLED) == "true" // || isInIdea
 
 val Project.supportAwt: Boolean
-    get() = findProperty("skiko.awt.enabled") == "true" || isInIdea
+    get() = findProperty(SkikoGradleProperties.AWT_ENABLED) == "true" || isInIdea
 
 val Project.supportAllNative: Boolean
-    get() = findProperty("skiko.native.enabled") == "true" || isInIdea
+    get() = findProperty(SkikoGradleProperties.NATIVE_ENABLED) == "true" || isInIdea
 
 val Project.supportAllNativeIos: Boolean
-    get() = supportAllNative || findProperty("skiko.native.ios.enabled") == "true" || isInIdea
+    get() = supportAllNative || findProperty("${SkikoGradleProperties.NATIVE_IOS}.enabled") == "true" || isInIdea
 
 val Project.supportNativeIosArm64: Boolean
-    get() = supportAllNativeIos || findProperty("skiko.native.ios.arm64.enabled") == "true" || isInIdea
+    get() = supportAllNativeIos || findProperty(SkikoGradleProperties.NATIVE_IOS_ARM64) == "true" || isInIdea
 
 val Project.supportNativeIosSimulatorArm64: Boolean
-    get() = supportAllNativeIos || findProperty("skiko.native.ios.simulatorArm64.enabled") == "true" || isInIdea
+    get() = supportAllNativeIos || findProperty(SkikoGradleProperties.NATIVE_IOS_SIMULATOR_ARM64) == "true" || isInIdea
 
 val Project.supportNativeIosX64: Boolean
-    get() = supportAllNativeIos || findProperty("skiko.native.ios.x64.enabled") == "true" || isInIdea
+    get() = supportAllNativeIos || findProperty(SkikoGradleProperties.NATIVE_IOS_X64) == "true" || isInIdea
 
 val Project.supportAnyNativeIos: Boolean
     get() = supportAllNativeIos || supportNativeIosArm64 || supportNativeIosSimulatorArm64 || supportNativeIosX64
 
 val Project.supportAllNativeTvos: Boolean
-    get() = supportAllNative || findProperty("skiko.native.tvos.enabled") == "true" || isInIdea
+    get() = supportAllNative || findProperty("${SkikoGradleProperties.NATIVE_TVOS}.enabled") == "true" || isInIdea
 
 val Project.supportNativeTvosArm64: Boolean
-    get() = supportAllNativeTvos || findProperty("skiko.native.tvos.arm64.enabled") == "true" || isInIdea
+    get() = supportAllNativeTvos || findProperty(SkikoGradleProperties.NATIVE_TVOS_ARM64) == "true" || isInIdea
 
 val Project.supportNativeTvosSimulatorArm64: Boolean
-    get() = supportAllNativeTvos || findProperty("skiko.native.tvos.simulatorArm64.enabled") == "true" || isInIdea
+    get() = supportAllNativeTvos || findProperty(SkikoGradleProperties.NATIVE_TVOS_SIMULATOR_ARM64) == "true" || isInIdea
 
 val Project.supportNativeTvosX64: Boolean
-    get() = supportAllNativeTvos || findProperty("skiko.native.tvos.x64.enabled") == "true" || isInIdea
+    get() = supportAllNativeTvos || findProperty(SkikoGradleProperties.NATIVE_TVOS_X64) == "true" || isInIdea
 
 val Project.supportAnyNativeTvos: Boolean
     get() = supportAllNativeTvos || supportNativeTvosArm64 || supportNativeTvosSimulatorArm64 || supportNativeTvosX64
 
 val Project.supportNativeMac: Boolean
-    get() = supportAllNative || findProperty("skiko.native.mac.enabled") == "true" || isInIdea
+    get() = supportAllNative || findProperty(SkikoGradleProperties.NATIVE_MAC) == "true" || isInIdea
 
 val Project.supportNativeLinux: Boolean
-    get() = supportAllNative || findProperty("skiko.native.linux.enabled") == "true" || isInIdea
+    get() = supportAllNative || findProperty(SkikoGradleProperties.NATIVE_LINUX) == "true" || isInIdea
 
 val Project.supportAnyNative: Boolean
     get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
 
 val Project.supportWeb: Boolean
-    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
+    get() = findProperty(SkikoGradleProperties.WASM_ENABLED) == "true" || isInIdea
 
 fun Project.skiaVersion(target: String): String {
     val platformSpecificVersion = "dependencies.skia.$target"
