@@ -157,12 +157,45 @@ class SkikoProperties(private val myProject: Project) {
     val visualStudioBuildToolsDir: File?
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
 
+    /**
+     * Skia-pack repository root directory for building Skia from source.
+     *
+     * Property naming conventions:
+     * - Gradle property: `-Pskia.pack.dir=...` (kebab-case, Gradle convention)
+     * - Kotlin accessor: `skiaPackDir` (camelCase, Kotlin convention)
+     * - Environment variable: `SKIA_PACK_DIR`
+     *
+     * Usage: `-Pskia.pack.dir=/path/to/skia-pack`
+     *
+     * Note: Must point to skia-pack repository root containing script/ with Python build scripts.
+     */
+    // todo: make compatible with the configuration cache
+    val skiaPackDir: File?
+        get() = (System.getenv()["SKIA_PACK_DIR"] ?: System.getProperty("skia.pack.dir") ?: myProject.findProperty("skia.pack.dir")
+            ?.toString())?.let { skiaPackDirProp ->
+                val file = File(skiaPackDirProp)
+                if (!file.isDirectory) throw (GradleException("\"skia.pack.dir\" property was explicitly set to ${skiaPackDirProp} which is not resolved as a directory"))
+                file
+            }
+
+    /**
+     * Skia source directory for publishing.
+     *
+     * Property naming conventions:
+     * - Gradle property: `-Pskia.dir=...` (kebab-case, Gradle convention)
+     * - Kotlin accessor: `skiaDir` (camelCase, Kotlin convention)
+     * - Environment variable: `SKIA_DIR`
+     *
+     * Usage: `-Pskia.dir=/path/to/skia`
+     *
+     * Note: Must point to directory containing built Skia source code and headers.
+     */
     // todo: make compatible with the configuration cache
     val skiaDir: File?
         get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir") ?: myProject.findProperty("skia.dir")
             ?.toString())?.let { skiaDirProp ->
                 val file = File(skiaDirProp)
-                if (!file.isDirectory) throw (GradleException("\"skiko.skiaDir\" property was explicitly set to ${skiaDirProp} which is not resolved as a directory"))
+                if (!file.isDirectory) throw (GradleException("\"skia.dir\" property was explicitly set to ${skiaDirProp} which is not resolved as a directory"))
                 file
             }
 

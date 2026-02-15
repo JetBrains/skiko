@@ -360,45 +360,26 @@ skikoProjectContext.additionalRuntimeLibraries.forEach {
 }
 
 // Local Skia build tasks
-tasks.register<BuildLocalSkiaTask>("buildSkiaLocally") {
+tasks.register<BuildLocalSkiaTask>("prepareLocalSkiaBuild") {
     group = "skia"
-    description = "Build Skia locally and publish to Maven Local"
+    description = "Build Skia binaries locally (without publishing Skiko)"
 
     skiaVersion.set(provider { skiko.skiaVersionFromEnvOrProperties })
     skiaTarget.set(provider { skiko.skiaTarget })
     buildType.set(skiko.buildType)
 
-    // Set skiaDir - either from property or default location
-    val skiaDir = skiko.skiaDir
-    if (skiaDir != null) {
-        this.skiaDir.set(skiaDir)
+    // Set skiaPackDir - either from property or default location
+    val skiaPackDir = skiko.skiaPackDir
+    if (skiaPackDir != null) {
+        this.skiaPackDir.set(skiaPackDir)
     } else {
-        // Will be set by bash script via -Pskia.dir, or use default
-        this.skiaDir.set(project.file("skia"))
+        // Will be set by bash script via -Pskia.pack.dir, or use default skia-pack
+        this.skiaPackDir.set(project.file("skia-pack"))
     }
 
     skikoTargetFlags.set(provider {
         skiko.skiaTarget.getGradleFlags(skiko.targetArch)
     })
-}
-
-tasks.register("detectSkiaDir") {
-    group = "skia"
-    description = "Detect Skia directory for bash script"
-    doLast {
-        val skiaDir = skiko.skiaDir
-        if (skiaDir != null) {
-            println(skiaDir.absolutePath)
-        } else {
-            // Check workspace locations
-            val workspaceSkia = project.projectDir.resolve("../skia")
-            if (workspaceSkia.exists()) {
-                println(workspaceSkia.absolutePath)
-            } else {
-                println(project.projectDir.resolve("skia").absolutePath)
-            }
-        }
-    }
 }
 
 tasks.register("printSkiaVersion") {
