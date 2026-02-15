@@ -189,6 +189,40 @@ class SkikoProperties(private val myProject: Project) {
 
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
+
+    val skiaTarget: SkiaTarget
+        get() {
+            val targetString = System.getenv("SKIA_TARGET")
+                ?: myProject.findProperty("skia.target")?.toString()
+                ?: hostOs.id  // Default to current OS
+            return SkiaTarget.fromString(targetString)
+        }
+
+    val skiaVersionFromEnvOrProperties: String
+        get() {
+            // Environment variable takes precedence
+            System.getenv("SKIA_VERSION")?.let { return it }
+
+            // Fall back to gradle.properties
+            return myProject.property("dependencies.skia").toString()
+        }
+}
+
+object SkikoGradleProperties {
+    const val AWT_ENABLED = "skiko.awt.enabled"
+    const val WASM_ENABLED = "skiko.wasm.enabled"
+    const val ANDROID_ENABLED = "skiko.android.enabled"
+    const val NATIVE_ENABLED = "skiko.native.enabled"
+    const val NATIVE_IOS = "skiko.native.ios"
+    const val NATIVE_IOS_ARM64 = "skiko.native.ios.arm64.enabled"
+    const val NATIVE_IOS_SIMULATOR_ARM64 = "skiko.native.ios.simulatorArm64.enabled"
+    const val NATIVE_IOS_X64 = "skiko.native.ios.x64.enabled"
+    const val NATIVE_TVOS = "skiko.native.tvos"
+    const val NATIVE_TVOS_ARM64 = "skiko.native.tvos.arm64.enabled"
+    const val NATIVE_TVOS_SIMULATOR_ARM64 = "skiko.native.tvos.simulatorArm64.enabled"
+    const val NATIVE_TVOS_X64 = "skiko.native.tvos.x64.enabled"
+    const val NATIVE_MAC = "skiko.native.mac.enabled"
+    const val NATIVE_LINUX = "skiko.native.linux.enabled"
 }
 
 object SkikoArtifacts {

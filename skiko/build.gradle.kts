@@ -359,6 +359,56 @@ skikoProjectContext.additionalRuntimeLibraries.forEach {
     it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))
 }
 
+// Local Skia build tasks
+tasks.register<BuildLocalSkiaTask>("buildSkiaLocally") {
+    group = "skia"
+    description = "Build Skia locally and publish to Maven Local"
+
+    skiaVersion.set(provider { skiko.skiaVersionFromEnvOrProperties })
+    skiaTarget.set(provider { skiko.skiaTarget })
+    buildType.set(skiko.buildType)
+
+    // Set skiaDir - either from property or default location
+    val skiaDir = skiko.skiaDir
+    if (skiaDir != null) {
+        this.skiaDir.set(skiaDir)
+    } else {
+        // Will be set by bash script via -Pskia.dir, or use default
+        this.skiaDir.set(project.file("skia"))
+    }
+
+    skikoTargetFlags.set(provider {
+        skiko.skiaTarget.getGradleFlags(skiko.targetArch)
+    })
+}
+
+tasks.register("detectSkiaDir") {
+    group = "skia"
+    description = "Detect Skia directory for bash script"
+    doLast {
+        val skiaDir = skiko.skiaDir
+        if (skiaDir != null) {
+            println(skiaDir.absolutePath)
+        } else {
+            // Check workspace locations
+            val workspaceSkia = project.projectDir.resolve("../skia")
+            if (workspaceSkia.exists()) {
+                println(workspaceSkia.absolutePath)
+            } else {
+                println(project.projectDir.resolve("skia").absolutePath)
+            }
+        }
+    }
+}
+
+tasks.register("printSkiaVersion") {
+    group = "skia"
+    description = "Print resolved Skia version"
+    doLast {
+        println(skiko.skiaVersionFromEnvOrProperties)
+    }
+}
+
 tasks.withType<KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583
     compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
