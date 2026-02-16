@@ -35,7 +35,7 @@ internal fun autoCloseScope(body: CloseScope.() -> Unit) {
     try {
         scope.body()
     } finally {
-        resources.fastForEachReversed{ item ->
+        resources.fastForEachReversed { item ->
             item.close()
         }
     }
