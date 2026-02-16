@@ -26,7 +26,7 @@ i.e. something like this
 ```kotlin
     repositories {
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://redirector.kotlinlang.org/maven/compose-dev")
     }
 
     val osName = System.getProperty("os.name")

@@ -4,7 +4,7 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://redirector.kotlinlang.org/maven/compose-dev")
     mavenLocal()
 }
 
