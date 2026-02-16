@@ -142,7 +142,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
         internal fun InteropScope.arrayOfFontFeaturesToInterop(fontFeatures: Array<FontFeature>?): InteropPointer {
             val ints = IntArray(4 * (fontFeatures?.size ?: 0))
 
-            fontFeatures?.unpackTo(ints){ feature , arr, index ->
+            fontFeatures?.unpackTo(ints) { feature , arr, index ->
                 arr[index] = feature._tag
                 arr[index + 1] = feature.value
                 arr[index + 2] = feature.start.toInt()
