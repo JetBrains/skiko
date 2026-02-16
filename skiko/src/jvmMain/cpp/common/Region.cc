@@ -1,6 +1,7 @@
 #include <iostream>
 #include <jni.h>
 #include "SkRegion.h"
+#include "SkPathBuilder.h"
 #include "interop.hh"
 
 static void deleteRegion(SkRegion* region) {
@@ -50,11 +51,15 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nComp
     return instance->computeRegionComplexity();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nGetBoundaryPath(JNIEnv* env, jclass jclass, jlong ptr, jlong pathPtr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nAddBoundaryPath(JNIEnv* env, jclass jclass, jlong ptr, jlong pathBuilderPtr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(ptr));
-    SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
-    *path = instance->getBoundaryPath();
-    return true;
+    SkPathBuilder* pathBuilder = reinterpret_cast<SkPathBuilder*>(static_cast<uintptr_t>(pathBuilderPtr));
+    return instance->addBoundaryPath(pathBuilder);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nGetBoundaryPath(JNIEnv* env, jclass jclass, jlong ptr) {
+    SkRegion* instance = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(ptr));
+    return reinterpret_cast<jlong>(new SkPath(instance->getBoundaryPath()));
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nSetEmpty(JNIEnv* env, jclass jclass, jlong ptr) {
@@ -131,7 +136,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1n
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nQuickRejectRegion(JNIEnv* env, jclass jclass, jlong ptr, jlong regionPtr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(ptr));
     SkRegion* region = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(regionPtr));
-    return instance->contains(*region);
+    return instance->quickReject(*region);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nTranslate(JNIEnv* env, jclass jclass, jlong ptr, jint dx, jint dy) {

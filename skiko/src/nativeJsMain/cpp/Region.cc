@@ -1,5 +1,6 @@
 #include <iostream>
 #include "SkRegion.h"
+#include "SkPathBuilder.h"
 #include "common.h"
 
 static void deleteRegion(SkRegion* region) {
@@ -54,11 +55,15 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Region__1nComputeRegionComplexity(KNativePo
     return instance->computeRegionComplexity();
 }
 
-SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nGetBoundaryPath(KNativePointer ptr, KNativePointer pathPtr) {
+SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nAddBoundaryPath(KNativePointer ptr, KNativePointer pathBuilderPtr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>((ptr));
-    SkPath* path = reinterpret_cast<SkPath*>((pathPtr));
-    *path = instance->getBoundaryPath();
-    return true;
+    SkPathBuilder* pathBuilder = reinterpret_cast<SkPathBuilder*>((pathBuilderPtr));
+    return instance->addBoundaryPath(pathBuilder);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Region__1nGetBoundaryPath(KNativePointer ptr) {
+    SkRegion* instance = reinterpret_cast<SkRegion*>((ptr));
+    return reinterpret_cast<KNativePointer>(new SkPath(instance->getBoundaryPath()));
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nSetEmpty(KNativePointer ptr) {
@@ -132,7 +137,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nQuickRejectIRect(KNativePoint
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nQuickRejectRegion(KNativePointer ptr, KNativePointer regionPtr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>((ptr));
     SkRegion* region = reinterpret_cast<SkRegion*>((regionPtr));
-    return instance->contains(*region);
+    return instance->quickReject(*region);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Region__1nTranslate(KNativePointer ptr, KInt dx, KInt dy) {
