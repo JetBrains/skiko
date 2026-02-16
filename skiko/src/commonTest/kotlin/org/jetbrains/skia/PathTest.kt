@@ -6,6 +6,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNull
 
 class PathTest {
 
@@ -91,6 +92,14 @@ class PathTest {
             assertNotEquals(NullPointer, p.approximateBytesUsed)
             assertEquals(PathSegmentMask.LINE, p.segmentMasks)
         }
+    }
+
+    @Test
+    fun emptyPath() {
+        val emptyPath = Path()
+
+        assertEquals(0, emptyPath.pointsCount)
+        assertNull(emptyPath.lastPt)
     }
 
     @Test

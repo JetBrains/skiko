@@ -628,10 +628,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_getLastPt](https://fiddle.skia.org/c/@Path_getLastPt)
      */
-    val lastPt: Point
+    val lastPt: Point?
         get() = try {
             Stats.onNativeCall()
-            Point.fromInteropPointer { _nGetLastPt(_ptr, it) }
+            Point.fromNullableInteropPointer { _nGetLastPt(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
