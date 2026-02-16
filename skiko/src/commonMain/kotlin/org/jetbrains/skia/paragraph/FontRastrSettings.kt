@@ -4,7 +4,7 @@ import org.jetbrains.skia.FontEdging
 import org.jetbrains.skia.FontHinting
 
 @Deprecated(
-    message = "Replaced by separate properties in TextStyle: edging, hinting, subpixel",
+    message = "Replaced by separate properties in TextStyle: fontEdging, fontHinting, subpixel",
     level = DeprecationLevel.ERROR,
 )
 data class FontRastrSettings(val edging: FontEdging,

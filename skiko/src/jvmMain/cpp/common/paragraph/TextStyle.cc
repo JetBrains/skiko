@@ -410,7 +410,7 @@ instance->setFontEdging(static_cast<SkFont::Edging>(fontEdging));
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetSubpixel
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
-    return static_cast<jint>(instance->getSubpixel());
+    return static_cast<jboolean>(instance->getSubpixel());
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetSubpixel

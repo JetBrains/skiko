@@ -192,7 +192,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
 
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(
-        message = "Replaced by separate properties in TextStyle: edging, hinting, subpixel",
+        message = "Replaced by separate properties in TextStyle: fontEdging, fontHinting, subpixel",
         level = DeprecationLevel.ERROR,
     )
     var fontRastrSettings: FontRastrSettings
