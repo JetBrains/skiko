@@ -71,10 +71,10 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PictureKt__1nGetApprox
     return instance->approximateOpCount();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nGetApproximateBytesUsed
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PictureKt__1nGetApproximateBytesUsed
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
-    return instance->approximateBytesUsed();
+    return static_cast<jint>(instance->approximateBytesUsed());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nMakeShader

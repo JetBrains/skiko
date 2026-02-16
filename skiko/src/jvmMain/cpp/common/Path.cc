@@ -185,9 +185,9 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetVerbs(JNI
     return count;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nApproximateBytesUsed(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nApproximateBytesUsed(JNIEnv* env, jclass jclass, jlong ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    return static_cast<jlong>(instance->approximateBytesUsed());
+    return static_cast<jint>(instance->approximateBytesUsed());
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nGetBounds(JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {

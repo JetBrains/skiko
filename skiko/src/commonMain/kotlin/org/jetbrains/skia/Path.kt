@@ -883,7 +883,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @return  approximate size in bytes
      */
-    val approximateBytesUsed: Long
+    val approximateBytesUsed: Int
         get() = try {
             Stats.onNativeCall()
             _nApproximateBytesUsed(_ptr)
@@ -1330,7 +1330,7 @@ private external fun _nCountVerbs(ptr: NativePointer): Int
 private external fun _nGetVerbs(ptr: NativePointer, verbs: InteropPointer, max: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nApproximateBytesUsed")
-private external fun _nApproximateBytesUsed(ptr: NativePointer): Long
+private external fun _nApproximateBytesUsed(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetBounds")
 private external fun _nGetBounds(ptr: NativePointer, rect: InteropPointer)

@@ -182,7 +182,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
      *
      * @see [https://fiddle.skia.org/c/@Picture_approximateBytesUsed](https://fiddle.skia.org/c/@Picture_approximateBytesUsed)
      */
-    val approximateBytesUsed: NativePointer
+    val approximateBytesUsed: Int
         get() = try {
             Stats.onNativeCall()
             _nGetApproximateBytesUsed(_ptr)
@@ -273,7 +273,7 @@ private external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bo
 private external fun _nGetApproximateOpCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
-private external fun _nGetApproximateBytesUsed(ptr: NativePointer): NativePointer
+private external fun _nGetApproximateBytesUsed(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
 private external fun _nMakeShader(

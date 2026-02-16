@@ -4,6 +4,7 @@ import org.jetbrains.skia.tests.assertCloseEnough
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -172,8 +173,8 @@ class PathTest {
         
         assertEquals(4, pathClosed.pointsCount)
         assertEquals(4, pathOpen.pointsCount)
-        assertEquals(true, pathClosed.isLastContourClosed)
-        assertEquals(false, pathOpen.isLastContourClosed)
+        assertTrue(pathClosed.isLastContourClosed)
+        assertFalse(pathOpen.isLastContourClosed)
     }
 
     @Test

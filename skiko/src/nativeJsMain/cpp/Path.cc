@@ -176,9 +176,9 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetVerbs(KNativePointer ptr, KByte*
     return instance->getVerbs({reinterpret_cast<uint8_t *>(verbsArray), max});
 }
 
-SKIKO_EXPORT KLong org_jetbrains_skia_Path__1nApproximateBytesUsed(KNativePointer ptr) {
+SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nApproximateBytesUsed(KNativePointer ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
-    return static_cast<KLong>(instance->approximateBytesUsed());
+    return static_cast<KInt>(instance->approximateBytesUsed());
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Path__1nGetBounds(KNativePointer ptr, KInteropPointer resultArray) {
