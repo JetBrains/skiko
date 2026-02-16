@@ -1,12 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.tests.assertCloseEnough
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class PathTest {
 
@@ -89,7 +89,7 @@ class PathTest {
                     null
                 ), verbs
             )
-            assertNotEquals(NullPointer, p.approximateBytesUsed)
+            assertTrue(p.approximateBytesUsed > 0, "approximateBytesUsed should return positive size")
             assertEquals(PathSegmentMask.LINE, p.segmentMasks)
         }
     }
@@ -108,5 +108,84 @@ class PathTest {
         val bounds = Rect(0.0f, 0.0f, 40.0f, 40.0f)
         assertCloseEnough(bounds, path.bounds)
         assertCloseEnough(bounds, path.computeTightBounds())
+    }
+
+    @Test
+    fun rawTest() {
+        val pts = arrayOf(Point(0f, 0f), Point(10f, 10f), Point(20f, 0f))
+        val verbs = arrayOf(PathVerb.MOVE, PathVerb.LINE, PathVerb.LINE)
+        val path = Path.Raw(pts, verbs)
+        
+        assertEquals(3, path.pointsCount)
+        assertEquals(3, path.verbsCount)
+        assertCloseEnough(Rect(0f, 0f, 20f, 10f), path.bounds)
+    }
+
+    @Test
+    fun rectTest() {
+        val rect = Rect(10f, 20f, 30f, 40f)
+        val path = Path.Rect(rect)
+        
+        assertEquals(4, path.pointsCount) // 4 corners
+        assertEquals(rect, path.isRect)
+        assertCloseEnough(rect, path.bounds)
+    }
+
+    @Test
+    fun ovalTest() {
+        val rect = Rect(10f, 20f, 30f, 40f)
+        val path = Path.Oval(rect)
+        
+        assertEquals(rect, path.isOval)
+        assertCloseEnough(rect, path.bounds)
+    }
+
+    @Test
+    fun circleTest() {
+        val centerX = 50f
+        val centerY = 50f
+        val radius = 25f
+        val path = Path.Circle(centerX, centerY, radius)
+        
+        val expectedBounds = Rect(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
+        assertCloseEnough(expectedBounds, path.bounds)
+        assertEquals(expectedBounds, path.isOval)
+    }
+
+    @Test
+    fun rrectTest() {
+        val rect = Rect(10f, 20f, 110f, 120f)
+        val rx = 10f
+        val ry = 10f
+        val path = Path.RRect(rect, rx, ry)
+        
+        assertCloseEnough(rect, path.bounds)
+        val rrect = path.isRRect
+        assertEquals(rect, rrect?.let { Rect(it.left, it.top, it.right, it.bottom) })
+    }
+
+    @Test
+    fun polygonTest() {
+        val pts = arrayOf(Point(0f, 0f), Point(10f, 0f), Point(10f, 10f), Point(0f, 10f))
+        val pathClosed = Path.Polygon(pts, true)
+        val pathOpen = Path.Polygon(pts, false)
+        
+        assertEquals(4, pathClosed.pointsCount)
+        assertEquals(4, pathOpen.pointsCount)
+        assertEquals(true, pathClosed.isLastContourClosed)
+        assertEquals(false, pathOpen.isLastContourClosed)
+    }
+
+    @Test
+    fun lineTest() {
+        val p0 = Point(10f, 20f)
+        val p1 = Point(30f, 40f)
+        val path = Path.Line(p0, p1)
+        
+        assertEquals(2, path.pointsCount)
+        val line = path.asLine
+        assertEquals(2, line?.size)
+        assertEquals(p0, line?.get(0))
+        assertEquals(p1, line?.get(1))
     }
 }

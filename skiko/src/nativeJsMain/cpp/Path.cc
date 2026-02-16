@@ -176,9 +176,9 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetVerbs(KNativePointer ptr, KByte*
     return instance->getVerbs({reinterpret_cast<uint8_t *>(verbsArray), max});
 }
 
-SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nApproximateBytesUsed(KNativePointer ptr) {
+SKIKO_EXPORT KLong org_jetbrains_skia_Path__1nApproximateBytesUsed(KNativePointer ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
-    return (KInt) instance->approximateBytesUsed();
+    return static_cast<KLong>(instance->approximateBytesUsed());
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Path__1nGetBounds(KNativePointer ptr, KInteropPointer resultArray) {
@@ -313,4 +313,107 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Path__1nIsValid
   (KNativePointer ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
     return instance->isValid();
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromRaw
+  (KFloat* ptsArray, KInt ptsCount, 
+   KByte* verbsArray, KInt verbsCount,
+   KFloat* conicWeightsArray, KInt conicWeightsCount,
+   KInt fillType, KBoolean isVolatile) {
+    SkPath path = SkPath::Raw(
+        SkSpan<const SkPoint>(reinterpret_cast<const SkPoint*>(ptsArray), ptsCount),
+        SkSpan<const SkPathVerb>(reinterpret_cast<const SkPathVerb*>(verbsArray), verbsCount),
+        SkSpan<const SkScalar>(conicWeightsArray, conicWeightsCount),
+        static_cast<SkPathFillType>(fillType),
+        isVolatile
+    );
+    
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<KNativePointer>(instance);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromRect
+  (KFloat left, KFloat top, KFloat right, KFloat bottom,
+   KInt fillType, KInt direction, KInt startIndex) {
+    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
+    SkPath path = SkPath::Rect(
+        rect,
+        static_cast<SkPathFillType>(fillType),
+        static_cast<SkPathDirection>(direction),
+        startIndex
+    );
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<KNativePointer>(instance);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromOval
+  (KFloat left, KFloat top, KFloat right, KFloat bottom,
+   KInt direction, KInt startIndex) {
+    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
+    SkPath path = SkPath::Oval(
+        rect,
+        static_cast<SkPathDirection>(direction),
+        startIndex
+    );
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<KNativePointer>(instance);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromCircle
+  (KFloat centerX, KFloat centerY, KFloat radius, KInt direction) {
+    SkPath path = SkPath::Circle(
+        centerX,
+        centerY,
+        radius,
+        static_cast<SkPathDirection>(direction)
+    );
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<KNativePointer>(instance);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromRRect
+  (KFloat* radiiArray,
+   KFloat left, KFloat top, KFloat right, KFloat bottom,
+   KInt direction, KInt startIndex) {
+    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
+    
+    SkRRect rrect;
+    rrect.setRectRadii(rect, reinterpret_cast<const SkVector*>(radiiArray));
+    
+    SkPath path = SkPath::RRect(
+        rrect,
+        static_cast<SkPathDirection>(direction),
+        startIndex
+    );
+    
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<KNativePointer>(instance);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromRRectXY
+  (KFloat left, KFloat top, KFloat right, KFloat bottom,
+   KFloat rx, KFloat ry, KInt direction) {
+    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
+    SkPath path = SkPath::RRect(
+        rect,
+        rx,
+        ry,
+        static_cast<SkPathDirection>(direction)
+    );
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<KNativePointer>(instance);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromPolygon
+  (KFloat* ptsArray, KInt ptsCount,
+   KBoolean isClosed, KInt fillType, KBoolean isVolatile) {
+    SkPath path = SkPath::Polygon(
+        SkSpan<const SkPoint>(reinterpret_cast<const SkPoint*>(ptsArray), ptsCount),
+        isClosed,
+        static_cast<SkPathFillType>(fillType),
+        isVolatile
+    );
+    
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<KNativePointer>(instance);
 }

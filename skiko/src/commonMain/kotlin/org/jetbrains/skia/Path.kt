@@ -5,28 +5,23 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import kotlin.math.min
 
 /**
- *
  * Path contain geometry. Path may be empty, or contain one or more verbs that
  * outline a figure. Path always starts with a move verb to a Cartesian coordinate,
  * and may be followed by additional verbs that add lines or curves.
  *
- *
  * Adding a close verb makes the geometry into a continuous loop, a closed contour.
  * Path may contain any number of contours, each beginning with a move verb.
- *
  *
  * Path contours may contain only a move verb, or may also contain lines,
  * quadratic beziers, conics, and cubic beziers. Path contours may be open or
  * closed.
  *
- *
  * When used to draw a filled area, Path describes whether the fill is inside or
  * outside the geometry. Path also describes the winding rule used to fill
  * overlapping contours.
  *
- *
  * Internally, Path lazily computes metrics likes bounds and convexity. Call
- * [.updateBoundsCache] to make Path thread safe.
+ * [updateBoundsCache] to make Path thread safe.
  */
 class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
     companion object {
@@ -41,6 +36,200 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             } else {
                 return Path(result)
             }
+        }
+
+        /**
+         * Creates a new path with the specified spans.
+         *
+         * The points and weights arrays are read in order, based on the sequence of verbs.
+         *
+         * - Move    1 point
+         * - Line    1 point
+         * - Quad    2 points
+         * - Conic   2 points and 1 weight
+         * - Cubic   3 points
+         * - Close   0 points
+         *
+         * If an illegal sequence of verbs is encountered, or the specified number of points
+         * or weights is not sufficient given the verbs, an empty Path is returned.
+         *
+         * A legal sequence of verbs consists of any number of Contours. A contour always begins
+         * with a Move verb, followed by 0 or more segments: Line, Quad, Conic, Cubic, followed
+         * by an optional Close.
+         *
+         * @param pts        array of points
+         * @param verbs      array of path verbs
+         * @param conicWeights array of conic weights
+         * @param fillType   fill type for the path
+         * @param isVolatile whether the path is volatile
+         * @return           new Path constructed from the provided data
+         */
+        fun Raw(
+            pts: Array<Point>,
+            verbs: Array<PathVerb>,
+            conicWeights: FloatArray = FloatArray(0),
+            fillType: PathFillMode = PathFillMode.WINDING,
+            isVolatile: Boolean = false
+        ): Path {
+            Stats.onNativeCall()
+            val ptsFlat = FloatArray(pts.size * 2)
+            for (i in pts.indices) {
+                ptsFlat[i * 2] = pts[i].x
+                ptsFlat[i * 2 + 1] = pts[i].y
+            }
+            val verbsBytes = ByteArray(verbs.size) { verbs[it].ordinal.toByte() }
+            return interopScope {
+                val result = _nMakeFromRaw(
+                    toInterop(ptsFlat), pts.size,
+                    toInterop(verbsBytes), verbs.size,
+                    toInterop(conicWeights), conicWeights.size,
+                    fillType.ordinal, isVolatile
+                )
+                require(result != NullPointer) { "Failed to create Path from raw data" }
+                Path(result)
+            }
+        }
+
+        /**
+         * Creates a rectangular path.
+         *
+         * @param rect       rectangle bounds
+         * @param fillType   fill type for the path
+         * @param direction  direction to wind the rectangle
+         * @param startIndex starting corner index (0-3)
+         * @return           new rectangular Path
+         */
+        fun Rect(
+            rect: Rect,
+            fillType: PathFillMode = PathFillMode.WINDING,
+            direction: PathDirection = PathDirection.CLOCKWISE,
+            startIndex: Int = 0
+        ): Path {
+            Stats.onNativeCall()
+            val result = _nMakeFromRect(rect.left, rect.top, rect.right, rect.bottom, fillType.ordinal, direction.ordinal, startIndex)
+            require(result != NullPointer) { "Failed to create Path from rectangle" }
+            return Path(result)
+        }
+
+        /**
+         * Creates an oval path.
+         *
+         * @param rect       oval bounds
+         * @param direction  direction to wind the oval
+         * @param startIndex starting point index
+         * @return           new oval Path
+         */
+        fun Oval(
+            rect: Rect,
+            direction: PathDirection = PathDirection.CLOCKWISE,
+            startIndex: Int = 1
+        ): Path {
+            Stats.onNativeCall()
+            val result = _nMakeFromOval(rect.left, rect.top, rect.right, rect.bottom, direction.ordinal, startIndex)
+            require(result != NullPointer) { "Failed to create Path from oval" }
+            return Path(result)
+        }
+
+        /**
+         * Creates a circular path.
+         *
+         * @param centerX    x-coordinate of circle center
+         * @param centerY    y-coordinate of circle center
+         * @param radius     circle radius
+         * @param direction  direction to wind the circle
+         * @return           new circular Path
+         */
+        fun Circle(
+            centerX: Float,
+            centerY: Float,
+            radius: Float,
+            direction: PathDirection = PathDirection.CLOCKWISE
+        ): Path {
+            Stats.onNativeCall()
+            val result = _nMakeFromCircle(centerX, centerY, radius, direction.ordinal)
+            require(result != NullPointer) { "Failed to create Path from circle" }
+            return Path(result)
+        }
+
+        /**
+         * Creates a rounded rectangle path.
+         *
+         * @param rrect      rounded rectangle
+         * @param direction  direction to wind the rounded rectangle
+         * @param startIndex starting point index
+         * @return           new rounded rectangle Path
+         */
+        fun RRect(
+            rrect: RRect,
+            direction: PathDirection = PathDirection.CLOCKWISE,
+            startIndex: Int = if (direction == PathDirection.CLOCKWISE) 6 else 7
+        ): Path {
+            Stats.onNativeCall()
+            return interopScope {
+                val result = _nMakeFromRRect(toInterop(rrect.radii), rrect.left, rrect.top, rrect.right, rrect.bottom, direction.ordinal, startIndex)
+                require(result != NullPointer) { "Failed to create Path from rounded rectangle" }
+                Path(result)
+            }
+        }
+
+        /**
+         * Creates a rounded rectangle path from bounds and corner radii.
+         *
+         * @param bounds     rectangle bounds
+         * @param rx         x-axis radius of corners
+         * @param ry         y-axis radius of corners
+         * @param direction  direction to wind the rounded rectangle
+         * @return           new rounded rectangle Path
+         */
+        fun RRect(
+            bounds: Rect,
+            rx: Float,
+            ry: Float,
+            direction: PathDirection = PathDirection.CLOCKWISE
+        ): Path {
+            Stats.onNativeCall()
+            val result = _nMakeFromRRectXY(bounds.left, bounds.top, bounds.right, bounds.bottom, rx, ry, direction.ordinal)
+            require(result != NullPointer) { "Failed to create Path from rounded rectangle" }
+            return Path(result)
+        }
+
+        /**
+         * Creates a polygon path from an array of points.
+         *
+         * @param pts        array of polygon vertices
+         * @param isClosed   whether to close the polygon
+         * @param fillType   fill type for the path
+         * @param isVolatile whether the path is volatile
+         * @return           new polygon Path
+         */
+        fun Polygon(
+            pts: Array<Point>,
+            isClosed: Boolean,
+            fillType: PathFillMode = PathFillMode.WINDING,
+            isVolatile: Boolean = false
+        ): Path {
+            Stats.onNativeCall()
+            val ptsFlat = FloatArray(pts.size * 2)
+            for (i in pts.indices) {
+                ptsFlat[i * 2] = pts[i].x
+                ptsFlat[i * 2 + 1] = pts[i].y
+            }
+            return interopScope {
+                val result = _nMakeFromPolygon(toInterop(ptsFlat), pts.size, isClosed, fillType.ordinal, isVolatile)
+                require(result != NullPointer) { "Failed to create Path from polygon" }
+                Path(result)
+            }
+        }
+
+        /**
+         * Creates a simple line path between two points.
+         *
+         * @param p0 start point
+         * @param p1 end point
+         * @return   new line Path
+         */
+        fun Line(p0: Point, p1: Point): Path {
+            return Polygon(arrayOf(p0, p1), false)
         }
 
         /**
@@ -185,16 +374,13 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
 
         /**
-         *
-         * Initializes Path from byte buffer. Returns null if the buffer is
+         * Initializes Path from byte buffer. Throws exception if the buffer
          * data is inconsistent, or the length is too small.
-         *
          *
          * Reads [PathFillMode], verb array, Point array, conic weight, and
          * additionally reads computed information like path convexity and bounds.
          *
-         *
-         * Used only in concert with [];
+         * Used only in concert with [serializeToBytes];
          * the format used for Path in memory is not guaranteed.
          *
          * @param data  storage for Path
@@ -249,14 +435,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     }
 
     /**
-     *
      * Returns true if Path contain equal verbs and equal weights.
      * If Path contain one or more conics, the weights must match.
      *
-     *
-     * [.conicTo] may add different verbs
-     * depending on conic weight, so it is not trivial to interpolate a pair of Path
-     * containing conics with different conic weight values.
+     * conicTo may add different verbs depending on conic weight, so it is not
+     * trivial to interpolate a pair of Path containing conics with different
+     * conic weight values.
      *
      * @param compare  Path to compare
      * @return         true if Path verb array and weights are equivalent
@@ -317,6 +501,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
     }
 
+    /**
+     * Returns the path's fill type. This defines how "inside" is computed.
+     * The default value is [PathFillMode.WINDING].
+     *
+     * @return  this path's [PathFillMode]
+     */
     var fillMode: PathFillMode
         get() = try {
             Stats.onNativeCall()
@@ -391,12 +581,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
 
 
     /**
-     *
      * Returns if Path is empty.
      *
-     *
      * Empty Path may have FillMode but has no [Point], [PathVerb], or conic weight.
-     * [] constructs empty Path; [.reset] and [.rewind] make Path empty.
+     * [Path] constructor constructs empty Path.
      *
      * @return  true if the path contains no Verb array
      */
@@ -409,11 +597,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
 
     /**
-     *
      * Returns if contour is closed.
      *
-     *
-     * Contour is closed if Path Verb array was last modified by [.closePath]. When stroked,
+     * Contour is closed if Path Verb array was last modified by close verb. When stroked,
      * closed contour draws [PaintStrokeJoin] instead of [PaintStrokeCap] at first and last Point.
      *
      * @return  true if the last contour ends with a [PathVerb.CLOSE]
@@ -651,6 +837,13 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         } finally {
             reachabilityBarrier(this)
         }
+    /**
+     * Returns all verbs in Path.
+     *
+     * @return  Array containing all Path verbs
+     *
+     * @see [https://fiddle.skia.org/c/@Path_getVerbs](https://fiddle.skia.org/c/@Path_getVerbs)
+     */
     val verbs: Array<PathVerb?>
         get() {
             val res = arrayOfNulls<PathVerb>(verbsCount)
@@ -688,9 +881,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     /**
      * Returns the approximate byte size of the Path in memory.
      *
-     * @return  approximate size
+     * @return  approximate size in bytes
      */
-    val approximateBytesUsed: NativePointer
+    val approximateBytesUsed: Long
         get() = try {
             Stats.onNativeCall()
             _nApproximateBytesUsed(_ptr)
@@ -743,13 +936,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
 
     /**
+     * Updates internal bounds so that subsequent calls to [bounds] are instantaneous.
+     * Unaltered copies of Path may also access cached bounds through [bounds].
      *
-     * Updates internal bounds so that subsequent calls to [.getBounds] are instantaneous.
-     * Unaltered copies of Path may also access cached bounds through [.getBounds].
-     *
-     *
-     * For now, identical to calling [.getBounds] and ignoring the returned value.
-     *
+     * For now, identical to calling [bounds] and ignoring the returned value.
      *
      * Call to prepare Path subsequently drawn from multiple threads,
      * to avoid a race condition where each draw separately computes the bounds.
@@ -763,20 +953,18 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     }
 
     /**
-     *
      * Returns minimum and maximum axes values of the lines and curves in Path.
      * Returns (0, 0, 0, 0) if Path contains no points.
      * Returned bounds width and height may be larger or smaller than area affected
      * when Path is drawn.
      *
-     *
      * Includes Point associated with [PathVerb.MOVE] that define empty
      * contours.
      *
-     * Behaves identically to [.getBounds] when Path contains
+     * Behaves identically to [bounds] when Path contains
      * only lines. If Path contains curves, computed bounds includes
-     * the maximum extent of the quad, conic, or cubic; is slower than [.getBounds];
-     * and unlike [.getBounds], does not cache the result.
+     * the maximum extent of the quad, conic, or cubic; is slower than [bounds];
+     * and unlike [bounds], does not cache the result.
      *
      * @return  tight bounds of curves in Path
      *
@@ -908,14 +1096,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     }
 
     /**
-     *
      * Writes text representation of Path to standard output. The representation may be
      * directly compiled as C++ code. Floating point values are written
      * in hexadecimal to preserve their exact bit pattern. The output reconstructs the
      * original Path.
      *
-     *
-     * Use instead of [] when submitting
+     * Use instead of [dump] when precision is important.
      *
      * @return  this
      *
@@ -928,15 +1114,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     }
 
     /**
-     *
      * Writes Path to byte buffer.
-     *
      *
      * Writes [PathFillMode], verb array, Point array, conic weight, and
      * additionally writes computed information like path convexity and bounds.
      *
-     *
-     * Use only be used in concert with [];
+     * Use only in concert with [makeFromBytes];
      * the format used for Path in memory is not guaranteed.
      *
      * @return  serialized Path; length always a multiple of 4
@@ -1021,6 +1204,50 @@ private external fun Path_nSwap(ptr: NativePointer, otherPtr: NativePointer)
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetGenerationId")
 private external fun Path_nGetGenerationId(ptr: NativePointer): Int
 
+@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromRaw")
+private external fun _nMakeFromRaw(
+    pts: InteropPointer, ptsCount: Int,
+    verbs: InteropPointer, verbsCount: Int,
+    conicWeights: InteropPointer, conicWeightsCount: Int,
+    fillType: Int, isVolatile: Boolean
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromRect")
+private external fun _nMakeFromRect(
+    left: Float, top: Float, right: Float, bottom: Float,
+    fillType: Int, direction: Int, startIndex: Int
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromOval")
+private external fun _nMakeFromOval(
+    left: Float, top: Float, right: Float, bottom: Float,
+    direction: Int, startIndex: Int
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromCircle")
+private external fun _nMakeFromCircle(
+    centerX: Float, centerY: Float, radius: Float, direction: Int
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromRRect")
+private external fun _nMakeFromRRect(
+    radii: InteropPointer,
+    left: Float, top: Float, right: Float, bottom: Float,
+    direction: Int, startIndex: Int
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromRRectXY")
+private external fun _nMakeFromRRectXY(
+    left: Float, top: Float, right: Float, bottom: Float,
+    rx: Float, ry: Float, direction: Int
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromPolygon")
+private external fun _nMakeFromPolygon(
+    pts: InteropPointer, ptsCount: Int,
+    isClosed: Boolean, fillType: Int, isVolatile: Boolean
+): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromSVGString")
 private external fun _nMakeFromSVGString(svg: InteropPointer): NativePointer
 
@@ -1103,7 +1330,7 @@ private external fun _nCountVerbs(ptr: NativePointer): Int
 private external fun _nGetVerbs(ptr: NativePointer, verbs: InteropPointer, max: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nApproximateBytesUsed")
-private external fun _nApproximateBytesUsed(ptr: NativePointer): NativePointer
+private external fun _nApproximateBytesUsed(ptr: NativePointer): Long
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetBounds")
 private external fun _nGetBounds(ptr: NativePointer, rect: InteropPointer)
