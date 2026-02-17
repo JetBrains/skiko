@@ -12,6 +12,11 @@ import org.jetbrains.skia.impl.interopScope
 class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
 
+        fun makeMode(mode: BlendMode): Blender {
+            Stats.onNativeCall()
+            return Blender(_nMakeMode(mode.ordinal))
+        }
+
         fun makeArithmetic(
             k1: Float,
             k2: Float,
@@ -45,3 +50,6 @@ private external fun _nMakeArithmetic(
     k4: Float,
     enforcePMColor: Boolean
 ): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Blender__1nMakeMode")
+private external fun _nMakeMode(mode: Int): NativePointer
