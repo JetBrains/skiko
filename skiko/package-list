@@ -2979,7 +2979,6 @@ $dokka.location:org.jetbrains.skiko/FrameDispatcher/scheduleFrame/#/PointingToDe
 $dokka.location:org.jetbrains.skiko/FrameLimiter///PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/index.html
 $dokka.location:org.jetbrains.skiko/FrameLimiter/FrameLimiter/#kotlinx.coroutines.CoroutineScope#kotlin.Function0[kotlin.Long]#kotlin.coroutines.SuspendFunction1[kotlin.Long,kotlin.Unit]#kotlin.Function0[kotlin.time.Duration]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/-frame-limiter.html
 $dokka.location:org.jetbrains.skiko/FrameLimiter/awaitNextFrame/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/await-next-frame.html
-$dokka.location:org.jetbrains.skiko/GenericSkikoView///PointingToDeclaration/skiko/org.jetbrains.skiko/-generic-skiko-view/index.html
 $dokka.location:org.jetbrains.skiko/GpuPriority.Auto///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-gpu-priority/-auto/index.html
 $dokka.location:org.jetbrains.skiko/GpuPriority.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/-companion/index.html
 $dokka.location:org.jetbrains.skiko/GpuPriority.Companion/parseOrNull/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/-companion/parse-or-null.html
@@ -3159,7 +3158,6 @@ $dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#org.jetbrains.skiko
 $dokka.location:org.jetbrains.skiko/SkikoUIView/didMoveToWindow/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/did-move-to-window.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/layoutSubviews/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/layout-subviews.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/load/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/load.html
-$dokka.location:org.jetbrains.skiko/SkikoView///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.DARK///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-system-theme/-d-a-r-k/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.LIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-system-theme/-l-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-system-theme/-u-n-k-n-o-w-n/index.html
