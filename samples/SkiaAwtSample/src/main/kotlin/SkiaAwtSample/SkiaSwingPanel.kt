@@ -1,13 +1,16 @@
+@file:OptIn(ExperimentalSkikoApi::class)
+
 package SkiaAwtSample
 
 import org.jetbrains.skiko.ClipComponent
-import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.jetbrains.skiko.SkikoRenderDelegate
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import java.awt.Color
 import java.awt.Component
 import javax.swing.JLayeredPane
 
-class SkiaSwingPanel(skikoView: SkikoView) : JLayeredPane() {
+class SkiaSwingPanel(skikoView: SkikoRenderDelegate) : JLayeredPane() {
     val layer = SkiaSwingLayer(skikoView)
 
     init {
