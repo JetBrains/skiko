@@ -187,16 +187,16 @@ SKIKO_EXPORT void org_jetbrains_skia_Paint__1nSetImageFilter
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nGetBlender
-(KNativePointer ptr) {
-SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
-return reinterpret_cast<KNativePointer>(instance->refBlender().release());
+  (KNativePointer ptr) {
+    SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
+    return reinterpret_cast<KNativePointer>(instance->refBlender().release());
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Paint__1nSetBlender
-        (KNativePointer ptr, KNativePointer filterPtr) {
-SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
-SkBlender* filter = reinterpret_cast<SkBlender*>((filterPtr));
-instance->setBlender(sk_ref_sp<SkBlender>(filter));
+  (KNativePointer ptr, KNativePointer filterPtr) {
+    SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
+    SkBlender* filter = reinterpret_cast<SkBlender*>((filterPtr));
+    instance->setBlender(sk_ref_sp<SkBlender>(filter));
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Paint__1nGetBlendMode
