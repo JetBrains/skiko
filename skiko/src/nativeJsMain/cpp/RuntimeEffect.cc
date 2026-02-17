@@ -44,7 +44,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeBlender
     SkRuntimeEffect* runtimeEffect = reinterpret_cast<SkRuntimeEffect*>(ptr);
     SkData* uniform = reinterpret_cast<SkData*>(uniformPtr);
 
-    sk_sp<SkBlender> blender = runtimeEffect->makeBlender(uniform);
+    sk_sp<SkBlender> blender = runtimeEffect->makeBlender(sk_ref_sp<SkData>(uniform));
     return reinterpret_cast<KNativePointer>(blender.release());
 }
 
