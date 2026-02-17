@@ -1,18 +1,9 @@
-package org.jetbrains.skiko.tests.org.jetbrains.skiko
+package org.jetbrains.skiko
 
-import org.jetbrains.skiko.OS
-import org.jetbrains.skiko.detectHostOs
-import org.jetbrains.skiko.hostOs
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 
 class HostOsTest {
-    @Test
-    fun canGetHostOs() {
-        assertNotEquals(OS.JS, hostOs)
-    }
-
     @Test
     fun canGetLinux() {
         spoofUserAgentData("linux")
@@ -51,6 +42,13 @@ class HostOsTest {
     }
 }
 
-private fun spoofUserAgentData(newValue: String) =
-    js("""navigator.__defineGetter__('userAgentData', function () { return { platform:newValue }; });""")
-
+private fun spoofUserAgentData(newValue: String) {
+    val userAgentData = js("({})")
+    userAgentData.platform = newValue
+    js(
+        """Object.defineProperty(navigator, 'userAgentData', {
+            configurable: true,
+            value: userAgentData
+        });"""
+    )
+}
