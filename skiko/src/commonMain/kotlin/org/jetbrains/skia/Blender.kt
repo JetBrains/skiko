@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.interopScope
 
 /**
@@ -11,6 +12,9 @@ import org.jetbrains.skia.impl.interopScope
 */
 class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
+        init {
+            staticLoad()
+        }
 
         fun makeMode(mode: BlendMode): Blender {
             Stats.onNativeCall()
