@@ -3,7 +3,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         google()
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        maven("https://redirector.kotlinlang.org/maven/compose-dev")
     }
 
     plugins {

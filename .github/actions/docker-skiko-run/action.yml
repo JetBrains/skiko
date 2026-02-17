@@ -1,0 +1,96 @@
+name: 'Docker Skiko Run'
+description: 'Build Docker image locally if needed and run commands inside it'
+
+inputs:
+  image_name:
+    description: 'Image name (e.g., linux-compat)'
+    required: true
+  command:
+    description: 'Command to run inside the container'
+    required: true
+  working_directory:
+    description: 'Working directory relative to project root (e.g., samples/SkiaAndroidSample)'
+    required: false
+    default: '.'
+  virtual-display:
+    description: 'Enable virtual display for UI testing (enables e2e UI interaction tests with real windows)'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Detect Docker changes'
+      id: filter
+      uses: dorny/paths-filter@v3
+      with:
+        base: ${{ github.event.pull_request.base.sha || github.event.before || 'master' }}
+        filters: |
+          docker_changed:
+            - '.github/actions/docker-skiko-publish/**'
+            - '.github/workflows/docker-publish.yml'
+            - 'skiko/docker/${{ inputs.image_name }}/**'
+
+    - name: 'Set Variables'
+      id: vars
+      shell: bash
+      run: |
+        IMAGE_NAMESPACE="${GITHUB_REPOSITORY,,}"
+        echo "image_namespace=${IMAGE_NAMESPACE}" >> $GITHUB_OUTPUT
+        
+        # Determine which tag to use
+        # github.base_ref is set for PRs regardless of event type (pull_request or workflow_call)
+        if [[ -n "${{ github.base_ref }}" && "${{ steps.filter.outputs.docker_changed }}" != "true" ]]; then
+          # For PRs without docker changes, use the base (target) branch name as the docker tag.
+          # Most of the time it points to an already built-image.
+          TAG="${{ github.base_ref }}"
+        else
+          # For PRs with docker changes or non-PRs, use the current branch name as the docker tag
+          TAG="${GITHUB_REF_NAME}"
+        fi
+        TAG="${TAG//\//-}"
+        
+        # Try to pull image from GHCR
+        # This checks both if the image exists in the registry and loads it into the local daemon
+        if docker pull "ghcr.io/${IMAGE_NAMESPACE}/${{ inputs.image_name }}:${TAG}" >/dev/null 2>&1; then
+          IMAGE_EXISTS="true"
+        else
+          IMAGE_EXISTS="false"
+        fi
+        
+        echo "tag=${TAG}" >> $GITHUB_OUTPUT
+        echo "image_exists=${IMAGE_EXISTS}" >> $GITHUB_OUTPUT
+
+    - name: 'Build Docker image locally (if needed)'
+      if: steps.filter.outputs.docker_changed == 'true' || steps.vars.outputs.image_exists == 'false'
+      uses: ./.github/actions/docker-skiko-publish
+      with:
+        image_name: ${{ inputs.image_name }}
+        tag: ${{ steps.vars.outputs.tag }}
+        load: true
+        should_publish: false
+
+    - name: 'Prepare command'
+      id: cmd
+      shell: bash
+      run: |
+        CMD="${{ inputs.command }}"
+        if [[ "${{ inputs.virtual-display }}" == "true" ]]; then
+          CMD="Xvfb :1 -screen 0 1920x1080x24 -extension RANDR +extension GLX & export DISPLAY=:1.0 && ${CMD}"
+        fi
+        {
+          echo "command<<EOF"
+          echo "${CMD}"
+          echo "EOF"
+        } >> $GITHUB_OUTPUT
+
+    - name: 'Run command in container'
+      shell: bash
+      run: |
+        docker run --rm \
+          -v "${{ github.workspace }}":/workspace \
+          -v "${HOME}/.gradle":/gradle-cache \
+          -e GRADLE_USER_HOME=/gradle-cache \
+          -w /workspace/${{ inputs.working_directory }} \
+          "ghcr.io/${{ steps.vars.outputs.image_namespace }}/${{ inputs.image_name }}:${{ steps.vars.outputs.tag }}" \
+          bash -c '${{ steps.cmd.outputs.command }}'

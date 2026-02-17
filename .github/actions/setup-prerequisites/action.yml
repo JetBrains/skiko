@@ -1,7 +1,19 @@
 name: 'Setup Prerequisites'
+description: 'Shared steps to prepare build environment'
+
 runs:
   using: "composite"
   steps:
+    - name: Free up space on GitHub runner
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        df -h
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        df -h
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
       with:
