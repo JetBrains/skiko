@@ -2905,9 +2905,7 @@ $dokka.location:org.jetbrains.skiko//toBufferedImage/[Error type: Unresolved typ
 $dokka.location:org.jetbrains.skiko//toImage/java.awt.image.BufferedImage#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-image.html
 $dokka.location:org.jetbrains.skiko//transparentWindowBackgroundHack/#[Error type: Unresolved type for GraphicsApi]/PointingToDeclaration/skiko/org.jetbrains.skiko/transparent-window-background-hack.html
 $dokka.location:org.jetbrains.skiko/Arch.Arm64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-arm64/index.html
-$dokka.location:org.jetbrains.skiko/Arch.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-j-s/index.html
 $dokka.location:org.jetbrains.skiko/Arch.Unknown///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-unknown/index.html
-$dokka.location:org.jetbrains.skiko/Arch.WASM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-w-a-s-m/index.html
 $dokka.location:org.jetbrains.skiko/Arch.X64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-x64/index.html
 $dokka.location:org.jetbrains.skiko/Arch///PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/index.html
 $dokka.location:org.jetbrains.skiko/Arch/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/entries.html
@@ -2926,16 +2924,6 @@ $dokka.location:org.jetbrains.skiko/ClipRectangle/height/#/PointingToDeclaration
 $dokka.location:org.jetbrains.skiko/ClipRectangle/width/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-rectangle/width.html
 $dokka.location:org.jetbrains.skiko/ClipRectangle/x/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-rectangle/x.html
 $dokka.location:org.jetbrains.skiko/ClipRectangle/y/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-rectangle/y.html
-$dokka.location:org.jetbrains.skiko/ClipboardManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/index.html
-$dokka.location:org.jetbrains.skiko/ClipboardManager/ClipboardManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/-clipboard-manager.html
-$dokka.location:org.jetbrains.skiko/ClipboardManager/getText/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/get-text.html
-$dokka.location:org.jetbrains.skiko/ClipboardManager/hasText/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/has-text.html
-$dokka.location:org.jetbrains.skiko/ClipboardManager/setText/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/set-text.html
-$dokka.location:org.jetbrains.skiko/Cursor///PointingToDeclaration/skiko/org.jetbrains.skiko/-cursor/index.html
-$dokka.location:org.jetbrains.skiko/CursorManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-cursor-manager/index.html
-$dokka.location:org.jetbrains.skiko/CursorManager/CursorManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-cursor-manager/-cursor-manager.html
-$dokka.location:org.jetbrains.skiko/CursorManager/getCursor/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-cursor-manager/get-cursor.html
-$dokka.location:org.jetbrains.skiko/CursorManager/setCursor/#kotlin.Any?#org.jetbrains.skiko.Cursor/PointingToDeclaration/skiko/org.jetbrains.skiko/-cursor-manager/set-cursor.html
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/-companion/index.html
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger.Companion/fromLevel/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/-companion/from-level.html
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger///PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/index.html
@@ -3019,7 +3007,6 @@ $dokka.location:org.jetbrains.skiko/LibraryLoadException///PointingToDeclaration
 $dokka.location:org.jetbrains.skiko/LibraryLoadException/LibraryLoadException/#kotlin.String#kotlin.Throwable?/PointingToDeclaration/skiko/org.jetbrains.skiko/-library-load-exception/-library-load-exception.html
 $dokka.location:org.jetbrains.skiko/OS.Android///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-android/index.html
 $dokka.location:org.jetbrains.skiko/OS.Ios///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-ios/index.html
-$dokka.location:org.jetbrains.skiko/OS.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-j-s/index.html
 $dokka.location:org.jetbrains.skiko/OS.Linux///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-linux/index.html
 $dokka.location:org.jetbrains.skiko/OS.MacOS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-mac-o-s/index.html
 $dokka.location:org.jetbrains.skiko/OS.Tvos///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-tvos/index.html
@@ -3040,19 +3027,6 @@ $dokka.location:org.jetbrains.skiko/OSVersion/major/#/PointingToDeclaration/ski
 $dokka.location:org.jetbrains.skiko/OSVersion/minor/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/minor.html
 $dokka.location:org.jetbrains.skiko/OSVersion/patch/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/patch.html
 $dokka.location:org.jetbrains.skiko/OSVersion/toString/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/to-string.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursors///PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors/index.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursors/CROSSHAIR/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors/-c-r-o-s-s-h-a-i-r.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursors/DEFAULT/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors/-d-e-f-a-u-l-t.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursors/HAND/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors/-h-a-n-d.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursors/TEXT/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors/-t-e-x-t.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursorsId.CROSSHAIR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-predefined-cursors-id/-c-r-o-s-s-h-a-i-r/index.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursorsId.DEFAULT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-predefined-cursors-id/-d-e-f-a-u-l-t/index.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursorsId.HAND///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-predefined-cursors-id/-h-a-n-d/index.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursorsId.TEXT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-predefined-cursors-id/-t-e-x-t/index.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursorsId///PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors-id/index.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursorsId/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors-id/entries.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursorsId/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors-id/value-of.html
-$dokka.location:org.jetbrains.skiko/PredefinedCursorsId/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors-id/values.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/index.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/SkiaLayer/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/-skia-layer.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#kotlin.Any/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
@@ -3165,9 +3139,6 @@ $dokka.location:org.jetbrains.skiko/SystemTheme///PointingToDeclaration/skiko/o
 $dokka.location:org.jetbrains.skiko/SystemTheme/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/entries.html
 $dokka.location:org.jetbrains.skiko/SystemTheme/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/value-of.html
 $dokka.location:org.jetbrains.skiko/SystemTheme/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/values.html
-$dokka.location:org.jetbrains.skiko/URIManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/index.html
-$dokka.location:org.jetbrains.skiko/URIManager/URIManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/-u-r-i-manager.html
-$dokka.location:org.jetbrains.skiko/URIManager/openUri/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/open-uri.html
 $dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener///PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/index.html
 $dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/WorkaroundSimpleOnGestureListener/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/-workaround-simple-on-gesture-listener.html
 $dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/onFling/#android.view.MotionEvent#android.view.MotionEvent#float#float/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/on-fling.html
