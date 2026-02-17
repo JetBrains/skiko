@@ -58,6 +58,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         } finally {
             reachabilityBarrier(this)
+            reachabilityBarrier(uniforms)
         }
     }
 }
