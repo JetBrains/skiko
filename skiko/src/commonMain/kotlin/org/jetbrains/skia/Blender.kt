@@ -9,7 +9,7 @@ import org.jetbrains.skia.impl.interopScope
 /**
  * Blender represents a custom blend function in the Skia pipeline.  A blender combines a source
  * color (the result of our paint) and destination color (from the canvas) into a final color.
-*/
+ */
 class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         init {
@@ -28,19 +28,17 @@ class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             k4: Float,
             enforcePMColor: Boolean,
         ): Blender {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    Blender(
-                        _nMakeArithmetic(
-                            k1,
-                            k2,
-                            k3,
-                            k4,
-                            enforcePMColor)
-                    )
-                }
-            } finally {
+            Stats.onNativeCall()
+            return interopScope {
+                Blender(
+                    _nMakeArithmetic(
+                        k1,
+                        k2,
+                        k3,
+                        k4,
+                        enforcePMColor,
+                    ),
+                )
             }
         }
     }
