@@ -402,9 +402,9 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontEdging
-(JNIEnv* env, jclass jclass, jlong ptr, jint fontEdging) {
-TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
-instance->setFontEdging(static_cast<SkFont::Edging>(fontEdging));
+  (JNIEnv* env, jclass jclass, jlong ptr, jint fontEdging) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    instance->setFontEdging(static_cast<SkFont::Edging>(fontEdging));
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetSubpixel
@@ -414,9 +414,9 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyl
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetSubpixel
-(JNIEnv* env, jclass jclass, jlong ptr, jboolean subpixel) {
-TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
-instance->setSubpixel(subpixel);
+  (JNIEnv* env, jclass jclass, jlong ptr, jboolean subpixel) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    instance->setSubpixel(subpixel);
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontHinting
