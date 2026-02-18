@@ -96,10 +96,12 @@ class ImageTest {
         return Surface.makeRasterN32Premul(100, 100).use { surface ->
             val paint = Paint()
             paint.color = -0x10000
-            Path().moveTo(20f, 80f)
+            PathBuilder()
+                .moveTo(20f, 80f)
                 .lineTo(50f, 20f)
                 .lineTo(80f, 80f)
                 .closePath()
+                .detach()
                 .use { path ->
                     val canvas = surface.canvas
                     canvas.drawPath(path, paint)

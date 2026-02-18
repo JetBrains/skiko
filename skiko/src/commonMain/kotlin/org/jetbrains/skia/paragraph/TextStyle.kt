@@ -509,7 +509,6 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
-
     val fontMetrics: FontMetrics
         get() = try {
             Stats.onNativeCall()
@@ -529,10 +528,56 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
     fun setPlaceholder(): TextStyle {
-        Stats.onNativeCall()
-        _nSetPlaceholder(_ptr)
+        try {
+            Stats.onNativeCall()
+            _nSetPlaceholder(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
+
+    var fontEdging: FontEdging
+        get() = try {
+            Stats.onNativeCall()
+            FontEdging.entries[_nGetFontEdging(_ptr)]
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetFontEdging(_ptr, value.ordinal)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var subpixel: Boolean
+        get() = try {
+            Stats.onNativeCall()
+            _nGetSubpixel(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetSubpixel(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    var fontHinting: FontHinting
+        get() = try {
+            Stats.onNativeCall()
+            FontHinting.entries[_nGetFontHinting(_ptr)]
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetFontHinting(_ptr, value.ordinal)
+        } finally {
+            reachabilityBarrier(this)
+        }
 
     internal object _FinalizerHolder {
         val PTR = TextStyle_nGetFinalizer()
@@ -688,3 +733,21 @@ private external fun _nIsPlaceholder(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetPlaceholder")
 private external fun _nSetPlaceholder(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontEdging")
+private external fun _nGetFontEdging(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontEdging")
+private external fun _nSetFontEdging(ptr: NativePointer, fontEdging: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetSubpixel")
+private external fun _nGetSubpixel(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetSubpixel")
+private external fun _nSetSubpixel(ptr: NativePointer, subpixel: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontHinting")
+private external fun _nGetFontHinting(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontHinting")
+private external fun _nSetFontHinting(ptr: NativePointer, fontHinting: Int)

@@ -37,9 +37,9 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1n
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetViewBox
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray result) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
-    SkTLazy<SkSVGViewBoxType> viewBox = instance->getViewBox();
-    if (viewBox.isValid()) {
-        skija::Rect::copyToInterop(env, *viewBox.get(), result);
+    std::optional<SkSVGViewBoxType> viewBox = instance->getViewBox();
+    if (viewBox.has_value()) {
+        skija::Rect::copyToInterop(env, viewBox.value(), result);
         return true;
     } else {
         return false;
