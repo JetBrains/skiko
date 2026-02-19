@@ -695,7 +695,7 @@ private external fun _nSetImageFilter(ptr: NativePointer, filterPtr: NativePoint
 private external fun _nGetBlender(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetBlender")
-private external fun _nSetBlender(ptr: NativePointer, shaderPtr: NativePointer)
+private external fun _nSetBlender(ptr: NativePointer, blenderPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nHasNothingToDraw")
 private external fun _nHasNothingToDraw(ptr: NativePointer): Boolean
