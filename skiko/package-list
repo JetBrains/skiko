@@ -1075,6 +1075,10 @@ $dokka.location:org.jetbrains.skia/BlendMode///PointingToDeclaration/skiko/org.
 $dokka.location:org.jetbrains.skia/BlendMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-blend-mode/entries.html
 $dokka.location:org.jetbrains.skia/BlendMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-blend-mode/value-of.html
 $dokka.location:org.jetbrains.skia/BlendMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-blend-mode/values.html
+$dokka.location:org.jetbrains.skia/Blender.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-blender/-companion/index.html
+$dokka.location:org.jetbrains.skia/Blender.Companion/makeArithmetic/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-blender/-companion/make-arithmetic.html
+$dokka.location:org.jetbrains.skia/Blender.Companion/makeMode/#org.jetbrains.skia.BlendMode/PointingToDeclaration/skiko/org.jetbrains.skia/-blender/-companion/make-mode.html
+$dokka.location:org.jetbrains.skia/Blender///PointingToDeclaration/skiko/org.jetbrains.skia/-blender/index.html
 $dokka.location:org.jetbrains.skia/BreakIterator.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/-companion/index.html
 $dokka.location:org.jetbrains.skia/BreakIterator.Companion/DONE/#/PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/-companion/-d-o-n-e.html
 $dokka.location:org.jetbrains.skia/BreakIterator.Companion/WORD_IDEO/#/PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/-companion/-w-o-r-d_-i-d-e-o.html
@@ -2094,6 +2098,7 @@ $dokka.location:org.jetbrains.skia/Paint/Paint/#/PointingToDeclaration/skiko/or
 $dokka.location:org.jetbrains.skia/Paint/alpha/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/alpha.html
 $dokka.location:org.jetbrains.skia/Paint/alphaf/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/alphaf.html
 $dokka.location:org.jetbrains.skia/Paint/blendMode/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/blend-mode.html
+$dokka.location:org.jetbrains.skia/Paint/blender/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/blender.html
 $dokka.location:org.jetbrains.skia/Paint/color/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/color.html
 $dokka.location:org.jetbrains.skia/Paint/color4f/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/color4f.html
 $dokka.location:org.jetbrains.skia/Paint/colorFilter/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/color-filter.html
@@ -2565,9 +2570,11 @@ $dokka.location:org.jetbrains.skia/Region/setRects/#kotlin.Array[org.jetbrains.s
 $dokka.location:org.jetbrains.skia/Region/setRegion/#org.jetbrains.skia.Region/PointingToDeclaration/skiko/org.jetbrains.skia/-region/set-region.html
 $dokka.location:org.jetbrains.skia/Region/translate/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-region/translate.html
 $dokka.location:org.jetbrains.skia/RuntimeEffect.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/-companion/index.html
+$dokka.location:org.jetbrains.skia/RuntimeEffect.Companion/makeForBlender/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/-companion/make-for-blender.html
 $dokka.location:org.jetbrains.skia/RuntimeEffect.Companion/makeForColorFilter/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/-companion/make-for-color-filter.html
 $dokka.location:org.jetbrains.skia/RuntimeEffect.Companion/makeForShader/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/-companion/make-for-shader.html
 $dokka.location:org.jetbrains.skia/RuntimeEffect///PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/index.html
+$dokka.location:org.jetbrains.skia/RuntimeEffect/makeBlender/#org.jetbrains.skia.Data?/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/make-blender.html
 $dokka.location:org.jetbrains.skia/RuntimeEffect/makeShader/#org.jetbrains.skia.Data?#kotlin.Array[org.jetbrains.skia.Shader?]?#org.jetbrains.skia.Matrix33?/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/make-shader.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/-companion/index.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder///PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/index.html
