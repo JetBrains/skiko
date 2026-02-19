@@ -193,10 +193,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nGetBlender
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Paint__1nSetBlender
-  (KNativePointer ptr, KNativePointer filterPtr) {
+  (KNativePointer ptr, KNativePointer blenderPtr) {
     SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
-    SkBlender* filter = reinterpret_cast<SkBlender*>((filterPtr));
-    instance->setBlender(sk_ref_sp<SkBlender>(filter));
+    SkBlender* blender = reinterpret_cast<SkBlender*>((blenderPtr));
+    instance->setBlender(sk_ref_sp<SkBlender>(blender));
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Paint__1nGetBlendMode

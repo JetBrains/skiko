@@ -190,10 +190,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt__1nGetBlender
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintKt__1nSetBlender
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong filterPtr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong blenderPtr) {
     SkPaint* instance = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(ptr));
-    SkBlender* filter = reinterpret_cast<SkBlender*>(static_cast<uintptr_t>(filterPtr));
-    instance->setBlender(sk_ref_sp<SkBlender>(filter));
+    SkBlender* blender = reinterpret_cast<SkBlender*>(static_cast<uintptr_t>(blenderPtr));
+    instance->setBlender(sk_ref_sp<SkBlender>(blender));
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PaintKt__1nGetBlendMode
