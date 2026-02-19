@@ -6,7 +6,7 @@ jetbrainsRuntime-api = "1.5.0"
 androidGradlePlugin = "7.4.2"
 dokka = "1.9.10"
 
-buildHelpers-publishing = "0.1.18"
+buildHelpers-publishing = "0.1.28"
 githubApi = "1.329"
 gradleDownloadTask = "5.5.0"
 cryptoChecksumPlugin = "1.4.0"
