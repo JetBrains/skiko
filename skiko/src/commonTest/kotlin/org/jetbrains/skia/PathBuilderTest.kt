@@ -44,6 +44,28 @@ class PathBuilderTest {
     }
 
     @Test
+    fun testDetachTwiceWithoutMutationReturnsEmptyPath() {
+        val builder = PathBuilder().moveTo(0f, 0f).lineTo(10f, 10f)
+        val first = builder.detach()
+        assertEquals(2, first.pointsCount)
+
+        val second = builder.detach()
+        assertEquals(0, second.pointsCount)
+    }
+
+    @Test
+    fun testDetachAfterMutationIsAllowed() {
+        val builder = PathBuilder().moveTo(0f, 0f).lineTo(10f, 10f)
+
+        val first = builder.detach()
+        assertEquals(2, first.pointsCount)
+
+        val second = builder.moveTo(5f, 5f).lineTo(6f, 6f).detach()
+        assertEquals(2, second.pointsCount)
+        assertEquals(Point(5f, 5f), second.getPoint(0))
+    }
+
+    @Test
     fun testSetFillType() {
         val path = PathBuilder()
             .setFillType(PathFillMode.INVERSE_WINDING)
