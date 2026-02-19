@@ -39,6 +39,24 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilt
     return reinterpret_cast<KNativePointer>(result);
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeBlender
+(KNativePointer ptr, KNativePointer uniformPtr) {
+    SkRuntimeEffect* runtimeEffect = reinterpret_cast<SkRuntimeEffect*>(ptr);
+    SkData* uniform = reinterpret_cast<SkData*>(uniformPtr);
+
+    sk_sp<SkBlender> blender = runtimeEffect->makeBlender(sk_ref_sp<SkData>(uniform));
+    return reinterpret_cast<KNativePointer>(blender.release());
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForBlender
+    (KInteropPointer sksl) {
+    SkString skslProper = skString(sksl);
+    SkRuntimeEffect::Result* result = new SkRuntimeEffect::Result {
+            SkRuntimeEffect::MakeForBlender(skslProper)
+    };
+    return reinterpret_cast<KNativePointer>(result);
+}
+
 // Result
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1Result_nGetPtr
   (KNativePointer ptr) {

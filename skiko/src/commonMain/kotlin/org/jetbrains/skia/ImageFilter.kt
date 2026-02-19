@@ -3,6 +3,19 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.*
 
+/**
+ *  Base class for image filters. If one is installed in the paint, then all drawing occurs as
+ *  usual, but it is as if the drawing happened into an offscreen (before the xfermode is applied).
+ *  This offscreen bitmap will then be handed to the imagefilter, who in turn creates a new bitmap
+ *  which is what will finally be drawn to the device (using the original xfermode).
+ *
+ *  The local space of image filters matches the local space of the drawn geometry. For instance if
+ *  there is rotation on the canvas, the blur will be computed along those rotated axes and not in
+ *  the device space. In order to achieve this result, the actual drawing of the geometry may happen
+ *  in an unrotated coordinate system so that the filtered image can be computed more easily, and
+ *  then it will be post transformed to match what would have been produced if the geometry were
+ *  drawn with the total canvas matrix to begin with.
+ */
 class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
 
