@@ -367,6 +367,25 @@ class PathBuilderTest {
     }
 
     @Test
+    fun testOffsetAndTransform() {
+        val offsetPath = PathBuilder()
+            .moveTo(1f, 2f)
+            .lineTo(3f, 4f)
+            .offset(5f, 6f)
+            .detach()
+        assertEquals(Point(6f, 8f), offsetPath.getPoint(0))
+        assertEquals(Point(8f, 10f), offsetPath.getPoint(1))
+
+        val transformedPath = PathBuilder()
+            .moveTo(1f, 2f)
+            .lineTo(3f, 4f)
+            .transform(Matrix33.makeScale(2f, 3f))
+            .detach()
+        assertEquals(Point(2f, 6f), transformedPath.getPoint(0))
+        assertEquals(Point(6f, 12f), transformedPath.getPoint(1))
+    }
+
+    @Test
     fun testSetLastPt() {
         val path = PathBuilder()
             .moveTo(0f, 0f)

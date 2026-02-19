@@ -783,6 +783,42 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 
     /**
+     * Offsets all points in this builder by (dx, dy).
+     *
+     * @param dx offset on x-axis
+     * @param dy offset on y-axis
+     * @return this builder for chaining
+     */
+    fun offset(dx: Float, dy: Float): PathBuilder {
+        return try {
+            Stats.onNativeCall()
+            PathBuilder_nOffset(_ptr, dx, dy)
+            this
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
+    /**
+     * Transforms this builder by matrix.
+     *
+     * @param matrix transform to apply
+     * @return this builder for chaining
+     */
+    fun transform(matrix: Matrix33): PathBuilder {
+        return try {
+            Stats.onNativeCall()
+            interopScope {
+                PathBuilder_nTransform(_ptr, toInterop(matrix.mat))
+            }
+            this
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(matrix)
+        }
+    }
+
+    /**
      * Sets last point to (x, y).
      * 
      * @param x x-coordinate
@@ -901,3 +937,9 @@ private external fun PathBuilder_nAddPathTransform(ptr: NativePointer, srcPtr: N
 
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nSetLastPt")
 private external fun PathBuilder_nSetLastPt(ptr: NativePointer, x: Float, y: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nOffset")
+private external fun PathBuilder_nOffset(ptr: NativePointer, dx: Float, dy: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nTransform")
+private external fun PathBuilder_nTransform(ptr: NativePointer, matrix: InteropPointer)
