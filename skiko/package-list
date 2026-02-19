@@ -2241,6 +2241,7 @@ $dokka.location:org.jetbrains.skia/PathBuilder/lineTo/#kotlin.Float#kotlin.Float
 $dokka.location:org.jetbrains.skia/PathBuilder/lineTo/#org.jetbrains.skia.Point/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/line-to.html
 $dokka.location:org.jetbrains.skia/PathBuilder/moveTo/#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/move-to.html
 $dokka.location:org.jetbrains.skia/PathBuilder/moveTo/#org.jetbrains.skia.Point/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/move-to.html
+$dokka.location:org.jetbrains.skia/PathBuilder/offset/#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/offset.html
 $dokka.location:org.jetbrains.skia/PathBuilder/quadTo/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/quad-to.html
 $dokka.location:org.jetbrains.skia/PathBuilder/quadTo/#org.jetbrains.skia.Point#org.jetbrains.skia.Point/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/quad-to.html
 $dokka.location:org.jetbrains.skia/PathBuilder/rConicTo/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/r-conic-to.html
@@ -2255,6 +2256,7 @@ $dokka.location:org.jetbrains.skia/PathBuilder/setLastPt/#kotlin.Float#kotlin.Fl
 $dokka.location:org.jetbrains.skia/PathBuilder/snapshot/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/snapshot.html
 $dokka.location:org.jetbrains.skia/PathBuilder/tangentArcTo/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/tangent-arc-to.html
 $dokka.location:org.jetbrains.skia/PathBuilder/tangentArcTo/#org.jetbrains.skia.Point#org.jetbrains.skia.Point#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/tangent-arc-to.html
+$dokka.location:org.jetbrains.skia/PathBuilder/transform/#org.jetbrains.skia.Matrix33/PointingToDeclaration/skiko/org.jetbrains.skia/-path-builder/transform.html
 $dokka.location:org.jetbrains.skia/PathDirection.CLOCKWISE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-direction/-c-l-o-c-k-w-i-s-e/index.html
 $dokka.location:org.jetbrains.skia/PathDirection.COUNTER_CLOCKWISE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-direction/-c-o-u-n-t-e-r_-c-l-o-c-k-w-i-s-e/index.html
 $dokka.location:org.jetbrains.skia/PathDirection///PointingToDeclaration/skiko/org.jetbrains.skia/-path-direction/index.html
