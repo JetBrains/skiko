@@ -448,14 +448,17 @@ class Paint : Managed {
         }
 
     /**
-     * @param blender  how geometry is filled with color; if null, color is used instead
+     * Returns the user-supplied blend function, if one has been set.
      *
-     * @see [https://fiddle.skia.org/c/@Color_Filter_Methods](https://fiddle.skia.org/c/@Color_Filter_Methods)
+     * A null blender signifies the default SrcOver behavior.
      *
-     * @see [https://fiddle.skia.org/c/@Paint_setShader](https://fiddle.skia.org/c/@Paint_setShader)
+     * For convenience, you can call [blendMode] if the blend effect can be expressed
+     * as one of those values.
      *
-     * @return  [Shader] or null
-     * @see [https://fiddle.skia.org/c/@Paint_refShader](https://fiddle.skia.org/c/@Paint_refShader)
+     * @see [https://fiddle.skia.org/c/@Paint_setBlender](https://fiddle.skia.org/c/@Paint_setBlender)
+     * @see [https://fiddle.skia.org/c/@Paint_refBlender](https://fiddle.skia.org/c/@Paint_refBlender)
+     *
+     * @return  the [Blender] assigned to this paint, otherwise null
      */
     var blender: Blender?
         get() = try {
