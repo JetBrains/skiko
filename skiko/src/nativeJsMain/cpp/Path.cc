@@ -217,21 +217,6 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Path__1nIsRect
     }
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_Path__1nOffset
-  (KNativePointer ptr, KFloat dx, KFloat dy, KNativePointer dstPtr) {
-    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
-    SkPath* dst = reinterpret_cast<SkPath*>((dstPtr));
-    *dst = instance->makeOffset(dx, dy);
-}
-
-SKIKO_EXPORT void org_jetbrains_skia_Path__1nTransform
-  (KNativePointer ptr, KFloat* matrixArr, KNativePointer dstPtr) {
-    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
-    SkPath* dst = reinterpret_cast<SkPath*>((dstPtr));
-    std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
-    *dst = instance->makeTransform(*matrix);
-}
-
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Path__1nGetLastPt
   (KNativePointer ptr, KInteropPointer resultArray) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
@@ -416,4 +401,199 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromPolygon
     
     SkPath* instance = new SkPath(path);
     return reinterpret_cast<KNativePointer>(instance);
+}
+
+// ================ DEPRECATED ================
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nReset(KNativePointer ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->reset();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nRewind(KNativePointer ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->rewind();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nUpdateBoundsCache(KNativePointer ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->updateBoundsCache();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nIncReserve(KNativePointer ptr, int extraPtCount) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->incReserve(extraPtCount);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nMoveTo(KNativePointer ptr, KFloat x, KFloat y) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->moveTo(x, y);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nRMoveTo(KNativePointer ptr, KFloat dx, KFloat dy) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->rMoveTo(dx, dy);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nLineTo(KNativePointer ptr, KFloat x, KFloat y) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->lineTo(x, y);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nRLineTo(KNativePointer ptr, KFloat dx, KFloat dy) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->rLineTo(dx, dy);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nQuadTo(KNativePointer ptr, KFloat x1, KFloat y1, KFloat x2, KFloat y2) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->quadTo(x1, y1, x2, y2);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nRQuadTo(KNativePointer ptr, KFloat dx1, KFloat dy1, KFloat dx2, KFloat dy2) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->rQuadTo(dx1, dy1, dx2, dy2);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nConicTo(KNativePointer ptr, KFloat x1, KFloat y1, KFloat x2, KFloat y2, KFloat w) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->conicTo(x1, y1, x2, y2, w);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nRConicTo(KNativePointer ptr, KFloat dx1, KFloat dy1, KFloat dx2, KFloat dy2, KFloat w) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->rConicTo(dx1, dy1, dx2, dy2, w);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nCubicTo(KNativePointer ptr, KFloat x1, KFloat y1, KFloat x2, KFloat y2, KFloat x3, KFloat y3) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->cubicTo(x1, y1, x2, y2, x3, y3);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nRCubicTo(KNativePointer ptr, KFloat dx1, KFloat dy1, KFloat dx2, KFloat dy2, KFloat dx3, KFloat dy3) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->rCubicTo(dx1, dy1, dx2, dy2, dx3, dy3);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nArcTo(KNativePointer ptr, KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat startAngle, KFloat sweepAngle, KBoolean forceMoveTo) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->arcTo({left, top, right, bottom}, startAngle, sweepAngle, forceMoveTo);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nTangentArcTo(KNativePointer ptr, KFloat x1, KFloat y1, KFloat x2, KFloat y2, KFloat radius) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->arcTo(x1, y1, x2, y2, radius);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nEllipticalArcTo(KNativePointer ptr, KFloat rx, KFloat ry, KFloat xAxisRotate, KInt size, KInt direction, KFloat x, float y) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->arcTo(rx, ry, xAxisRotate, static_cast<SkPath::ArcSize>(size), static_cast<SkPathDirection>(direction), x, y);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nREllipticalArcTo(KNativePointer ptr, KFloat rx, KFloat ry, KFloat xAxisRotate, KInt size, KInt direction, KFloat dx, float dy) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->rArcTo(rx, ry, xAxisRotate, static_cast<SkPath::ArcSize>(size), static_cast<SkPathDirection>(direction), dx, dy);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nClosePath(KNativePointer ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->close();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddRect
+  (KNativePointer ptr, KFloat l, KFloat t, KFloat r, KFloat b, KInt dirInt, KInt start) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkPathDirection dir = static_cast<SkPathDirection>(dirInt);
+    instance->addRect({l, t, r, b}, dir, start);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddOval
+  (KNativePointer ptr, KFloat l, KFloat t, KFloat r, KFloat b, KInt dirInt, KInt start) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkPathDirection dir = static_cast<SkPathDirection>(dirInt);
+    instance->addOval({l, t, r, b}, dir, start);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddCircle
+  (KNativePointer ptr, KFloat x, KFloat y, KFloat r, KInt dirInt) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkPathDirection dir = static_cast<SkPathDirection>(dirInt);
+    instance->addCircle(x, y, r, dir);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddArc
+  (KNativePointer ptr, KFloat l, KFloat t, KFloat r, KFloat b, KFloat startAngle, KFloat sweepAngle) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->addArc({l, t, r, b}, startAngle, sweepAngle);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddRRect
+  (KNativePointer ptr, KFloat l, KFloat t, KFloat r, KFloat b, KFloat* radii, KInt radiiSize, KInt dirInt, KInt start) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkRRect rrect = skija::RRect::toSkRRect(l, t, r, b, radii, radiiSize);
+    SkPathDirection dir = static_cast<SkPathDirection>(dirInt);
+    instance->addRRect(rrect, dir, start);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddPoly
+  (KNativePointer ptr, KFloat* coords, KInt count, KBoolean close) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->addPoly({reinterpret_cast<SkPoint*>(coords), count}, close);
+}
+
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddPath
+  (KNativePointer ptr, KNativePointer srcPtr, KBoolean extend) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkPath* src = reinterpret_cast<SkPath*>((srcPtr));
+    SkPath::AddPathMode mode = extend ? SkPath::AddPathMode::kExtend_AddPathMode : SkPath::AddPathMode::kAppend_AddPathMode;
+    instance->addPath(*src, mode);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddPathOffset
+  (KNativePointer ptr, KNativePointer srcPtr, KFloat dx, KFloat dy, KBoolean extend) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkPath* src = reinterpret_cast<SkPath*>((srcPtr));
+    SkPath::AddPathMode mode = extend ? SkPath::AddPathMode::kExtend_AddPathMode : SkPath::AddPathMode::kAppend_AddPathMode;
+    instance->addPath(*src, dx, dy, mode);
+}
+
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nAddPathTransform
+  (KNativePointer ptr, KNativePointer srcPtr, KFloat* matrixArr, KBoolean extend) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkPath* src = reinterpret_cast<SkPath*>((srcPtr));
+    std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
+    SkPath::AddPathMode mode = extend ? SkPath::AddPathMode::kExtend_AddPathMode : SkPath::AddPathMode::kAppend_AddPathMode;
+    instance->addPath(*src, *matrix, mode);
+}
+
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nReverseAddPath
+  (KNativePointer ptr, KNativePointer srcPtr) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkPath* src = reinterpret_cast<SkPath*>((srcPtr));
+    instance->reverseAddPath(*src);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nOffset
+  (KNativePointer ptr, KFloat dx, KFloat dy, KNativePointer dstPtr) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkPath* dst = reinterpret_cast<SkPath*>((dstPtr));
+    *dst = instance->makeOffset(dx, dy);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nTransform
+  (KNativePointer ptr, KFloat* matrixArr, KNativePointer dstPtr, KBoolean pcBool) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    SkPath* dst = reinterpret_cast<SkPath*>((dstPtr));
+    std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
+    // SkApplyPerspectiveClip is deleted on skia side, ignore
+    instance->transform(*matrix, dst);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nSetLastPt
+  (KNativePointer ptr, KFloat x, KFloat y) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->setLastPt(x, y);
 }
