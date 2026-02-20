@@ -1,0 +1,68 @@
+package org.jetbrains.skia
+
+import org.jetbrains.skiko.tests.runTest
+import kotlin.test.Test
+
+@Suppress("DEPRECATION_ERROR")
+class PathMutatingMethodsCompatTest {
+    @Test
+    fun restoredMutatingMethodsAreCallable() = runTest {
+        val path = Path()
+        val src = PathBuilder().moveTo(0f, 0f).lineTo(10f, 10f).detach()
+        val dst = Path()
+
+        val point1 = Point(1f, 2f)
+        val point2 = Point(3f, 4f)
+        val point3 = Point(5f, 6f)
+        val oval = Rect.makeLTRB(0f, 0f, 20f, 30f)
+        val rrect = RRect.makeLTRB(0f, 0f, 20f, 30f, 4f)
+        val matrix = Matrix33.makeTranslate(7f, 8f)
+        val radii = floatArrayOf(1f, 1f, 2f, 2f, 3f, 3f, 4f, 4f)
+
+        path.reset()
+        path.rewind()
+        path.incReserve(8)
+        path.moveTo(0f, 0f)
+        path.moveTo(point1)
+        path.rMoveTo(1f, 1f)
+        path.lineTo(2f, 2f)
+        path.lineTo(point2)
+        path.rLineTo(1f, 1f)
+        path.quadTo(1f, 2f, 3f, 4f)
+        path.quadTo(point1, point2)
+        path.rQuadTo(1f, 1f, 2f, 2f)
+        path.conicTo(1f, 2f, 3f, 4f, 0.5f)
+        path.conicTo(point1, point2, 0.5f)
+        path.rConicTo(1f, 1f, 2f, 2f, 0.75f)
+        path.cubicTo(1f, 2f, 3f, 4f, 5f, 6f)
+        path.cubicTo(point1, point2, point3)
+        path.rCubicTo(1f, 1f, 2f, 2f, 3f, 3f)
+        path.arcTo(oval, 0f, 90f, false)
+        path.arcTo(0f, 0f, 20f, 30f, 90f, 45f, true)
+        path.tangentArcTo(1f, 2f, 3f, 4f, 5f)
+        path.tangentArcTo(point1, point2, 6f)
+        path.ellipticalArcTo(10f, 20f, 30f, PathEllipseArc.SMALLER, PathDirection.CLOCKWISE, 40f, 50f)
+        path.ellipticalArcTo(point1, 15f, PathEllipseArc.LARGER, PathDirection.COUNTER_CLOCKWISE, point2)
+        path.rEllipticalArcTo(10f, 20f, 30f, PathEllipseArc.SMALLER, PathDirection.CLOCKWISE, 5f, 6f)
+        path.closePath()
+        path.addRect(oval, PathDirection.CLOCKWISE, 0)
+        path.addRect(0f, 0f, 20f, 30f, PathDirection.COUNTER_CLOCKWISE, 2)
+        path.addOval(oval, PathDirection.CLOCKWISE, 1)
+        path.addOval(0f, 0f, 20f, 30f, PathDirection.COUNTER_CLOCKWISE, 3)
+        path.addCircle(5f, 5f, 4f, PathDirection.CLOCKWISE)
+        path.addArc(oval, 45f, 90f)
+        path.addArc(0f, 0f, 20f, 30f, 10f, 15f)
+        path.addRRect(rrect, PathDirection.CLOCKWISE, 6)
+        path.addRRect(0f, 0f, 20f, 30f, radii, PathDirection.COUNTER_CLOCKWISE, 5)
+        path.addPoly(arrayOf(point1, point2, point3), true)
+        path.addPoly(floatArrayOf(0f, 0f, 1f, 1f, 2f, 2f), false)
+        path.addPath(src, false)
+        path.addPath(src, 1f, 2f, true)
+        path.addPath(src, matrix, false)
+        path.reverseAddPath(src)
+        path.offset(3f, 4f, dst)
+        path.transform(matrix, true)
+        path.transform(matrix, dst, false)
+        path.setLastPt(9f, 10f)
+    }
+}

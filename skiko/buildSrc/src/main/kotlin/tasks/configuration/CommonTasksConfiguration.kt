@@ -66,12 +66,14 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         "-DSK_SUPPORT_OPENCL=0",
         "-DSK_UNICODE_AVAILABLE",
         "-DSK_USING_THIRD_PARTY_ICU",
-        "-DSK_HIDE_PATH_EDIT_METHODS", // Temporary (m144) skia flag for migration to SkPathBuilder
         // For ICU symbols renaming:
         "-DU_DISABLE_RENAMING=0",
         "-DU_DISABLE_VERSION_SUFFIX=1",
         "-DU_HAVE_LIB_SUFFIX=1",
         "-DU_LIB_SUFFIX_C_NAME=_skiko",
+
+        // Temporary (m144) skia flag for migration to SkPathBuilder
+        "-USK_HIDE_PATH_EDIT_METHODS",
         *buildType.flags
     )
 

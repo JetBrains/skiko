@@ -1181,6 +1181,567 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         } finally {
             reachabilityBarrier(this)
         }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun reset(): Path {
+        Stats.onNativeCall()
+        Path_nReset(_ptr)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun rewind(): Path {
+        Stats.onNativeCall()
+        _nRewind(_ptr)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun incReserve(extraPtCount: Int): Path {
+        Stats.onNativeCall()
+        _nIncReserve(_ptr, extraPtCount)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun moveTo(x: Float, y: Float): Path {
+        Stats.onNativeCall()
+        _nMoveTo(_ptr, x, y)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun moveTo(p: Point): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return moveTo(p.x, p.y)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun rMoveTo(dx: Float, dy: Float): Path {
+        Stats.onNativeCall()
+        _nRMoveTo(_ptr, dx, dy)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun lineTo(x: Float, y: Float): Path {
+        Stats.onNativeCall()
+        _nLineTo(_ptr, x, y)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun lineTo(p: Point): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return lineTo(p.x, p.y)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun rLineTo(dx: Float, dy: Float): Path {
+        Stats.onNativeCall()
+        _nRLineTo(_ptr, dx, dy)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun quadTo(x1: Float, y1: Float, x2: Float, y2: Float): Path {
+        Stats.onNativeCall()
+        _nQuadTo(_ptr, x1, y1, x2, y2)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun quadTo(p1: Point, p2: Point): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return quadTo(p1.x, p1.y, p2.x, p2.y)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun rQuadTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float): Path {
+        Stats.onNativeCall()
+        _nRQuadTo(_ptr, dx1, dy1, dx2, dy2)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun conicTo(x1: Float, y1: Float, x2: Float, y2: Float, w: Float): Path {
+        Stats.onNativeCall()
+        _nConicTo(_ptr, x1, y1, x2, y2, w)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun conicTo(p1: Point, p2: Point, w: Float): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return conicTo(p1.x, p1.y, p2.x, p2.y, w)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun rConicTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float): Path {
+        Stats.onNativeCall()
+        _nRConicTo(_ptr, dx1, dy1, dx2, dy2, w)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun cubicTo(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float): Path {
+        Stats.onNativeCall()
+        _nCubicTo(_ptr, x1, y1, x2, y2, x3, y3)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun cubicTo(p1: Point, p2: Point, p3: Point): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return cubicTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun rCubicTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float): Path {
+        Stats.onNativeCall()
+        _nRCubicTo(_ptr, dx1, dy1, dx2, dy2, dx3, dy3)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun arcTo(oval: Rect, startAngle: Float, sweepAngle: Float, forceMoveTo: Boolean): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return arcTo(oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle, forceMoveTo)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun arcTo(left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float, forceMoveTo: Boolean): Path {
+        Stats.onNativeCall()
+        _nArcTo(_ptr, left, top, right, bottom, startAngle, sweepAngle, forceMoveTo)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun tangentArcTo(x1: Float, y1: Float, x2: Float, y2: Float, radius: Float): Path {
+        Stats.onNativeCall()
+        _nTangentArcTo(_ptr, x1, y1, x2, y2, radius)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun tangentArcTo(p1: Point, p2: Point, radius: Float): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return tangentArcTo(p1.x, p1.y, p2.x, p2.y, radius)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun ellipticalArcTo(
+        rx: Float,
+        ry: Float,
+        xAxisRotate: Float,
+        arc: PathEllipseArc,
+        direction: PathDirection,
+        x: Float,
+        y: Float
+    ): Path {
+        Stats.onNativeCall()
+        _nEllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, x, y)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun ellipticalArcTo(r: Point, xAxisRotate: Float, arc: PathEllipseArc, direction: PathDirection, xy: Point): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return ellipticalArcTo(r.x, r.y, xAxisRotate, arc, direction, xy.x, xy.y)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun rEllipticalArcTo(
+        rx: Float,
+        ry: Float,
+        xAxisRotate: Float,
+        arc: PathEllipseArc,
+        direction: PathDirection,
+        dx: Float,
+        dy: Float
+    ): Path {
+        Stats.onNativeCall()
+        _nREllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, dx, dy)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun closePath(): Path {
+        Stats.onNativeCall()
+        _nClosePath(_ptr)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addRect(rect: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 0): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return addRect(rect.left, rect.top, rect.right, rect.bottom, dir, start)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addRect(left: Float, top: Float, right: Float, bottom: Float, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 0): Path {
+        Stats.onNativeCall()
+        _nAddRect(_ptr, left, top, right, bottom, dir.ordinal, start)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addOval(oval: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 1): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return addOval(oval.left, oval.top, oval.right, oval.bottom, dir, start)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addOval(left: Float, top: Float, right: Float, bottom: Float, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 1): Path {
+        Stats.onNativeCall()
+        _nAddOval(_ptr, left, top, right, bottom, dir.ordinal, start)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addCircle(x: Float, y: Float, radius: Float, dir: PathDirection = PathDirection.CLOCKWISE): Path {
+        Stats.onNativeCall()
+        _nAddCircle(_ptr, x, y, radius, dir.ordinal)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addArc(oval: Rect, startAngle: Float, sweepAngle: Float): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return addArc(oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addArc(left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float): Path {
+        Stats.onNativeCall()
+        _nAddArc(_ptr, left, top, right, bottom, startAngle, sweepAngle)
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addRRect(rrect: RRect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 6): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return addRRect(rrect.left, rrect.top, rrect.right, rrect.bottom, rrect.radii, dir, start)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 6): Path {
+        Stats.onNativeCall()
+        interopScope {
+            _nAddRRect(_ptr, left, top, right, bottom, toInterop(radii), radii.size, dir.ordinal, start)
+        }
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addPoly(pts: Array<Point>, close: Boolean): Path {
+        val flat = FloatArray(pts.size * 2)
+        for (i in pts.indices) {
+            flat[i * 2] = pts[i].x
+            flat[i * 2 + 1] = pts[i].y
+        }
+        @Suppress("DEPRECATION_ERROR")
+        return addPoly(flat, close)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addPoly(pts: FloatArray, close: Boolean): Path {
+        require(pts.size % 2 == 0) { "Expected even amount of pts, got " + pts.size }
+        Stats.onNativeCall()
+        interopScope {
+            _nAddPoly(_ptr, toInterop(pts), pts.size / 2, close)
+        }
+        return this
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addPath(src: Path?, extend: Boolean = false): Path {
+        return try {
+            Stats.onNativeCall()
+            _nAddPath(
+                _ptr,
+                getPtr(src),
+                extend
+            )
+            this
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(src)
+        }
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addPath(src: Path?, dx: Float, dy: Float, extend: Boolean = false): Path {
+        return try {
+            Stats.onNativeCall()
+            _nAddPathOffset(
+                _ptr,
+                getPtr(src),
+                dx,
+                dy,
+                extend
+            )
+            this
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(src)
+        }
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun addPath(src: Path?, matrix: Matrix33, extend: Boolean = false): Path {
+        return try {
+            Stats.onNativeCall()
+            interopScope {
+                _nAddPathTransform(
+                    _ptr,
+                    getPtr(src),
+                    toInterop(matrix.mat),
+                    extend
+                )
+            }
+            this
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(src)
+        }
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun reverseAddPath(src: Path?): Path {
+        return try {
+            Stats.onNativeCall()
+            _nReverseAddPath(_ptr, getPtr(src))
+            this
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(src)
+        }
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun offset(dx: Float, dy: Float, dst: Path? = null): Path {
+        return try {
+            Stats.onNativeCall()
+            _nOffset(_ptr, dx, dy, getPtr(dst))
+            this
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(dst)
+        }
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun transform(matrix: Matrix33, applyPerspectiveClip: Boolean): Path {
+        @Suppress("DEPRECATION_ERROR")
+        return transform(matrix, null, applyPerspectiveClip)
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun transform(matrix: Matrix33, dst: Path? = null, applyPerspectiveClip: Boolean = true): Path {
+        return try {
+            Stats.onNativeCall()
+            interopScope {
+                _nTransform(
+                    _ptr,
+                    toInterop(matrix.mat),
+                    getPtr(dst),
+                    applyPerspectiveClip
+                )
+            }
+            this
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(dst)
+        }
+    }
+
+    @Deprecated(
+        message = "Mutating Path API was moved to PathBuilder in Skia m144",
+        replaceWith = ReplaceWith("PathBuilder"),
+        level = DeprecationLevel.ERROR,
+    )
+    fun setLastPt(x: Float, y: Float): Path {
+        Stats.onNativeCall()
+        _nSetLastPt(_ptr, x, y)
+        return this
+    }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFinalizer")
@@ -1383,3 +1944,140 @@ private external fun _nMakeFromBytes(data: InteropPointer, size: Int): NativePoi
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsValid")
 private external fun _nIsValid(ptr: NativePointer): Boolean
+
+// ================ DEPRECATED ================
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nReset")
+private external fun Path_nReset(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nRewind")
+private external fun _nRewind(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nIncReserve")
+private external fun _nIncReserve(ptr: NativePointer, extraPtCount: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nMoveTo")
+private external fun _nMoveTo(ptr: NativePointer, x: Float, y: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nRMoveTo")
+private external fun _nRMoveTo(ptr: NativePointer, dx: Float, dy: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nLineTo")
+private external fun _nLineTo(ptr: NativePointer, x: Float, y: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nRLineTo")
+private external fun _nRLineTo(ptr: NativePointer, dx: Float, dy: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nQuadTo")
+private external fun _nQuadTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nRQuadTo")
+private external fun _nRQuadTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nConicTo")
+private external fun _nConicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, w: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nRConicTo")
+private external fun _nRConicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nCubicTo")
+private external fun _nCubicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nRCubicTo")
+private external fun _nRCubicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nArcTo")
+private external fun _nArcTo(
+    ptr: NativePointer,
+    left: Float,
+    top: Float,
+    right: Float,
+    bottom: Float,
+    startAngle: Float,
+    sweepAngle: Float,
+    forceMoveTo: Boolean
+)
+
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nTangentArcTo")
+private external fun _nTangentArcTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, radius: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nEllipticalArcTo")
+private external fun _nEllipticalArcTo(
+    ptr: NativePointer,
+    rx: Float,
+    ry: Float,
+    xAxisRotate: Float,
+    size: Int,
+    direction: Int,
+    x: Float,
+    y: Float
+)
+
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nREllipticalArcTo")
+private external fun _nREllipticalArcTo(
+    ptr: NativePointer,
+    rx: Float,
+    ry: Float,
+    xAxisRotate: Float,
+    size: Int,
+    direction: Int,
+    dx: Float,
+    dy: Float
+)
+
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nClosePath")
+private external fun _nClosePath(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nAddRect")
+private external fun _nAddRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nAddOval")
+private external fun _nAddOval(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nAddCircle")
+private external fun _nAddCircle(ptr: NativePointer, x: Float, y: Float, r: Float, dir: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nAddArc")
+private external fun _nAddArc(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, startAngle: Float, sweepAngle: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nAddRRect")
+private external fun _nAddRRect(
+    ptr: NativePointer,
+    l: Float,
+    t: Float,
+    r: Float,
+    b: Float,
+    radii: InteropPointer,
+    size: Int,
+    dir: Int,
+    start: Int
+)
+
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nAddPoly")
+private external fun _nAddPoly(ptr: NativePointer, coords: InteropPointer, count: Int, close: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nAddPath")
+private external fun _nAddPath(ptr: NativePointer, srcPtr: NativePointer, extend: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nAddPathOffset")
+private external fun _nAddPathOffset(ptr: NativePointer, srcPtr: NativePointer, dx: Float, dy: Float, extend: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nAddPathTransform")
+private external fun _nAddPathTransform(ptr: NativePointer, srcPtr: NativePointer, matrix: InteropPointer, extend: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nReverseAddPath")
+private external fun _nReverseAddPath(ptr: NativePointer, srcPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nOffset")
+private external fun _nOffset(ptr: NativePointer, dx: Float, dy: Float, dst: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nTransform")
+private external fun _nTransform(ptr: NativePointer, matrix: InteropPointer, dst: NativePointer, applyPerspectiveClip: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nSetLastPt")
+private external fun _nSetLastPt(ptr: NativePointer, x: Float, y: Float)
+
