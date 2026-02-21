@@ -2,6 +2,7 @@ package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.cutoutFromClip
+import org.jetbrains.skiko.internal.fastForEach
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Component
 import java.awt.Graphics
@@ -45,8 +46,7 @@ open class SkiaSwingLayer(
     private val renderDelegateWithClipping = SkikoRenderDelegate { canvas, width, height, nanoTime ->
         val scale = graphicsConfiguration.defaultTransform.scaleX.toFloat()
         // clipping
-        for (index in clipComponents.indices) {
-            val item = clipComponents[index]
+        clipComponents.fastForEach { item ->
             canvas.cutoutFromClip(item, scale)
         }
         renderDelegate.onRender(canvas, width, height, nanoTime)
