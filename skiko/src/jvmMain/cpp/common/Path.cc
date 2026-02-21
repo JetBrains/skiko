@@ -96,16 +96,6 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nIsRRect(
     }
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt_Path_1nReset(JNIEnv* env, jclass jclass, jlong ptr) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    instance->reset();
-}
-
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nRewind(JNIEnv* env, jclass jclass, jlong ptr) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    instance->rewind();
-}
-
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nIsEmpty(JNIEnv* env, jclass jclass, jlong ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     return instance->isEmpty();
@@ -129,6 +119,12 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt_Path_1nIsVo
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt_Path_1nSetVolatile(JNIEnv* env, jclass jclass, jlong ptr, jboolean isVolatile) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     instance->setIsVolatile(isVolatile);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt_Path_1nSwap(JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    SkPath* other = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(otherPtr));
+    instance->swap(*other);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nIsLineDegenerate(JNIEnv* env, jclass jclass, jfloat x0, jfloat y0, jfloat x1, jfloat y1, jboolean exact) {
@@ -168,7 +164,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nGetPoint(JNI
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetPoints(JNIEnv* env, jclass jclass, jlong ptr, jfloatArray pointsArray, jint max) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     jfloat* points = pointsArray == nullptr ? nullptr : env->GetFloatArrayElements(pointsArray, 0);
-    int count = instance->getPoints(reinterpret_cast<SkPoint*>(points), max);
+    int count = instance->getPoints({reinterpret_cast<SkPoint*>(points), max});
     if (pointsArray != nullptr) {
         env->ReleaseFloatArrayElements(pointsArray, points, 0);
     }
@@ -183,7 +179,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nCountVerbs(J
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetVerbs(JNIEnv* env, jclass jclass, jlong ptr, jbyteArray verbsArray, jint max) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     jbyte* verbs = verbsArray == nullptr ? nullptr : env->GetByteArrayElements(verbsArray, 0);
-    int count = instance->getVerbs(reinterpret_cast<uint8_t *>(verbs), max);
+    int count = instance->getVerbs({reinterpret_cast<uint8_t *>(verbs), max});
     if (verbsArray != nullptr)
         env->ReleaseByteArrayElements(verbsArray, verbs, 0);
     return count;
@@ -191,23 +187,12 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetVerbs(JNI
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nApproximateBytesUsed(JNIEnv* env, jclass jclass, jlong ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    return (jint) instance->approximateBytesUsed();
-}
-
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt_Path_1nSwap(JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    SkPath* other = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(otherPtr));
-    instance->swap(*other);
+    return static_cast<jint>(instance->approximateBytesUsed());
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nGetBounds(JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     skija::Rect::copyToInterop(env, instance->getBounds(), resultArray);
-}
-
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nUpdateBoundsCache(JNIEnv* env, jclass jclass, jlong ptr) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    instance->updateBoundsCache();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nComputeTightBounds(JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
@@ -219,6 +204,253 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nConserva
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     SkRect rect {l, t, r, b};
     return instance->conservativelyContainsRect(rect);
+}
+
+extern "C" JNIEXPORT jint Java_org_jetbrains_skia_PathKt__1nConvertConicToQuads
+  (JNIEnv* env, jclass jclass, jfloat x0, jfloat y0, jfloat x1, jfloat y1, jfloat x2, jfloat y2, jfloat w, jint pow2, jfloatArray resultArray) {
+    jfloat* points = env->GetFloatArrayElements(resultArray, 0);
+    int count = SkPath::ConvertConicToQuads({x0, y0}, {x1, y1}, {x2, y2}, w, reinterpret_cast<SkPoint*>(points), pow2);
+    env->ReleaseFloatArrayElements(resultArray, points, 0);
+    return count;
+}
+
+extern "C" JNIEXPORT jboolean Java_org_jetbrains_skia_PathKt__1nIsRect
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    SkRect rect;
+    if (instance->isRect(&rect)) {
+        skija::Rect::copyToInterop(env, rect, resultArray);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nGetLastPt
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    SkPoint out;
+    if (instance->getLastPt(&out)) {
+        skija::Point::copyToInterop(env, out, resultArray);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetSegmentMasks
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    return instance->getSegmentMasks();
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nContains
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat x, jfloat y) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    return instance->contains(x, y);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nDump
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    instance->dump();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nDumpHex
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    instance->dumpHex();
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nSerializeToBytes
+  (JNIEnv* env, jclass jclass, jlong ptr, jbyteArray dstArray) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    jbyte* dst = dstArray == nullptr ? nullptr : env->GetByteArrayElements(dstArray, 0);
+    size_t count = instance->writeToMemory(reinterpret_cast<void*>(dst));
+    if (dst != nullptr) {
+        env->ReleaseByteArrayElements(dstArray, dst, 0);
+    }
+
+    if (count > std::numeric_limits<jint>::max()) {
+        return -1;
+    } else {
+        return count;
+    }
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeCombining
+  (JNIEnv* env, jclass jclass, jlong aPtr, jlong bPtr, jint jop) {
+    SkPath* a = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(aPtr));
+    SkPath* b = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(bPtr));
+    SkPathOp op = static_cast<SkPathOp>(jop);
+    auto res = std::make_unique<SkPath>();
+    if (Op(*a, *b, op, res.get()))
+        return reinterpret_cast<jlong>(res.release());
+    else
+        return 0;
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromBytes
+  (JNIEnv* env, jclass jclass, jbyteArray bytesArray, jint _size) {
+    int count = env->GetArrayLength(bytesArray);
+    jbyte* bytes = env->GetByteArrayElements(bytesArray, 0);
+    std::optional<SkPath> pathOpt = SkPath::ReadFromMemory(bytes, count);
+    env->ReleaseByteArrayElements(bytesArray, bytes, 0);
+    if (pathOpt.has_value()) {
+        SkPath* instance = new SkPath(pathOpt.value());
+        return reinterpret_cast<jlong>(instance);
+    } else {
+        return 0;
+    }
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt_Path_1nGetGenerationId
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    return instance->getGenerationID();
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nIsValid
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    return instance->isValid();
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromRaw
+  (JNIEnv* env, jclass jclass, jfloatArray ptsArray, jint ptsCount, 
+   jbyteArray verbsArray, jint verbsCount,
+   jfloatArray conicWeightsArray, jint conicWeightsCount,
+   jint fillType, jboolean isVolatile) {
+    jfloat* pts = env->GetFloatArrayElements(ptsArray, 0);
+    jbyte* verbs = env->GetByteArrayElements(verbsArray, 0);
+    jfloat* conicWeights = conicWeightsCount > 0 ? env->GetFloatArrayElements(conicWeightsArray, 0) : nullptr;
+    
+    SkPath path = SkPath::Raw(
+        SkSpan<const SkPoint>(reinterpret_cast<SkPoint*>(pts), ptsCount),
+        SkSpan<const SkPathVerb>(reinterpret_cast<SkPathVerb*>(verbs), verbsCount),
+        SkSpan<const SkScalar>(conicWeights, conicWeightsCount),
+        static_cast<SkPathFillType>(fillType),
+        isVolatile
+    );
+    
+    env->ReleaseFloatArrayElements(ptsArray, pts, 0);
+    env->ReleaseByteArrayElements(verbsArray, verbs, 0);
+    if (conicWeights != nullptr) {
+        env->ReleaseFloatArrayElements(conicWeightsArray, conicWeights, 0);
+    }
+    
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<jlong>(instance);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromRect
+  (JNIEnv* env, jclass jclass, jfloat left, jfloat top, jfloat right, jfloat bottom,
+   jint fillType, jint direction, jint startIndex) {
+    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
+    SkPath path = SkPath::Rect(
+        rect,
+        static_cast<SkPathFillType>(fillType),
+        static_cast<SkPathDirection>(direction),
+        startIndex
+    );
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<jlong>(instance);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromOval
+  (JNIEnv* env, jclass jclass, jfloat left, jfloat top, jfloat right, jfloat bottom,
+   jint direction, jint startIndex) {
+    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
+    SkPath path = SkPath::Oval(
+        rect,
+        static_cast<SkPathDirection>(direction),
+        startIndex
+    );
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<jlong>(instance);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromCircle
+  (JNIEnv* env, jclass jclass, jfloat centerX, jfloat centerY, jfloat radius, jint direction) {
+    SkPath path = SkPath::Circle(
+        centerX,
+        centerY,
+        radius,
+        static_cast<SkPathDirection>(direction)
+    );
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<jlong>(instance);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromRRect
+  (JNIEnv* env, jclass jclass, jfloatArray radiiArray,
+   jfloat left, jfloat top, jfloat right, jfloat bottom,
+   jint direction, jint startIndex) {
+    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
+    jfloat* radii = env->GetFloatArrayElements(radiiArray, 0);
+    
+    SkRRect rrect;
+    rrect.setRectRadii(rect, reinterpret_cast<SkVector*>(radii));
+    
+    SkPath path = SkPath::RRect(
+        rrect,
+        static_cast<SkPathDirection>(direction),
+        startIndex
+    );
+    
+    env->ReleaseFloatArrayElements(radiiArray, radii, 0);
+    
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<jlong>(instance);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromRRectXY
+  (JNIEnv* env, jclass jclass, jfloat left, jfloat top, jfloat right, jfloat bottom,
+   jfloat rx, jfloat ry, jint direction) {
+    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
+    SkPath path = SkPath::RRect(
+        rect,
+        rx,
+        ry,
+        static_cast<SkPathDirection>(direction)
+    );
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<jlong>(instance);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromPolygon
+  (JNIEnv* env, jclass jclass, jfloatArray ptsArray, jint ptsCount,
+   jboolean isClosed, jint fillType, jboolean isVolatile) {
+    jfloat* pts = env->GetFloatArrayElements(ptsArray, 0);
+    
+    SkPath path = SkPath::Polygon(
+        SkSpan<const SkPoint>(reinterpret_cast<SkPoint*>(pts), ptsCount),
+        isClosed,
+        static_cast<SkPathFillType>(fillType),
+        isVolatile
+    );
+    
+    env->ReleaseFloatArrayElements(ptsArray, pts, 0);
+    
+    SkPath* instance = new SkPath(path);
+    return reinterpret_cast<jlong>(instance);
+}
+
+// ================ DEPRECATED ================
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt_Path_1nReset(JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    instance->reset();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nRewind(JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    instance->rewind();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nUpdateBoundsCache(JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    instance->updateBoundsCache();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nIncReserve(JNIEnv* env, jclass jclass, jlong ptr, int extraPtCount) {
@@ -301,26 +533,6 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nClosePath(JN
     instance->close();
 }
 
-extern "C" JNIEXPORT jint Java_org_jetbrains_skia_PathKt__1nConvertConicToQuads
-  (JNIEnv* env, jclass jclass, jfloat x0, jfloat y0, jfloat x1, jfloat y1, jfloat x2, jfloat y2, jfloat w, jint pow2, jfloatArray resultArray) {
-    jfloat* points = env->GetFloatArrayElements(resultArray, 0);
-    int count = SkPath::ConvertConicToQuads({x0, y0}, {x1, y1}, {x2, y2}, w, reinterpret_cast<SkPoint*>(points), pow2);
-    env->ReleaseFloatArrayElements(resultArray, points, 0);
-    return count;
-}
-
-extern "C" JNIEXPORT jboolean Java_org_jetbrains_skia_PathKt__1nIsRect
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    SkRect rect;
-    if (instance->isRect(&rect)) {
-        skija::Rect::copyToInterop(env, rect, resultArray);
-        return true;
-    } else {
-        return false;
-    }
-}
-
 extern "C" JNIEXPORT void Java_org_jetbrains_skia_PathKt__1nAddRect
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jint dirInt, jint start) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
@@ -361,7 +573,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nAddPoly
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     jsize len = env->GetArrayLength(coords);
     jfloat* arr = env->GetFloatArrayElements(coords, 0);
-    instance->addPoly(reinterpret_cast<SkPoint*>(arr), len / 2, close);
+    instance->addPoly({reinterpret_cast<SkPoint*>(arr), len / 2}, close);
     env->ReleaseFloatArrayElements(coords, arr, 0);
 }
 
@@ -401,7 +613,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nOffset
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat dx, jfloat dy, jlong dstPtr) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     SkPath* dst = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(dstPtr));
-    instance->offset(dx, dy, dst);
+    *dst = instance->makeOffset(dx, dy);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nTransform
@@ -409,103 +621,12 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nTransform
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     SkPath* dst = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(dstPtr));
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
-    SkApplyPerspectiveClip pc = pcBool ? SkApplyPerspectiveClip::kYes : SkApplyPerspectiveClip::kNo;
-    instance->transform(*matrix, dst, pc);
-}
-
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nGetLastPt
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    SkPoint out;
-    if (instance->getLastPt(&out)) {
-        skija::Point::copyToInterop(env, out, resultArray);
-        return true;
-    } else {
-        return false;
-    }
+    // SkApplyPerspectiveClip is deleted on skia side, ignore
+    instance->transform(*matrix, dst);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nSetLastPt
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat x, jfloat y) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     instance->setLastPt(x, y);
-}
-
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetSegmentMasks
-  (JNIEnv* env, jclass jclass, jlong ptr) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    return instance->getSegmentMasks();
-}
-
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nContains
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloat x, jfloat y) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    return instance->contains(x, y);
-}
-
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nDump
-  (JNIEnv* env, jclass jclass, jlong ptr) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    instance->dump();
-}
-
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nDumpHex
-  (JNIEnv* env, jclass jclass, jlong ptr) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    instance->dumpHex();
-}
-
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nSerializeToBytes
-  (JNIEnv* env, jclass jclass, jlong ptr, jbyteArray dstArray) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    jbyte* dst = dstArray == nullptr ? nullptr : env->GetByteArrayElements(dstArray, 0);
-    size_t count = instance->writeToMemory(reinterpret_cast<void*>(dst));
-    if (dst != nullptr) {
-        env->ReleaseByteArrayElements(dstArray, dst, 0);
-    }
-
-    if (count > std::numeric_limits<jint>::max()) {
-        return -1;
-    } else {
-        return count;
-    }
-}
-
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeCombining
-  (JNIEnv* env, jclass jclass, jlong aPtr, jlong bPtr, jint jop) {
-    SkPath* a = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(aPtr));
-    SkPath* b = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(bPtr));
-    SkPathOp op = static_cast<SkPathOp>(jop);
-    auto res = std::make_unique<SkPath>();
-    if (Op(*a, *b, op, res.get()))
-        return reinterpret_cast<jlong>(res.release());
-    else
-        return 0;
-}
-
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromBytes
-  (JNIEnv* env, jclass jclass, jbyteArray bytesArray, jint _size) {
-    SkPath* instance = new SkPath();
-    int count = env->GetArrayLength(bytesArray);
-    jbyte* bytes = env->GetByteArrayElements(bytesArray, 0);
-    if (instance->readFromMemory(bytes, count)) {
-        env->ReleaseByteArrayElements(bytesArray, bytes, 0);
-        return reinterpret_cast<jlong>(instance);
-    } else {
-        env->ReleaseByteArrayElements(bytesArray, bytes, 0);
-        delete instance;
-        return 0;
-    }
-}
-
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt_Path_1nGetGenerationId
-  (JNIEnv* env, jclass jclass, jlong ptr) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    return instance->getGenerationID();
-}
-
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nIsValid
-  (JNIEnv* env, jclass jclass, jlong ptr) {
-    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    return instance->isValid();
 }

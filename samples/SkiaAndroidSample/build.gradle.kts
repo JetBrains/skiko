@@ -6,7 +6,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://redirector.kotlinlang.org/maven/compose-dev")
     }
 
     dependencies {
@@ -18,7 +18,7 @@ repositories {
     mavenLocal()
     google()
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://redirector.kotlinlang.org/maven/compose-dev")
 }
 
 plugins {

@@ -206,7 +206,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyp
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     std::vector<jshort> glyphs(uniArrLen);
     jint* uni = env->GetIntArrayElements(uniArr, nullptr);
-    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), uniArrLen, reinterpret_cast<SkGlyphID*>(glyphs.data()));
+    instance->unicharsToGlyphs({reinterpret_cast<SkUnichar*>(uni), uniArrLen}, {reinterpret_cast<SkGlyphID*>(glyphs.data()), uniArrLen});
     env->ReleaseIntArrayElements(uniArr, uni, 0);
     env->SetShortArrayRegion(resultGlyphs, 0, uniArrLen, glyphs.data());
 }
@@ -253,7 +253,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetWidths
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     std::vector<jfloat> widths(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
-    instance->getWidths(reinterpret_cast<SkGlyphID*>(glyphs), count, widths.data());
+    instance->getWidths({reinterpret_cast<SkGlyphID*>(glyphs), count}, {widths.data(), count});
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
     env->SetFloatArrayRegion(res, 0, count, widths.data());
 }
@@ -264,7 +264,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetBounds
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     std::vector<SkRect> bounds(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
-    instance->getBounds(reinterpret_cast<SkGlyphID*>(glyphs), count, bounds.data(), paint);
+    instance->getBounds({reinterpret_cast<SkGlyphID*>(glyphs), count}, {bounds.data(), count}, paint);
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
 
     for (int i = 0; i < count; ++i) {
@@ -279,7 +279,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetPositions
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     std::vector<SkPoint> positions(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
-    instance->getPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), {dx, dy});
+    instance->getPos({reinterpret_cast<SkGlyphID*>(glyphs), count}, {positions.data(), count}, {dx, dy});
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
 
     std::vector<jfloat> r(count * 2);
@@ -296,7 +296,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetXPosition
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     std::vector<jfloat> positions(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
-    instance->getXPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), dx);
+    instance->getXPos({reinterpret_cast<SkGlyphID*>(glyphs), count}, {positions.data(), count}, dx);
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
     env->SetFloatArrayRegion(res, 0, count, positions.data());
 }
@@ -304,9 +304,12 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetXPosition
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPath
   (JNIEnv* env, jclass jclass, jlong ptr, jshort glyph) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    SkPath* path = new SkPath();
-    instance->getPath(glyph, path);
-    return reinterpret_cast<jlong>(path);
+    std::optional<SkPath> pathOpt = instance->getPath(glyph);
+    if (pathOpt.has_value()) {
+        SkPath* path = new SkPath(pathOpt.value());
+        return reinterpret_cast<jlong>(path);
+    }
+    return 0;
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPaths
@@ -319,11 +322,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPaths
         std::vector<jlong>* paths;
     } ctx = { new std::vector<jlong>() };
 
-    instance->getPaths(reinterpret_cast<SkGlyphID*>(glyphs), count, [](const SkPath* orig, const SkMatrix& mx, void* voidCtx) {
+    instance->getPaths({reinterpret_cast<SkGlyphID*>(glyphs), count}, [](const SkPath* orig, const SkMatrix& mx, void* voidCtx) {
         Ctx* ctx = static_cast<Ctx*>(voidCtx);
         if (orig) {
-            SkPath* path = new SkPath();
-            orig->transform(mx, path);
+            SkPath* path = new SkPath(orig->makeTransform(mx));
             ctx->paths->push_back(reinterpret_cast<jlong>(path));
         }
     }, &ctx);

@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.EncodedImageFormat
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Path
+import org.jetbrains.skia.PathBuilder
 import org.jetbrains.skia.Surface
 import java.io.File
 import java.nio.file.Files
@@ -15,7 +16,7 @@ class ImageTest  {
         Surface.makeRasterN32Premul(100, 100).use { surface ->
                 val paint = Paint()
                 paint.color = -0x10000
-                Path().moveTo(20f, 80f).lineTo(50f, 20f).lineTo(80f, 80f).closePath().use { path ->
+                PathBuilder().moveTo(20f, 80f).lineTo(50f, 20f).lineTo(80f, 80f).closePath().detach().use { path ->
                     val canvas = surface.canvas
                     canvas.drawPath(path, paint)
                     surface.makeImageSnapshot().use { image ->

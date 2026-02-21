@@ -90,6 +90,7 @@ runs:
         docker run --rm \
           -v "${{ github.workspace }}":/workspace \
           -v "${HOME}/.gradle":/gradle-cache \
+          -v "${HOME}/.m2":/root/.m2 \
           -e GRADLE_USER_HOME=/gradle-cache \
           -w /workspace/${{ inputs.working_directory }} \
           "ghcr.io/${{ steps.vars.outputs.image_namespace }}/${{ inputs.image_name }}:${{ steps.vars.outputs.tag }}" \

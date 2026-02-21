@@ -56,7 +56,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromPosH
     SkTextBlob* instance = SkTextBlob::MakeFromPosTextH(
         glyphsArr,
         glyphsLen * sizeof(short),
-        xposArr, ypos,
+        {xposArr, glyphsLen}, ypos,
         *font,
         SkTextEncoding::kGlyphID
     ).release();
@@ -71,7 +71,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromPos
     SkTextBlob* instance = SkTextBlob::MakeFromPosText(
         glyphsArr,
         glyphsLen * sizeof(KShort),
-        reinterpret_cast<SkPoint*>(posArr),
+        {reinterpret_cast<SkPoint*>(posArr), glyphsLen},
         *font,
         SkTextEncoding::kGlyphID
     ).release();
@@ -85,7 +85,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromRSXform
 
    SkTextBlob* instance = SkTextBlob::MakeFromRSXform(
         glyphsArr, glyphsLen * sizeof(short),
-        reinterpret_cast<SkRSXform*>(xformArr),
+        {reinterpret_cast<SkRSXform*>(xformArr), glyphsLen},
         *font, SkTextEncoding::kGlyphID
    ).release();
 

@@ -49,7 +49,7 @@ namespace skikoMpp {
                 if (run.fGlyphCount > 1 && SkScalarNearlyEqual(posBuffer[(run.fGlyphCount - 2) * 2], lastLeft))
                     lastWidth = 0;
                 else
-                    font.getWidths(&run.fGlyphIndices[run.fGlyphCount - 1], 1, &lastWidth);
+                    font.getWidths({&run.fGlyphIndices[run.fGlyphCount - 1], 1}, {&lastWidth, 1});
 
                 auto runBounds = SkRect::MakeLTRB(posBuffer[0], posBuffer[1] + metrics.fAscent, lastLeft + lastWidth, posBuffer[1] + metrics.fDescent);
                 bounds->join(runBounds);

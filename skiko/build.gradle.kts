@@ -359,6 +359,37 @@ skikoProjectContext.additionalRuntimeLibraries.forEach {
     it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))
 }
 
+// Local Skia build tasks
+tasks.register<BuildLocalSkiaTask>("prepareLocalSkiaBuild") {
+    group = "skia"
+    description = "Build Skia binaries locally (without publishing Skiko)"
+
+    skiaVersion.set(provider { skiko.skiaVersionFromEnvOrProperties })
+    skiaTarget.set(provider { skiko.skiaTarget })
+    buildType.set(skiko.buildType)
+
+    // Set skiaPackDir - either from property or default location
+    val skiaPackDir = skiko.skiaPackDir
+    if (skiaPackDir != null) {
+        this.skiaPackDir.set(skiaPackDir)
+    } else {
+        // Will be set by bash script via -Pskia.pack.dir, or use default skia-pack
+        this.skiaPackDir.set(project.file("skia-pack"))
+    }
+
+    skikoTargetFlags.set(provider {
+        skiko.skiaTarget.getGradleFlags(skiko.targetArch)
+    })
+}
+
+tasks.register("printSkiaVersion") {
+    group = "skia"
+    description = "Print resolved Skia version"
+    doLast {
+        println(skiko.skiaVersionFromEnvOrProperties)
+    }
+}
+
 tasks.withType<KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583
     compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")

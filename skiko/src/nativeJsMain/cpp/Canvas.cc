@@ -35,7 +35,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPoints
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
     SkCanvas::PointMode skMode = static_cast<SkCanvas::PointMode>(mode);
-    canvas->drawPoints(skMode, coordsCount / 2, reinterpret_cast<SkPoint*>(coords), *paint);
+    canvas->drawPoints(skMode, {reinterpret_cast<SkPoint*>(coords), coordsCount / 2}, *paint);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawLine

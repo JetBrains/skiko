@@ -37,9 +37,9 @@ SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio
 SKIKO_EXPORT KBoolean org_jetbrains_skia_svg_SVGSVG__1nGetViewBox
   (KNativePointer ptr, KInteropPointer result) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
-    SkTLazy<SkSVGViewBoxType> viewBox = instance->getViewBox();
-    if (viewBox.isValid()) {
-        skija::Rect::copyToInterop(*viewBox.get(), result);
+    std::optional<SkSVGViewBoxType> viewBox = instance->getViewBox();
+    if (viewBox.has_value()) {
+        skija::Rect::copyToInterop(viewBox.value(), result);
         return true;
     } else {
         return false;

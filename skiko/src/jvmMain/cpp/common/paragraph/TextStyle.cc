@@ -394,3 +394,39 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setPlaceholder();
 }
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontEdging
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    return static_cast<jint>(instance->getFontEdging());
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontEdging
+  (JNIEnv* env, jclass jclass, jlong ptr, jint fontEdging) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    instance->setFontEdging(static_cast<SkFont::Edging>(fontEdging));
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetSubpixel
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    return static_cast<jboolean>(instance->getSubpixel());
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetSubpixel
+  (JNIEnv* env, jclass jclass, jlong ptr, jboolean subpixel) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    instance->setSubpixel(subpixel);
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontHinting
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    return static_cast<jint>(instance->getFontHinting());
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontHinting
+  (JNIEnv* env, jclass jclass, jlong ptr, jint fontHinting) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    instance->setFontHinting(static_cast<SkFontHinting>(fontHinting));
+}

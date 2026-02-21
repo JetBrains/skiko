@@ -7,14 +7,9 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/internal") {
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev") {
             content {
                 includeGroupByRegex("org.jetbrains.compose.internal.*")
-            }
-        }
-
-        maven("https://maven.pkg.jetbrains.space/public/p/space/maven") {
-            content {
                 includeModuleByRegex("org.jetbrains", ".*space.*")
             }
         }

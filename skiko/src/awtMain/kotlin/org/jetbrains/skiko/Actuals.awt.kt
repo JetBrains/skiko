@@ -1,15 +1,6 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skiko.redrawer.*
-import java.awt.Component
-import java.awt.Desktop
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
-import java.awt.datatransfer.StringSelection
-import java.awt.datatransfer.UnsupportedFlavorException
-import java.io.IOException
-import java.net.URI
-import java.net.URL
 import javax.swing.UIManager
 
 actual fun setSystemLookAndFeel() = UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
@@ -35,70 +26,4 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory =
             }
             else -> throw UnsupportedOperationException("AWT doesn't support $hostOs")
         }
-    }
-
-internal actual fun URIHandler_openUri(uri: String) {
-    val desktop = Desktop.getDesktop()
-    if (desktop.isSupported(Desktop.Action.BROWSE)) {
-        desktop.browse(URI(uri))
-    } else when (hostOs) {
-        OS.Linux -> {
-            URI(uri) // Validate URI for exception behavior consistent with the Desktop.browse() case (throwing URISyntaxException)
-            Runtime.getRuntime().exec(arrayOf("xdg-open", URI(uri).toString()))
-        }
-        OS.Windows, OS.MacOS -> {
-            throw UnsupportedOperationException("AWT doesn't support the BROWSE action on $hostOs")
-        }
-        else -> throw UnsupportedOperationException("AWT doesn't support $hostOs")
-    }
-}
-
-private val systemClipboard by lazy {
-    try {
-        Toolkit.getDefaultToolkit().getSystemClipboard()
-    } catch (e: java.awt.HeadlessException) {
-        null
-    }
-}
-
-internal actual fun ClipboardManager_setText(text: String) {
-    systemClipboard?.setContents(StringSelection(text), null)
-}
-
-internal actual fun ClipboardManager_getText(): String? {
-    return try {
-        systemClipboard?.getData(DataFlavor.stringFlavor) as String?
-    } catch (_: UnsupportedFlavorException) {
-        null
-    } catch (_: IllegalStateException) {
-        null
-    } catch (_: IOException) {
-        null
-    }
-}
-
-internal actual fun ClipboardManager_hasText(): Boolean = !ClipboardManager_getText().isNullOrEmpty()
-
-actual typealias Cursor = java.awt.Cursor
-
-internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {
-    if (component is Component) {
-        component.cursor = cursor
-    }
-}
-
-internal actual fun CursorManager_getCursor(component: Any): Cursor? {
-    return if (component is Component) {
-        component.cursor
-    } else {
-        null
-    }
-}
-
-internal actual fun getCursorById(id: PredefinedCursorsId): Cursor =
-    when (id) {
-        PredefinedCursorsId.DEFAULT -> Cursor(Cursor.DEFAULT_CURSOR)
-        PredefinedCursorsId.CROSSHAIR -> Cursor(Cursor.CROSSHAIR_CURSOR)
-        PredefinedCursorsId.HAND -> Cursor(Cursor.HAND_CURSOR)
-        PredefinedCursorsId.TEXT -> Cursor(Cursor.TEXT_CURSOR)
     }

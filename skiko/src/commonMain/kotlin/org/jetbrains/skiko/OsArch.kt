@@ -7,9 +7,6 @@ enum class OS(val id: String) {
     MacOS("macos"),
     Ios("ios"),
     Tvos("tvos"),
-
-    @Deprecated("JS is invalid host OS name. Consider using enum KotlinBackend to detect JS.")
-    JS("js"),
     Unknown("unknown")
     ;
 
@@ -26,10 +23,6 @@ enum class OS(val id: String) {
 enum class Arch(val id: String) {
     X64("x64"),
     Arm64("arm64"),
-    @Deprecated("JS is not valid Arch value")
-    JS("js"),
-    @Deprecated("WASM is not valid Arch value")
-    WASM("wasm"),
     Unknown("unknown"),
     ;
 }
