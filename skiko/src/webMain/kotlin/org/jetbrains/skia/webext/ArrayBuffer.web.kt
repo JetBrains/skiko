@@ -6,23 +6,16 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl._malloc
 import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.khronos.webgl.ArrayBuffer
 import kotlin.js.js
 
-internal fun skikoArrayBuffer(skikoWasm: SkikoWasm): WebArrayBufferExt =
+internal fun skikoArrayBuffer(skikoWasm: SkikoWasm): ArrayBuffer =
     js("skikoWasm.wasmExports.memory.buffer")
 
-/**
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
- */
-@ExperimentalSkikoApi
-external interface WebArrayBufferExt {
-    val byteLength: Int
-    operator fun set(ix: Int, value: Byte)
-}
 internal external interface SkikoWasm
 
 internal suspend fun copyBufferToSkiko(
-    src: WebArrayBufferExt
+    src: ArrayBuffer
 ): NativePointer {
     val ptr = _malloc(src.byteLength)
     if (ptr != Native.NullPointer) {
@@ -35,8 +28,8 @@ internal suspend fun copyBufferToSkiko(
 internal expect suspend fun getSkikoWasm(): SkikoWasm
 
 internal fun copyBuffer(
-    src: WebArrayBufferExt,
-    dst: WebArrayBufferExt,
+    src: ArrayBuffer,
+    dst: ArrayBuffer,
     size: Int,
     dstOffset: Int
 ) {
