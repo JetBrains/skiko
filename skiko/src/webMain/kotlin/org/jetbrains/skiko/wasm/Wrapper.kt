@@ -2,6 +2,8 @@ package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skia.impl.NativePointer
 import org.w3c.dom.HTMLCanvasElement
+import kotlin.js.JsAny
+import kotlin.js.Promise
 
 internal external interface ContextAttributes {
     val alpha: Int?
@@ -21,3 +23,5 @@ internal external interface ContextAttributes {
 internal expect fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): NativePointer
 
 internal expect fun onWasmReady(onReady: () -> Unit)
+
+internal expect val awaitSkiko: Promise<JsAny>
