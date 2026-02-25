@@ -7,6 +7,7 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl._malloc
 import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.Uint8Array
 import kotlin.js.js
 
 internal fun skikoArrayBuffer(skikoWasm: SkikoWasm): ArrayBuffer =
@@ -20,7 +21,7 @@ internal suspend fun copyBufferToSkiko(
     val ptr = _malloc(src.byteLength)
     if (ptr != Native.NullPointer) {
         val skikoArrayBuffer = skikoArrayBuffer(getSkikoWasm())
-        copyBuffer(src, skikoArrayBuffer, src.byteLength, ptr)
+        copyBuffer(src, skikoArrayBuffer, ptr)
     }
     return ptr
 }
@@ -30,12 +31,9 @@ internal expect suspend fun getSkikoWasm(): SkikoWasm
 internal fun copyBuffer(
     src: ArrayBuffer,
     dst: ArrayBuffer,
-    size: Int,
     dstOffset: Int
 ) {
-    js("""
-        var dstView = new Uint8Array(dst);
-        var srcView = new Uint8Array(src);
-        dstView.set(srcView, dstOffset);
-    """)
+    val dstView = Uint8Array(dst)
+    val srcView = Uint8Array(src)
+    dstView.set(srcView, dstOffset)
 }
