@@ -9,7 +9,6 @@ import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.await
 import org.jetbrains.skiko.wasm.awaitSkiko
 import org.khronos.webgl.ArrayBuffer
-import org.khronos.webgl.Uint8Array
 import kotlin.js.JsAny
 import kotlin.js.js
 
@@ -32,7 +31,9 @@ internal fun copyBuffer(
     dst: ArrayBuffer,
     dstOffset: Int
 ) {
-    val dstView = Uint8Array(dst)
-    val srcView = Uint8Array(src)
-    dstView.set(srcView, dstOffset)
+    js("""
+        var dstView = new Uint8Array(dst);
+        var srcView = new Uint8Array(src);
+        dstView.set(srcView, dstOffset);
+    """)
 }
