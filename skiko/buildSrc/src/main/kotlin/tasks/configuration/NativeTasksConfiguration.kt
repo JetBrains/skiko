@@ -285,6 +285,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             OS.Linux -> listOf(
                 "-linker-option", "-lX11",
                 "-linker-option", "-lGLX",
+                "-linker-option", "--allow-shlib-undefined"
             )
             else -> emptyList()
         })
