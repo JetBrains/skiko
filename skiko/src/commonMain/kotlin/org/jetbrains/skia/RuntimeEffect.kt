@@ -19,13 +19,6 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
-        fun makeForBlender(sksl: String): RuntimeEffect {
-            Stats.onNativeCall()
-            return interopScope {
-                makeFromResultPtr(_nMakeForBlender(toInterop(sksl)))
-            }
-        }
-
         init {
             staticLoad()
         }
@@ -49,18 +42,6 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             reachabilityBarrier(children)
         }
     }
-
-    fun makeBlender(uniforms: Data?): Blender {
-        Stats.onNativeCall()
-        return try {
-            interopScope {
-                Blender(_nMakeBlender(_ptr, getPtr(uniforms)))
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(uniforms)
-        }
-    }
 }
 
 internal expect fun RuntimeEffect.Companion.makeFromResultPtr(ptr: NativePointer): RuntimeEffect
@@ -71,19 +52,12 @@ private external fun _nMakeShader(
     childCount: Int, localMatrix: InteropPointer
 ): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeBlender")
-private external fun _nMakeBlender(
-    runtimeEffectPtr: NativePointer, uniformPtr: NativePointer
-): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForShader")
 private external fun _nMakeForShader(sksl: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter")
 private external fun _nMakeForColorFilter(sksl: InteropPointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForBlender")
-private external fun _nMakeForBlender(sksl: InteropPointer): NativePointer
 
 //  The functions below can be used only in JS and native targets
 

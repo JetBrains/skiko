@@ -3,10 +3,6 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
-/**
- * MaskFilter is the base class for object that perform transformations on
- * the mask before drawing it. An example subclass is Blur.
- */
 class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         init {

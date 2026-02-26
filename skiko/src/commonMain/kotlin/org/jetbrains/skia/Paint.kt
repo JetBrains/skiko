@@ -448,35 +448,6 @@ class Paint : Managed {
         }
 
     /**
-     * Returns the user-supplied blend function, if one has been set.
-     *
-     * A null blender signifies the default SrcOver behavior.
-     *
-     * For convenience, you can call [blendMode] if the blend effect can be expressed
-     * as one of those values.
-     *
-     * @see [https://fiddle.skia.org/c/@Paint_setBlender](https://fiddle.skia.org/c/@Paint_setBlender)
-     * @see [https://fiddle.skia.org/c/@Paint_refBlender](https://fiddle.skia.org/c/@Paint_refBlender)
-     *
-     * @return  the [Blender] assigned to this paint, otherwise null
-     */
-    var blender: Blender?
-        get() = try {
-            Stats.onNativeCall()
-            val blenderPtr = _nGetBlender(_ptr)
-            if (blenderPtr == NullPointer) null else Blender(blenderPtr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetBlender(_ptr, getPtr(value))
-        } finally {
-            reachabilityBarrier(value)
-            reachabilityBarrier(this)
-        }
-
-    /**
      * @return  true if BlendMode is BlendMode.SRC_OVER, the default.
      */
     val isSrcOver: Boolean
@@ -693,12 +664,6 @@ private external fun _nGetImageFilter(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetImageFilter")
 private external fun _nSetImageFilter(ptr: NativePointer, filterPtr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlender")
-private external fun _nGetBlender(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Paint__1nSetBlender")
-private external fun _nSetBlender(ptr: NativePointer, blenderPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nHasNothingToDraw")
 private external fun _nHasNothingToDraw(ptr: NativePointer): Boolean

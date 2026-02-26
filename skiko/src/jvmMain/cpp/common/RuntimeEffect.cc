@@ -57,29 +57,3 @@ Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeForColorFilter(JNIEnv* env,
         return 0;
     }
 }
-
-extern "C" JNIEXPORT jlong JNICALL
-Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeBlender(JNIEnv* env,
-        jclass jclass,
-        jlong ptr,
-        jlong uniformPtr) {
-    SkRuntimeEffect* runtimeEffect = jlongToPtr<SkRuntimeEffect*>(ptr);
-    SkData* uniform = jlongToPtr<SkData*>(uniformPtr);
-
-    sk_sp<SkBlender> blender = runtimeEffect->makeBlender(sk_ref_sp<SkData>(uniform));
-    return ptrToJlong(blender.release());
-}
-
-extern "C" JNIEXPORT jlong JNICALL
-Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeForBlender(JNIEnv* env,
-        jclass jclass,
-        jstring sksl) {
-    SkString skslProper = skString(env, sksl);
-    SkRuntimeEffect::Result result = SkRuntimeEffect::MakeForBlender(skslProper);
-    if (result.errorText.isEmpty()) {
-        return ptrToJlong(result.effect.release());
-    } else {
-        env->ThrowNew(java::lang::RuntimeException::cls, result.errorText.c_str());
-        return 0;
-    }
-}

@@ -3,14 +3,6 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.*
 
-/**
- *  ColorFilters are optional objects in the drawing pipeline. When present in
- *  a paint, they are called with the "src" colors, and return new colors, which
- *  are then passed onto the next stage (either ImageFilter or Xfermode).
- *
- *  All subclasses are required to be reentrant-safe : it must be legal to share
- *  the same instance between several threads.
- */
 class ColorFilter : RefCnt {
     companion object {
         fun makeComposed(outer: ColorFilter?, inner: ColorFilter?): ColorFilter {

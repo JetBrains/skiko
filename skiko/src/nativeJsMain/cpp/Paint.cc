@@ -1,7 +1,6 @@
 #include <iostream>
 #include "SkColorFilter.h"
 #include "SkImageFilter.h"
-#include "SkBlender.h"
 #include "SkMaskFilter.h"
 #include "SkPaint.h"
 #include "SkPathEffect.h"
@@ -184,19 +183,6 @@ SKIKO_EXPORT void org_jetbrains_skia_Paint__1nSetImageFilter
     SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
     SkImageFilter* filter = reinterpret_cast<SkImageFilter*>((filterPtr));
     instance->setImageFilter(sk_ref_sp<SkImageFilter>(filter));
-}
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nGetBlender
-  (KNativePointer ptr) {
-    SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
-    return reinterpret_cast<KNativePointer>(instance->refBlender().release());
-}
-
-SKIKO_EXPORT void org_jetbrains_skia_Paint__1nSetBlender
-  (KNativePointer ptr, KNativePointer blenderPtr) {
-    SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
-    SkBlender* blender = reinterpret_cast<SkBlender*>((blenderPtr));
-    instance->setBlender(sk_ref_sp<SkBlender>(blender));
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Paint__1nGetBlendMode
