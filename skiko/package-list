@@ -1077,6 +1077,7 @@ $dokka.location:org.jetbrains.skia/BlendMode/valueOf/#kotlin.String/PointingToDe
 $dokka.location:org.jetbrains.skia/BlendMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-blend-mode/values.html
 $dokka.location:org.jetbrains.skia/Blender.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-blender/-companion/index.html
 $dokka.location:org.jetbrains.skia/Blender.Companion/makeArithmetic/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-blender/-companion/make-arithmetic.html
+$dokka.location:org.jetbrains.skia/Blender.Companion/makeMode/#org.jetbrains.skia.BlendMode/PointingToDeclaration/skiko/org.jetbrains.skia/-blender/-companion/make-mode.html
 $dokka.location:org.jetbrains.skia/Blender///PointingToDeclaration/skiko/org.jetbrains.skia/-blender/index.html
 $dokka.location:org.jetbrains.skia/BreakIterator.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/-companion/index.html
 $dokka.location:org.jetbrains.skia/BreakIterator.Companion/DONE/#/PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/-companion/-d-o-n-e.html
