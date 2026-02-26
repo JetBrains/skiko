@@ -65,7 +65,7 @@
   <div class="breadcrumbs"><a href="../../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skia</a><span class="delimiter">/</span><span class="current">BlendMode</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Blend</span><wbr></wbr><span><span>Mode</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">enum </span><a href="index.html">BlendMode</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">BlendMode</a><span class="token operator">&gt; </span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">enum </span><a href="index.html">BlendMode</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">BlendMode</a><span class="token operator">&gt; </span></div><p class="paragraph">Blends are operators that take in two colors (source, destination) and return a new color. Many of these operate the same on all 4 components: red, green, blue, alpha. For these, we just document what happens to one component, rather than naming each one separately.</p><p class="paragraph">Different SkColorTypes have different representations for color components:      8-bit: 0..255      6-bit: 0..63      5-bit: 0..31      4-bit: 0..15     floats: 0...1</p><p class="paragraph">The documentation is expressed as if the component values are always 0..1 (floats).</p><p class="paragraph">For brevity, the documentation uses the following abbreviations s  : source d  : destination sa : source alpha da : destination alpha</p><p class="paragraph">Results are abbreviated r  : if all 4 components are computed in the same manner ra : result alpha component rc : result &quot;color&quot;: red, green, blue components</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="ENTRY">Entries</button></div>
@@ -82,7 +82,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-c-l-e-a-r/index.html">CLEAR</a></div></div><div class="brief "><p class="paragraph">Replaces destination with zero: fully transparent.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-c-l-e-a-r/index.html">CLEAR</a></div></div><div class="brief "><p class="paragraph">Replaces destination with zero: fully transparent. r = 0</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -97,7 +97,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c/index.html">SRC</a></div></div><div class="brief "><p class="paragraph">Replaces destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c/index.html">SRC</a></div></div><div class="brief "><p class="paragraph">Replaces destination. r = s</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -112,7 +112,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t/index.html">DST</a></div></div><div class="brief "><p class="paragraph">Preserves destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t/index.html">DST</a></div></div><div class="brief "><p class="paragraph">Preserves destination. r = d</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -127,7 +127,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c_-o-v-e-r/index.html">SRC_OVER</a></div></div><div class="brief "><p class="paragraph">Source over destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c_-o-v-e-r/index.html">SRC_OVER</a></div></div><div class="brief "><p class="paragraph">Source over destination. r = s + (1-sa)*d</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t_-o-v-e-r/index.html">DST_OVER</a></div></div><div class="brief "><p class="paragraph">Destination over source.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t_-o-v-e-r/index.html">DST_OVER</a></div></div><div class="brief "><p class="paragraph">Destination over source. r = d + (1-da)*s</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -157,7 +157,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c_-i-n/index.html">SRC_IN</a></div></div><div class="brief "><p class="paragraph">Source trimmed inside destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c_-i-n/index.html">SRC_IN</a></div></div><div class="brief "><p class="paragraph">Source trimmed inside destination. r = s * da</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -172,7 +172,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t_-i-n/index.html">DST_IN</a></div></div><div class="brief "><p class="paragraph">Destination trimmed by source.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t_-i-n/index.html">DST_IN</a></div></div><div class="brief "><p class="paragraph">Destination trimmed by source. r = d * sa</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -187,7 +187,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c_-o-u-t/index.html">SRC_OUT</a></div></div><div class="brief "><p class="paragraph">Source trimmed outside destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c_-o-u-t/index.html">SRC_OUT</a></div></div><div class="brief "><p class="paragraph">Source trimmed outside destination. r = s * (1-da)</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -202,7 +202,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t_-o-u-t/index.html">DST_OUT</a></div></div><div class="brief "><p class="paragraph">Destination trimmed outside source.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t_-o-u-t/index.html">DST_OUT</a></div></div><div class="brief "><p class="paragraph">Destination trimmed outside source. r = d * (1-sa)</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -217,7 +217,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c_-a-t-o-p/index.html">SRC_ATOP</a></div></div><div class="brief "><p class="paragraph">Source inside destination blended with destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-r-c_-a-t-o-p/index.html">SRC_ATOP</a></div></div><div class="brief "><p class="paragraph">Source inside destination blended with destination. r = s<i>da + d</i>(1-sa)</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -232,7 +232,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t_-a-t-o-p/index.html">DST_ATOP</a></div></div><div class="brief "><p class="paragraph">Destination inside source blended with source.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-s-t_-a-t-o-p/index.html">DST_ATOP</a></div></div><div class="brief "><p class="paragraph">Destination inside source blended with source. r = d<i>sa + s</i>(1-da)</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -247,7 +247,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-x-o-r/index.html">XOR</a></div></div><div class="brief "><p class="paragraph">Each of source and destination trimmed outside the other.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-x-o-r/index.html">XOR</a></div></div><div class="brief "><p class="paragraph">Each of source and destination trimmed outside the other. r = s*(1-da) + d*(1-sa)</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -262,7 +262,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-p-l-u-s/index.html">PLUS</a></div></div><div class="brief "><p class="paragraph">Sum of colors.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-p-l-u-s/index.html">PLUS</a></div></div><div class="brief "><p class="paragraph">Sum of colors. r = min(s + d, 1)</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -277,7 +277,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-m-o-d-u-l-a-t-e/index.html">MODULATE</a></div></div><div class="brief "><p class="paragraph">Product of premultiplied colors; darkens destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-m-o-d-u-l-a-t-e/index.html">MODULATE</a></div></div><div class="brief "><p class="paragraph">Product of premultiplied colors; darkens destination. r = s*d</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -292,7 +292,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-c-r-e-e-n/index.html">SCREEN</a></div></div><div class="brief "><p class="paragraph">Multiply inverse of pixels, inverting result; brightens destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-s-c-r-e-e-n/index.html">SCREEN</a></div></div><div class="brief "><p class="paragraph">Multiply inverse of pixels, inverting result; brightens destination. r = s + d - s*d</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -322,7 +322,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-a-r-k-e-n/index.html">DARKEN</a></div></div><div class="brief "><p class="paragraph">Darker of source and destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-a-r-k-e-n/index.html">DARKEN</a></div></div><div class="brief "><p class="paragraph">Darker of source and destination. rc = s + d - max(s<i>da, d</i>sa), ra = kSrcOver</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -337,7 +337,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-l-i-g-h-t-e-n/index.html">LIGHTEN</a></div></div><div class="brief "><p class="paragraph">Lighter of source and destination.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-l-i-g-h-t-e-n/index.html">LIGHTEN</a></div></div><div class="brief "><p class="paragraph">Lighter of source and destination. rc = s + d - min(s<i>da, d</i>sa), ra = kSrcOver</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -412,7 +412,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-i-f-f-e-r-e-n-c-e/index.html">DIFFERENCE</a></div></div><div class="brief "><p class="paragraph">Subtract darker from lighter with higher contrast.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-d-i-f-f-e-r-e-n-c-e/index.html">DIFFERENCE</a></div></div><div class="brief "><p class="paragraph">Subtract darker from lighter with higher contrast. rc = s + d - 2*(min(s<i>da, d</i>sa)), ra = kSrcOver</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -427,7 +427,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-e-x-c-l-u-s-i-o-n/index.html">EXCLUSION</a></div></div><div class="brief "><p class="paragraph">Subtract darker from lighter with lower contrast.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-e-x-c-l-u-s-i-o-n/index.html">EXCLUSION</a></div></div><div class="brief "><p class="paragraph">Subtract darker from lighter with lower contrast. rc = s + d - two(s*d), ra = kSrcOver</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -442,7 +442,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-m-u-l-t-i-p-l-y/index.html">MULTIPLY</a></div></div><div class="brief "><p class="paragraph">Multiply source with destination, darkening image.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="-m-u-l-t-i-p-l-y/index.html">MULTIPLY</a></div></div><div class="brief "><p class="paragraph">Multiply source with destination, darkening image. r = s*(1-da) + d*(1-sa) + s*d</p></div></div></div>
                 </div>
               </div>
             </div>
