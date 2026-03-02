@@ -43,26 +43,23 @@ internal abstract class ContextHandler(
         canvas?.apply {
             clear(Color.TRANSPARENT)
 
-            val scale = layer.contentScale
-
-            save()
-
-            for (clip in layer.cutoutRectangles) {
-                cutoutFromClip(clip, scale)
-            }
-
-            val layerBg = layer.backgroundColor
-            clear(
-                if (layer.transparency && isTransparentBackgroundSupported()) {
-                    layerBg
-                } else {
-                    layerBg or 0xFF000000.toInt()
+            runSavingAndRestoring {
+                val scale = layer.contentScale
+                for (clip in layer.cutoutRectangles) {
+                    cutoutFromClip(clip, scale)
                 }
-            )
 
-            drawContent()
+                val layerBg = layer.backgroundColor
+                clear(
+                    if (layer.transparency && isTransparentBackgroundSupported()) {
+                        layerBg
+                    } else {
+                        layerBg or 0xFF000000.toInt()
+                    }
+                )
 
-            restore()
+                drawContent()
+            }
         }
         flush()
     }
@@ -88,4 +85,13 @@ internal inline fun Canvas.cutoutFromClip(rectangle: ClipRectangle, scale: Float
         mode = ClipMode.DIFFERENCE,
         antiAlias = true
     )
+}
+
+private inline fun Canvas.runSavingAndRestoring(block: Canvas.() -> Unit) {
+    save()
+    try {
+        block()
+    } finally {
+        restore()
+    }
 }
