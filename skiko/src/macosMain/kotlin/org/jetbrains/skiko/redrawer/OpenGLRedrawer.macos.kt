@@ -78,6 +78,8 @@ internal class MacOsOpenGLRedrawer(
         glLayer.setNeedsDisplay()
         skiaLayer.nsView.setNeedsDisplay(true)
     }
+
+    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(skiaLayer)
 }
 
 internal class MacosGLLayer : CAOpenGLLayer {

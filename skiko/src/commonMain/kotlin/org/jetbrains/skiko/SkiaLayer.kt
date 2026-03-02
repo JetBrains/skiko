@@ -29,24 +29,9 @@ expect open class SkiaLayer {
     var fullscreen: Boolean
 
     /**
-     * If transparency is enabled.
-     */
-    var transparency: Boolean
-
-    /**
-     * The color, in ARGB format, with which the layer is cleared before rendering.
-     */
-    internal var backgroundColor: Int
-
-    /**
      * Underlying platform component.
      */
     val component: Any?
-
-    /**
-     * A list of rectangles to cut out from the rendered content; No content will be drawn inside them.
-     */
-    internal val cutoutRectangles: List<ClipRectangle>
 
     /**
      * Current view used for rendering.

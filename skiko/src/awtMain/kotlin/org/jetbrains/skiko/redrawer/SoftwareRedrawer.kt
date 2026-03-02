@@ -55,4 +55,9 @@ internal class SoftwareRedrawer(
             }
         }
     }
+
+    override fun isTransparentBackgroundSupported(): Boolean {
+        // TODO: why Software rendering has another transparency logic from the beginning
+        return hostOs == OS.MacOS
+    }
 }

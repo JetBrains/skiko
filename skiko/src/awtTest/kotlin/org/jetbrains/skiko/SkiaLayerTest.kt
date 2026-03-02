@@ -15,6 +15,7 @@ import org.jetbrains.skiko.context.JvmContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -565,6 +566,7 @@ class SkiaLayerTest {
         override fun needRender(throttledToVsync: Boolean) = frameDispatcher.scheduleFrame()
         override fun renderImmediately() = Unit
         override fun update(nanoTime: Long) = layer.update(nanoTime)
+        override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 
         override val renderInfo: String
             get() = ""

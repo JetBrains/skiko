@@ -42,34 +42,9 @@ internal abstract class ContextHandler(
         initCanvas()
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
-
-            val scale = layer.contentScale
-            for (clip in layer.cutoutRectangles) {
-                cutoutFromClip(clip, scale)
-            }
-
-            val layerBg = layer.backgroundColor
-            clear(
-                if (layer.transparency && isTransparentBackgroundSupported()) {
-                    layerBg
-                } else {
-                    layerBg or 0xFF000000.toInt()
-                }
-            )
-
             drawContent()
         }
         flush()
-    }
-
-    protected open fun isTransparentBackgroundSupported(): Boolean {
-        if (hostOs == OS.MacOS) {
-            // macOS transparency is always supported
-            return true
-        }
-
-        // for non-macOS in fullscreen transparency is not supported
-        return !layer.fullscreen
     }
 }
 
@@ -85,7 +60,7 @@ internal inline fun Canvas.cutoutFromClip(rectangle: ClipRectangle, scale: Float
     )
 }
 
-private inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
+internal inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
     val restoreCount = save()
     try {
         block()
