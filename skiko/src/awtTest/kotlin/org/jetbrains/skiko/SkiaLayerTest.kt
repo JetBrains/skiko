@@ -1395,6 +1395,7 @@ class SkiaLayerTest {
             window.isUndecorated = true
             window.isVisible = true
 
+            delay(100)
             withContext(Dispatchers.Default) {
                 Robot().waitForIdle()
             }
@@ -1408,6 +1409,8 @@ class SkiaLayerTest {
             // Remove the swingComponent and its clip
             layeredPane.remove(swingComponent)
             layer.clipComponents.remove(clipRect)
+
+            delay(100)
             withContext(Dispatchers.Default) {
                 Robot().waitForIdle()
             }
