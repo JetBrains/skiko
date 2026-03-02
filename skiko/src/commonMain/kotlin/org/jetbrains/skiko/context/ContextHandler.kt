@@ -40,26 +40,24 @@ internal abstract class ContextHandler(
             throw RenderException("Cannot init graphic context")
         }
         initCanvas()
-        canvas?.apply {
+        canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
 
-            runSavingAndRestoring {
-                val scale = layer.contentScale
-                for (clip in layer.cutoutRectangles) {
-                    cutoutFromClip(clip, scale)
-                }
-
-                val layerBg = layer.backgroundColor
-                clear(
-                    if (layer.transparency && isTransparentBackgroundSupported()) {
-                        layerBg
-                    } else {
-                        layerBg or 0xFF000000.toInt()
-                    }
-                )
-
-                drawContent()
+            val scale = layer.contentScale
+            for (clip in layer.cutoutRectangles) {
+                cutoutFromClip(clip, scale)
             }
+
+            val layerBg = layer.backgroundColor
+            clear(
+                if (layer.transparency && isTransparentBackgroundSupported()) {
+                    layerBg
+                } else {
+                    layerBg or 0xFF000000.toInt()
+                }
+            )
+
+            drawContent()
         }
         flush()
     }
@@ -87,11 +85,11 @@ internal inline fun Canvas.cutoutFromClip(rectangle: ClipRectangle, scale: Float
     )
 }
 
-private inline fun Canvas.runSavingAndRestoring(block: Canvas.() -> Unit) {
-    save()
+private inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
+    val restoreCount = save()
     try {
         block()
     } finally {
-        restore()
+        restoreToCount(restoreCount)
     }
 }
