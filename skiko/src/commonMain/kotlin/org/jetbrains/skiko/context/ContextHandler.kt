@@ -44,6 +44,9 @@ internal abstract class ContextHandler(
             clear(Color.TRANSPARENT)
 
             val scale = layer.contentScale
+
+            save()
+
             for (clip in layer.cutoutRectangles) {
                 cutoutFromClip(clip, scale)
             }
@@ -58,6 +61,8 @@ internal abstract class ContextHandler(
             )
 
             drawContent()
+
+            restore()
         }
         flush()
     }
