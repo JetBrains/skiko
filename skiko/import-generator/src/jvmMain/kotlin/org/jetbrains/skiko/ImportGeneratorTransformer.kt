@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -7,6 +8,7 @@ import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
@@ -25,12 +27,12 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
 
     @Suppress("UNCHECKED_CAST")
     private fun IrConstructorCall.getStringValue(value: String): String =
-        (getValueArgument(Name.identifier(value)) as IrConst<String>).value
+        (getValueArgument(Name.identifier(value)) as IrConst).value as String
 
-    @OptIn(UnsafeDuringIrConstructionAPI::class)
+    @OptIn(UnsafeDuringIrConstructionAPI::class, DeprecatedForRemovalCompilerApi::class)
     private fun IrFunction.addWasmImportAnnotation(name: String) {
         val annotationClass = pluginContext.referenceClass(
-            ClassId.fromString("kotlin/wasm/WasmImport") // Replace with your fully qualified annotation name
+            ClassId.fromString("kotlin/wasm/WasmImport")
         ) ?: return
 
         val ctor = annotationClass.owner.constructors.first()
@@ -61,14 +63,40 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
         annotations += annotationCall
     }
 
+    @OptIn(UnsafeDuringIrConstructionAPI::class, DeprecatedForRemovalCompilerApi::class)
+    private fun IrFunction.addJsNameAnnotation(name: String) {
+        val annotationClass = pluginContext.referenceClass(
+            ClassId.fromString("kotlin/js/JsName")
+        ) ?: return
+
+        val ctor = annotationClass.owner.constructors.first()
+
+        val annotationCall = IrConstructorCallImpl.fromSymbolOwner(
+            startOffset = startOffset,
+            endOffset = endOffset,
+            type = annotationClass.owner.defaultType,
+            constructorSymbol = ctor.symbol,
+        )
+
+        annotationCall.putValueArgument(0, IrConstImpl.string(
+            startOffset,
+            endOffset,
+            pluginContext.irBuiltIns.stringType,
+            name
+        ))
+
+        annotations += annotationCall
+    }
+
     override fun visitFunction(declaration: IrFunction): IrStatement {
         return super.visitFunction(declaration).apply {
             if (this !is IrFunction) return@apply
 
-            val jsNameAnnotation = getAnnotation(FqName("kotlin.js.JsName"))
+            val webImportAnnotation = getAnnotation(FqName("org.jetbrains.skiko.WebImport"))
                 ?: return@apply
 
-            val name = jsNameAnnotation.getStringValue("name")
+            val name = webImportAnnotation.getStringValue("name")
+            addJsNameAnnotation(name)
             addWasmImportAnnotation(name)
 
             exportSymbols.add(name)

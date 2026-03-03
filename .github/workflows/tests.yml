@@ -172,7 +172,7 @@ jobs:
           image_name: linux-compat
           virtual-display: true
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew --no-daemon --info --stacktrace \
               -Pskiko.native.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \

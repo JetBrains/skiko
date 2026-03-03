@@ -1,11 +1,11 @@
 package org.jetbrains.skiko
 
+import kotlinx.browser.window
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.PixelGeometry
-import org.jetbrains.skiko.w3c.HTMLCanvasElement
-import org.jetbrains.skiko.w3c.window
 import org.jetbrains.skiko.wasm.createWebGLContext
+import org.w3c.dom.HTMLCanvasElement
 
 /**
  * Provides a way to render the content and to receive the input events.

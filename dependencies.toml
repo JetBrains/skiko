@@ -1,9 +1,11 @@
 [versions]
-kotlin = "2.0.10"
+kotlin = "2.3.0"
+kotlinxBrowser = "0.5.0"
+
 coroutines = "1.8.0"
 jetbrainsRuntime-api = "1.5.0"
 
-androidGradlePlugin = "7.4.2"
+androidGradlePlugin = "8.2.2"
 dokka = "1.9.10"
 
 buildHelpers-publishing = "0.1.28"
@@ -21,6 +23,8 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 
 
 jetbrainsRuntime-api = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jetbrainsRuntime-api" }
+
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinxBrowser" } 
 
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 dokka-gradlePlugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }

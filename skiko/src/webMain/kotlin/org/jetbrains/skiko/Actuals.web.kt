@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.w3c.window
+import kotlinx.browser.window
+import org.w3c.dom.HTMLElement
 
 internal actual inline fun <R> maybeSynchronized(lock: Any, block: () -> R): R =
     block()
@@ -14,3 +15,5 @@ internal actual fun loadOpenGLLibrary() {
 internal actual fun loadAngleLibrary() {
     // Nothing to do here
 }
+
+annotation class WebImport(val name : String)
