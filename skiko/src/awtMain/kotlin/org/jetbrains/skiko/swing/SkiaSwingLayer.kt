@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.cutoutFromClip
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Component
 import java.awt.Graphics
@@ -46,8 +45,8 @@ open class SkiaSwingLayer(
         val scale = graphicsConfiguration.defaultTransform.scaleX.toFloat()
         // clipping
         for (index in clipComponents.indices) {
-            val item = clipComponents[index]
-            canvas.cutoutFromClip(item, scale)
+            val component = clipComponents[index]
+            canvas.cutoutFromClip(component, scale)
         }
         renderDelegate.onRender(canvas, width, height, nanoTime)
     }

@@ -194,16 +194,14 @@ actual open class SkiaLayer internal constructor(
     }
 
     private var _transparency: Boolean = false
-    actual var transparency: Boolean
+
+    /**
+     * Whether transparency is enabled.
+     */
+    var transparency: Boolean
         get() = _transparency
         set(value) {
             configureBackground(value, _background)
-        }
-
-    internal actual var backgroundColor: Int
-        get() = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
-        set(value) {
-            configureBackground(_transparency, Color(value, true))
         }
 
     // This is needed because after setBackground(null), getBackground() will not return null, but an ancestor's
@@ -333,10 +331,10 @@ actual open class SkiaLayer internal constructor(
         jComponent.add(this)
     }
 
+    /**
+     * A list of rectangles to cut out from the rendered content; No content will be drawn inside them.
+     */
     val clipComponents = mutableListOf<ClipRectangle>()
-
-    internal actual val cutoutRectangles: List<ClipRectangle>
-        get() = clipComponents
 
     @Volatile
     private var isDisposed = false
@@ -603,13 +601,27 @@ actual open class SkiaLayer internal constructor(
         // If this approach will be changed, create an issue in https://youtrack.jetbrains.com/issues/CMP for changing it in
         // https://github.com/JetBrains/compose-multiplatform/blob/e4e2d329709cded91a09cc612d4defbce37aad96/benchmarks/multiplatform/benchmarks/src/commonMain/kotlin/MeasureComposable.kt#L151 as well
 
+        val contentScale = this.contentScale
         val pictureWidth = (backedLayer.width * contentScale).coerceAtLeast(0f)
         val pictureHeight = (backedLayer.height * contentScale).coerceAtLeast(0f)
         val intWidth = pictureWidth.toInt()
         val intHeight = pictureHeight.toInt()
 
         val pictureRecorder = pictureRecorder!!
-        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight)
+        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight).apply {
+            for (component in clipComponents) {
+                cutoutFromClip(component, contentScale)
+            }
+
+            val layerBg = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
+            clear(
+                if (transparency && (redrawer?.isTransparentBackgroundSupported() == true)) {
+                    layerBg
+                } else {
+                    layerBg or 0xFF000000.toInt()
+                }
+            )
+        }
 
         try {
             isRendering = true

@@ -50,24 +50,6 @@ actual open class SkiaLayer {
         }
 
     /**
-     * Transparency is not supported on macOS native.
-     */
-    actual var transparency: Boolean
-        get() = false
-        set(value) {
-            if (value) throw IllegalArgumentException("transparency unsupported")
-        }
-
-    /**
-     * The background color of the layer.
-     */
-    internal actual var backgroundColor: Int = Color.WHITE
-        set(value) {
-            field = value
-            needRender()
-        }
-
-    /**
      * Underlying [NSView]
      */
     lateinit var nsView: NSView
@@ -75,9 +57,6 @@ actual open class SkiaLayer {
 
     actual val component: Any?
         get() = this.nsView
-
-    internal actual val cutoutRectangles: List<ClipRectangle>
-        get() = emptyList()
 
     /**
      * Implements rendering logic and events processing.
@@ -172,7 +151,9 @@ actual open class SkiaLayer {
         val pictureWidth = (width * contentScale).coerceAtLeast(0.0)
         val pictureHeight = (height * contentScale).coerceAtLeast(0.0)
 
-        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth.toFloat(), pictureHeight.toFloat())
+        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth.toFloat(), pictureHeight.toFloat()).apply {
+            clear(Color.WHITE)
+        }
         renderDelegate?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
 
         val picture = pictureRecorder.finishRecordingAsPicture()

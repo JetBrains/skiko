@@ -20,21 +20,6 @@ actual open class SkiaLayer {
             if (value) throw IllegalArgumentException("changing fullscreen is unsupported")
         }
 
-    actual var transparency: Boolean
-        get() = false
-        set(value) {
-            if (value) throw IllegalArgumentException("transparency unsupported")
-        }
-
-    /**
-     * The background color of the layer.
-     */
-    actual internal var backgroundColor: Int = Color.WHITE
-        set(value) {
-            field = value
-            needRender()
-        }
-
     actual var renderDelegate: SkikoRenderDelegate? = null
 
     actual fun attachTo(container: Any) {
@@ -80,9 +65,6 @@ actual open class SkiaLayer {
 
     actual val component: Any?
         get() = this.container
-
-    actual internal val cutoutRectangles: List<ClipRectangle>
-        get() = emptyList()
 
     internal actual fun draw(canvas: Canvas): Unit = TODO()
 }
