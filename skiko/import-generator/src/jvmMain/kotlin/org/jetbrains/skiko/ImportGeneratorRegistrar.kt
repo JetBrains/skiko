@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 @OptIn(ExperimentalCompilerApi::class)
 class ImportGeneratorRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean = true
+    val pluginId: String = "skiko-import-generator"
 
     override fun ExtensionStorage.registerExtensions(
         configuration: CompilerConfiguration,

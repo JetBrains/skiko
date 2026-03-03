@@ -5,7 +5,6 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
 import org.jetbrains.skiko.wasm.awaitSkiko
 
-actual typealias TestReturnType = Any
 /**
  * Awaits for `wasmSetup` and then runs the [block] in a coroutine.
  */

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalWasmDsl::class)
-
 package tasks.configuration
 
 import Arch
@@ -19,15 +17,21 @@ import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.jetbrains.kotlin.gradle.plugin.*
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import projectDirs
 import registerOrGetSkiaDirProvider
-import setupMjs
-import setupReexportMjs
-import skikoTestMjs
 import supportWeb
+import wasmImport
 import java.io.File
+
+private val Project.setupMjs
+    get() = wasmImport("setup.mjs")
+
+private val Project.setupReexportMjs
+    get() = wasmImport("js-reexport-symbols.mjs")
+
+private val Project.skikoTestMjs
+    get() = wasmImport("skiko-test.mjs")
 
 fun SkikoProjectContext.declareWasmTasks() {
     if (!project.supportWeb) {

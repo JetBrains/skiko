@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.w3c.window
+import kotlinx.browser.window
+import kotlin.js.js
 
 actual val hostOs: OS = detectHostOs()
 
@@ -22,7 +23,9 @@ actual val kotlinBackend: KotlinBackend
  * See https://developer.mozilla.org/en-US/docs/Web/API/NavigatorUAData/platform - new API,
  * but not supported in all browsers
  */
-internal expect fun getNavigatorInfo(): String
+internal fun getNavigatorInfo(): String =
+    js("navigator.userAgentData ? navigator.userAgentData.platform : navigator.platform")
+
 
 /**
  * In a browser, user platform can be obtained from different places:

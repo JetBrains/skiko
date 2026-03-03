@@ -1,10 +1,10 @@
 package org.jetbrains.skiko
 
+import kotlinx.browser.window
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skiko.w3c.HTMLCanvasElement
-import org.jetbrains.skiko.w3c.window
 import org.jetbrains.skiko.wasm.ContextAttributes
+import org.w3c.dom.HTMLCanvasElement
 
 /**
  * CanvasRenderer takes an [HTMLCanvasElement] instance and initializes

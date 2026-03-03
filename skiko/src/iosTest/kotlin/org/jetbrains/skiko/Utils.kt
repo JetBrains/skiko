@@ -22,7 +22,7 @@ class BasicIosTests {
         val f = fopen(path, "r") ?: throw Error("cannot open $path: ${strerror(errno)?.toKString()}")
         val buf = ByteArray(200)
         buf.usePinned {
-            val rv = fread(it.addressOf(0), 1, buf.size.toULong(), f)
+            val rv = fread(it.addressOf(0), 1u, buf.size.toULong(), f)
             assertTrue { rv != 0UL }
         }
         assertEquals("This is test data.\n", buf.toKString())
