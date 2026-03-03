@@ -15,3 +15,5 @@ actual annotation class SkipNativeTarget
 actual fun makeFromFileName(path: String?): Data = Data(0)
 
 actual val isDebugModeOnJvm: Boolean = false
+
+actual typealias TestReturnType = Any
