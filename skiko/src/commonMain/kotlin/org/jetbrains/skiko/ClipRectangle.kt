@@ -1,5 +1,8 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.ClipMode
+
 /**
  * Rectangle used for clipping.
  */
@@ -18,4 +21,18 @@ internal fun ClipRectangle(x: Float, y: Float, width: Float, height: Float) = ob
     override val y: Float = y
     override val width: Float = width
     override val height: Float = height
+}
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun Canvas.cutoutFromClip(rect: ClipRectangle, scale: Float) {
+    val x = rect.x
+    val y = rect.y
+    clipRect(
+        left = x * scale,
+        top = y * scale,
+        right = (x + rect.width) * scale,
+        bottom = (y + rect.height) * scale,
+        mode = ClipMode.DIFFERENCE,
+        antiAlias = true
+    )
 }

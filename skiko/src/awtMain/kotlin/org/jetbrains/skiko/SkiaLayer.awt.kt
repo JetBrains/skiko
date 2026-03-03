@@ -609,8 +609,8 @@ actual open class SkiaLayer internal constructor(
 
         val pictureRecorder = pictureRecorder!!
         val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight).apply {
-            for (clip in clipComponents) {
-                cutoutFromClip(clip, contentScale)
+            for (component in clipComponents) {
+                cutoutFromClip(component, contentScale)
             }
 
             val layerBg = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
