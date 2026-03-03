@@ -47,24 +47,3 @@ internal abstract class ContextHandler(
         flush()
     }
 }
-
-@Suppress("NOTHING_TO_INLINE")
-internal inline fun Canvas.cutoutFromClip(rectangle: ClipRectangle, scale: Float) {
-    clipRect(
-        left = rectangle.x * scale,
-        top = rectangle.y * scale,
-        right = (rectangle.x + rectangle.width) * scale,
-        bottom = (rectangle.y + rectangle.height) * scale,
-        mode = ClipMode.DIFFERENCE,
-        antiAlias = true
-    )
-}
-
-internal inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
-    val restoreCount = save()
-    try {
-        block()
-    } finally {
-        restoreToCount(restoreCount)
-    }
-}

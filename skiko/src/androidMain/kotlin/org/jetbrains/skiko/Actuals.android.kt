@@ -4,6 +4,7 @@ import android.content.*
 import android.content.res.Configuration
 import android.view.View
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
 
 actual fun setSystemLookAndFeel(): Unit = TODO()
 
@@ -15,6 +16,7 @@ internal class AndroidOpenGLRedrawer(
     override fun needRender(canUpdateImmediately: Boolean) = TODO()
     override fun renderImmediately() = TODO()
     override fun update(nanoTime: Long) = TODO()
+    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 
     override val renderInfo: String get() = "Android renderer"
 }

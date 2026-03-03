@@ -5,7 +5,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.context.cutoutFromClip
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
@@ -203,15 +202,6 @@ actual open class SkiaLayer internal constructor(
         get() = _transparency
         set(value) {
             configureBackground(value, _background)
-        }
-
-    /**
-     * The color, in ARGB format, with which the layer is cleared before rendering.
-     */
-    internal var backgroundColor: Int
-        get() = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
-        set(value) {
-            configureBackground(_transparency, Color(value, true))
         }
 
     // This is needed because after setBackground(null), getBackground() will not return null, but an ancestor's
@@ -623,7 +613,7 @@ actual open class SkiaLayer internal constructor(
                 cutoutFromClip(clip, contentScale)
             }
 
-            val layerBg = backgroundColor
+            val layerBg = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
             clear(
                 if (transparency && (redrawer?.isTransparentBackgroundSupported() == true)) {
                     layerBg

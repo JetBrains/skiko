@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.ImageFilter.Companion.makeDropShadowOnly
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.ClipRectangle
 
 open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, internal val _owner: Any) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
@@ -1849,3 +1850,26 @@ private external fun _nRestore(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestoreToCount")
 private external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun Canvas.cutoutFromClip(rectangle: ClipRectangle, scale: Float) {
+    val rectX = rectangle.x
+    val rectY = rectangle.y
+    clipRect(
+        left = rectX * scale,
+        top = rectY * scale,
+        right = (rectX + rectangle.width) * scale,
+        bottom = (rectY + rectangle.height) * scale,
+        mode = ClipMode.DIFFERENCE,
+        antiAlias = true
+    )
+}
+
+internal inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
+    val restoreCount = save()
+    try {
+        block()
+    } finally {
+        restoreToCount(restoreCount)
+    }
+}

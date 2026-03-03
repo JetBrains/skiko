@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.swing
 
+import org.jetbrains.skia.cutoutFromClip
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.cutoutFromClip
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Component
 import java.awt.Graphics
