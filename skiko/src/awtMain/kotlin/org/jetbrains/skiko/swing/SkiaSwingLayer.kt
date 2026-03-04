@@ -120,6 +120,8 @@ open class SkiaSwingLayer(
                 redrawerManager.findNextWorkingRenderApi()
                 repaint()
             }
+        } catch (e: Exception) {
+            Logger.warn(e) { "Exception during SkiaSwingLayer rendering" }
         }
     }
 
