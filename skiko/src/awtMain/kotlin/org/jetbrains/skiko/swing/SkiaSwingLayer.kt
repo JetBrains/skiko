@@ -1,6 +1,5 @@
 package org.jetbrains.skiko.swing
 
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Component
