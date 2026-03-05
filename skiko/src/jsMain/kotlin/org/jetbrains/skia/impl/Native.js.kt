@@ -151,14 +151,12 @@ internal actual class InteropScope actual constructor() {
     }
 
     actual fun toInterop(stringArray: Array<String>?): InteropPointer {
-        return if (stringArray.isNullOrEmpty()) {
-            0
-        } else {
-            val ptrs = IntArray(stringArray.size) { i ->
-                toInterop(stringArray[i])
-            }
-            toInterop(ptrs)
+        if (stringArray.isNullOrEmpty()) return 0
+
+        val ptrs = IntArray(stringArray.size) { i ->
+            toInterop(stringArray[i])
         }
+        return toInterop(ptrs)
     }
 
     actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray {
