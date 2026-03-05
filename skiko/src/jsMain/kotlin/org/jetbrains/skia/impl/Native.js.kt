@@ -174,7 +174,7 @@ internal actual class InteropScope actual constructor() {
     }
 
     actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer {
-        return toInterop(IntArray(interopPointers.size) { index -> interopPointers[index] })
+        return toInterop(interopPointers.toIntArray())
     }
 
     actual fun booleanCallback(callback: (() -> Boolean)?): NativePointer {
