@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.internal.unpackTo
 
 class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -150,13 +151,18 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      */
     fun makeClone(variations: Array<FontVariation>, collectionIndex: Int = 0): Typeface {
         return try {
-            if (variations.size == 0) return this
+            if (variations.isEmpty()) return this
             Stats.onNativeCall()
-            val variationsData = variations.asList().flatMap { listOf(it._tag, it.value.toRawBits()) }.toIntArray()
-            val ptr =
-                interopScope { _nMakeClone(_ptr, toInterop(variationsData), 2 * variations.size, collectionIndex) }
+            val variationsCount = variations.size * 2
+            val variationsData = variations.unpackTo(IntArray(variationsCount)) { variation, arr, idx ->
+                arr[idx] = variation._tag
+                arr[idx + 1] = variation.value.toRawBits()
+                //Stepping 2 places for the next variation
+                idx + 2
+            }
+            val ptr = interopScope { _nMakeClone(_ptr, toInterop(variationsData), variationsCount, collectionIndex) }
             require(ptr != NullPointer) {
-                "Failed to clone Typeface $this with $variations"
+                "Failed to clone Typeface $this with ${variations.contentToString()}"
             }
             Typeface(ptr)
         } finally {

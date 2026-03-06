@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
+import org.jetbrains.skiko.internal.unpackTo
 
 class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt) {
 
@@ -141,13 +142,14 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
         internal fun InteropScope.arrayOfFontFeaturesToInterop(fontFeatures: Array<FontFeature>?): InteropPointer {
             val ints = IntArray(4 * (fontFeatures?.size ?: 0))
 
-            fontFeatures?.forEachIndexed { ix, fontFeature ->
-                val j = ix * 4
-                ints[j] = fontFeature._tag
-                ints[j + 1] = fontFeature.value
-                ints[j + 2] = fontFeature.start.toInt()
-                ints[j + 3] = fontFeature.end.toInt()
-            }
+            fontFeatures?.unpackTo(ints) { feature , arr, index ->
+                arr[index] = feature._tag
+                arr[index + 1] = feature.value
+                arr[index + 2] = feature.start.toInt()
+                arr[index + 3] = feature.end.toInt()
+                //Stepping 4 places for the next feature, because every feature is represented by 4 ints
+                index + 4
+             }
 
             return toInterop(ints)
         }
