@@ -7,7 +7,7 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MacOsMetalRedrawer
 
 /**
- * Metal ContextHandler implementation for MacOs.
+ * Metal ContextHandler implementation for macOS.
  */
 internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer, layer::draw) {
     private val metalRedrawer: MacOsMetalRedrawer
@@ -25,12 +25,17 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer
         return true
     }
 
-    override fun initCanvas() {
+    override fun createDrawScope() = DrawScope(
+        layerWidth = layer.nsView.frame.useContents { size.width },
+        layerHeight = layer.nsView.frame.useContents { size.height },
+        scale = layer.contentScale
+    )
+
+    override fun DrawScope.initCanvas() {
         disposeCanvas()
 
-        val scale = layer.contentScale
-        val w = (layer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
-        val h = (layer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
 
         if (w > 0 && h > 0) {
             renderTarget = metalRedrawer.makeRenderTarget(w, h)

@@ -23,12 +23,11 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextBasedContextHandle
         return false
     }
 
-    override fun initCanvas() {
+    override fun DrawScope.initCanvas() {
         val context = context ?: return
-        val scale = layer.contentScale
 
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
 
         if (isSizeChanged(w, h) || surface == null) {
             disposeCanvas()

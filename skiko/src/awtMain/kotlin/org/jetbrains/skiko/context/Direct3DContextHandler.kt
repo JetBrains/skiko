@@ -30,15 +30,14 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         return false
     }
 
-    override fun initCanvas() {
+    override fun DrawScope.initCanvas() {
         val context = context ?: return
-        val scale = layer.contentScale
 
         // Direct3D can't work with zero size.
         // Don't rewrite code to skipping, as we need the whole pipeline in zero case too
         // (drawing -> flushing -> swapping -> waiting for vsync)
-        val width = (layer.width * scale).toInt().coerceAtLeast(1)
-        val height = (layer.height * scale).toInt().coerceAtLeast(1)
+        val width = scaledLayerWidth.coerceAtLeast(1)
+        val height = scaledLayerHeight.coerceAtLeast(1)
 
         if (isSizeChanged(width, height) || isSurfacesNull()) {
             disposeCanvas()

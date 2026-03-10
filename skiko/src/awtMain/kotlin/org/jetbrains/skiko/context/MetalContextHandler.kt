@@ -20,12 +20,11 @@ internal class MetalContextHandler(
     private val device: MetalDevice,
     private val adapter: MetalAdapter
 ) : ContextBasedContextHandler(layer, "Metal") {
-    override fun initCanvas() {
+    override fun DrawScope.initCanvas() {
         disposeCanvas()
 
-        val scale = layer.contentScale
-        val width = (layer.backedLayer.width * scale).toInt().coerceAtLeast(0)
-        val height = (layer.backedLayer.height * scale).toInt().coerceAtLeast(0)
+        val width = scaledLayerWidth
+        val height = scaledLayerHeight
 
         if (width > 0 && height > 0) {
             renderTarget = makeRenderTarget(width, height)

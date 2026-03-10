@@ -7,6 +7,7 @@ import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.Direct3DContextHandler
 
 internal class Direct3DRedrawer(
@@ -73,24 +74,28 @@ internal class Direct3DRedrawer(
         update()
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
+                contextHandler.inDrawScope {
+                    drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
+                }
             }
         }
     }
 
     private suspend fun draw() {
         inDrawScope {
-            withContext(dispatcherToBlockOn) {
-                drawAndSwap(withVsync = properties.isVsyncEnabled)
+            contextHandler.inDrawScope {
+                withContext(dispatcherToBlockOn) {
+                    drawAndSwap(withVsync = properties.isVsyncEnabled)
+                }
             }
         }
     }
 
-    private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
+    private fun ContextHandler.DrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
         if (isDisposed) {
             return
         }
-        contextHandler.draw()
+        contextHandlerDraw()
         swap(withVsync)
     }
 

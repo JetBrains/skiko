@@ -3,6 +3,7 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MetalContextHandler
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.SwingUtilities.*
@@ -104,7 +105,9 @@ internal class MetalRedrawer(
         update()
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw()
+                contextHandler.inDrawScope {
+                    performDraw()
+                }
                 // Trying to draw immediately in Metal will result in lost (undrawn)
                 // frames if there are more than two between consecutive vsync events.
                 if (SkikoProperties.macOSWaitForPreviousFrameVsyncOnRedrawImmediately) {
@@ -118,11 +121,13 @@ internal class MetalRedrawer(
 
     private suspend fun draw() {
         inDrawScope {
-            // Move drawing to another thread to free the main thread
-            // It can be expensive to run it in the main thread and FPS can become unstable.
-            // This is visible by running [SkiaLayerPerformanceTest], standard deviation is increased significantly.
-            withContext(dispatcherToBlockOn) {
-                performDraw()
+            contextHandler.inDrawScope {
+                // Move drawing to another thread to free the main thread
+                // It can be expensive to run it in the main thread and FPS can become unstable.
+                // This is visible by running [SkiaLayerPerformanceTest], standard deviation is increased significantly.
+                withContext(dispatcherToBlockOn) {
+                    performDraw()
+                }
             }
         }
         if (isDisposed) throw CancellationException()
@@ -144,10 +149,10 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun performDraw() = synchronized(drawLock) {
+    private fun ContextHandler.DrawScope.performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
             autoreleasepool {
-                contextHandler.draw()
+                contextHandlerDraw()
             }
         }
     }

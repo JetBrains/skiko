@@ -22,12 +22,11 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHand
     var imageData: ByteArray? = null
     var raster: WritableRaster? = null
 
-    override fun initCanvas() {
+    override fun DrawScope.initCanvas() {
         disposeCanvas()
 
-        val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
 
         if (storage.width != w || storage.height != h) {
             storage.allocPixelsFlags(ImageInfo.makeS32(w, h, ColorAlphaType.PREMUL), false)

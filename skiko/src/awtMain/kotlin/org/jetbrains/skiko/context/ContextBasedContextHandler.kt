@@ -6,7 +6,7 @@ import org.jetbrains.skiko.SkiaLayer
 
 internal abstract class ContextBasedContextHandler(layer: SkiaLayer, val name: String) : JvmContextHandler(layer) {
 
-    abstract protected fun makeContext(): DirectContext
+    protected abstract fun makeContext(): DirectContext
 
     override fun initContext(): Boolean {
         try {

@@ -4,6 +4,13 @@ import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.SkiaLayer
 
 internal abstract class JvmContextHandler(layer: SkiaLayer) : ContextHandler(layer, layer::draw) {
+
+    override fun createDrawScope() = DrawScope(
+        layerWidth = layer.width,
+        layerHeight = layer.height,
+        scale = layer.contentScale
+    )
+
     protected fun onContextInitialized() {
         if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
             Logger.info { "Renderer info:\n ${rendererInfo()}" }

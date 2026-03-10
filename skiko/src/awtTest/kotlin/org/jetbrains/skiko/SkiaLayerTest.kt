@@ -578,7 +578,7 @@ class SkiaLayerTest {
             object : BaseTestRedrawer(layer) {
                 private val contextHandler = object : JvmContextHandler(layer) {
                     override fun initContext() = false
-                    override fun initCanvas() = Unit
+                    override fun DrawScope.initCanvas() = Unit
                 }
                 override fun renderImmediately() = layer.inDrawScope(contextHandler::draw)
             }
