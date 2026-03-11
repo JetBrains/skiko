@@ -158,23 +158,34 @@ class SkikoProperties(private val myProject: Project) {
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
 
     /**
-     * Skia-pack repository root directory for building Skia from source.
+     * Skia repository root directory for building Skia from source.
      *
      * Property naming conventions:
-     * - Gradle property: `-Pskia.pack.dir=...` (kebab-case, Gradle convention)
-     * - Kotlin accessor: `skiaPackDir` (camelCase, Kotlin convention)
-     * - Environment variable: `SKIA_PACK_DIR`
+     * - Gradle property: `-Pskia.repo.dir=...` (preferred)
+     * - Kotlin accessor: `skiaRepoDir`
+     * - Environment variable: `SKIA_REPO_DIR`
      *
-     * Usage: `-Pskia.pack.dir=/path/to/skia-pack`
+     * Legacy `skia.pack.dir` and `SKIA_PACK_DIR` are still accepted to keep
+     * existing local workflows working while the standalone repo is retired.
      *
-     * Note: Must point to skia-pack repository root containing script/ with Python build scripts.
+     * Usage: `-Pskia.repo.dir=/path/to/skia`
+     *
+     * Note: Must point to skia repository root containing tools/skia_release/.
      */
     // todo: make compatible with the configuration cache
-    val skiaPackDir: File?
-        get() = (System.getenv()["SKIA_PACK_DIR"] ?: System.getProperty("skia.pack.dir") ?: myProject.findProperty("skia.pack.dir")
-            ?.toString())?.let { skiaPackDirProp ->
-                val file = File(skiaPackDirProp)
-                if (!file.isDirectory) throw (GradleException("\"skia.pack.dir\" property was explicitly set to ${skiaPackDirProp} which is not resolved as a directory"))
+    val skiaRepoDir: File?
+        get() = (
+            System.getenv()["SKIA_REPO_DIR"]
+                ?: System.getenv()["SKIA_PACK_DIR"]
+                ?: System.getProperty("skia.repo.dir")
+                ?: System.getProperty("skia.pack.dir")
+                ?: myProject.findProperty("skia.repo.dir")?.toString()
+                ?: myProject.findProperty("skia.pack.dir")?.toString()
+            )?.let { skiaRepoDirProp ->
+                val file = File(skiaRepoDirProp)
+                if (!file.isDirectory) {
+                    throw GradleException("\"skia.repo.dir\" property was explicitly set to $skiaRepoDirProp which is not resolved as a directory")
+                }
                 file
             }
 
@@ -189,6 +200,7 @@ class SkikoProperties(private val myProject: Project) {
      * Usage: `-Pskia.dir=/path/to/skia`
      *
      * Note: Must point to directory containing built Skia source code and headers.
+     * When using the integrated release scripts this is typically the same path as `skia.repo.dir`.
      */
     // todo: make compatible with the configuration cache
     val skiaDir: File?
