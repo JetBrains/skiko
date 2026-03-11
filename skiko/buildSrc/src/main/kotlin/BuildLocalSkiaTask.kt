@@ -19,7 +19,7 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
     abstract val buildType: Property<SkiaBuildType>
 
     @get:InputDirectory
-    abstract val skiaPackDir: DirectoryProperty
+    abstract val skiaRepoDir: DirectoryProperty
 
     @get:Internal
     abstract val skikoTargetFlags: ListProperty<String>
@@ -29,15 +29,14 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
         val version = skiaVersion.get()
         val target = skiaTarget.get()
         val type = buildType.get()
-        val skiaPackRoot = skiaPackDir.get().asFile
+        val skiaRepoRoot = skiaRepoDir.get().asFile
 
-        // Validate that skiaPackDir points to skia-pack repository root
-        val scriptsDir = File(skiaPackRoot, "script")
+        val scriptsDir = File(skiaRepoRoot, "tools/skia_release")
         if (!scriptsDir.isDirectory) {
             throw GradleException(
-                "Directory script not found in ${skiaPackRoot.absolutePath}\n" +
-                "Expected: skia-pack repository root containing script/\n" +
-                "Ensure skia.pack.dir points to the correct skia-pack directory"
+                "Directory tools/skia_release not found in ${skiaRepoRoot.absolutePath}\n" +
+                "Expected: skia repository root containing tools/skia_release/\n" +
+                "Ensure skia.repo.dir points to the correct skia checkout"
             )
         }
 
@@ -51,8 +50,8 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
         }
 
         logger.lifecycle("Building Skia $version for target ${target.id} in ${type.id} mode")
-        logger.lifecycle("Using skia-pack directory: ${skiaPackRoot.absolutePath}")
-        logger.lifecycle("Using scripts directory: script")
+        logger.lifecycle("Using skia repository: ${skiaRepoRoot.absolutePath}")
+        logger.lifecycle("Using scripts directory: tools/skia_release")
 
         // Determine host architecture
         val hostArch = when (System.getProperty("os.arch")) {
@@ -64,14 +63,12 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
         val machines = target.machines(hostArch)
         logger.lifecycle("Building for architectures: ${machines.joinToString { it.id }}")
 
-        // Checkout Skia dependencies
-        runPythonScript(skiaPackRoot, "checkout.py", "--version", version)
-
         // Build and archive for each machine
         machines.forEach { machine ->
             logger.lifecycle("Building for ${machine.id}...")
             runPythonScript(
-                skiaPackRoot, "build.py",
+                skiaRepoRoot, "build.py",
+                "--skia-dir", ".",
                 "--target", target.id,
                 "--machine", machine.id,
                 "--build-type", type.id
@@ -79,7 +76,8 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
 
             logger.lifecycle("Archiving ${machine.id}...")
             runPythonScript(
-                skiaPackRoot, "archive.py",
+                skiaRepoRoot, "archive.py",
+                "--skia-dir", ".",
                 "--version", version,
                 "--target", target.id,
                 "--machine", machine.id,
@@ -92,19 +90,19 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
         project.file("build/classes/kotlin").deleteRecursively()
 
         logger.lifecycle("Skia binaries built successfully")
-        logger.lifecycle("Next: Run './gradlew publishToMavenLocal -Pskia.dir=<skia-source-dir>' to publish")
+        logger.lifecycle("Next: Run './gradlew publishToMavenLocal -Pskia.dir=<skia-repo-dir>' to publish")
     }
 
-    private fun runPythonScript(skiaPackRoot: File, script: String, vararg args: String) {
-        val scriptPath = "script/$script"
-        val scriptFile = File(skiaPackRoot, scriptPath)
+    private fun runPythonScript(skiaRepoRoot: File, script: String, vararg args: String) {
+        val scriptPath = "tools/skia_release/$script"
+        val scriptFile = File(skiaRepoRoot, scriptPath)
 
         // Validate script file exists
         if (!scriptFile.exists()) {
             throw GradleException(
                 "Python script not found: ${scriptFile.absolutePath}\n" +
-                "Expected: skia-pack directory with script/$script\n" +
-                "Ensure skia.pack.dir points to correct skia-pack directory"
+                "Expected: skia directory with tools/skia_release/$script\n" +
+                "Ensure skia.repo.dir points to the correct skia checkout"
             )
         }
 
@@ -114,7 +112,7 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
 
         val output = ByteArrayOutputStream()
         val result = project.exec {
-            workingDir = skiaPackRoot
+            workingDir = skiaRepoRoot
             commandLine = fullCommand
             standardOutput = output
             errorOutput = output

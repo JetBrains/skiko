@@ -378,13 +378,11 @@ tasks.register<BuildLocalSkiaTask>("prepareLocalSkiaBuild") {
     skiaTarget.set(provider { skiko.skiaTarget })
     buildType.set(skiko.buildType)
 
-    // Set skiaPackDir - either from property or default location
-    val skiaPackDir = skiko.skiaPackDir
-    if (skiaPackDir != null) {
-        this.skiaPackDir.set(skiaPackDir)
+    val skiaRepoDir = skiko.skiaRepoDir
+    if (skiaRepoDir != null) {
+        this.skiaRepoDir.set(skiaRepoDir)
     } else {
-        // Will be set by bash script via -Pskia.pack.dir, or use default skia-pack
-        this.skiaPackDir.set(project.file("skia-pack"))
+        this.skiaRepoDir.set(project.file("skia"))
     }
 
     skikoTargetFlags.set(provider {
