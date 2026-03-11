@@ -41,7 +41,7 @@ internal abstract class ContextHandler(
 
     /**
      * Reads layer properties, creating a [DrawScope] in which [DrawScope.contextHandlerDraw] can later be called on a
-     * background thread.
+     * render thread.
      *
      * This function should be called only in a thread where it is valid to access layer properties.
      */
