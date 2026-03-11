@@ -32,7 +32,7 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHand
             storage.allocPixelsFlags(ImageInfo.makeS32(w, h, ColorAlphaType.PREMUL), false)
         }
 
-        canvas = Canvas(storage, SurfaceProps(pixelGeometry = layer.pixelGeometry))
+        canvas = Canvas(storage, SurfaceProps(pixelGeometry = pixelGeometry))
     }
 
     override fun flush() {

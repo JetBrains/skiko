@@ -6,6 +6,7 @@ import org.jetbrains.skiko.SkiaLayer
 internal abstract class JvmContextHandler(layer: SkiaLayer) : ContextHandler(layer, layer::draw) {
 
     override fun createDrawScope() = DrawScope(
+        pixelGeometry = layer.pixelGeometry,
         layerWidth = layer.width,
         layerHeight = layer.height,
         scale = layer.contentScale

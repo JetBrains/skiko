@@ -35,7 +35,7 @@ internal class MetalContextHandler(
                 SurfaceOrigin.TOP_LEFT,
                 SurfaceColorFormat.BGRA_8888,
                 ColorSpace.sRGB,
-                SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                SurfaceProps(pixelGeometry = pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface!!.canvas

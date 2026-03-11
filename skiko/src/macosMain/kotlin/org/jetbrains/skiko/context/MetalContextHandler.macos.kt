@@ -26,6 +26,7 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer
     }
 
     override fun createDrawScope() = DrawScope(
+        pixelGeometry = layer.pixelGeometry,
         layerWidth = layer.nsView.frame.useContents { size.width },
         layerHeight = layer.nsView.frame.useContents { size.height },
         scale = layer.contentScale

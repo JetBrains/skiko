@@ -45,7 +45,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
 
             val justInitialized = directXRedrawer.changeSize(width, height)
             try {
-                val surfaceProps = SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                val surfaceProps = SurfaceProps(pixelGeometry = pixelGeometry)
                 for (bufferIndex in 0 until bufferCount) {
                     surfaces[bufferIndex] = directXRedrawer.makeSurface(
                         context = getPtr(context),

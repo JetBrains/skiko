@@ -40,7 +40,7 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextBasedContextHandl
                 SurfaceOrigin.BOTTOM_LEFT,
                 SurfaceColorFormat.RGBA_8888,
                 ColorSpace.sRGB,
-                SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                SurfaceProps(pixelGeometry = pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
         }
 

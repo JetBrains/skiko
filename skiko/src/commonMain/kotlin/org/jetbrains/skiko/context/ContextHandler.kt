@@ -70,14 +70,27 @@ internal abstract class ContextHandler(
     }
 
     inner class DrawScope(
+        val pixelGeometry: PixelGeometry,
         val scaledLayerWidth: Int,
-        val scaledLayerHeight: Int
+        val scaledLayerHeight: Int,
     ) {
-        constructor(layerWidth: Int, layerHeight: Int, scale: Float): this(
+        constructor(
+            pixelGeometry: PixelGeometry,
+            layerWidth: Int,
+            layerHeight: Int,
+            scale: Float
+        ): this(
+            pixelGeometry = pixelGeometry,
             scaledLayerWidth = (layerWidth * scale).toInt().coerceAtLeast(0),
             scaledLayerHeight = (layerHeight * scale).toInt().coerceAtLeast(0)
         )
-        constructor(layerWidth: Double, layerHeight: Double, scale: Float): this(
+        constructor(
+            pixelGeometry: PixelGeometry,
+            layerWidth: Double,
+            layerHeight: Double,
+            scale: Float
+        ): this(
+            pixelGeometry = pixelGeometry,
             scaledLayerWidth = (layerWidth * scale).toInt().coerceAtLeast(0),
             scaledLayerHeight = (layerHeight * scale).toInt().coerceAtLeast(0)
         )
