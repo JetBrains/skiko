@@ -62,13 +62,27 @@ jobs:
         name: 'Setup Prerequisites'
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Publish Maven Local'
+        name: 'Publish KMP and AWT Maven Local'
         with:
           image_name: linux-compat
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
-              :skiko:publishToMavenLocal
+              -Pskiko.awt.enabled=true \
+              :skiko:publishKotlinMultiplatformPublicationToMavenLocal \
+              :skiko:publishAwtPublicationToMavenLocal \
+              :skiko:publishAwtRuntimeElementsPublicationToMavenLocal
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Publish Native Maven Local'
+        with:
+          image_name: linux-amd64
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.native.enabled=true \
+              -Pskiko.awt.enabled=false \
+              :skiko:publishLinuxArm64PublicationToMavenLocal \
+              :skiko:publishLinuxX64PublicationToMavenLocal
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Check AWT Sample'

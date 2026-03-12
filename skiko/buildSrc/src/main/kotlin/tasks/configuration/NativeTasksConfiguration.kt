@@ -182,7 +182,7 @@ fun configureCinterop(
     }
     target.compilations.getByName("main") {
         cinterops.create(cinteropName).apply {
-            defFileProperty.set(writeCInteropDef.map { it.outputFile.get().asFile })
+            definitionFile.set(writeCInteropDef.flatMap { it.outputFile })
         }
     }
 }
@@ -294,9 +294,13 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     target.binaries.all {
         freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
     }
+
+
     target.compilations.all {
-        kotlinOptions {
-            freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
+        compilerOptions.configure {
+            freeCompilerArgs.addAll(
+                allLibraries.flatMap { listOf("-include-binary", it) } + linkerFlags
+            )
         }
     }
 
@@ -343,7 +347,7 @@ fun KotlinMultiplatformExtension.configureIOSTestsWithMetal(project: Project) {
         if (targets.names.contains(target)) {
             val testBinary = targets.getByName<KotlinNativeTarget>(target).binaries.getTest("DEBUG")
             project.tasks.register(target + "TestWithMetal") {
-                dependsOn(testBinary.linkTask)
+                dependsOn(testBinary.linkTaskProvider)
                 doLast {
                     val simulatorIdPropertyKey = "skiko.iosSimulatorUUID"
                     val simulatorId = project.findProperty(simulatorIdPropertyKey)?.toString()

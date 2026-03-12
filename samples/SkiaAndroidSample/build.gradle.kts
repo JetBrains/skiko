@@ -23,7 +23,7 @@ repositories {
 
 plugins {
     id("com.android.application") version "8.9.0"
-    kotlin("android") version "1.9.21"
+    kotlin("android") version "2.2.20"
 }
 
 val skikoNativeX64 by configurations.creating

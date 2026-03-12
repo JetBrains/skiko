@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
 
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
@@ -8,10 +8,11 @@ import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import tasks.configuration.*
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     kotlin("multiplatform")
@@ -58,6 +59,11 @@ repositories {
 }
 
 kotlin {
+    compilerOptions {
+        languageVersion.set(KotlinVersion.KOTLIN_2_2)
+        apiVersion.set(KotlinVersion.KOTLIN_2_2)
+    }
+
     applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
     skikoProjectContext.declareSkiaTasks()
 
@@ -96,7 +102,7 @@ kotlin {
         skikoProjectContext.declareWasmTasks()
 
         js {
-            moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
+            outputModuleName.set("skiko-kjs") // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
                     useKarma {
@@ -120,7 +126,7 @@ kotlin {
 
         @OptIn(ExperimentalWasmDsl::class)
         wasmJs {
-            moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
+            outputModuleName.set("skiko-kjs-wasm") // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
                     useKarma {
@@ -181,6 +187,10 @@ kotlin {
     skikoProjectContext.jvmMainSourceSet?.dependencies {
         implementation(kotlin("stdlib"))
         implementation(libs.coroutines.core.jvm)
+    }
+
+    skikoProjectContext.webMainSourceSet?.dependencies {
+        implementation(libs.kotlinx.browser)
     }
 
     skikoProjectContext.awtMainSourceSet?.dependencies {
@@ -391,8 +401,6 @@ tasks.register("printSkiaVersion") {
 }
 
 tasks.withType<KotlinNativeCompile>().configureEach {
-    // https://youtrack.jetbrains.com/issue/KT-56583
-    compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
     compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
 }
 
