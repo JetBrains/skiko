@@ -4,6 +4,7 @@ import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
@@ -29,7 +30,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         return false
     }
 
-    override fun DrawScope.initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         val context = context ?: return
 
         // Direct3D can't work with zero size.

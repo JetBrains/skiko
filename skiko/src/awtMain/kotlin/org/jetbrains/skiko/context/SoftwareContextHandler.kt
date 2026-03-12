@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
@@ -22,7 +23,7 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHand
     var imageData: ByteArray? = null
     var raster: WritableRaster? = null
 
-    override fun DrawScope.initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         disposeCanvas()
 
         val w = scaledLayerWidth

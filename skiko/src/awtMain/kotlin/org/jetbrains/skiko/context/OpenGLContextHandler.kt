@@ -18,7 +18,7 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextBasedContextHandl
         return false
     }
 
-    override fun DrawScope.initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         val w = scaledLayerWidth
         val h = scaledLayerHeight
 

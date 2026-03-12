@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.MetalAdapter
 import org.jetbrains.skiko.RenderException
@@ -20,7 +21,7 @@ internal class MetalContextHandler(
     private val device: MetalDevice,
     private val adapter: MetalAdapter
 ) : ContextBasedContextHandler(layer, "Metal") {
-    override fun DrawScope.initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         disposeCanvas()
 
         val width = scaledLayerWidth

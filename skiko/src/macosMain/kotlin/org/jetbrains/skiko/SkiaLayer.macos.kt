@@ -168,4 +168,17 @@ actual open class SkiaLayer {
 
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
+
+    private fun createDrawScope() = LayerDrawScope(
+        pixelGeometry = pixelGeometry,
+        layerWidth = nsView.frame.useContents { size.width },
+        layerHeight = nsView.frame.useContents { size.height },
+        scale = contentScale
+    )
+
+    internal fun inDrawScope(block: LayerDrawScope.() -> Unit) {
+        with(createDrawScope()) {
+            block()
+        }
+    }
 }

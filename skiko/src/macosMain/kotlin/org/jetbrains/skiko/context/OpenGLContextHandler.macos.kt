@@ -3,6 +3,7 @@ package org.jetbrains.skiko.context
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
@@ -39,13 +40,6 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
         return result
     }
 
-    override fun createDrawScope() = DrawScope(
-        pixelGeometry = layer.pixelGeometry,
-        layerWidth = layer.nsView.frame.useContents { size.width },
-        layerHeight = layer.nsView.frame.useContents { size.height },
-        scale = layer.contentScale
-    )
-
     private var currentWidth = 0
     private var currentHeight = 0
     private fun isSizeChanged(width: Int, height: Int): Boolean {
@@ -57,7 +51,7 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
         return false
     }
 
-    override fun DrawScope.initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         val w = scaledLayerWidth
         val h = scaledLayerHeight
         if (isSizeChanged(w, h)) {

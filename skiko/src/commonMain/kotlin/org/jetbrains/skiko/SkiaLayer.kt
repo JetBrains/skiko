@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.PixelGeometry
+import org.jetbrains.skiko.context.ContextHandler
 
 /**
  * Generic layer for Skiko rendering.
@@ -70,6 +71,35 @@ expect open class SkiaLayer {
     internal fun draw(canvas: Canvas)
 }
 
-
 internal class PictureHolder(val instance: Picture, val width: Int, val height: Int)
 
+class LayerDrawScope(
+    val pixelGeometry: PixelGeometry,
+    val scaledLayerWidth: Int,
+    val scaledLayerHeight: Int,
+) {
+    constructor(
+        pixelGeometry: PixelGeometry,
+        layerWidth: Int,
+        layerHeight: Int,
+        scale: Float
+    ): this(
+        pixelGeometry = pixelGeometry,
+        scaledLayerWidth = (layerWidth * scale).toInt().coerceAtLeast(0),
+        scaledLayerHeight = (layerHeight * scale).toInt().coerceAtLeast(0)
+    )
+    constructor(
+        pixelGeometry: PixelGeometry,
+        layerWidth: Double,
+        layerHeight: Double,
+        scale: Float
+    ): this(
+        pixelGeometry = pixelGeometry,
+        scaledLayerWidth = (layerWidth * scale).toInt().coerceAtLeast(0),
+        scaledLayerHeight = (layerHeight * scale).toInt().coerceAtLeast(0)
+    )
+
+    internal fun ContextHandler.draw() {
+        this@LayerDrawScope.draw()
+    }
+}

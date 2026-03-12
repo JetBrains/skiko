@@ -2,6 +2,7 @@ package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.AngleApi
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AngleRedrawer
@@ -23,7 +24,7 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextBasedContextHandle
         return false
     }
 
-    override fun DrawScope.initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         val context = context ?: return
 
         val w = scaledLayerWidth

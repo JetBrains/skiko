@@ -97,7 +97,7 @@ internal class LinuxOpenGLRedrawer(
     }
 
     private fun draw() {
-        inDrawScope(contextHandler::draw)
+        inDrawScope { contextHandler.draw() }
     }
 
     companion object {

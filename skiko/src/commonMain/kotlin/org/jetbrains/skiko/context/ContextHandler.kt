@@ -13,7 +13,7 @@ internal abstract class ContextHandler(
     protected var canvas: Canvas? = null
 
     protected abstract fun initContext(): Boolean
-    protected abstract fun DrawScope.initCanvas()
+    protected abstract fun LayerDrawScope.initCanvas()
 
     protected open fun flush() {
         context?.flush()
@@ -34,30 +34,8 @@ internal abstract class ContextHandler(
                 "OS: ${hostOs.id} ${hostArch.id}\n"
     }
 
-    /**
-     * This function will be called only in a thread where it is valid to access layer properties.
-     */
-    protected abstract fun createDrawScope(): DrawScope
-
-    /**
-     * Reads layer properties, creating a [DrawScope] in which [DrawScope.contextHandlerDraw] can later be called on a
-     * render thread.
-     *
-     * This function should be called only in a thread where it is valid to access layer properties.
-     */
-    inline fun inDrawScope(block: DrawScope.() -> Unit) {
-        createDrawScope().block()
-    }
-
-    /**
-     * This function should be called only in a thread where it is valid to access layer properties.
-     */
-    fun draw() {
-        createDrawScope().contextHandlerDraw()
-    }
-
     // throws RenderException if initialization of graphic context was not successful
-    private fun DrawScope.drawImpl() {
+    fun LayerDrawScope.draw() {
         if (!initContext()) {
             throw RenderException("Cannot init graphic context")
         }
@@ -68,35 +46,5 @@ internal abstract class ContextHandler(
         }
         flush()
     }
-
-    inner class DrawScope(
-        val pixelGeometry: PixelGeometry,
-        val scaledLayerWidth: Int,
-        val scaledLayerHeight: Int,
-    ) {
-        constructor(
-            pixelGeometry: PixelGeometry,
-            layerWidth: Int,
-            layerHeight: Int,
-            scale: Float
-        ): this(
-            pixelGeometry = pixelGeometry,
-            scaledLayerWidth = (layerWidth * scale).toInt().coerceAtLeast(0),
-            scaledLayerHeight = (layerHeight * scale).toInt().coerceAtLeast(0)
-        )
-        constructor(
-            pixelGeometry: PixelGeometry,
-            layerWidth: Double,
-            layerHeight: Double,
-            scale: Float
-        ): this(
-            pixelGeometry = pixelGeometry,
-            scaledLayerWidth = (layerWidth * scale).toInt().coerceAtLeast(0),
-            scaledLayerHeight = (layerHeight * scale).toInt().coerceAtLeast(0)
-        )
-
-        fun contextHandlerDraw() {
-            drawImpl()
-        }
-    }
 }
+

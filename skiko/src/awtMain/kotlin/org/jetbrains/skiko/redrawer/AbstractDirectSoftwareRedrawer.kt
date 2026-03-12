@@ -33,7 +33,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    protected open fun draw() = inDrawScope(contextHandler::draw)
+    protected open fun draw() = inDrawScope { contextHandler.draw() }
 
     override fun renderImmediately() {
         update()

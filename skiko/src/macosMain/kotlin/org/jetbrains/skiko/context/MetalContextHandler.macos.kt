@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.context
 
-import kotlinx.cinterop.useContents
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MacOsMetalRedrawer
@@ -25,14 +25,7 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer
         return true
     }
 
-    override fun createDrawScope() = DrawScope(
-        pixelGeometry = layer.pixelGeometry,
-        layerWidth = layer.nsView.frame.useContents { size.width },
-        layerHeight = layer.nsView.frame.useContents { size.height },
-        scale = layer.contentScale
-    )
-
-    override fun DrawScope.initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         disposeCanvas()
 
         val w = scaledLayerWidth
