@@ -36,11 +36,9 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHand
         canvas = Canvas(storage, SurfaceProps(pixelGeometry = pixelGeometry))
     }
 
-    override fun flush() {
-        val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
-
+    override fun flush(scope: LayerDrawScope) {
+        val w = scope.scaledLayerWidth
+        val h = scope.scaledLayerHeight
 
         val bytes = storage.readPixels(storage.imageInfo, (w * 4), 0, 0)
         if (bytes != null) {

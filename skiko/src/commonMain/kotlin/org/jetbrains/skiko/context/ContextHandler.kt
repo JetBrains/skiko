@@ -15,7 +15,7 @@ internal abstract class ContextHandler(
     protected abstract fun initContext(): Boolean
     protected abstract fun LayerDrawScope.initCanvas()
 
-    protected open fun flush() {
+    protected open fun flush(scope: LayerDrawScope) {
         context?.flush()
     }
 
@@ -44,7 +44,7 @@ internal abstract class ContextHandler(
             clear(Color.TRANSPARENT)
             drawContent()
         }
-        flush()
+        flush(this)
     }
 }
 

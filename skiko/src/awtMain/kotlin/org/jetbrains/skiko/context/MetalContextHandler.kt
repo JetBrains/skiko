@@ -47,8 +47,8 @@ internal class MetalContextHandler(
         }
     }
 
-    override fun flush() {
-        super.flush()
+    override fun flush(scope: LayerDrawScope) {
+        super.flush(scope)
         surface?.flushAndSubmit()
         finishFrame()
         Logger.debug { "MetalContextHandler finished drawing frame" }

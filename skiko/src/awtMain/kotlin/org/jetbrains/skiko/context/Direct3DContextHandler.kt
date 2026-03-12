@@ -67,7 +67,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         canvas = surface!!.canvas
     }
 
-    override fun flush() {
+    override fun flush(scope: LayerDrawScope) {
         val context = context ?: return
         val surface = surface ?: return
         try {

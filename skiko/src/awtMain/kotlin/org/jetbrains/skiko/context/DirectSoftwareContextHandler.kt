@@ -37,7 +37,7 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : ContextFreeConte
         }
     }
 
-    override fun flush() {
+    override fun flush(scope: LayerDrawScope) {
         val surface = surface
         if (surface != null) {
             try {
