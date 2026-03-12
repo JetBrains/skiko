@@ -401,8 +401,6 @@ tasks.register("printSkiaVersion") {
 }
 
 tasks.withType<KotlinNativeCompile>().configureEach {
-    // https://youtrack.jetbrains.com/issue/KT-56583
-    //compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
     compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
 }
 
