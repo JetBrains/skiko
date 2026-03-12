@@ -15,6 +15,7 @@ import org.jetbrains.skiko.context.JvmContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -565,6 +566,7 @@ class SkiaLayerTest {
         override fun needRender(throttledToVsync: Boolean) = frameDispatcher.scheduleFrame()
         override fun renderImmediately() = Unit
         override fun update(nanoTime: Long) = layer.update(nanoTime)
+        override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 
         override val renderInfo: String
             get() = ""
@@ -1375,14 +1377,13 @@ class SkiaLayerTest {
             }
 
             swingComponent.bounds = Rectangle(0, 200, 300, 100)
-            layer.clipComponents.add(
-                ClipRectangle(
-                    x = swingComponent.x.toFloat(),
-                    y = swingComponent.y.toFloat(),
-                    width = swingComponent.width.toFloat(),
-                    height = swingComponent.height.toFloat()
-                )
+            val clipRect = ClipRectangle(
+                x = swingComponent.x.toFloat(),
+                y = swingComponent.y.toFloat(),
+                width = swingComponent.width.toFloat(),
+                height = swingComponent.height.toFloat()
             )
+            layer.clipComponents.add(clipRect)
 
             layeredPane.add(layer, BorderLayout.CENTER)
             layeredPane.add(swingComponent, BorderLayout.CENTER, 0)
@@ -1396,6 +1397,7 @@ class SkiaLayerTest {
             window.isUndecorated = true
             window.isVisible = true
 
+            delay(100)
             withContext(Dispatchers.Default) {
                 Robot().waitForIdle()
             }
@@ -1404,7 +1406,21 @@ class SkiaLayerTest {
             // - Red, from the layer content
             // - Yellow, from the layer background
             // - Green, from the Swing component
-            screenshots.assert(window.bounds, "frame")
+            screenshots.assert(window.bounds, "frame_1")
+
+            // Remove the swingComponent and its clip
+            layeredPane.remove(swingComponent)
+            layer.clipComponents.remove(clipRect)
+
+            delay(100)
+            withContext(Dispatchers.Default) {
+                Robot().waitForIdle()
+            }
+
+            // Expect to see two layers:
+            // - Red, from the layer content
+            // - Yellow, from the layer background (twice as tall as the Red)
+            screenshots.assert(window.bounds, "frame_2")
         } finally {
             window.close()
         }

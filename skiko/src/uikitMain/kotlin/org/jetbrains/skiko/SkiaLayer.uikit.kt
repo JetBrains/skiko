@@ -20,19 +20,6 @@ actual open class SkiaLayer {
         get() = true
         set(_) { throw UnsupportedOperationException() }
 
-    actual var transparency: Boolean
-        get() = false
-        set(_) { throw UnsupportedOperationException() }
-
-    /**
-     * The background color of the layer, as transparency is not supported.
-     */
-    internal actual var backgroundColor: Int = Color.WHITE
-        set(value) {
-            field = value
-            needRender()
-        }
-
     actual fun needRender(throttledToVsync: Boolean) {
         needRedrawCallback.invoke()
     }
@@ -45,9 +32,6 @@ actual open class SkiaLayer {
 
     actual val component: Any?
         get() = this.view
-
-    internal actual val cutoutRectangles: List<ClipRectangle>
-        get() = emptyList()
 
     val width: Float
        get() = view!!.frame.useContents {
@@ -80,7 +64,9 @@ actual open class SkiaLayer {
     }
 
     internal fun draw(surface: Surface) {
-        renderDelegate?.onRender(surface.canvas, surface.width, surface.height, currentNanoTime())
+        val canvas = surface.canvas
+        canvas.clear(Color.WHITE)
+        renderDelegate?.onRender(canvas, surface.width, surface.height, currentNanoTime())
     }
 
     actual val pixelGeometry: PixelGeometry

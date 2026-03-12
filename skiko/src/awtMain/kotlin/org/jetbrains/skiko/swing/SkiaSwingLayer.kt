@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.cutoutFromClip
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Component
 import java.awt.Graphics
@@ -10,7 +9,7 @@ import java.awt.GraphicsConfiguration
 import javax.accessibility.AccessibleContext
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
-
+import org.jetbrains.skiko.internal.fastForEach
 /**
  * Swing component that draws content provided by [renderDelegate] with GPU acceleration using Skia engine.
  *
@@ -45,9 +44,8 @@ open class SkiaSwingLayer(
     private val renderDelegateWithClipping = SkikoRenderDelegate { canvas, width, height, nanoTime ->
         val scale = graphicsConfiguration.defaultTransform.scaleX.toFloat()
         // clipping
-        for (index in clipComponents.indices) {
-            val item = clipComponents[index]
-            canvas.cutoutFromClip(item, scale)
+        clipComponents.fastForEach { component ->
+            canvas.cutoutFromClip(component, scale)
         }
         renderDelegate.onRender(canvas, width, height, nanoTime)
     }

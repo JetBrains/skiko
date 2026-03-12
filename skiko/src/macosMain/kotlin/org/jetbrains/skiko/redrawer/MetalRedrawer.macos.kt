@@ -191,6 +191,8 @@ internal class MacOsMetalRedrawer(
             }
         }
     }
+
+    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(skiaLayer)
 }
 
 internal class MetalLayer : CAMetalLayer {

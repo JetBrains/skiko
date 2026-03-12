@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skiko.internal.fastForEachReversed
+
 internal interface CloseScope {
     fun <T : AutoCloseable> T.autoClose(): T
 }
@@ -33,8 +35,7 @@ internal fun autoCloseScope(body: CloseScope.() -> Unit) {
     try {
         scope.body()
     } finally {
-        for (index in resources.indices.reversed()) {
-            val item = resources[index]
+        resources.fastForEachReversed { item ->
             item.close()
         }
     }

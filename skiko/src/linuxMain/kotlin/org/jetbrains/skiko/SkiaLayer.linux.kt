@@ -12,16 +12,8 @@ actual open class SkiaLayer  {
     actual var fullscreen: Boolean
         get() = TODO("Not yet implemented")
         set(value) {}
-    actual var transparency: Boolean
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    internal actual var backgroundColor: Int
-        get() = TODO("Not yet implemented")
-        set(value) {}
     actual val component: Any?
         get() = TODO("Not yet implemented")
-    internal actual val cutoutRectangles: List<ClipRectangle>
-        get() = emptyList()
     actual fun needRender(throttledToVsync: Boolean) {
         TODO("unimplemented")
     }

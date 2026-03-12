@@ -74,4 +74,6 @@ internal abstract class AWTRedrawer(
     protected fun checkDisposed() {
         check(!isDisposed) { "${this.javaClass.simpleName} is disposed" }
     }
+
+    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 }

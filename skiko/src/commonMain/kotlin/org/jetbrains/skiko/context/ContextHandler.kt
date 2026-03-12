@@ -40,47 +40,10 @@ internal abstract class ContextHandler(
             throw RenderException("Cannot init graphic context")
         }
         initCanvas()
-        canvas?.apply {
+        canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
-
-            val scale = layer.contentScale
-            for (clip in layer.cutoutRectangles) {
-                cutoutFromClip(clip, scale)
-            }
-
-            val layerBg = layer.backgroundColor
-            clear(
-                if (layer.transparency && isTransparentBackgroundSupported()) {
-                    layerBg
-                } else {
-                    layerBg or 0xFF000000.toInt()
-                }
-            )
-
             drawContent()
         }
         flush()
     }
-
-    protected open fun isTransparentBackgroundSupported(): Boolean {
-        if (hostOs == OS.MacOS) {
-            // macOS transparency is always supported
-            return true
-        }
-
-        // for non-macOS in fullscreen transparency is not supported
-        return !layer.fullscreen
-    }
-}
-
-@Suppress("NOTHING_TO_INLINE")
-internal inline fun Canvas.cutoutFromClip(rectangle: ClipRectangle, scale: Float) {
-    clipRect(
-        left = rectangle.x * scale,
-        top = rectangle.y * scale,
-        right = (rectangle.x + rectangle.width) * scale,
-        bottom = (rectangle.y + rectangle.height) * scale,
-        mode = ClipMode.DIFFERENCE,
-        antiAlias = true
-    )
 }

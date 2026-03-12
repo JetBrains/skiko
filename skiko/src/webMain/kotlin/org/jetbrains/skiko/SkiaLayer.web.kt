@@ -38,24 +38,6 @@ actual open class SkiaLayer {
         }
 
     /**
-     * Transparency is not supported
-     */
-    actual var transparency: Boolean
-        get() = false
-        set(value) {
-            if (value) throw Exception("Transparency is not supported!")
-        }
-
-    /**
-     * The background color of the layer, as transparency is not supported.
-     */
-    internal actual var backgroundColor: Int = Color.WHITE
-        set(value) {
-            field = value
-            needRender()
-        }
-
-    /**
      * Schedules a drawFrame to the appropriate moment.
      */
     actual fun needRender(throttledToVsync: Boolean) {
@@ -88,9 +70,6 @@ actual open class SkiaLayer {
     actual val component: Any?
         get() = this.htmlCanvas
 
-    internal actual val cutoutRectangles: List<ClipRectangle>
-        get() = emptyList()
-
     private var htmlCanvas: HTMLCanvasElement? = null
 
     /**
@@ -110,6 +89,7 @@ actual open class SkiaLayer {
     }
 
     internal actual fun draw(canvas: Canvas) {
+        canvas.clear(Color.WHITE)
         renderDelegate?.onRender(canvas, state!!.width, state!!.height, currentNanoTime())
     }
 

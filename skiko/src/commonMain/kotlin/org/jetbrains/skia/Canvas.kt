@@ -1849,3 +1849,12 @@ private external fun _nRestore(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestoreToCount")
 private external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)
+
+internal inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
+    val restoreCount = save()
+    try {
+        block()
+    } finally {
+        restoreToCount(restoreCount)
+    }
+}
