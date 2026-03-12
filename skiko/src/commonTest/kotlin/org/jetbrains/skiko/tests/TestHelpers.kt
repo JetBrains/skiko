@@ -1,3 +1,5 @@
+@file:Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // https://youtrack.jetbrains.com/issue/KT-50727
+
 package org.jetbrains.skiko.tests
 
 import org.jetbrains.skia.*
