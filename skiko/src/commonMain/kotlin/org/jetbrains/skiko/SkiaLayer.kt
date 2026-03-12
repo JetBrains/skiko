@@ -73,7 +73,7 @@ expect open class SkiaLayer {
 
 internal class PictureHolder(val instance: Picture, val width: Int, val height: Int)
 
-class LayerDrawScope(
+internal class LayerDrawScope(
     val pixelGeometry: PixelGeometry,
     val scaledLayerWidth: Int,
     val scaledLayerHeight: Int,
