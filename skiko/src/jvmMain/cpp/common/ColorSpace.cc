@@ -22,8 +22,15 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpaceKt__1nMakeS
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpaceKt__1nMakeDisplayP3(JNIEnv* env, jclass jclass) {
-    SkColorSpace* ptr = SkColorSpace::MakeRGB(SkNamedTransferFn::kSRGB, SkNamedGamut::kDisplayP3).release();
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpaceKt__1nMakeRGB
+  (JNIEnv* env, jclass jclass, jfloatArray jtransferFunction, jfloatArray jtoXYZD50) {
+    jfloat *tf = env->GetFloatArrayElements(jtransferFunction, 0);
+    jfloat *mat = env->GetFloatArrayElements(jtoXYZD50, 0);
+    skcms_TransferFunction transferFn = { tf[0], tf[1], tf[2], tf[3], tf[4], tf[5], tf[6] };
+    skcms_Matrix3x3 toXYZ = {{{ mat[0], mat[1], mat[2] }, { mat[3], mat[4], mat[5] }, { mat[6], mat[7], mat[8] }}};
+    SkColorSpace* ptr = SkColorSpace::MakeRGB(transferFn, toXYZ).release();
+    env->ReleaseFloatArrayElements(jtransferFunction, tf, 0);
+    env->ReleaseFloatArrayElements(jtoXYZD50, mat, 0);
     return reinterpret_cast<jlong>(ptr);
 }
 
@@ -63,4 +70,33 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpaceKt__1nIsSRG
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(ptr));
     return instance->isSRGB();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ColorSpaceKt__1nGetTransferFunction
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray jresult) {
+    SkColorSpace* instance = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(ptr));
+    skcms_TransferFunction tf;
+    instance->transferFn(&tf);
+    jfloat array[7] = { tf.g, tf.a, tf.b, tf.c, tf.d, tf.e, tf.f };
+    env->SetFloatArrayRegion(jresult, 0, 7, array);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ColorSpaceKt__1nGetToXYZD50
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray jresult) {
+    SkColorSpace* instance = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(ptr));
+    skcms_Matrix3x3 toXYZ;
+    instance->toXYZD50(&toXYZ);
+    jfloat array[9] = {
+        toXYZ.vals[0][0], toXYZ.vals[0][1], toXYZ.vals[0][2],
+        toXYZ.vals[1][0], toXYZ.vals[1][1], toXYZ.vals[1][2],
+        toXYZ.vals[2][0], toXYZ.vals[2][1], toXYZ.vals[2][2]
+    };
+    env->SetFloatArrayRegion(jresult, 0, 9, array);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpaceKt__1nEquals
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
+    SkColorSpace* instance = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(ptr));
+    SkColorSpace* other = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(otherPtr));
+    return SkColorSpace::Equals(instance, other);
 }
