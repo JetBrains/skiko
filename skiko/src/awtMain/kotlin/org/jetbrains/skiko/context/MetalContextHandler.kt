@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.MetalAdapter
 import org.jetbrains.skiko.RenderException
@@ -20,12 +21,11 @@ internal class MetalContextHandler(
     private val device: MetalDevice,
     private val adapter: MetalAdapter
 ) : ContextBasedContextHandler(layer, "Metal") {
-    override fun initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         disposeCanvas()
 
-        val scale = layer.contentScale
-        val width = (layer.backedLayer.width * scale).toInt().coerceAtLeast(0)
-        val height = (layer.backedLayer.height * scale).toInt().coerceAtLeast(0)
+        val width = scaledLayerWidth
+        val height = scaledLayerHeight
 
         if (width > 0 && height > 0) {
             renderTarget = makeRenderTarget(width, height)
@@ -36,7 +36,7 @@ internal class MetalContextHandler(
                 SurfaceOrigin.TOP_LEFT,
                 SurfaceColorFormat.BGRA_8888,
                 ColorSpace.sRGB,
-                SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                SurfaceProps(pixelGeometry = pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface!!.canvas
@@ -47,8 +47,8 @@ internal class MetalContextHandler(
         }
     }
 
-    override fun flush() {
-        super.flush()
+    override fun flush(scope: LayerDrawScope) {
+        super.flush(scope)
         surface?.flushAndSubmit()
         finishFrame()
         Logger.debug { "MetalContextHandler finished drawing frame" }

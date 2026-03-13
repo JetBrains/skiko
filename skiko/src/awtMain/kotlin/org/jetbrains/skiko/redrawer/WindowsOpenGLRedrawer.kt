@@ -78,7 +78,7 @@ internal class WindowsOpenGLRedrawer(
     }
 
     private fun draw() {
-        inDrawScope(contextHandler::draw)
+        inDrawScope { contextHandler.draw() }
     }
 
     private fun makeCurrent() = makeCurrent(device, context)

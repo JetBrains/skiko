@@ -133,7 +133,9 @@ internal class MacosGLLayer : CAOpenGLLayer {
         CGLSetCurrentContext(ctx)
         try {
             skiaLayer.update(currentNanoTime())
-            contextHandler.draw()
+            skiaLayer.inDrawScope {
+                contextHandler.draw()
+            }
         } catch (e: Throwable) {
             e.printStackTrace()
             throw e

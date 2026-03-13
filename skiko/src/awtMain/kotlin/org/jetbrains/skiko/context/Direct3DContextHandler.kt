@@ -4,7 +4,7 @@ import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skiko.Logger
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
@@ -30,15 +30,14 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         return false
     }
 
-    override fun initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         val context = context ?: return
-        val scale = layer.contentScale
 
         // Direct3D can't work with zero size.
         // Don't rewrite code to skipping, as we need the whole pipeline in zero case too
         // (drawing -> flushing -> swapping -> waiting for vsync)
-        val width = (layer.width * scale).toInt().coerceAtLeast(1)
-        val height = (layer.height * scale).toInt().coerceAtLeast(1)
+        val width = scaledLayerWidth.coerceAtLeast(1)
+        val height = scaledLayerHeight.coerceAtLeast(1)
 
         if (isSizeChanged(width, height) || isSurfacesNull()) {
             disposeCanvas()
@@ -46,7 +45,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
 
             val justInitialized = directXRedrawer.changeSize(width, height)
             try {
-                val surfaceProps = SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                val surfaceProps = SurfaceProps(pixelGeometry = pixelGeometry)
                 for (bufferIndex in 0 until bufferCount) {
                     surfaces[bufferIndex] = directXRedrawer.makeSurface(
                         context = getPtr(context),
@@ -68,7 +67,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         canvas = surface!!.canvas
     }
 
-    override fun flush() {
+    override fun flush(scope: LayerDrawScope) {
         val context = context ?: return
         val surface = surface ?: return
         try {

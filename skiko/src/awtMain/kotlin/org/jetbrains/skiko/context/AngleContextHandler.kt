@@ -2,6 +2,7 @@ package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.AngleApi
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AngleRedrawer
@@ -23,12 +24,11 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextBasedContextHandle
         return false
     }
 
-    override fun initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         val context = context ?: return
-        val scale = layer.contentScale
 
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
 
         if (isSizeChanged(w, h) || surface == null) {
             disposeCanvas()
@@ -41,7 +41,7 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextBasedContextHandle
                 SurfaceOrigin.BOTTOM_LEFT,
                 SurfaceColorFormat.RGBA_8888,
                 ColorSpace.sRGB,
-                SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                SurfaceProps(pixelGeometry = pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
         }
 

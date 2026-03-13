@@ -86,7 +86,7 @@ internal class Direct3DRedrawer(
         }
     }
 
-    private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
+    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
         if (isDisposed) {
             return
         }

@@ -13,9 +13,9 @@ internal abstract class ContextHandler(
     protected var canvas: Canvas? = null
 
     protected abstract fun initContext(): Boolean
-    protected abstract fun initCanvas()
+    protected abstract fun LayerDrawScope.initCanvas()
 
-    protected open fun flush() {
+    protected open fun flush(scope: LayerDrawScope) {
         context?.flush()
     }
 
@@ -35,7 +35,7 @@ internal abstract class ContextHandler(
     }
 
     // throws RenderException if initialization of graphic context was not successful
-    fun draw() {
+    fun LayerDrawScope.draw() {
         if (!initContext()) {
             throw RenderException("Cannot init graphic context")
         }
@@ -44,6 +44,7 @@ internal abstract class ContextHandler(
             clear(Color.TRANSPARENT)
             drawContent()
         }
-        flush()
+        flush(this)
     }
 }
+

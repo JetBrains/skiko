@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AbstractDirectSoftwareRedrawer
 import java.lang.ref.Reference
@@ -20,10 +21,9 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : ContextFreeConte
         return false
     }
 
-    override fun initCanvas() {
-        val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
+    override fun LayerDrawScope.initCanvas() {
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
         if (isSizeChanged(w, h) || surface == null) {
             disposeCanvas()
             if (w > 0 && h > 0) {
@@ -37,7 +37,7 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : ContextFreeConte
         }
     }
 
-    override fun flush() {
+    override fun flush(scope: LayerDrawScope) {
         val surface = surface
         if (surface != null) {
             try {

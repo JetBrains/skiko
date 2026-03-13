@@ -89,7 +89,9 @@ internal class AngleRedrawer(
             return
         }
         makeCurrent(device)
-        contextHandler.draw()
+        layer.inDrawScope {
+            contextHandler.draw()
+        }
         swapBuffers(device, withVsync)
     }
 
