@@ -17,6 +17,8 @@ internal external object window {
     val performance: Performance
 
     fun requestAnimationFrame(block: (Double) -> Unit)
+    fun setTimeout(block: () -> Unit, delay: Int): Int
+    fun clearTimeout(handle: Int)
     fun open(url: String?, target: String?)
 }
 
