@@ -24,6 +24,21 @@ import supportWeb
 import toTitleCase
 import java.io.File
 
+private fun Project.appleToolchainOutputOrNull(vararg args: String): String? =
+    runCatching {
+        providers.exec {
+            commandLine("xcrun", *args)
+        }.standardOutput.asText.get().trim()
+    }.getOrNull()?.ifBlank { null }
+
+fun Project.appleToolchainExecutableOrDefault(tool: String, fallback: String): String =
+    appleToolchainOutputOrNull("--find", tool) ?: fallback
+
+fun Project.appleMacOsSdkFlags(): List<String> =
+    appleToolchainOutputOrNull("--sdk", "macosx", "--show-sdk-path")
+        ?.let { listOf("-isysroot", it) }
+        ?: emptyList()
+
 fun skiaHeadersDirs(skiaDir: File): List<File> =
     listOf(
         skiaDir,
