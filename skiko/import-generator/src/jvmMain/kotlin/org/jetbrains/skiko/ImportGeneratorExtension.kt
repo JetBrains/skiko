@@ -37,7 +37,7 @@ internal class ImportGeneratorExtension(
         reexportFile.writer().use { reexportWriter ->
             reexportWriter.appendLine("import * as wasmApi from \"./skiko.mjs\";")
             reexportWriter.appendLine("window['GL'] = wasmApi.GL;")
-            reexportWriter.appendLine("export const awaitSkiko = wasmApi.awaitSkiko")
+            reexportWriter.appendLine("export const api = { awaitSkiko: wasmApi.awaitSkiko }")
 
             importGenerator.getExportSymbols().forEach { symbolName ->
                 reexportWriter.appendLine("window['${symbolName}'] = wasmApi['${symbolName}'];")
