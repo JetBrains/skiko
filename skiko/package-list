@@ -931,14 +931,11 @@ $dokka.location:org.jetbrains.skia.svg/SVGTag/values/#/PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-transformable-node/-companion/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-transformable-node/index.html
 $dokka.location:org.jetbrains.skia.webext////PointingToDeclaration/skiko/org.jetbrains.skia.webext/index.html
-$dokka.location:org.jetbrains.skia.webext//installPixelsFromArrayBuffer/org.jetbrains.skia.Bitmap#org.jetbrains.skia.ImageInfo#org.jetbrains.skia.webext.WebArrayBufferExt#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.webext/install-pixels-from-array-buffer.html
-$dokka.location:org.jetbrains.skia.webext/WebArrayBufferExt///PointingToDeclaration/skiko/org.jetbrains.skia.webext/-web-array-buffer-ext/index.html
-$dokka.location:org.jetbrains.skia.webext/WebArrayBufferExt/byteLength/#/PointingToDeclaration/skiko/org.jetbrains.skia.webext/-web-array-buffer-ext/byte-length.html
-$dokka.location:org.jetbrains.skia.webext/WebArrayBufferExt/set/#kotlin.Int#kotlin.Byte/PointingToDeclaration/skiko/org.jetbrains.skia.webext/-web-array-buffer-ext/set.html
+$dokka.location:org.jetbrains.skia.webext//installPixelsFromArrayBuffer/org.jetbrains.skia.Bitmap#org.jetbrains.skia.ImageInfo#org.khronos.webgl.ArrayBuffer#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.webext/install-pixels-from-array-buffer.html
 $dokka.location:org.jetbrains.skia////PointingToDeclaration/skiko/org.jetbrains.skia/index.html
 $dokka.location:org.jetbrains.skia//LANG/#/PointingToDeclaration/skiko/org.jetbrains.skia/-l-a-n-g.html
 $dokka.location:org.jetbrains.skia//_nAdoptTextureFrom/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/_n-adopt-texture-from.html
-$dokka.location:org.jetbrains.skia//makeFromEncoded/org.jetbrains.skia.Image.Companion#[Error type: Unresolved type for NSData]/PointingToDeclaration/skiko/org.jetbrains.skia/make-from-encoded.html
+$dokka.location:org.jetbrains.skia//makeFromEncoded/org.jetbrains.skia.Image.Companion#platform.Foundation.NSData/PointingToDeclaration/skiko/org.jetbrains.skia/make-from-encoded.html
 $dokka.location:org.jetbrains.skia//makeFromFileName/org.jetbrains.skia.Data.Companion#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file-name.html
 $dokka.location:org.jetbrains.skia//makeGLWithInterface/org.jetbrains.skia.DirectContext.Companion#org.jetbrains.skia.GLAssembledInterface/PointingToDeclaration/skiko/org.jetbrains.skia/make-g-l-with-interface.html
 $dokka.location:org.jetbrains.skia//toIPoint/#kotlin.Long/PointingToDeclaration/skiko/org.jetbrains.skia/to-i-point.html
@@ -3207,8 +3204,8 @@ $dokka.location:org.jetbrains.skiko/SkikoSurfaceView/scheduleFrame/#/PointingToD
 $dokka.location:org.jetbrains.skiko/SkikoUIView.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-companion/index.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView.Companion/layerClass/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-companion/layer-class.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/index.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#[Error type: Unresolved type for NSCoder]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#org.jetbrains.skiko.SkiaLayer#kotlinx.cinterop.CValue[[Error type: Unresolved type for CGRect]]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#org.jetbrains.skiko.SkiaLayer#kotlinx.cinterop.CValue[platform.CoreGraphics.CGRect]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#platform.Foundation.NSCoder/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/didMoveToWindow/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/did-move-to-window.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/layoutSubviews/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/layout-subviews.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/load/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/load.html
@@ -3219,6 +3216,8 @@ $dokka.location:org.jetbrains.skiko/SystemTheme///PointingToDeclaration/skiko/o
 $dokka.location:org.jetbrains.skiko/SystemTheme/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/entries.html
 $dokka.location:org.jetbrains.skiko/SystemTheme/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/value-of.html
 $dokka.location:org.jetbrains.skiko/SystemTheme/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/values.html
+$dokka.location:org.jetbrains.skiko/WebImport///PointingToDeclaration/skiko/org.jetbrains.skiko/-web-import/index.html
+$dokka.location:org.jetbrains.skiko/WebImport/name/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-web-import/name.html
 $dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener///PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/index.html
 $dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/WorkaroundSimpleOnGestureListener/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/-workaround-simple-on-gesture-listener.html
 $dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/onFling/#android.view.MotionEvent#android.view.MotionEvent#float#float/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/on-fling.html
