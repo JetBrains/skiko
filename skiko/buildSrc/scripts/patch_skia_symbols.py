@@ -245,15 +245,8 @@ def main():
     #     static libraries.  Those symbols are NOT captured by the scan
     #     above, so without this step they would survive patching under
     #     their original names and could clash with a second copy of Skia
-    #     linked into the same binary.
-    #
-    #     We rename ONLY symbols whose Mach-O name starts with "__Z"
-    #     (the mandatory Itanium ABI prefix for every C++ mangled symbol
-    #     on arm64/x86_64 Mach-O).  The bridge's own public API uses
-    #     `extern "C"` (SKIKO_EXPORT), so those symbols have C linkage
-    #     and a single-underscore prefix ("_org_jetbrains_…") — they
-    #     never match "__Z" and are left unchanged, preserving the
-    #     Kotlin/Native cinterop ABI.
+    #     linked into the same binary. We rename ONLY symbols whose Mach-O
+    #     name starts with "__Z"
     # ------------------------------------------------------------------
     print("Extracting C++ symbols from skiko bridge …")
     bridge_syms = extract_global_defined_symbols(args.skiko_bridge)
@@ -267,23 +260,16 @@ def main():
           f"({len(new_in_bridge)} not already covered by Skia libs)")
 
     # ------------------------------------------------------------------
-    # 2. Write symbols.txt  (one symbol per line, sorted)
+    # 2. Write redefine-syms.txt  (llvm-objcopy --redefine-syms format)
     # ------------------------------------------------------------------
     symbols_sorted = sorted(all_symbols)
-    symbols_file = out_dir / "symbols.txt"
-    symbols_file.write_text("\n".join(symbols_sorted) + "\n")
-    print(f"Written: {symbols_file}")
-
-    # ------------------------------------------------------------------
-    # 3. Write redefine-syms.txt  (llvm-objcopy --redefine-syms format)
-    # ------------------------------------------------------------------
     redefine_syms_file = out_dir / "redefine-syms.txt"
     lines = [f"{sym} {renamed(sym)}" for sym in symbols_sorted]
     redefine_syms_file.write_text("\n".join(lines) + "\n")
     print(f"Written: {redefine_syms_file}")
 
     # ------------------------------------------------------------------
-    # 4. Patch every library (Skia libs + skiko bridge)
+    # 3. Patch every library (Skia libs + skiko bridge)
     # ------------------------------------------------------------------
     print("Patching libraries …")
     for lib in all_libs:
