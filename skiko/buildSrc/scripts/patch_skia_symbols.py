@@ -8,9 +8,8 @@ Steps:
   1. Extract all public (globally visible, defined) symbols from every Skia
      static library (i.e. everything *except* the skiko C++ bridge).
   2. Write the collected symbol names to <output-dir>/symbols.txt.
-  3. For *every* library (Skia libs + skiko bridge) rewrite each collected
-     symbol with a "_skiko" suffix:
-         _some_symbol  ->  _some_symbol_skiko
+  3. For *every* library (Skia libs + skiko bridge) rewrite each collected symbol with a "_skiko" suffix:
+     _some_symbol  ->  _some_symbol_skiko
 """
 
 import argparse
@@ -18,11 +17,6 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-
-
-# ---------------------------------------------------------------------------
-# helpers
-# ---------------------------------------------------------------------------
 
 def run(cmd, cwd=None, check=True):
     result = subprocess.run(
@@ -71,7 +65,6 @@ _NS_ENCODING = f"{len(_SKIKO_NS)}{_SKIKO_NS}"   # "5skiko"
 # CV-qualifiers (K=const, V=volatile, r=restrict) and ref-qualifiers (R=&, O=&&)
 # that may appear between N and the first prefix component in a nested-name.
 _NESTED_QUALIFIERS = frozenset("KVrRO")
-
 
 def _try_mangle_in_namespace(sym: str) -> "str | None":
     """
@@ -190,11 +183,6 @@ def patch_library(lib_path: str, redefine_syms_file: str, output_path: str):
         lib_path,
         output_path,
     ])
-
-
-# ---------------------------------------------------------------------------
-# main
-# ---------------------------------------------------------------------------
 
 def main():
     parser = argparse.ArgumentParser(

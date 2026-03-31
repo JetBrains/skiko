@@ -352,7 +352,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             val skiaLibPaths = skiaStaticLibraries(skiaDir, targetString, buildType)
             executable = "python3"
             argumentProviders.add {
-                listOf(project.file("tools/patch_skia_symbols.py").absolutePath) +
+                listOf(project.file("buildSrc/scripts/patch_skia_symbols.py").absolutePath) +
                 listOf("--skia-libs") + skiaLibPaths +
                 listOf(
                     "--skiko-bridge", bridgesLibraryPath,
