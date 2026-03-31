@@ -151,6 +151,36 @@ def main():
     print(f"  {'TOTAL':40s}  {len(all_symbols):6d} unique symbols to rename")
 
     # ------------------------------------------------------------------
+    # 1b. Also collect C++ mangled symbols defined in the bridge itself.
+    #
+    #     The bridge's .cpp files include Skia headers and may produce
+    #     symbol definitions locally — template instantiations or `inline`
+    #     function copies — that were never instantiated inside the Skia
+    #     static libraries.  Those symbols are NOT captured by the scan
+    #     above, so without this step they would survive patching under
+    #     their original names and could clash with a second copy of Skia
+    #     linked into the same binary.
+    #
+    #     We rename ONLY symbols whose Mach-O name starts with "__Z"
+    #     (the mandatory Itanium ABI prefix for every C++ mangled symbol
+    #     on arm64/x86_64 Mach-O).  The bridge's own public API uses
+    #     `extern "C"` (SKIKO_EXPORT), so those symbols have C linkage
+    #     and a single-underscore prefix ("_org_jetbrains_…") — they
+    #     never match "__Z" and are left unchanged, preserving the
+    #     Kotlin/Native cinterop ABI.
+    # ------------------------------------------------------------------
+    print("Extracting C++ symbols from skiko bridge …")
+    bridge_syms = extract_global_defined_symbols(args.skiko_bridge)
+    bridge_cxx_syms = {
+        s for s in bridge_syms
+        if s.startswith("__Z") and not s.endswith("_skiko")
+    }
+    new_in_bridge = bridge_cxx_syms - all_symbols
+    all_symbols.update(bridge_cxx_syms)
+    print(f"  {'bridge (C++ only)':40s}  {len(bridge_cxx_syms):6d} symbols "
+          f"({len(new_in_bridge)} not already covered by Skia libs)")
+
+    # ------------------------------------------------------------------
     # 2. Write symbols.txt  (one symbol per line, sorted)
     # ------------------------------------------------------------------
     symbols_sorted = sorted(all_symbols)
