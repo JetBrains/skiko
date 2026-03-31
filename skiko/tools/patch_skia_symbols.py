@@ -66,15 +66,113 @@ def extract_global_defined_symbols(lib_path: str) -> set[str]:
     return symbols
 
 
+_SKIKO_NS = "skiko"
+_NS_ENCODING = f"{len(_SKIKO_NS)}{_SKIKO_NS}"   # "5skiko"
+# CV-qualifiers (K=const, V=volatile, r=restrict) and ref-qualifiers (R=&, O=&&)
+# that may appear between N and the first prefix component in a nested-name.
+_NESTED_QUALIFIERS = frozenset("KVrRO")
+
+
+def _try_mangle_in_namespace(sym: str) -> "str | None":
+    """
+    Attempt to rewrite *sym* so that the 'skiko' namespace is encoded directly
+    into the Itanium ABI mangled name.  Returns None when the symbol shape is
+    too complex to rewrite safely without a full grammar parser.
+
+    Handled forms
+    -------------
+    __ZN [cv/ref-quals] <source-name|nested-N…>
+        Nested name (class methods, functions in a namespace).
+        The namespace component is inserted after N (and after any leading
+        CV / ref qualifiers), becoming the outermost qualifier:
+
+          __ZN7SkPaint4MakeEv     →  __ZN5skiko7SkPaint4MakeEv
+          demangles as: skiko::SkPaint::Make()
+
+          __ZNK7SkPaint6getCapEv  →  __ZNK5skiko7SkPaint6getCapEv
+          demangles as: skiko::SkPaint::getCap() const
+
+    __ZTV|TI|TS|TT <type>
+        Vtable / typeinfo / typeinfo-name / VTT.
+
+        Simple source-name type (digit-prefixed):
+          __ZTV7SkPaint           →  __ZTVN5skiko7SkPaintE
+          demangles as: vtable for skiko::SkPaint
+
+        Already-nested type (N…E):
+          __ZTVN7SkPaint5InnerE   →  __ZTVN5skiko7SkPaint5InnerE
+          demangles as: vtable for skiko::SkPaint::Inner
+
+    Limitations
+    -----------
+    Symbols whose parameter types contain Itanium substitution back-references
+    (S_, S0_, …) will have those references displaced by +1 after namespace
+    insertion (the new 'skiko' namespace itself becomes substitution 0).
+    In practice this affects parameter *type* display in the demangled output
+    while leaving the function *name* readable — a significant improvement
+    over the completely un-demangable suffix form.
+
+    Symbols that start with a substitution (S_), template parameter (T), or
+    other complex production as their first qualifier are left to the suffix
+    fallback rather than risk silently producing wrong output.
+    """
+    if sym.startswith("__ZN"):
+        body = sym[4:]
+        # Skip any leading CV-qualifiers and ref-qualifiers.
+        i = 0
+        while i < len(body) and body[i] in _NESTED_QUALIFIERS:
+            i += 1
+        cv_quals = body[:i]
+        rest = body[i:]
+        # Only rewrite when the first qualifier is a source-name (digit) or a
+        # further nested-name (N). Substitution references (S) and template
+        # parameters (T) would need index-shifted rewrites — skip them.
+        if rest and (rest[0].isdigit() or rest[0] == "N"):
+            return f"__ZN{cv_quals}{_NS_ENCODING}{rest}"
+        return None
+
+    if sym.startswith("__Z") and len(sym) >= 5:
+        tag = sym[3:5]
+        if tag in ("TV", "TI", "TS", "TT"):
+            type_enc = sym[5:]
+            if type_enc.startswith("N"):
+                # Already-nested type: N<body> — insert ns after N.
+                return f"__Z{tag}N{_NS_ENCODING}{type_enc[1:]}"
+            if type_enc and type_enc[0].isdigit():
+                # Simple source-name type — wrap in N…E.
+                return f"__Z{tag}N{_NS_ENCODING}{type_enc}E"
+
+    return None
+
+
 def renamed(sym: str, suffix: str = "_skiko") -> str:
     """
-    Apply the renaming rule: append "_skiko" to every symbol.
+    Rename *sym* so that the result is still valid and demangable.
 
-    Mach-O global symbols carry a leading underscore by convention:
-      _uloc_getDefault     ->  _uloc_getDefault_skiko
-      __ZN7SkPaint4MakeEv  ->  __ZN7SkPaint4MakeEv_skiko
+    For C++ Itanium-ABI mangled names the 'skiko' namespace is encoded
+    directly into the mangled grammar, producing names that LLDB, c++filt,
+    Instruments, Crashlytics, and Sentry can decode:
+
+        __ZN7SkPaint4MakeEv   →  __ZN5skiko7SkPaint4MakeEv
+                                 ↳ skiko::SkPaint::Make()
+
+        __ZNK7SkPaint6getCapEv →  __ZNK5skiko7SkPaint6getCapEv
+                                  ↳ skiko::SkPaint::getCap() const
+
+        __ZTV7SkPaint         →  __ZTVN5skiko7SkPaintE
+                                 ↳ vtable for skiko::SkPaint
+
+    For plain C symbols (single leading '_', no '__Z') the suffix is
+    appended — C identifiers allow trailing underscores and the result
+    remains a legal C name:
+
+        _uloc_getDefault      →  _uloc_getDefault_skiko
+
+    Symbols with mangled shapes too complex to rewrite without a full
+    Itanium ABI parser also receive the suffix as a safe fallback.
     """
-    return sym + suffix
+    rewritten = _try_mangle_in_namespace(sym)
+    return rewritten if rewritten is not None else sym + suffix
 
 
 def patch_library(lib_path: str, redefine_syms_file: str, output_path: str):
