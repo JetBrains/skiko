@@ -229,7 +229,20 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
 
     val bridgesLibrary = layout.buildDirectory.file("nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a")
     val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
-    val allLibraries = skiaStaticLibraries(skiaDir, targetString, buildType) + bridgesLibraryPath
+
+    // For iOS/tvOS we patch every library so that all public Skia symbols have
+    // postfix with "_skiko", preventing conflicts when multiple Skia copies
+    // are present in the same app binary.
+    val requiresSymbolPatching = os == OS.IOS || os == OS.TVOS
+    val patchedLibsDir = layout.buildDirectory.dir("nativeBridges/patched/$targetString").get().asFile
+
+    val allLibraries = if (requiresSymbolPatching) {
+        skiaStaticLibraries(skiaDir, targetString, buildType).map { lib ->
+            "${patchedLibsDir.absolutePath}/${File(lib).name}"
+        } + "${patchedLibsDir.absolutePath}/skiko-native-bridges-$targetString.a"
+    } else {
+        skiaStaticLibraries(skiaDir, targetString, buildType) + bridgesLibraryPath
+    }
 
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val linkerFlags = when (os) {
@@ -329,9 +342,34 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         file(outDir).mkdirs()
         outputs.dir(outDir)
     }
+
+    // For iOS/tvOS: patch all Skia + skiko-bridge symbols after linking.
+    val compilationDependency = if (requiresSymbolPatching) {
+        val patchActionName = "patchSkikoSymbols".withSuffix(isUikitSim = isUikitSim)
+        project.registerSkikoTask<Exec>(patchActionName, os, arch) {
+            dependsOn(unzipper)
+            dependsOn(linkTask)
+            val skiaLibPaths = skiaStaticLibraries(skiaDir, targetString, buildType)
+            executable = "python3"
+            argumentProviders.add {
+                listOf(project.file("tools/patch_skia_symbols.py").absolutePath) +
+                listOf("--skia-libs") + skiaLibPaths +
+                listOf(
+                    "--skiko-bridge", bridgesLibraryPath,
+                    "--output-dir", patchedLibsDir.absolutePath,
+                )
+            }
+            inputs.files(skiaLibPaths + listOf(bridgesLibraryPath))
+            outputs.dir(patchedLibsDir)
+            file(patchedLibsDir).mkdirs()
+        }
+    } else {
+        linkTask
+    }
+
     target.compilations.all {
         compileTaskProvider.configure {
-            dependsOn(linkTask)
+            dependsOn(compilationDependency)
         }
     }
 }
