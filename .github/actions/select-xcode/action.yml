@@ -12,3 +12,7 @@ runs:
     - name: Select Xcode
       shell: bash
       run: sudo xcode-select -s ${{ inputs.xcode-path }}
+
+    - name: Install LLVM
+      shell: bash
+      run: brew install llvm

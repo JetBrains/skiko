@@ -175,20 +175,34 @@ def find_llvm_objcopy() -> str:
     setups) the tool is not bundled with Xcode — it comes from Homebrew LLVM,
     which is pre-installed on all GitHub Actions macOS images.
     """
+    print("=== DEBUG: find_llvm_objcopy ===")
+
     # Homebrew LLVM is the canonical source on macOS (pre-installed on CI).
-    brew = run(["brew", "--prefix", "llvm"], check=False)
-    if brew.returncode == 0:
-        candidate = Path(brew.stdout.strip()) / "bin" / "llvm-objcopy"
-        if candidate.exists():
-            return str(candidate)
+    # Try both the unversioned formula name and common versioned names.
+    for formula in ("llvm", "llvm@18", "llvm@17", "llvm@19", "llvm@20"):
+        brew = run(["brew", "--prefix", formula], check=False)
+        print(f"  brew --prefix {formula} → rc={brew.returncode} stdout={brew.stdout.strip()!r}")
+        if brew.returncode == 0:
+            candidate = Path(brew.stdout.strip()) / "bin" / "llvm-objcopy"
+            print(f"    candidate: {candidate}  exists={candidate.exists()}")
+            if candidate.exists():
+                print("=== END DEBUG ===")
+                return str(candidate)
+
     # xcrun works on some local Xcode setups where the tool is registered.
     xcrun_find = run(["xcrun", "-f", "llvm-objcopy"], check=False)
+    print(f"  xcrun -f llvm-objcopy → rc={xcrun_find.returncode} stdout={xcrun_find.stdout.strip()!r}")
     if xcrun_find.returncode == 0:
+        print("=== END DEBUG ===")
         return xcrun_find.stdout.strip()
+
     # Last resort: tool installed somewhere in PATH.
     found = shutil.which("llvm-objcopy")
+    print(f"  shutil.which → {found!r}")
+    print("=== END DEBUG ===")
     if found:
         return found
+
     print("ERROR: llvm-objcopy not found. Install via: brew install llvm", file=sys.stderr)
     sys.exit(1)
 
@@ -299,16 +313,7 @@ def main():
     # 3. Patch every library (Skia libs + skiko bridge)
     # ------------------------------------------------------------------
 
-    # DEBUG: confirm which llvm-objcopy was resolved and verify it works
-    print("=== DEBUG: llvm-objcopy resolution ===")
-    print(f"  resolved path : {llvm_objcopy}")
-    print(f"  exists        : {os.path.exists(llvm_objcopy)}")
-    brew_prefix = run(["brew", "--prefix", "llvm"], check=False)
-    print(f"  brew --prefix llvm → rc={brew_prefix.returncode} stdout={brew_prefix.stdout.strip()!r}")
-    version = run([llvm_objcopy, "--version"], check=False)
-    print(f"  --version → rc={version.returncode} stdout={version.stdout.splitlines()[0] if version.stdout else ''!r}")
-    print("=== END DEBUG ===")
-
+    print(f"Using llvm-objcopy: {llvm_objcopy}")
     print("Patching libraries …")
     for lib in all_libs:
         out_lib = str(out_dir / os.path.basename(lib))
