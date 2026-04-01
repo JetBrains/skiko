@@ -14,6 +14,7 @@ Steps:
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -168,17 +169,41 @@ def renamed(sym: str, suffix: str = "_skiko") -> str:
     return rewritten if rewritten is not None else sym + suffix
 
 
-def patch_library(lib_path: str, redefine_syms_file: str, output_path: str):
+def find_llvm_objcopy() -> str:
+    """
+    Locate llvm-objcopy. On GitHub Actions macOS runners (and most macOS
+    setups) the tool is not bundled with Xcode — it comes from Homebrew LLVM,
+    which is pre-installed on all GitHub Actions macOS images.
+    """
+    # Homebrew LLVM is the canonical source on macOS (pre-installed on CI).
+    brew = run(["brew", "--prefix", "llvm"], check=False)
+    if brew.returncode == 0:
+        candidate = Path(brew.stdout.strip()) / "bin" / "llvm-objcopy"
+        if candidate.exists():
+            return str(candidate)
+    # xcrun works on some local Xcode setups where the tool is registered.
+    xcrun_find = run(["xcrun", "-f", "llvm-objcopy"], check=False)
+    if xcrun_find.returncode == 0:
+        return xcrun_find.stdout.strip()
+    # Last resort: tool installed somewhere in PATH.
+    found = shutil.which("llvm-objcopy")
+    if found:
+        return found
+    print("ERROR: llvm-objcopy not found. Install via: brew install llvm", file=sys.stderr)
+    sys.exit(1)
+
+
+def patch_library(lib_path: str, redefine_syms_file: str, output_path: str, llvm_objcopy: str):
     """
     Rename symbols in *lib_path* according to *redefine_syms_file* and write
     the result to *output_path*.
 
-    Uses `xcrun llvm-objcopy --redefine-syms` which processes every object
-    file inside the archive individually and rewrites both the definitions and
-    the undefined (imported) references of each renamed symbol.
+    Uses `llvm-objcopy --redefine-syms` which processes every object file
+    inside the archive individually and rewrites both the definitions and the
+    undefined (imported) references of each renamed symbol.
     """
     run([
-        "xcrun", "llvm-objcopy",
+        llvm_objcopy,
         f"--redefine-syms={redefine_syms_file}",
         lib_path,
         output_path,
@@ -212,6 +237,8 @@ def main():
              "redefine-syms.txt will be written.",
     )
     args = parser.parse_args()
+
+    llvm_objcopy = find_llvm_objcopy()
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -272,31 +299,21 @@ def main():
     # 3. Patch every library (Skia libs + skiko bridge)
     # ------------------------------------------------------------------
 
-    # DEBUG: print Xcode environment to diagnose xcrun llvm-objcopy failures
-    print("=== DEBUG: Xcode environment ===")
-    xcode_dev = run(["xcode-select", "-p"], check=False)
-    dev_dir = xcode_dev.stdout.strip() if xcode_dev.returncode == 0 else "<xcode-select failed>"
-    print(f"  xcode-select -p : {dev_dir}")
-    for probe in [
-        f"{dev_dir}/usr/bin/llvm-objcopy",
-        f"{dev_dir}/Toolchains/XcodeDefault.xctoolchain/usr/bin/llvm-objcopy",
-    ]:
-        exists = os.path.exists(probe)
-        is_link = os.path.islink(probe) if exists else False
-        link_target = os.readlink(probe) if is_link else ""
-        print(f"  {probe}")
-        print(f"    exists={exists}  symlink={is_link}  target={link_target!r}")
-    xcrun_find = run(["xcrun", "-f", "llvm-objcopy"], check=False)
-    print(f"  xcrun -f llvm-objcopy → rc={xcrun_find.returncode} stdout={xcrun_find.stdout.strip()!r} stderr={xcrun_find.stderr.strip()!r}")
-    xcrun_find_clang = run(["xcrun", "-f", "clang"], check=False)
-    print(f"  xcrun -f clang      → rc={xcrun_find_clang.returncode} stdout={xcrun_find_clang.stdout.strip()!r}")
+    # DEBUG: confirm which llvm-objcopy was resolved and verify it works
+    print("=== DEBUG: llvm-objcopy resolution ===")
+    print(f"  resolved path : {llvm_objcopy}")
+    print(f"  exists        : {os.path.exists(llvm_objcopy)}")
+    brew_prefix = run(["brew", "--prefix", "llvm"], check=False)
+    print(f"  brew --prefix llvm → rc={brew_prefix.returncode} stdout={brew_prefix.stdout.strip()!r}")
+    version = run([llvm_objcopy, "--version"], check=False)
+    print(f"  --version → rc={version.returncode} stdout={version.stdout.splitlines()[0] if version.stdout else ''!r}")
     print("=== END DEBUG ===")
 
     print("Patching libraries …")
     for lib in all_libs:
         out_lib = str(out_dir / os.path.basename(lib))
         print(f"  {os.path.basename(lib):40s}  ->  {out_lib}")
-        patch_library(lib, str(redefine_syms_file), out_lib)
+        patch_library(lib, str(redefine_syms_file), out_lib, llvm_objcopy)
 
     print("Done.")
 
