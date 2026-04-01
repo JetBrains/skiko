@@ -271,6 +271,27 @@ def main():
     # ------------------------------------------------------------------
     # 3. Patch every library (Skia libs + skiko bridge)
     # ------------------------------------------------------------------
+
+    # DEBUG: print Xcode environment to diagnose xcrun llvm-objcopy failures
+    print("=== DEBUG: Xcode environment ===")
+    xcode_dev = run(["xcode-select", "-p"], check=False)
+    dev_dir = xcode_dev.stdout.strip() if xcode_dev.returncode == 0 else "<xcode-select failed>"
+    print(f"  xcode-select -p : {dev_dir}")
+    for probe in [
+        f"{dev_dir}/usr/bin/llvm-objcopy",
+        f"{dev_dir}/Toolchains/XcodeDefault.xctoolchain/usr/bin/llvm-objcopy",
+    ]:
+        exists = os.path.exists(probe)
+        is_link = os.path.islink(probe) if exists else False
+        link_target = os.readlink(probe) if is_link else ""
+        print(f"  {probe}")
+        print(f"    exists={exists}  symlink={is_link}  target={link_target!r}")
+    xcrun_find = run(["xcrun", "-f", "llvm-objcopy"], check=False)
+    print(f"  xcrun -f llvm-objcopy → rc={xcrun_find.returncode} stdout={xcrun_find.stdout.strip()!r} stderr={xcrun_find.stderr.strip()!r}")
+    xcrun_find_clang = run(["xcrun", "-f", "clang"], check=False)
+    print(f"  xcrun -f clang      → rc={xcrun_find_clang.returncode} stdout={xcrun_find_clang.stdout.strip()!r}")
+    print("=== END DEBUG ===")
+
     print("Patching libraries …")
     for lib in all_libs:
         out_lib = str(out_dir / os.path.basename(lib))
