@@ -74,6 +74,9 @@ jobs:
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app
+
       # Retrieve the device .udid to use in tests and store it in env var
       - shell: bash
         name: 'Set Up Simulator UUID'
