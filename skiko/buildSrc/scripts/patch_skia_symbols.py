@@ -14,7 +14,6 @@ Steps:
 
 import argparse
 import os
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -169,39 +168,17 @@ def renamed(sym: str, suffix: str = "_skiko") -> str:
     return rewritten if rewritten is not None else sym + suffix
 
 
-def find_llvm_objcopy() -> str:
-    """
-    Locate the llvm-objcopy binary without going through xcrun.
-
-    llvm-objcopy ships inside the Xcode toolchain alongside clang but is not
-    registered as an xcrun tool, so `xcrun llvm-objcopy` fails on GitHub
-    Actions with 'xcodebuild -find llvm-objcopy' returning exit code 17664.
-    We find it by asking xcrun where clang lives and looking in the same dir.
-    Falls back to PATH for non-Xcode setups (e.g. Homebrew LLVM).
-    """
-    clang = run(["xcrun", "-f", "clang"], check=False)
-    if clang.returncode == 0:
-        candidate = Path(clang.stdout.strip()).parent / "llvm-objcopy"
-        if candidate.exists():
-            return str(candidate)
-    found = shutil.which("llvm-objcopy")
-    if found:
-        return found
-    print("ERROR: llvm-objcopy not found in Xcode toolchain or PATH", file=sys.stderr)
-    sys.exit(1)
-
-
-def patch_library(lib_path: str, redefine_syms_file: str, output_path: str, llvm_objcopy: str):
+def patch_library(lib_path: str, redefine_syms_file: str, output_path: str):
     """
     Rename symbols in *lib_path* according to *redefine_syms_file* and write
     the result to *output_path*.
 
-    Uses `llvm-objcopy --redefine-syms` which processes every object file
-    inside the archive individually and rewrites both the definitions and the
-    undefined (imported) references of each renamed symbol.
+    Uses `xcrun llvm-objcopy --redefine-syms` which processes every object
+    file inside the archive individually and rewrites both the definitions and
+    the undefined (imported) references of each renamed symbol.
     """
     run([
-        llvm_objcopy,
+        "xcrun", "llvm-objcopy",
         f"--redefine-syms={redefine_syms_file}",
         lib_path,
         output_path,
@@ -235,8 +212,6 @@ def main():
              "redefine-syms.txt will be written.",
     )
     args = parser.parse_args()
-
-    llvm_objcopy = find_llvm_objcopy()
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -300,7 +275,7 @@ def main():
     for lib in all_libs:
         out_lib = str(out_dir / os.path.basename(lib))
         print(f"  {os.path.basename(lib):40s}  ->  {out_lib}")
-        patch_library(lib, str(redefine_syms_file), out_lib, llvm_objcopy)
+        patch_library(lib, str(redefine_syms_file), out_lib)
 
     print("Done.")
 

@@ -12,3 +12,16 @@ runs:
     - name: Select Xcode
       shell: bash
       run: sudo xcode-select -s ${{ inputs.xcode-path }}
+
+    - name: Register Xcode toolchain tools
+      shell: bash
+      run: |
+        # Register tools that exist in the Xcode toolchain but are not exposed
+        # via xcrun (xcodebuild -find can't locate them without this symlink).
+        TOOLCHAIN_BIN="${{ inputs.xcode-path }}/Toolchains/XcodeDefault.xctoolchain/usr/bin"
+        DEVELOPER_BIN="${{ inputs.xcode-path }}/usr/bin"
+        for tool in llvm-objcopy llvm-nm; do
+          if [ -f "$TOOLCHAIN_BIN/$tool" ] && [ ! -e "$DEVELOPER_BIN/$tool" ]; then
+            sudo ln -sf "$TOOLCHAIN_BIN/$tool" "$DEVELOPER_BIN/$tool"
+          fi
+        done
