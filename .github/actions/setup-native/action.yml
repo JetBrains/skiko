@@ -1,5 +1,5 @@
-name: 'Select Xcode'
-description: 'Select the active Xcode installation via xcode-select'
+name: 'Setup Native Build Environment'
+description: 'Set up the macOS native build environment: select Xcode and install required LLVM tools'
 
 inputs:
   xcode-path:
