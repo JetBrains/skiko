@@ -94,6 +94,9 @@ jobs:
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
+      - uses: ./.github/actions/select-xcode
+        name: 'Select Xcode'
+
       - shell: bash
         name: 'Publish Maven Local'
         run: |
