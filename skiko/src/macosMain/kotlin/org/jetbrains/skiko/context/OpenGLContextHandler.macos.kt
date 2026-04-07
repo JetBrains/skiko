@@ -16,7 +16,7 @@ import platform.OpenGLCommon.GLenum
  * Not used anymore, unless corresponding [GraphicsApi] is hardcoded in [SkiaLayer].
  * See [MacOsMetalContextHandler] instead.
  */
-internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer, layer::draw) {
+internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : GaneshContextHandler(layer) {
     override fun initContext(): Boolean {
         try {
             if (context == null) {
@@ -57,24 +57,28 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
         if (isSizeChanged(w, h)) {
             val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
             renderTarget = BackendRenderTarget.makeGL(
-                    w,
-                    h,
-                    0,
-                    8,
-                    fbId.toInt(),
-                    FramebufferFormat.GR_GL_RGBA8
-                )
+                w,
+                h,
+                0,
+                8,
+                fbId.toInt(),
+                FramebufferFormat.GR_GL_RGBA8
+            )
             surface = Surface.makeFromBackendRenderTarget(
-                    context!!,
-                    renderTarget!!,
-                    SurfaceOrigin.BOTTOM_LEFT,
-                    SurfaceColorFormat.RGBA_8888,
-                    ColorSpace.sRGB,
-                    SurfaceProps(pixelGeometry = layer.pixelGeometry)
-                ) ?: throw RenderException("Cannot create surface")
+                context!!,
+                renderTarget!!,
+                SurfaceOrigin.BOTTOM_LEFT,
+                SurfaceColorFormat.RGBA_8888,
+                ColorSpace.sRGB,
+                SurfaceProps(pixelGeometry = layer.pixelGeometry)
+            ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface?.canvas
                 ?: error("Could not obtain Canvas from Surface")
         }
+    }
+
+    override fun flush(scope: LayerDrawScope) {
+        context?.flush()
     }
 }

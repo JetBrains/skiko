@@ -54,4 +54,8 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextBasedContextHandl
             "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
             "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
     }
+
+    override fun flush(scope: LayerDrawScope) {
+        context?.flush()
+    }
 }

@@ -3,6 +3,7 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.NativePtr
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr
@@ -10,12 +11,13 @@ import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeoutOrNull
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.gpu.SkiaGpuBackend
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkikoFlags
 import org.jetbrains.skiko.context.ContextHandler
+import org.jetbrains.skiko.context.MacOsGraphiteMetalContextHandler
 import org.jetbrains.skiko.context.MacOsMetalContextHandler
 import org.jetbrains.skiko.currentNanoTime
 import platform.AppKit.NSWindowDidChangeOcclusionStateNotification
@@ -47,12 +49,15 @@ import kotlin.concurrent.Volatile
 internal class MacOsMetalRedrawer(
     private val skiaLayer: SkiaLayer
 ) : Redrawer {
-    private val contextHandler = MacOsMetalContextHandler(skiaLayer)
+    private val contextHandler = when(SkikoFlags.skiaGpuBackend) {
+        SkiaGpuBackend.GANESH -> MacOsMetalContextHandler(skiaLayer)
+        SkiaGpuBackend.GRAPHITE -> MacOsGraphiteMetalContextHandler(skiaLayer)
+    }
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var isDisposed = false
     internal val device = MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
-    private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
+    internal val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
     private val occlusionObserver: NSObjectProtocol
@@ -82,18 +87,11 @@ internal class MacOsMetalRedrawer(
     }
 
     /**
-     * Creates and returns an instances of [DirectContext]
-     */
-    fun makeContext(): DirectContext = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
-
-    /**
-     * Creates and returns an instances of [BackendRenderTarget] ready for rendering.
-     *
      * https://developer.apple.com/documentation/quartzcore/cametallayer/1478172-nextdrawable
      */
-    fun makeRenderTarget(width: Int, height: Int): BackendRenderTarget {
+    fun getDrawableTexture(): NativePtr {
         currentDrawable = metalLayer.nextDrawable()!!
-        return BackendRenderTarget.makeMetal(width, height, currentDrawable!!.texture.objcPtr())
+        return currentDrawable!!.texture.objcPtr()
     }
 
     override fun dispose() {

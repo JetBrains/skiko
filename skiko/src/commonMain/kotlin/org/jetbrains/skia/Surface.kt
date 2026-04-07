@@ -221,6 +221,7 @@ class Surface : RefCnt {
                 reachabilityBarrier(imageInfo.colorInfo.colorSpace)
             }
         }
+
         /**
          *
          * Wraps a GPU-backed buffer into [Surface].

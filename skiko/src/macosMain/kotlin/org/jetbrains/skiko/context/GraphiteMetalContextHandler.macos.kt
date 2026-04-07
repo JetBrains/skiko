@@ -1,23 +1,33 @@
+@file:OptIn(ExperimentalSkikoApi::class)
+
 package org.jetbrains.skiko.context
 
 import kotlinx.cinterop.objcPtr
-import org.jetbrains.skia.*
+import org.jetbrains.skia.ColorSpace
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.SurfaceColorFormat
+import org.jetbrains.skia.SurfaceProps
+import org.jetbrains.skia.gpu.graphite.BackendTexture
+import org.jetbrains.skia.gpu.graphite.GraphiteContext
+import org.jetbrains.skia.gpu.graphite.Recorder
+import org.jetbrains.skia.gpu.graphite.makeFromBackendTexture
+import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MacOsMetalRedrawer
 
-/**
- * Metal ContextHandler implementation for macOS.
- */
-internal class MacOsMetalContextHandler(layer: SkiaLayer) : GaneshContextHandler(layer) {
+internal class MacOsGraphiteMetalContextHandler(layer: SkiaLayer) : GraphiteContextHandler(layer) {
     private val metalRedrawer: MacOsMetalRedrawer
         get() = layer.redrawer!! as MacOsMetalRedrawer
 
+    var recorder: Recorder? = null
     override fun initContext(): Boolean {
         try {
             if (context == null) {
-                context = DirectContext.makeMetal(metalRedrawer.device.objcPtr(), metalRedrawer.queue.objcPtr())
+                context =
+                    GraphiteContext.makeMetal(metalRedrawer.device.objcPtr(), metalRedrawer.queue.objcPtr())
+                recorder = context!!.makeRecorder()
             }
         } catch (e: Exception) {
             println("${e.message}\nFailed to create Skia Ganesh Metal context!")
@@ -33,12 +43,11 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : GaneshContextHandler
         val h = scaledLayerHeight
 
         if (w > 0 && h > 0) {
-            renderTarget = BackendRenderTarget.makeMetal(w, h, metalRedrawer.getDrawableTexture())
+            backendTexture = BackendTexture.wrapMetalTexture(metalRedrawer.getDrawableTexture(), w, h)
 
-            surface = Surface.makeFromBackendRenderTarget(
-                context!!,
-                renderTarget!!,
-                SurfaceOrigin.TOP_LEFT,
+            surface = Surface.makeFromBackendTexture(
+                recorder!!,
+                backendTexture!!,
                 SurfaceColorFormat.BGRA_8888,
                 ColorSpace.sRGB,
                 SurfaceProps(pixelGeometry = layer.pixelGeometry)
@@ -46,7 +55,7 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : GaneshContextHandler
 
             canvas = surface!!.canvas
         } else {
-            renderTarget = null
+            backendTexture = null
             surface = null
             canvas = null
         }
@@ -54,13 +63,14 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : GaneshContextHandler
 
     override fun flush(scope: LayerDrawScope) {
         // TODO: maybe make flush async as in JVM version.
-        context?.flush()
-        surface?.flushAndSubmit()
+        val recording = recorder!!.snap()
+        context!!.insertRecording(recording)
+        recording.close()
+        context!!.submit()
         metalRedrawer.finishFrame()
     }
 
     override fun rendererInfo(): String {
-        return "Ganesh Native Metal: device ${metalRedrawer.device.name}"
+        return "Graphite Native Metal: device ${metalRedrawer.device.name}"
     }
 }
-

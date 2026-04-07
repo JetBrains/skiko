@@ -55,4 +55,8 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextBasedContextHandle
                 "Version: ${AngleApi.glGetString(AngleApi.GL_VERSION)}\n"
                 // "Total VRAM: ${AngleApi.glGetIntegerv(AngleApi.GL_TOTAL_MEMORY) / 1024} MB\n"
     }
+
+    override fun flush(scope: LayerDrawScope) {
+        context?.flush()
+    }
 }

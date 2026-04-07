@@ -1,32 +1,36 @@
+@file:OptIn(ExperimentalSkikoApi::class)
+
 package org.jetbrains.skiko.context
 
-import org.jetbrains.skia.*
-import org.jetbrains.skiko.*
+import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Color
+import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.gpu.graphite.BackendTexture
+import org.jetbrains.skia.gpu.graphite.GraphiteContext
+import org.jetbrains.skia.runRestoringState
+import org.jetbrains.skiko.LayerDrawScope
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.jetbrains.skiko.RenderException
+import org.jetbrains.skiko.hostArch
+import org.jetbrains.skiko.hostOs
 
-internal abstract class ContextHandler(
+internal sealed class ContextHandler(
     protected val layer: SkiaLayer,
     private val drawContent: Canvas.() -> Unit
 ) {
-    protected var context: DirectContext? = null
-    protected var renderTarget: BackendRenderTarget? = null
     protected var surface: Surface? = null
     protected var canvas: Canvas? = null
 
     protected abstract fun initContext(): Boolean
     protected abstract fun LayerDrawScope.initCanvas()
-
-    protected open fun flush(scope: LayerDrawScope) {
-        context?.flush()
-    }
-
-    open fun dispose() {
-        disposeCanvas()
-        context?.close()
-    }
+    abstract fun flush(scope: LayerDrawScope)
+    abstract fun dispose()
 
     protected open fun disposeCanvas() {
         surface?.close()
-        renderTarget?.close()
     }
 
     open fun rendererInfo(): String {
@@ -48,3 +52,47 @@ internal abstract class ContextHandler(
     }
 }
 
+
+internal abstract class GaneshContextHandler(
+    layer: SkiaLayer
+) : ContextHandler(layer, layer::draw) {
+    protected var context: DirectContext? = null
+    protected var renderTarget: BackendRenderTarget? = null
+
+    override fun dispose() {
+        disposeCanvas()
+        context?.close()
+    }
+
+    override fun disposeCanvas() {
+        super.disposeCanvas()
+        renderTarget?.close()
+    }
+
+    override fun rendererInfo(): String {
+        return "GraphicsApi: Ganesh ${layer.renderApi}\n" +
+                "OS: ${hostOs.id} ${hostArch.id}\n"
+    }
+}
+
+internal abstract class GraphiteContextHandler(
+    layer: SkiaLayer
+) : ContextHandler(layer, layer::draw) {
+    protected var context: GraphiteContext? = null
+    protected var backendTexture: BackendTexture? = null
+
+    override fun dispose() {
+        disposeCanvas()
+        context?.close()
+    }
+
+    override fun disposeCanvas() {
+        super.disposeCanvas()
+        backendTexture?.close()
+    }
+
+    override fun rendererInfo(): String {
+        return "GraphicsApi: Graphite ${layer.renderApi}\n" +
+                "OS: ${hostOs.id} ${hostArch.id}\n"
+    }
+}
