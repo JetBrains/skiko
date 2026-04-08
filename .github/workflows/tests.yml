@@ -23,9 +23,6 @@ jobs:
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - uses: ./.github/actions/setup-native
-        name: 'Setup Native Build Environment'
-
       - shell: bash
         name: 'Run AWT Tests'
         run: |
@@ -76,9 +73,6 @@ jobs:
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
-
-      - uses: ./.github/actions/setup-native
-        name: 'Setup Native Build Environment'
 
       # Retrieve the device .udid to use in tests and store it in env var
       - shell: bash
@@ -137,9 +131,6 @@ jobs:
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
-
-      - uses: ./.github/actions/setup-native
-        name: 'Setup Native Build Environment'
 
       - shell: bash
         name: 'Run tvOS Tests'

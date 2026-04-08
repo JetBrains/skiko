@@ -14,6 +14,11 @@ runs:
         sudo rm -rf /opt/hostedtoolcache/CodeQL
         df -h
 
+    - name: Install LLVM
+      if: runner.os == 'macOS'
+      shell: bash
+      run: brew install llvm
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
       with:
