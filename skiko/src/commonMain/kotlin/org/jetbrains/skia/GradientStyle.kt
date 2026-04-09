@@ -44,7 +44,7 @@ class GradientStyle(
     }
 
     fun withLocalMatrix(_localMatrix: Matrix33): GradientStyle {
-        return if (localMatrix === _localMatrix) this else GradientStyle(tileMode, isPremul, _localMatrix)
+        return if (localMatrix == _localMatrix) this else GradientStyle(tileMode, isPremul, _localMatrix)
     }
 
     companion object {
