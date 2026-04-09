@@ -1,10 +1,33 @@
 #include <iostream>
 #include "SkColorFilter.h"
-#include "SkShader.h"
-#include "SkGradientShader.h"
+#include "SkGradient.h"
 #include "SkPerlinNoiseShader.h"
+#include "SkShader.h"
 #include "SkSize.h"
 #include "common.h"
+
+static SkGradient makeGradient(const SkColor4f* colors,
+                               sk_sp<SkColorSpace> colorSpace,
+                               const float* positions,
+                               int count,
+                               SkTileMode tileMode,
+                               KInt inPremul,
+                               KInt interpolationColorSpace,
+                               KInt hueMethod) {
+    SkGradient::Interpolation interpolation{
+        inPremul == 0 ? SkGradient::Interpolation::InPremul::kNo
+                      : SkGradient::Interpolation::InPremul::kYes,
+        static_cast<SkGradient::Interpolation::ColorSpace>(interpolationColorSpace),
+        static_cast<SkGradient::Interpolation::HueMethod>(hueMethod)
+    };
+    return SkGradient(
+        SkGradient::Colors(
+            SkSpan<const SkColor4f>(colors, count),
+            positions == nullptr ? SkSpan<const float>() : SkSpan<const float>(positions, count),
+            tileMode,
+            std::move(colorSpace)),
+        interpolation);
+}
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeWithLocalMatrix
   (KNativePointer ptr, KFloat* localMatrixArr) {
@@ -23,96 +46,53 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeWithColorFilter
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeLinearGradient
-  (KFloat x0, KFloat y0, KFloat x1, KFloat y1, KInt* colorsArray, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
-    SkPoint pts[2] {SkPoint::Make(x0, y0), SkPoint::Make(x1, y1)};
-    SkColor* colors = reinterpret_cast<SkColor*>(colorsArray);
-    float* pos = reinterpret_cast<float*>(posArray);
-    SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
-    std::unique_ptr<SkMatrix> localMatrix = skMatrix(matrixArray);
-    SkShader* ptr = SkGradientShader::MakeLinear(pts, colors, pos, count, tileMode, static_cast<uint32_t>(flags), localMatrix.get()).release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeLinearGradientCS
-  (KFloat x0, KFloat y0, KFloat x1, KFloat y1, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
+  (KFloat x0, KFloat y0, KFloat x1, KFloat y1, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* positionsArray, KInt count, KInt tileModeInt, KInt inPremul, KInt interpolationColorSpace, KInt hueMethod, KFloat* matrixArray) {
     SkPoint pts[2] {SkPoint::Make(x0, y0), SkPoint::Make(x1, y1)};
     SkColor4f* colors = reinterpret_cast<SkColor4f*>(colorsArray);
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
-    float* pos = reinterpret_cast<float*>(posArray);
+    float* positions = reinterpret_cast<float*>(positionsArray);
     SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(matrixArray);
-    SkShader* ptr = SkGradientShader::MakeLinear(pts, colors, colorSpace, pos, count, tileMode, static_cast<uint32_t>(flags), localMatrix.get()).release();
+    SkGradient gradient = makeGradient(colors, colorSpace, positions, count, tileMode, inPremul, interpolationColorSpace, hueMethod);
+    SkShader* ptr = SkShaders::LinearGradient(pts, gradient, localMatrix.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeRadialGradient
-  (KFloat x, KFloat y, KFloat r, KInt* colorsArray, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
-    SkColor* colors = reinterpret_cast<SkColor*>(colorsArray);
-    float* pos = reinterpret_cast<float*>(posArray);
-    SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
-    std::unique_ptr<SkMatrix> localMatrix = skMatrix(matrixArray);
-    SkShader* ptr = SkGradientShader::MakeRadial(SkPoint::Make(x, y), r, colors, pos, count, tileMode, static_cast<uint32_t>(flags), localMatrix.get()).release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeRadialGradientCS
-  (KFloat x, KFloat y, KFloat r, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
+  (KFloat x, KFloat y, KFloat radius, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* positionsArray, KInt count, KInt tileModeInt, KInt inPremul, KInt interpolationColorSpace, KInt hueMethod, KFloat* matrixArray) {
     SkColor4f* colors = reinterpret_cast<SkColor4f*>(colorsArray);
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
-    float* pos = reinterpret_cast<float*>(posArray);
+    float* positions = reinterpret_cast<float*>(positionsArray);
     SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(matrixArray);
-    SkShader* ptr = SkGradientShader::MakeRadial(SkPoint::Make(x, y), r, colors, colorSpace, pos, count, tileMode, static_cast<uint32_t>(flags), localMatrix.get()).release();
+    SkGradient gradient = makeGradient(colors, colorSpace, positions, count, tileMode, inPremul, interpolationColorSpace, hueMethod);
+    SkShader* ptr = SkShaders::RadialGradient(SkPoint::Make(x, y), radius, gradient, localMatrix.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient
-  (KFloat x0, KFloat y0, KFloat r0, KFloat x1, KFloat y1, KFloat r1, KInt* colorsArray, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
-    SkColor* colors = reinterpret_cast<SkColor*>(colorsArray);
-    float* pos = reinterpret_cast<float*>(posArray);
-    SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
-    std::unique_ptr<SkMatrix> localMatrix = skMatrix(matrixArray);
-    SkShader* ptr = SkGradientShader::MakeTwoPointConical(SkPoint::Make(x0, y0), r0, SkPoint::Make(x1, y1), r1, colors, pos, count, tileMode, static_cast<uint32_t>(flags), localMatrix.get()).release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradientCS
-  (KFloat x0, KFloat y0, KFloat r0, KFloat x1, KFloat y1, KFloat r1, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
+  (KFloat x0, KFloat y0, KFloat startRadius, KFloat x1, KFloat y1, KFloat endRadius, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* positionsArray, KInt count, KInt tileModeInt, KInt inPremul, KInt interpolationColorSpace, KInt hueMethod, KFloat* matrixArray) {
     SkColor4f* colors = reinterpret_cast<SkColor4f*>(colorsArray);
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
-    float* pos = reinterpret_cast<float*>(posArray);
+    float* positions = reinterpret_cast<float*>(positionsArray);
     SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(matrixArray);
-    SkShader* ptr = SkGradientShader::MakeTwoPointConical(SkPoint::Make(x0, y0), r0, SkPoint::Make(x1, y1), r1, colors, colorSpace, pos, count, tileMode, static_cast<uint32_t>(flags), localMatrix.get()).release();
+    SkGradient gradient = makeGradient(colors, colorSpace, positions, count, tileMode, inPremul, interpolationColorSpace, hueMethod);
+    SkShader* ptr = SkShaders::TwoPointConicalGradient(SkPoint::Make(x0, y0), startRadius, SkPoint::Make(x1, y1), endRadius, gradient, localMatrix.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeSweepGradient
-  (KFloat x, KFloat y, KFloat start, KFloat end, KInt* colorsArray, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
-    SkColor* colors = reinterpret_cast<SkColor*>(colorsArray);
-    float* pos = reinterpret_cast<float*>(posArray);
-    SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
-    std::unique_ptr<SkMatrix> localMatrix = skMatrix(matrixArray);
-    SkShader* ptr = SkGradientShader::MakeSweep(x, y, colors, pos, count, tileMode, start, end, static_cast<uint32_t>(flags), localMatrix.get()).release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeSweepGradientCS
-  (KFloat x, KFloat y, KFloat start, KFloat end, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* posArray, KInt count, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
+  (KFloat x, KFloat y, KFloat startAngle, KFloat endAngle, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* positionsArray, KInt count, KInt tileModeInt, KInt inPremul, KInt interpolationColorSpace, KInt hueMethod, KFloat* matrixArray) {
     SkColor4f* colors = reinterpret_cast<SkColor4f*>(colorsArray);
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
-    float* pos = reinterpret_cast<float*>(posArray);
+    float* positions = reinterpret_cast<float*>(positionsArray);
     SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(matrixArray);
-    SkShader* ptr = SkGradientShader::MakeSweep(x, y, colors, colorSpace, pos, count, tileMode, start, end, static_cast<uint32_t>(flags), localMatrix.get()).release();
-    return reinterpret_cast<KNativePointer>(ptr);}
-
+    SkGradient gradient = makeGradient(colors, colorSpace, positions, count, tileMode, inPremul, interpolationColorSpace, hueMethod);
+    SkShader* ptr = SkShaders::SweepGradient(SkPoint::Make(x, y), startAngle, endAngle, gradient, localMatrix.get()).release();
+    return reinterpret_cast<KNativePointer>(ptr);
+}
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeEmpty() {
     SkShader* ptr = SkShaders::Empty().release();

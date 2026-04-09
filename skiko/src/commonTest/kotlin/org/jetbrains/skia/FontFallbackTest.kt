@@ -23,7 +23,7 @@ class FontFallbackTest {
             it.setDefaultFontManager(FontMgrWithFallback(fm))
 
             // 0x6C34 = "水"
-            val df = it.defaultFallback(0x6C34, FontStyle.NORMAL, null)!!
+            val df = it.defaultFallback(0x6C34, null, FontStyle.NORMAL, null)!!
             val glyphs = df.getStringGlyphs("水")
 
             if (kotlinBackend.isWeb()) {

@@ -553,8 +553,12 @@ class ImageFilterTest {
             Shader.makeLinearGradient(
                 x0 = 0.0f, y0 = 0.0f,
                 x1 = 200.0f, y1 = 0.0f,
-                colors = intArrayOf(Color.RED, Color.BLUE),
-                style = GradientStyle.DEFAULT
+                gradient = Gradient(
+                    Gradient.Colors(
+                        colors = arrayOf(Color4f(Color.RED), Color4f(Color.BLUE)),
+                        tileMode = FilterTileMode.CLAMP
+                    )
+                )
             )
         )
 

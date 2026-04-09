@@ -18,23 +18,20 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             staticLoad()
         }
 
-        // Linear
-        fun makeLinearGradient(p0: Point, p1: Point, colors: IntArray): Shader {
-            return makeLinearGradient(p0.x, p0.y, p1.x, p1.y, colors)
-        }
-
-        fun makeLinearGradient(p0: Point, p1: Point, colors: IntArray, positions: FloatArray?): Shader {
-            return makeLinearGradient(p0.x, p0.y, p1.x, p1.y, colors, positions)
-        }
-
+        /**
+         * Returns a shader that generates a linear gradient between the two specified points.
+         * If the inputs are invalid, this will return nullptr.
+         * @param points  Array of 2 points, the end-points of the line segment
+         * @param gradient Description of the colors and interpolation method
+         * @param localMatrix Optional local matrix, may be null
+         */
         fun makeLinearGradient(
             p0: Point,
             p1: Point,
-            colors: IntArray,
-            positions: FloatArray?,
-            style: GradientStyle
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
         ): Shader {
-            return makeLinearGradient(p0.x, p0.y, p1.x, p1.y, colors, positions, style)
+            return makeLinearGradient(p0.x, p0.y, p1.x, p1.y, gradient, localMatrix)
         }
 
         fun makeLinearGradient(
@@ -42,319 +39,212 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             y0: Float,
             x1: Float,
             y1: Float,
-            colors: IntArray,
-            positions: FloatArray? = null,
-            style: GradientStyle = GradientStyle.Companion.DEFAULT
-        ): Shader {
-            require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
-            Stats.onNativeCall()
-            return Shader(
-                interopScope {
-                    _nMakeLinearGradient(
-                        x0,
-                        y0,
-                        x1,
-                        y1,
-                        toInterop(colors),
-                        toInterop(positions),
-                        colors.size,
-                        style.tileMode.ordinal,
-                        style._getFlags(),
-                        toInterop(style._getMatrixArray())
-                    )
-                }
-            )
-        }
-
-        fun makeLinearGradient(
-            p0: Point,
-            p1: Point,
-            colors: Array<Color4f>,
-            cs: ColorSpace?,
-            positions: FloatArray?,
-            style: GradientStyle
-        ): Shader {
-            return makeLinearGradient(p0.x, p0.y, p1.x, p1.y, colors, cs, positions, style)
-        }
-
-        fun makeLinearGradient(
-            x0: Float,
-            y0: Float,
-            x1: Float,
-            y1: Float,
-            colors: Array<Color4f>,
-            cs: ColorSpace?,
-            positions: FloatArray?,
-            style: GradientStyle
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
         ): Shader {
             return try {
-                require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
                 Stats.onNativeCall()
                 Shader(
                     interopScope {
-                        _nMakeLinearGradientCS(
+                        _nMakeLinearGradient(
                             x0,
                             y0,
                             x1,
                             y1,
-                            toInterop(Color4f.flattenArray(colors)),
-                            getPtr(cs),
-                            toInterop(positions),
-                            colors.size,
-                            style.tileMode.ordinal,
-                            style._getFlags(),
-                            toInterop(style._getMatrixArray())
+                            toInterop(Color4f.flattenArray(gradient.colors.colors)),
+                            getPtr(gradient.colors.colorSpace),
+                            toInterop(gradient.colors.positions),
+                            gradient.colors.colors.size,
+                            gradient.colors.tileMode.ordinal,
+                            gradient.interpolation.inPremul.ordinal,
+                            gradient.interpolation.colorSpace.ordinal,
+                            gradient.interpolation.hueMethod.ordinal,
+                            toInterop(localMatrix?.mat)
                         )
                     }
                 )
             } finally {
-                reachabilityBarrier(cs)
+                reachabilityBarrier(gradient)
+                reachabilityBarrier(gradient.colors.colorSpace)
+                reachabilityBarrier(localMatrix)
             }
         }
 
-        // Radial
-        fun makeRadialGradient(center: Point, r: Float, colors: IntArray): Shader {
-            return makeRadialGradient(center.x, center.y, r, colors)
-        }
-
-        fun makeRadialGradient(center: Point, r: Float, colors: IntArray, positions: FloatArray?): Shader {
-            return makeRadialGradient(center.x, center.y, r, colors, positions)
-        }
-
+        /**
+         * Returns a shader that generates a radial gradient given the center and radius.
+         * @param center  The center of the circle for this gradient
+         * @param radius  Must be positive. The radius of the circle for this gradient
+         * @param gradient Description of the colors and interpolation method
+         * @param localMatrix Optional local matrix, may be null
+         */
         fun makeRadialGradient(
             center: Point,
-            r: Float,
-            colors: IntArray,
-            positions: FloatArray?,
-            style: GradientStyle
+            radius: Float,
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
         ): Shader {
-            return makeRadialGradient(center.x, center.y, r, colors, positions, style)
+            return makeRadialGradient(center.x, center.y, radius, gradient, localMatrix)
         }
 
         fun makeRadialGradient(
             x: Float,
             y: Float,
-            r: Float,
-            colors: IntArray,
-            positions: FloatArray? = null,
-            style: GradientStyle = GradientStyle.Companion.DEFAULT
-        ): Shader {
-            require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
-            Stats.onNativeCall()
-            return Shader(
-                interopScope {
-                    _nMakeRadialGradient(
-                        x,
-                        y,
-                        r,
-                        toInterop(colors),
-                        toInterop(positions),
-                        colors.size,
-                        style.tileMode.ordinal,
-                        style._getFlags(),
-                        toInterop(style._getMatrixArray())
-                    )
-                }
-            )
-        }
-
-        fun makeRadialGradient(
-            center: Point,
-            r: Float,
-            colors: Array<Color4f>,
-            cs: ColorSpace?,
-            positions: FloatArray?,
-            style: GradientStyle
-        ): Shader {
-            return makeRadialGradient(center.x, center.y, r, colors, cs, positions, style)
-        }
-
-        fun makeRadialGradient(
-            x: Float,
-            y: Float,
-            r: Float,
-            colors: Array<Color4f>,
-            cs: ColorSpace?,
-            positions: FloatArray?,
-            style: GradientStyle
+            radius: Float,
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
         ): Shader {
             return try {
-                require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
                 Stats.onNativeCall()
                 Shader(
                     interopScope {
-                        _nMakeRadialGradientCS(
+                        _nMakeRadialGradient(
                             x,
                             y,
-                            r,
-                            toInterop(Color4f.flattenArray(colors)),
-                            getPtr(cs),
-                            toInterop(positions),
-                            colors.size,
-                            style.tileMode.ordinal,
-                            style._getFlags(),
-                            toInterop(style._getMatrixArray())
+                            radius,
+                            toInterop(Color4f.flattenArray(gradient.colors.colors)),
+                            getPtr(gradient.colors.colorSpace),
+                            toInterop(gradient.colors.positions),
+                            gradient.colors.colors.size,
+                            gradient.colors.tileMode.ordinal,
+                            gradient.interpolation.inPremul.ordinal,
+                            gradient.interpolation.colorSpace.ordinal,
+                            gradient.interpolation.hueMethod.ordinal,
+                            toInterop(localMatrix?.mat)
                         )
                     }
                 )
             } finally {
-                reachabilityBarrier(cs)
+                reachabilityBarrier(gradient)
+                reachabilityBarrier(gradient.colors.colorSpace)
+                reachabilityBarrier(localMatrix)
             }
         }
 
-        // Two-point Conical
-        fun makeTwoPointConicalGradient(p0: Point, r0: Float, p1: Point, r1: Float, colors: IntArray): Shader {
-            return makeTwoPointConicalGradient(p0.x, p0.y, r0, p1.x, p1.y, r1, colors)
-        }
-
+        /**
+         * Returns a shader that generates a conical gradient given two circles, or
+         * returns null if the inputs are invalid. The gradient interprets the
+         * two circles according to the following HTML spec.
+         * http://dev.w3.org/html5/2dcontext/#dom-context-2d-createradialgradient
+         * @param start        The center of the circle for this gradient
+         * @param startRadius  Must be positive. The radius of the circle for this gradient
+         * @param end          The center of the circle for this gradient
+         * @param endRadius    Must be positive. The radius of the circle for this gradient
+         * @param gradient     Description of the colors and interpolation method
+         * @param localMatrix  Optional local matrix, may be null
+         */
         fun makeTwoPointConicalGradient(
-            p0: Point,
-            r0: Float,
-            p1: Point,
-            r1: Float,
-            colors: IntArray,
-            positions: FloatArray?
+            start: Point,
+            startRadius: Float,
+            end: Point,
+            endRadius: Float,
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
         ): Shader {
-            return makeTwoPointConicalGradient(p0.x, p0.y, r0, p1.x, p1.y, r1, colors, positions)
-        }
-
-        fun makeTwoPointConicalGradient(
-            p0: Point,
-            r0: Float,
-            p1: Point,
-            r1: Float,
-            colors: IntArray,
-            positions: FloatArray?,
-            style: GradientStyle
-        ): Shader {
-            return makeTwoPointConicalGradient(p0.x, p0.y, r0, p1.x, p1.y, r1, colors, positions, style)
-        }
-
-        fun makeTwoPointConicalGradient(
-            x0: Float,
-            y0: Float,
-            r0: Float,
-            x1: Float,
-            y1: Float,
-            r1: Float,
-            colors: IntArray,
-            positions: FloatArray? = null,
-            style: GradientStyle = GradientStyle.Companion.DEFAULT
-        ): Shader {
-            require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
-            Stats.onNativeCall()
-            return Shader(
-                interopScope {
-                    _nMakeTwoPointConicalGradient(
-                        x0,
-                        y0,
-                        r0,
-                        x1,
-                        y1,
-                        r1,
-                        toInterop(colors),
-                        toInterop(positions),
-                        colors.size,
-                        style.tileMode.ordinal,
-                        style._getFlags(),
-                        toInterop(style._getMatrixArray())
-                    )
-                }
+            return makeTwoPointConicalGradient(
+                start.x,
+                start.y,
+                startRadius,
+                end.x,
+                end.y,
+                endRadius,
+                gradient,
+                localMatrix
             )
         }
 
         fun makeTwoPointConicalGradient(
-            p0: Point,
-            r0: Float,
-            p1: Point,
-            r1: Float,
-            colors: Array<Color4f>,
-            cs: ColorSpace?,
-            positions: FloatArray?,
-            style: GradientStyle
-        ): Shader {
-            return makeTwoPointConicalGradient(p0.x, p0.y, r0, p1.x, p1.y, r1, colors, cs, positions, style)
-        }
-
-        fun makeTwoPointConicalGradient(
             x0: Float,
             y0: Float,
-            r0: Float,
+            startRadius: Float,
             x1: Float,
             y1: Float,
-            r1: Float,
-            colors: Array<Color4f>,
-            cs: ColorSpace?,
-            positions: FloatArray?,
-            style: GradientStyle
+            endRadius: Float,
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
         ): Shader {
             return try {
-                require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
                 Stats.onNativeCall()
                 Shader(
                     interopScope {
-                        _nMakeTwoPointConicalGradientCS(
+                        _nMakeTwoPointConicalGradient(
                             x0,
                             y0,
-                            r0,
+                            startRadius,
                             x1,
                             y1,
-                            r1,
-                            toInterop(Color4f.flattenArray(colors)),
-                            getPtr(cs),
-                            toInterop(positions),
-                            colors.size,
-                            style.tileMode.ordinal,
-                            style._getFlags(),
-                            toInterop(style._getMatrixArray())
+                            endRadius,
+                            toInterop(Color4f.flattenArray(gradient.colors.colors)),
+                            getPtr(gradient.colors.colorSpace),
+                            toInterop(gradient.colors.positions),
+                            gradient.colors.colors.size,
+                            gradient.colors.tileMode.ordinal,
+                            gradient.interpolation.inPremul.ordinal,
+                            gradient.interpolation.colorSpace.ordinal,
+                            gradient.interpolation.hueMethod.ordinal,
+                            toInterop(localMatrix?.mat)
                         )
                     }
                 )
             } finally {
-                reachabilityBarrier(cs)
+                reachabilityBarrier(gradient)
+                reachabilityBarrier(gradient.colors.colorSpace)
+                reachabilityBarrier(localMatrix)
             }
         }
 
-        // Sweep
-        fun makeSweepGradient(center: Point, colors: IntArray): Shader {
-            return makeSweepGradient(center.x, center.y, colors)
-        }
-
-        fun makeSweepGradient(x: Float, y: Float, colors: IntArray): Shader {
-            return makeSweepGradient(x, y, 0f, 360f, colors, null, GradientStyle.Companion.DEFAULT)
-        }
-
-        fun makeSweepGradient(center: Point, colors: IntArray, positions: FloatArray?): Shader {
-            return makeSweepGradient(center.x, center.y, colors, positions)
-        }
-
-        fun makeSweepGradient(x: Float, y: Float, colors: IntArray, positions: FloatArray?): Shader {
-            return makeSweepGradient(x, y, 0f, 360f, colors, positions, GradientStyle.Companion.DEFAULT)
-        }
-
-        fun makeSweepGradient(center: Point, colors: IntArray, positions: FloatArray?, style: GradientStyle): Shader {
-            return makeSweepGradient(center.x, center.y, colors, positions, style)
+        /**
+         * Returns a shader that generates a sweep gradient given a center.
+         * The shader accepts negative angles and angles larger than 360, draws
+         * between 0 and 360 degrees, similar to the CSS conic-gradient
+         * semantics. 0 degrees means horizontal positive x axis. The start angle
+         * must be less than the end angle, otherwise a null pointer is
+         * returned. If color stops do not contain 0 and 1 but are within this
+         * range, the respective outer color stop is repeated for 0 and 1. Color
+         * stops less than 0 are clamped to 0, and greater than 1 are clamped to 1.
+         * @param center      The center of the sweep
+         * @param gradient    Description of the colors and interpolation method
+         * @param localMatrix Optional local matrix, may be null
+         */
+        fun makeSweepGradient(
+            center: Point,
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
+        ): Shader {
+            return makeSweepGradient(center.x, center.y, gradient, localMatrix)
         }
 
         fun makeSweepGradient(
             x: Float,
             y: Float,
-            colors: IntArray,
-            positions: FloatArray?,
-            style: GradientStyle
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
         ): Shader {
-            return makeSweepGradient(x, y, 0f, 360f, colors, positions, style)
+            return makeSweepGradient(x, y, 0f, 360f, gradient, localMatrix)
         }
 
+        /**
+         * Returns a shader that generates a sweep gradient given a center.
+         * The shader accepts negative angles and angles larger than 360, draws
+         * between 0 and 360 degrees, similar to the CSS conic-gradient
+         * semantics. 0 degrees means horizontal positive x axis. The start angle
+         * must be less than the end angle, otherwise a null pointer is
+         * returned. If color stops do not contain 0 and 1 but are within this
+         * range, the respective outer color stop is repeated for 0 and 1. Color
+         * stops less than 0 are clamped to 0, and greater than 1 are clamped to 1.
+         * @param center      The center of the sweep
+         * @param startAngle  Start of the angular range, corresponding to pos == 0.
+         * @param endAngle    End of the angular range, corresponding to pos == 1.
+         * @param gradient    Description of the colors and interpolation method
+         * @param localMatrix Optional local matrix, may be null
+         */
         fun makeSweepGradient(
             center: Point,
             startAngle: Float,
             endAngle: Float,
-            colors: IntArray,
-            positions: FloatArray?,
-            style: GradientStyle
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
         ): Shader {
-            return makeSweepGradient(center.x, center.y, startAngle, endAngle, colors, positions, style)
+            return makeSweepGradient(center.x, center.y, startAngle, endAngle, gradient, localMatrix)
         }
 
         fun makeSweepGradient(
@@ -362,78 +252,37 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             y: Float,
             startAngle: Float,
             endAngle: Float,
-            colors: IntArray,
-            positions: FloatArray?,
-            style: GradientStyle
-        ): Shader {
-            require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
-            Stats.onNativeCall()
-            return Shader(
-                interopScope {
-                    _nMakeSweepGradient(
-                        x,
-                        y,
-                        startAngle,
-                        endAngle,
-                        toInterop(colors),
-                        toInterop(positions),
-                        colors.size,
-                        style.tileMode.ordinal,
-                        style._getFlags(),
-                        toInterop(style._getMatrixArray())
-                    )
-                }
-            )
-        }
-
-        fun makeSweepGradient(
-            center: Point,
-            startAngle: Float,
-            endAngle: Float,
-            colors: Array<Color4f>,
-            cs: ColorSpace?,
-            positions: FloatArray?,
-            style: GradientStyle
-        ): Shader {
-            return makeSweepGradient(center.x, center.y, startAngle, endAngle, colors, cs, positions, style)
-        }
-
-        fun makeSweepGradient(
-            x: Float,
-            y: Float,
-            startAngle: Float,
-            endAngle: Float,
-            colors: Array<Color4f>,
-            cs: ColorSpace?,
-            positions: FloatArray?,
-            style: GradientStyle
+            gradient: Gradient,
+            localMatrix: Matrix33? = null
         ): Shader {
             return try {
-                require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
                 Stats.onNativeCall()
                 Shader(
                     interopScope {
-                        _nMakeSweepGradientCS(
+                        _nMakeSweepGradient(
                             x,
                             y,
                             startAngle,
                             endAngle,
-                            toInterop(Color4f.flattenArray(colors)),
-                            getPtr(cs),
-                            toInterop(positions),
-                            colors.size,
-                            style.tileMode.ordinal,
-                            style._getFlags(),
-                            toInterop(style._getMatrixArray())
+                            toInterop(Color4f.flattenArray(gradient.colors.colors)),
+                            getPtr(gradient.colors.colorSpace),
+                            toInterop(gradient.colors.positions),
+                            gradient.colors.colors.size,
+                            gradient.colors.tileMode.ordinal,
+                            gradient.interpolation.inPremul.ordinal,
+                            gradient.interpolation.colorSpace.ordinal,
+                            gradient.interpolation.hueMethod.ordinal,
+                            toInterop(localMatrix?.mat)
                         )
                     }
                 )
             } finally {
-                reachabilityBarrier(cs)
+                reachabilityBarrier(gradient)
+                reachabilityBarrier(gradient.colors.colorSpace)
+                reachabilityBarrier(localMatrix)
             }
         }
 
-        //
         fun makeEmpty(): Shader {
             Stats.onNativeCall()
             return Shader(Shader_nMakeEmpty())
@@ -564,93 +413,50 @@ private external fun _nMakeLinearGradient(
     x1: Float,
     y1: Float,
     colors: InteropPointer,
-    positions: InteropPointer,
-    count: Int,
-    tileType: Int,
-    flags: Int,
-    matrix: InteropPointer
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradientCS")
-private external fun _nMakeLinearGradientCS(
-    x0: Float,
-    y0: Float,
-    x1: Float,
-    y1: Float,
-    colors: InteropPointer,
     colorSpacePtr: NativePointer,
     positions: InteropPointer,
     count: Int,
-    tileType: Int,
-    flags: Int,
+    tileMode: Int,
+    inPremul: Int,
+    interpolationColorSpace: Int,
+    hueMethod: Int,
     matrix: InteropPointer
 ): NativePointer
-
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradient")
 private external fun _nMakeRadialGradient(
     x: Float,
     y: Float,
-    r: Float,
-    colors: InteropPointer,
-    positions: InteropPointer,
-    count: Int,
-    tileType: Int,
-    flags: Int,
-    matrix: InteropPointer
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradientCS")
-private external fun _nMakeRadialGradientCS(
-    x: Float,
-    y: Float,
-    r: Float,
+    radius: Float,
     colors: InteropPointer,
     colorSpacePtr: NativePointer,
     positions: InteropPointer,
     count: Int,
-    tileType: Int,
-    flags: Int,
+    tileMode: Int,
+    inPremul: Int,
+    interpolationColorSpace: Int,
+    hueMethod: Int,
     matrix: InteropPointer
 ): NativePointer
-
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
 private external fun _nMakeTwoPointConicalGradient(
     x0: Float,
     y0: Float,
-    r0: Float,
+    startRadius: Float,
     x1: Float,
     y1: Float,
-    r1: Float,
-    colors: InteropPointer,
-    positions: InteropPointer,
-    count: Int,
-    tileType: Int,
-    flags: Int,
-    matrix: InteropPointer
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradientCS")
-private external fun _nMakeTwoPointConicalGradientCS(
-    x0: Float,
-    y0: Float,
-    r0: Float,
-    x1: Float,
-    y1: Float,
-    r1: Float,
+    endRadius: Float,
     colors: InteropPointer,
     colorSpacePtr: NativePointer,
     positions: InteropPointer,
     count: Int,
-    tileType: Int,
-    flags: Int,
+    tileMode: Int,
+    inPremul: Int,
+    interpolationColorSpace: Int,
+    hueMethod: Int,
     matrix: InteropPointer
 ): NativePointer
-
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradient")
 private external fun _nMakeSweepGradient(
@@ -659,29 +465,15 @@ private external fun _nMakeSweepGradient(
     startAngle: Float,
     endAngle: Float,
     colors: InteropPointer,
-    positions: InteropPointer,
-    count: Int,
-    tileType: Int,
-    flags: Int,
-    matrix: InteropPointer
-): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradientCS")
-private external fun _nMakeSweepGradientCS(
-    x: Float,
-    y: Float,
-    startAngle: Float,
-    endAngle: Float,
-    colors: InteropPointer,
     colorSpacePtr: NativePointer,
     positions: InteropPointer,
     count: Int,
-    tileType: Int,
-    flags: Int,
+    tileMode: Int,
+    inPremul: Int,
+    interpolationColorSpace: Int,
+    hueMethod: Int,
     matrix: InteropPointer
 ): NativePointer
-
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeFractalNoise")
 private external fun _nMakeFractalNoise(
@@ -692,7 +484,6 @@ private external fun _nMakeFractalNoise(
     tileWidth: Int,
     tileHeight: Int,
 ): NativePointer
-
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTurbulence")
 private external fun _nMakeTurbulence(

@@ -1,4 +1,5 @@
 #include <jni.h>
+#include "SkPathBuilder.h"
 #include "SkPathMeasure.h"
 #include "interop.hh"
 
@@ -88,23 +89,9 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nG
         flags |= SkPathMeasure::MatrixFlags::kGetTangent_MatrixFlag;
 
     if (instance->getMatrix(distance, &matrix, static_cast<SkPathMeasure::MatrixFlags>(flags))) {
-        float* floats;
-        matrix.get9(floats);
-
-        jfloat d[9] = {
-          floats[0],
-          floats[1],
-          floats[2],
-          floats[3],
-          floats[4],
-          floats[5],
-          floats[6],
-          floats[7],
-          floats[8]
-        };
-
-        env->SetFloatArrayRegion(data, 0, 9, d);
-
+        jfloat values[9];
+        matrix.get9(values);
+        env->SetFloatArrayRegion(data, 0, 9, values);
         return true;
     }
 
@@ -114,7 +101,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nG
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetSegment
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat startD, jfloat endD, jlong dstPtr, jboolean startWithMoveTo) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
-    SkPath* dst = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(dstPtr));
+    SkPathBuilder* dst = reinterpret_cast<SkPathBuilder*>(static_cast<uintptr_t>(dstPtr));
     return instance->getSegment(startD, endD, dst, startWithMoveTo);
 }
 

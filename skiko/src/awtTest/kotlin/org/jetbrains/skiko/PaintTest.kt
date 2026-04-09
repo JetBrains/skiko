@@ -56,7 +56,18 @@ class PaintTest {
         surface.canvas.drawRect(
             r = rect,
             paint = Paint().apply {
-                shader = Shader.makeLinearGradient(rect.left, rect.top, rect.right, rect.bottom, intArrayOf(Color.RED, Color.BLUE))
+                shader = Shader.makeLinearGradient(
+                    rect.left,
+                    rect.top,
+                    rect.right,
+                    rect.bottom,
+                    Gradient(
+                        Gradient.Colors(
+                            colors = arrayOf(Color4f(Color.RED), Color4f(Color.BLUE)),
+                            tileMode = FilterTileMode.CLAMP
+                        )
+                    )
+                )
             }
         )
 

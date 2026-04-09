@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
+#include "modules/skunicode/include/SkUnicode_icu.h"
 #include "ParagraphBuilder.h"
+
 using namespace std;
 using namespace skia::textlayout;
 #include "common.h"
@@ -13,7 +15,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphBuilder__1nMak
   (KNativePointer paragraphStylePtr, KNativePointer fontCollectionPtr) {
     ParagraphStyle* paragraphStyle = reinterpret_cast<ParagraphStyle*>((paragraphStylePtr));
     FontCollection* fontCollection = reinterpret_cast<FontCollection*>((fontCollectionPtr));
-    ParagraphBuilder* instance = ParagraphBuilder::make(*paragraphStyle, sk_ref_sp(fontCollection)).release();
+    ParagraphBuilder* instance = ParagraphBuilder::make(
+        *paragraphStyle,
+        sk_ref_sp(fontCollection),
+        SkUnicodes::ICU::Make()
+    ).release();
     return reinterpret_cast<KNativePointer>(instance);
 }
 

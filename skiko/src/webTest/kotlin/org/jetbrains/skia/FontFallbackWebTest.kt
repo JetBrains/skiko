@@ -14,7 +14,7 @@ class FontFallbackWebTest {
             it.setDefaultFontManager(FontMgr.default)
 
             // 0x6C34 = "水"
-            val df = it.defaultFallback(0x6C34, FontStyle.NORMAL, null)
+            val df = it.defaultFallback(0x6C34, null, FontStyle.NORMAL, null)
             assertEquals(null, df)
         }
     }
