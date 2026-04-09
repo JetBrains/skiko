@@ -18,7 +18,7 @@ import kotlin.jvm.JvmInline
  * @param mat 16 elements in row-major order
  */
 @JvmInline
-value class Matrix44(val mat: FloatArray) {
+value class Matrix44 internal constructor(val mat: FloatArray) {
     constructor(
         m00: Float, m01: Float, m02: Float, m03: Float,
         m10: Float, m11: Float, m12: Float, m13: Float,
