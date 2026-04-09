@@ -1,15 +1,20 @@
 package org.jetbrains.skia
 
-enum class FilterBlurMode {
-    /** fuzzy inside and outside  */
-    NORMAL,
+import kotlin.jvm.JvmInline
 
-    /** solid inside, fuzzy outside  */
-    SOLID,
+@JvmInline
+value class FilterBlurMode internal constructor(val ordinal: Int) {
+    companion object {
+        /** fuzzy inside and outside  */
+        val NORMAL = FilterBlurMode(0)
 
-    /** nothing inside, fuzzy outside  */
-    OUTER,
+        /** solid inside, fuzzy outside  */
+        val SOLID = FilterBlurMode(1)
 
-    /** fuzzy inside, nothing outside  */
-    INNER;
+        /** nothing inside, fuzzy outside  */
+        val OUTER = FilterBlurMode(2)
+
+        /** fuzzy inside, nothing outside  */
+        val INNER = FilterBlurMode(3)
+    }
 }

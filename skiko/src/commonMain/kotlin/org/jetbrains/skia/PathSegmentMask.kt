@@ -1,10 +1,13 @@
 package org.jetbrains.skia
 
-interface PathSegmentMask {
+import kotlin.jvm.JvmInline
+
+@JvmInline
+value class PathSegmentMask internal constructor(val value: Int) {
     companion object {
-        const val LINE = 1
-        const val QUAD = 2
-        const val CONIC = 4
-        const val CUBIC = 8
+        val LINE = PathSegmentMask(1)
+        val QUAD = PathSegmentMask(2)
+        val CONIC = PathSegmentMask(4)
+        val CUBIC = PathSegmentMask(8)
     }
 }

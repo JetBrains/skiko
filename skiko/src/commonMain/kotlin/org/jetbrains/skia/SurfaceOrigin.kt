@@ -1,6 +1,11 @@
 package org.jetbrains.skia
 
-enum class SurfaceOrigin {
-    TOP_LEFT,
-    BOTTOM_LEFT;
+import kotlin.jvm.JvmInline
+
+@JvmInline
+value class SurfaceOrigin internal constructor(val ordinal: Int) {
+    companion object {
+        val TOP_LEFT = SurfaceOrigin(0)
+        val BOTTOM_LEFT = SurfaceOrigin(1)
+    }
 }

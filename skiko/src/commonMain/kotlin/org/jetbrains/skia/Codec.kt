@@ -64,14 +64,14 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     val encodedOrigin: EncodedOrigin
         get() = try {
             Stats.onNativeCall()
-            EncodedOrigin.entries[_nGetEncodedOrigin(_ptr)]
+            EncodedOrigin(_nGetEncodedOrigin(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
     val encodedImageFormat: EncodedImageFormat
         get() = try {
             Stats.onNativeCall()
-            EncodedImageFormat.entries[_nGetEncodedImageFormat(_ptr)]
+            EncodedImageFormat(_nGetEncodedImageFormat(_ptr))
         } finally {
             reachabilityBarrier(this)
         }

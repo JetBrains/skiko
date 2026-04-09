@@ -1,8 +1,13 @@
 package org.jetbrains.skia
 
-enum class ColorChannel {
-    R,
-    G,
-    B,
-    A;
+import kotlin.jvm.JvmInline
+
+@JvmInline
+value class ColorChannel internal constructor(val ordinal: Int) {
+    companion object {
+        val R = ColorChannel(0)
+        val G = ColorChannel(1)
+        val B = ColorChannel(2)
+        val A = ColorChannel(3)
+    }
 }

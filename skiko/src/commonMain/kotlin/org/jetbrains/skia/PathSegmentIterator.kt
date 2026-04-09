@@ -69,7 +69,7 @@ private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
     val isClosedLineBit = ((context shr 6) and 1)
     val isClosed = isClosedBit != 0
 
-    return when (PathVerb.entries[verb]) {
+    return when (PathVerb(verb)) {
         PathVerb.MOVE, PathVerb.CLOSE -> {
             PathSegment(verb, Float.fromBits(points[0]), Float.fromBits(points[1]), isClosed)
         }
@@ -121,6 +121,10 @@ private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
         }
         PathVerb.DONE -> {
             PathSegment()
+        }
+
+        else -> {
+            throw IllegalStateException("Unexpected verb: ${PathVerb(verb)}")
         }
     }
 }

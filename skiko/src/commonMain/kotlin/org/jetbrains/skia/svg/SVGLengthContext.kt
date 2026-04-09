@@ -18,10 +18,10 @@ class SVGLengthContext constructor(
             SVGLengthUnit.PX -> length.value
             SVGLengthUnit.PERCENTAGE -> {
                 when (type) {
-                    SVGLengthType.HORIZONTAL -> return length.value * width / 100.0f
-                    SVGLengthType.VERTICAL -> return length.value * height / 100.0f
+                    SVGLengthType.HORIZONTAL -> length.value * width / 100.0f
+                    SVGLengthType.VERTICAL -> length.value * height / 100.0f
                     SVGLengthType.OTHER ->                 // https://www.w3.org/TR/SVG11/coords.html#Units_viewport_percentage
-                        return (length.value * hypot(
+                        (length.value * hypot(
                             width.toDouble(),
                             height.toDouble()
                         ) / sqrt(2.0) / 100.0).toFloat()

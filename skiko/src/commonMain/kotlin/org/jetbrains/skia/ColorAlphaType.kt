@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import kotlin.jvm.JvmInline
+
 /**
  *
  * Describes how to interpret the alpha component of a pixel. A pixel may
@@ -19,24 +21,27 @@ package org.jetbrains.skia
  * value is the original RGB multiplied by alpha. Premultiplied color
  * components improve performance.
  */
-enum class ColorAlphaType {
-    /**
-     * uninitialized
-     */
-    UNKNOWN,
+@JvmInline
+value class ColorAlphaType internal constructor(val ordinal: Int) {
+    companion object {
+        /**
+         * uninitialized
+         */
+        val UNKNOWN = ColorAlphaType(0)
 
-    /**
-     * pixel is opaque
-     */
-    OPAQUE,
+        /**
+         * pixel is opaque
+         */
+        val OPAQUE = ColorAlphaType(1)
 
-    /**
-     * pixel components are premultiplied by alpha
-     */
-    PREMUL,
+        /**
+         * pixel components are premultiplied by alpha
+         */
+        val PREMUL = ColorAlphaType(2)
 
-    /**
-     * pixel components are independent of alpha
-     */
-    UNPREMUL;
+        /**
+         * pixel components are independent of alpha
+         */
+        val UNPREMUL = ColorAlphaType(3)
+    }
 }

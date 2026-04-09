@@ -510,7 +510,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     var fillMode: PathFillMode
         get() = try {
             Stats.onNativeCall()
-            PathFillMode.entries[_nGetFillMode(_ptr)]
+            PathFillMode(_nGetFillMode(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -871,7 +871,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
                     out?.let { ptr.fromInterop(it) }
                 }
             }
-            if (verbs != null) for (i in 0 until minOf(count, max)) verbs[i] = PathVerb.entries[out!![i].toInt()]
+            if (verbs != null) for (i in 0 until minOf(count, max)) verbs[i] = PathVerb(out!![i].toInt())
             count
         } finally {
             reachabilityBarrier(this)
@@ -1031,10 +1031,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see PathSegmentMask.CUBIC
      */
-    val segmentMasks: Int
+    val segmentMasks: PathSegmentMask
         get() = try {
             Stats.onNativeCall()
-            _nGetSegmentMasks(_ptr)
+            PathSegmentMask(_nGetSegmentMasks(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
