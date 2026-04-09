@@ -86,9 +86,6 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         "-DU_DISABLE_VERSION_SUFFIX=1",
         "-DU_HAVE_LIB_SUFFIX=1",
         "-DU_LIB_SUFFIX_C_NAME=_skiko",
-
-        // Temporary (m144) skia flag for migration to SkPathBuilder
-        "-USK_HIDE_PATH_EDIT_METHODS",
         *buildType.flags
     )
 
