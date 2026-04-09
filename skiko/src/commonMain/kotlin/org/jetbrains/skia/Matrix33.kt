@@ -22,6 +22,12 @@ internal inline fun Float.toRadians(): Double = this.toDouble() * radiansToDegre
  *
  * @param mat  9-element array of floats representing the matrix in row-major order
  *
+ * <pre>`
+ * | scaleX   skewX  transX |
+ * |  skewY  scaleY  transY |
+ * | persp0  persp1  persp2 |
+`</pre> *
+ *
  * @see [https://fiddle.skia.org/c/@Matrix_063](https://fiddle.skia.org/c/@Matrix_063)
  */
 @JvmInline
