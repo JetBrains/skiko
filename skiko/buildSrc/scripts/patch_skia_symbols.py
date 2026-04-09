@@ -7,8 +7,9 @@ linked into the same app binary.
 Steps:
   1. Extract all public (globally visible, defined) symbols from every Skia
      static library (i.e. everything *except* the skiko C++ bridge).
-  2. Write the collected symbol names to <output-dir>/symbols.txt.
-  3. For *every* library (Skia libs + skiko bridge) rewrite each collected symbol with a "_skiko" suffix:
+  2. Write the collected symbol names to <output-dir>/redefine-syms.txt.
+  3. For *every* library (Skia libs + skiko bridge) rewrite each collected
+     symbol with a "_skiko" suffix:
      _some_symbol  ->  _some_symbol_skiko
 """
 
