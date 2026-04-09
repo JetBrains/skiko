@@ -85,7 +85,7 @@ class TextStyleTest {
                 lineThrough = false,
                 gaps = true,
                 color = Color.BLUE,
-                lineStyle = DecorationLineStyle.DASHED.ordinal,
+                lineStyle = DecorationLineStyle.DASHED,
                 thicknessMultiplier = 2f
             )
 
@@ -95,7 +95,7 @@ class TextStyleTest {
                 lineThrough = false,
                 gaps = true,
                 color = Color.BLUE,
-                lineStyle = DecorationLineStyle.DASHED.ordinal,
+                lineStyle = DecorationLineStyle.DASHED,
                 thicknessMultiplier = 2f
             )
 

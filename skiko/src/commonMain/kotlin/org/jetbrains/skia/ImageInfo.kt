@@ -43,7 +43,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         width,
         height,
         ColorType.entries[colorType],
-        ColorAlphaType.entries[alphaType],
+        ColorAlphaType(alphaType),
         if (colorSpace == Native.NullPointer) null else ColorSpace(colorSpace)
     )
 

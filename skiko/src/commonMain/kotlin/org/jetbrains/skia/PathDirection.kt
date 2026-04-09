@@ -1,9 +1,14 @@
 package org.jetbrains.skia
 
-enum class PathDirection {
-    /** Clockwise direction for adding closed contours.  */
-    CLOCKWISE,
+import kotlin.jvm.JvmInline
 
-    /** Counter-clockwise direction for adding closed contours.  */
-    COUNTER_CLOCKWISE;
+@JvmInline
+value class PathDirection internal constructor(val ordinal: Int) {
+    companion object {
+        /** Clockwise direction for adding closed contours.  */
+        val CLOCKWISE = PathDirection(0)
+
+        /** Counter-clockwise direction for adding closed contours.  */
+        val COUNTER_CLOCKWISE = PathDirection(1)
+    }
 }

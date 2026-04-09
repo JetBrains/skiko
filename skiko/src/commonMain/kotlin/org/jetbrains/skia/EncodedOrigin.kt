@@ -1,50 +1,55 @@
 package org.jetbrains.skia
 
-enum class EncodedOrigin {
-    /**
-     * Do not use
-     */
-    UNUSED,
+import kotlin.jvm.JvmInline
 
-    /**
-     * Default
-     */
-    TOP_LEFT,
+@JvmInline
+value class EncodedOrigin internal constructor(val ordinal: Int) {
+    companion object {
+        /**
+         * Do not use
+         */
+        val UNUSED = EncodedOrigin(0)
 
-    /**
-     * Reflected across y-axis
-     */
-    TOP_RIGHT,
+        /**
+         * Default
+         */
+        val TOP_LEFT = EncodedOrigin(1)
 
-    /**
-     * Rotated 180
-     */
-    BOTTOM_RIGHT,
+        /**
+         * Reflected across y-axis
+         */
+        val TOP_RIGHT = EncodedOrigin(2)
 
-    /**
-     * Reflected across x-axis
-     */
-    BOTTOM_LEFT,
+        /**
+         * Rotated 180
+         */
+        val BOTTOM_RIGHT = EncodedOrigin(3)
 
-    /**
-     * Reflected across x-axis, Rotated 90 CCW
-     */
-    LEFT_TOP,
+        /**
+         * Reflected across x-axis
+         */
+        val BOTTOM_LEFT = EncodedOrigin(4)
 
-    /**
-     * Rotated 90 CW
-     */
-    RIGHT_TOP,
+        /**
+         * Reflected across x-axis, Rotated 90 CCW
+         */
+        val LEFT_TOP = EncodedOrigin(5)
 
-    /**
-     * Reflected across x-axis, Rotated 90 CW
-     */
-    RIGHT_BOTTOM,
+        /**
+         * Rotated 90 CW
+         */
+        val RIGHT_TOP = EncodedOrigin(6)
 
-    /**
-     * Rotated 90 CCW
-     */
-    LEFT_BOTTOM;
+        /**
+         * Reflected across x-axis, Rotated 90 CW
+         */
+        val RIGHT_BOTTOM = EncodedOrigin(7)
+
+        /**
+         * Rotated 90 CCW
+         */
+        val LEFT_BOTTOM = EncodedOrigin(8)
+    }
 
     /**
      * Given an encoded origin and the width and height of the source data, returns a matrix
@@ -53,7 +58,7 @@ enum class EncodedOrigin {
      */
     fun toMatrix(w: Int, h: Int): Matrix33 {
         return when (this) {
-            TOP_LEFT -> Matrix33.Companion.IDENTITY
+            TOP_LEFT -> Matrix33.IDENTITY
             TOP_RIGHT -> Matrix33(-1f, 0f, w.toFloat(), 0f, 1f, 0f, 0f, 0f, 1f)
             BOTTOM_RIGHT -> Matrix33(-1f, 0f, w.toFloat(), 0f, -1f, h.toFloat(), 0f, 0f, 1f)
             BOTTOM_LEFT -> Matrix33(1f, 0f, 0f, 0f, -1f, h.toFloat(), 0f, 0f, 1f)

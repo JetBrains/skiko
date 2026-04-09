@@ -1,28 +1,48 @@
 package org.jetbrains.skia
 
+import kotlin.jvm.JvmInline
+
 /**
- * Verb instructs Path how to interpret one or more Point and optional conic weight;
- * manage contour, and terminate Path.
+ * Verb instructs [Path] how to interpret one or more [Point] values and an optional conic weight,
+ * manage contours, and terminate a [Path].
  */
-enum class PathVerb {
-    /** iter.next returns 1 point  */
-    MOVE,
+@JvmInline
+value class PathVerb internal constructor(val ordinal: Int) {
 
-    /** iter.next returns 2 points  */
-    LINE,
+    companion object {
+        /**
+         * [PathSegmentIterator.next] returns 1 point.
+         */
+        val MOVE = PathVerb(0)
 
-    /** iter.next returns 3 points  */
-    QUAD,
+        /**
+         * [PathSegmentIterator.next] returns 2 points.
+         */
+        val LINE = PathVerb(1)
 
-    /** iter.next returns 3 points + iter.conicWeight()  */
-    CONIC,
+        /**
+         * [PathSegmentIterator.next] returns 3 points.
+         */
+        val QUAD = PathVerb(2)
 
-    /** iter.next returns 4 points  */
-    CUBIC,
+        /**
+         * [PathSegmentIterator.next] returns 3 points plus [PathSegmentIterator.conicWeight].
+         */
+        val CONIC = PathVerb(3)
 
-    /** iter.next returns 1 point (contour's moveTo pt)  */
-    CLOSE,
+        /**
+         * [PathSegmentIterator.next] returns 4 points.
+         */
+        val CUBIC = PathVerb(4)
 
-    /** iter.next returns 0 points  */
-    DONE;
+        /**
+         * [PathSegmentIterator.next] returns 1 point, the contour's move-to point.
+         */
+        val CLOSE = PathVerb(5)
+
+        /**
+         * [PathSegmentIterator.next] returns 0 points.
+         */
+        val DONE = PathVerb(6)
+    }
 }

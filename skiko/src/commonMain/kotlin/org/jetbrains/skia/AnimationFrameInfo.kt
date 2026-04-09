@@ -79,10 +79,10 @@ class AnimationFrameInfo(
                 repr[offset + 0],
                 repr[offset + 1],
                 repr[offset + 2] != 0,
-                repr[offset + 3],
+                ColorAlphaType(repr[offset + 3]),
                 repr[offset + 4] != 0,
-                repr[offset + 5],
-                repr[offset + 6],
+                AnimationDisposalMode(repr[offset + 5]),
+                BlendMode(repr[offset + 6]),
                 IRect(repr[offset + 7], repr[offset + 8], repr[offset + 9], repr[offset + 10])
             )
         }
@@ -96,26 +96,6 @@ class AnimationFrameInfo(
             return Array(size) { fromIntArray(repr, it) }
         }
     }
-
-    internal constructor(
-        requiredFrame: Int,
-        duration: Int,
-        fullyReceived: Boolean,
-        alphaTypeOrdinal: Int,
-        hasAlphaWithinBounds: Boolean,
-        disposalMethodOrdinal: Int,
-        blendModeOrdinal: Int,
-        frameRect: IRect
-    ) : this(
-        requiredFrame,
-        duration,
-        fullyReceived,
-        ColorAlphaType.entries[alphaTypeOrdinal],
-        hasAlphaWithinBounds,
-        AnimationDisposalMode.entries[disposalMethodOrdinal],
-        BlendMode.entries[blendModeOrdinal],
-        frameRect
-    )
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
@@ -261,7 +241,7 @@ class AnimationFrameInfo(
      * @return `this`.
      */
     fun withDisposalMethod(_disposalMethod: AnimationDisposalMode): AnimationFrameInfo {
-        return if (disposalMethod === _disposalMethod) this else AnimationFrameInfo(
+        return if (disposalMethod == _disposalMethod) this else AnimationFrameInfo(
             requiredFrame,
             duration,
             isFullyReceived,

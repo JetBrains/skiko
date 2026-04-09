@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import kotlin.jvm.JvmInline
+
 /**
  *
  * Join specifies how corners are drawn when a shape is stroked. Join
@@ -16,19 +18,22 @@ package org.jetbrains.skia
  * not contain the actual join. For instance, a fill path constructed with round joins does
  * not necessarily include circles at each connected segment.
  */
-enum class PaintStrokeJoin {
-    /**
-     * extends to miter limit
-     */
-    MITER,
+@JvmInline
+value class PaintStrokeJoin internal constructor(val ordinal: Int){
+    companion object {
+        /**
+         * extends to miter limit
+         */
+        val MITER = PaintStrokeJoin(0)
 
-    /**
-     * adds circle
-     */
-    ROUND,
+        /**
+         * adds circle
+         */
+        val ROUND = PaintStrokeJoin(1)
 
-    /**
-     * connects outside edges
-     */
-    BEVEL;
+        /**
+         * connects outside edges
+         */
+        val BEVEL = PaintStrokeJoin(2)
+    }
 }

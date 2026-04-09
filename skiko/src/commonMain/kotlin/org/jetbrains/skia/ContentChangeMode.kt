@@ -1,9 +1,14 @@
 package org.jetbrains.skia
 
-enum class ContentChangeMode {
-    /** Discards surface on change.  */
-    DISCARD,
+import kotlin.jvm.JvmInline
 
-    /** Preserves surface on change.  */
-    RETAIN;
+@JvmInline
+value class ContentChangeMode internal constructor(val ordinal: Int) {
+    companion object {
+        /** Discards surface on change.  */
+        val DISCARD = ContentChangeMode(0)
+
+        /** Preserves surface on change.  */
+        val RETAIN = ContentChangeMode(1)
+    }
 }

@@ -1,6 +1,9 @@
 package org.jetbrains.skia.paragraph
 
-enum class Affinity {
-    UPSTREAM,
-    DOWNSTREAM;
+@kotlin.jvm.JvmInline
+value class Affinity internal constructor(val ordinal: Int) {
+    companion object {
+        val UPSTREAM = Affinity(0)
+        val DOWNSTREAM = Affinity(1)
+    }
 }

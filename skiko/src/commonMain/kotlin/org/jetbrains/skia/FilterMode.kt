@@ -1,13 +1,18 @@
 package org.jetbrains.skia
 
-enum class FilterMode {
-    /**
-     * single sample point (nearest neighbor)
-     */
-    NEAREST,
+import kotlin.jvm.JvmInline
 
-    /**
-     * interporate between 2x2 sample points (bilinear interpolation)
-     */
-    LINEAR;
+@JvmInline
+value class FilterMode internal constructor(val ordinal: Int) {
+    companion object {
+        /**
+         * single sample point (nearest neighbor)
+         */
+        val NEAREST = FilterMode(0)
+
+        /**
+         * interporate between 2x2 sample points (bilinear interpolation)
+         */
+        val LINEAR = FilterMode(1)
+    }
 }

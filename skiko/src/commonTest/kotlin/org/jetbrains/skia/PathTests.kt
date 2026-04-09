@@ -69,7 +69,8 @@ class PathTests {
 
     @Test
     fun isShapeTest() {
-        for (dir in PathDirection.entries) {
+        val pathDirectionEntries = listOf(PathDirection.CLOCKWISE, PathDirection.COUNTER_CLOCKWISE)
+        for (dir in pathDirectionEntries) {
             for (start in 0..3) {
                 PathBuilder().addRect(Rect.makeLTRB(0f, 0f, 40f, 20f), dir, start).detach().use { p ->
                     assertEquals(Rect.makeLTRB(0f, 0f, 40f, 20f), p.isRect)
@@ -78,7 +79,7 @@ class PathTests {
                 }
             }
         }
-        for (dir in PathDirection.entries) {
+        for (dir in pathDirectionEntries) {
             for (start in 0..3) {
                 PathBuilder().addOval(Rect.makeLTRB(0f, 0f, 40f, 20f), dir, start).detach().use { p ->
                     assertNull(p.isRect)
@@ -87,14 +88,14 @@ class PathTests {
                 }
             }
         }
-        for (dir in PathDirection.entries) {
+        for (dir in pathDirectionEntries) {
             PathBuilder().addCircle(20f, 20f, 20f, dir).detach().use { p ->
                 assertNull(p.isRect)
                 assertEquals(Rect.makeLTRB(0f, 0f, 40f, 40f), p.isOval)
                 assertNull(p.isRRect)
             }
         }
-        for (dir in PathDirection.entries) {
+        for (dir in pathDirectionEntries) {
             for (start in 0..7) {
                 PathBuilder().addRRect(RRect.makeLTRB(0f, 0f, 40f, 20f, 5f), dir, start).detach().use { p ->
                     assertNull(p.isRect)
