@@ -230,9 +230,11 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     val bridgesLibrary = layout.buildDirectory.file("nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a")
     val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
 
-    // For iOS/tvOS we patch every library so that all public Skia symbols have
-    // postfix with "_skiko", preventing conflicts when multiple Skia copies
-    // are present in the same app binary.
+    // For iOS/tvOS we patch every library so that public Skia symbols are
+    // renamed, preventing conflicts when multiple Skia copies are present in
+    // the same app binary. Many C++ Itanium-mangled symbols are rewritten by
+    // inserting the `skiko` namespace into the mangled name; C symbols and
+    // unsupported shapes fall back to a "_skiko" suffix.
     val requiresSymbolPatching = os == OS.IOS || os == OS.TVOS
     val patchedLibsDir = layout.buildDirectory.dir("nativeBridges/patched/$targetString").get().asFile
 
