@@ -119,7 +119,7 @@ class DecorationStyle(
     }
 
     fun withLineStyle(lineStyle: DecorationLineStyle): DecorationStyle {
-        return if (this.lineStyle.ordinal == lineStyle.ordinal) this else DecorationStyle(
+        return if (this.lineStyle == lineStyle) this else DecorationStyle(
             underline,
             overline,
             lineThrough,
