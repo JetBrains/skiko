@@ -2,6 +2,7 @@ package tasks.configuration
 
 import Arch
 import CompileSkikoCppTask
+import MergeStaticLibrariesTask
 import OS
 import SkiaBuildType
 import SkikoProjectContext
@@ -231,7 +232,13 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
 
     val bridgesLibrary = layout.buildDirectory.file("nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a")
     val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
-    val allLibraries = skiaStaticLibraries(skiaDir, targetString, buildType) + bridgesLibraryPath
+    val skiaLibs = skiaStaticLibraries(skiaDir, targetString, buildType)
+    val allLibraries = if (os == OS.IOS) {
+        val mergedDir = layout.buildDirectory.dir("mergedNativeLibraries/$targetString").get().asFile
+        listOf(File(mergedDir, "skiko-merged-$targetString.a").absolutePath)
+    } else {
+        skiaLibs + bridgesLibraryPath
+    }
 
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val linkerFlags = when (os) {
@@ -335,9 +342,29 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         file(outDir).mkdirs()
         outputs.dir(outDir)
     }
+    val mergeTask = if (os == OS.IOS) {
+        val mergeActionName = "mergeNativeLibraries".withSuffix(isUikitSim = isUikitSim)
+        project.registerSkikoTask<MergeStaticLibrariesTask>(mergeActionName, os, arch) {
+            dependsOn(linkTask)
+            this.bridgesLibrary.set(bridgesLibrary)
+            inputLibraries.from(project.files(skiaLibs + bridgesLibraryPath))
+            outputDir.set(layout.buildDirectory.dir("mergedNativeLibraries/$targetString"))
+            outputFileName.set("skiko-merged-$targetString.a")
+            ldArch.set(when (arch) {
+                Arch.Arm64 -> "arm64"
+                Arch.X64 -> "x86_64"
+                else -> error("Unsupported architecture for iOS library merge: $arch")
+            })
+            // iosX64 is always a simulator target even though isUikitSim is false
+            platformName.set(if (isUikitSim || arch == Arch.X64) "ios-simulator" else "ios")
+            minOsVersion.set("12.0")
+            kotlinSourceRoot.set(layout.projectDirectory.dir("src"))
+        }
+    } else null
+
     target.compilations.all {
         compileTaskProvider.configure {
-            dependsOn(linkTask)
+            dependsOn(mergeTask ?: linkTask)
         }
     }
 }
