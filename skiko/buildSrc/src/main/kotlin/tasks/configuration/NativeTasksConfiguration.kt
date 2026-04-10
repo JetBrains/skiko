@@ -2,6 +2,7 @@ package tasks.configuration
 
 import Arch
 import CompileSkikoCppTask
+import PatchSkiaSymbolsTask
 import OS
 import SkiaBuildType
 import SkikoProjectContext
@@ -348,23 +349,12 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     // For iOS/tvOS: patch all Skia + skiko-bridge symbols after linking.
     val compilationDependency = if (requiresSymbolPatching) {
         val patchActionName = "patchSkikoSymbols".withSuffix(isUikitSim = isUikitSim)
-        project.registerSkikoTask<Exec>(patchActionName, os, arch) {
+        project.registerSkikoTask<PatchSkiaSymbolsTask>(patchActionName, os, arch) {
             dependsOn(unzipper)
             dependsOn(linkTask)
-            val skiaLibPaths = skiaStaticLibraries(skiaDir, targetString, buildType)
-            val patchScript = project.file("buildSrc/scripts/patch_skia_symbols.py")
-            executable = "python3"
-            argumentProviders.add {
-                listOf(patchScript.absolutePath) +
-                listOf("--skia-libs") + skiaLibPaths +
-                listOf(
-                    "--skiko-bridge", bridgesLibraryPath,
-                    "--output-dir", patchedLibsDir.absolutePath,
-                )
-            }
-            inputs.files(skiaLibPaths + listOf(bridgesLibraryPath, patchScript))
-            outputs.dir(patchedLibsDir)
-            file(patchedLibsDir).mkdirs()
+            skiaLibs.set(skiaStaticLibraries(skiaDir, targetString, buildType).map { File(it) })
+            skikoBridge.set(File(bridgesLibraryPath))
+            outputDir.set(patchedLibsDir)
         }
     } else {
         linkTask
