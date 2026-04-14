@@ -9,17 +9,16 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * Patches public symbols in Skia static libraries for iOS/tvOS to avoid symbol
- * conflicts when multiple copies of Skia (or libraries depending on Skia) are
- * linked into the same app binary.
+ * Renames all public symbols in Skia and skiko-bridge static libraries (iOS/tvOS)
+ * into a `skiko`-namespaced form to prevent symbol clashes when multiple copies of
+ * Skia are linked into the same app binary.
  *
- * Steps:
- *   1. Extract all public (globally visible, defined) symbols from every Skia
- *      static library (i.e. everything *except* the skiko C++ bridge).
- *   2. Write the collected symbol names to `<output-dir>/redefine-syms.txt`.
- *   3. For *every* library (Skia libs + skiko bridge) rewrite each collected
- *      symbol with a "_skiko" suffix:
- *      `_some_symbol  ->  _some_symbol_skiko`
+ * - C++ mangled names get `skiko` encoded as an outer namespace
+ * (`__ZN7SkPaint4MakeEv` → `__ZN5skiko7SkPaint4MakeEv`).
+ * - Plain C names receive a `_skiko` suffix (`_uloc_getDefault` → `_uloc_getDefault_skiko`).
+ * - Symbols already carrying the `_skiko` suffix are left untouched.
+ *
+ * Produces patched copies of every input library mapping file in [outputDir].
  */
 abstract class PatchSkiaSymbolsTask : DefaultTask() {
     @get:Inject
@@ -155,9 +154,6 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
      *
      * We keep only lines with exactly three whitespace-separated tokens whose
      * middle token is a single uppercase letter (defined global symbol type).
-     *
-     * Note: Python's `str.split()` splits on any whitespace and discards empty
-     * strings — equivalent to `line.trim().split(WHITESPACE_REGEX)` in Kotlin.
      */
     private fun extractGlobalDefinedSymbols(libPath: File): Set<String> {
         val output = run("xcrun", "nm", "-g", "--defined-only", libPath.absolutePath)
