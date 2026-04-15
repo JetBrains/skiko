@@ -302,7 +302,8 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
         }
 
         /**
-         * Rename [sym] so that the result is still valid and demangable.
+         * Rename [sym] into a `skiko`-namespaced form while preserving
+         * demanglability for the Itanium-ABI mangled shapes we can rewrite.
          *
          * For C++ Itanium-ABI mangled names the `skiko` namespace is encoded
          * directly into the mangled grammar, producing names that LLDB, c++filt,
@@ -329,6 +330,9 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
          *
          * Symbols with mangled shapes too complex to rewrite without a full
          * Itanium ABI parser also receive the suffix as a safe fallback.
+         * That fallback preserves uniqueness and linker-valid naming, but for
+         * complex C++ mangled inputs it does not guarantee that the result will
+         * remain demangleable by standard tools.
          */
         internal fun renamed(sym: String, suffix: String = "_skiko"): String {
             return tryMangleInNamespace(sym) ?: (sym + suffix)
