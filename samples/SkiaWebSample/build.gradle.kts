@@ -51,7 +51,7 @@ kotlin {
         binaries.executable()
     }
 
-    wasmJs() {
+    wasmJs {
         browser {
             commonWebpackConfig {
                 outputFileName = "webApp.js"
@@ -61,24 +61,16 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain.dependencies {
+            implementation(libs.skiko)
+        }
+
+        webMain {
             dependencies {
-                implementation(libs.skiko)
+                implementation(libs.browser)
             }
-        }
 
-        val webMain by creating {
-            dependsOn(commonMain)
-            resources.setSrcDirs(resources.srcDirs)
             resources.srcDirs(unpackWasmRuntime.map { it.destinationDir })
-        }
-
-        val jsMain by getting {
-            dependsOn(webMain)
-        }
-
-        val wasmJsMain by getting {
-            dependsOn(webMain)
         }
     }
 }

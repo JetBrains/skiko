@@ -29,16 +29,24 @@ class SkikoProjectContext(
 }
 
 fun SkikoProjectContext.declareSkiaTasks() {
-    val basicConfigs = listOf("android", "ios", "iosSim", "linux", "macos", "tvos", "tvosSim", "wasm", "windows")
-
-    basicConfigs.forEach { config ->
-        (if (config == "wasm") listOf("wasm") else listOf("arm64", "x64")).forEach { arch ->
+    mapOf(
+        "android" to listOf("arm64", "x64"),
+        "ios" to listOf("arm64", "x64"),
+        "iosSim" to listOf("arm64", "x64"),
+        "linux" to listOf("arm64", "x64"),
+        "macos" to listOf("arm64", "x64"),
+        "tvos" to listOf("arm64"),
+        "tvosSim" to listOf("arm64", "x64"),
+        "wasm" to listOf("wasm"),
+        "windows" to listOf("arm64", "x64"),
+    ).forEach { (config, architectures) ->
+        architectures.forEach { arch ->
             val taskNameSuffix = joinToTitleCamelCase(config, arch)
             val target = "$config-$arch"
 
             val skiaReleaseTag = project.skiaVersion(target)
 
-            val skiaBaseUrl = "https://github.com/JetBrains/skia-pack/releases/download/$skiaReleaseTag"
+            val skiaBaseUrl = "https://github.com/JetBrains/skia/releases/download/$skiaReleaseTag"
 
             val artifactId = "Skia-${skiaReleaseTag}-${config}-$buildType-${arch}"
 

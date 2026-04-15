@@ -18,10 +18,9 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextBasedContextHandl
         return false
     }
 
-    override fun initCanvas() {
-        val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
+    override fun LayerDrawScope.initCanvas() {
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
 
         if (isSizeChanged(w, h) || surface == null) {
             disposeCanvas()
@@ -41,7 +40,7 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextBasedContextHandl
                 SurfaceOrigin.BOTTOM_LEFT,
                 SurfaceColorFormat.RGBA_8888,
                 ColorSpace.sRGB,
-                SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                SurfaceProps(pixelGeometry = pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
         }
 

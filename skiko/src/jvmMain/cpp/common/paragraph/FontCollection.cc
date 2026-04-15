@@ -1,8 +1,9 @@
 #include <iostream>
 #include <jni.h>
+#include <vector>
 #include "../interop.hh"
-#include "SkRefCnt.h"
 #include "FontCollection.h"
+#include "SkRefCnt.h"
 
 using namespace std;
 using namespace skia::textlayout;
@@ -73,9 +74,15 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollect
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nDefaultFallbackChar
-  (JNIEnv* env, jclass jclass, jlong ptr, jint unicode, jint fontStyle, jstring locale) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint unicode, jobjectArray familyNamesArray, jsize len, jint fontStyle, jstring locale) {
     FontCollection* instance = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(ptr));
-    return reinterpret_cast<jlong>(instance->defaultFallback(unicode, skija::FontStyle::fromJava(fontStyle), skString(env, locale), std::nullopt).release());
+    return reinterpret_cast<jlong>(instance->defaultFallback(
+        unicode,
+        skStringVector(env, familyNamesArray),
+        skija::FontStyle::fromJava(fontStyle),
+        skString(env, locale),
+        std::nullopt
+    ).release());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nDefaultFallback

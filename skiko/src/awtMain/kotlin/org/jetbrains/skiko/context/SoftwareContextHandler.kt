@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
@@ -22,25 +23,22 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHand
     var imageData: ByteArray? = null
     var raster: WritableRaster? = null
 
-    override fun initCanvas() {
+    override fun LayerDrawScope.initCanvas() {
         disposeCanvas()
 
-        val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
 
         if (storage.width != w || storage.height != h) {
             storage.allocPixelsFlags(ImageInfo.makeS32(w, h, ColorAlphaType.PREMUL), false)
         }
 
-        canvas = Canvas(storage, SurfaceProps(pixelGeometry = layer.pixelGeometry))
+        canvas = Canvas(storage, SurfaceProps(pixelGeometry = pixelGeometry))
     }
 
-    override fun flush() {
-        val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
-
+    override fun flush(scope: LayerDrawScope) {
+        val w = scope.scaledLayerWidth
+        val h = scope.scaledLayerHeight
 
         val bytes = storage.readPixels(storage.imageInfo, (w * 4), 0, 0)
         if (bytes != null) {

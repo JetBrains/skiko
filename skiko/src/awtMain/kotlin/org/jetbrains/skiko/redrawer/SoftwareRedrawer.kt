@@ -27,7 +27,7 @@ internal class SoftwareRedrawer(
 
         if (layer.isShowing) {
             update()
-            inDrawScope(contextHandler::draw)
+            inDrawScope { contextHandler.draw() }
         }
     }
 

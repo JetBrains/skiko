@@ -7,47 +7,37 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 
 object PathUtils {
 
-    /**
-     * Returns the filled equivalent of the stroked path using the provided paint attributes.
-     *
-     * @param src       Path to create a filled version of.
-     * @param paint     Paint from which attributes such as stroke cap, width, miter, join, and
-     *                  pathEffect will be used.
-     * @param cull      Optional limit passed to the path effect.
-     * @param resScale  If &gt; 1, increase precision, else if (0 &lt; resScale &lt; 1) reduce precision
-     *                  to favor speed and size.
-     * @return          A filled version of the source path.
-     */
-    fun fillPathWithPaint(src: Path, paint: Paint, cull: Rect?, resScale: Float): Path {
-        return fillPathWithPaint(src, paint, cull, Matrix33.makeScale(resScale))
+    /** Returns the filled equivalent of the stroked path. */
+    fun fillPathWithPaint(src: Path, paint: Paint, dst: PathBuilder, cull: Rect?, resScale: Float): Boolean {
+        return fillPathWithPaint(src, paint, dst, cull, Matrix33.makeScale(resScale))
     }
 
     /**
-     * Returns the filled equivalent of the stroked path using the provided paint attributes.
+     * Returns the filled equivalent of the stroked path.
      *
-     * @param src       Path to create a filled version of.
-     * @param paint     Paint from which attributes such as stroke cap, width, miter, join, and
-     *                  pathEffect will be used.
-     * @param cull      Optional limit passed to the path effect.
-     * @param matrix    Current transformation matrix.
-     * @return          A filled version of the source path.
+     * @param src       SkPath read to create a filled version
+     * @param paint     uses settings for stroke cap, width, miter, join, and patheffect.
+     * @param dst       results are written to this builder.
+     * @param cull      optional limit passed to SkPathEffect
+     * @param matrix    matrix to take into acount for increased precision (if it scales up).
+     * @return          true if the result can be filled, or false if it is a hairline (to be stroked).
      */
-    fun fillPathWithPaint(src: Path, paint: Paint, cull: Rect?, matrix: Matrix33): Path {
+    fun fillPathWithPaint(src: Path, paint: Paint, dst: PathBuilder, cull: Rect?, matrix: Matrix33): Boolean {
         return try {
             Stats.onNativeCall()
-            if (cull == null) org.jetbrains.skia.Path(
-                interopScope {
-                    _nFillPathWithPaint(
+            interopScope {
+                if (cull == null) {
+                    _nFillPathWithPaintMatrix(
                         getPtr(src),
                         getPtr(paint),
+                        getPtr(dst),
                         toInterop(matrix.mat)
                     )
-                }
-            ) else org.jetbrains.skia.Path(
-                interopScope {
+                } else {
                     _nFillPathWithPaintCull(
                         getPtr(src),
                         getPtr(paint),
+                        getPtr(dst),
                         cull.left,
                         cull.top,
                         cull.right,
@@ -55,7 +45,25 @@ object PathUtils {
                         toInterop(matrix.mat)
                     )
                 }
-            )
+            }
+        } finally {
+            reachabilityBarrier(matrix)
+            reachabilityBarrier(src)
+            reachabilityBarrier(paint)
+            reachabilityBarrier(dst)
+        }
+    }
+
+    /**
+     * Returns the filled equivalent of the stroked path.
+     *
+     * @param src   SkPath read to create a filled version
+     * @param paint uses settings for stroke cap, width, miter, join, and patheffect.
+     */
+    fun fillPathWithPaint(src: Path, paint: Paint): Path {
+        return try {
+            Stats.onNativeCall()
+            Path(_nFillPathWithPaint(getPtr(src), getPtr(paint)))
         } finally {
             reachabilityBarrier(src)
             reachabilityBarrier(paint)
@@ -63,14 +71,22 @@ object PathUtils {
     }
 
     /**
-     * Returns the filled equivalent of the stroked path using the provided paint attributes.
+     * Returns the filled equivalent of the stroked path.
      *
-     * @param src   Path to create a filled version of.
-     * @param paint Paint attributes such as stroke cap, width, miter, join, and pathEffect.
-     * @return      A filled version of the source path.
+     * @param src   SkPath read to create a filled version
+     * @param paint uses settings for stroke cap, width, miter, join, and patheffect.
+     * @param dst   results are written to this builder.
+     * @return      true if the result can be filled, or false if it is a hairline (to be stroked).
      */
-    fun fillPathWithPaint(src: Path, paint: Paint): Path {
-        return fillPathWithPaint(src, paint, null, 1f)
+    fun fillPathWithPaint(src: Path, paint: Paint, dst: PathBuilder): Boolean {
+        return try {
+            Stats.onNativeCall()
+            _nFillPathWithPaintBuilder(getPtr(src), getPtr(paint), getPtr(dst))
+        } finally {
+            reachabilityBarrier(src)
+            reachabilityBarrier(paint)
+            reachabilityBarrier(dst)
+        }
     }
 
     init {
@@ -81,17 +97,32 @@ object PathUtils {
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaint")
 private external fun _nFillPathWithPaint(
     srcPtr: NativePointer,
-    paintPtr: NativePointer,
-    matrix: InteropPointer
+    paintPtr: NativePointer
 ): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintBuilder")
+private external fun _nFillPathWithPaintBuilder(
+    srcPtr: NativePointer,
+    paintPtr: NativePointer,
+    dstPtr: NativePointer
+): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintMatrix")
+private external fun _nFillPathWithPaintMatrix(
+    srcPtr: NativePointer,
+    paintPtr: NativePointer,
+    dstPtr: NativePointer,
+    matrix: InteropPointer
+): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintCull")
 private external fun _nFillPathWithPaintCull(
     srcPtr: NativePointer,
     paintPtr: NativePointer,
+    dstPtr: NativePointer,
     left: Float,
     top: Float,
     right: Float,
     bottom: Float,
     matrix: InteropPointer
-): NativePointer
+): Boolean

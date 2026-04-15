@@ -169,7 +169,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name: 'Run Linux (x64) Tests'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           virtual-display: true
           command: |
             ./gradlew --no-daemon --stacktrace \

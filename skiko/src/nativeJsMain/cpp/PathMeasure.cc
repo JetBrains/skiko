@@ -1,3 +1,4 @@
+#include "SkPathBuilder.h"
 #include "SkPathMeasure.h"
 #include "common.h"
 
@@ -89,19 +90,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetMatrix
       flags |= SkPathMeasure::MatrixFlags::kGetTangent_MatrixFlag;
 
   if (instance->getMatrix(distance, &matrix, static_cast<SkPathMeasure::MatrixFlags>(flags))) {
-      float* f;
-      matrix.get9(f);
-
-      data[0] = data[0];
-      data[1] = data[1];
-      data[2] = data[2];
-      data[3] = data[3];
-      data[4] = data[4];
-      data[5] = data[5];
-      data[6] = data[6];
-      data[7] = data[7];
-      data[8] = data[8];
-
+      matrix.get9(data);
       return true;
   }
 
@@ -111,7 +100,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetMatrix
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetSegment
   (KNativePointer ptr, KFloat startD, KFloat endD, KNativePointer dstPtr, KBoolean startWithMoveTo) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
-    SkPath* dst = reinterpret_cast<SkPath*>((dstPtr));
+    SkPathBuilder* dst = reinterpret_cast<SkPathBuilder*>((dstPtr));
     return instance->getSegment(startD, endD, dst, startWithMoveTo);
 }
 

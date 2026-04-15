@@ -102,7 +102,11 @@ kotlin {
 
     jvm("awt") {
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+                }
+            }
         }
     }
 
@@ -310,7 +314,7 @@ if (hostOs == "macos") {
     } else {
         // Otherwise copy the executable into the Xcode output directory.
         tasks.create("packForXCode", Copy::class.java) {
-            dependsOn(kotlinBinary.linkTask)
+            dependsOn(kotlinBinary.linkTaskProvider)
             
             println("Packing for XCode: ${kotlinBinary.target}")
 
@@ -371,7 +375,5 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
 
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
-    kotlinOptions {
-        freeCompilerArgs += "-opt-in=kotlinx.cinterop.ExperimentalForeignApi"
-    }
+    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
 }

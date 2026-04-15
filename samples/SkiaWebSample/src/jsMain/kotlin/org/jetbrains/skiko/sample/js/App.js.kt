@@ -7,7 +7,7 @@ fun main() {
     onWasmReady {
         val description = "Skiko running with ${getPlatform().name}"
         document.title = description
-        findElementById("description")?.innerHTML = description
+        document.getElementById("description")?.innerHTML = description
         runApp()
     }
 }

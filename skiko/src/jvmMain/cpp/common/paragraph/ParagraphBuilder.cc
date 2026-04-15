@@ -1,8 +1,9 @@
 #include <iostream>
 #include <jni.h>
 #include <string>
-#include "ParagraphBuilder.h"
 #include "../interop.hh"
+#include "modules/skunicode/include/SkUnicode_icu.h"
+#include "ParagraphBuilder.h"
 
 using namespace std;
 using namespace skia::textlayout;
@@ -15,7 +16,11 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphBu
   (JNIEnv* env, jclass jclass, jlong paragraphStylePtr, jlong fontCollectionPtr) {
     ParagraphStyle* paragraphStyle = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(paragraphStylePtr));
     FontCollection* fontCollection = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(fontCollectionPtr));
-    ParagraphBuilder* instance = ParagraphBuilder::make(*paragraphStyle, sk_ref_sp(fontCollection)).release();
+    ParagraphBuilder* instance = ParagraphBuilder::make(
+        *paragraphStyle,
+        sk_ref_sp(fontCollection),
+        SkUnicodes::ICU::Make()
+    ).release();
     return reinterpret_cast<jlong>(instance);
 }
 

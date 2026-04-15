@@ -157,7 +157,9 @@ internal class MacOsMetalRedrawer(
                 update()
             }
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                contextHandler.draw()
+                skiaLayer.inDrawScope {
+                    contextHandler.draw()
+                }
             }
         }
     }
@@ -166,7 +168,9 @@ internal class MacOsMetalRedrawer(
         autoreleasepool {
             if (!isDisposed) {
                 update()
-                contextHandler.draw()
+                skiaLayer.inDrawScope {
+                    contextHandler.draw()
+                }
             }
         }
 
@@ -233,6 +237,8 @@ internal class MetalLayer : CAMetalLayer {
 
     override fun drawInContext(ctx: CGContextRef?) {
         skiaLayer.update(currentNanoTime())
-        contextHandler.draw()
+        skiaLayer.inDrawScope {
+            contextHandler.draw()
+        }
     }
 }

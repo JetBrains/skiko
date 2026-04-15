@@ -645,13 +645,22 @@ actual open class SkiaLayer internal constructor(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    internal inline fun inDrawScope(body: () -> Unit) {
+    private fun createDrawScope() = LayerDrawScope(
+        pixelGeometry = pixelGeometry,
+        layerWidth = width,
+        layerHeight = height,
+        scale = contentScale
+    )
+
+    internal inline fun inDrawScope(body: LayerDrawScope.() -> Unit) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
         try {
             fpsCounter?.tick()
-            body()
-        } catch (e: CancellationException) {
+            with(createDrawScope()) {
+                body()
+            }
+        } catch (_: CancellationException) {
             // ignore
         } catch (e: RenderException) {
             if (!isDisposed) {

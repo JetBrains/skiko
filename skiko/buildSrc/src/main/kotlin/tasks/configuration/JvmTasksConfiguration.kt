@@ -72,8 +72,10 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     val osFlags: Array<String>
     when (targetOs) {
         OS.MacOS -> {
+            compiler.set(project.appleToolchainExecutableOrDefault("clang++", compiler.get()))
             includeHeadersNonRecursive(jdkHome.resolve("include/darwin"))
             osFlags = arrayOf(
+                *project.appleMacOsSdkFlags().toTypedArray(),
                 *targetOs.clangFlags,
                 *buildType.clangFlags,
                 "-arch", if (targetArch == Arch.Arm64) "arm64" else "x86_64",
@@ -199,7 +201,7 @@ fun SkikoProjectContext.createObjcCompileTask(
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp"))
 
-    compiler.set("clang")
+    compiler.set(project.appleToolchainExecutableOrDefault("clang", "clang"))
     buildVariant.set(buildType)
     buildTargetOS.set(os)
     buildTargetArch.set(arch)
@@ -207,6 +209,7 @@ fun SkikoProjectContext.createObjcCompileTask(
         listOf(
             "-fobjc-arc",
             "-arch", if (arch == Arch.Arm64) "arm64" else "x86_64",
+            *project.appleMacOsSdkFlags().toTypedArray(),
             *os.clangFlags,
             *buildType.clangFlags,
             *skiaPreprocessorFlags(os, buildType),

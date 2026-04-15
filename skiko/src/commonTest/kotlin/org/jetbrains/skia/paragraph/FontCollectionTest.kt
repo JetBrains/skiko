@@ -88,9 +88,9 @@ class FontCollectionTest {
         }
 
         if (kotlinBackend.isNotJs()) {
-            fontCollection.defaultFallback(65 /* A */, FontStyle.NORMAL, "en-US")!!.use { t1 ->
+            fontCollection.defaultFallback(65 /* A */, null, FontStyle.NORMAL, "en-US")!!.use { t1 ->
                 val refCnt: Int = t1.refCount
-                fontCollection.defaultFallback(65 /* A */, FontStyle.NORMAL, "en-US")!!.use { t2 ->
+                fontCollection.defaultFallback(65 /* A */, null, FontStyle.NORMAL, "en-US")!!.use { t2 ->
                     assertEquals(refCnt + 1, t1.refCount)
                     assertEquals(refCnt + 1, t2.refCount)
                     assertEquals(t1, t2)

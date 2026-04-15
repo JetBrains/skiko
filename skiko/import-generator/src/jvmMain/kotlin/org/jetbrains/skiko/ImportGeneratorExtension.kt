@@ -26,9 +26,6 @@ internal class ImportGeneratorExtension(
 
             importGenerator.getExportSymbols().forEach { symbolName ->
                 writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
-                if (reexportPath == null) {
-                    writer.appendLine("window['${symbolName}'] = (...a) => loadedWasm._[\"${symbolName}\"](...a)")
-                }
             }
         }
 

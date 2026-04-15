@@ -46,14 +46,14 @@ class CanvasTest {
 
         // Hint: use surface.makeImageSnapshot().printBitmap() to print image as kotlin array
         val expected = imageFromIntArray(intArrayOf(
-            0x00000000.toInt(), 0xffbf2020.toInt(), 0xff9f2040.toInt(), 0xff802060.toInt(), 0xff602080.toInt(), 0xff40209f.toInt(), 0xff2020bf.toInt(), 0xff0020df.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0xff806020.toInt(), 0xff606040.toInt(), 0xff406060.toInt(), 0xff206080.toInt(), 0xff00609f.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xff409f20.toInt(), 0xff209f40.toInt(), 0xff009f60.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xff00df20.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xff20ffdf.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xff60bfdf.toInt(), 0xff60dfbf.toInt(), 0xff60ff9f.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0xff9f80df.toInt(), 0xff9f9fbf.toInt(), 0xff9fbf9f.toInt(), 0xff9fdf80.toInt(), 0xff9fff60.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0xffdf40df.toInt(), 0xffdf60bf.toInt(), 0xffdf809f.toInt(), 0xffdf9f80.toInt(), 0xffdfbf60.toInt(), 0xffdfdf40.toInt(), 0xffdfff20.toInt(),
+            0x00000000, 0xffbf2020.toInt(), 0xff9f2040.toInt(), 0xff802060.toInt(), 0xff602080.toInt(), 0xff40209f.toInt(), 0xff2020bf.toInt(), 0xff0020df.toInt(),
+            0x00000000, 0x00000000, 0xff806020.toInt(), 0xff606040.toInt(), 0xff406060.toInt(), 0xff206080.toInt(), 0xff00609f.toInt(), 0x00000000,
+            0x00000000, 0x00000000, 0x00000000, 0xff409f20.toInt(), 0xff209f40.toInt(), 0xff009f60.toInt(), 0x00000000, 0x00000000,
+            0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xff00df20.toInt(), 0x00000000, 0x00000000, 0x00000000,
+            0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xff20ffdf.toInt(), 0x00000000, 0x00000000, 0x00000000,
+            0x00000000, 0x00000000, 0x00000000, 0xff60bfdf.toInt(), 0xff60dfbf.toInt(), 0xff60ff9f.toInt(), 0x00000000, 0x00000000,
+            0x00000000, 0x00000000, 0xff9f80df.toInt(), 0xff9f9fbf.toInt(), 0xff9fbf9f.toInt(), 0xff9fdf80.toInt(), 0xff9fff60.toInt(), 0x00000000,
+            0x00000000, 0xffdf40df.toInt(), 0xffdf60bf.toInt(), 0xffdf809f.toInt(), 0xffdf9f80.toInt(), 0xffdfbf60.toInt(), 0xffdfdf40.toInt(), 0xffdfff20.toInt(),
         ), surface.width)
 
         assertContentSame(expected, surface.makeImageSnapshot(), 0.25)
@@ -79,14 +79,14 @@ class CanvasTest {
         )
 
         val expected = imageFromIntArray(intArrayOf(
-            0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0xffff0000.toInt(), 0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0xffff0000.toInt(), 0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-            0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xffff0000.toInt(),
+            0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+            0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+            0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+            0x00000000, 0x00000000, 0x00000000, 0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000, 0x00000000, 0x00000000,
+            0x00000000, 0x00000000, 0xffff0000.toInt(), 0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000, 0x00000000, 0x00000000,
+            0x00000000, 0xffff0000.toInt(), 0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+            0x00000000, 0xffff0000.toInt(), 0xffff0000.toInt(), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+            0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xffff0000.toInt(),
         ), surface.width)
 
         assertContentSame(expected, surface.makeImageSnapshot(), 0.25)
@@ -176,14 +176,14 @@ class CanvasTest {
 
         val expected = imageFromIntArray(
             pixArray = intArrayOf(
-                0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-                0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xffcb0634.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-                0x00000000.toInt(), 0x00000000.toInt(), 0xffb63b49.toInt(), 0xff9b3064.toInt(), 0xff762b8a.toInt(), 0xff4b1cb4.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-                0x00000000.toInt(), 0x00000000.toInt(), 0xff8d6e73.toInt(), 0xff866479.toInt(), 0xff7a6386.toInt(), 0xff675698.toInt(), 0xff3632c9.toInt(), 0x00000000.toInt(),
-                0x00000000.toInt(), 0xff36cdc9.toInt(), 0xff67a998.toInt(), 0xff7a9c86.toInt(), 0xff869b79.toInt(), 0xff8d9173.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-                0x00000000.toInt(), 0x00000000.toInt(), 0xff4be3b4.toInt(), 0xff76d48a.toInt(), 0xff9bcf64.toInt(), 0xffb6c449.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-                0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xffcbf934.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
-                0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
+                0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+                0x00000000, 0x00000000, 0x00000000, 0xffcb0634.toInt(), 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+                0x00000000, 0x00000000, 0xffb63b49.toInt(), 0xff9b3064.toInt(), 0xff762b8a.toInt(), 0xff4b1cb4.toInt(), 0x00000000, 0x00000000,
+                0x00000000, 0x00000000, 0xff8d6e73.toInt(), 0xff866479.toInt(), 0xff7a6386.toInt(), 0xff675698.toInt(), 0xff3632c9.toInt(), 0x00000000,
+                0x00000000, 0xff36cdc9.toInt(), 0xff67a998.toInt(), 0xff7a9c86.toInt(), 0xff869b79.toInt(), 0xff8d9173.toInt(), 0x00000000, 0x00000000,
+                0x00000000, 0x00000000, 0xff4be3b4.toInt(), 0xff76d48a.toInt(), 0xff9bcf64.toInt(), 0xffb6c449.toInt(), 0x00000000, 0x00000000,
+                0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xffcbf934.toInt(), 0x00000000, 0x00000000, 0x00000000,
+                0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 
                 ),
             imageWidth = 8

@@ -8,6 +8,7 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl._free
 import org.jetbrains.skia.impl.skia_memGetByte
 import org.jetbrains.skiko.tests.runTest
+import org.khronos.webgl.Int8Array
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.measureTimedValue
@@ -17,10 +18,10 @@ class WebExtTest {
     @Test
     fun canCopyArrayBufferToSkikoMemory() = runTest {
         val bytes = ByteArray(16_000_000) { (it and 0xFF).toByte() }
-        val ba = createInt8ArrayToCopy(bytes.size)
+        val ba = Int8Array(bytes.size)
         for (i in bytes.indices) ba[i] = bytes[i]
 
-        val ptr = measureTimedValue<NativePointer> { copyBufferToSkiko(ba.buffer) }
+        val ptr = measureTimedValue { copyBufferToSkiko(ba.buffer) }
         println("copyBufferToSkiko took ${ptr.duration}\n")
 
         // Sanity check
@@ -50,7 +51,7 @@ class WebExtTest {
             }
         }
 
-        val ba = createInt8ArrayToCopy(bytes.size)
+        val ba = Int8Array(bytes.size)
         for (i in bytes.indices) ba[i] = bytes[i]
 
         val info = ImageInfo(width, height, ColorType.RGBA_8888, ColorAlphaType.PREMUL)
@@ -80,17 +81,10 @@ class WebExtTest {
     }
 }
 
-private fun createInt8ArrayToCopy(length: Int): Int8ArrayInternal =
-    js("new Int8Array(length)")
-
-private external interface Int8ArrayInternal {
-    val buffer: WebArrayBufferExt
-}
-
-private operator fun Int8ArrayInternal.set(index: Int, value: Byte) {
+private operator fun Int8Array.set(index: Int, value: Byte) {
     int8ArraySet(this, index, value)
 }
 
-private fun int8ArraySet(arrayInternal: Int8ArrayInternal, index: Int, value: Byte) {
+private fun int8ArraySet(arrayInternal: Int8Array, index: Int, value: Byte) {
     js("arrayInternal[index] = value;")
 }

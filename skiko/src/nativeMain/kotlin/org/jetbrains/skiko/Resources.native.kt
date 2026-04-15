@@ -35,7 +35,7 @@ actual suspend fun loadBytesFromPath(path: String): ByteArray {
 
     val bytes = ByteArray(size.toInt())
     val result = bytes.usePinned {
-        fread(it.addressOf(0), 1, size.toULong(), file)
+        fread(it.addressOf(0), 1UL, size.toULong(), file)
     }
     fclose(file)
 

@@ -163,13 +163,13 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 
     /**
-     * Given a start and stop distance, return in dst the intervening segment(s).
+     * Given a start and stop distance, append to [dst] the intervening segment(s).
      * If the segment is zero-length, return false, else return true.
-     * startD and stopD are pinned to legal values (0..getLength()). If startD &gt; stopD
-     * then return false (and leave dst untouched).
+     * startD and endD are pinned to legal values (0..length). If startD &gt; endD
+     * then return false (and leave [dst] untouched).
      * Begin the segment with a moveTo if startWithMoveTo is true
      */
-    fun getSegment(startD: Float, endD: Float, dst: Path, startWithMoveTo: Boolean): Boolean {
+    fun getSegment(startD: Float, endD: Float, dst: PathBuilder, startWithMoveTo: Boolean): Boolean {
         return try {
             Stats.onNativeCall()
             _nGetSegment(

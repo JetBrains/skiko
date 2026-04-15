@@ -13,6 +13,8 @@ val SkikoProjectContext.awtTestSourceSet get() = if (project.supportAwt) kotlin.
 
 val SkikoProjectContext.androidMainSourceSet get() = if (project.supportAndroid) kotlin.sourceSets.getByName("androidMain") else null
 
+val SkikoProjectContext.webMainSourceSet get() = if (project.supportWeb) kotlin.sourceSets.getByName("webMain") else null
+
 val SkikoProjectContext.webTestSourceSet get() = if (project.supportWeb) kotlin.sourceSets.getByName("webTest") else null
 
 val SkikoProjectContext.wasmJsTest get() = if (project.supportWeb) kotlin.sourceSets.getByName("wasmJsTest") else null

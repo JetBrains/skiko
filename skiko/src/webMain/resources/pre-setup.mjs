@@ -1,6 +1,6 @@
 // This file is merged with skiko.mjs by emcc
 
-const loadedWasm = {
+export const loadedWasm = {
     _: {}
 }
 

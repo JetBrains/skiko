@@ -144,7 +144,7 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun performDraw() = synchronized(drawLock) {
+    private fun LayerDrawScope.performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
             autoreleasepool {
                 contextHandler.draw()

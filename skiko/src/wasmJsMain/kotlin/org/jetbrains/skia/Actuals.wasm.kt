@@ -1,3 +1,5 @@
 package org.jetbrains.skia
 
-actual typealias ExternalSymbolName = kotlin.js.JsName
+import org.jetbrains.skiko.WebImport
+
+actual typealias ExternalSymbolName = WebImport

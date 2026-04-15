@@ -7,11 +7,12 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.khronos.webgl.ArrayBuffer
 
 @ExperimentalSkikoApi
 suspend fun Bitmap.installPixelsFromArrayBuffer(
     info: ImageInfo,
-    pixelsArrayBuffer: WebArrayBufferExt,
+    pixelsArrayBuffer: ArrayBuffer,
     rowBytes: Int
 ): Boolean {
     val pixelsPtr = copyBufferToSkiko(pixelsArrayBuffer)
