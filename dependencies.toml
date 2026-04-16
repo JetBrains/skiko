@@ -4,6 +4,7 @@ kotlinxBrowser = "0.5.0"
 
 coroutines = "1.8.0"
 jetbrainsRuntime-api = "1.5.0"
+jetbrains-annotations = "26.0.2"
 
 androidGradlePlugin = "8.2.2"
 dokka = "1.9.10"
@@ -23,6 +24,7 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 
 
 jetbrainsRuntime-api = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jetbrainsRuntime-api" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinxBrowser" } 
 
