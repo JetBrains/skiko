@@ -71,7 +71,7 @@ kotlin {
         jvm("awt") {
             compilations.all {
                 compileTaskProvider.configure {
-                    compilerOptions.jvmTarget.set(JvmTarget.JVM_1_8)
+                    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
                 }
             }
             generateVersion(targetOs, targetArch, skiko)
@@ -84,7 +84,7 @@ kotlin {
 
             compilations.all {
                 compileTaskProvider.configure {
-                    compilerOptions.jvmTarget.set(JvmTarget.JVM_1_8)
+                    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
                 }
             }
 
@@ -256,8 +256,8 @@ if (supportAndroid) {
         defaultConfig.targetSdk = 24
         defaultConfig.javaCompileOptions
 
-        compileOptions.sourceCompatibility = JavaVersion.VERSION_1_8
-        compileOptions.targetCompatibility = JavaVersion.VERSION_1_8
+        compileOptions.sourceCompatibility = JavaVersion.VERSION_11
+        compileOptions.targetCompatibility = JavaVersion.VERSION_11
 
         sourceSets.named("main") {
             java.srcDirs("src/androidMain/java")
@@ -350,8 +350,8 @@ tasks.withType<AbstractTestTask> {
 
 tasks.withType<JavaCompile> {
     // Workaround to configure Java sources on Android (src/androidMain/java)
-    targetCompatibility = "1.8"
-    sourceCompatibility = "1.8"
+    targetCompatibility = JavaVersion.VERSION_11.toString()
+    sourceCompatibility = JavaVersion.VERSION_11.toString()
 }
 
 project.tasks.withType<KotlinJsCompile>().configureEach {
