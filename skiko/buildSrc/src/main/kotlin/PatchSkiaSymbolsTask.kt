@@ -304,7 +304,6 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
         /**
          * Rename [sym] into a `skiko`-namespaced form while preserving
          * demanglability for the Itanium-ABI mangled shapes we can rewrite.
-         *
          * For C++ Itanium-ABI mangled names the `skiko` namespace is encoded
          * directly into the mangled grammar, producing names that LLDB, c++filt,
          * Instruments, Crashlytics, and Sentry can decode:
