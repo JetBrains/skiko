@@ -49,13 +49,12 @@ internal class MetalSwingRedrawer(
             Library.load()
         }
 
-        private fun createSwingPainter(swingLayerProperties: SwingLayerProperties): SwingPainter {
-            val softwarePainter = SoftwareSwingPainter(swingLayerProperties)
-            return try {
-                AcceleratedSwingPainter(fallback = softwarePainter, sharedTextures = createSharedTexturesAdapter())
-            } catch (_: RenderException) {
-                softwarePainter
-            }
+        private fun createSwingPainter(swingLayerProperties: SwingLayerProperties): SwingPainter = try {
+            AcceleratedSwingPainter(
+                sharedTextures = createSharedTexturesAdapter()
+            ) { SoftwareSwingPainter(swingLayerProperties) }
+        } catch (_: RenderException) {
+            SoftwareSwingPainter(swingLayerProperties)
         }
     }
 

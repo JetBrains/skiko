@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.swing
 
 import com.jetbrains.SharedTextures
-import org.jetbrains.annotations.VisibleForTesting
 import org.jetbrains.skia.Surface
 import java.awt.Graphics2D
 import java.awt.GraphicsConfiguration
@@ -9,20 +8,27 @@ import java.awt.GraphicsEnvironment
 import java.awt.Image
 
 internal class AcceleratedSwingPainter(
-    private val fallback: SwingPainter,
-    @VisibleForTesting internal val sharedTextures: SharedTexturesAdapter
+    internal val sharedTextures: SharedTexturesAdapter,
+    private val fallbackPainterCreator: () -> SwingPainter,
 ) : SwingPainter {
-    private var imageWrapper: Image? = null
-    private var texturePtr: Long = 0L
+    var imageWrapper: Image? = null
+        private set
+
+    var texturePtr: Long = 0L
+        private set
+
     private var gc: GraphicsConfiguration = GraphicsEnvironment.getLocalGraphicsEnvironment()
         .defaultScreenDevice.defaultConfiguration
+
+    private var fallbackPainter: SwingPainter? = null
 
     override fun paint(g: Graphics2D, surface: Surface, texture: Long) {
         val deviceConfiguration = g.deviceConfiguration
         if (!deviceConfiguration.isSharedTextureCompatibleConfiguration()) {
             imageWrapper = null
             texturePtr = 0L
-            fallback.paint(g, surface, texture)
+            if (fallbackPainter == null) fallbackPainter = fallbackPainterCreator()
+            fallbackPainter?.paint(g, surface, texture)
             return
         }
 
@@ -36,23 +42,14 @@ internal class AcceleratedSwingPainter(
     }
 
     override fun dispose() {
-        fallback.dispose()
+        fallbackPainter?.dispose()
     }
 
-    @VisibleForTesting
     internal fun setCachedStateForTesting(imageWrapper: Image?, texturePtr: Long, gc: GraphicsConfiguration) {
         this.imageWrapper = imageWrapper
         this.texturePtr = texturePtr
         this.gc = gc
     }
-
-    @get:VisibleForTesting
-    internal val imageWrapperForTesting: Image?
-        get() = imageWrapper
-
-    @get:VisibleForTesting
-    internal val texturePtrForTesting: Long
-        get() = texturePtr
 
     private fun GraphicsConfiguration.isSharedTextureCompatibleConfiguration(): Boolean =
         if (sharedTextures.textureType == SharedTextures.METAL_TEXTURE_TYPE) {
