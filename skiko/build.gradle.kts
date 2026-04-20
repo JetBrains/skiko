@@ -195,7 +195,6 @@ kotlin {
 
     skikoProjectContext.awtMainSourceSet?.dependencies {
         implementation(libs.jetbrainsRuntime.api)
-        implementation(libs.jetbrains.annotations)
     }
 
     skikoProjectContext.awtTestSourceSet?.dependencies {
