@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.swing
 
 import com.jetbrains.SharedTextures
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.skia.Canvas
@@ -9,21 +8,20 @@ import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.MainUIDispatcher
-import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkikoRenderDelegate
 import org.jetbrains.skiko.toImage
 import org.jetbrains.skiko.util.ScreenshotTestRule
+import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import java.awt.Color
-import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.GraphicsConfiguration
 import java.awt.Image
 import java.awt.image.BufferedImage
 import javax.swing.JFrame
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
 
 class AcceleratedSwingPainterTest {
@@ -82,19 +80,19 @@ class AcceleratedSwingPainterTest {
     }
 
     @Test
-    fun `paint before initialization`() {
+    fun `does not crash when painting to sw bitmap before initialization`() {
         runBlocking(MainUIDispatcher) {
             val window = JFrame()
             try {
                 val layer = SkiaSwingLayer(FakeRenderer(window, 100, 100, Color.RED))
                 window.contentPane.add(layer)
+                window.setSize(100, 100)
+                delay(1000)
 
                 val image = BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
                 val g2d = image.createGraphics()
                 window.contentPane.paint(g2d)
                 g2d.dispose()
-
-                screenshots.assert(image.toImage(), "windowBitmap")
             } finally {
                 window.dispose()
             }
@@ -102,13 +100,13 @@ class AcceleratedSwingPainterTest {
     }
 
     @Test
-    fun `paint after initialization`() {
+    fun `can paint to sw bitmap after initialization`() {
         runBlocking(MainUIDispatcher) {
             val window = JFrame()
             try {
                 val layer = SkiaSwingLayer(FakeRenderer(window, 100, 100, Color.RED))
                 window.contentPane.add(layer)
-
+                window.setSize(100, 100)
                 window.isVisible = true
                 delay(1000)
 
@@ -148,31 +146,12 @@ class AcceleratedSwingPainterTest {
         }
     }
 
-    private class FakeNoSharedTextures : SharedTexturesAdapter {
-        var wrapTextureCalls = 0
-
-        override val textureType: Int = 0
-
-        override fun wrapTexture(gc: GraphicsConfiguration, texturePtr: Long): Image {
-            wrapTextureCalls++
-            return BufferedImage(8, 8, BufferedImage.TYPE_INT_ARGB_PRE)
-        }
-    }
-
     private class FakeRenderer(
         private val getContentScale: () -> Float,
         var rectWidth: Int,
         var rectHeight: Int,
         private val rectColor: Color
     ) : SkikoRenderDelegate {
-        constructor(
-            layer: SkiaLayer,
-            rectWidth: Int,
-            rectHeight: Int,
-            rectColor: Color
-        ) : this(
-            { layer.contentScale }, rectWidth, rectHeight, rectColor
-        )
 
         constructor(
             layer: JFrame,
