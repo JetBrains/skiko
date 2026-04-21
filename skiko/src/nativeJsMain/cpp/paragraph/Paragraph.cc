@@ -146,6 +146,23 @@ SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_Paragraph__1nGetUnresolvedGlyphsC
     return instance->unresolvedGlyphs();
 }
 
+SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_Paragraph__1nGetUnresolvedCodepointsCount
+  (KNativePointer ptr) {
+    Paragraph* instance = reinterpret_cast<Paragraph*>(ptr);
+    return static_cast<KInt>(instance->unresolvedCodepoints().size());
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_Paragraph__1nGetUnresolvedCodepoints
+  (KNativePointer ptr, KInteropPointer resultPtr) {
+    Paragraph* instance = reinterpret_cast<Paragraph*>(ptr);
+    auto codepoints = instance->unresolvedCodepoints();
+    KInt* result = reinterpret_cast<KInt*>(resultPtr);
+    size_t i = 0;
+    for (SkUnichar cp : codepoints) {
+      result[i++] = static_cast<KInt>(cp);
+    }
+}
+
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_Paragraph__1nUpdateAlignment
   (KNativePointer ptr, KInt textAlignment) {
     Paragraph* instance = reinterpret_cast<Paragraph*>((ptr));

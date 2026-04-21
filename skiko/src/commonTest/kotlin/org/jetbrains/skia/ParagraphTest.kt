@@ -132,6 +132,8 @@ class ParagraphTest {
         assertEquals(IRange(0, 5), paragraph.getWordBoundary(0))
         assertEquals(IRange(8, 21), paragraph.getWordBoundary(10))
         assertEquals(0, paragraph.unresolvedGlyphsCount)
+        assertEquals(0, paragraph.unresolvedCodepointsCount)
+        assertContentEquals(IntArray(0), paragraph.unresolvedCodepoints)
         assertEquals(2, paragraph.lineNumber)
 
         assertContentEquals(arrayOf(), paragraph.rectsForPlaceholders)
@@ -155,6 +157,27 @@ class ParagraphTest {
             PositionWithAffinity(5, Affinity.UPSTREAM),
             paragraph.getGlyphPositionAtCoordinate(30f, 10f)
         )
+    }
+
+    @Test
+    fun unresolvedCodepointsWithUnknownSymbols() = runTest {
+        // U+E001 is a Private Use Area character not present in Inter.
+        // It appears twice in the text to verify count-vs-unique-set semantics.
+        val unknownChar = '\uE001'
+        val text = "Hello${unknownChar}World${unknownChar}!"
+
+        val paragraph = ParagraphBuilder(style, fontCollection()).use {
+            it.addText(text)
+            it.build()
+        }.layout(Float.POSITIVE_INFINITY)
+
+        // unresolvedGlyphsCount counts all glyph instances (2 occurrences of U+E001)
+        assertEquals(2, paragraph.unresolvedGlyphsCount)
+        // unresolvedCodepoints returns the set of unique unresolved codepoints
+        assertEquals(1, paragraph.unresolvedCodepointsCount)
+        val codepoints = paragraph.unresolvedCodepoints
+        assertEquals(1, codepoints.size)
+        assertTrue(unknownChar.code in codepoints, "Expected U+E001 to be in unresolvedCodepoints")
     }
 
     @Test

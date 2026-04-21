@@ -177,6 +177,24 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt_
     return instance->unresolvedGlyphs();
 }
 
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetUnresolvedCodepointsCount
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
+    return instance->unresolvedCodepoints().size();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetUnresolvedCodepoints
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray resultArray) {
+    Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
+    auto codepoints = instance->unresolvedCodepoints();
+    std::vector<jint> data;
+    data.reserve(codepoints.size());
+    for (SkUnichar cp : codepoints) {
+        data.push_back(static_cast<jint>(cp));
+    }
+    env->SetIntArrayRegion(resultArray, 0, static_cast<jsize>(data.size()), data.data());
+}
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nUpdateAlignment
   (JNIEnv* env, jclass jclass, jlong ptr, jint textAlignment) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));

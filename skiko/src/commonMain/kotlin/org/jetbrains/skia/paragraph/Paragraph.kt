@@ -188,6 +188,27 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
             reachabilityBarrier(this)
         }
 
+    val unresolvedCodepointsCount: Int
+        get() = try {
+            Stats.onNativeCall()
+            _nGetUnresolvedCodepointsCount(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    val unresolvedCodepoints: IntArray
+        get() = try {
+            Stats.onNativeCall()
+            val count = _nGetUnresolvedCodepointsCount(_ptr)
+            val result = IntArray(count)
+            if (count > 0) {
+                withResult(result) { _nGetUnresolvedCodepoints(_ptr, it) }
+            }
+            result
+        } finally {
+            reachabilityBarrier(this)
+        }
+
     fun updateAlignment(alignment: Alignment): Paragraph {
         Stats.onNativeCall()
         _nUpdateAlignment(_ptr, alignment.ordinal)
@@ -356,6 +377,12 @@ private external fun _nMarkDirty(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetUnresolvedGlyphsCount")
 private external fun _nGetUnresolvedGlyphsCount(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetUnresolvedCodepointsCount")
+private external fun _nGetUnresolvedCodepointsCount(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetUnresolvedCodepoints")
+private external fun _nGetUnresolvedCodepoints(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateAlignment")
 private external fun _nUpdateAlignment(ptr: NativePointer, Align: Int)
