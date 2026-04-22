@@ -329,6 +329,8 @@ $dokka.location:org.jetbrains.skia.paragraph/Paragraph/maxWidth/#/PointingToDecl
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/minIntrinsicWidth/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/min-intrinsic-width.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/paint/#org.jetbrains.skia.Canvas?#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/paint.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/rectsForPlaceholders/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/rects-for-placeholders.html
+$dokka.location:org.jetbrains.skia.paragraph/Paragraph/unresolvedCodepoints/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/unresolved-codepoints.html
+$dokka.location:org.jetbrains.skia.paragraph/Paragraph/unresolvedCodepointsCount/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/unresolved-codepoints-count.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/unresolvedGlyphsCount/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/unresolved-glyphs-count.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/updateAlignment/#org.jetbrains.skia.paragraph.Alignment/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/update-alignment.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/updateBackgroundPaint/#kotlin.Int#kotlin.Int#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/update-background-paint.html
