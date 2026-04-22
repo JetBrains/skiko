@@ -112,7 +112,7 @@ class AcceleratedSwingPainterTest {
 
                 val image = BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
                 val g2d = image.createGraphics()
-                window.contentPane.paint(g2d)
+                layer.paint(g2d)
                 g2d.dispose()
 
                 screenshots.assert(image.toImage(), "windowBitmap")
