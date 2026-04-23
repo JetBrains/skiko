@@ -107,6 +107,7 @@ class AcceleratedSwingPainterTest {
                 val layer = SkiaSwingLayer(FakeRenderer(window, 100, 100, Color.RED))
                 window.contentPane.add(layer)
                 window.setSize(100, 100)
+                window.isUndecorated = true
                 window.isVisible = true
                 delay(1000)
 
