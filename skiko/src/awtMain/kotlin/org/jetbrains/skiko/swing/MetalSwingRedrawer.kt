@@ -1,18 +1,40 @@
 package org.jetbrains.skiko.swing
 
-import org.jetbrains.skia.*
-import org.jetbrains.skiko.*
+import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.Color
+import org.jetbrains.skia.ColorSpace
+import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.PixelGeometry
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.SurfaceColorFormat
+import org.jetbrains.skia.SurfaceOrigin
+import org.jetbrains.skia.SurfaceProps
+import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.Library
+import org.jetbrains.skiko.MetalAdapter
+import org.jetbrains.skiko.RenderException
+import org.jetbrains.skiko.SkiaLayerAnalytics
+import org.jetbrains.skiko.SkikoRenderDelegate
+import org.jetbrains.skiko.autoCloseScope
+import org.jetbrains.skiko.autoreleasepool
+import org.jetbrains.skiko.chooseMetalAdapter
+import org.jetbrains.skiko.dispose
+import org.jetbrains.skiko.swing.SharedTexturesAdapter.Companion.createSharedTexturesAdapter
 import java.awt.Graphics2D
 
 /**
- * Provides a way to draw on Skia canvas rendered off-screen with Metal GPU acceleration and then pass it to [java.awt.Graphics2D].
- * It provides better interoperability with Swing, but it is less efficient than on-screen rendering.
+ * Provides a way to draw on Skia canvas rendered off-screen with Metal
+ * GPU acceleration and then pass it to [java.awt.Graphics2D]. It provides
+ * better interoperability with Swing, but it is less efficient than
+ * on-screen rendering.
  *
- * For now, it uses drawing to [java.awt.image.BufferedImage] that cause VRAM <-> RAM memory transfer and so increased CPU usage.
+ * For now, it uses drawing to [java.awt.image.BufferedImage] that cause
+ * VRAM <-> RAM memory transfer and so increased CPU usage.
  *
  * Content to draw is provided by [SkikoRenderDelegate].
  *
- * For on-screen rendering see [org.jetbrains.skiko.redrawer.MetalRedrawer].
+ * For on-screen rendering see
+ * [org.jetbrains.skiko.redrawer.MetalRedrawer].
  *
  * @see SwingRedrawerBase
  * @see SoftwareSwingPainter
@@ -28,8 +50,10 @@ internal class MetalSwingRedrawer(
         }
 
         private fun createSwingPainter(swingLayerProperties: SwingLayerProperties): SwingPainter = try {
-            AcceleratedSwingPainter()
-        } catch (_ : RenderException) {
+            AcceleratedSwingPainter(
+                sharedTextures = createSharedTexturesAdapter()
+            ) { SoftwareSwingPainter(swingLayerProperties) }
+        } catch (_: RenderException) {
             SoftwareSwingPainter(swingLayerProperties)
         }
     }
@@ -92,8 +116,8 @@ internal class MetalSwingRedrawer(
 
     override fun rendererInfo(): String {
         return super.rendererInfo() +
-                "Video card: ${adapter.name}\n" +
-                "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
+            "Video card: ${adapter.name}\n" +
+            "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
     }
 
     private fun makeRenderTarget() = BackendRenderTarget(
@@ -109,9 +133,9 @@ internal class MetalSwingRedrawer(
     private external fun makeMetalRenderTargetOffScreen(texture: Long): Long
 
     /**
-     * Provides Metal texture taking given [oldTexture] into account
-     * since it can be reused if width and height are not changed,
-     * or the new one will be created.
+     * Provides Metal texture taking given [oldTexture] into account since it
+     * can be reused if width and height are not changed, or the new one will
+     * be created.
      */
     private external fun makeMetalTexture(adapter: Long, oldTexture: Long, width: Int, height: Int): Long
     private external fun disposeMetalTexture(texture: Long): Long
