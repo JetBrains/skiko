@@ -2,12 +2,10 @@ package org.jetbrains.skiko.swing
 
 import com.jetbrains.JBR
 import com.jetbrains.SharedTextures
-import org.jetbrains.annotations.VisibleForTesting
 import org.jetbrains.skiko.RenderException
 import java.awt.GraphicsConfiguration
 import java.awt.Image
 
-@VisibleForTesting
 internal interface SharedTexturesAdapter {
     val textureType: Int
 
