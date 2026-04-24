@@ -189,4 +189,25 @@ class PathTest {
         assertEquals(p0, line?.get(0))
         assertEquals(p1, line?.get(1))
     }
+
+    @Test
+    fun closedPathIntersectTest() {
+        val builder1 = PathBuilder()
+            .moveTo(0f, 0f)
+            .lineTo(40f, 40f)
+            .lineTo(40f, 20f)
+            .closePath()
+
+        val builder2 = PathBuilder()
+            .moveTo(0f, 0f)
+            .lineTo(20f, 20f)
+            .lineTo(40f, 20f)
+            .closePath()
+
+        val triangle1 = builder1.detach()
+        val triangle2 = builder2.detach()
+
+        val result = triangle1.intersect(triangle2)
+        assertTrue(result.isNotEmpty())
+    }
 }

@@ -114,7 +114,7 @@ class PathSegment constructor(
                 isClosedContour
             )
             PathVerb.CUBIC -> objectHashes(verb, p0, p1, p2, p3, isClosedContour)
-            else -> throw RuntimeException("Unreachable")
+            PathVerb.CLOSE -> objectHashes(verb, p0, isClosedContour)
         }
     }
 }
