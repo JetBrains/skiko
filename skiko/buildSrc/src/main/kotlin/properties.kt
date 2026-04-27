@@ -82,15 +82,15 @@ enum class SkiaBuildType(
     DEBUG(
         id = "Debug",
         flags = arrayOf("-DSK_DEBUG"),
-        clangFlags = arrayOf("-std=c++17", "-g", "-DSK_TRIVIAL_ABI=[[clang::trivial_abi]]"),
-        winCompilerFlags = arrayOf("/Zi", "/std:c++17"),
+        clangFlags = arrayOf("-std=c++2a", "-g", "-DSK_TRIVIAL_ABI=[[clang::trivial_abi]]"),
+        winCompilerFlags = arrayOf("/Zi", "/std:c++20"),
         winLinkerFlags = arrayOf("/DEBUG"),
     ),
     RELEASE(
         id = "Release",
         flags = arrayOf("-DNDEBUG"),
-        clangFlags = arrayOf("-std=c++17", "-O3"),
-        winCompilerFlags = arrayOf("/O2", "/std:c++17"),
+        clangFlags = arrayOf("-std=c++2a", "-O3"),
+        winCompilerFlags = arrayOf("/O2", "/std:c++20"),
         winLinkerFlags = arrayOf("/DEBUG"),
     );
     override fun toString() = id

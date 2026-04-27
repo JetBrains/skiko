@@ -9,12 +9,14 @@
 #include "SkColorSpace.h"
 #include "ganesh/GrBackendSurface.h"
 #include "ganesh/GrDirectContext.h"
+#include "ganesh/d3d/GrD3DDirectContext.h"
 #include "SkSurface.h"
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
 #include "interop.hh"
 #include "DCompLibrary.h"
 
 #include "ganesh/d3d/GrD3DTypes.h"
+#include "ganesh/d3d/GrD3DBackendSurface.h"
 #include <d3d12sdklayers.h>
 #include "ganesh/d3d/GrD3DBackendContext.h"
 #include <d3d12.h>
@@ -399,7 +401,7 @@ extern "C"
     {
         DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
         GrD3DBackendContext backendContext = d3dDevice->backendContext;
-        return toJavaPointer(GrDirectContext::MakeDirect3D(backendContext).release());
+        return toJavaPointer(GrDirectContexts::MakeD3D(backendContext).release());
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeDirectXSurface(
@@ -419,7 +421,10 @@ extern "C"
         info.fResource = d3dDevice->buffers[index];
 
         std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
-        GrBackendTexture backendTexture((int)d3dDevice->buffers[index]->GetDesc().Width, (int)d3dDevice->buffers[index]->GetDesc().Height, info);
+        GrBackendTexture backendTexture = GrBackendTextures::MakeD3D(
+                                 (int)d3dDevice->buffers[index]->GetDesc().Width,
+                                 (int)d3dDevice->buffers[index]->GetDesc().Height,
+                                 info);
         auto result = SkSurfaces::WrapBackendTexture(
                                  context, backendTexture, kTopLeft_GrSurfaceOrigin, 0,
                                  kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), surfaceProps.get())

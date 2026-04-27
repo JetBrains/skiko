@@ -232,7 +232,16 @@ fun SkikoProjectContext.createLinkJvmBindings(
     val osFlags: Array<String>
 
     libFiles = project.fileTree(skiaJvmBindingsDir.map { it.resolve(skiaBinSubdir) }) {
-        include(if (targetOs.isWindows) "*.lib" else "*.a")
+        val fileExtension = if (targetOs.isWindows) "lib" else "a"
+        val filePrefix = if (targetOs.isWindows) "" else "lib"
+        val excludedLibs = listOf(
+            "skia_graphite_ext",
+            "skia_graphite_dawn_ext",
+            "dawn_combined"
+        )
+        include("*.$fileExtension")
+
+        exclude(excludedLibs.map { "$filePrefix$it.$fileExtension" })
     }
 
     dependsOn(compileTask)
@@ -290,6 +299,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                         // Hack to fix problem with linker not always finding certain declarations.
                         "$skiaBinDir/libsksg.a",
                         "$skiaBinDir/libskia.a",
+                        "$skiaBinDir/libskia_ganesh_ext.a",
                         "$skiaBinDir/libskunicode_core.a",
                         "$skiaBinDir/libskunicode_icu.a",
                         "$skiaBinDir/libskshaper.a",
@@ -340,6 +350,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-latomic",
                 // Hack to fix problem with linker not always finding certain declarations.
                 "$skiaBinDir/libskia.a",
+                "$skiaBinDir/libskia_ganesh_ext.a"
             )
             linker.set(project.androidClangFor(targetArch))
         }

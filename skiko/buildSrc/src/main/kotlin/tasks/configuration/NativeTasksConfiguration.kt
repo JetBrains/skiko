@@ -196,6 +196,7 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String, buildType: SkiaBu
         "libskresources.a",
         "libskparagraph.a",
         "libskia.a",
+        "libskia_ganesh_ext.a",
         "libicu.a",
         "libjsonreader.a",
         "libskottie.a",
@@ -283,7 +284,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 "$skiaBinDir/libskshaper.a",
                 "$skiaBinDir/libskunicode_core.a",
                 "$skiaBinDir/libskunicode_icu.a",
-                "$skiaBinDir/libskia.a"
+                "$skiaBinDir/libskia.a",
+                "$skiaBinDir/libskia_ganesh_ext.a"
             )
             if (arch == Arch.Arm64) {
                 options.add("-lEGL")

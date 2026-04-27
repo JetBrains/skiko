@@ -39,6 +39,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt
 
 #ifdef SK_DIRECT3D
 #include "ganesh/d3d/GrD3DTypes.h"
+#include "ganesh/d3d/GrD3DBackendSurface.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt__1nMakeDirect3D
   (JNIEnv* env, jclass jclass, jint width, jint height, jlong texturePtr, jint format, jint sampleCnt, jint levelCnt) {
@@ -49,7 +50,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt
     texResInfo.fFormat = static_cast<DXGI_FORMAT>(format);
     texResInfo.fSampleCount = static_cast<uint32_t>(sampleCnt);
     texResInfo.fLevelCount = static_cast<uint32_t>(levelCnt);
-    GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, texResInfo);
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(
+        GrBackendRenderTargets::MakeD3D(width, height, texResInfo)
+    );
     return reinterpret_cast<jlong>(instance);
 }
 #endif //SK_DIRECT3D
