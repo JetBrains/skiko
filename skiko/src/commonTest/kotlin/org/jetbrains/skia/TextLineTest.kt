@@ -14,6 +14,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 class TextLineTest {
     private val inter36: suspend () -> Font = suspend {
@@ -144,12 +145,25 @@ class TextLineTest {
         assertEquals("☺", ManagedString("☺").toString())
         assertEquals("☺️", ManagedString("☺️").toString())
 
-        TextLine.make("☺", firaCode36()).use { misc ->
-            TextLine.make("☺️", firaCode36()).use { emoji ->
-                assertContentEquals(shortArrayOf(1706), misc.glyphs)
-                assertEquals(1, emoji.glyphs.size)
-                if (kotlinBackend.isNotJs()) { // TODO(karpovich): try with a FontMngr without fallbacks
+        val font = firaCode36()
+        val smileGlyph = font.getUTF32Glyph(0x263A) // U+263A WHITE SMILING FACE
+
+        TextLine.make("☺", font).use { misc ->
+            TextLine.make("☺️", font).use { emoji ->
+                assertContentEquals(shortArrayOf(smileGlyph), misc.glyphs)
+                if (kotlinBackend.isNotJs()) {
+                    // Skia m148 changed HarfBuzz variation-selector handling, and
+                    // `TextLine.make("☺️", FiraCode)` now shapes as two glyphs.
+                    // Exact variation-selector glyph IDs differ across native backends, but
+                    // these invariants are stable:
+                    // 1) the sequence produces two glyphs;
+                    // 2) first glyph differs from bare U+263A;
+                    // 3) second glyph is non-zero.
+                    assertEquals(2, emoji.glyphs.size)
                     assertNotEquals(misc.glyphs[0], emoji.glyphs[0])
+                    assertNotEquals(0, emoji.glyphs[1].toInt())
+                } else { // TODO(karpovich): try with a FontMngr without fallbacks
+                    assertTrue(emoji.glyphs.isNotEmpty())
                 }
             }
         }
