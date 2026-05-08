@@ -1,7 +1,6 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
 
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.LibraryPlugin
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -11,10 +10,11 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     kotlin("multiplatform")
+    id("com.android.kotlin.multiplatform.library") apply false
 }
 
 if (supportAndroid) {
-    apply<LibraryPlugin>()
+    apply(plugin = "com.android.kotlin.multiplatform.library")
 }
 
 repositories {
@@ -41,11 +41,13 @@ kotlin {
     }
 
     if (supportAndroid) {
-        androidTarget("android") {
-            compilations.all {
-                compileTaskProvider.configure {
-                    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
-                }
+        targets.withType<KotlinMultiplatformAndroidLibraryTarget>().configureEach {
+            namespace = "org.jetbrains.skiko.testutils"
+            compileSdk = 35
+            minSdk = 24
+
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_11)
             }
         }
     }
@@ -98,17 +100,6 @@ kotlin {
         sourceSets.jvmMain.dependencies {
             implementation(kotlin("test-junit"))
         }
-    }
-}
-
-if (supportAndroid) {
-    configure<LibraryExtension> {
-        compileSdk = 33
-        namespace = "org.jetbrains.skiko.testutils"
-        defaultConfig.minSdk = 24
-        defaultConfig.targetSdk = 24
-        compileOptions.sourceCompatibility = JavaVersion.VERSION_11
-        compileOptions.targetCompatibility = JavaVersion.VERSION_11
     }
 }
 

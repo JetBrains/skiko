@@ -152,18 +152,18 @@ fun Project.configureSignAndPublishDependencies() {
     }
     if (supportAndroid) {
         tasks.configureEach {
-            val signAndroid = "signAndroidReleasePublication"
-            val generateMetadata = "generateMetadataFileForAndroidReleasePublication"
-            val publishAndroid = "publishAndroidReleasePublicationTo"
+            val signAndroid = "signAndroidPublication"
+            val generateMetadata = "generateMetadataFileForAndroidPublication"
+            val publishAndroid = "publishAndroidPublicationTo"
             val publishX64 = "publishSkikoJvmRuntimeAndroidX64PublicationTo"
             val publishArm64 = "publishSkikoJvmRuntimeAndroidArm64PublicationTo"
             val signX64 = "signSkikoJvmRuntimeAndroidX64Publication"
             val signArm64 = "signSkikoJvmRuntimeAndroidArm64Publication"
-            val skikoAndroidJar = "skikoAndroidJar"
+            val skikoAndroidArtifact = "skikoAndroidArtifact"
 
             when {
                 name.startsWith(signAndroid) || name.startsWith(generateMetadata) -> {
-                    dependsOn(skikoAndroidJar)
+                    dependsOn(skikoAndroidArtifact)
                 }
                 name.startsWith(publishAndroid) -> {
                     dependsOn(signX64, signArm64)
