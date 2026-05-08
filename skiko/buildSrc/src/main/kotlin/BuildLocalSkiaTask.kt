@@ -4,10 +4,15 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
+import javax.inject.Inject
 
 abstract class BuildLocalSkiaTask : DefaultTask() {
+
+    @get:Inject
+    abstract val execOperations: ExecOperations
 
     @get:Input
     abstract val skiaVersion: Property<String>
@@ -111,9 +116,10 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
         logger.lifecycle("Running: ${fullCommand.joinToString(" ")}")
 
         val output = ByteArrayOutputStream()
-        val result = project.exec {
+        val result = execOperations.exec {
             workingDir = skiaRepoRoot
-            commandLine = fullCommand
+            executable = fullCommand.first()
+            args(fullCommand.drop(1))
             standardOutput = output
             errorOutput = output
             isIgnoreExitValue = true
