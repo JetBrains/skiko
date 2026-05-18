@@ -7,7 +7,9 @@ plugins {
 
 repositories {
     mavenLocal()
-    mavenCentral()
+    mavenCentral {
+        url = uri("https://cache-redirector.jetbrains.com/maven-central")
+    }
     maven("https://redirector.kotlinlang.org/maven/compose-dev")
 }
 
