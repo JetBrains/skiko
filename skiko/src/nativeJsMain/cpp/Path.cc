@@ -187,6 +187,11 @@ SKIKO_EXPORT void org_jetbrains_skia_Path__1nGetBounds(KNativePointer ptr, KInte
     skija::Rect::copyToInterop(bounds, resultArray);
 }
 
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nUpdateBoundsCache(KNativePointer ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    instance->updateBoundsCache();
+}
+
 SKIKO_EXPORT void org_jetbrains_skia_Path__1nComputeTightBounds(KNativePointer ptr, KInteropPointer resultArray) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
     SkRect bounds = instance->computeTightBounds();
