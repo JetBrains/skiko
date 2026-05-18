@@ -195,6 +195,11 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nGetBounds(JN
     skija::Rect::copyToInterop(env, instance->getBounds(), resultArray);
 }
 
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nUpdateBoundsCache(JNIEnv* env, jclass jclass, jlong ptr) {
+    SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
+    instance->updateBoundsCache();
+}
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nComputeTightBounds(JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     skija::Rect::copyToInterop(env, instance->computeTightBounds(), resultArray);

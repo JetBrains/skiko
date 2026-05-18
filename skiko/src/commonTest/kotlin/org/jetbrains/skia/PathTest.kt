@@ -112,6 +112,14 @@ class PathTest {
     }
 
     @Test
+    fun updateBoundsCacheTest() {
+        val path = PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach()
+        val bounds = Rect(0.0f, 0.0f, 40.0f, 40.0f)
+        assertTrue(path.updateBoundsCache() === path)
+        assertCloseEnough(bounds, path.bounds)
+    }
+
+    @Test
     fun rawTest() {
         val pts = arrayOf(Point(0f, 0f), Point(10f, 10f), Point(20f, 0f))
         val verbs = arrayOf(PathVerb.MOVE, PathVerb.LINE, PathVerb.LINE)
