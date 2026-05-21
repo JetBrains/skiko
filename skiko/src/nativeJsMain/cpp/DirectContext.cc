@@ -13,6 +13,13 @@
 #include "ganesh/d3d/GrD3DDirectContext.h"
 #endif
 
+#ifdef SK_VULKAN
+#include "include/gpu/ganesh/vk/GrVkDirectContext.h"
+#include "include/gpu/ganesh/vk/GrVkTypes.h"
+#include "include/gpu/vk/VulkanBackendContext.h"
+#include "include/gpu/vk/VulkanExtensions.h"
+#endif
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
   () {
     return static_cast<KNativePointer>(GrDirectContexts::MakeGL().release());
@@ -54,6 +61,36 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
 #else // SK_DIRECT3D
     return nullptr;
 #endif // SK_DIRECT3D
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeVulkan
+  (KNativePointer instancePtr, KNativePointer physicalDevicePtr, KNativePointer devicePtr, KNativePointer queuePtr, KInt graphicsQueueIndex, KNativePointer instanceProcAddr, KNativePointer deviceProcAddr, KInt apiVersion) {
+#ifdef SK_VULKAN
+    skgpu::VulkanBackendContext backendContext = {};
+    backendContext.fInstance = reinterpret_cast<VkInstance>(instancePtr);
+    backendContext.fPhysicalDevice = reinterpret_cast<VkPhysicalDevice>(physicalDevicePtr);
+    backendContext.fDevice = reinterpret_cast<VkDevice>(devicePtr);
+    backendContext.fQueue = reinterpret_cast<VkQueue>(queuePtr);
+    backendContext.fGraphicsQueueIndex = static_cast<uint32_t>(graphicsQueueIndex);
+    backendContext.fGetProc = [instanceProcAddr, deviceProcAddr](const char* name, VkInstance instance, VkDevice device) -> PFN_vkVoidFunction {
+        if (device != VK_NULL_HANDLE) {
+            return reinterpret_cast<PFN_vkGetDeviceProcAddr>(deviceProcAddr)(device, name);
+        }
+        return reinterpret_cast<PFN_vkGetInstanceProcAddr>(instanceProcAddr)(instance, name);
+    };
+
+    skgpu::VulkanExtensions extensions;
+    if (!extensions.init(backendContext.fGetProc, backendContext.fInstance, backendContext.fPhysicalDevice, 0, nullptr, 0, nullptr)) {
+        return nullptr;
+    }
+    backendContext.fVkExtensions = &extensions;
+    backendContext.fMaxAPIVersion = static_cast<uint32_t>(apiVersion);
+
+    sk_sp<GrDirectContext> instance = GrDirectContexts::MakeVulkan(backendContext);
+    return static_cast<KNativePointer>(instance.release());
+#else
+    return nullptr;
+#endif // SK_VULKAN
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlushDefault

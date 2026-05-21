@@ -10,6 +10,7 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory =
         when (hostOs) {
             OS.MacOS -> when (renderApi) {
                 GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareRedrawer(layer, analytics, properties)
+                GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan redrawers")
                 else -> MetalRedrawer(layer, analytics, properties)
             }
             OS.Windows -> when (renderApi) {
@@ -17,11 +18,13 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory =
                 GraphicsApi.SOFTWARE_FAST -> WindowsSoftwareRedrawer(layer, analytics, properties)
                 GraphicsApi.OPENGL -> WindowsOpenGLRedrawer(layer, analytics, properties)
                 GraphicsApi.ANGLE -> AngleRedrawer(layer, analytics, properties)
+                GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan redrawers")
                 else -> Direct3DRedrawer(layer, analytics, properties)
             }
             OS.Linux -> when (renderApi) {
                 GraphicsApi.SOFTWARE_COMPAT -> SoftwareRedrawer(layer, analytics, properties)
                 GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRedrawer(layer, analytics, properties)
+                GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan redrawers")
                 else -> LinuxOpenGLRedrawer(layer, analytics, properties)
             }
             else -> throw UnsupportedOperationException("AWT doesn't support $hostOs")

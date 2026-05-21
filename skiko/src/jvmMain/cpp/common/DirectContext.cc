@@ -50,6 +50,39 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 }
 #endif //SK_DIRECT3D
 
+#ifdef SK_VULKAN
+#include "include/gpu/ganesh/vk/GrVkDirectContext.h"
+#include "include/gpu/ganesh/vk/GrVkTypes.h"
+#include "include/gpu/vk/VulkanBackendContext.h"
+#include "include/gpu/vk/VulkanExtensions.h"
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeVulkan
+  (JNIEnv* env, jclass jclass, jlong instancePtr, jlong physicalDevicePtr, jlong devicePtr, jlong queuePtr, jint graphicsQueueIndex, jlong instanceProcAddr, jlong deviceProcAddr, jint apiVersion) {
+    skgpu::VulkanBackendContext backendContext = {};
+    backendContext.fInstance = reinterpret_cast<VkInstance>(static_cast<uintptr_t>(instancePtr));
+    backendContext.fPhysicalDevice = reinterpret_cast<VkPhysicalDevice>(static_cast<uintptr_t>(physicalDevicePtr));
+    backendContext.fDevice = reinterpret_cast<VkDevice>(static_cast<uintptr_t>(devicePtr));
+    backendContext.fQueue = reinterpret_cast<VkQueue>(static_cast<uintptr_t>(queuePtr));
+    backendContext.fGraphicsQueueIndex = static_cast<uint32_t>(graphicsQueueIndex);
+    backendContext.fGetProc = [instanceProcAddr, deviceProcAddr](const char* name, VkInstance instance, VkDevice device) -> PFN_vkVoidFunction {
+        if (device != VK_NULL_HANDLE) {
+            return reinterpret_cast<PFN_vkGetDeviceProcAddr>(static_cast<uintptr_t>(deviceProcAddr))(device, name);
+        }
+        return reinterpret_cast<PFN_vkGetInstanceProcAddr>(static_cast<uintptr_t>(instanceProcAddr))(instance, name);
+    };
+
+    skgpu::VulkanExtensions extensions;
+    if (!extensions.init(backendContext.fGetProc, backendContext.fInstance, backendContext.fPhysicalDevice, 0, nullptr, 0, nullptr)) {
+        return 0;
+    }
+    backendContext.fVkExtensions = &extensions;
+    backendContext.fMaxAPIVersion = static_cast<uint32_t>(apiVersion);
+
+    sk_sp<GrDirectContext> directContext = GrDirectContexts::MakeVulkan(backendContext);
+    return reinterpret_cast<jlong>(directContext.release());
+}
+#endif // SK_VULKAN
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nFlushDefault
   (JNIEnv* env, jclass jclass, jlong ptr) {
   GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));

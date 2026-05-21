@@ -29,7 +29,10 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory {
             analytics: SkiaLayerAnalytics,
             properties: SkiaLayerProperties
         ): Redrawer = when (hostOs) {
-            OS.Android -> AndroidOpenGLRedrawer(layer, properties)
+            OS.Android -> when (renderApi) {
+                GraphicsApi.OPENGL -> AndroidOpenGLRedrawer(layer, properties)
+                else -> throw UnsupportedOperationException("Android doesn't support $renderApi redrawers")
+            }
             else -> throw IllegalArgumentException("Must not happen")
         }
     }
