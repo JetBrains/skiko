@@ -80,9 +80,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeVulkan
     };
 
     skgpu::VulkanExtensions extensions;
-    if (!extensions.init(backendContext.fGetProc, backendContext.fInstance, backendContext.fPhysicalDevice, 0, nullptr, 0, nullptr)) {
-        return nullptr;
-    }
+    extensions.init(backendContext.fGetProc, backendContext.fInstance, backendContext.fPhysicalDevice, 0, nullptr, 0, nullptr);
     backendContext.fVkExtensions = &extensions;
     backendContext.fMaxAPIVersion = static_cast<uint32_t>(apiVersion);
 
