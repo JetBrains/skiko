@@ -72,9 +72,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
     };
 
     skgpu::VulkanExtensions extensions;
-    if (!extensions.init(backendContext.fGetProc, backendContext.fInstance, backendContext.fPhysicalDevice, 0, nullptr, 0, nullptr)) {
-        return 0;
-    }
+    extensions.init(backendContext.fGetProc, backendContext.fInstance, backendContext.fPhysicalDevice, 0, nullptr, 0, nullptr);
     backendContext.fVkExtensions = &extensions;
     backendContext.fMaxAPIVersion = static_cast<uint32_t>(apiVersion);
 
