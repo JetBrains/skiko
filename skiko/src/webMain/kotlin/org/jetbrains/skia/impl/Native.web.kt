@@ -1,6 +1,7 @@
 package org.jetbrains.skia.impl
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skiko.InternalSkikoApi
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
     actual var _ptr: NativePointer
@@ -36,7 +37,9 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 internal actual fun reachabilityBarrier(obj: Any?) {}
 
 actual typealias NativePointer = Int
-internal actual typealias InteropPointer = Int
+
+@InternalSkikoApi
+actual typealias InteropPointer = Int
 
 private val INTEROP_SCOPE = InteropScope()
 private var interopScopeCounter = 0

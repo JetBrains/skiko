@@ -5,6 +5,7 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.makeFromFileName
+import org.jetbrains.skiko.InternalSkikoApi
 
 actual typealias TestReturnType = Unit
 
@@ -12,6 +13,7 @@ actual fun runTest(block: suspend () -> Unit): TestReturnType {
     return runBlocking { block() }
 }
 
+@OptIn(InternalSkikoApi::class)
 actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointer {
     return toInterop(ByteArray(size))
 }

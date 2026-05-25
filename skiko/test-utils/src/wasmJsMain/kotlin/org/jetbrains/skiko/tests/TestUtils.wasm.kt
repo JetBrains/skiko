@@ -3,6 +3,7 @@ package org.jetbrains.skiko.tests
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
+import org.jetbrains.skiko.InternalSkikoApi
 import org.jetbrains.skiko.wasm.awaitSkiko
 
 actual annotation class SkipJsTarget
@@ -14,6 +15,7 @@ private external fun jsRef(): JsAny
 /**
  * Runs the [block] in a coroutine.
  */
+@OptIn(InternalSkikoApi::class)
 actual fun runTest(block: suspend () -> Unit): TestReturnType = MainScope().promise {
     awaitSkiko.await<Any>()
     block()

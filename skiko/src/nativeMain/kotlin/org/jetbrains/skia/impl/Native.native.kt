@@ -2,6 +2,7 @@ package org.jetbrains.skia.impl
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skiko.InternalSkikoApi
 import org.jetbrains.skiko.internal.fastForEach
 import kotlin.native.internal.NativePtr
 
@@ -49,13 +50,16 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 }
 
 actual typealias NativePointer = NativePtr
-internal actual typealias InteropPointer = NativePtr
+
+@InternalSkikoApi
+actual typealias InteropPointer = NativePtr
 
 internal actual fun reachabilityBarrier(obj: Any?) {
     // TODO: implement native barrier
 }
 
-internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+@InternalSkikoApi
+actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     val scope = InteropScope()
     try {
         return scope.block()
@@ -64,7 +68,8 @@ internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     }
 }
 
-internal actual class InteropScope actual constructor() {
+@InternalSkikoApi
+actual class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer {
         return if (string != null) {
             val pinned = convertToZeroTerminatedString(string).pin()
