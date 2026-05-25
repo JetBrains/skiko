@@ -8,7 +8,7 @@ expect class TestReturnType
 
 expect fun runTest(block: suspend () -> Unit): TestReturnType
 
-internal expect fun InteropScope.allocateBytesForPixels(size: Int): NativePointer
+expect fun InteropScope.allocateBytesForPixels(size: Int): NativePointer
 
 expect annotation class SkipNativeTarget()
 

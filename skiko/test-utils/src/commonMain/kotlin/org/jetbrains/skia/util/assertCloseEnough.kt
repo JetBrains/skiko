@@ -74,38 +74,38 @@ private inline fun TextBox.isCloseEnoughTo(textBox: TextBox, epsilon: Float = EP
     return (direction == textBox.direction) && rect.isCloseEnoughTo(textBox.rect, epsilon)
 }
 
-internal fun assertCloseEnough(expected: Float, actual: Float, epsilon: Float = EPSILON) {
+fun assertCloseEnough(expected: Float, actual: Float, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
-internal fun assertCloseEnough(expected: Point, actual: Point, epsilon: Float = EPSILON) {
+fun assertCloseEnough(expected: Point, actual: Point, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
-internal fun assertCloseEnough(expected: TextBox, actual: TextBox, epsilon: Float = EPSILON) {
+fun assertCloseEnough(expected: TextBox, actual: TextBox, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
-internal fun assertCloseEnough(expected: FontMetrics, actual: FontMetrics, epsilon: Float = EPSILON) {
+fun assertCloseEnough(expected: FontMetrics, actual: FontMetrics, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
-internal fun assertCloseEnough(expected: Matrix33, actual: Matrix33, epsilon: Float = EPSILON) {
+fun assertCloseEnough(expected: Matrix33, actual: Matrix33, epsilon: Float = EPSILON) {
     assertTrue(
         expected.mat.zip(actual.mat).all { (a, b) -> a.isCloseEnoughTo(b, epsilon) },
         message = "expected=$expected, actual=$actual, eps=$epsilon"
     )
 }
 
-internal fun assertCloseEnough(expected: Color4f, actual: Color4f, epsilon: Float = EPSILON) {
+fun assertCloseEnough(expected: Color4f, actual: Color4f, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
-internal fun assertCloseEnough(expected: Rect, actual: Rect, epsilon: Float = EPSILON) {
+fun assertCloseEnough(expected: Rect, actual: Rect, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
-internal fun assertCloseEnough(expected: LineMetrics, actual: LineMetrics, epsilon: Float = EPSILON) {
+fun assertCloseEnough(expected: LineMetrics, actual: LineMetrics, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
@@ -113,7 +113,7 @@ private fun fail(message: String) {
     throw AssertionError(message)
 }
 
-internal fun <T> assertContentEquivalent(expected: Iterator<T>, actual: Iterator<T>, eq: (a: T, b: T) -> Boolean) {
+fun <T> assertContentEquivalent(expected: Iterator<T>, actual: Iterator<T>, eq: (a: T, b: T) -> Boolean) {
     var count = 0
 
     while (expected.hasNext() && actual.hasNext()) {
@@ -134,22 +134,22 @@ internal fun <T> assertContentEquivalent(expected: Iterator<T>, actual: Iterator
     }
 }
 
-internal fun assertContentCloseEnough(expected: FloatArray, actual: FloatArray, epsilon: Float = EPSILON) {
+fun assertContentCloseEnough(expected: FloatArray, actual: FloatArray, epsilon: Float = EPSILON) {
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }
 
-internal fun assertContentCloseEnough(expected: Array<Point>, actual: Array<Point>, epsilon: Float = EPSILON) {
+fun assertContentCloseEnough(expected: Array<Point>, actual: Array<Point>, epsilon: Float = EPSILON) {
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }
 
-internal fun assertContentCloseEnough(expected: List<Point>, actual: List<Point>, epsilon: Float = EPSILON) {
+fun assertContentCloseEnough(expected: List<Point>, actual: List<Point>, epsilon: Float = EPSILON) {
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }
 
-internal fun assertContentCloseEnough(expected: Array<TextBox>, actual: Array<TextBox>, epsilon: Float = EPSILON) {
+fun assertContentCloseEnough(expected: Array<TextBox>, actual: Array<TextBox>, epsilon: Float = EPSILON) {
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }
 
-internal fun assertContentCloseEnough(expected: Array<Shadow>, actual: Array<Shadow>, epsilon: Float = EPSILON) {
+fun assertContentCloseEnough(expected: Array<Shadow>, actual: Array<Shadow>, epsilon: Float = EPSILON) {
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }

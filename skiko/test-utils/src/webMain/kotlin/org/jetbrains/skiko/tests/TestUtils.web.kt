@@ -4,7 +4,7 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.NativePointer
 
-internal actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointer {
+actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointer {
     return toInterop(ByteArray(size))
 }
 
