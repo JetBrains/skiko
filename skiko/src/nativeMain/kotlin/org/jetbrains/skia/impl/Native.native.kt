@@ -58,8 +58,7 @@ internal actual fun reachabilityBarrier(obj: Any?) {
     // TODO: implement native barrier
 }
 
-@InternalSkikoApi
-actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     val scope = InteropScope()
     try {
         return scope.block()
