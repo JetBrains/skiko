@@ -50,6 +50,8 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          * @param instanceProcAddr pointer to vkGetInstanceProcAddr; must not be null
          * @param deviceProcAddr pointer to vkGetDeviceProcAddr; must not be null
          * @param apiVersion Vulkan API version
+         * @param memoryAllocator custom allocator for Vulkan device memory, or null to use
+         *                        the built-in per-allocation allocator
          */
         fun makeVulkan(
             instancePtr: NativePointer,
@@ -59,7 +61,8 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             graphicsQueueIndex: Int,
             instanceProcAddr: NativePointer,
             deviceProcAddr: NativePointer,
-            apiVersion: Int
+            apiVersion: Int,
+            memoryAllocator: VulkanMemoryAllocator? = null
         ): DirectContext {
             require(instancePtr != NullPointer) { "instancePtr must not be null" }
             require(physicalDevicePtr != NullPointer) { "physicalDevicePtr must not be null" }
@@ -78,7 +81,8 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 graphicsQueueIndex,
                 instanceProcAddr,
                 deviceProcAddr,
-                apiVersion
+                apiVersion,
+                memoryAllocator
             )
             if (ptr == NullPointer) throw RenderException("Can't create Vulkan DirectContext")
             return DirectContext(ptr)
@@ -231,7 +235,8 @@ private external fun _nMakeVulkan(
     graphicsQueueIndex: Int,
     instanceProcAddr: NativePointer,
     deviceProcAddr: NativePointer,
-    apiVersion: Int
+    apiVersion: Int,
+    memoryAllocator: VulkanMemoryAllocator?
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
