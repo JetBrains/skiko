@@ -1,35 +1,35 @@
 package org.jetbrains.skia
 
 /**
- * Controls how Skia allocates Vulkan device memory.
+ * Interface for Vulkan device memory allocation used by Skia.
  *
- * You may pass an implementation of this class to [DirectContext.makeVulkan].
- * When omitted, a built-in per-allocation allocator is used that is always functional, however,
- * it does not do any sub-allocations.
+ * @see [DirectContext.makeVulkan]
  */
 abstract class VulkanMemoryAllocator {
 
     /**
      * Describes how Skia intends to use a buffer allocation.
+     *
+     * This may or may not be acknowledged by the underlying allocator implementation.
      */
     enum class BufferUsage(internal val ordinalValue: Int) {
         /**
-         * Accessed only on the GPU. This is always device local.
+         * GPU-only memory.
          */
         GPU_ONLY(0),
 
         /**
-         * Frequently updated by the CPU, read by the GPU.
+         * CPU-written, GPU-read memory.
          */
         CPU_WRITES_GPU_READS(1),
 
         /**
-         * Staging buffer for CPU-to-GPU transfers. Must be host-visible and host-coherent.
+         * CPU-to-GPU transfer staging memory.
          */
         TRANSFERS_FROM_CPU_TO_GPU(2),
 
         /**
-         * Buffer written by the GPU and read back on the CPU. Must be host-visible.
+         * GPU-to-CPU transfer memory.
          */
         TRANSFERS_FROM_GPU_TO_CPU(3);
     }
@@ -37,12 +37,12 @@ abstract class VulkanMemoryAllocator {
     /**
      * The result of a successful allocation.
      *
-     * @param deviceMemory    The allocated `VkDeviceMemory` handle (as a [Long]).
-     * @param offset          Byte offset within [deviceMemory]; 0 for dedicated allocations.
-     * @param size            Size of this allocation in bytes.
-     * @param memoryTypeIndex Index into `VkPhysicalDeviceMemoryProperties.memoryTypes` that
-     *                        was used. The allocator bridge uses this to determine coherency
-     *                        and mappability flags for Skia.
+     * @property deviceMemory Vulkan `VkDeviceMemory` handle.
+     * @property offset Byte offset within `deviceMemory`.
+     *                  For dedicated allocations this is typically `0`.
+     * @property size Allocation size in bytes.
+     * @property memoryTypeIndex Index into
+     * `VkPhysicalDeviceMemoryProperties.memoryTypes`.
      */
     data class Allocation(
         val deviceMemory: Long,
@@ -54,58 +54,85 @@ abstract class VulkanMemoryAllocator {
     /**
      * Allocate device memory for [image].
      *
-     * @param image                  `VkImage` handle (as [Long]) that needs memory.
-     * @param allocationPropertyFlags Hints from Skia; combination of [ALLOCATION_FLAG_*] constants.
+     * @param image Vulkan `VkImage` handle.
+     * @param allocationPropertyFlags Bitmask of `ALLOCATION_FLAG_*` values.
+     *
+     * @return Allocation information, or `null` if allocation failed.
      */
     abstract fun allocateImageMemory(image: Long, allocationPropertyFlags: Int): Allocation?
 
     /**
      * Allocate device memory for [buffer].
      *
-     * @param buffer                 `VkBuffer` handle (as [Long]) that needs memory.
-     * @param usage                  How Skia intends to use this buffer — drives memory type choice.
-     * @param allocationPropertyFlags Hints from Skia; combination of [ALLOCATION_FLAG_*] constants.
+     * @param buffer Vulkan `VkBuffer` handle.
+     * @param usage Intended usage pattern for the buffer.
+     * @param allocationPropertyFlags Bitmask of `ALLOCATION_FLAG_*` values.
+     *
+     * @return Allocation information, or `null` if allocation failed.
      */
     abstract fun allocateBufferMemory(buffer: Long, usage: BufferUsage, allocationPropertyFlags: Int): Allocation?
 
     /**
-     * Map [deviceMemory] for CPU access and return the mapped address as a [Long],
-     * or 0 if the memory cannot be or was not mapped.
+     * Maps a Vulkan memory allocation for CPU access.
      *
-     * Only called for host-visible (mappable) memory. The default implementation returns 0.
+     * Only called for host-visible memory types.
+     *
+     * @param deviceMemory Vulkan `VkDeviceMemory` handle.
+     *
+     * @return Mapped pointer address as a `Long`, or `0` on failure.
      */
     open fun mapMemory(deviceMemory: Long): Long = 0L
 
     /**
-     * Unmap [deviceMemory] previously returned by [mapMemory].
+     * Unmaps a previously mapped Vulkan memory allocation.
+     *
+     * @param deviceMemory Vulkan `VkDeviceMemory` handle.
      */
     open fun unmapMemory(deviceMemory: Long) {}
 
     /**
-     * Flush [size] bytes starting at [offset] within [deviceMemory] to make CPU writes
-     * visible to the GPU.  Only called for non-coherent memory.
+     * Flushes CPU writes for a non-coherent memory range.
      *
-     * @return a `VkResult` value (0 = `VK_SUCCESS`).
+     * Called only for non-coherent host-visible memory.
+     *
+     * @param deviceMemory Vulkan `VkDeviceMemory` handle.
+     * @param offset Byte offset of the flushed range.
+     * @param size Size of the flushed range in bytes.
+     *
+     * @return Vulkan `VkResult`.
      */
     open fun flushMemory(deviceMemory: Long, offset: Long, size: Long): Int = 0
 
     /**
-     * Invalidate [size] bytes starting at [offset] within [deviceMemory] so GPU writes
-     * become visible to the CPU. Only called for non-coherent memory.
+     * Invalidates a non-coherent memory range.
      *
-     * @return a `VkResult` value (0 = `VK_SUCCESS`).
+     * Makes GPU writes visible to the CPU.
+     * Called only for non-coherent host-visible memory.
+     *
+     * @param deviceMemory Vulkan `VkDeviceMemory` handle.
+     * @param offset Byte offset of the invalidated range.
+     * @param size Size of the invalidated range in bytes.
+     *
+     * @return Vulkan `VkResult`.
      */
     open fun invalidateMemory(deviceMemory: Long, offset: Long, size: Long): Int = 0
 
     /**
-     * Free a [deviceMemory] handle previously returned by [allocateImageMemory] or
-     * [allocateBufferMemory].
+     * Frees a Vulkan memory allocation.
+     *
+     * @param deviceMemory Vulkan `VkDeviceMemory` handle previously returned
+     * by this allocator.
      */
     abstract fun freeMemory(deviceMemory: Long)
 
     /**
-     * @return `(totalAllocated, totalUsed)` byte counts for diagnostic purposes.
-     * Both may be 0 if tracking is not implemented.
+     * Returns allocator memory statistics.
+     *
+     * @return Pair of:
+     * - total allocated bytes
+     * - total used bytes
+     *
+     * Implementations that do not track statistics may return `(0, 0)`.
      */
     open fun totalAllocatedAndUsedMemory(): Pair<Long, Long> = Pair(0L, 0L)
 
@@ -120,23 +147,24 @@ abstract class VulkanMemoryAllocator {
     }
 
     companion object {
+
         /**
-         * Place allocation in its own `VkDeviceMemory`
+         * Requests a dedicated `VkDeviceMemory` allocation.
          */
         const val ALLOCATION_FLAG_DEDICATED: Int = 0b0001
 
         /**
-         * Lazily allocated and device-only, may be unavailable until accessed.
+         * Requests lazily allocated device-local memory.
          */
         const val ALLOCATION_FLAG_LAZY: Int = 0b0010
 
         /**
-         * Keep this memory persistently mapped (host-visible allocations only).
+         * Requests persistent mapping for host-visible memory.
          */
         const val ALLOCATION_FLAG_PERSISTENTLY_MAPPED: Int = 0b0100
 
         /**
-         * Allocate in a protected memory region.
+         * Requests protected memory allocation.
          */
         const val ALLOCATION_FLAG_PROTECTED: Int = 0b1000
     }
