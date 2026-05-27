@@ -2,9 +2,11 @@
 
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skiko.InternalSkikoApi
 import org.jetbrains.skiko.internal.fastForEach
 
-internal actual class InteropScope actual constructor() {
+@InternalSkikoApi
+actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
     private var callbacksInitialized = false
 

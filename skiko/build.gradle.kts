@@ -64,6 +64,9 @@ kotlin {
     compilerOptions {
         languageVersion.set(KotlinVersion.KOTLIN_2_2)
         apiVersion.set(KotlinVersion.KOTLIN_2_2)
+        freeCompilerArgs.add(
+            "-opt-in=org.jetbrains.skiko.InternalSkikoApi"
+        )
     }
 
     applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
@@ -184,6 +187,7 @@ kotlin {
     sourceSets.commonTest.dependencies {
         implementation(kotlin("test"))
         implementation(kotlin("test-annotations-common"))
+        implementation(project(":test-utils"))
     }
 
     skikoProjectContext.jvmMainSourceSet?.dependencies {

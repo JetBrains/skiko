@@ -3,6 +3,8 @@
 @file:JsQualifier("api")
 package org.jetbrains.skiko.wasm
 
+import org.jetbrains.skiko.InternalSkikoApi
 import kotlin.js.Promise
 
-internal actual external val awaitSkiko: Promise<JsAny>
+@InternalSkikoApi
+actual external val awaitSkiko: Promise<JsAny>

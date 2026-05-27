@@ -1,5 +1,6 @@
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skiko.InternalSkikoApi
 import java.lang.ref.Reference
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
@@ -48,7 +49,8 @@ internal actual fun reachabilityBarrier(obj: Any?) {
 
 actual typealias NativePointer = Long
 
-internal actual typealias InteropPointer = java.lang.Object
+@InternalSkikoApi
+actual typealias InteropPointer = java.lang.Object
 
 internal object theScope: InteropScope()
 internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
@@ -56,7 +58,8 @@ internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
 }
 
 @Suppress("RETURN_TYPE_MISMATCH") // Hack to pass nulls as InteropPointer
-internal actual open class InteropScope actual constructor() {
+@InternalSkikoApi
+actual open class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer = string
 
     actual fun toInterop(array: ByteArray?): InteropPointer = array
