@@ -39,7 +39,7 @@ open class SkiaSwingLayer(
     @Volatile
     private var isDisposed = false
 
-    val clipComponents: MutableList<ClipRectangle> get() = mutableListOf()
+    val clipComponents: MutableList<ClipRectangle> = mutableListOf()
 
     private val renderDelegateWithClipping = SkikoRenderDelegate { canvas, width, height, nanoTime ->
         val scale = graphicsConfiguration.defaultTransform.scaleX.toFloat()
