@@ -1,6 +1,8 @@
 package org.jetbrains.skia
 
 import kotlinx.browser.window
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
+import org.jetbrains.skia.impl.NativePointer
 
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
@@ -34,3 +36,19 @@ val LANG: String by lazy {
 actual fun defaultLanguageTag(): String = LANG
 
 actual fun compilePattern(regex: String): Pattern = Pattern(regex)
+
+internal actual fun nMakeVulkanImpl(
+    instancePtr: NativePointer,
+    physicalDevicePtr: NativePointer,
+    devicePtr: NativePointer,
+    queuePtr: NativePointer,
+    graphicsQueueIndex: Int,
+    instanceProcAddr: NativePointer,
+    deviceProcAddr: NativePointer,
+    apiVersion: Int,
+    memoryAllocator: VulkanMemoryAllocator?
+): NativePointer = _nMakeVulkan(
+    instancePtr, physicalDevicePtr, devicePtr, queuePtr,
+    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion,
+    NullPointer
+)

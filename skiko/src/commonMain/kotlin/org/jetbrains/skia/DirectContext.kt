@@ -73,7 +73,7 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             require(deviceProcAddr != NullPointer) { "deviceProcAddr must not be null" }
 
             Stats.onNativeCall()
-            val ptr = _nMakeVulkan(
+            val ptr = nMakeVulkanImpl(
                 instancePtr,
                 physicalDevicePtr,
                 devicePtr,
@@ -227,7 +227,7 @@ private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePoint
 private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeVulkan")
-private external fun _nMakeVulkan(
+internal external fun _nMakeVulkan(
     instancePtr: NativePointer,
     physicalDevicePtr: NativePointer,
     devicePtr: NativePointer,
@@ -236,7 +236,7 @@ private external fun _nMakeVulkan(
     instanceProcAddr: NativePointer,
     deviceProcAddr: NativePointer,
     apiVersion: Int,
-    memoryAllocator: VulkanMemoryAllocator?
+    memoryAllocatorPtr: NativePointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")

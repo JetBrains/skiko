@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.NativePointer
+
 internal expect fun <R> commonSynchronized(lock: Any, block: () -> R)
 
 internal expect fun defaultLanguageTag(): String
@@ -20,3 +22,15 @@ internal expect fun compilePattern(regex: String): Pattern
 @OptIn(ExperimentalMultiplatform::class)
 @OptionalExpectation
 expect annotation class ExternalSymbolName(val name: String)
+
+internal expect fun nMakeVulkanImpl(
+    instancePtr: NativePointer,
+    physicalDevicePtr: NativePointer,
+    devicePtr: NativePointer,
+    queuePtr: NativePointer,
+    graphicsQueueIndex: Int,
+    instanceProcAddr: NativePointer,
+    deviceProcAddr: NativePointer,
+    apiVersion: Int,
+    memoryAllocator: VulkanMemoryAllocator?
+): NativePointer
