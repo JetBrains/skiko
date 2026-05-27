@@ -1,7 +1,6 @@
 package org.jetbrains.skia
 
 import kotlinx.browser.window
-import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
@@ -47,8 +46,7 @@ internal actual fun nMakeVulkanImpl(
     deviceProcAddr: NativePointer,
     apiVersion: Int,
     memoryAllocator: VulkanMemoryAllocator?
-): NativePointer = _nMakeVulkan(
+): NativePointer = nMakeVulkanNoAllocator(
     instancePtr, physicalDevicePtr, devicePtr, queuePtr,
-    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion,
-    NullPointer
+    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion
 )

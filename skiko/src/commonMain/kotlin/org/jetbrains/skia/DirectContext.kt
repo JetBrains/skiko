@@ -227,7 +227,7 @@ private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePoint
 private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeVulkan")
-internal external fun _nMakeVulkan(
+private external fun _nMakeVulkan(
     instancePtr: NativePointer,
     physicalDevicePtr: NativePointer,
     devicePtr: NativePointer,
@@ -250,3 +250,18 @@ private external fun _nReset(ptr: NativePointer, flags: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
 private external fun _nAbandon(ptr: NativePointer, flags: Int)
+
+internal fun nMakeVulkanNoAllocator(
+    instancePtr: NativePointer,
+    physicalDevicePtr: NativePointer,
+    devicePtr: NativePointer,
+    queuePtr: NativePointer,
+    graphicsQueueIndex: Int,
+    instanceProcAddr: NativePointer,
+    deviceProcAddr: NativePointer,
+    apiVersion: Int
+): NativePointer = _nMakeVulkan(
+    instancePtr, physicalDevicePtr, devicePtr, queuePtr,
+    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion,
+    NullPointer
+)

@@ -3,7 +3,6 @@ package org.jetbrains.skia
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
 import org.jetbrains.skia.impl.InteropPointer
-import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.withResult
 
@@ -56,10 +55,9 @@ internal actual fun nMakeVulkanImpl(
     deviceProcAddr: NativePointer,
     apiVersion: Int,
     memoryAllocator: VulkanMemoryAllocator?
-): NativePointer = _nMakeVulkan(
+): NativePointer = nMakeVulkanNoAllocator(
     instancePtr, physicalDevicePtr, devicePtr, queuePtr,
-    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion,
-    NullPointer
+    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion
 )
 
 @SymbolName("uloc_getDefault_skiko")
