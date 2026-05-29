@@ -17,6 +17,7 @@ class SkikoProjectContext(
     val project: Project,
     val skiko: SkikoProperties,
     val kind: SkikoModuleKind,
+    val artifacts: SkikoArtifacts,
     val kotlin: KotlinMultiplatformExtension,
     val windowsSdkPathProvider: () -> WindowsSdkPaths,
     val createChecksumsTask: (OS, Arch, Provider<File>) -> TaskProvider<*>,
@@ -38,9 +39,8 @@ class SkikoProjectContext(
     val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
 
     val projectPath: String = if (kind == SkikoModuleKind.CORE) ":" else ":${project.name}"
-    val libBaseName: String = if (kind == SkikoModuleKind.CORE) "skiko" else project.name
-    val nativeBridgesLibPrefix: String =
-        if (kind == SkikoModuleKind.CORE) "skiko-native-bridges" else "${project.name}-native-bridges"
+    val libBaseName: String = artifacts.artifactIdPrefix
+    val nativeBridgesLibPrefix: String = "${artifacts.artifactIdPrefix}-native-bridges"
     val cinteropName: String = libBaseName
 
     fun staticLibBaseNames(os: OS, arch: Arch, env: TargetEnv): List<String> =

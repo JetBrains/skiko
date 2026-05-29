@@ -35,6 +35,7 @@ val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
 val targetOs = hostOs
 val targetArch = skiko.targetArch
+val skikoArtifacts = SkikoArtifacts()
 
 val coreDependencies: SkikoDependencyScope.() -> Unit = {
     targets {
@@ -181,18 +182,19 @@ val skikoProjectContext = SkikoProjectContext(
     skiko = skiko,
     kotlin = kotlin,
     kind = SkikoModuleKind.CORE,
+    artifacts = skikoArtifacts,
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
     },
     createChecksumsTask = { targetOs: OS, targetArch: Arch, fileToChecksum: Provider<File> ->
         createChecksumsTask(targetOs, targetArch, fileToChecksum)
     },
-    additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko),
+    additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko, skikoArtifacts),
     configureDependencies = coreDependencies
 )
 
 allprojects {
-    group = SkikoArtifacts.groupId
+    group = SkikoArtifacts.DEFAULT_GROUP_ID
     version = skiko.deployVersion
 }
 

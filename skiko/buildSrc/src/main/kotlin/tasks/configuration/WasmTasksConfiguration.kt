@@ -204,7 +204,7 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
     override fun getCompilerPluginId() = "org.jetbrains.skiko.imports.generator"
 
     override fun getPluginArtifact(): SubpluginArtifact =
-        SubpluginArtifact(SkikoArtifacts.groupId, IMPORT_GENERATOR)
+        SubpluginArtifact(SkikoArtifacts.DEFAULT_GROUP_ID, IMPORT_GENERATOR)
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
         return ((kotlinCompilation.platformType == KotlinPlatformType.wasm) || (kotlinCompilation.platformType == KotlinPlatformType.js))
@@ -242,7 +242,7 @@ fun KotlinJsTargetDsl.setupImportsGeneratorPlugin() {
         // By default, it will try to use the same version as kotlin, because we use version=null in getPluginArtifact.
         // But we don't publish the artifact, therefore we substitute it for project dependency.
         it.configurations.pluginConfiguration.resolutionStrategy.dependencySubstitution {
-            substitute(module("${SkikoArtifacts.groupId}:$IMPORT_GENERATOR"))
+            substitute(module("${SkikoArtifacts.DEFAULT_GROUP_ID}:$IMPORT_GENERATOR"))
                 .using(project(":import-generator"))
         }
     }
