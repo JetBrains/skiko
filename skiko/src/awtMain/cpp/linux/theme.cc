@@ -5,16 +5,20 @@
 
 #include "jni_helpers.h"
 
-static bool initDbusThreads(void* lib) {
+static dbus_bool_t initDbusThreads(void* lib) {
     auto func = (dbus_bool_t(*)()) dlsym(lib, "dbus_threads_init_default");
-    if (func) func();
-    return true;
+    if (func) return func();
+    return false;
 }
 
 static void* loadLibDbus() {
-    static void* result = dlopen("libdbus-1.so", RTLD_LAZY | RTLD_LOCAL);
-    static bool _ = result && initDbusThreads(result);
-    return result;
+    static void* dlOpenResult = dlopen("libdbus-1.so", RTLD_LAZY | RTLD_LOCAL);
+    static bool initSuccess = dlOpenResult && initDbusThreads(dlOpenResult);
+    if (initSuccess) {
+        return dlOpenResult;
+    } else {
+        return nullptr;
+    }
 }
 
 static DBusMessage* dbus_message_new_method_call_dynamic(const char *bus_name, const char *path, const char *iface, const char *method) {
