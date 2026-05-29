@@ -9,6 +9,7 @@ import OS
 import SealAndSignSharedLibraryTask
 import SkiaBuildType
 import SkikoProjectContext
+import dsl.TargetEnv
 import compilerForTarget
 import dynamicLibExt
 import hostArch
@@ -135,7 +136,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     flags.set(
         listOf(
             *skiaPreprocessorFlags(targetOs, buildType),
-            *osFlags
+            *osFlags,
         )
     )
 }
@@ -229,26 +230,16 @@ fun SkikoProjectContext.createLinkJvmBindings(
     val target = targetId(targetOs, targetArch)
     val skiaBinSubdir = "out/${buildType.id}-$target"
     val skiaBinDir = skiaJvmBindingsDir.get().absolutePath + "/" + skiaBinSubdir
+    val resolvedBinaryInputs = resolveBinaryInputs(targetOs, targetArch, TargetEnv.JVM, skiaBinDir)
     val osFlags: Array<String>
 
-    libFiles = project.fileTree(skiaJvmBindingsDir.map { it.resolve(skiaBinSubdir) }) {
-        val fileExtension = if (targetOs.isWindows) "lib" else "a"
-        val filePrefix = if (targetOs.isWindows) "" else "lib"
-        val excludedLibs = listOf(
-            "skia_graphite_ext",
-            "skia_graphite_dawn_ext",
-            "dawn_combined"
-        )
-        include("*.$fileExtension")
-
-        exclude(excludedLibs.map { "$filePrefix$it.$fileExtension" })
-    }
+    libFiles = project.files((resolvedBinaryInputs.staticArchivePaths).distinct())
 
     dependsOn(compileTask)
     objectFiles = project.fileTree(compileTask.map { it.outDir.get() }) {
         include("**/*.o")
     }
-    val libNamePrefix = if (targetOs.isWindows) "skiko" else "libskiko"
+    val libNamePrefix = if (targetOs.isWindows) libBaseName else "lib$libBaseName"
     libOutputFileName.set("$libNamePrefix-${targetOs.id}-${targetArch.id}${targetOs.dynamicLibExt}")
     buildTargetOS.set(targetOs)
     buildSuffix.set("jvm")
@@ -267,19 +258,10 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-arch", if (targetArch == Arch.Arm64) "arm64" else "x86_64",
                 "-shared",
                 "-dead_strip",
-                "-lobjc",
                 "-install_name", "./${libOutputFileName.get()}",
                 "-current_version", skiko.planeDeployVersion,
-                "-framework", "AppKit",
-                "-framework", "CoreFoundation",
-                "-framework", "CoreGraphics",
-                "-framework", "CoreServices",
-                "-framework", "CoreText",
-                "-framework", "Foundation",
-                "-framework", "IOKit",
-                "-framework", "Metal",
-                "-framework", "OpenGL",
-                "-framework", "QuartzCore" // for CoreAnimation
+                *resolvedBinaryInputs.linkFlags.toTypedArray(),
+                *resolvedBinaryInputs.frameworks.toTypedArray()
             )
         }
         OS.Linux -> {
@@ -290,25 +272,14 @@ fun SkikoProjectContext.createLinkJvmBindings(
                         // `libstdc++.so.6.*` binaries are forward-compatible and used from GCC 3.4 to 16+,
                         // so do not use `-static-libstdc++` to avoid issues with complex setup.
                         "-static-libgcc",
-                        "-lGL",
-                        "-lX11",
-                        "-lfontconfig",
                         // Enforce immediate symbol resolution at library load time to prevent
                         // lazy-binding issues and make GOT read-only afterwards.
                         "-Wl,-z,relro,-z,now",
-                        // Hack to fix problem with linker not always finding certain declarations.
-                        "$skiaBinDir/libsksg.a",
-                        "$skiaBinDir/libskia.a",
-                        "$skiaBinDir/libskia_ganesh_ext.a",
-                        "$skiaBinDir/libskunicode_core.a",
-                        "$skiaBinDir/libskunicode_icu.a",
-                        "$skiaBinDir/libskshaper.a",
-                        "$skiaBinDir/libjsonreader.a"
                     )
                 )
-                if (targetArch == Arch.Arm64) {
-                    add("-lEGL")
-                }
+                addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
+                addAll(resolvedBinaryInputs.directStaticArchivePaths)
+                addAll(resolvedBinaryInputs.linkFlags)
             }.toTypedArray()
         }
         OS.Windows -> {
@@ -337,21 +308,22 @@ fun SkikoProjectContext.createLinkJvmBindings(
                     )
                 )
                 if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
+                addAll(resolvedBinaryInputs.dynamicLibNames.map { "$it.lib" })
+                addAll(resolvedBinaryInputs.linkFlags)
             }.toTypedArray()
         }
         OS.Android -> {
-            osFlags = arrayOf(
+            val androidFlags = mutableListOf(
                 "-shared",
                 "-static-libstdc++",
-                "-lGLESv3",
-                "-lEGL",
                 "-llog",
                 "-landroid",
                 "-latomic",
-                // Hack to fix problem with linker not always finding certain declarations.
-                "$skiaBinDir/libskia.a",
-                "$skiaBinDir/libskia_ganesh_ext.a"
             )
+            androidFlags.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
+            androidFlags.addAll(resolvedBinaryInputs.directStaticArchivePaths)
+            androidFlags.addAll(resolvedBinaryInputs.linkFlags)
+            osFlags = androidFlags.toTypedArray()
             linker.set(project.androidClangFor(targetArch))
         }
         OS.Wasm, OS.IOS, OS.TVOS -> {

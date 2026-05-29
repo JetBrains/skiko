@@ -7,6 +7,7 @@ import LinkSkikoWasmTask
 import OS
 import SkikoProjectContext
 import compilerForTarget
+import dsl.TargetEnv
 import linkerForTarget
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
@@ -41,7 +42,6 @@ fun SkikoProjectContext.declareWasmTasks() {
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
         dependsOn(skiaWasmDir)
-
         compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
@@ -70,17 +70,15 @@ fun SkikoProjectContext.declareWasmTasks() {
     fun LinkSkikoWasmTask.configureCommon(prefixPath: String) {
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
+        val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
+        val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
         linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
 
-        libFiles = project.fileTree(skiaWasmDir.get()) {
-            include("**/*.wasm.a")
-            exclude("**/libskia_graphite_ext.wasm.a")
-            exclude("**/libskia_graphite_dawn_ext.wasm.a")
-        }
+        libFiles = project.files(resolvedBinaryInputs.staticArchivePaths.distinct())
         objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
             include("**/*.o")
         }
@@ -94,17 +92,10 @@ fun SkikoProjectContext.declareWasmTasks() {
         flags.addAll(buildList {
             addAll(
                 listOf(
-                    "-l", "GL",
-                    "-s", "MAX_WEBGL_VERSION=2",
-                    "-s", "MIN_WEBGL_VERSION=2",
                     "-s", "OFFSCREEN_FRAMEBUFFER=1",
                     "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
                     "-s", "EXPORT_ES6=1",
-                    "-s", "MODULARIZE=1",
-                    "-s", "EXPORT_NAME=loadSkikoWASM",
-                    "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
                     "-s", "SUPPORT_LONGJMP=wasm",
-                    "--bind",
                     // -O2 saves 800kB for the output file, and ~100kB for transferred size.
                     // -O3 breaks the exports in js/mjs files. skiko.wasm size is the same though
                     "-O2"
@@ -112,6 +103,7 @@ fun SkikoProjectContext.declareWasmTasks() {
             )
 
             if (skiko.isWasmBuildWithProfiling) add("--profiling")
+            addAll(resolvedBinaryInputs.linkFlags)
         })
 
         doLast {

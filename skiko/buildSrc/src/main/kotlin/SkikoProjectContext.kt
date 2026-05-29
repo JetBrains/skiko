@@ -9,15 +9,25 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
+import dsl.*
+
+enum class SkikoModuleKind { CORE, EXTENSION }
 
 class SkikoProjectContext(
     val project: Project,
     val skiko: SkikoProperties,
+    val kind: SkikoModuleKind,
     val kotlin: KotlinMultiplatformExtension,
     val windowsSdkPathProvider: () -> WindowsSdkPaths,
     val createChecksumsTask: (OS, Arch, Provider<File>) -> TaskProvider<*>,
     val additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
+    configureDependencies: (SkikoDependencyScope.() -> Unit)
 ) {
+    val dependencyRegistry = BinaryRegistry()
+
+    init {
+        SkikoDependencyScope(dependencyRegistry).configureDependencies()
+    }
 
     val buildType = skiko.buildType
 
@@ -26,6 +36,52 @@ class SkikoProjectContext(
     }
 
     val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
+
+    val projectPath: String = if (kind == SkikoModuleKind.CORE) ":" else ":${project.name}"
+    val libBaseName: String = if (kind == SkikoModuleKind.CORE) "skiko" else project.name
+    val nativeBridgesLibPrefix: String =
+        if (kind == SkikoModuleKind.CORE) "skiko-native-bridges" else "${project.name}-native-bridges"
+    val cinteropName: String = libBaseName
+
+    fun staticLibBaseNames(os: OS, arch: Arch, env: TargetEnv): List<String> =
+        dependencyRegistry.getLibs(os, arch, env, Linkage.STATIC)
+
+    fun directStaticLibBaseNames(os: OS, arch: Arch, env: TargetEnv): List<String> =
+        dependencyRegistry.getLibs(os, arch, env, Linkage.DIRECT_STATIC)
+
+    private fun archivePaths(os: OS, libBaseNames: List<String>, skiaBinDir: String): List<String> {
+        val prefix = if (os == OS.Windows) "" else "lib"
+        val suffix = when (os) {
+            OS.Windows -> ".lib"
+            OS.Wasm -> ".wasm.a"
+            else -> ".a"
+        }
+
+        return libBaseNames.map { baseName ->
+            "$skiaBinDir/$prefix$baseName$suffix"
+        }
+    }
+
+    fun staticArchivePaths(os: OS, arch: Arch, env: TargetEnv, skiaBinDir: String): List<String> =
+        archivePaths(os, staticLibBaseNames(os, arch, env), skiaBinDir)
+
+    fun directStaticArchivePaths(os: OS, arch: Arch, env: TargetEnv, skiaBinDir: String): List<String> =
+        archivePaths(os, directStaticLibBaseNames(os, arch, env), skiaBinDir)
+
+    fun dynamicLibNames(os: OS, arch: Arch, env: TargetEnv): List<String> =
+        dependencyRegistry.getLibs(os, arch, env, Linkage.DYNAMIC)
+
+    fun resolveBinaryInputs(os: OS, arch: Arch, env: TargetEnv, skiaBinDir: String): ResolvedBinaryConfiguration {
+        return ResolvedBinaryConfiguration(
+            staticLibBaseNames = staticLibBaseNames(os, arch, env),
+            staticArchivePaths = staticArchivePaths(os, arch, env, skiaBinDir),
+            directStaticLibBaseNames = directStaticLibBaseNames(os, arch, env),
+            directStaticArchivePaths = directStaticArchivePaths(os, arch, env, skiaBinDir),
+            dynamicLibNames = dynamicLibNames(os, arch, env),
+            frameworks = dependencyRegistry.getFrameworks(os, arch, env),
+            linkFlags = dependencyRegistry.getLinkFlags(os, arch, env)
+        )
+    }
 }
 
 fun SkikoProjectContext.declareSkiaTasks() {
@@ -73,6 +129,23 @@ fun SkikoProjectContext.declareSkiaTasks() {
                 from(project.zipTree(downloadSkiaTask.get().dest))
 
                 into(outputDir)
+
+                // On Windows, some of the skia libraries have lib prefix and some do not
+                // Let's standardize it
+                if (config == "windows") {
+                    doLast {
+                        outputDir.walkTopDown().forEach { file ->
+                            if (file.isFile && file.name.startsWith("lib") && file.name.endsWith(".lib")) {
+                                val newName = file.name.removePrefix("lib")
+                                val renamedFile = File(file.parentFile, newName)
+
+                                if (file.renameTo(renamedFile)) {
+                                    logger.info("Normalized Windows lib: ${file.name} -> $newName")
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
