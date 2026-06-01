@@ -95,7 +95,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                     "skshaper",
                     "jsonreader"
                 )
-                dynamicSystemLibs("GL", "X11", "fontconfig", "expat")
+                dynamicSystemLibs("GL", "X11", "fontconfig")
                 arm64 { dynamicSystemLibs("EGL") }
             }
 
