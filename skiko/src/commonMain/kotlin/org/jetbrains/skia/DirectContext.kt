@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.loadOpenGLLibrary
 
@@ -36,6 +37,55 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
+        }
+
+        /**
+         * Creates Vulkan direct rendering context from Vulkan native objects.
+         *
+         * @param instancePtr pointer to VkInstance; must not be null
+         * @param physicalDevicePtr pointer to VkPhysicalDevice; must not be null
+         * @param devicePtr pointer to VkDevice; must not be null
+         * @param queuePtr pointer to VkQueue; must not be null
+         * @param graphicsQueueIndex index of the graphics queue used for rendering
+         * @param instanceProcAddr pointer to vkGetInstanceProcAddr; must not be null
+         * @param deviceProcAddr pointer to vkGetDeviceProcAddr; must not be null
+         * @param apiVersion Vulkan API version
+         * @param memoryAllocator custom allocator for Vulkan device memory, or null to use
+         *                        the built-in per-allocation allocator
+         */
+        fun makeVulkan(
+            instancePtr: NativePointer,
+            physicalDevicePtr: NativePointer,
+            devicePtr: NativePointer,
+            queuePtr: NativePointer,
+            graphicsQueueIndex: Int,
+            instanceProcAddr: NativePointer,
+            deviceProcAddr: NativePointer,
+            apiVersion: Int,
+            memoryAllocator: VulkanMemoryAllocator? = null
+        ): DirectContext {
+            require(instancePtr != NullPointer) { "instancePtr must not be null" }
+            require(physicalDevicePtr != NullPointer) { "physicalDevicePtr must not be null" }
+            require(devicePtr != NullPointer) { "devicePtr must not be null" }
+            require(queuePtr != NullPointer) { "queuePtr must not be null" }
+            require(graphicsQueueIndex >= 0) { "graphicsQueueIndex must be non-negative" }
+            require(instanceProcAddr != NullPointer) { "instanceProcAddr must not be null" }
+            require(deviceProcAddr != NullPointer) { "deviceProcAddr must not be null" }
+
+            Stats.onNativeCall()
+            val ptr = nMakeVulkanImpl(
+                instancePtr,
+                physicalDevicePtr,
+                devicePtr,
+                queuePtr,
+                graphicsQueueIndex,
+                instanceProcAddr,
+                deviceProcAddr,
+                apiVersion,
+                memoryAllocator
+            )
+            if (ptr == NullPointer) throw RenderException("Can't create Vulkan DirectContext")
+            return DirectContext(ptr)
         }
 
         init {
@@ -176,6 +226,19 @@ private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePoint
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
 private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeVulkan")
+private external fun _nMakeVulkan(
+    instancePtr: NativePointer,
+    physicalDevicePtr: NativePointer,
+    devicePtr: NativePointer,
+    queuePtr: NativePointer,
+    graphicsQueueIndex: Int,
+    instanceProcAddr: NativePointer,
+    deviceProcAddr: NativePointer,
+    apiVersion: Int,
+    memoryAllocatorPtr: NativePointer
+): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
 private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean)
 
@@ -187,3 +250,18 @@ private external fun _nReset(ptr: NativePointer, flags: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
 private external fun _nAbandon(ptr: NativePointer, flags: Int)
+
+internal fun nMakeVulkanNoAllocator(
+    instancePtr: NativePointer,
+    physicalDevicePtr: NativePointer,
+    devicePtr: NativePointer,
+    queuePtr: NativePointer,
+    graphicsQueueIndex: Int,
+    instanceProcAddr: NativePointer,
+    deviceProcAddr: NativePointer,
+    apiVersion: Int
+): NativePointer = _nMakeVulkan(
+    instancePtr, physicalDevicePtr, devicePtr, queuePtr,
+    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion,
+    NullPointer
+)
