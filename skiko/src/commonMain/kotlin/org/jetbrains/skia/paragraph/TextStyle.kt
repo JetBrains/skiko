@@ -133,12 +133,12 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             Stats.onNativeCall()
             _nSetDecorationStyle(
                 _ptr,
-                d._underline,
-                d._overline,
-                d._lineThrough,
-                d._gaps,
+                d.underline,
+                d.overline,
+                d.lineThrough,
+                d.gaps,
                 d.color,
-                d._lineStyle.ordinal,
+                d.lineStyle.ordinal,
                 d.thicknessMultiplier
             )
         } finally {
@@ -491,7 +491,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var baselineMode: BaselineMode
         get() = try {
             Stats.onNativeCall()
-            BaselineMode.entries[_nGetBaselineMode(_ptr)]
+            BaselineMode(_nGetBaselineMode(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -540,7 +540,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var fontEdging: FontEdging
         get() = try {
             Stats.onNativeCall()
-            FontEdging.entries[_nGetFontEdging(_ptr)]
+            FontEdging(_nGetFontEdging(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -568,7 +568,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var fontHinting: FontHinting
         get() = try {
             Stats.onNativeCall()
-            FontHinting.entries[_nGetFontHinting(_ptr)]
+            FontHinting(_nGetFontHinting(_ptr))
         } finally {
             reachabilityBarrier(this)
         }

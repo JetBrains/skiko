@@ -214,7 +214,7 @@ class Font : Managed {
     var edging: FontEdging
         get() = try {
             Stats.onNativeCall()
-            FontEdging.entries[_nGetEdging(_ptr)]
+            FontEdging(_nGetEdging(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -231,7 +231,7 @@ class Font : Managed {
     var hinting: FontHinting
         get() = try {
             Stats.onNativeCall()
-            FontHinting.entries[_nGetHinting(_ptr)]
+            FontHinting(_nGetHinting(_ptr))
         } finally {
             reachabilityBarrier(this)
         }

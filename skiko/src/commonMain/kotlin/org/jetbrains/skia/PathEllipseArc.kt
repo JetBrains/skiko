@@ -1,9 +1,14 @@
 package org.jetbrains.skia
 
-enum class PathEllipseArc {
-    /** Smaller of arc pair.  */
-    SMALLER,
+import kotlin.jvm.JvmInline
 
-    /** Larger of arc pair.  */
-    LARGER;
+@JvmInline
+value class PathEllipseArc internal constructor(val ordinal: Int) {
+    companion object {
+        /** Smaller of arc pair.  */
+        val SMALLER = PathEllipseArc(0)
+
+        /** Larger of arc pair.  */
+        val LARGER = PathEllipseArc(1)
+    }
 }

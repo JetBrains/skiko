@@ -82,7 +82,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     var direction: Direction
         get() = try {
             Stats.onNativeCall()
-            Direction.entries[_nGetDirection(_ptr)]
+            Direction(_nGetDirection(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -97,7 +97,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     var alignment: Alignment
         get() = try {
             Stats.onNativeCall()
-            Alignment.entries[_nGetAlignment(_ptr)]
+            Alignment(_nGetAlignment(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -157,7 +157,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     var heightMode: HeightMode
         get() = try {
             Stats.onNativeCall()
-            HeightMode.entries[_nGetHeightMode(_ptr)]
+            HeightMode(_nGetHeightMode(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -171,7 +171,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     val effectiveAlignment: Alignment
         get() = try {
             Stats.onNativeCall()
-            Alignment.entries[_nGetEffectiveAlignment(_ptr)]
+            Alignment(_nGetEffectiveAlignment(_ptr))
         } finally {
             reachabilityBarrier(this)
         }

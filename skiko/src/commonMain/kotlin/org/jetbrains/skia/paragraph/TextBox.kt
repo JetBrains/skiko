@@ -6,16 +6,11 @@ import org.jetbrains.skia.impl.ArrayInteropDecoder
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.interopScope
 
-class TextBox(val rect: Rect, direction: Direction) {
-    val _direction: Direction
-
+class TextBox(val rect: Rect, val direction: Direction) {
     constructor(l: Float, t: Float, r: Float, b: Float, direction: Int) : this(
         Rect.makeLTRB(l, t, r, b),
-        Direction.entries[direction]
+        Direction(direction)
     )
-
-    val direction: Direction
-        get() = _direction
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
@@ -34,10 +29,6 @@ class TextBox(val rect: Rect, direction: Direction) {
 
     override fun toString(): String {
         return "TextBox(_rect=$rect, _direction=$direction)"
-    }
-
-    init {
-        _direction = direction
     }
 
     internal companion object : ArrayInteropDecoder<TextBox> {

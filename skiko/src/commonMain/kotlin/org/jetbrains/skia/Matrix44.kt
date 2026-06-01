@@ -1,8 +1,10 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.ColorMatrix
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
+import kotlin.jvm.JvmInline
 
 /**
  *
@@ -11,14 +13,31 @@ import org.jetbrains.skia.impl.withResult
  * Skia assumes a right-handed coordinate system:
  * +X goes to the right
  * +Y goes down
- * +Z goes into the screen (away from the viewer)
+ * +Z goes into the screen (away from the viewer)ç
+ *
+ * @param mat 16 elements in row-major order
  */
-class Matrix44(vararg mat: Float) {
+@JvmInline
+value class Matrix44 internal constructor(val mat: FloatArray) {
+    constructor(
+        m00: Float, m01: Float, m02: Float, m03: Float,
+        m10: Float, m11: Float, m12: Float, m13: Float,
+        m20: Float, m21: Float, m22: Float, m23: Float,
+        m30: Float, m31: Float, m32: Float, m33: Float
+    ) : this(
+        floatArrayOf(
+            m00, m01, m02, m03,
+            m10, m11, m12, m13,
+            m20, m21, m22, m23,
+            m30, m31, m32, m33,
+        )
+    )
     /**
-     * Matrix elements are in row-major order.
+     * The constructor parameters are in row-major order.
      */
-    val mat: FloatArray
-
+    init {
+        require(mat.size == 16) { "Expected 16 elements, got ${mat.size}" }
+    }
     /**
      *
      * When converting from Matrix44 to Matrix33, the third row and
@@ -35,21 +54,8 @@ class Matrix44(vararg mat: Float) {
         return Matrix33(mat[0], mat[1], mat[3], mat[4], mat[5], mat[7], mat[12], mat[13], mat[15])
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (other === this) return true
-        if (other !is Matrix44) return false
-        return mat.contentEquals(other.mat)
-    }
-
-    override fun hashCode(): Int {
-        val PRIME = 59
-        var result = 1
-        result = result * PRIME + mat.contentHashCode()
-        return result
-    }
-
     override fun toString(): String {
-        return "Matrix44(_mat=$mat)"
+        return "Matrix44(mat=${mat.contentToString()})"
     }
 
     companion object {
@@ -57,15 +63,7 @@ class Matrix44(vararg mat: Float) {
 
         internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Matrix44 {
             val result = withResult(FloatArray(16), block)
-            return Matrix44(*result)
+            return Matrix44(result)
         }
-    }
-
-    /**
-     * The constructor parameters are in row-major order.
-     */
-    init {
-        require(mat.size == 16) { "Expected 16 elements, got ${mat.size}" }
-        this.mat = mat
     }
 }

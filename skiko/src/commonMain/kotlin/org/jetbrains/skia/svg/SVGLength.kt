@@ -8,11 +8,9 @@ class SVGLength(val value: Float, val unit: SVGLengthUnit) {
     companion object {
         internal fun fromInterop(block: InteropScope.(InteropPointer) -> Unit)
             = withResult(IntArray(2), block).let {
-                SVGLength(Float.fromBits(it[0]), it[1])
+                SVGLength(Float.fromBits(it[0]), SVGLengthUnit(it[1]))
             }
     }
-
-    internal constructor(value: Float, unit: Int) : this(value, SVGLengthUnit.entries[unit])
 
     constructor(value: Float) : this(value, SVGLengthUnit.NUMBER) {}
 
@@ -40,6 +38,6 @@ class SVGLength(val value: Float, val unit: SVGLengthUnit) {
     }
 
     fun withUnit(_unit: SVGLengthUnit): SVGLength {
-        return if (this.unit === _unit) this else SVGLength(value, _unit)
+        return if (this.unit == _unit) this else SVGLength(value, _unit)
     }
 }

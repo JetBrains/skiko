@@ -1,18 +1,23 @@
 package org.jetbrains.skia
 
-enum class MipmapMode {
-    /**
-     * ignore mipmap levels, sample from the "base"
-     */
-    NONE,
+import kotlin.jvm.JvmInline
 
-    /**
-     * sample from the nearest level
-     */
-    NEAREST,
+@JvmInline
+value class MipmapMode internal constructor(val ordinal: Int) {
+    companion object {
+        /**
+         * ignore mipmap levels, sample from the "base"
+         */
+        val NONE = MipmapMode(0)
 
-    /**
-     * interpolate between the two nearest levels
-     */
-    LINEAR;
+        /**
+         * sample from the nearest level
+         */
+        val NEAREST = MipmapMode(1)
+
+        /**
+         * interpolate between the two nearest levels
+         */
+        val LINEAR = MipmapMode(2)
+    }
 }

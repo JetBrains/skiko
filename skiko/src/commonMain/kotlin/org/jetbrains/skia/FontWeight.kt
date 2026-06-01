@@ -1,17 +1,23 @@
 package org.jetbrains.skia
 
-interface FontWeight {
-    companion object {
-        const val INVISIBLE = 0
-        const val THIN = 100
-        const val EXTRA_LIGHT = 200
-        const val LIGHT = 300
-        const val NORMAL = 400
-        const val MEDIUM = 500
-        const val SEMI_BOLD = 600
-        const val BOLD = 700
-        const val EXTRA_BOLD = 800
-        const val BLACK = 900
-        const val EXTRA_BLACK = 1000
+import kotlin.jvm.JvmInline
+
+
+@JvmInline
+value class FontWeight(val value: Int) {
+    operator fun compareTo(other: FontWeight): Int = value.compareTo(other.value)
+
+     companion object {
+        val INVISIBLE = FontWeight(0)
+        val THIN = FontWeight(100)
+        val EXTRA_LIGHT = FontWeight(200)
+        val LIGHT = FontWeight(300)
+        val NORMAL = FontWeight(400)
+        val MEDIUM = FontWeight(500)
+        val SEMI_BOLD = FontWeight(600)
+        val BOLD = FontWeight(700)
+        val EXTRA_BOLD = FontWeight(800)
+        val BLACK = FontWeight(900)
+        val EXTRA_BLACK = FontWeight(1000)
     }
 }
