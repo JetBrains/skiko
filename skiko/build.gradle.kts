@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import tasks.configuration.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import dsl.SkikoDependencyScope
 
 plugins {
     kotlin("multiplatform")
@@ -34,22 +35,166 @@ val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
 val targetOs = hostOs
 val targetArch = skiko.targetArch
+val skikoArtifacts = SkikoArtifacts()
+
+val coreDependencies: SkikoDependencyScope.() -> Unit = {
+    targets {
+        all {
+            staticSkiaLibs(
+                "skia",
+                "skia_ganesh_ext",
+                "svg",
+                "skparagraph",
+                "skshaper",
+                "skunicode_core",
+                "skunicode_icu",
+                "icu",
+                "harfbuzz",
+                "skresources",
+                "png",
+                "jpeg",
+                "webp",
+                "webp_sse41",
+                "zlib",
+                "expat",
+                "skottie",
+                "sksg",
+                "jsonreader"
+            )
+        }
+        jvm {
+            macos {
+                staticSkiaLibs("piex", "dng_sdk")
+                linkFlags("-lobjc")
+                frameworks(
+                    "AppKit",
+                    "CoreFoundation",
+                    "CoreGraphics",
+                    "CoreServices",
+                    "CoreText",
+                    "Foundation",
+                    "IOKit",
+                    "Metal",
+                    "OpenGL",
+                    "QuartzCore",  // for CoreAnimation
+                )
+            }
+
+            windows {
+                    staticSkiaLibs("d3d12allocator")
+            }
+
+            linux {
+                // Hack to fix problem with linker not always finding certain declarations.
+                directStaticSkiaLibs(
+                    "sksg",
+                    "skia",
+                    "skia_ganesh_ext",
+                    "skunicode_core",
+                    "skunicode_icu",
+                    "skshaper",
+                    "jsonreader"
+                )
+                dynamicSystemLibs("GL", "X11", "fontconfig")
+                arm64 { dynamicSystemLibs("EGL") }
+            }
+
+            android {
+                // Hack to fix problem with linker not always finding certain declarations.
+                directStaticSkiaLibs("skia", "skia_ganesh_ext")
+                dynamicSystemLibs("GLESv3", "EGL")
+            }
+        }
+        native {
+            staticSkiaLibs(
+                "piex",
+                "dng_sdk",
+            )
+
+            linux {
+                // Hack to fix problem with linker not always finding certain declarations.
+                directStaticSkiaLibs(
+                    "skottie",
+                    "jsonreader",
+                    "sksg",
+                    "skshaper",
+                    "skunicode_core",
+                    "skunicode_icu",
+                    "skia",
+                    "skia_ganesh_ext"
+                )
+                dynamicSystemLibs("fontconfig", "GL")
+                arm64 { dynamicSystemLibs("EGL") }
+            }
+
+            macos {
+                frameworks(
+                    "Metal",
+                    "CoreGraphics",
+                    "CoreText",
+                    "CoreServices",
+                )
+            }
+
+            ios {
+                frameworks(
+                    "Metal",
+                    "CoreGraphics",
+                    "CoreText",
+                    "UIKit",
+                )
+            }
+
+            tvos {
+                frameworks(
+                    "Metal",
+                    "CoreGraphics",
+                    "CoreText",
+                    "UIKit",
+                )
+            }
+        }
+        wasm {
+            staticSkiaLibs(
+                "bentleyottmann",
+                "freetype2",
+                "jpeg12",
+                "jpeg16",
+                "wuffs",
+                "skcms",
+                "brotli",
+            )
+            linkFlags(
+                "-l", "GL",
+                "-s", "MAX_WEBGL_VERSION=2",
+                "-s", "MIN_WEBGL_VERSION=2",
+                "-s", "MODULARIZE=1",
+                "-s", "EXPORT_NAME=loadSkikoWASM",
+                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
+                "--bind",
+            )
+        }
+    }
+}
 
 val skikoProjectContext = SkikoProjectContext(
     project = project,
     skiko = skiko,
     kotlin = kotlin,
+    kind = SkikoModuleKind.CORE,
+    artifacts = skikoArtifacts,
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
     },
     createChecksumsTask = { targetOs: OS, targetArch: Arch, fileToChecksum: Provider<File> ->
         createChecksumsTask(targetOs, targetArch, fileToChecksum)
     },
-    additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko)
+    additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko, skikoArtifacts),
+    configureDependencies = coreDependencies
 )
 
 allprojects {
-    group = SkikoArtifacts.groupId
+    group = SkikoArtifacts.DEFAULT_GROUP_ID
     version = skiko.deployVersion
 }
 

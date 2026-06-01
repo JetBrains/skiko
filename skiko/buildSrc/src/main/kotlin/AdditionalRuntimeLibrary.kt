@@ -1,4 +1,3 @@
-import SkikoArtifacts.jvmAdditionalRuntimeArtifactIdFor
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
@@ -27,6 +26,7 @@ fun Project.registerAdditionalRuntimeLibrary(
     targetOs: OS,
     targetArch: Arch,
     skikoProperties: SkikoProperties,
+    artifacts: SkikoArtifacts,
     name: String,
     archiveUrl: String,
     filesToInclude: List<String>,
@@ -70,7 +70,7 @@ fun Project.registerAdditionalRuntimeLibrary(
         group = visibleName
         dependsOn(unzipTask)
         dependsOn(checksumTask)
-        archiveBaseName.set("skiko-$name")
+        archiveBaseName.set("${artifacts.artifactIdPrefix}-$name")
         archiveClassifier.set(targetId)
         from(unzipTask)
         from(checksumTask)
@@ -85,8 +85,8 @@ fun Project.registerAdditionalRuntimeLibrary(
             pomNameForPublication: MutableMap<String, String>
         ) {
             container.create("skikoJvmRuntime$taskSuffix", MavenPublication::class.java) {
-                pomNameForPublication[this.name] = "Skiko $visibleName for ${targetOs.id} ${targetArch.id}"
-                artifactId = jvmAdditionalRuntimeArtifactIdFor(name, targetOs, targetArch)
+                pomNameForPublication[this.name] = "${artifacts.displayName} $visibleName for ${targetOs.id} ${targetArch.id}"
+                artifactId = artifacts.jvmAdditionalRuntimeArtifactIdFor(name, targetOs, targetArch)
                 afterEvaluate {
                     artifact(jarTask.map { it.archiveFile.get() })
                     artifact(emptySourcesJar)

@@ -45,9 +45,6 @@ fun Task.projectDirs(vararg relativePaths: String): List<Directory> {
     return relativePaths.map { path -> projectDir.dir(path) }
 }
 
-fun listOfFrameworks(vararg frameworks: String): List<String> =
-    frameworks.toList().addElementBeforeEach("-framework")
-
 fun mutableListOfLinkerOptions(options: Collection<String>): MutableList<String> =
     options.addElementBeforeEach("-linker-option")
 
