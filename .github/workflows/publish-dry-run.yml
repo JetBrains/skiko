@@ -62,16 +62,23 @@ jobs:
         name: 'Setup Prerequisites'
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Publish KMP and AWT Maven Local'
+        name: 'Publish KMP Maven Local'
         with:
           image_name: linux-compat
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Pskiko.awt.enabled=true \
-              :skiko:publishKotlinMultiplatformPublicationToMavenLocal \
-              :skiko:publishAwtPublicationToMavenLocal \
-              :skiko:publishAwtRuntimeElementsPublicationToMavenLocal
+              :skiko:publishKotlinMultiplatformPublicationToMavenLocal
+
+      - uses: ./.github/actions/docker-skiko-run
+        name:  'Publish AWT Maven Local'
+        with:
+          image_name: linux-compat
+          command: |
+            ./gradlew --no-daemon --stacktrace \
+              -Pskiko.awt.enabled=true \
+              :skiko:publishToMavenLocal
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Native Maven Local'
@@ -116,6 +123,13 @@ jobs:
             :skiko:publishToMavenLocal
 
       - shell: bash
+        name: 'Publish AWT Maven Local'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.awt.enabled=true \
+            :skiko:publishToMavenLocal
+
+      - shell: bash
         name: 'Check AWT Sample'
         run: |
           ./gradlew --no-daemon --stacktrace \
@@ -147,6 +161,13 @@ jobs:
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
              :skiko:publishToMavenLocal
+
+      - shell: bash
+        name: 'Publish AWT Maven Local'
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.awt.enabled=true \
+            :skiko:publishToMavenLocal
 
       - shell: bash
         name: 'Check AWT Sample'
