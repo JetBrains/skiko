@@ -5,7 +5,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 buildscript {
     repositories {
         google()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         maven("https://redirector.kotlinlang.org/maven/compose-dev")
     }
 
@@ -17,7 +19,9 @@ buildscript {
 repositories {
     mavenLocal()
     google()
-    mavenCentral()
+    mavenCentral {
+        url = uri("https://cache-redirector.jetbrains.com/maven-central")
+    }
     maven("https://redirector.kotlinlang.org/maven/compose-dev")
 }
 

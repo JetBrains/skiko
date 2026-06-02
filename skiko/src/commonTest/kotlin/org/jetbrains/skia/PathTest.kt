@@ -112,6 +112,14 @@ class PathTest {
     }
 
     @Test
+    fun updateBoundsCacheTest() {
+        val path = PathBuilder().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().detach()
+        val bounds = Rect(0.0f, 0.0f, 40.0f, 40.0f)
+        assertTrue(path.updateBoundsCache() === path)
+        assertCloseEnough(bounds, path.bounds)
+    }
+
+    @Test
     fun rawTest() {
         val pts = arrayOf(Point(0f, 0f), Point(10f, 10f), Point(20f, 0f))
         val verbs = arrayOf(PathVerb.MOVE, PathVerb.LINE, PathVerb.LINE)
@@ -188,5 +196,26 @@ class PathTest {
         assertEquals(2, line?.size)
         assertEquals(p0, line?.get(0))
         assertEquals(p1, line?.get(1))
+    }
+
+    @Test
+    fun closedPathIntersectTest() {
+        val builder1 = PathBuilder()
+            .moveTo(0f, 0f)
+            .lineTo(40f, 40f)
+            .lineTo(40f, 20f)
+            .closePath()
+
+        val builder2 = PathBuilder()
+            .moveTo(0f, 0f)
+            .lineTo(20f, 20f)
+            .lineTo(40f, 20f)
+            .closePath()
+
+        val triangle1 = builder1.detach()
+        val triangle2 = builder2.detach()
+
+        val result = triangle1.intersect(triangle2)
+        assertTrue(result.isNotEmpty())
     }
 }

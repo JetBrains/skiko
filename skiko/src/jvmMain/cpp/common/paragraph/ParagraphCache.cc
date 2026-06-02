@@ -1,5 +1,6 @@
 #include <iostream>
 #include <jni.h>
+#include <memory>
 #include "ParagraphCache.h"
 #include "ParagraphStyle.h"
 

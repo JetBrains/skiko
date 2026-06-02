@@ -1,10 +1,12 @@
 package org.jetbrains.skia.impl
 
 import org.jetbrains.skia.ManagedString
+import org.jetbrains.skiko.InternalSkikoApi
 
 expect class NativePointer
 
-internal expect class InteropPointer
+@InternalSkikoApi
+expect class InteropPointer
 
 expect abstract class Native(ptr: NativePointer) {
     internal var _ptr: NativePointer
@@ -21,7 +23,8 @@ internal expect fun reachabilityBarrier(obj: Any?)
 
 internal fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
 
-internal expect class InteropScope() {
+@InternalSkikoApi
+expect class InteropScope() {
     fun toInterop(string: String?): InteropPointer
 
     fun toInterop(array: ByteArray?): InteropPointer
@@ -181,7 +184,8 @@ internal inline fun withStringReferenceNullableResult(block: () -> NativePointer
 }
 
 
-internal interface ArrayInteropDecoder<T> {
+@InternalSkikoApi
+interface ArrayInteropDecoder<T> {
     fun getArrayElement(array: InteropPointer, index: Int): T
     fun getArraySize(array: InteropPointer): Int
     fun disposeArray(array: InteropPointer)

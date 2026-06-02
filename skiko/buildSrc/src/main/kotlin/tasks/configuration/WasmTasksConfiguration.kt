@@ -76,7 +76,11 @@ fun SkikoProjectContext.declareWasmTasks() {
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
 
-        libFiles = project.fileTree(skiaWasmDir.get()) { include("**/*.a") }
+        libFiles = project.fileTree(skiaWasmDir.get()) {
+            include("**/*.wasm.a")
+            exclude("**/libskia_graphite_ext.wasm.a")
+            exclude("**/libskia_graphite_dawn_ext.wasm.a")
+        }
         objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
             include("**/*.o")
         }

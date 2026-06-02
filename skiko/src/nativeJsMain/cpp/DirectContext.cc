@@ -10,6 +10,7 @@
 
 #ifdef SK_DIRECT3D
 #include "ganesh/d3d/GrD3DBackendContext.h"
+#include "ganesh/d3d/GrD3DDirectContext.h"
 #endif
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
@@ -48,7 +49,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
     backendContext.fAdapter.retain(adapter);
     backendContext.fDevice.retain(device);
     backendContext.fQueue.retain(queue);
-    sk_sp<GrDirectContext> instance = GrDirectContext::MakeDirect3D(backendContext);
+    sk_sp<GrDirectContext> instance = GrDirectContexts::MakeD3D(backendContext);
     return static_cast<KNativePointer>(instance.release());
 #else // SK_DIRECT3D
     return nullptr;

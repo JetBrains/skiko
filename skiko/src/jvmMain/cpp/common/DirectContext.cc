@@ -34,6 +34,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 
 #ifdef SK_DIRECT3D
 #include "ganesh/d3d/GrD3DBackendContext.h"
+#include "ganesh/d3d/GrD3DDirectContext.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeDirect3D
   (JNIEnv* env, jclass jclass, jlong adapterPtr, jlong devicePtr, jlong queuePtr) {
@@ -44,10 +45,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
     backendContext.fAdapter.retain(adapter);
     backendContext.fDevice.retain(device);
     backendContext.fQueue.retain(queue);
-    sk_sp<GrDirectContext> instance = GrDirectContext::MakeDirect3D(backendContext);
+    sk_sp<GrDirectContext> instance = GrDirectContexts::MakeD3D(backendContext);
     return reinterpret_cast<jlong>(instance.release());
 }
-#endif //SK_DIRECT3D 
+#endif //SK_DIRECT3D
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nFlushDefault
   (JNIEnv* env, jclass jclass, jlong ptr) {

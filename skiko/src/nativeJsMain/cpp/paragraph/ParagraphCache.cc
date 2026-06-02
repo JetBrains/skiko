@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include "ParagraphCache.h"
 #include "ParagraphStyle.h"
 using namespace skia::textlayout;

@@ -2,11 +2,12 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.InternalSkikoApi
 
 /**
  * Data holds an immutable data buffer.
  */
-class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
+class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
 
     /**
      * A reference to the underlying memory owner to prevent it from being cleaned by GC until Data instance finalization.
