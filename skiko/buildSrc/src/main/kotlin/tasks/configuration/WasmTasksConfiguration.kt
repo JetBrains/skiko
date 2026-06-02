@@ -77,7 +77,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
-
+        println("QQQ wasm resolvedBinaryInputs.staticArchivePaths " + resolvedBinaryInputs.staticArchivePaths.distinct().joinToString())
         libFiles = project.files(resolvedBinaryInputs.staticArchivePaths.distinct())
         objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
             include("**/*.o")

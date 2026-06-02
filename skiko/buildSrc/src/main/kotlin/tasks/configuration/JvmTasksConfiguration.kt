@@ -234,7 +234,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
     val osFlags: Array<String>
 
     libFiles = project.files((resolvedBinaryInputs.staticArchivePaths).distinct())
-
+    println("QQQ jvm libFiles " + libFiles.joinToString())
     dependsOn(compileTask)
     objectFiles = project.fileTree(compileTask.map { it.outDir.get() }) {
         include("**/*.o")
@@ -253,6 +253,9 @@ fun SkikoProjectContext.createLinkJvmBindings(
             objectFiles += project.fileTree(objcCompileTask.map { it.outDir.get() }) {
                 include("**/*.o")
             }
+
+            println("QQQ jvm MacOS resolvedBinaryInputs.linkFlags " + resolvedBinaryInputs.linkFlags.joinToString())
+            println("QQQ jvm MacOS resolvedBinaryInputs.frameworks " + resolvedBinaryInputs.frameworks.joinToString())
             osFlags = arrayOf(
                 *targetOs.clangFlags,
                 "-arch", if (targetArch == Arch.Arm64) "arm64" else "x86_64",
@@ -281,6 +284,9 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 addAll(resolvedBinaryInputs.directStaticArchivePaths)
                 addAll(resolvedBinaryInputs.linkFlags)
             }.toTypedArray()
+            println("QQQ Linux resolvedBinaryInputs.dynamicLibNames " + resolvedBinaryInputs.dynamicLibNames.map { "-l$it" }.joinToString())
+            println("QQQ Linux resolvedBinaryInputs.directStaticArchivePaths " + resolvedBinaryInputs.directStaticArchivePaths.joinToString())
+            println("QQQ Linux resolvedBinaryInputs.linkFlags " + resolvedBinaryInputs.linkFlags.joinToString())
         }
         OS.Windows -> {
             libDirs.set(windowsSdkPaths.libDirs)
@@ -310,6 +316,8 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
                 addAll(resolvedBinaryInputs.dynamicLibNames.map { "$it.lib" })
                 addAll(resolvedBinaryInputs.linkFlags)
+                println("QQQ Windows resolvedBinaryInputs.dynamicLibNames " + resolvedBinaryInputs.dynamicLibNames.map { "$it.lib" }.joinToString())
+                println("QQQ Windows resolvedBinaryInputs.linkFlags " + resolvedBinaryInputs.linkFlags.joinToString())
             }.toTypedArray()
         }
         OS.Android -> {
@@ -324,6 +332,10 @@ fun SkikoProjectContext.createLinkJvmBindings(
             androidFlags.addAll(resolvedBinaryInputs.directStaticArchivePaths)
             androidFlags.addAll(resolvedBinaryInputs.linkFlags)
             osFlags = androidFlags.toTypedArray()
+            println("QQQ Android resolvedBinaryInputs.dynamicLibNames " + resolvedBinaryInputs.dynamicLibNames.map { "-l$it" }.joinToString())
+            println("QQQ Android resolvedBinaryInputs.directStaticArchivePaths " + resolvedBinaryInputs.directStaticArchivePaths.joinToString())
+            println("QQQ Android resolvedBinaryInputs.linkFlags " + resolvedBinaryInputs.linkFlags.joinToString())
+
             linker.set(project.androidClangFor(targetArch))
         }
         OS.Wasm, OS.IOS, OS.TVOS -> {

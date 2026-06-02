@@ -216,6 +216,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val resolvedBinaryInputs = resolveBinaryInputs(os, arch, TargetEnv.NATIVE, skiaBinDir)
     val nativeArchives = resolvedBinaryInputs.staticArchivePaths.distinct()
+    println("QQQ nativeArchives " + nativeArchives.joinToString())
+
     val allLibraries = if (requiresSymbolPatching) {
         nativeArchives.map { lib ->
             "${patchedLibsDir.absolutePath}/${File(lib).name}"
@@ -226,6 +228,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
 
     val linkerFlags = when (os) {
         OS.MacOS -> {
+            println("QQQ macos resolvedBinaryInputs.frameworks " + resolvedBinaryInputs.frameworks.joinToString())
+            println("QQQ macos resolvedBinaryInputs.linkFlags " + resolvedBinaryInputs.linkFlags.joinToString())
             configureCinterop(cinteropName, os, arch, target, targetString, resolvedBinaryInputs.frameworks)
             mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags)
         }
@@ -234,10 +238,14 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             // https://github.com/JetBrains/compose-multiplatform/issues/3178
             // Important! Removing or renaming cinterop-uikit publication might cause compile error
             // for projects depending on older Compose/Skiko transitively https://youtrack.jetbrains.com/issue/KT-60399
+            println("QQQ ios resolvedBinaryInputs.frameworks " + resolvedBinaryInputs.frameworks.joinToString())
+            println("QQQ ios resolvedBinaryInputs.linkFlags " + resolvedBinaryInputs.linkFlags.joinToString())
             configureCinterop("uikit", os, arch, target, targetString, resolvedBinaryInputs.frameworks)
             mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags)
         }
         OS.TVOS -> {
+            println("QQQ tvos resolvedBinaryInputs.frameworks " + resolvedBinaryInputs.frameworks.joinToString())
+            println("QQQ tvos resolvedBinaryInputs.linkFlags " + resolvedBinaryInputs.linkFlags.joinToString())
             configureCinterop("uikit", os, arch, target, targetString, resolvedBinaryInputs.frameworks)
             mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags)
         }
@@ -246,6 +254,9 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 "-L/usr/lib64",
                 "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
             )
+            println("QQQ tvos resolvedBinaryInputs.directStaticArchivePaths " + resolvedBinaryInputs.directStaticArchivePaths.joinToString())
+            println("QQQ tvos resolvedBinaryInputs.dynamicLibNames " + resolvedBinaryInputs.dynamicLibNames.map { "-l$it" }.joinToString())
+            println("QQQ tvos resolvedBinaryInputs.linkFlags " + resolvedBinaryInputs.linkFlags.joinToString())
             options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
             options.addAll(resolvedBinaryInputs.linkFlags)
