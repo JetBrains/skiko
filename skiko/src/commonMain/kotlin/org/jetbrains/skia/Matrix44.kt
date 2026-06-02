@@ -12,7 +12,7 @@ import kotlin.jvm.JvmInline
  * Skia assumes a right-handed coordinate system:
  * +X goes to the right
  * +Y goes down
- * +Z goes into the screen (away from the viewer)ç
+ * +Z goes into the screen (away from the viewer)
  *
  * @param mat 16 elements in row-major order
  */
