@@ -62,23 +62,26 @@ jobs:
         name: 'Setup Prerequisites'
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Publish KMP Maven Local'
+        name: 'Publish KMP and AWT Maven Local'
         with:
           image_name: linux-compat
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Pskiko.awt.enabled=true \
-              :skiko:publishKotlinMultiplatformPublicationToMavenLocal
+              :skiko:publishKotlinMultiplatformPublicationToMavenLocal \
+              :skiko:publishAwtPublicationToMavenLocal \
+              :skiko:publishAwtRuntimeElementsPublicationToMavenLocal
 
       - uses: ./.github/actions/docker-skiko-run
-        name:  'Publish AWT Maven Local'
+        name:  'Publish AWT Runtime Maven Local'
         with:
           image_name: linux-compat
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.awt.enabled=true \
-              :skiko:publishToMavenLocal
+              :skiko:publishSkikoJvmRuntimeLinuxArm64PublicationToComposeRepoRepository \
+              :skiko:publishSkikoJvmRuntimeLinuxX64PublicationToComposeRepoRepository
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Native Maven Local'
@@ -123,11 +126,12 @@ jobs:
             :skiko:publishToMavenLocal
 
       - shell: bash
-        name: 'Publish AWT Maven Local'
+        name: 'Publish AWT Runtime Maven Local'
         run: |
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.awt.enabled=true \
-            :skiko:publishToMavenLocal
+            :skiko:publishSkikoJvmRuntimeMacosArm64PublicationToComposeRepoRepository \
+            :skiko:publishSkikoJvmRuntimeMacosX64PublicationToComposeRepoRepository
 
       - shell: bash
         name: 'Check AWT Sample'
@@ -163,11 +167,12 @@ jobs:
              :skiko:publishToMavenLocal
 
       - shell: bash
-        name: 'Publish AWT Maven Local'
+        name: 'Publish AWT Runtime Maven Local'
         run: |
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.awt.enabled=true \
-            :skiko:publishToMavenLocal
+            :skiko:publishSkikoJvmRuntimeWindowsArm64PublicationToComposeRepoRepository \
+            :skiko:publishSkikoJvmRuntimeWindowsX64PublicationToComposeRepoRepository
 
       - shell: bash
         name: 'Check AWT Sample'
