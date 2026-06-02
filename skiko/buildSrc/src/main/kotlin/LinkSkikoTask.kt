@@ -56,7 +56,11 @@ abstract class LinkSkikoTask : AbstractSkikoNativeToolTask() {
 
             repeatedArg("-L", values = libDirs.get())
             repeatedArg(values = objectFiles.files)
-            repeatedArg(values = libFiles.files)
+            val resolvedLibFiles = libFiles.files
+            if (buildSuffix.orNull == "jvm") {
+                println("QQQ jvm libFiles " + resolvedLibFiles.joinToString())
+            }
+            repeatedArg(values = resolvedLibFiles)
             rawArgs(flags.get())
         }
 }

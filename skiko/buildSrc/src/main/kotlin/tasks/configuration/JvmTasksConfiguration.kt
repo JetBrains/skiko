@@ -243,7 +243,6 @@ fun SkikoProjectContext.createLinkJvmBindings(
 
         exclude(excludedLibs.map { "$filePrefix$it.$fileExtension" })
     }
-    println("QQQ jvm libFiles " + libFiles.joinToString())
 
     dependsOn(compileTask)
     objectFiles = project.fileTree(compileTask.map { it.outDir.get() }) {
