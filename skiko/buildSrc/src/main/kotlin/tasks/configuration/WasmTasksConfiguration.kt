@@ -81,6 +81,7 @@ fun SkikoProjectContext.declareWasmTasks() {
             exclude("**/libskia_graphite_ext.wasm.a")
             exclude("**/libskia_graphite_dawn_ext.wasm.a")
         }
+        println("QQQ wasm libFiles " + libFiles.joinToString())
         objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
             include("**/*.o")
         }

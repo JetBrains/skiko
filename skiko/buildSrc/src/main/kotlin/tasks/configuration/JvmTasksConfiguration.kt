@@ -243,6 +243,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
 
         exclude(excludedLibs.map { "$filePrefix$it.$fileExtension" })
     }
+    println("QQQ jvm libFiles " + libFiles.joinToString())
 
     dependsOn(compileTask)
     objectFiles = project.fileTree(compileTask.map { it.outDir.get() }) {
@@ -281,6 +282,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-framework", "OpenGL",
                 "-framework", "QuartzCore" // for CoreAnimation
             )
+            println("QQQ jvm MacOS osFlags " + osFlags.joinToString())
         }
         OS.Linux -> {
             osFlags = mutableListOf<String>().apply {
@@ -310,6 +312,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                     add("-lEGL")
                 }
             }.toTypedArray()
+            println("QQQ jvm Linux osFlags " + osFlags.joinToString())
         }
         OS.Windows -> {
             libDirs.set(windowsSdkPaths.libDirs)
@@ -338,6 +341,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 )
                 if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
             }.toTypedArray()
+            println("QQQ jvm Windows osFlags " + osFlags.joinToString())
         }
         OS.Android -> {
             osFlags = arrayOf(
@@ -352,6 +356,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "$skiaBinDir/libskia.a",
                 "$skiaBinDir/libskia_ganesh_ext.a"
             )
+            println("QQQ jvm Android osFlags " + osFlags.joinToString())
             linker.set(project.androidClangFor(targetArch))
         }
         OS.Wasm, OS.IOS, OS.TVOS -> {

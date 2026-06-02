@@ -242,6 +242,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     val requiresSymbolPatching = os == OS.IOS || os == OS.TVOS
     val patchedLibsDir = layout.buildDirectory.dir("nativeBridges/patched/$targetString").get().asFile
 
+    println("QQQ native allLibraries " + skiaStaticLibraries(skiaDir, targetString, buildType).joinToString())
     val allLibraries = if (requiresSymbolPatching) {
         skiaStaticLibraries(skiaDir, targetString, buildType).map { lib ->
             "${patchedLibsDir.absolutePath}/${File(lib).name}"
@@ -254,11 +255,13 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     val linkerFlags = when (os) {
         OS.MacOS -> {
             val macFrameworks = listOfFrameworks("Metal", "CoreGraphics", "CoreText", "CoreServices")
+            println("QQQ macos macFrameworks " + macFrameworks.joinToString())
             configureCinterop("skiko", os, arch, target, targetString, macFrameworks)
             mutableListOfLinkerOptions(macFrameworks)
         }
         OS.IOS -> {
             val iosFrameworks = listOfFrameworks("Metal", "CoreGraphics", "CoreText", "UIKit")
+            println("QQQ ios iosFrameworks " + iosFrameworks.joinToString())
             // list of linker options to be included into klib, which are needed for skiko consumers
             // https://github.com/JetBrains/compose-multiplatform/issues/3178
             // Important! Removing or renaming cinterop-uikit publication might cause compile error
@@ -268,6 +271,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         }
         OS.TVOS -> {
             val tvosFrameworks = listOfFrameworks("Metal", "CoreGraphics", "CoreText", "UIKit")
+            println("QQQ tvos tvosFrameworks " + tvosFrameworks.joinToString())
             configureCinterop("uikit", os, arch, target, targetString, tvosFrameworks)
             mutableListOfLinkerOptions(tvosFrameworks)
         }
@@ -296,6 +300,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
                 options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
             }
+            println("QQQ linux options " + options.joinToString())
             mutableListOfLinkerOptions(options)
         }
         else -> mutableListOf()
