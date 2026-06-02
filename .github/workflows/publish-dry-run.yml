@@ -103,7 +103,7 @@ jobs:
               :SkiaAwtSample:installDist
 
   LinuxArm:
-    name: 'Linux Publish Dry Run'
+    name: 'Linux Arm Publish Dry Run'
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
