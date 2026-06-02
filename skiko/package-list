@@ -2093,9 +2093,7 @@ $dokka.location:org.jetbrains.skia/Matcher/matches/#/PointingToDeclaration/skik
 $dokka.location:org.jetbrains.skia/Matrix22.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-matrix22/-companion/index.html
 $dokka.location:org.jetbrains.skia/Matrix22.Companion/IDENTITY/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix22/-companion/-i-d-e-n-t-i-t-y.html
 $dokka.location:org.jetbrains.skia/Matrix22///PointingToDeclaration/skiko/org.jetbrains.skia/-matrix22/index.html
-$dokka.location:org.jetbrains.skia/Matrix22/Matrix22/#kotlin.FloatArray/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix22/-matrix22.html
-$dokka.location:org.jetbrains.skia/Matrix22/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix22/equals.html
-$dokka.location:org.jetbrains.skia/Matrix22/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix22/hash-code.html
+$dokka.location:org.jetbrains.skia/Matrix22/Matrix22/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix22/-matrix22.html
 $dokka.location:org.jetbrains.skia/Matrix22/mat/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix22/mat.html
 $dokka.location:org.jetbrains.skia/Matrix22/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix22/to-string.html
 $dokka.location:org.jetbrains.skia/Matrix33.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/-companion/index.html
@@ -2108,10 +2106,8 @@ $dokka.location:org.jetbrains.skia/Matrix33.Companion/makeScale/#kotlin.Float/Po
 $dokka.location:org.jetbrains.skia/Matrix33.Companion/makeSkew/#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/-companion/make-skew.html
 $dokka.location:org.jetbrains.skia/Matrix33.Companion/makeTranslate/#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/-companion/make-translate.html
 $dokka.location:org.jetbrains.skia/Matrix33///PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/index.html
-$dokka.location:org.jetbrains.skia/Matrix33/Matrix33/#kotlin.FloatArray/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/-matrix33.html
+$dokka.location:org.jetbrains.skia/Matrix33/Matrix33/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/-matrix33.html
 $dokka.location:org.jetbrains.skia/Matrix33/asMatrix44/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/as-matrix44.html
-$dokka.location:org.jetbrains.skia/Matrix33/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/equals.html
-$dokka.location:org.jetbrains.skia/Matrix33/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/hash-code.html
 $dokka.location:org.jetbrains.skia/Matrix33/makeConcat/#org.jetbrains.skia.Matrix33/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/make-concat.html
 $dokka.location:org.jetbrains.skia/Matrix33/makePreScale/#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/make-pre-scale.html
 $dokka.location:org.jetbrains.skia/Matrix33/mat/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix33/mat.html
@@ -2119,10 +2115,8 @@ $dokka.location:org.jetbrains.skia/Matrix33/toString/#/PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skia/Matrix44.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/-companion/index.html
 $dokka.location:org.jetbrains.skia/Matrix44.Companion/IDENTITY/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/-companion/-i-d-e-n-t-i-t-y.html
 $dokka.location:org.jetbrains.skia/Matrix44///PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/index.html
-$dokka.location:org.jetbrains.skia/Matrix44/Matrix44/#kotlin.FloatArray/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/-matrix44.html
+$dokka.location:org.jetbrains.skia/Matrix44/Matrix44/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/-matrix44.html
 $dokka.location:org.jetbrains.skia/Matrix44/asMatrix33/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/as-matrix33.html
-$dokka.location:org.jetbrains.skia/Matrix44/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/equals.html
-$dokka.location:org.jetbrains.skia/Matrix44/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/hash-code.html
 $dokka.location:org.jetbrains.skia/Matrix44/mat/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/mat.html
 $dokka.location:org.jetbrains.skia/Matrix44/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia/-matrix44/to-string.html
 $dokka.location:org.jetbrains.skia/MipmapMode.LINEAR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-mipmap-mode/-l-i-n-e-a-r/index.html
