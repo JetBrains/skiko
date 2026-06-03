@@ -62,26 +62,15 @@ jobs:
         name: 'Setup Prerequisites'
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Publish KMP and AWT Maven Local'
+        name: 'Publish Maven Local x64'
         with:
           image_name: linux-compat
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Pskiko.awt.enabled=true \
-              :skiko:publishKotlinMultiplatformPublicationToMavenLocal \
-              :skiko:publishAwtPublicationToMavenLocal \
-              :skiko:publishAwtRuntimeElementsPublicationToMavenLocal
-
-      - uses: ./.github/actions/docker-skiko-run
-        name:  'Publish AWT Runtime x64 Maven Local'
-        with:
-          image_name: linux-compat
-          command: |
-            ./gradlew --no-daemon --stacktrace \
-              -Pskiko.awt.enabled=true \
-              :skiko:publishSkikoJvmRuntimeLinuxX64PublicationToMavenLocal \
-              -Pskiko.arch=x64
+              -Pskiko.arch=x64 \
+               :skiko:publishToMavenLocal
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Native Maven Local'
@@ -112,6 +101,7 @@ jobs:
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
+      # We run it on a separate runner because cross-compilation on x64 fails
       - uses: ./.github/actions/docker-skiko-run
         name:  'Publish AWT Runtime Arm64 Maven Local'
         with:
@@ -139,12 +129,15 @@ jobs:
         name: 'Setup Prerequisites'
 
       - shell: bash
-        name: 'Publish Maven Local'
+        name: 'Publish Maven Local arm64'
         run: |
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
+            -Pskiko.awt.enabled=true \
+            -Pskiko.arch=arm64 \
             :skiko:publishToMavenLocal
 
+      # Build x64 separately (arm64 is built in publishToMavenLocal)
       - shell: bash
         name: 'Publish AWT Runtime x64 Maven Local'
         run: |
@@ -152,14 +145,6 @@ jobs:
             -Pskiko.awt.enabled=true \
             :skiko:publishSkikoJvmRuntimeMacosX64PublicationToMavenLocal \
             -Pskiko.arch=x64
-
-      - shell: bash
-        name: 'Publish AWT Runtime Arm64 Maven Local'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            -Pskiko.awt.enabled=true \
-            :skiko:publishSkikoJvmRuntimeMacosArm64PublicationToMavenLocal \
-            -Pskiko.arch=arm64
 
       - shell: bash
         name: 'Check AWT Sample'
@@ -188,20 +173,15 @@ jobs:
         name: 'Setup Prerequisites'
 
       - shell: bash
-        name: 'Publish Maven Local'
+        name: 'Publish Maven Local x64'
         run: |
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
+            -Pskiko.awt.enabled=true \
+            -Pskiko.arch=x64 \
              :skiko:publishToMavenLocal
 
-      - shell: bash
-        name: 'Publish AWT Runtime x64 Maven Local'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            -Pskiko.awt.enabled=true \
-            :skiko:publishSkikoJvmRuntimeWindowsX64PublicationToMavenLocal \
-            -Pskiko.arch=x64
-
+      # Build Arm64 separately (x64 is built in publishToMavenLocal)
       - shell: bash
         name: 'Publish AWT Runtime Arm64 Maven Local'
         run: |
