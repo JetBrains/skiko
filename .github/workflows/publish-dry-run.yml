@@ -137,7 +137,7 @@ jobs:
             -Pskiko.arch=arm64 \
             :skiko:publishToMavenLocal
 
-      # Build Arm64 separately (arm64 is built in publishToMavenLocal)
+      # Build x64 separately (arm64 is built in publishToMavenLocal)
       - shell: bash
         name: 'Publish AWT Runtime x64 Maven Local'
         run: |
