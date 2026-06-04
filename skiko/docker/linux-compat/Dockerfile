@@ -84,7 +84,10 @@ ENV PATH=$DEPOT_TOOLS:$PATH
 RUN git clone 'https://chromium.googlesource.com/chromium/tools/depot_tools.git' $DEPOT_TOOLS
 
 # Install cross-compilation toolchain for ARM64
-:arm64
+# This cross-compilation setup is required because Kotlin/Native doesn't support
+# Linux ARM64 as a HOST platform (only as a target). When cross-compiling from x64 to ARM64,
+# Kotlin/Native's linker needs ARM64 versions of system libraries.
+# See: https://youtrack.jetbrains.com/issue/KT-36871
 ENV ARM_TOOLCHAIN_VERSION=10.3-2021.07
 ENV ARM_TOOLCHAIN_NAME=gcc-arm-${ARM_TOOLCHAIN_VERSION}-x86_64-aarch64-none-linux-gnu
 ENV ARM_TOOLCHAIN_PATH=/opt/arm-gnu-toolchain
@@ -98,21 +101,6 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     ln -s $ARM_TOOLCHAIN_PATH/bin/aarch64-none-linux-gnu-gcc /usr/local/bin/aarch64-linux-gnu-gcc && \
     ln -s $ARM_TOOLCHAIN_PATH/bin/aarch64-none-linux-gnu-ar /usr/local/bin/aarch64-linux-gnu-ar; \
     fi
-
-# Install ARM64 libraries for cross-compilation
-RUN dpkg --add-architecture arm64 && echo \
-        "deb [arch=arm64] http://ports.ubuntu.com/ focal main restricted\n" \
-        "deb [arch=arm64] http://ports.ubuntu.com/ focal-updates main restricted\n" \
-        "deb [arch=arm64] http://ports.ubuntu.com/ focal universe\n" \
-        "deb [arch=arm64] http://ports.ubuntu.com/ focal-updates universe\n" \
-        "deb [arch=arm64] http://ports.ubuntu.com/ focal multiverse\n" \
-        "deb [arch=arm64] http://ports.ubuntu.com/ focal-updates multiverse\n" \
-        "deb [arch=arm64] http://ports.ubuntu.com/ focal-backports main restricted universe multiverse" \
-    | tee /etc/apt/sources.list.d/arm-cross-compile-sources.list && \
-    sed -i -E "s/(deb)\ (http:.+)/\1\ [arch=amd64]\ \2/" /etc/apt/sources.list && \
-    apt update -y && \
-    apt install libfontconfig1-dev:arm64 libglu1-mesa-dev:arm64 libxrandr-dev:arm64 libdbus-1-dev:arm64 -y && \
-    rm -rf /var/lib/apt/lists/*
 
 # Copy development headers to ARM64 sysroot
 ENV ARM_SYSROOT_HEADERS="fontconfig freetype2 GL X11 KHR"
