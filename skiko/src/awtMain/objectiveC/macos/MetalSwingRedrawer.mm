@@ -38,6 +38,12 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMe
         if (oldTexture == nil || oldTexture.width != width || oldTexture.height != height) {
             id <MTLDevice> adapter = (__bridge id <MTLDevice>) (void *) adapterPtr;
             MTLTextureDescriptor *textureDescriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm width:width height:height mipmapped:NO];
+            // Skia renders into this texture as a backend render target, then it
+            // is sampled when blitted back to Graphics2D via the shared texture.
+            // The default usage of a texture2DDescriptor is MTLTextureUsageShaderRead
+            // only, which trips GrMtlGpu::onWrapBackendRenderTarget's render-target
+            // usage assert on a debug Skia.
+            textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
             metalTexture = [adapter newTextureWithDescriptor:textureDescriptor];
         } else {
             metalTexture = oldTexture;
