@@ -84,7 +84,10 @@ ENV PATH=$DEPOT_TOOLS:$PATH
 RUN git clone 'https://chromium.googlesource.com/chromium/tools/depot_tools.git' $DEPOT_TOOLS
 
 # Install cross-compilation toolchain for ARM64
-:arm64
+# This cross-compilation setup is required because Kotlin/Native doesn't support
+# Linux ARM64 as a HOST platform (only as a target). When cross-compiling from x64 to ARM64,
+# Kotlin/Native's linker needs ARM64 versions of system libraries.
+# See: https://youtrack.jetbrains.com/issue/KT-36871
 ENV ARM_TOOLCHAIN_VERSION=10.3-2021.07
 ENV ARM_TOOLCHAIN_NAME=gcc-arm-${ARM_TOOLCHAIN_VERSION}-x86_64-aarch64-none-linux-gnu
 ENV ARM_TOOLCHAIN_PATH=/opt/arm-gnu-toolchain
