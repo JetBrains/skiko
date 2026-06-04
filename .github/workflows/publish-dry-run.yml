@@ -143,8 +143,8 @@ jobs:
         run: |
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.awt.enabled=true \
-            :skiko:publishSkikoJvmRuntimeMacosX64PublicationToMavenLocal \
-            -Pskiko.arch=x64
+            -Pskiko.arch=x64 \
+            :skiko:publishSkikoJvmRuntimeMacosX64PublicationToMavenLocal
 
       - shell: bash
         name: 'Check AWT Sample'
