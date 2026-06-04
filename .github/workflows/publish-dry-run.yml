@@ -109,8 +109,8 @@ jobs:
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.awt.enabled=true \
-              :skiko:publishSkikoJvmRuntimeLinuxArm64PublicationToMavenLocal \
-              -Pskiko.arch=arm64
+              -Pskiko.arch=arm64 \
+              :skiko:publishSkikoJvmRuntimeLinuxArm64PublicationToMavenLocal
 
   macOS:
     name: 'macOS Publish Dry Run'
