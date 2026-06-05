@@ -3,7 +3,8 @@ import org.gradle.api.Project
 fun Project.registerAdditionalLibraries(
     targetOs: OS,
     targetArch: Arch,
-    skikoProperties: SkikoProperties
+    skikoProperties: SkikoProperties,
+    artifacts: SkikoArtifacts,
 ): List<AdditionalRuntimeLibrary> {
     val angleTag = property("dependencies.angle") as String
     return listOfNotNull(
@@ -12,6 +13,7 @@ fun Project.registerAdditionalLibraries(
                 targetOs = targetOs,
                 targetArch = targetArch,
                 skikoProperties = skikoProperties,
+                artifacts = artifacts,
                 name = "angle",
                 archiveUrl = "https://github.com/JetBrains/angle-pack/releases/download/$angleTag/Angle-$angleTag-${targetOs.id}-Release-${targetArch.id}.zip",
                 filesToInclude = listOf(
