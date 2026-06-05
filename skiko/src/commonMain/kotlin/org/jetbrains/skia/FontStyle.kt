@@ -5,7 +5,6 @@ import kotlin.jvm.JvmInline
 @JvmInline
 value class FontStyle internal constructor(val _value: Int) {
     constructor(weight: FontWeight, width: FontWidth, slant: FontSlant) : this(weight.value and 65535 or (width.value and 255 shl 16) or (slant.ordinal shl 24))
-    constructor (weight: Int, width: Int, slant: FontSlant) : this(FontWeight(weight), FontWidth(width), slant)
     inline val weight: FontWeight
         get() = FontWeight(_value and 65535)
 
