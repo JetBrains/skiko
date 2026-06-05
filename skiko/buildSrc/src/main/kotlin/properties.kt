@@ -22,6 +22,9 @@ enum class OS(
     val isMacOs
         get() = this == MacOS
 
+    val isLinux
+        get() = this == Linux
+
     fun idWithSuffix(isUikitSim: Boolean = false): String {
         return id + if (isUikitSim) "Sim" else ""
     }
