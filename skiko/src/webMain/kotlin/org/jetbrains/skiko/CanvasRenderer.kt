@@ -35,6 +35,17 @@ internal abstract class CanvasRenderer(
         initCanvas()
     }
 
+    private val onFrame: (Double) -> Unit = { timestamp: Double ->
+        redrawScheduled = false
+        GL.makeContextCurrent(contextPointer)
+        // `clear` and `resetMatrix` make canvas not accumulate previous effects
+        canvas?.clear(Color.WHITE)
+        canvas?.resetMatrix()
+        drawFrame(timestamp)
+        surface?.flushAndSubmit()
+        context.flush()
+    }
+
     fun initCanvas() {
         disposeCanvas()
 
@@ -74,16 +85,7 @@ internal abstract class CanvasRenderer(
             return
         }
         redrawScheduled = true
-        window.requestAnimationFrame { timestamp ->
-            redrawScheduled = false
-            GL.makeContextCurrent(contextPointer)
-            // `clear` and `resetMatrix` make canvas not accumulate previous effects
-            canvas?.clear(Color.WHITE)
-            canvas?.resetMatrix()
-            drawFrame(timestamp)
-            surface?.flushAndSubmit()
-            context.flush()
-        }
+        window.requestAnimationFrame(onFrame)
     }
 }
 
