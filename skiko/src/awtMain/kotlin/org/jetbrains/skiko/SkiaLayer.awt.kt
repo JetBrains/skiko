@@ -610,7 +610,7 @@ actual open class SkiaLayer internal constructor(
 
         val pictureRecorder = pictureRecorder!!
         val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight).apply {
-            for (component in clipComponents) {
+            clipComponents.fastForEach { component ->
                 cutoutFromClip(component, contentScale)
             }
 
