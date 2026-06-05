@@ -25,7 +25,9 @@ import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import projectDirs
 import registerOrGetSkiaDirProvider
 import registerSkikoTask
+import symbols.HideSkiaSymbolsTask
 import java.io.File
+import kotlin.collections.plus
 
 fun String.withSuffix(isUikitSim: Boolean = false) =
     this + if (isUikitSim) "Sim" else ""
@@ -224,10 +226,33 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         nativeArchives + bridgesLibraryPath
     }
 
+    val hiddenSymbolsFile = layout.buildDirectory.file(
+        "nativeHiddenSymbols/$targetString/${if (os.isLinux) "symbols.map" else "symbols.txt"}"
+    )
+    val hiddenSymbolSources = if (requiresSymbolPatching) {
+        val patchedBaseLibraries = nativeArchives.map { lib -> "${patchedLibsDir.absolutePath}/${File(lib).name}" }
+        val patchedBridgeLibrary = "${patchedLibsDir.absolutePath}/${nativeBridgesLibPrefix}-$targetString.a"
+        patchedBaseLibraries + patchedBridgeLibrary
+    } else {
+        nativeArchives
+    }
+    val hideSkiaSymbols = project.registerSkikoTask<HideSkiaSymbolsTask>(
+        "hideSkiaSymbols".withSuffix(isUikitSim = isUikitSim),
+        os,
+        arch
+    ) {
+        targetOs.set(os)
+        symbolSourceLibraries.from(hiddenSymbolSources.map { File(it) })
+        outputFile.set(hiddenSymbolsFile)
+    }
+
     val linkerFlags = when (os) {
         OS.MacOS -> {
             configureCinterop(cinteropName, os, arch, target, targetString, resolvedBinaryInputs.frameworks)
-            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags)
+            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags + listOf(
+                "-unexported_symbols_list",
+                hiddenSymbolsFile.get().asFile.absolutePath
+            ))
         }
         OS.IOS -> {
             // list of linker options to be included into klib, which are needed for skiko consumers
@@ -235,11 +260,17 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             // Important! Removing or renaming cinterop-uikit publication might cause compile error
             // for projects depending on older Compose/Skiko transitively https://youtrack.jetbrains.com/issue/KT-60399
             configureCinterop("uikit", os, arch, target, targetString, resolvedBinaryInputs.frameworks)
-            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags)
+            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags + listOf(
+                "-unexported_symbols_list",
+                hiddenSymbolsFile.get().asFile.absolutePath
+            ))
         }
         OS.TVOS -> {
             configureCinterop("uikit", os, arch, target, targetString, resolvedBinaryInputs.frameworks)
-            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags)
+            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags + listOf(
+                "-unexported_symbols_list",
+                hiddenSymbolsFile.get().asFile.absolutePath
+            ))
         }
         OS.Linux -> {
             val options = mutableListOf(
@@ -255,6 +286,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
                 options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
             }
+            options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
             mutableListOfLinkerOptions(options)
         }
         else -> mutableListOf()
@@ -320,6 +352,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             dependsOn(unzipper)
             dependsOn(linkTask)
             skiaLibs.set(nativeArchives.map { File(it) })
+            symbolSourceLibs.set(emptyList())
             skikoBridge.set(File(bridgesLibraryPath))
             outputDir.set(patchedLibsDir)
         }
@@ -327,9 +360,14 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         linkTask
     }
 
+    hideSkiaSymbols.configure {
+        dependsOn(unzipper)
+        dependsOn(compilationDependency)
+    }
+
     target.compilations.all {
         compileTaskProvider.configure {
-            dependsOn(compilationDependency)
+            dependsOn(hideSkiaSymbols)
         }
     }
 }
