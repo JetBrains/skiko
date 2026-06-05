@@ -4,32 +4,33 @@ import org.jetbrains.compose.internal.publishing.*
 val skiko = SkikoProperties(project)
 val mavenCentral = MavenCentralProperties(project)
 val GITHUB_REPO = "JetBrains/skiko"
+val skikoArtifacts = SkikoArtifacts()
 
 val skikoArtifactIds: List<String> =
     listOf(
-        SkikoArtifacts.commonArtifactId,
-        SkikoArtifacts.jvmArtifactId,
-        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
-        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
-        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
-        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
-        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
-        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
-        SkikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.X64),
-        SkikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.Arm64),
-        SkikoArtifacts.jsWasmArtifactId,
-        SkikoArtifacts.jsArtifactId,
-        SkikoArtifacts.wasmArtifactId,
-        SkikoArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
-        SkikoArtifacts.nativeArtifactIdFor(OS.Linux, Arch.Arm64),
-        SkikoArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
-        SkikoArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
-        SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
-        SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
-        SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
-        SkikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
-        SkikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
-        SkikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+        skikoArtifacts.commonArtifactId,
+        skikoArtifacts.jvmArtifactId,
+        skikoArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        skikoArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
+        skikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.X64),
+        skikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.Arm64),
+        skikoArtifacts.jsWasmArtifactId,
+        skikoArtifacts.jsArtifactId,
+        skikoArtifacts.wasmArtifactId,
+        skikoArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoArtifacts.nativeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
@@ -94,7 +95,7 @@ fun Project.skikoMavenModules(version: String): Provider<List<ModuleToUpload>> =
         val artifactsDir = layout.buildDirectory.dir("skiko-artifacts").get().asFile
 
         skikoArtifactIds.map { artifactId ->
-            val skikoGroupId = "org.jetbrains.skiko"
+            val skikoGroupId = SkikoArtifacts.DEFAULT_GROUP_ID
             ModuleToUpload(
                 groupId = skikoGroupId,
                 artifactId = artifactId,

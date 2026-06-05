@@ -82,7 +82,7 @@ enum class SkiaBuildType(
     DEBUG(
         id = "Debug",
         flags = arrayOf("-DSK_DEBUG"),
-        clangFlags = arrayOf("-std=c++2a", "-g", "-DSK_TRIVIAL_ABI=[[clang::trivial_abi]]"),
+        clangFlags = arrayOf("-std=c++2a", "-g"),
         winCompilerFlags = arrayOf("/Zi", "/std:c++20"),
         winLinkerFlags = arrayOf("/DEBUG"),
     ),
@@ -270,29 +270,37 @@ object SkikoGradleProperties {
     const val NATIVE_LINUX = "skiko.native.linux.enabled"
 }
 
-object SkikoArtifacts {
-    val groupId = "org.jetbrains.skiko"
+class SkikoArtifacts(
+    val artifactIdPrefix: String = DEFAULT_ARTIFACT_ID_PREFIX,
+    val displayName: String = "Skiko",
+    val pomDescription: String = "Kotlin Skia bindings",
+) {
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
-    val commonArtifactId = "skiko"
-    val jvmArtifactId = "skiko-awt"
-    val jvmRuntimeArtifactId = "skiko-awt-runtime"
+    val commonArtifactId = artifactIdPrefix
+    val jvmArtifactId = "$artifactIdPrefix-awt"
+    val jvmRuntimeArtifactId = "$artifactIdPrefix-awt-runtime"
     // an artifact (klib) for k/js targets
-    val jsArtifactId = "skiko-js"
+    val jsArtifactId = "$artifactIdPrefix-js"
     // an artifact (klib) for k/wasm targets
-    val wasmArtifactId = "skiko-wasm-js"
+    val wasmArtifactId = "$artifactIdPrefix-wasm-js"
     // an artifact with skiko.wasm and supporting js code - jar
-    val jsWasmArtifactId = "skiko-js-wasm-runtime"
+    val jsWasmArtifactId = "$artifactIdPrefix-js-wasm-runtime"
     fun jvmRuntimeArtifactIdFor(os: OS, arch: Arch) =
         if (os == OS.Android)
-            "skiko-android-runtime-${arch.id}"
+            "$artifactIdPrefix-android-runtime-${arch.id}"
         else
-            "skiko-awt-runtime-${targetId(os, arch)}"
+            "$artifactIdPrefix-awt-runtime-${targetId(os, arch)}"
     fun jvmAdditionalRuntimeArtifactIdFor(name: String, os: OS, arch: Arch) =
-        "skiko-awt-runtime-$name-${os.id}-${arch.id}"
-    // Using custom name like skiko-<Os>-<Arch> (with a dash)
+        "$artifactIdPrefix-awt-runtime-$name-${os.id}-${arch.id}"
+    // Using a custom name like skiko-<Os>-<Arch> (with a dash)
     // does not seem possible (at least without adding a dash to a target's tasks),
     // so we're using the default naming pattern instead.
     // See https://youtrack.jetbrains.com/issue/KT-50001.
     fun nativeArtifactIdFor(os: OS, arch: Arch, isUikitSim: Boolean = false) =
-        "skiko-${os.id + if (isUikitSim) "simulator" else ""}${arch.id}"
+        "$artifactIdPrefix-${os.id + if (isUikitSim) "simulator" else ""}${arch.id}"
+
+    companion object {
+        const val DEFAULT_ARTIFACT_ID_PREFIX = "skiko"
+        const val DEFAULT_GROUP_ID = "org.jetbrains.skiko"
+    }
 }
