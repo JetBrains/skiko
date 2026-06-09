@@ -5,6 +5,34 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.RenderException
 
+internal actual fun nMakeVulkanImpl(
+    instancePtr: NativePointer,
+    physicalDevicePtr: NativePointer,
+    devicePtr: NativePointer,
+    queuePtr: NativePointer,
+    graphicsQueueIndex: Int,
+    instanceProcAddr: NativePointer,
+    deviceProcAddr: NativePointer,
+    apiVersion: Int,
+    memoryAllocator: VulkanMemoryAllocator?
+): NativePointer = _nMakeVulkanJvmAllocator(
+    instancePtr, physicalDevicePtr, devicePtr, queuePtr,
+    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion,
+    memoryAllocator
+)
+
+private external fun _nMakeVulkanJvmAllocator(
+    instancePtr: NativePointer,
+    physicalDevicePtr: NativePointer,
+    devicePtr: NativePointer,
+    queuePtr: NativePointer,
+    graphicsQueueIndex: Int,
+    instanceProcAddr: NativePointer,
+    deviceProcAddr: NativePointer,
+    apiVersion: Int,
+    allocator: VulkanMemoryAllocator?
+): NativePointer
+
 /**
  * Creates OpenGL [DirectContext] using the provided interface.
  * This allows usage of different OpenGL interfaces (e.g., EGL).

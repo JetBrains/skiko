@@ -9,6 +9,11 @@
 #include "ganesh/mtl/GrMtlTypes.h"
 #endif
 
+#ifdef SK_VULKAN
+#include "include/gpu/ganesh/vk/GrVkBackendSurface.h"
+#include "include/gpu/ganesh/vk/GrVkTypes.h"
+#endif
+
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     delete rt;
 }
@@ -60,4 +65,28 @@ SKIKO_EXPORT KNativePointer BackendRenderTarget_MakeDirect3D
 #else
     return 0;
 #endif
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nMakeVulkan
+  (KInt width, KInt height, KNativePointer imagePtr, KInt imageTiling, KInt imageLayout, KInt format, KInt imageUsageFlags, KInt sampleCnt, KInt levelCnt) {
+#ifdef SK_VULKAN
+    GrVkImageInfo vkInfo = {};
+    vkInfo.fImage = reinterpret_cast<VkImage>(imagePtr);
+    vkInfo.fImageTiling = static_cast<VkImageTiling>(imageTiling);
+    vkInfo.fImageLayout = static_cast<VkImageLayout>(imageLayout);
+    vkInfo.fFormat = static_cast<VkFormat>(format);
+    vkInfo.fImageUsageFlags = static_cast<VkImageUsageFlags>(imageUsageFlags);
+    vkInfo.fSampleCount = static_cast<uint32_t>(sampleCnt);
+    vkInfo.fLevelCount = static_cast<uint32_t>(levelCnt);
+
+    GrBackendRenderTarget backendRenderTarget = GrBackendRenderTargets::MakeVk(width, height, vkInfo);
+    if (!backendRenderTarget.isValid()) {
+        return nullptr;
+    }
+
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(backendRenderTarget);
+    return instance;
+#else
+    return nullptr;
+#endif // SK_VULKAN
 }
