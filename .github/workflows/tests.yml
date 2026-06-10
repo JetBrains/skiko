@@ -3,6 +3,9 @@ name: Skiko Tests
 on:
   workflow_call: # Allow being called by other workflows
 
+# TODO: Set up Android tests
+# Some tests can fail on Android while passing in other JVM targets.
+# Example: https://github.com/JetBrains/skiko/pull/1211
 jobs:
   macos:
     name: 'macOS'
