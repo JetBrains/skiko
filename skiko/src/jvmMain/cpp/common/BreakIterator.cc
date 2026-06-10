@@ -105,11 +105,11 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGet
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nSetText
-  (JNIEnv* env, jclass jclass, jlong ptr, jcharArray textArr, jint len, jintArray errorCode) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray textArr, jint len, jintArray errorCode) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
 
-    std::vector<jchar>* text = new std::vector<jchar>(len);
-    env->GetCharArrayRegion(textArr, 0, len, text->data());
+    std::vector<jshort>* text = new std::vector<jshort>(len);
+    env->GetShortArrayRegion(textArr, 0, len, text->data());
 
     UErrorCode errorCodes[1] = { U_ZERO_ERROR };
     ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), len, errorCodes);
