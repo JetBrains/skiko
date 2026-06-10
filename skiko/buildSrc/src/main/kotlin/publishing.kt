@@ -330,7 +330,7 @@ private fun SkikoPublishingContext.configureWebPublication() = publications {
 
 private fun SkikoPublishingContext.configureAndroidPublication() = publications {
     if (!project.supportAndroid) return@publications
-    pomNameForPublication["androidRelease"] = "${skikoArtifacts.displayName} Android Runtime"
+    pomNameForPublication["android"] = "${skikoArtifacts.displayName} Android Runtime"
 }
 
 private fun SkikoPublishingContext.configurePomNames() = publications {

@@ -1,7 +1,7 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
 
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.LibraryPlugin
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
@@ -11,12 +11,14 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.gradle.kotlin.dsl.withType
 import tasks.configuration.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import dsl.SkikoDependencyScope
 
 plugins {
     kotlin("multiplatform")
+    id("com.android.kotlin.multiplatform.library") apply false
     org.jetbrains.dokka
     `maven-publish`
     signing
@@ -25,7 +27,7 @@ plugins {
 }
 
 if (supportAndroid) {
-    apply<LibraryPlugin>()
+    apply(plugin = "com.android.kotlin.multiplatform.library")
 }
 
 apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
@@ -229,21 +231,16 @@ kotlin {
     }
 
     if (supportAndroid) {
-        androidTarget("android") {
-            publishLibraryVariants("release")
+        targets.withType<KotlinMultiplatformAndroidLibraryTarget>().configureEach {
+            namespace = "org.jetbrains.skiko"
+            compileSdk = 35
+            minSdk = 24
+            withJava()
+            withHostTest {}
 
-            compilations.all {
-                compileTaskProvider.configure {
-                    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
-                }
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_11)
             }
-
-            // Keep the previously defined attribute that was used to distinguish JVM and android variant
-            attributes {
-                attributes.attribute(Attribute.of("ui", String::class.java), "android")
-            }
-            // TODO: seems incorrect.
-            generateVersion(OS.Android, Arch.Arm64, skiko, "release")
         }
     }
 
@@ -356,6 +353,12 @@ kotlin {
         implementation(libs.coroutines.android)
     }
 
+    if (supportAndroid && supportAwt) {
+        sourceSets.named("androidMain") {
+            dependsOn(sourceSets.getByName("jvmMain"))
+        }
+    }
+
     skikoProjectContext.jvmTestSourceSet?.dependencies {
         implementation(libs.coroutines.test)
         implementation(kotlin("test-junit"))
@@ -398,39 +401,21 @@ if (supportAwt) {
 
 
 if (supportAndroid) {
-    // Android configuration, when available
-    configure<LibraryExtension> {
-        compileSdk = 33
-        namespace = "org.jetbrains.skiko"
-
-        defaultConfig.minSdk = 24
-        defaultConfig.targetSdk = 24
-        defaultConfig.javaCompileOptions
-
-        compileOptions.sourceCompatibility = JavaVersion.VERSION_11
-        compileOptions.targetCompatibility = JavaVersion.VERSION_11
-
-        sourceSets.named("main") {
-            java.srcDirs("src/androidMain/java")
-            res.srcDirs("src/androidMain/res")
-        }
-    }
-
     val os = OS.Android
-    val skikoAndroidJar by project.tasks.registering(Jar::class) {
+    kotlin.targets.getByName("android").generateVersion(os, Arch.Arm64, skiko)
+    val skikoAndroidArtifact by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-android")
-        from(kotlin.androidTarget("android").compilations["release"].output.allOutputs)
+        from(kotlin.targets.getByName("android").compilations.getByName("main").output.allOutputs)
     }
     for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
-        skikoProjectContext.createSkikoJvmJarTask(os, arch, skikoAndroidJar)
+        skikoProjectContext.createSkikoJvmJarTask(os, arch, skikoAndroidArtifact)
     }
-    tasks.matching { name == "publishAndroidReleasePublicationToMavenLocal" }.configureEach {
-        // It needs to be compatible with Gradle 8.1
-        dependsOn(skikoAndroidJar)
-    }
-    tasks.matching { name == "generateMetadataFileForAndroidReleasePublication" }.configureEach {
-        // It needs to be compatible with Gradle 8.1
-        dependsOn(skikoAndroidJar)
+
+    tasks.withType<JavaCompile>().configureEach {
+        if (name.startsWith("compileAndroid") && name.endsWith("JavaWithJavac")) {
+            sourceCompatibility = JavaVersion.VERSION_11.toString()
+            targetCompatibility = JavaVersion.VERSION_11.toString()
+        }
     }
 }
 
@@ -497,12 +482,6 @@ tasks.withType<AbstractTestTask> {
         showStandardStreams = true
         showStackTraces = true
     }
-}
-
-tasks.withType<JavaCompile> {
-    // Workaround to configure Java sources on Android (src/androidMain/java)
-    targetCompatibility = JavaVersion.VERSION_11.toString()
-    sourceCompatibility = JavaVersion.VERSION_11.toString()
 }
 
 project.tasks.withType<KotlinJsCompile>().configureEach {

@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 
 buildscript {
@@ -17,7 +19,6 @@ buildscript {
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
 
 repositories {
@@ -206,31 +207,74 @@ kotlin {
 }
 
 if (hostOs == "macos") {
-    project.tasks.register<Exec>("runIosSim") {
-        val device = "iPhone 11"
-        workingDir = project.buildDir
-        val linkExecutableTaskName = when (host) {
-            "macos-x64" -> "linkReleaseExecutableIosX64"
-            "macos-arm64" -> "linkReleaseExecutableIosSimulatorArm64"
-            else -> throw GradleException("Host OS is not supported")
-        }
-        val binTask = project.tasks.named(linkExecutableTaskName)
+    val iosSimDevice = providers.gradleProperty("skiko.iosSimulatorDevice").orElse("booted")
+    val iosSimAppName = "SkiaMultiplatformSample"
+    val iosSimBundleId = "org.jetbrains.skiko.sample"
+    val iosSimLinkExecutableTaskName = when (host) {
+        "macos-x64" -> throw GradleException("runIosSim is supported only on Apple Silicon hosts (iosSimulatorArm64 target)")
+        "macos-arm64" -> "linkReleaseExecutableIosSimulatorArm64"
+        else -> throw GradleException("Host OS is not supported")
+    }
+
+    val packageIosSimApp = project.tasks.register("packageIosSimApp") {
+        val binTask = project.tasks.named(iosSimLinkExecutableTaskName)
         dependsOn(binTask)
-        commandLine = listOf(
-            "xcrun",
-            "simctl",
-            "spawn",
-            "--standalone",
-            device
-        )
-        argumentProviders.add {
-            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
-            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+        doLast {
+            val executable = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
+                .single { it.name.endsWith(".kexe") }
+
+            val appDir = project.layout.buildDirectory.dir("iosSimulator/${iosSimAppName}.app").get().asFile
+            appDir.mkdirs()
+
+            val targetExecutable = appDir.resolve(iosSimAppName)
+            executable.copyTo(targetExecutable, overwrite = true)
+            targetExecutable.setExecutable(true)
+
+            appDir.resolve("PkgInfo").writeText("APPL????")
+            val plistTemplate = project.file("plists/Ios/Info.plist").readText()
+            appDir.resolve("Info.plist").writeText(
+                plistTemplate
+                    .replace("$(DEVELOPMENT_LANGUAGE)", "en")
+                    .replace("$(EXECUTABLE_NAME)", iosSimAppName)
+                    .replace("$(PRODUCT_BUNDLE_IDENTIFIER)", iosSimBundleId)
+                    .replace("$(PRODUCT_NAME)", iosSimAppName)
+            )
         }
     }
+
+    project.tasks.register("runIosSim") {
+        dependsOn(packageIosSimApp)
+        doLast {
+            fun runCommand(command: List<String>, ignoreFailure: Boolean = false) {
+                val process = ProcessBuilder(command)
+                    .directory(project.projectDir)
+                    .inheritIO()
+                    .start()
+                val exitCode = process.waitFor()
+                if (exitCode != 0 && !ignoreFailure) {
+                    throw GradleException("Command failed ($exitCode): ${command.joinToString(" ")}")
+                }
+            }
+
+            val appDir = project.layout.buildDirectory.dir("iosSimulator/${iosSimAppName}.app").get().asFile.absolutePath
+            val device = iosSimDevice.get()
+            val launchTarget = if (device == "booted") "booted" else device
+
+            if (device != "booted") {
+                runCommand(listOf("xcrun", "simctl", "boot", device), ignoreFailure = true)
+                runCommand(listOf("xcrun", "simctl", "bootstatus", device, "-b"))
+            }
+
+            runCommand(listOf("xcrun", "simctl", "install", launchTarget, appDir))
+            runCommand(listOf("xcrun", "simctl", "launch", "--terminate-running-process", launchTarget, iosSimBundleId))
+        }
+    }
+
     project.tasks.register<Exec>("runNative") {
         workingDir = project.buildDir
-        val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
+        val hostOsCap = hostOs.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        val hostArchCap = hostArch.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        val binTask = project.tasks.named("linkDebugExecutable${hostOsCap}${hostArchCap}")
         dependsOn(binTask)
         // Hacky approach.
         commandLine = listOf("bash", "-c")
@@ -302,7 +346,7 @@ if (hostOs == "macos") {
     val targetBuildDir: String? = System.getenv("TARGET_BUILD_DIR")
     val executablePath: String? = System.getenv("EXECUTABLE_PATH")
     val buildType = System.getenv("CONFIGURATION")?.let {
-        org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.valueOf(it.toUpperCase())
+        org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.valueOf(it.uppercase())
     } ?: org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.DEBUG
 
     val currentTarget = kotlin.targets[target.key] as org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -337,16 +381,6 @@ if (hostOs == "macos") {
             from(kotlinBinary.outputFile) {
                 rename { executablePath }
             }
-        }
-    }
-}
-
-apple {
-    iosApp {
-        productName = "SkikoAppCode"
-        sceneDelegateClass = "SceneDelegate"
-        dependencies {
-            implementation(project(":"))
         }
     }
 }
