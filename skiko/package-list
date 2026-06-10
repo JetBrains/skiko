@@ -3174,10 +3174,6 @@ $dokka.location:org.jetbrains.skiko/SystemTheme/valueOf/#kotlin.String/PointingT
 $dokka.location:org.jetbrains.skiko/SystemTheme/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/values.html
 $dokka.location:org.jetbrains.skiko/WebImport///PointingToDeclaration/skiko/org.jetbrains.skiko/-web-import/index.html
 $dokka.location:org.jetbrains.skiko/WebImport/name/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-web-import/name.html
-$dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener///PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/index.html
-$dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/WorkaroundSimpleOnGestureListener/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/-workaround-simple-on-gesture-listener.html
-$dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/onFling/#android.view.MotionEvent#android.view.MotionEvent#float#float/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/on-fling.html
-$dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/onScroll/#android.view.MotionEvent#android.view.MotionEvent#float#float/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/on-scroll.html
 org.jetbrains.skia
 org.jetbrains.skia.icu
 org.jetbrains.skia.impl
