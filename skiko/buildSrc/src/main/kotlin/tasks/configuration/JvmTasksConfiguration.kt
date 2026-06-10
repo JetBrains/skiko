@@ -253,9 +253,13 @@ fun SkikoProjectContext.configureGenerateSymbolsList(
     project.tasks.register<GenerateSymbolsListTask>("generateSymbolsList$suffix") {
         this.targetOs.set(targetOs)
         this.targetArch.set(targetArch)
-        if (targetOs == OS.Android) {
-            this.androidLlvmNm.set(project.androidLlvmNm())
-        }
+        this.symbolExtractorCommand.set(
+            when (targetOs) {
+                OS.Android -> project.androidLlvmNm().map { listOf(it) }
+                OS.Windows -> project.provider { listOf(windowsSdkPaths.dumpbin.absolutePath) }
+                else -> project.provider { listOf("nm") }
+            }
+        )
         val target = targetId(targetOs, targetArch)
         val maybeSignedDir = project.layout.buildDirectory.dir("maybe-signed-$target")
         outputDir.set(maybeSignedDir)

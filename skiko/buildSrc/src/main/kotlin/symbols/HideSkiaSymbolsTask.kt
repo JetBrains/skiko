@@ -3,6 +3,7 @@ package symbols
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -19,6 +20,9 @@ abstract class HideSkiaSymbolsTask : DefaultTask() {
     @get:Input
     abstract val targetOs: Property<OS>
 
+    @get:Input
+    abstract val symbolExtractorCommand: ListProperty<String>
+
     @get:InputFiles
     abstract val symbolSourceLibraries: ConfigurableFileCollection
 
@@ -31,6 +35,7 @@ abstract class HideSkiaSymbolsTask : DefaultTask() {
         val symbols = SymbolExtractor(
             execOperations = execOperations,
             os = os,
+            command = symbolExtractorCommand.get(),
         ).extract(symbolSourceLibraries.files, SymbolType.DefinedGlobal)
             .filter { !isOrgJetbrainsSymbol(it) }
             .sorted()

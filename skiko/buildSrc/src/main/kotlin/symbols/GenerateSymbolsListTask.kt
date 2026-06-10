@@ -5,6 +5,7 @@ import Arch
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
@@ -21,9 +22,8 @@ abstract class GenerateSymbolsListTask : DefaultTask() {
     @get:Input
     abstract val targetArch: Property<Arch>
 
-    @get:Optional
     @get:Input
-    abstract val androidLlvmNm: Property<String>
+    abstract val symbolExtractorCommand: ListProperty<String>
 
     @get:InputFiles
     abstract val coreObjectFiles: ConfigurableFileCollection
@@ -106,7 +106,7 @@ abstract class GenerateSymbolsListTask : DefaultTask() {
         return SymbolExtractor(
             execOperations = execOperations,
             os = os,
-            androidLlvmNm = if (os == OS.Android) androidLlvmNm.get() else null,
+            command = symbolExtractorCommand.get(),
         ).extract(files, type).toList()
     }
 

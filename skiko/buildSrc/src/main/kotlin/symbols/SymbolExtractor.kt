@@ -8,7 +8,7 @@ import java.io.File
 internal class SymbolExtractor(
     private val execOperations: ExecOperations,
     private val os: OS,
-    private val androidLlvmNm: String? = null,
+    private val command: List<String>,
 ) {
     fun extract(files: Collection<File>, type: SymbolType): Set<String> {
         val actualFiles = files.filter { it.isFile }
@@ -19,14 +19,17 @@ internal class SymbolExtractor(
         return when (os) {
             OS.Linux, OS.Android, OS.MacOS, OS.IOS, OS.TVOS -> {
                 val nmCommand = nmCommand(type)
-                val output = run(nmCommand.executable, nmCommand.args + actualFiles.map { it.absolutePath })
+                val output = run(nmCommand.command, nmCommand.args + actualFiles.map { it.absolutePath })
                 parseNmPosix(output)
                     .filter { it.type == type }
                     .mapTo(mutableSetOf()) { it.name }
             }
 
             OS.Windows -> {
-                val output = run("dumpbin", listOf("/SYMBOLS") + actualFiles.map { it.absolutePath })
+                val output = run(
+                    command,
+                    listOf("/SYMBOLS") + actualFiles.map { it.absolutePath }
+                )
                 parseDumpbinSymbols(output)
                     .filter { it.type == type }
                     .mapTo(mutableSetOf()) { it.name }
@@ -45,23 +48,18 @@ internal class SymbolExtractor(
                 else -> error("nm symbol extraction does not support ${os.name} target")
             }
         }
-        return when (os) {
-            OS.IOS, OS.TVOS -> Command("xcrun", listOf("nm") + args)
-            OS.Android -> Command(
-                androidLlvmNm ?: error("androidLlvmNm is required for Android symbol extraction"),
-                args
-            )
-            OS.Linux, OS.MacOS -> Command("nm", args)
-            else -> error("nm symbol extraction does not support ${os.name} target")
-        }
+        return Command(command, args)
     }
 
-    private fun run(executable: String, args: List<String>): String {
+    private fun run(command: List<String>, args: List<String>): String {
+        require(command.isNotEmpty()) { "Symbol extractor command must not be empty" }
+        val executable = command.first()
+        val allArgs = command.drop(1) + args
         val stdout = ByteArrayOutputStream()
         val stderr = ByteArrayOutputStream()
         val result = execOperations.exec {
             this.executable = executable
-            this.args = args
+            this.args = allArgs
             standardOutput = stdout
             errorOutput = stderr
             isIgnoreExitValue = true
@@ -69,7 +67,7 @@ internal class SymbolExtractor(
         if (result.exitValue != 0) {
             error(
                 """
-                Command failed with exit code ${result.exitValue}: $executable ${args.joinToString(" ")}
+                Command failed with exit code ${result.exitValue}: $executable ${allArgs.joinToString(" ")}
                 stderr:
                 $stderr
                 """.trimIndent()
@@ -78,5 +76,5 @@ internal class SymbolExtractor(
         return stdout.toString()
     }
 
-    private data class Command(val executable: String, val args: List<String>)
+    private data class Command(val command: List<String>, val args: List<String>)
 }

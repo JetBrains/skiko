@@ -242,6 +242,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         arch
     ) {
         targetOs.set(os)
+        symbolExtractorCommand.set(if (os == OS.IOS || os == OS.TVOS) listOf("xcrun", "nm") else listOf("nm"))
         symbolSourceLibraries.from(hiddenSymbolSources.map { File(it) })
         outputFile.set(hiddenSymbolsFile)
     }
