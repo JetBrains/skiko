@@ -28,6 +28,15 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
     @get:InputFiles
     abstract val skiaLibs: ListProperty<File>
 
+    /**
+     * Additional static libraries whose public symbols must be present in the
+     * rename map, but which should not be copied into [outputDir].
+     *
+     * We use it in extension modules so that skia core symbols will be also patched.
+     */
+    @get:InputFiles
+    abstract val symbolSourceLibs: ListProperty<File>
+
     /** Path to the skiko C++ native-bridges static library (.a). */
     @get:InputFile
     abstract val skikoBridge: Property<File>
@@ -43,6 +52,7 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
         outDir.mkdirs()
 
         val skiaLibFiles = skiaLibs.get()
+        val symbolSourceLibFiles = symbolSourceLibs.get()
         val bridgeFile = skikoBridge.get()
         val allLibs = skiaLibFiles + bridgeFile
 
@@ -53,12 +63,12 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
         //    renamed a second time.
         logger.lifecycle("Extracting public symbols from Skia libraries …")
         val allSymbols = mutableSetOf<String>()
-        for (lib in skiaLibFiles) {
+        for (lib in symbolSourceLibFiles + skiaLibFiles) {
             val syms = extractGlobalDefinedSymbols(lib)
             val newSyms = syms.filterTo(mutableSetOf()) { !it.endsWith("_skiko") }
             logger.lifecycle(
                 "  ${lib.name.padEnd(40)}  ${"%6d".format(newSyms.size)} symbols " +
-                    "(${syms.size - newSyms.size} already-renamed skipped)"
+                        "(${syms.size - newSyms.size} already-renamed skipped)"
             )
             allSymbols.addAll(newSyms)
         }
@@ -83,7 +93,7 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
         allSymbols.addAll(bridgeCxxSyms)
         logger.lifecycle(
             "  ${"bridge (C++ only)".padEnd(40)}  ${"%6d".format(bridgeCxxSyms.size)} symbols " +
-                "(${newInBridge.size} not already covered by Skia libs)"
+                    "(${newInBridge.size} not already covered by Skia libs)"
         )
 
         // 2. Write redefine-syms.txt (llvm-objcopy --redefine-syms format)

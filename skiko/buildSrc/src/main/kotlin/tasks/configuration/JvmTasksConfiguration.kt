@@ -25,11 +25,14 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
+import org.gradle.kotlin.dsl.register
 import projectDirs
 import registerOrGetSkiaDirProvider
 import registerSkikoTask
 import runPkgConfig
+import symbols.GenerateSymbolsListTask
 import targetId
 import java.io.File
 
@@ -144,18 +147,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
 fun Provider<String>.orEmpty(): Provider<String> =
     orElse("")
 
-fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<String> {
-    val androidArch = when (targetArch) {
-        Arch.Arm64 -> "aarch64"
-        Arch.X64 -> "x86_64"
-        else -> throw GradleException("unsupported $targetArch")
-    }
-    val hostOsArch = when (hostOs) {
-        OS.MacOS -> "darwin-x86_64"
-        OS.Linux -> "linux-x86_64"
-        OS.Windows -> "windows-x86_64"
-        else -> throw GradleException("unsupported $hostOs")
-    }
+fun Project.androidNdkPath(): Provider<String> {
     val ndkPathProvider = project.providers
         .environmentVariable("ANDROID_NDK_HOME")
         .orEmpty()
@@ -171,12 +163,43 @@ fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<
                 "$androidHome/$ndkVersion"
             }
         }
-    return ndkPathProvider.map { ndkPath ->
+    return ndkPathProvider
+}
+
+fun Project.androidLlvmBinPath(): Provider<String> {
+    val hostOsArch = when (hostOs) {
+        OS.MacOS -> "darwin-x86_64"
+        OS.Linux -> "linux-x86_64"
+        OS.Windows -> "windows-x86_64"
+        else -> throw GradleException("unsupported $hostOs")
+    }
+    return androidNdkPath().map { ndkPath ->
+        "$ndkPath/toolchains/llvm/prebuilt/$hostOsArch/bin"
+    }
+}
+
+fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<String> {
+    val androidArch = when (targetArch) {
+        Arch.Arm64 -> "aarch64"
+        Arch.X64 -> "x86_64"
+        else -> throw GradleException("unsupported $targetArch")
+    }
+    return androidLlvmBinPath().map { llvmBinPath ->
         var clangBinaryName = "$androidArch-linux-android$version-clang++"
         if (hostOs.isWindows) {
             clangBinaryName += ".cmd"
         }
-        "$ndkPath/toolchains/llvm/prebuilt/$hostOsArch/bin/$clangBinaryName"
+        "$llvmBinPath/$clangBinaryName"
+    }
+}
+
+fun Project.androidLlvmNm(): Provider<String> {
+    return androidLlvmBinPath().map { llvmBinPath ->
+        var nmBinaryName = "llvm-nm"
+        if (hostOs.isWindows) {
+            nmBinaryName += ".exe"
+        }
+        "$llvmBinPath/$nmBinaryName"
     }
 }
 
@@ -219,6 +242,49 @@ fun SkikoProjectContext.createObjcCompileTask(
     )
 }
 
+fun SkikoProjectContext.configureGenerateSymbolsList(
+    targetOs: OS,
+    targetArch: Arch,
+    skiaJvmBindingsDir: Provider<File>,
+    coreCompile: TaskProvider<CompileSkikoCppTask>,
+    coreObjcCompile: TaskProvider<CompileSkikoObjCTask>?
+) {
+    val suffix = joinToTitleCamelCase(targetOs.id, targetArch.id)
+    project.tasks.register<GenerateSymbolsListTask>("generateSymbolsList$suffix") {
+        this.targetOs.set(targetOs)
+        this.targetArch.set(targetArch)
+        this.symbolExtractorCommand.set(
+            when (targetOs) {
+                OS.Android -> project.androidLlvmNm().map { listOf(it) }
+                OS.Windows -> project.provider { listOf(windowsSdkPaths.dumpbin.absolutePath) }
+                else -> project.provider { listOf("nm") }
+            }
+        )
+        val target = targetId(targetOs, targetArch)
+        val maybeSignedDir = project.layout.buildDirectory.dir("maybe-signed-$target")
+        outputDir.set(maybeSignedDir)
+
+        dependsOn(coreCompile)
+        coreObjectFiles.from(coreCompile.map {
+            it.outDir.get().asFile.walk().filter { it.name.endsWith(".o") || it.name.endsWith(".obj") }.toList()
+        })
+        if (coreObjcCompile != null) {
+            dependsOn(coreObjcCompile)
+            coreObjectFiles.from(coreObjcCompile.map {
+                it.outDir.get().asFile.walk().filter { it.name.endsWith(".o") }.toList()
+            })
+        }
+
+        val skiaBinSubdir = "out/${buildType.id}-$target"
+        val skiaBinDirProvider = skiaJvmBindingsDir.map { it.resolve(skiaBinSubdir) }
+        val skiaBinDir = skiaBinDirProvider.get().absolutePath
+        val coreBinaryInputs = resolveBinaryInputs(targetOs, targetArch, TargetEnv.JVM, skiaBinDir)
+
+        skiaLibs.from(project.files(coreBinaryInputs.staticArchivePaths + coreBinaryInputs.directStaticArchivePaths))
+
+        moduleLibs.from(project.files(emptyList<File>()))
+    }
+}
 
 fun SkikoProjectContext.createLinkJvmBindings(
     targetOs: OS,
@@ -246,7 +312,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
     buildTargetArch.set(targetArch)
     buildVariant.set(buildType)
     linker.set(linkerForTarget(targetOs, targetArch))
-
+    val maybeSignedDir = project.layout.buildDirectory.dir("maybe-signed-$target").get().asFile
     when (targetOs) {
         OS.MacOS -> {
             dependsOn(objcCompileTask!!)
@@ -331,6 +397,46 @@ fun SkikoProjectContext.createLinkJvmBindings(
         }
     }
     flags.set(listOf(*osFlags))
+
+    flags.addAll(project.provider {
+        val result = mutableListOf<String>()
+        val unexportedSymbols = maybeSignedDir.resolve("symbols_unexported.txt")
+        val exportedSymbols = maybeSignedDir.resolve("symbols_filtered.txt")
+        if (unexportedSymbols.exists()) {
+            when (targetOs) {
+                OS.MacOS -> {
+                    result.add("-Wl,-exported_symbols_list,${exportedSymbols.absolutePath}")
+                }
+
+                OS.Linux, OS.Android -> {
+                    val versionScript = maybeSignedDir.resolve("symbols.map")
+                    if (versionScript.exists()) {
+                        result.add("-Wl,--version-script=${versionScript.absolutePath}")
+                    }
+                    // The version script controls symbol visibility, but it does not make
+                    // static archive members live. Add the kept symbols as undefined roots
+                    // before the explicitly ordered Skia archives so Linux pulls members
+                    // needed by extension modules, without resorting to --whole-archive.
+                    if (exportedSymbols.exists()) {
+                        exportedSymbols.readLines()
+                            .map { it.trim() }
+                            .filter { it.isNotEmpty() }
+                            .forEach { result.add("-Wl,-u,$it") }
+                    }
+                }
+
+                OS.Windows -> {
+                    val defFile = maybeSignedDir.resolve("symbols.def")
+                    if (defFile.exists()) {
+                        result.add("/DEF:${defFile.absolutePath}")
+                    }
+                }
+
+                else -> {}
+            }
+        }
+        result
+    })
 }
 
 private val Arch.darwinSignClientName: String
@@ -420,7 +526,7 @@ fun SkikoProjectContext.createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: Tas
         createDownloadCodeSignClientDarwinTask(os, hostArch)
     }
     val maybeSign = maybeSignOrSealTask(os, arch, linkBindings)
-    val nativeLib = maybeSign.map { it.outputFiles.get().single() }
+    val nativeLib = maybeSign.map { it -> it.outputFiles.get().single { it.name.endsWith(os.dynamicLibExt) } }
     val createChecksums = createChecksumsTask(os, arch, nativeLib)
     val nativeFiles = mutableListOf(
         nativeLib,
@@ -440,7 +546,7 @@ fun SkikoProjectContext.createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: Tas
         val linkBindings2 =
             createLinkJvmBindings(os, altArch, skiaBindingsDir2, compileBindings2, objcCompile2)
         val maybeSign2 = maybeSignOrSealTask(os, altArch, linkBindings2)
-        val nativeLib2 = maybeSign2.map { it.outputFiles.get().single() }
+        val nativeLib2 = maybeSign2.map { it.outputFiles.get().single { f -> f.name.endsWith(os.dynamicLibExt) } }
         val createChecksums2 = createChecksumsTask(os, altArch, nativeLib2)
         nativeFiles.add(nativeLib2)
         nativeFiles.add(createChecksums2.map { it.outputs.files.singleFile })

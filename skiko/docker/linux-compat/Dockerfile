@@ -10,6 +10,7 @@ RUN yum install -y tar xz git wget curl zip unzip gzip && \
     ln -sf /usr/bin/gcc10-gcc /usr/bin/gcc && \
     ln -sf /usr/bin/gcc10-g++ /usr/bin/g++ && \
     ln -sf /usr/bin/gcc10-ar /usr/bin/ar && \
+    ln -sf /usr/bin/gcc10-nm /usr/bin/nm && \
     yum clean all
 
 # Install Xvfb (and GLX module) for headless UI testing
