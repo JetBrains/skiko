@@ -4,6 +4,7 @@ import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withNullableResult
 import org.jetbrains.skia.impl.withResult
+import org.jetbrains.skiko.InternalSkikoApi
 
 class Point(val x: Float, val y: Float) {
 
@@ -65,12 +66,14 @@ class Point(val x: Float, val y: Float) {
             return arr
         }
 
-        internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Point {
+        @InternalSkikoApi
+        fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Point {
             val result = withResult(FloatArray(2), block)
             return Point(result[0], result[1])
         }
 
-        internal fun fromNullableInteropPointer(block: InteropScope.(InteropPointer) -> Boolean): Point? {
+        @InternalSkikoApi
+        fun fromNullableInteropPointer(block: InteropScope.(InteropPointer) -> Boolean): Point? {
             val result = withNullableResult(FloatArray(2), block) ?: return null
             return Point(result[0], result[1])
         }

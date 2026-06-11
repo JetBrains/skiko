@@ -24,7 +24,7 @@ abstract class Logger : RefCnt(_nMake()) {
     init {
         Stats.onNativeCall()
         Stats.onNativeCall()
-        doInit(_ptr)
+        doInit(nativePtr)
     }
 }
 

@@ -6,6 +6,10 @@ import java.lang.ref.Reference
 actual abstract class Native actual constructor(ptr: NativePointer) {
     internal actual var _ptr: NativePointer
 
+    @InternalSkikoApi
+    actual val nativePtr: NativePointer
+        get() = _ptr
+
     actual companion object {
         actual val NullPointer: NativePointer
             get() = 0L
@@ -43,7 +47,8 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
     }
 }
 
-internal actual fun reachabilityBarrier(obj: Any?) {
+@InternalSkikoApi
+actual fun reachabilityBarrier(obj: Any?) {
     Reference.reachabilityFence(obj)
 }
 
@@ -53,7 +58,9 @@ actual typealias NativePointer = Long
 actual typealias InteropPointer = java.lang.Object
 
 internal object theScope: InteropScope()
-internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+
+@InternalSkikoApi
+actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     return theScope.block()
 }
 

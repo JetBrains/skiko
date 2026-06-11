@@ -35,7 +35,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     fun setFontManager(fontMgr: FontMgr?): AnimationBuilder {
         return try {
             Stats.onNativeCall()
-            _nSetFontManager(_ptr, getPtr(fontMgr))
+            _nSetFontManager(nativePtr, getPtr(fontMgr))
             this
         } finally {
             reachabilityBarrier(this)
@@ -50,7 +50,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     fun setLogger(logger: Logger?): AnimationBuilder {
         return try {
             Stats.onNativeCall()
-            _nSetLogger(_ptr, getPtr(logger))
+            _nSetLogger(nativePtr, getPtr(logger))
             this
         } finally {
             reachabilityBarrier(this)
@@ -61,7 +61,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     fun buildFromString(data: String): Animation {
         return try {
             Stats.onNativeCall()
-            val ptr = interopScope { _nBuildFromString(_ptr, toInterop(data)) }
+            val ptr = interopScope { _nBuildFromString(nativePtr, toInterop(data)) }
             require(ptr != NullPointer) { "Failed to create Animation from string: \"$data\"" }
             Animation(ptr)
         } finally {
@@ -73,7 +73,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
         return try {
             Stats.onNativeCall()
             val ptr =
-                _nBuildFromData(_ptr, getPtr(data))
+                _nBuildFromData(nativePtr, getPtr(data))
             require(ptr != NullPointer) { "Failed to create Animation from data" }
             Animation(ptr)
         } finally {

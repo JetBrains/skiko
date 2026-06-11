@@ -123,7 +123,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             Stats.onNativeCall()
             var flags = 0
             for (flag in renderFlags) flags = flags or flag._flag
-            _nRender(_ptr, getPtr(canvas), left, top, right, bottom, flags)
+            _nRender(nativePtr, getPtr(canvas), left, top, right, bottom, flags)
             this
         } finally {
             reachabilityBarrier(this)
@@ -153,7 +153,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     fun seek(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
-            _nSeek(_ptr, t, getPtr(ic))
+            _nSeek(nativePtr, t, getPtr(ic))
             this
         } finally {
             reachabilityBarrier(this)
@@ -193,7 +193,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     fun seekFrame(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
-            _nSeekFrame(_ptr, t, getPtr(ic))
+            _nSeekFrame(nativePtr, t, getPtr(ic))
             this
         } finally {
             reachabilityBarrier(this)
@@ -225,7 +225,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     fun seekFrameTime(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
-            _nSeekFrameTime(_ptr, t, getPtr(ic))
+            _nSeekFrameTime(nativePtr, t, getPtr(ic))
             this
         } finally {
             reachabilityBarrier(this)
@@ -239,7 +239,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val duration: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetDuration(_ptr)
+            _nGetDuration(nativePtr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -250,7 +250,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val fPS: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetFPS(_ptr)
+            _nGetFPS(nativePtr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -261,7 +261,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val inPoint: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetInPoint(_ptr)
+            _nGetInPoint(nativePtr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -272,14 +272,14 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val outPoint: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetOutPoint(_ptr)
+            _nGetOutPoint(nativePtr)
         } finally {
             reachabilityBarrier(this)
         }
     val version: String
         get() = try {
             Stats.onNativeCall()
-            withStringReferenceResult { _nGetVersion(_ptr) }
+            withStringReferenceResult { _nGetVersion(nativePtr) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -288,7 +288,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val size: Point
         get() {
             if (_size == null) {
-                _size = Point.fromInteropPointer { _nGetSize(_ptr, it) }
+                _size = Point.fromInteropPointer { _nGetSize(nativePtr, it) }
             }
             return _size!!
         }
