@@ -10,6 +10,8 @@ expect class InteropPointer
 
 expect abstract class Native(ptr: NativePointer) {
     internal var _ptr: NativePointer
+    @InternalSkikoApi
+    val nativePtr: NativePointer
     internal open fun nativeEquals(other: Native?): Boolean
 
     companion object {
@@ -19,9 +21,11 @@ expect abstract class Native(ptr: NativePointer) {
     override fun toString(): String
 }
 
-internal expect fun reachabilityBarrier(obj: Any?)
+@InternalSkikoApi
+expect fun reachabilityBarrier(obj: Any?)
 
-internal fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
+@InternalSkikoApi
+fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
 
 @InternalSkikoApi
 expect class InteropScope() {
@@ -77,7 +81,8 @@ expect class InteropScope() {
     fun release()
 }
 
-internal expect inline fun <T> interopScope(block: InteropScope.() -> T): T
+@InternalSkikoApi
+expect inline fun <T> interopScope(block: InteropScope.() -> T): T
 
 internal inline fun withResult(result: ByteArray, block: InteropScope.(InteropPointer) -> Unit): ByteArray = interopScope {
     val handle = toInteropForResult(result)
@@ -170,12 +175,14 @@ internal inline fun withStringResult(pointer: NativePointer): String {
  * It is caller responsibility to destroy underlying SkString. Use it if pointer
  * is received from reference (SkString&)
  */
-internal inline fun withStringReferenceResult(block: () -> NativePointer): String {
+@InternalSkikoApi
+fun withStringReferenceResult(block: () -> NativePointer): String {
     val string = ManagedString(block(), false)
     return string.toString()
 }
 
-internal inline fun withStringReferenceNullableResult(block: () -> NativePointer): String? {
+@InternalSkikoApi
+fun withStringReferenceNullableResult(block: () -> NativePointer): String? {
     val ptr = block()
     if (ptr == Native.NullPointer) return null
 

@@ -9,6 +9,10 @@ import kotlin.native.internal.NativePtr
 actual abstract class Native actual constructor(ptr: NativePointer) {
     internal actual var _ptr: NativePointer
 
+    @InternalSkikoApi
+    actual val nativePtr: NativePointer
+        get() = _ptr
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (null == other) return false
@@ -54,11 +58,13 @@ actual typealias NativePointer = NativePtr
 @InternalSkikoApi
 actual typealias InteropPointer = NativePtr
 
-internal actual fun reachabilityBarrier(obj: Any?) {
+@InternalSkikoApi
+actual fun reachabilityBarrier(obj: Any?) {
     // TODO: implement native barrier
 }
 
-internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+@InternalSkikoApi
+actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     val scope = InteropScope()
     try {
         return scope.block()

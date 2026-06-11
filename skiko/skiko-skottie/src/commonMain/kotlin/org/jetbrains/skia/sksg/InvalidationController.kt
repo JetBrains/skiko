@@ -28,7 +28,7 @@ class InvalidationController internal constructor(ptr: NativePointer) : Managed(
         interopScope {
             val mat = matrix?.mat ?: Matrix33.IDENTITY.mat
             InvalidationController_nInvalidate(
-                _ptr,
+                nativePtr,
                 left,
                 top,
                 right,
@@ -42,7 +42,7 @@ class InvalidationController internal constructor(ptr: NativePointer) : Managed(
     val bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            Rect.fromInteropPointer { InvalidationController_nGetBounds(_ptr, it) }
+            Rect.fromInteropPointer { InvalidationController_nGetBounds(nativePtr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -50,7 +50,7 @@ class InvalidationController internal constructor(ptr: NativePointer) : Managed(
     fun reset(): InvalidationController {
         Stats.onNativeCall()
 
-        InvalidationController_nReset(_ptr)
+        InvalidationController_nReset(nativePtr)
         return this
     }
 }
