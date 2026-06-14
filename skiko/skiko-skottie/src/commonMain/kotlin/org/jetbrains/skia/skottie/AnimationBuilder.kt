@@ -4,7 +4,6 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.impl.*
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -13,10 +12,6 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
             for (flag in builderFlags) flags = flags or flag._flag
             return flags
         }
-
-        init {
-            staticLoad()
-        }
     }
 
     private object _FinalizerHolder {
@@ -24,7 +19,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     }
 
     constructor() : this(*emptyArray<AnimationBuilderFlag>()) {}
-    constructor(vararg builderFlags: AnimationBuilderFlag) : this(AnimationBuilder_nMake(_flagsToInt(*builderFlags))) {
+    constructor(vararg builderFlags: AnimationBuilderFlag) : this(makeAnimationBuilder(_flagsToInt(*builderFlags))) {
         Stats.onNativeCall()
     }
 
@@ -81,6 +76,11 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
             reachabilityBarrier(this)
         }
     }
+}
+
+private fun makeAnimationBuilder(flags: Int): NativePointer {
+    SkottieLibrary.load()
+    return AnimationBuilder_nMake(flags)
 }
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
