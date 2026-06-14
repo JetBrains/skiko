@@ -1,6 +1,6 @@
 #pragma once
 #include <jni.h>
-#include "../interop.hh"
+#include "interop.hh"
 
 namespace skija {
     namespace skottie {

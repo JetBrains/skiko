@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "../interop.hh"
+#include "interop.hh"
 #include "SkStream.h"
 #include "Skottie.h"
 #include "SkFontMgr.h"

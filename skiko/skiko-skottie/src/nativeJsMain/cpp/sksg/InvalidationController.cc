@@ -1,6 +1,5 @@
 #include "SkSGInvalidationController.h"
 #include "common.h"
-#include "../common.h"
 
 using sksg::InvalidationController;
 

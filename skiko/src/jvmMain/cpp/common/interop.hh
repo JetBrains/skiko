@@ -21,6 +21,16 @@
 #include "TextStyle.h"
 #include "mppinterop.h"
 
+#ifdef _WIN32
+#ifdef SKIKO_JVM_BUILDING_CORE
+#define SKIKO_JVM_EXPORT __declspec(dllexport)
+#else
+#define SKIKO_JVM_EXPORT __declspec(dllimport)
+#endif
+#else
+#define SKIKO_JVM_EXPORT __attribute__((visibility("default")))
+#endif
+
 namespace java {
     namespace io {
         namespace OutputStream {
@@ -260,7 +270,7 @@ namespace skija {
         jobject fromSkPoint(JNIEnv* env, const SkPoint& p);
         jobjectArray fromSkPoints(JNIEnv* env, const std::vector<SkPoint>& ps);
 
-        void copyToInterop(JNIEnv* env, const SkPoint& point, jfloatArray pointer);
+        SKIKO_JVM_EXPORT void copyToInterop(JNIEnv* env, const SkPoint& point, jfloatArray pointer);
     }
 
     namespace PaintFilterCanvas {
@@ -285,7 +295,7 @@ namespace skija {
         jobject fromLTRB(JNIEnv* env, float left, float top, float right, float bottom);
         jobject fromSkRect(JNIEnv* env, const SkRect& rect);
 
-        void copyToInterop(JNIEnv* env, const SkRect& rect, jfloatArray pointer);
+        SKIKO_JVM_EXPORT void copyToInterop(JNIEnv* env, const SkRect& rect, jfloatArray pointer);
     }
 
     namespace RRect {
@@ -353,13 +363,13 @@ namespace kotlin {
     void onUnload(JNIEnv* env);
 }
 
-std::unique_ptr<SkMatrix> skMatrix(JNIEnv* env, jfloatArray arr);
+SKIKO_JVM_EXPORT std::unique_ptr<SkMatrix> skMatrix(JNIEnv* env, jfloatArray arr);
 std::unique_ptr<SkM44> skM44(JNIEnv* env, jfloatArray arr);
 
-SkString skString(JNIEnv* env, jstring str);
-jstring javaString(JNIEnv* env, const SkString& str);
-jstring javaString(JNIEnv* env, const char* chars, size_t len);
-jstring javaString(JNIEnv* env, const char* chars);
+SKIKO_JVM_EXPORT SkString skString(JNIEnv* env, jstring str);
+SKIKO_JVM_EXPORT jstring javaString(JNIEnv* env, const SkString& str);
+SKIKO_JVM_EXPORT jstring javaString(JNIEnv* env, const char* chars, size_t len);
+SKIKO_JVM_EXPORT jstring javaString(JNIEnv* env, const char* chars);
 
 jobject javaFloat(JNIEnv* env, SkScalar val);
 jlong packTwoInts(int32_t a, int32_t b);
