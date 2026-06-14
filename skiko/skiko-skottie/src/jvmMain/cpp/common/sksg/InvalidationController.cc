@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "../interop.hh"
+#include "interop.hh"
 #include "SkSGInvalidationController.h"
 
 using namespace sksg;
