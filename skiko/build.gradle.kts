@@ -59,9 +59,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "webp_sse41",
                 "zlib",
                 "expat",
-                "skottie",
-                "sksg",
-                "jsonreader"
             )
         }
         jvm {
@@ -95,13 +92,11 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             linux {
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs(
-                    "sksg",
                     "skia",
                     "skia_ganesh_ext",
                     "skunicode_core",
                     "skunicode_icu",
                     "skshaper",
-                    "jsonreader"
                 )
                 dynamicSystemLibs("GL", "X11", "fontconfig")
                 arm64 { dynamicSystemLibs("EGL") }
@@ -122,9 +117,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             linux {
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs(
-                    "skottie",
-                    "jsonreader",
-                    "sksg",
                     "skshaper",
                     "skunicode_core",
                     "skunicode_icu",
@@ -475,9 +467,14 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
     val skiaBindingsDir = skikoProjectContext.registerOrGetSkiaDirProvider(os, arch)
     val coreCompile = tasks.named<CompileSkikoCppTask>("compileJvmBindings$suffix")
     val coreObjcCompile = if (os.isMacOs) tasks.named<CompileSkikoObjCTask>("objcCompile$suffix") else null
+    val requiredSymbolFiles = files(
+        skikoProjectContext.jvmRequiredSymbolsFor(os, arch).also {
+            dependencies.add(it.name, project(":skiko-skottie"))
+        }
+    )
 
     skikoProjectContext.configureGenerateSymbolsList(
-        os, arch, skiaBindingsDir, coreCompile, coreObjcCompile
+        os, arch, skiaBindingsDir, coreCompile, coreObjcCompile, requiredSymbolFiles
     )
 
     tasks.named("linkJvmBindings$suffix") {

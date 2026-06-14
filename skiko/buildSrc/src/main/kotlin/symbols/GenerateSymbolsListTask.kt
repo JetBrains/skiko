@@ -29,13 +29,10 @@ abstract class GenerateSymbolsListTask : DefaultTask() {
     abstract val coreObjectFiles: ConfigurableFileCollection
 
     @get:InputFiles
-    abstract val moduleObjectFiles: ConfigurableFileCollection
+    abstract val requiredSymbolFiles: ConfigurableFileCollection
 
     @get:InputFiles
     abstract val skiaLibs: ConfigurableFileCollection
-
-    @get:InputFiles
-    abstract val moduleLibs: ConfigurableFileCollection
 
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
@@ -51,7 +48,7 @@ abstract class GenerateSymbolsListTask : DefaultTask() {
         }
 
         logger.lifecycle(
-            "generateSymbolsList: targetOs=${os.name}, targetArch=${arch.name}, coreObjects=${coreObjectFiles.files.size}, moduleObjects=${moduleObjectFiles.files.size}, skiaLibs=${skiaLibs.files.size}, moduleLibs=${moduleLibs.files.size}"
+            "generateSymbolsList: targetOs=${os.name}, targetArch=${arch.name}, coreObjects=${coreObjectFiles.files.size}, skiaLibs=${skiaLibs.files.size}, requiredSymbolFiles=${requiredSymbolFiles.files.size}"
         )
 
         val coreExports = outDir.resolve("core_exports.txt")
@@ -63,9 +60,12 @@ abstract class GenerateSymbolsListTask : DefaultTask() {
         val coreExportedList = extractSymbols(skiaLibs.files.toList() + coreObjectFiles.files.toList(), true)
         coreExports.writeText(coreExportedList.sorted().joinToString("\n"))
 
-        // 2. all ext imports
-        val extImportedList =
-            extractSymbols(moduleObjectFiles.files.toList() + moduleLibs.files.toList(), false).toMutableList()
+        // 2. all extension imports
+        val extImportedList = requiredSymbolFiles.files
+            .flatMap { it.readLines() }
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .toMutableList()
 
         // Keep JVM/JNI infrastructure globals
         extImportedList.addAll(coreExportedList.filter(::isJniInfrastructureSymbol))
