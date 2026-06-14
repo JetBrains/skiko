@@ -8,6 +8,8 @@ import org.gradle.kotlin.dsl.withType
 import tasks.configuration.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import dsl.SkikoDependencyScope
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform")
@@ -108,6 +110,45 @@ kotlin {
         }
     }
 
+    fun coreNativeSymbolSources(os: OS, arch: Arch, isUikitSim: Boolean) =
+        skikoSkottieProjectContext.nativeSymbolSourcesFor(os, arch, isUikitSim).also {
+            dependencies.add(it.name, coreProject)
+        }
+
+    if (supportNativeMac) {
+        skikoSkottieProjectContext.configureNativeTarget(OS.MacOS, Arch.X64, macosX64(), ::coreNativeSymbolSources)
+        skikoSkottieProjectContext.configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64(), ::coreNativeSymbolSources)
+    }
+
+    if (supportNativeLinux) {
+        skikoSkottieProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64(), ::coreNativeSymbolSources)
+        skikoSkottieProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64(), ::coreNativeSymbolSources)
+    }
+
+    if (supportNativeIosArm64) {
+        skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64(), ::coreNativeSymbolSources)
+    }
+
+    if (supportNativeIosSimulatorArm64) {
+        skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosSimulatorArm64(), ::coreNativeSymbolSources)
+    }
+
+    if (supportNativeIosX64) {
+        skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.X64, iosX64(), ::coreNativeSymbolSources)
+    }
+
+    if (supportNativeTvosArm64) {
+        skikoSkottieProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosArm64(), ::coreNativeSymbolSources)
+    }
+
+    if (supportNativeTvosSimulatorArm64) {
+        skikoSkottieProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosSimulatorArm64(), ::coreNativeSymbolSources)
+    }
+
+    if (supportNativeTvosX64) {
+        skikoSkottieProjectContext.configureNativeTarget(OS.TVOS, Arch.X64, tvosX64(), ::coreNativeSymbolSources)
+    }
+
     sourceSets.commonMain.dependencies {
         implementation(kotlin("stdlib"))
         /*
@@ -155,6 +196,15 @@ kotlin {
         sourceSets.named("androidMain") {
             dependsOn(sourceSets.getByName("jvmMain"))
         }
+    }
+
+    if (supportAnyNative) {
+        sourceSets.all {
+            // Really ugly, see https://youtrack.jetbrains.com/issue/KT-46649 why it is required,
+            // note that setting it per source set still keeps it unset in commonized source sets.
+            languageSettings.optIn("kotlin.native.SymbolNameIsInternal")
+        }
+        configureIOSTestsWithMetal(project)
     }
 }
 
@@ -258,6 +308,9 @@ if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
     configureSignAndPublishDependencies()
 }
 
+tasks.withType<KotlinNativeCompile>().configureEach {
+    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
+}
 
 tasks.withType<KotlinCompilationTask<*>>().configureEach {
     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
