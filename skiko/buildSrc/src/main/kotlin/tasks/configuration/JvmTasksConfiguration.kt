@@ -19,7 +19,12 @@ import linkerForTarget
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.Usage
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
@@ -32,9 +37,159 @@ import projectDirs
 import registerOrGetSkiaDirProvider
 import registerSkikoTask
 import runPkgConfig
+import symbols.GenerateRequiredSymbolsTask
 import symbols.GenerateSymbolsListTask
 import targetId
 import java.io.File
+
+private val jvmTargetOsAttribute =
+    Attribute.of("org.jetbrains.skiko.jvm.target-os", String::class.java)
+
+private val jvmTargetArchAttribute =
+    Attribute.of("org.jetbrains.skiko.jvm.target-arch", String::class.java)
+
+private const val REQUIRED_SYMBOLS_USAGE = "skiko-required-symbols"
+private const val JVM_LINKED_LIBRARY_USAGE = "skiko-jvm-linked-library"
+private const val JVM_RUNTIME_JAR_USAGE = "skiko-jvm-runtime-jar"
+
+private fun Project.configureTargetJvmAttributes(
+    configuration: Configuration,
+    targetOs: OS,
+    targetArch: Arch,
+    usage: String,
+) {
+    configuration.attributes {
+        attribute(jvmTargetOsAttribute, targetOs.name)
+        attribute(jvmTargetArchAttribute, targetArch.name)
+        attribute(
+            Usage.USAGE_ATTRIBUTE,
+            objects.named(Usage::class.java, usage)
+        )
+    }
+}
+
+fun SkikoProjectContext.jvmLinkedLibraryFor(
+    targetOs: OS,
+    targetArch: Arch,
+): Configuration = with(project) {
+    configurations.create("jvmLinkedLibrary${joinToTitleCamelCase(targetOs.id, targetArch.id)}") {
+        isCanBeConsumed = false
+        isCanBeResolved = true
+
+        configureTargetJvmAttributes(this, targetOs, targetArch, JVM_LINKED_LIBRARY_USAGE)
+    }
+}
+
+fun SkikoProjectContext.jvmRequiredSymbolsFor(
+    targetOs: OS,
+    targetArch: Arch,
+): Configuration = with(project) {
+    configurations.create("jvmRequiredSymbols${joinToTitleCamelCase(targetOs.id, targetArch.id)}") {
+        isCanBeConsumed = false
+        isCanBeResolved = true
+
+        configureTargetJvmAttributes(this, targetOs, targetArch, REQUIRED_SYMBOLS_USAGE)
+    }
+}
+
+private fun SkikoProjectContext.configureRequiredSymbolsElements(
+    targetOs: OS,
+    targetArch: Arch,
+    generateRequiredSymbols: TaskProvider<GenerateRequiredSymbolsTask>
+) = with(project) {
+    configurations.create("jvmRequiredSymbolsElements${joinToTitleCamelCase(targetOs.id, targetArch.id)}") {
+        isCanBeConsumed = true
+        isCanBeResolved = false
+
+        configureTargetJvmAttributes(this, targetOs, targetArch, REQUIRED_SYMBOLS_USAGE)
+
+        outgoing.artifact(generateRequiredSymbols.flatMap { it.outputFile })
+    }
+}
+
+private fun SkikoProjectContext.configureJvmLinkedLibraryElements(
+    targetOs: OS,
+    targetArch: Arch,
+    linkTask: TaskProvider<LinkSkikoTask>,
+) = with(project) {
+    configurations.create("jvmLinkedLibraryElements${joinToTitleCamelCase(targetOs.id, targetArch.id)}") {
+        isCanBeConsumed = true
+        isCanBeResolved = false
+
+        configureTargetJvmAttributes(this, targetOs, targetArch, JVM_LINKED_LIBRARY_USAGE)
+        outgoing.artifact(linkTask.flatMap { it.outDir })
+    }
+}
+
+fun SkikoProjectContext.jvmRuntimeJarFor(
+    targetOs: OS,
+    targetArch: Arch,
+): Configuration = with(project) {
+    configurations.create("jvmRuntimeJar${joinToTitleCamelCase(targetOs.id, targetArch.id)}") {
+        isCanBeConsumed = false
+        isCanBeResolved = true
+
+        configureTargetJvmAttributes(this, targetOs, targetArch, JVM_RUNTIME_JAR_USAGE)
+    }
+}
+
+private fun SkikoProjectContext.configureJvmRuntimeJarElements(
+    targetOs: OS,
+    targetArch: Arch,
+    runtimeJar: TaskProvider<Jar>,
+) = with(project) {
+    configurations.create("jvmRuntimeJarElements${joinToTitleCamelCase(targetOs.id, targetArch.id)}") {
+        isCanBeConsumed = true
+        isCanBeResolved = false
+
+        configureTargetJvmAttributes(this, targetOs, targetArch, JVM_RUNTIME_JAR_USAGE)
+        outgoing.artifact(runtimeJar.flatMap { it.archiveFile })
+    }
+}
+
+
+private fun SkikoProjectContext.createGenerateRequiredSymbolsTask(
+    targetOs: OS,
+    targetArch: Arch,
+    skiaJvmBindingsDir: Provider<File>,
+    compileTask: TaskProvider<CompileSkikoCppTask>
+) = project.registerSkikoTask<GenerateRequiredSymbolsTask>("generateRequiredJvmSymbols", targetOs, targetArch) {
+    this.targetOs.set(targetOs)
+    this.symbolExtractorCommand.set(
+        when (targetOs) {
+            OS.Android -> project.androidLlvmNm().map { listOf(it) }
+            OS.Windows -> project.provider { listOf(windowsSdkPaths.dumpbin.absolutePath) }
+            else -> project.provider { listOf("nm") }
+        }
+    )
+
+    dependsOn(compileTask)
+    objectFiles.from(compileTask.map {
+        it.outDir.get().asFile.walk()
+            .filter { file -> file.name.endsWith(".o") || file.name.endsWith(".obj") }
+            .toList()
+    })
+
+    val target = targetId(targetOs, targetArch)
+    val skiaBinSubdir = "out/${buildType.id}-$target"
+    val skiaBinDir = skiaJvmBindingsDir.map { it.resolve(skiaBinSubdir).absolutePath }
+    val binaryInputs = skiaBinDir.map {
+        resolveBinaryInputs(targetOs, targetArch, TargetEnv.JVM, it)
+    }
+    libs.from(project.files(binaryInputs.map { it.staticArchivePaths + it.directStaticArchivePaths }))
+    outputFile.set(project.layout.buildDirectory.file("jvm-required-symbols/$target/required-symbols.txt"))
+}
+
+fun SkikoProjectContext.provideJvmRequiredSymbols(
+    targetOs: OS,
+    targetArch: Arch,
+) {
+    val suffix = joinToTitleCamelCase(targetOs.id, targetArch.id)
+    val skiaJvmBindingsDir = registerOrGetSkiaDirProvider(targetOs, targetArch)
+    val compileTask = project.tasks.named<CompileSkikoCppTask>("compileJvmBindings$suffix")
+    val requiredSymbols = createGenerateRequiredSymbolsTask(targetOs, targetArch, skiaJvmBindingsDir, compileTask)
+    configureRequiredSymbolsElements(targetOs, targetArch, requiredSymbols)
+}
 
 fun SkikoProjectContext.createCompileJvmBindingsTask(
     targetOs: OS,
@@ -70,6 +225,12 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/common"))
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
+    if (kind == SkikoModuleKind.EXTENSION) {
+        val coreProjectDir = project.rootProject.projectDir
+        includeHeadersNonRecursive(coreProjectDir.resolve("src/jvmMain/cpp/common"))
+        includeHeadersNonRecursive(coreProjectDir.resolve("src/jvmMain/cpp/include"))
+        includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
+    }
 
     compiler.set(compilerForTarget(targetOs, targetArch))
 
@@ -247,7 +408,8 @@ fun SkikoProjectContext.configureGenerateSymbolsList(
     targetArch: Arch,
     skiaJvmBindingsDir: Provider<File>,
     coreCompile: TaskProvider<CompileSkikoCppTask>,
-    coreObjcCompile: TaskProvider<CompileSkikoObjCTask>?
+    coreObjcCompile: TaskProvider<CompileSkikoObjCTask>?,
+    requiredSymbolFiles: ConfigurableFileCollection
 ) {
     val suffix = joinToTitleCamelCase(targetOs.id, targetArch.id)
     project.tasks.register<GenerateSymbolsListTask>("generateSymbolsList$suffix") {
@@ -281,8 +443,7 @@ fun SkikoProjectContext.configureGenerateSymbolsList(
         val coreBinaryInputs = resolveBinaryInputs(targetOs, targetArch, TargetEnv.JVM, skiaBinDir)
 
         skiaLibs.from(project.files(coreBinaryInputs.staticArchivePaths + coreBinaryInputs.directStaticArchivePaths))
-
-        moduleLibs.from(project.files(emptyList<File>()))
+        this.requiredSymbolFiles.from(requiredSymbolFiles)
     }
 }
 
@@ -291,17 +452,27 @@ fun SkikoProjectContext.createLinkJvmBindings(
     targetArch: Arch,
     skiaJvmBindingsDir: Provider<File>,
     compileTask: TaskProvider<CompileSkikoCppTask>,
-    objcCompileTask: TaskProvider<CompileSkikoObjCTask>?
+    objcCompileTask: TaskProvider<CompileSkikoObjCTask>?,
+    coreLinkedLibraryDirs: FileCollection? = null,
 ) = project.registerSkikoTask<LinkSkikoTask>("linkJvmBindings", targetOs, targetArch) {
     val target = targetId(targetOs, targetArch)
     val skiaBinSubdir = "out/${buildType.id}-$target"
     val skiaBinDir = skiaJvmBindingsDir.get().absolutePath + "/" + skiaBinSubdir
     val resolvedBinaryInputs = resolveBinaryInputs(targetOs, targetArch, TargetEnv.JVM, skiaBinDir)
+    val linksCore = kind == SkikoModuleKind.EXTENSION && dependsOnCore
+    val resolvedCoreLinkedLibraryDirs = if (linksCore) {
+        coreLinkedLibraryDirs ?: error("Core JVM linked library must be configured for $targetOs $targetArch")
+    } else {
+        null
+    }
     val osFlags: Array<String>
 
     libFiles = project.files((resolvedBinaryInputs.staticArchivePaths).distinct())
 
     dependsOn(compileTask)
+    if (resolvedCoreLinkedLibraryDirs != null) {
+        dependsOn(resolvedCoreLinkedLibraryDirs.buildDependencies)
+    }
     objectFiles = project.fileTree(compileTask.map { it.outDir.get() }) {
         include("**/*.o")
     }
@@ -327,7 +498,11 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-install_name", "./${libOutputFileName.get()}",
                 "-current_version", skiko.planeDeployVersion,
                 *resolvedBinaryInputs.linkFlags.toTypedArray(),
-                *resolvedBinaryInputs.frameworks.toTypedArray()
+                *resolvedBinaryInputs.frameworks.toTypedArray(),
+                *if (resolvedCoreLinkedLibraryDirs != null) arrayOf(
+                    "-L${resolvedCoreLinkedLibraryDirs.singleFile.absolutePath}",
+                    "-lskiko-${targetOs.id}-${targetArch.id}",
+                ) else emptyArray()
             )
         }
         OS.Linux -> {
@@ -346,6 +521,11 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
                 addAll(resolvedBinaryInputs.directStaticArchivePaths)
                 addAll(resolvedBinaryInputs.linkFlags)
+                if (resolvedCoreLinkedLibraryDirs != null) {
+                    add("-L${resolvedCoreLinkedLibraryDirs.singleFile.absolutePath}")
+                    add("-lskiko-${targetOs.id}-${targetArch.id}")
+                    add($$"-Wl,-rpath,$ORIGIN")
+                }
             }.toTypedArray()
         }
         OS.Windows -> {
@@ -376,6 +556,10 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
                 addAll(resolvedBinaryInputs.dynamicLibNames.map { "$it.lib" })
                 addAll(resolvedBinaryInputs.linkFlags)
+                if (resolvedCoreLinkedLibraryDirs != null) {
+                    add("/LIBPATH:${resolvedCoreLinkedLibraryDirs.singleFile.absolutePath}")
+                    add("skiko-${targetOs.id}-${targetArch.id}.lib")
+                }
             }.toTypedArray()
         }
         OS.Android -> {
@@ -389,6 +573,10 @@ fun SkikoProjectContext.createLinkJvmBindings(
             androidFlags.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
             androidFlags.addAll(resolvedBinaryInputs.directStaticArchivePaths)
             androidFlags.addAll(resolvedBinaryInputs.linkFlags)
+            if (resolvedCoreLinkedLibraryDirs != null) {
+                androidFlags.add("-L${resolvedCoreLinkedLibraryDirs.singleFile.absolutePath}")
+                androidFlags.add("-lskiko-${targetOs.id}-${targetArch.id}")
+            }
             osFlags = androidFlags.toTypedArray()
             linker.set(project.androidClangFor(targetArch))
         }
@@ -484,7 +672,7 @@ fun SkikoProjectContext.maybeSignOrSealTask(
     val target = targetId(targetOs, targetArch)
     outDir.set(project.layout.buildDirectory.dir("maybe-signed-$target"))
 
-    val toolsDir = project.layout.projectDirectory.dir("tools")
+    val toolsDir = project.rootProject.layout.projectDirectory.dir("tools")
     if (targetOs == OS.Linux) {
         // Linux requires additional sealing to run on wider set of platforms.
         // See https://github.com/olonho/sealer.
@@ -508,20 +696,35 @@ fun SkikoProjectContext.skikoJvmRuntimeJarTask(
     targetArch: Arch,
     awtJar: TaskProvider<Jar>,
     nativeFiles: List<Provider<File>>
-) = project.registerSkikoTask<Jar>("skikoJvmRuntimeJar", targetOs, targetArch) {
-    dependsOn(awtJar)
-    val target = targetId(targetOs, targetArch)
-    archiveBaseName.set(artifacts.artifactIdPrefix)
-    archiveClassifier.set(target)
-    nativeFiles.forEach { provider -> from(provider) }
+): TaskProvider<Jar> {
+    val runtimeJar = project.registerSkikoTask<Jar>("skikoJvmRuntimeJar", targetOs, targetArch) {
+        dependsOn(awtJar)
+        val target = targetId(targetOs, targetArch)
+        archiveBaseName.set(artifacts.artifactIdPrefix)
+        archiveClassifier.set(target)
+        nativeFiles.forEach { provider -> from(provider) }
+    }
+    if (kind == SkikoModuleKind.CORE) {
+        configureJvmRuntimeJarElements(targetOs, targetArch, runtimeJar)
+    }
+    return runtimeJar
 }
 
-fun SkikoProjectContext.createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: TaskProvider<Jar>): TaskProvider<Jar> = with(this.project) {
+fun SkikoProjectContext.createSkikoJvmJarTask(
+    os: OS,
+    arch: Arch,
+    commonJar: TaskProvider<Jar>,
+    coreLinkedLibraryDirs: FileCollection? = null,
+    macosX64CoreLinkedLibraryDirs: FileCollection? = null,
+): TaskProvider<Jar> = with(this.project) {
     val skiaBindingsDir = registerOrGetSkiaDirProvider(os, arch)
     val compileBindings = createCompileJvmBindingsTask(os, arch, skiaBindingsDir)
     val objcCompile = if (os == OS.MacOS) createObjcCompileTask(os, arch, skiaBindingsDir) else null
     val linkBindings =
-        createLinkJvmBindings(os, arch, skiaBindingsDir, compileBindings, objcCompile)
+        createLinkJvmBindings(os, arch, skiaBindingsDir, compileBindings, objcCompile, coreLinkedLibraryDirs)
+    if (kind == SkikoModuleKind.CORE) {
+        configureJvmLinkedLibraryElements(os, arch, linkBindings)
+    }
     if (os.isMacOs) {
         createDownloadCodeSignClientDarwinTask(os, hostArch)
     }
@@ -544,7 +747,10 @@ fun SkikoProjectContext.createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: Tas
         val compileBindings2 = createCompileJvmBindingsTask(os, altArch, skiaBindingsDir2)
         val objcCompile2 = createObjcCompileTask(os, altArch, skiaBindingsDir2)
         val linkBindings2 =
-            createLinkJvmBindings(os, altArch, skiaBindingsDir2, compileBindings2, objcCompile2)
+            createLinkJvmBindings(os, altArch, skiaBindingsDir2, compileBindings2, objcCompile2, macosX64CoreLinkedLibraryDirs)
+        if (kind == SkikoModuleKind.CORE) {
+            configureJvmLinkedLibraryElements(os, altArch, linkBindings2)
+        }
         val maybeSign2 = maybeSignOrSealTask(os, altArch, linkBindings2)
         val nativeLib2 = maybeSign2.map { it.outputFiles.get().single { f -> f.name.endsWith(os.dynamicLibExt) } }
         val createChecksums2 = createChecksumsTask(os, altArch, nativeLib2)
@@ -563,14 +769,21 @@ fun SkikoProjectContext.skikoRuntimeDirForTestsTask(
     skikoJvmJar: Provider<Jar>,
     skikoJvmRuntimeJar: Provider<Jar>,
     additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
+    additionalRuntimeJarFiles: Configuration? = null,
 ) = project.registerSkikoTask<Copy>("skikoRuntimeDirForTests", targetOs, targetArch) {
     dependsOn(skikoJvmJar, skikoJvmRuntimeJar)
     from(project.zipTree(skikoJvmJar.flatMap { it.archiveFile }))
     from(project.zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile }))
+    if (additionalRuntimeJarFiles != null) {
+        dependsOn(additionalRuntimeJarFiles)
+        from({
+            project.files(additionalRuntimeJarFiles).files.map { project.zipTree(it) }
+        })
+    }
     additionalRuntimeLibraries.forEach { lib ->
         from(project.zipTree(lib.jarTask.flatMap { it.archiveFile }))
     }
-    
+
     duplicatesStrategy = DuplicatesStrategy.WARN
     destinationDir = project.layout.buildDirectory.dir("skiko-runtime-for-tests").get().asFile
 }
@@ -586,10 +799,31 @@ fun SkikoProjectContext.skikoJarForTestsTask(
 fun SkikoProjectContext.setupJvmTestTask(
     skikoAwtJarForTests: TaskProvider<Jar>,
     targetOs: OS,
-    targetArch: Arch
+    targetArch: Arch,
+    coreLinkedLibraryDirs: FileCollection? = null,
+    macosX64CoreLinkedLibraryDirs: FileCollection? = null,
+    coreRuntimeJar: Configuration? = null,
 ) = with(project) {
-    val skikoAwtRuntimeJarForTests = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJarForTests)
-    val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests, additionalRuntimeLibraries)
+    val skikoAwtRuntimeJarForTests = createSkikoJvmJarTask(
+        targetOs,
+        targetArch,
+        skikoAwtJarForTests,
+        coreLinkedLibraryDirs,
+        macosX64CoreLinkedLibraryDirs
+    )
+    val coreRuntimeJarForTests = if (kind == SkikoModuleKind.EXTENSION && dependsOnCore) {
+        coreRuntimeJar ?: error("Core JVM runtime jar must be configured for $targetOs $targetArch")
+    } else {
+        null
+    }
+    val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(
+        targetOs,
+        targetArch,
+        skikoAwtJarForTests,
+        skikoAwtRuntimeJarForTests,
+        additionalRuntimeLibraries,
+        coreRuntimeJarForTests
+    )
     val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
     tasks.withType<Test>().configureEach {
