@@ -1,6 +1,5 @@
 package org.jetbrains.skia.skottie
 
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.sksg.InvalidationController
 import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
@@ -29,7 +28,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
 
         init {
-            staticLoad()
+            SkottieLibrary.load()
         }
     }
 

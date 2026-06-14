@@ -7,7 +7,8 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-internal class LibraryLoader(
+@InternalSkikoApi
+class LibraryLoader internal constructor(
     /**
      * Short library name without platform suffix and extension. For example "skiko" or "skiko-angle-libEGL"
      */
@@ -30,6 +31,17 @@ internal class LibraryLoader(
      */
     private val init: () -> Unit = {}
 ) {
+    constructor(
+        name: String,
+        additionalFile: String? = null,
+        init: () -> Unit = {},
+    ) : this(
+        name = name,
+        additionalFile = additionalFile,
+        lockFile = LockFile.skiko,
+        init = init,
+    )
+
     // A native library cannot be loaded in several classloaders, so we have to clone
     // the native library to allow Skiko loading to work properly in complex cases, i.e.,
     // several IDEA plugins.
