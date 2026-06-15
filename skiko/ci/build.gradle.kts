@@ -5,6 +5,11 @@ val skiko = SkikoProperties(project)
 val mavenCentral = MavenCentralProperties(project)
 val GITHUB_REPO = "JetBrains/skiko"
 val skikoArtifacts = SkikoArtifacts()
+val skikoSkottieArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-skottie",
+    displayName = "Skiko Skottie",
+    pomDescription = "Kotlin Skia Skottie bindings",
+)
 
 val skikoArtifactIds: List<String> =
     listOf(
@@ -30,8 +35,29 @@ val skikoArtifactIds: List<String> =
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
-
         "${skikoArtifacts.jvmRuntimeArtifactId}-all",
+
+        skikoSkottieArtifacts.commonArtifactId,
+        skikoSkottieArtifacts.jvmArtifactId,
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoSkottieArtifacts.jsArtifactId,
+        skikoSkottieArtifacts.wasmArtifactId,
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+        "${skikoSkottieArtifacts.jvmRuntimeArtifactId}-all",
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
