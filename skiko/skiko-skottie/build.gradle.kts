@@ -1,15 +1,20 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
+
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.gradle.kotlin.dsl.withType
+import org.gradle.kotlin.dsl.named
 import tasks.configuration.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import dsl.SkikoDependencyScope
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform")
@@ -24,6 +29,8 @@ plugins {
 if (supportAndroid) {
     apply(plugin = "com.android.kotlin.multiplatform.library")
 }
+
+apply<SideWasmImportsGeneratorPlugin>()
 
 val skiko = SkikoProperties(rootProject)
 val skikoSkottieArtifacts = SkikoArtifacts(
@@ -110,6 +117,58 @@ kotlin {
         }
     }
 
+    if (supportWeb) {
+        skikoSkottieProjectContext.declareWasmTasks()
+
+        js {
+            outputModuleName.set("skiko-skottie-kjs")
+            browser {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                        useConfigDirectory(rootProject.projectDir.resolve("karma.config.d").resolve("js"))
+                    }
+                }
+            }
+            binaries.executable()
+            generateVersion(OS.Wasm, Arch.Wasm, skiko)
+
+            val test by compilations.getting
+            project.tasks.named<Copy>(test.processResourcesTaskName) {
+                dependsOn(
+                    test.compileTaskProvider,
+                    tasks["compileTestKotlinWasmJs"],
+                )
+            }
+
+            setupImportsGeneratorPlugin(skikoSkottieArtifacts.artifactIdPrefix, isSideModule = skikoSkottieProjectContext.kind == SkikoModuleKind.EXTENSION)
+        }
+
+        @OptIn(ExperimentalWasmDsl::class)
+        wasmJs {
+            outputModuleName.set("skiko-skottie-kjs-wasm")
+            browser {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                        useConfigDirectory(rootProject.projectDir.resolve("karma.config.d").resolve("wasm"))
+                    }
+                }
+            }
+            generateVersion(OS.Wasm, Arch.Wasm, skiko)
+
+            val test by compilations.getting
+            project.tasks.named<Copy>(test.processResourcesTaskName) {
+                dependsOn(
+                    test.compileTaskProvider,
+                    tasks["compileTestKotlinJs"],
+                )
+            }
+
+            setupImportsGeneratorPlugin(skikoSkottieArtifacts.artifactIdPrefix, isSideModule = true)
+        }
+    }
+
     fun coreNativeSymbolSources(os: OS, arch: Arch, isUikitSim: Boolean) =
         skikoSkottieProjectContext.nativeSymbolSourcesFor(os, arch, isUikitSim).also {
             dependencies.add(it.name, coreProject)
@@ -183,6 +242,9 @@ kotlin {
     skikoSkottieProjectContext.awtTestSourceSet?.dependencies {
         implementation(libs.kotlinx.benchmark.runtime)
     }
+    skikoSkottieProjectContext.webMainSourceSet?.dependencies {
+        implementation(libs.kotlinx.browser)
+    }
 
     skikoSkottieProjectContext.awtMainSourceSet?.dependencies {
         implementation(libs.jetbrainsRuntime.api)
@@ -198,6 +260,24 @@ kotlin {
         }
     }
 
+    skikoSkottieProjectContext.wasmJsTest?.dependencies {
+        implementation(kotlin("test-wasm-js"))
+    }
+    skikoSkottieProjectContext.webTestSourceSet?.dependencies {
+        implementation(libs.coroutines.core)
+    }
+
+    skikoSkottieProjectContext.webTestSourceSet?.apply {
+        val coreWasmTestResources = skikoSkottieProjectContext.wasmTestResourcesFor().also {
+            dependencies.add(it.name, coreProject)
+        }
+        resources.srcDirs(
+            tasks.named("linkWasm"),
+            wasmImports,
+            coreWasmTestResources,
+        )
+    }
+
     if (supportAnyNative) {
         sourceSets.all {
             // Really ugly, see https://youtrack.jetbrains.com/issue/KT-46649 why it is required,
@@ -206,6 +286,10 @@ kotlin {
         }
         configureIOSTestsWithMetal(project)
     }
+}
+
+if (supportWeb) {
+    skikoSkottieProjectContext.provideWasmSideModules()
 }
 
 if (supportAndroid) {
