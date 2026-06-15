@@ -8,6 +8,7 @@ config.browserConsoleLogOptions.level = "debug";
 const basePath = config.basePath;
 const projectPath = path.resolve(basePath, "..", "..", "..", "..");
 const generatedAssetsPath = path.resolve(projectPath, "build", "karma-webpack-out")
+const skottieWasmPath = path.resolve(basePath, "kotlin", "skiko-skottie.wasm");
 
 const debug = message => console.log(`[karma-config] ${message}`);
 
@@ -15,6 +16,7 @@ debug(`karma basePath: ${basePath}`);
 debug(`karma generatedAssetsPath: ${generatedAssetsPath}`);
 
 config.proxies["/resources"] = path.resolve(basePath, "kotlin");
+config.proxies["/skiko-skottie.wasm"] = skottieWasmPath;
 
 config.files = [
     {pattern: path.resolve(generatedAssetsPath, "**/*"), included: false, served: true, watched: false},

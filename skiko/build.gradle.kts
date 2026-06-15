@@ -59,9 +59,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "webp_sse41",
                 "zlib",
                 "expat",
-                "skottie",
-                "sksg",
-                "jsonreader"
             )
         }
         jvm {
@@ -89,13 +86,11 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             linux {
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs(
-                    "sksg",
                     "skia",
                     "skia_ganesh_ext",
                     "skunicode_core",
                     "skunicode_icu",
                     "skshaper",
-                    "jsonreader"
                 )
                 dynamicSystemLibs("GL", "X11", "fontconfig")
                 arm64 { dynamicSystemLibs("EGL") }
@@ -116,9 +111,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             linux {
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs(
-                    "skottie",
-                    "jsonreader",
-                    "sksg",
                     "skshaper",
                     "skunicode_core",
                     "skunicode_icu",
@@ -167,12 +159,15 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "brotli",
             )
             linkFlags(
+                "-s", "MAIN_MODULE=2",
+                "-s", "AUTOLOAD_DYLIBS=0",
                 "-l", "GL",
                 "-s", "MAX_WEBGL_VERSION=2",
                 "-s", "MIN_WEBGL_VERSION=2",
                 "-s", "MODULARIZE=1",
+                "-s", "EXPORT_ES6=1",
                 "-s", "EXPORT_NAME=loadSkikoWASM",
-                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
+                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
                 "--bind",
             )
         }
@@ -267,7 +262,10 @@ kotlin {
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
             }
 
-            setupImportsGeneratorPlugin()
+            setupImportsGeneratorPlugin(
+                skikoArtifacts.artifactIdPrefix,
+                isSideModule = skikoProjectContext.kind == SkikoModuleKind.EXTENSION
+            )
         }
 
 
@@ -290,7 +288,10 @@ kotlin {
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinJs"])
             }
 
-            setupImportsGeneratorPlugin()
+            setupImportsGeneratorPlugin(
+                skikoArtifacts.artifactIdPrefix,
+                isSideModule = false
+            )
         }
     }
 
@@ -469,9 +470,14 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
     val skiaBindingsDir = skikoProjectContext.registerOrGetSkiaDirProvider(os, arch)
     val coreCompile = tasks.named<CompileSkikoCppTask>("compileJvmBindings$suffix")
     val coreObjcCompile = if (os.isMacOs) tasks.named<CompileSkikoObjCTask>("objcCompile$suffix") else null
+    val requiredSymbolFiles = files(
+        skikoProjectContext.jvmRequiredSymbolsFor(os, arch).also {
+            dependencies.add(it.name, project(":skiko-skottie"))
+        }
+    )
 
     skikoProjectContext.configureGenerateSymbolsList(
-        os, arch, skiaBindingsDir, coreCompile, coreObjcCompile
+        os, arch, skiaBindingsDir, coreCompile, coreObjcCompile, requiredSymbolFiles
     )
 
     tasks.named("linkJvmBindings$suffix") {
@@ -495,6 +501,21 @@ if (supportAndroid) {
             configureSymbolsFor(OS.Android, arch)
         }
     }
+}
+
+if (supportWeb) {
+    skikoProjectContext.provideWasmTestResources()
+
+    val linkWasmSideModules = skikoProjectContext.wasmSideModulesFor("linkWasm").also {
+        dependencies.add(it.name, project(":skiko-skottie"))
+    }
+    val linkWasmD8SideModules = skikoProjectContext.wasmSideModulesFor("linkWasmD8WithES6").also {
+        dependencies.add(it.name, project(":skiko-skottie"))
+    }
+    skikoProjectContext.configureWasmMainModuleSideModuleInputs(
+        linkWasmSideModules,
+        linkWasmD8SideModules,
+    )
 }
 
 skikoProjectContext.declarePublications()

@@ -25,9 +25,12 @@ class SkikoProjectContext(
     configureDependencies: (SkikoDependencyScope.() -> Unit)
 ) {
     val dependencyRegistry = BinaryRegistry()
+    val dependsOnCore: Boolean
 
     init {
-        SkikoDependencyScope(dependencyRegistry).configureDependencies()
+        val dependencyScope = SkikoDependencyScope(dependencyRegistry)
+        dependencyScope.configureDependencies()
+        dependsOnCore = dependencyScope.dependsOnCore
     }
 
     val buildType = skiko.buildType
@@ -102,7 +105,7 @@ fun SkikoProjectContext.declareSkiaTasks() {
 
             val skiaReleaseTag = project.skiaVersion(target)
 
-            val skiaBaseUrl = "https://github.com/JetBrains/skia/releases/download/$skiaReleaseTag"
+            val skiaBaseUrl = "https://github.com/hub-bla/skia/releases/download/$skiaReleaseTag"
 
             val artifactId = "Skia-${skiaReleaseTag}-${config}-$buildType-${arch}"
 
@@ -167,7 +170,7 @@ fun SkikoProjectContext.registerOrGetSkiaDirProvider(
             skiaDir.absoluteFile
         }
     } else {
-        project.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
+        project.rootProject.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
     }
 }
 

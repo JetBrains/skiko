@@ -6,6 +6,10 @@ import org.jetbrains.skiko.InternalSkikoApi
 actual abstract class Native actual constructor(ptr: NativePointer) {
     actual var _ptr: NativePointer
 
+    @InternalSkikoApi
+    actual val nativePtr: NativePointer
+        get() = _ptr
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (null == other) return false
@@ -34,17 +38,22 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
     }
 }
 
-internal actual fun reachabilityBarrier(obj: Any?) {}
+@InternalSkikoApi
+actual fun reachabilityBarrier(obj: Any?) {}
 
 actual typealias NativePointer = Int
 
 @InternalSkikoApi
 actual typealias InteropPointer = Int
 
-private val INTEROP_SCOPE = InteropScope()
-private var interopScopeCounter = 0
+@PublishedApi
+internal val INTEROP_SCOPE = InteropScope()
 
-internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+@PublishedApi
+internal var interopScopeCounter = 0
+
+@InternalSkikoApi
+actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     try {
         interopScopeCounter++
         return INTEROP_SCOPE.block()
