@@ -165,12 +165,15 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "brotli",
             )
             linkFlags(
+                "-s", "MAIN_MODULE=2",
+                "-s", "AUTOLOAD_DYLIBS=0",
                 "-l", "GL",
                 "-s", "MAX_WEBGL_VERSION=2",
                 "-s", "MIN_WEBGL_VERSION=2",
                 "-s", "MODULARIZE=1",
+                "-s", "EXPORT_ES6=1",
                 "-s", "EXPORT_NAME=loadSkikoWASM",
-                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
+                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
                 "--bind",
             )
         }
@@ -265,7 +268,10 @@ kotlin {
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
             }
 
-            setupImportsGeneratorPlugin()
+            setupImportsGeneratorPlugin(
+                skikoArtifacts.artifactIdPrefix,
+                isSideModule = skikoProjectContext.kind == SkikoModuleKind.EXTENSION
+            )
         }
 
 
@@ -288,7 +294,10 @@ kotlin {
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinJs"])
             }
 
-            setupImportsGeneratorPlugin()
+            setupImportsGeneratorPlugin(
+                skikoArtifacts.artifactIdPrefix,
+                isSideModule = false
+            )
         }
     }
 
@@ -498,6 +507,21 @@ if (supportAndroid) {
             configureSymbolsFor(OS.Android, arch)
         }
     }
+}
+
+if (supportWeb) {
+    skikoProjectContext.provideWasmTestResources()
+
+    val linkWasmSideModules = skikoProjectContext.wasmSideModulesFor("linkWasm").also {
+        dependencies.add(it.name, project(":skiko-skottie"))
+    }
+    val linkWasmD8SideModules = skikoProjectContext.wasmSideModulesFor("linkWasmD8WithES6").also {
+        dependencies.add(it.name, project(":skiko-skottie"))
+    }
+    skikoProjectContext.configureWasmMainModuleSideModuleInputs(
+        linkWasmSideModules,
+        linkWasmD8SideModules,
+    )
 }
 
 skikoProjectContext.declarePublications()

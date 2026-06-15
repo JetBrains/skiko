@@ -1,12 +1,13 @@
 package org.jetbrains.skia.skottie
 
+import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class LoggerTest {
     @Test
-    fun canLog() {
+    fun canLog() = runTest {
         var actualLevel: LogLevel? = null
         var actualMessage: String? = null
         var actualJson: String? = null
