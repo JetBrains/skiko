@@ -20,6 +20,8 @@
     4. Skiko is built using Clang-cl. Clang-cl is a part of LLVM and can be downloaded from the [LLVM project's website](https://releases.llvm.org/). Please also make sure that Clang-cl.exe is available in %PATH%.
 
 * Install Emscripten
+  * Skiko follows the Emscripten version used by the underlying Skia build. While other versions may work, we recommend using the same version that is currently used in the project to avoid compatibility issues. 
+  * The current version used by Skiko is `4.0.7`
 * Set `JAVA_HOME` to location of JDK, at least version 11
 * `./gradlew :skiko:publishToMavenLocal` will build the artifact and publish it to local Maven repo
 
