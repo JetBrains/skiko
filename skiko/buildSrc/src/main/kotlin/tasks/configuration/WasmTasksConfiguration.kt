@@ -131,10 +131,12 @@ fun SkikoProjectContext.declareWasmTasks() {
         doLast {
             // skiko.mjs is referenced in karma.config.d/*/config.js
             // so symbols must be replaced right after linking
-            val emccOutputFile = outDir.asFile.get().walk().first { it.name == emccOutputFileName.get() }
-            if (emccOutputFile.extension != "mjs") {
+            val outputFileName = emccOutputFileName.get()
+            if (!outputFileName.endsWith(".mjs")) {
                 return@doLast
             }
+
+            val emccOutputFile = outDir.asFile.get().walk().first { it.name == outputFileName }
 
             val isEnvironmentNodeCheckRegex = Regex(
                 // spacing is different in release and debug builds
