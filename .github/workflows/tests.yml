@@ -62,8 +62,7 @@ jobs:
         name: 'Test Summary'
         with:
           paths: |
-            ./skiko/build/test-results/**/TEST-*.xml
-            ./skiko/skiko-skottie/build/test-results/**/TEST-*.xml
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
 
   ios:
@@ -220,8 +219,7 @@ jobs:
         name: 'Test Summary'
         with:
           paths: |
-            ./skiko/build/test-results/**/TEST-*.xml
-            ./skiko/skiko-skottie/build/test-results/**/TEST-*.xml
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
 
   linux-cross-compile:
@@ -327,8 +325,7 @@ jobs:
         uses: test-summary/action@v2
         with:
           paths: |
-            ./skiko/build/test-results/**/TEST-*.xml
-            ./skiko/skiko-skottie/build/test-results/**/TEST-*.xml
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
 
   windows:
@@ -379,8 +376,7 @@ jobs:
         name: 'Test Summary'
         with:
           paths: |
-            ./skiko/build/test-results/**/TEST-*.xml
-            ./skiko/skiko-skottie/build/test-results/**/TEST-*.xml
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
 
   web-wasm:
@@ -458,6 +454,5 @@ jobs:
         name: 'Test Summary'
         with:
           paths: |
-            ./skiko/build/test-results/**/TEST-*.xml
-            ./skiko/skiko-skottie/build/test-results/**/TEST-*.xml
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
