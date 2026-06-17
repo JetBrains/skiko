@@ -19,9 +19,9 @@ jobs:
         with:
           image_name: linux-compat
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.android.enabled=true \
-              :skiko:publishToMavenLocal
+              publishToMavenLocal
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Check Android Sample'
@@ -47,9 +47,9 @@ jobs:
         with:
           image_name: linux-emscripten-amd64
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.wasm.enabled=true \
-              :skiko:publishToMavenLocal
+              publishToMavenLocal
 
   Linux:
     name: 'Linux x64 Publish Dry Run'
@@ -66,22 +66,22 @@ jobs:
         with:
           image_name: linux-compat
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Pskiko.awt.enabled=true \
               -Pskiko.arch=x64 \
-               :skiko:publishToMavenLocal
+              publishToMavenLocal
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Native Maven Local'
         with:
           image_name: linux-amd64
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Pskiko.awt.enabled=false \
-              :skiko:publishLinuxArm64PublicationToMavenLocal \
-              :skiko:publishLinuxX64PublicationToMavenLocal
+              publishLinuxArm64PublicationToMavenLocal \
+              publishLinuxX64PublicationToMavenLocal
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Check AWT Sample'
@@ -107,10 +107,10 @@ jobs:
         with:
           image_name: linux-compat
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.awt.enabled=true \
               -Pskiko.arch=arm64 \
-              :skiko:publishSkikoJvmRuntimeLinuxArm64PublicationToMavenLocal
+              publishSkikoJvmRuntimeLinuxArm64PublicationToMavenLocal
 
   macOS:
     name: 'macOS Publish Dry Run'
@@ -131,20 +131,20 @@ jobs:
       - shell: bash
         name: 'Publish arm64 Maven Local'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Pskiko.awt.enabled=true \
             -Pskiko.arch=arm64 \
-            :skiko:publishToMavenLocal
+            publishToMavenLocal
 
       # Build x64 separately (arm64 is built in publishToMavenLocal)
       - shell: bash
         name: 'Publish AWT Runtime x64 Maven Local'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.awt.enabled=true \
             -Pskiko.arch=x64 \
-            :skiko:publishSkikoJvmRuntimeMacosX64PublicationToMavenLocal
+            publishSkikoJvmRuntimeMacosX64PublicationToMavenLocal
 
       - shell: bash
         name: 'Check AWT Sample'
@@ -175,20 +175,20 @@ jobs:
       - shell: bash
         name: 'Publish x64 Maven Local'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Pskiko.awt.enabled=true \
             -Pskiko.arch=x64 \
-             :skiko:publishToMavenLocal
+            publishToMavenLocal
 
       # Build Arm64 separately (x64 is built in publishToMavenLocal)
       - shell: bash
         name: 'Publish AWT Runtime arm64 Maven Local'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.awt.enabled=true \
             -Pskiko.arch=arm64 \
-            :skiko:publishSkikoJvmRuntimeWindowsArm64PublicationToMavenLocal
+            publishSkikoJvmRuntimeWindowsArm64PublicationToMavenLocal
 
       - shell: bash
         name: 'Check AWT Sample'

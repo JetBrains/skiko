@@ -29,22 +29,20 @@ jobs:
       - shell: bash
         name: 'Run AWT Tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:awtTest \
-            :skiko:skiko-skottie:awtTest
+            awtTest
 
       - shell: bash
         name: 'Run macOS Tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:macosArm64Test \
-            :skiko:skiko-skottie:macosArm64Test
+            macosArm64Test
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Test Results'
@@ -99,24 +97,22 @@ jobs:
           timeout_minutes: 60
           shell: bash
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \
               -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" \
-              :skiko:iosX64TestWithMetal \
-              :skiko:skiko-skottie:iosX64TestWithMetal
+              iosX64TestWithMetal
 
       # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
       - shell: bash
         name: 'Compile iOS (arm64) tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:iosSimulatorArm64Test \
-            :skiko:skiko-skottie:iosSimulatorArm64Test
+            iosSimulatorArm64Test
 
       # TODO run iOS specific tests on iPhone simulator
 
@@ -149,20 +145,18 @@ jobs:
       - shell: bash
         name: 'Run tvOS Tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:tvosX64Test \
-            :skiko:skiko-skottie:tvosX64Test
+            tvosX64Test
           
           # tvosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:tvosSimulatorArm64Test \
-            :skiko:skiko-skottie:tvosSimulatorArm64Test
+            tvosSimulatorArm64Test
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Test Results'
@@ -190,12 +184,11 @@ jobs:
           image_name: linux-amd64
           virtual-display: true
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \
-              :skiko:linuxX64Test \
-              :skiko:skiko-skottie:linuxX64Test
+              linuxX64Test
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Run AWT Tests'
@@ -204,12 +197,11 @@ jobs:
           image_name: linux-compat
           virtual-display: true
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \
-              :skiko:awtTest \
-              :skiko:skiko-skottie:awtTest
+              awtTest
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Test Results'
@@ -247,11 +239,10 @@ jobs:
         with:
           image_name: linux-amd64
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.arch=x64 \
               -Pskiko.native.linux.enabled=true \
-              :skiko:linkDebugTestLinuxArm64 \
-              :skiko:skiko-skottie:linkDebugTestLinuxArm64
+              linkDebugTestLinuxArm64
 
       - uses: actions/upload-artifact@v4
         name: 'Upload linuxArm64 test binary as artifact'
@@ -312,12 +303,11 @@ jobs:
           image_name: linux-compat
           virtual-display: true
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \
-              :skiko:awtTest \
-              :skiko:skiko-skottie:awtTest
+              awtTest
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
@@ -365,12 +355,11 @@ jobs:
       - shell: bash
         name: 'Run AWT tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
             -Dskiko.test.ui.renderApi.ignoreAssertsFor=OPENGL \
-            :skiko:awtTest \
-            :skiko:skiko-skottie:awtTest
+            awtTest
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Test Results'
@@ -443,8 +432,7 @@ jobs:
             -Pskiko.wasm.enabled=true \
             -Pskiko.js.enabled=true \
             -Pskiko.test.onci=true \
-            :wasmJsTest \
-            :skiko-skottie:wasmJsTest
+            wasmJsTest
 
       - shell: bash
         name: 'Run JS Tests'
@@ -455,8 +443,7 @@ jobs:
             -Pskiko.wasm.enabled=true \
             -Pskiko.js.enabled=true \
             -Pskiko.test.onci=true \
-            :jsTest \
-            :skiko-skottie:jsTest
+            jsTest
 
       - uses: actions/upload-artifact@v4
         if: failure()
