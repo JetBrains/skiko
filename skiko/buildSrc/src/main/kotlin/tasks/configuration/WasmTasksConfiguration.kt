@@ -131,8 +131,8 @@ fun SkikoProjectContext.declareWasmTasks() {
         doLast {
             // skiko.mjs is referenced in karma.config.d/*/config.js
             // so symbols must be replaced right after linking
-            val jsFile = outDir.asFile.get().walk().first { it.name == jsOutputFileName.get() }
-            if (jsFile.extension != "mjs") {
+            val emccOutputFile = outDir.asFile.get().walk().first { it.name == emccOutputFileName.get() }
+            if (emccOutputFile.extension != "mjs") {
                 return@doLast
             }
 
@@ -141,10 +141,10 @@ fun SkikoProjectContext.declareWasmTasks() {
                 """if\s*\(ENVIRONMENT_IS_NODE\)\s*\{"""
             )
 
-            val originalContent = jsFile.readText()
+            val originalContent = emccOutputFile.readText()
             val newContent = originalContent
                 .replace(isEnvironmentNodeCheckRegex, "if (false) {") // to make webpack erase this part
-            jsFile.writeText(newContent)
+            emccOutputFile.writeText(newContent)
         }
     }
 
@@ -155,7 +155,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         )
 
         buildSuffix.set("es6")
-        jsOutputFileName.set(if (isSideModule) "$libBaseName.wasm" else "skiko.mjs") // this determines the name .wasm file too
+        emccOutputFileName.set(if (isSideModule) "$libBaseName.wasm" else "skiko.mjs") // this determines the name .wasm file too
         libOutputFileName.set("$libBaseName.wasm")
         val prefixPath = if (isSideModule) {
             project.sideModuleSetupMjs(libBaseName).normalize().absolutePath
@@ -172,7 +172,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         )
 
         buildSuffix.set("d8")
-        jsOutputFileName.set(if (isSideModule) "${libBaseName}d8.wasm" else "skikod8.mjs") // this determines the name .wasm file too
+        emccOutputFileName.set(if (isSideModule) "${libBaseName}d8.wasm" else "skikod8.mjs") // this determines the name .wasm file too
         libOutputFileName.set("${libBaseName}d8.wasm")
 
         flags.addAll(listOf("-s", "ENVIRONMENT=shell"))
