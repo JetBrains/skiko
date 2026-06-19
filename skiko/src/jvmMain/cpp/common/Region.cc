@@ -80,7 +80,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1n
     for (int i = 0; i < len; i += 4)
         rects[i / 4] = {arr[i], arr[i+1], arr[i+2], arr[i+3]};
     env->ReleaseIntArrayElements(coords, arr, 0);
-    return instance->setRects(SkSpan<const SkIRect>(rects.data(), len / 4));
+    return instance->setRects({rects.data(), len / 4});
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nSetRegion(JNIEnv* env, jclass jclass, jlong ptr, jlong regionPtr) {
