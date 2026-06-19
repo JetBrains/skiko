@@ -177,6 +177,9 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawVertic
         env->ReleaseFloatArrayElements(texCoordsArr, texCoords, 0);
     if (colors != nullptr)
         env->ReleaseIntArrayElements(colorsArr, colors, 0);
+    if (indices != nullptr) {
+        env->ReleaseShortArrayElements(indexArr, const_cast<jshort*>(indices), 0);
+    }
     env->ReleaseFloatArrayElements(positionsArr, positions, 0);
 }
 
