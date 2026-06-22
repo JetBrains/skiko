@@ -16,27 +16,15 @@ const extensionLoadPromises = new Map();
 export const loadSkikoExtension = (extensionPath) => {
     if (extensionLoadPromises.has(extensionPath)) return extensionLoadPromises.get(extensionPath);
     const loadPromise = awaitSkikoCore.then(async (module) => {
-        // Mimic the wasm loader: route this side module through
-        // locateFile so Emscripten does not fall back to a file:// scriptDirectory.
-        const originalLocateFile = module.locateFile;
-        module.locateFile = (path, prefix) => {
-            if (path === extensionPath) return extensionPath;
-            return originalLocateFile(path, prefix);
-        };
+        await module.loadDynamicLibrary(extensionPath, {
+            loadAsync: true,
+            global: true,
+            nodelete: true,
+            nodeJS: false
+        });
 
-        try {
-            await module.loadDynamicLibrary(extensionPath, {
-                loadAsync: true,
-                global: true,
-                nodelete: true,
-                nodeJS: false
-            });
-
-            const sideModuleExports = module.LDSO.loadedLibsByName[extensionPath].exports;
-            Object.assign(loadedWasm._, sideModuleExports);
-        } finally {
-            module.locateFile = originalLocateFile;
-        }
+        const sideModuleExports = module.LDSO.loadedLibsByName[extensionPath].exports;
+        Object.assign(loadedWasm._, sideModuleExports);
 
     }).catch((error) => {
         extensionLoadPromises.delete(extensionPath);
@@ -48,6 +36,15 @@ export const loadSkikoExtension = (extensionPath) => {
 };
 
 const awaitSkikoCore = loadSkikoWASM().then((module) => {
+    const originalLocateFile = module.locateFile;
+
+    module.locateFile = (path, prefix) => {
+        // If path is already an absolute URL, don't prepend scriptDirectory
+        if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:")) {
+            return path;
+        }
+        return originalLocateFile(path, prefix);
+    };
     loadedWasm._ = module.wasmExports;
     skikoGl = module.GL;
     return module;
