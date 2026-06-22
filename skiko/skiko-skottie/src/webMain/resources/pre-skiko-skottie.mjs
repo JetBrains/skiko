@@ -5,17 +5,20 @@ import {
 } from "./skiko.mjs";
 
 let skottieLoadPromise = null;
+let skottieLoaded = false;
 const skottieWasm = new URL("./skiko-skottie.wasm", import.meta.url).href;
 
 const ensureSkottieLoaded = () => {
     if (!skottieLoadPromise) {
-        skottieLoadPromise = loadSkikoExtension(skottieWasm);
+        skottieLoadPromise = loadSkikoExtension(skottieWasm).then(() => {
+            skottieLoaded = true;
+        });
     }
     return skottieLoadPromise;
 };
 
 registerSkikoWasmReadyCallback(() => ensureSkottieLoaded());
 
-const isSideModuleLoaded = () => skottieLoadPromise !== null;
+const isSideModuleLoaded = () => skottieLoaded;
 
 export { isSideModuleLoaded };
