@@ -51,9 +51,9 @@ const awaitSkikoCore = loadSkikoWASM().then((module) => {
 });
 
 export const awaitSkiko = awaitSkikoCore.then(async (module) => {
-    for (const callback of wasmReadyCallbacks) {
-        await callback(module);
-    }
+    await Promise.allSettled(
+        wasmReadyCallbacks.map(callback => callback(module))
+    );
 
     return module
 });
