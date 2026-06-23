@@ -1020,8 +1020,7 @@ SkString skString(JNIEnv* env, jstring str) {
         // See https://docs.oracle.com/javase/1.5.0/docs/guide/jni/spec/types.html#wp16542
         // Instead, get data as-is (UTF-16) and convert to UTF-8 ourselves.
         jsize utf16Units = env->GetStringLength(str);
-        jboolean isCopy;
-        const jchar *utf16 = env->GetStringChars(str, &isCopy);
+        const jchar *utf16 = env->GetStringChars(str, nullptr);
 
         // SkUTF::UTF16ToUTF8 returns empty string if there is invalid unicode characters.
         // Use our replacement that carefully handles invalid unicode strings.
@@ -1031,9 +1030,8 @@ SkString skString(JNIEnv* env, jstring str) {
             result.resize(utf8Units);
             UTF16ToUTF8(result.data(), utf8Units, utf16, utf16Units);
         }
-        if (isCopy == JNI_TRUE) {
-            env->ReleaseStringChars(str, utf16);
-        }
+        env->ReleaseStringChars(str, utf16);
+
         return result;
     }
 }
