@@ -21,14 +21,27 @@ value class FontMetrics(internal val metrics: FloatArray) {
         xMax: Float,
         xHeight: Float,
         capHeight: Float,
-        underlineThickness: Float,
-        underlinePosition: Float,
-        strikeoutThickness: Float,
-        strikeoutPosition: Float
+        underlineThickness: Float?,
+        underlinePosition: Float?,
+        strikeoutThickness: Float?,
+        strikeoutPosition: Float?
     ) : this(
         floatArrayOf(
-            top, ascent, descent, bottom, leading, avgCharWidth, maxCharWidth, xMin, xMax, xHeight, capHeight,
-            underlineThickness, underlinePosition, strikeoutThickness, strikeoutPosition
+            top,
+            ascent,
+            descent,
+            bottom,
+            leading,
+            avgCharWidth,
+            maxCharWidth,
+            xMin,
+            xMax,
+            xHeight,
+            capHeight,
+            underlineThickness ?: Float.NaN,
+            underlinePosition ?: Float.NaN,
+            strikeoutThickness ?: Float.NaN,
+            strikeoutPosition ?: Float.NaN
         )
     )
 
