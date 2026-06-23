@@ -514,6 +514,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 addAll(
                     arrayOf(
                         "-shared",
+                        "-Wl,-soname,${libOutputFileName.get()}",
                         // `libstdc++.so.6.*` binaries are forward-compatible and used from GCC 3.4 to 16+,
                         // so do not use `-static-libstdc++` to avoid issues with complex setup.
                         "-static-libgcc",
@@ -529,7 +530,6 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 if (resolvedCoreLinkedLibraryDirs != null) {
                     add("-L${resolvedCoreLinkedLibraryDirs.singleFile.absolutePath}")
                     add("-lskiko-${targetOs.id}-${targetArch.id}")
-                    add($$"-Wl,-rpath,$ORIGIN")
                 }
             }.toTypedArray()
         }
