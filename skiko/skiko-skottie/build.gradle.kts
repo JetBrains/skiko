@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.gradle.kotlin.dsl.withType
 import org.gradle.kotlin.dsl.named
 import tasks.configuration.*
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import dsl.SkikoDependencyScope
 
 plugins {
@@ -83,8 +82,8 @@ repositories {
 
 kotlin {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_2_2)
-        apiVersion.set(KotlinVersion.KOTLIN_2_2)
+        languageVersion.set(skikoKotlinLanguageVersion)
+        apiVersion.set(skikoKotlinApiVersion)
         freeCompilerArgs.add(
             "-opt-in=org.jetbrains.skiko.InternalSkikoApi"
         )

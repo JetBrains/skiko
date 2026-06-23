@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     kotlin("multiplatform")
@@ -24,8 +23,8 @@ repositories {
 
 kotlin {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_2_2)
-        apiVersion.set(KotlinVersion.KOTLIN_2_2)
+        languageVersion.set(skikoKotlinLanguageVersion)
+        apiVersion.set(skikoKotlinApiVersion)
     }
 
     applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
