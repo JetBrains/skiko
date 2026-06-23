@@ -35,7 +35,7 @@ internal abstract class CanvasRenderer(
         initCanvas()
     }
 
-    private val onFrame: (Double) -> Unit = { timestamp: Double ->
+    private fun onFrame(timestamp: Double) {
         redrawScheduled = false
         GL.makeContextCurrent(contextPointer)
         // `clear` and `resetMatrix` make canvas not accumulate previous effects
@@ -44,6 +44,11 @@ internal abstract class CanvasRenderer(
         drawFrame(timestamp)
         surface?.flushAndSubmit()
         context.flush()
+    }
+
+    @OptIn(ExperimentalWasmJsInterop::class)
+    private val rAfCallback = rAfCallbackToJs {
+        onFrame(it)
     }
 
     fun initCanvas() {
@@ -80,14 +85,25 @@ internal abstract class CanvasRenderer(
     /**
      * Schedules a call to [drawFrame] to the appropriate moment.
      */
+    @OptIn(ExperimentalWasmJsInterop::class)
     fun needRedraw() {
         if (redrawScheduled) {
             return
         }
         redrawScheduled = true
-        window.requestAnimationFrame(onFrame)
+        windowRequestAnimationFrame(rAfCallback)
     }
 }
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private fun windowRequestAnimationFrame(callback: JsAny) : Int =
+    //language=JavaScript
+    js("window.requestAnimationFrame(callback)")
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private fun rAfCallbackToJs(callback: (Double) -> Unit): JsAny =
+    //language=JavaScript
+    js("(timestamp) => callback(timestamp)")
 
 internal external interface GLInterface {
     fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer
