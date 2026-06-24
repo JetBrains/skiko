@@ -1,6 +1,5 @@
 package org.jetbrains.skiko
 
-import kotlinx.browser.window
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.wasm.ContextAttributes
@@ -35,7 +34,7 @@ internal abstract class CanvasRenderer(
         initCanvas()
     }
 
-    private fun onFrame(timestamp: Double) {
+    private val requestAnimationFrameCallback: (timestamp: Double) -> Unit = { timestamp ->
         redrawScheduled = false
         GL.makeContextCurrent(contextPointer)
         // `clear` and `resetMatrix` make canvas not accumulate previous effects
@@ -44,11 +43,6 @@ internal abstract class CanvasRenderer(
         drawFrame(timestamp)
         surface?.flushAndSubmit()
         context.flush()
-    }
-
-    @OptIn(ExperimentalWasmJsInterop::class)
-    private val rAfCallback = rAfCallbackToJs {
-        onFrame(it)
     }
 
     fun initCanvas() {
@@ -91,19 +85,15 @@ internal abstract class CanvasRenderer(
             return
         }
         redrawScheduled = true
-        windowRequestAnimationFrame(rAfCallback)
+        windowRequestAnimationFrame(requestAnimationFrameCallback)
     }
 }
 
 @OptIn(ExperimentalWasmJsInterop::class)
-private fun windowRequestAnimationFrame(callback: JsAny) : Int =
+private fun windowRequestAnimationFrame(callback: (Double) -> Unit) : Int =
     //language=JavaScript
     js("window.requestAnimationFrame(callback)")
 
-@OptIn(ExperimentalWasmJsInterop::class)
-private fun rAfCallbackToJs(callback: (Double) -> Unit): JsAny =
-    //language=JavaScript
-    js("(timestamp) => callback(timestamp)")
 
 internal external interface GLInterface {
     fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer
