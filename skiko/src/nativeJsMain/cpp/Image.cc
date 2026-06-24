@@ -171,3 +171,19 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nAdoptTextureFrom
 
     return reinterpret_cast<KNativePointer>(image.release());
 }
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nAdoptTextureFromAlphaType
+  (KNativePointer contextPtr, KNativePointer backendTexturePtr, KInt surfaceOrigin, KInt colorType, KInt alphaType) {
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(contextPtr);
+    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(backendTexturePtr);
+
+    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
+        static_cast<GrRecordingContext*>(context),
+        *backendTexture,
+        static_cast<GrSurfaceOrigin>(surfaceOrigin),
+        static_cast<SkColorType>(colorType),
+        static_cast<SkAlphaType>(alphaType)
+    );
+
+    return reinterpret_cast<KNativePointer>(image.release());
+}
