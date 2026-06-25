@@ -42,6 +42,12 @@ jobs:
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Maven Local'
         with:
@@ -50,6 +56,26 @@ jobs:
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.wasm.enabled=true \
               publishToMavenLocal
+
+      - uses: actions/setup-node@v4
+        name: 'Setup Node.js'
+        with:
+          node-version: 22
+
+      - shell: bash
+        name: 'Setup Playwright'
+        run: |
+          npm install --prefix "${RUNNER_TEMP}/skiko-playwright" @playwright/test@1.56.1
+          "${RUNNER_TEMP}/skiko-playwright/node_modules/.bin/playwright" install --with-deps chromium
+
+      - shell: bash
+        name: 'Check Skiko Extensions Web Sample'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skiko-extensions-gradle
+          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
+          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+        run: |
+          bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
 
   Linux:
     name: 'Linux x64 Publish Dry Run'
@@ -90,6 +116,15 @@ jobs:
           command: |
             ./gradlew --no-daemon --stacktrace \
               :SkiaAwtSample:installDist
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Check Skiko Extensions Sample'
+        with:
+          image_name: linux-compat
+          virtual-display: true
+          command: |
+            ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+              :runAwt --args=--exit-after-ms=5000
 
   LinuxArm:
     name: 'Linux arm64 Publish Dry Run'
@@ -152,6 +187,24 @@ jobs:
           ./gradlew --no-daemon --stacktrace \
             :SkiaAwtSample:installDist
 
+      - shell: bash
+        name: 'Check Skiko Extensions Sample'
+        run: |
+          ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+            :runAwt --args=--exit-after-ms=5000
+
+      - shell: bash
+        name: 'Check Skiko Extensions Apple Native Sample'
+        run: |
+          ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+            -Psample.exitAfterMs=5000 \
+            :runNative \
+            :linkDebugExecutableMacosArm64 \
+            :linkDebugExecutableMacosX64 \
+            :linkDebugExecutableIosArm64 \
+            :linkDebugExecutableIosSimulatorArm64 \
+            :linkDebugExecutableIosX64
+
   Windows:
     name: 'Windows Publish Dry Run'
     runs-on: windows-2022
@@ -195,3 +248,9 @@ jobs:
         run: |
           ./gradlew --no-daemon --stacktrace \
             :SkiaAwtSample:installDist
+
+      - shell: bash
+        name: 'Check Skiko Extensions Sample'
+        run: |
+          ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+            :runAwt --args=--exit-after-ms=5000
