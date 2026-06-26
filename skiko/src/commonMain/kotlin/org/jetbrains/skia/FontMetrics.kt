@@ -8,7 +8,25 @@ import kotlin.jvm.JvmInline
 @JvmInline
 value class FontMetrics(internal val metrics: FloatArray) {
 
-    //Maintained for binary compatibility
+    /**
+     * Maintained for binary compatibility and previous construction with its named values
+     *
+     * @param top greatest extent above origin of any glyph bounding box, typically negative; deprecated with variable fonts
+     * @param ascent distance to reserve above baseline, typically negative
+     * @param descent distance to reserve below baseline, typically positive
+     * @param bottom greatest extent below origin of any glyph bounding box, typically positive; deprecated with variable fonts
+     * @param leading distance to add between lines, typically positive or zero
+     * @param avgCharWidth average character width, zero if unknown
+     * @param maxCharWidth maximum character width, zero if unknown
+     * @param xMin greatest extent to left of origin of any glyph bounding box, typically negative; deprecated with variable fonts
+     * @param xMax greatest extent to right of origin of any glyph bounding box, typically positive; deprecated with variable fonts
+     * @param xHeight height of lower-case 'x', zero if unknown, typically negative
+     * @param capHeight height of an upper-case letter, zero if unknown, typically negative
+     * @param underlineThickness underline thickness
+     * @param underlinePosition distance from baseline to top of stroke, typically positive
+     * @param strikeoutThickness strikeout thickness
+     * @param strikeoutPosition distance from baseline to bottom of stroke, typically negative
+     */
     constructor(
         top: Float,
         ascent: Float,
@@ -54,7 +72,7 @@ value class FontMetrics(internal val metrics: FloatArray) {
      * distance to reserve above baseline, typically negative
      */
     val ascent: Float
-         get() = metrics[1]
+        get() = metrics[1]
     /**
      * distance to reserve below baseline, typically positive
      */
