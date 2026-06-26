@@ -1978,7 +1978,7 @@ $dokka.location:org.jetbrains.skia/Image.Companion/makeFromPixmap/#org.jetbrains
 $dokka.location:org.jetbrains.skia/Image.Companion/makeRaster/#org.jetbrains.skia.ImageInfo#kotlin.ByteArray#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-raster.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeRaster/#org.jetbrains.skia.ImageInfo#org.jetbrains.skia.Data#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-raster.html
 $dokka.location:org.jetbrains.skia/Image///PointingToDeclaration/skiko/org.jetbrains.skia/-image/index.html
-$dokka.location:org.jetbrains.skia/Image/encodeToData/#org.jetbrains.skia.EncodedImageFormat#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-image/encode-to-data.html
+$dokka.location:org.jetbrains.skia/Image/encodeToData/#org.jetbrains.skia.EncodedImageFormat#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-image/encode-to-data.html
 $dokka.location:org.jetbrains.skia/Image/imageInfo/#/PointingToDeclaration/skiko/org.jetbrains.skia/-image/image-info.html
 $dokka.location:org.jetbrains.skia/Image/makeShader/#org.jetbrains.skia.FilterTileMode#org.jetbrains.skia.FilterTileMode#org.jetbrains.skia.Matrix33?/PointingToDeclaration/skiko/org.jetbrains.skia/-image/make-shader.html
 $dokka.location:org.jetbrains.skia/Image/makeShader/#org.jetbrains.skia.FilterTileMode#org.jetbrains.skia.FilterTileMode#org.jetbrains.skia.SamplingMode#org.jetbrains.skia.Matrix33?/PointingToDeclaration/skiko/org.jetbrains.skia/-image/make-shader.html
