@@ -78,14 +78,14 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nGetIma
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToData
-  (JNIEnv* env, jclass jclass, jlong ptr, jint format, jint quality) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint format, jint quality, jint pngCompressionLevel) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkEncodedImageFormat skFormat = static_cast<SkEncodedImageFormat>(format);
     if (!instance->isTextureBacked()) {
       switch (skFormat) {
         case SkEncodedImageFormat::kPNG: {
           SkPngEncoder::Options options = SkPngEncoder::Options();
-          options.fZLibLevel = std::max(0, std::min((int)(quality / 10), 9));
+          options.fZLibLevel = pngCompressionLevel;
           SkData* data = SkPngEncoder::Encode(nullptr, instance, options).release();
           return reinterpret_cast<jlong>(data);
         }

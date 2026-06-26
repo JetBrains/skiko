@@ -16,6 +16,8 @@ class ImageTest {
             assertEquals(100, image.height)
 
             assertTrue(image.encodeToData()?.bytes!!.isNotEmpty())
+            assertTrue(image.encodeToData(EncodedImageFormat.PNG, pngCompressionLevel = 1)?.bytes!!.isNotEmpty())
+            assertTrue(image.encodeToData(EncodedImageFormat.PNG, pngCompressionLevel = 0)?.bytes!!.isNotEmpty())
             assertTrue(image.encodeToData(EncodedImageFormat.JPEG)?.bytes!!.isNotEmpty())
             assertTrue(image.encodeToData(EncodedImageFormat.JPEG, 50)?.bytes!!.isNotEmpty())
             assertTrue(image.encodeToData(EncodedImageFormat.WEBP)?.bytes!!.isNotEmpty())
