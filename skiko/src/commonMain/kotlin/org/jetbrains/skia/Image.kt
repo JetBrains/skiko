@@ -215,30 +215,27 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
      *
      * quality is a platform and format specific metric trading off size and encoding
      * error. When used, quality equaling 100 encodes with the least error. quality may
-     * be ignored by the encoder.
+     * be ignored by the encoder. PNG is lossless, so quality is ignored for PNG. Use
+     * `pngCompressionLevel` to control PNG compression.
      *
-     * @param format   one of: [EncodedImageFormat.JPEG], [EncodedImageFormat.PNG], [EncodedImageFormat.WEBP]
-     * @param quality  encoder specific metric with 100 equaling best
-     * @return         encoded Image, or null
+     * pngCompressionLevel is used only for PNG and is passed as zlib compression level.
+     * It must be in the 0..9 range, where 6 is the default, 9 is maximal compression,
+     * and 0 skips zlib compression.
      *
-     * @see [https://fiddle.skia.org/c/@Image_encodeToData](https://fiddle.skia.org/c/@Image_encodeToData)
+     * @param format               one of: [EncodedImageFormat.JPEG], [EncodedImageFormat.PNG], [EncodedImageFormat.WEBP]
+     * @param quality              encoder specific metric with 100 equaling best, ignored for PNG
+     * @param pngCompressionLevel  PNG zlib compression level in 0..9
+     * @return                     encoded Image, or null
+     *
      */
-    /**
-     *
-     * Encodes Image pixels, returning result as Data. Returns existing encoded data
-     * if present; otherwise, Image is encoded with [EncodedImageFormat.PNG].
-     *
-     *
-     * Returns null if existing encoded data is missing or invalid, and encoding fails.
-     *
-     * @return  encoded Image, or null
-     *
-     * @see [https://fiddle.skia.org/c/@Image_encodeToData_2](https://fiddle.skia.org/c/@Image_encodeToData_2)
-     */
-    fun encodeToData(format: EncodedImageFormat = EncodedImageFormat.PNG, quality: Int = 100): Data? {
+    fun encodeToData(
+        format: EncodedImageFormat = EncodedImageFormat.PNG,
+        quality: Int = 100,
+        pngCompressionLevel: Int = 6
+    ): Data? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nEncodeToData(_ptr, format.ordinal, quality)
+            val ptr = _nEncodeToData(_ptr, format.ordinal, quality, pngCompressionLevel)
             if (ptr == NullPointer) null else org.jetbrains.skia.Data(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -461,7 +458,12 @@ private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 internal external fun _nMakeFromEncoded(bytes: InteropPointer, encodedLength: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
-private external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: Int): NativePointer
+private external fun _nEncodeToData(
+    ptr: NativePointer,
+    format: Int,
+    quality: Int,
+    pngCompressionLevel: Int
+): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
 private external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
