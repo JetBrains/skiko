@@ -177,3 +177,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptTextu
     );
     return reinterpret_cast<jlong>(image.release());
 }
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptTextureFromAlphaType
+  (JNIEnv* env, jclass jclass, jlong contextPtr, jlong backendTexturePtr, jint surfaceOrigin, jint colorType, jint alphaType) {
+    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(static_cast<uintptr_t>(backendTexturePtr));
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(contextPtr));
+
+    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
+        static_cast<GrRecordingContext*>(context),
+        *backendTexture,
+        static_cast<GrSurfaceOrigin>(surfaceOrigin),
+        static_cast<SkColorType>(colorType),
+        static_cast<SkAlphaType>(alphaType)
+    );
+    return reinterpret_cast<jlong>(image.release());
+}
