@@ -1,5 +1,11 @@
 import org.kohsuke.github.*
 import org.jetbrains.compose.internal.publishing.*
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
+
+plugins {
+    `maven-publish`
+}
 
 val skiko = SkikoProperties(project)
 val mavenCentral = MavenCentralProperties(project)
@@ -31,6 +37,8 @@ val skikoArtifactIds: List<String> =
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+
+        "${skikoArtifacts.jvmRuntimeArtifactId}-all",
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
@@ -109,3 +117,120 @@ fun connectToGitHub() =
     GitHubBuilder()
         .withOAuthToken(System.getenv("SKIKO_GH_RELEASE_TOKEN"))
         .build()
+
+
+configure<PublishingExtension> {
+    repositories {
+        maven {
+            name = "ComposeRepo"
+            url = uri(skiko.composeRepoUrl)
+            credentials {
+                username = skiko.composeRepoUserName
+                password = skiko.composeRepoKey
+            }
+        }
+    }
+}
+
+// Aggregator task that publishes the awt runtime fat jars of every module that
+// calls registerJvmRuntimeAllPublication(). CI only ever needs to invoke this single task.
+val publishAllJvmRuntimeAllPublications = tasks.register("publishAllJvmRuntimeAllPublicationsToComposeRepoRepository") {
+    group = "publishing"
+    description =
+        "Publishes the fat (-all) JVM runtime jars of every registered Skiko module to the Compose repository."
+}
+
+// Desktop JVM targets bundled into the fat runtime jar.
+val jvmRuntimeAllTargets: List<Pair<OS, Arch>> =
+    listOf(
+        OS.Windows to Arch.X64,
+        OS.Windows to Arch.Arm64,
+        OS.Linux to Arch.X64,
+        OS.Linux to Arch.Arm64,
+        OS.MacOS to Arch.X64,
+        OS.MacOS to Arch.Arm64,
+    )
+
+fun registerJvmRuntimeAllPublication(artifacts: SkikoArtifacts) {
+    val allArtifactId = "${artifacts.jvmRuntimeArtifactId}-all"
+    val publicationName = artifacts.artifactIdPrefix
+        .split('-')
+        .mapIndexed { index, part ->
+            if (index == 0) part else part.replaceFirstChar { it.uppercaseChar() }
+        }
+        .joinToString("") + "JvmRuntimeAll"
+
+    val runtimeModules = provider {
+        val artifactsDir = layout.buildDirectory.dir("skiko-artifacts").get().asFile
+        jvmRuntimeAllTargets.map { (os, arch) ->
+            val artifactId = artifacts.jvmRuntimeArtifactIdFor(os, arch)
+            ModuleToUpload(
+                groupId = SkikoArtifacts.DEFAULT_GROUP_ID,
+                artifactId = artifactId,
+                version = skiko.deployVersion,
+                localDir = artifactsDir.resolve(
+                    "${skiko.deployVersion}/${SkikoArtifacts.DEFAULT_GROUP_ID}/$artifactId"
+                )
+            )
+        }
+    }
+
+    val downloadInputs = tasks.register(
+        "download${publicationName.replaceFirstChar { it.uppercaseChar() }}Inputs",
+        DownloadFromSpaceMavenRepoTask::class.java
+    ) {
+        modulesToDownload.set(runtimeModules)
+        spaceRepoUrl.set(skiko.composeRepoUrl)
+    }
+
+    val allJar = tasks.register("${publicationName}Jar", Jar::class.java) {
+        dependsOn(downloadInputs)
+        isZip64 = true
+        archiveBaseName.set(allArtifactId)
+        archiveVersion.set(skiko.deployVersion)
+        destinationDirectory.set(layout.buildDirectory.dir(allArtifactId))
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+        runtimeModules.get().forEach { module ->
+            val runtimeJar = module.localDir.resolve("${module.artifactId}-${module.version}.jar")
+            from(zipTree(runtimeJar)) {
+                exclude("**/META-INF/**")
+            }
+        }
+    }
+
+    val emptySourcesJar = tasks.register("${publicationName}SourcesJar", Jar::class.java) {
+        archiveBaseName.set(allArtifactId)
+        archiveVersion.set(skiko.deployVersion)
+        archiveClassifier.set("sources")
+        destinationDirectory.set(layout.buildDirectory.dir(allArtifactId))
+    }
+
+    configure<PublishingExtension> {
+        publications {
+            create<MavenPublication>(publicationName) {
+                groupId = SkikoArtifacts.DEFAULT_GROUP_ID
+                artifactId = allArtifactId
+                version = skiko.deployVersion
+
+                artifact(allJar)
+                artifact(emptySourcesJar)
+
+                pom {
+                    name.set("Composition of all ${artifacts.displayName} JVM Runtimes")
+                    description.set(artifacts.pomDescription)
+                    configureSkikoPomMetadata()
+                }
+            }
+        }
+    }
+
+    val publishTaskName =
+        "publish${publicationName.replaceFirstChar { it.uppercaseChar() }}PublicationToComposeRepoRepository"
+    val publishTask = tasks.named(publishTaskName)
+    publishAllJvmRuntimeAllPublications.configure {
+        dependsOn(publishTask)
+    }
+}
+
+registerJvmRuntimeAllPublication(skikoArtifacts)

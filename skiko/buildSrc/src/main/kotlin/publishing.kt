@@ -7,6 +7,7 @@ import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.publish.PublicationContainer
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.MavenPom
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.named
@@ -17,6 +18,34 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 
 private val SkikoProjectContext.publishing get() = project.extensions.getByType(PublishingExtension::class.java)
+
+/**
+ * Shared POM metadata for all Skiko publications (license, project URL, SCM, developers).
+ *
+ */
+fun MavenPom.configureSkikoPomMetadata() {
+    licenses {
+        license {
+            name.set("The Apache License, Version 2.0")
+            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+        }
+    }
+    val repoUrl = "https://www.github.com/JetBrains/skiko"
+    url.set(repoUrl)
+    scm {
+        url.set(repoUrl)
+        val repoConnection = "scm:git:$repoUrl.git"
+        connection.set(repoConnection)
+        developerConnection.set(repoConnection)
+    }
+    developers {
+        developer {
+            name.set("Compose Multiplatform Team")
+            organization.set("JetBrains")
+            organizationUrl.set("https://www.jetbrains.com")
+        }
+    }
+}
 
 private val awtRuntimeTargets = listOf(
     OS.MacOS to Arch.X64, OS.MacOS to Arch.Arm64,
@@ -110,27 +139,7 @@ private fun SkikoPublishingContext.configurePublicationDefaults() {
 
             pom {
                 description.set(skikoArtifacts.pomDescription)
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                val repoUrl = "https://www.github.com/JetBrains/skiko"
-                url.set(repoUrl)
-                scm {
-                    url.set(repoUrl)
-                    val repoConnection = "scm:git:$repoUrl.git"
-                    connection.set(repoConnection)
-                    developerConnection.set(repoConnection)
-                }
-                developers {
-                    developer {
-                        name.set("Compose Multiplatform Team")
-                        organization.set("JetBrains")
-                        organizationUrl.set("https://www.jetbrains.com")
-                    }
-                }
+                configureSkikoPomMetadata()
             }
         }
     }
