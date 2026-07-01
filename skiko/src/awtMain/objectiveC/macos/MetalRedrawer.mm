@@ -20,6 +20,10 @@
 
 #include "common/interop.hh"
 
+// Defined later in this file; forward-declared so AWTMetalLayer (below) can use them.
+static JNIEnv *resolveJNIEnvForCurrentThread();
+static jmethodID getDrawInLiveResizeMethodID(JNIEnv *env, jobject redrawer);
+
 @implementation AWTMetalLayer
 
 - (id)init
@@ -33,6 +37,32 @@
     [self setNeedsDisplayOnBoundsChange: YES];
 
     return self;
+}
+
+/// During a live resize this fires (on the AppKit main thread) when the layer autoresizes to track the
+/// window. We update drawableSize and synchronously draw + present, all within the ambient
+/// CATransaction that is also committing the window's new size, so content and backing stay in sync.
+- (void)setBounds:(CGRect)bounds
+{
+    [super setBounds:bounds];
+    if (!self.liveResizing || self.javaRef == NULL) {
+        return;
+    }
+
+    CGFloat scale = self.contentsScale;
+    int pixelWidth = (int)(bounds.size.width * scale);
+    int pixelHeight = (int)(bounds.size.height * scale);
+    if (pixelWidth <= 0 || pixelHeight <= 0) {
+        return;
+    }
+
+    self.drawableSize = CGSizeMake(pixelWidth, pixelHeight);
+
+    JNIEnv *env = resolveJNIEnvForCurrentThread();
+    jmethodID drawInLiveResize = getDrawInLiveResizeMethodID(env, self.javaRef);
+    if (drawInLiveResize) {
+        env->CallVoidMethod(self.javaRef, drawInLiveResize, (jint)pixelWidth, (jint)pixelHeight);
+    }
 }
 
 @end
@@ -115,6 +145,24 @@ static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawe
     return onOcclusionStateChanged;
 }
 
+static jmethodID getDrawInLiveResizeMethodID(JNIEnv *env, jobject redrawer) {
+    static jmethodID drawInLiveResize = NULL;
+    if (drawInLiveResize == NULL) {
+        jclass redrawerClass = env->GetObjectClass(redrawer);
+        drawInLiveResize = env->GetMethodID(redrawerClass, "drawInLiveResize", "(II)V");
+    }
+    return drawInLiveResize;
+}
+
+static jmethodID getOnLiveResizeChangedMethodID(JNIEnv *env, jobject redrawer) {
+    static jmethodID onLiveResizeChanged = NULL;
+    if (onLiveResizeChanged == NULL) {
+        jclass redrawerClass = env->GetObjectClass(redrawer);
+        onLiveResizeChanged = env->GetMethodID(redrawerClass, "onLiveResizeChanged", "(Z)V");
+    }
+    return onLiveResizeChanged;
+}
+
 extern "C"
 {
 
@@ -172,8 +220,51 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                 jniEnv->CallObjectMethod(layer.javaRef, onOcclusionStateChanged, isOccluded);
             }];
 
+        /// Toggle transactional presentation around an interactive live resize. These fire on the
+        /// AppKit main thread, so mutating the layer's presentsWithTransaction here is thread-safe.
+        /// weakDevice avoids a device -> observer -> block -> device retain cycle.
+        __weak MetalDevice *weakDevice = device;
+        device.liveResizeStartObserver =
+            [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowWillStartLiveResizeNotification
+                                                              object:window
+                                                               queue:nil
+                                                          usingBlock:^(NSNotification * _Nonnull note) {
+                MetalDevice *strongDevice = weakDevice;
+                if (!strongDevice) return;
+                strongDevice.inLiveResize = YES;
+                strongDevice.layer.presentsWithTransaction = YES;
+                strongDevice.layer.liveResizing = YES;
+                JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
+                jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)YES);
+            }];
+        device.liveResizeEndObserver =
+            [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidEndLiveResizeNotification
+                                                              object:window
+                                                               queue:nil
+                                                          usingBlock:^(NSNotification * _Nonnull note) {
+                MetalDevice *strongDevice = weakDevice;
+                if (!strongDevice) return;
+                /// Order matters: stop the main-thread live-resize draw and clear presentsWithTransaction
+                /// before inLiveResize, so the async present path (taken when inLiveResize is NO) never
+                /// runs while presentsWithTransaction is YES.
+                strongDevice.layer.liveResizing = NO;
+                strongDevice.layer.presentsWithTransaction = NO;
+                strongDevice.inLiveResize = NO;
+                JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
+                jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)NO);
+            }];
+
         return (jlong) (__bridge_retained void *) device;
     }
+}
+
+/// True while the window is in an interactive live resize. Used by the Kotlin side to hand
+/// presentation over to the main-thread path (AWTMetalLayer.setBounds) during the resize.
+JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_nativeIsInLiveResize(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
+{
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+    return device.inLiveResize ? JNI_TRUE : JNI_FALSE;
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLayers(
@@ -246,6 +337,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
         MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
         env->DeleteGlobalRef(device.layer.javaRef);
         [[NSNotificationCenter defaultCenter] removeObserver:device.occlusionObserver];
+        [[NSNotificationCenter defaultCenter] removeObserver:device.liveResizeStartObserver];
+        [[NSNotificationCenter defaultCenter] removeObserver:device.liveResizeEndObserver];
         device.layer.displaySyncEnabled = false;  // Prevents window background flashing when the window is disposed
         [device.layer removeFromSuperlayer];
     }

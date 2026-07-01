@@ -4,6 +4,7 @@
 #import <jawt_md.h>
 
 #import <QuartzCore/CAMetalLayer.h>
+#import <QuartzCore/CATransaction.h>
 #import <Metal/Metal.h>
 #import "ganesh/GrDirectContext.h"
 #import "gpu/ganesh/GrBackendSurface.h"
@@ -71,20 +72,34 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
                 dispatch_semaphore_signal(device.inflightSemaphore);
             }];
 
-            [commandBuffer addScheduledHandler:^(id<MTLCommandBuffer> buffer) {
-                int drawableWidth = currentDrawable.texture.width;
-                int drawableHeight = currentDrawable.texture.height;
+            if (device.inLiveResize) {
+                /// During live resize this runs on the AppKit main thread (driven from
+                /// AWTMetalLayer.setBounds) with presentsWithTransaction = YES, inside the ambient
+                /// CATransaction that is also committing the window's new size. Present synchronously so
+                /// the drawable swap joins that same transaction (no nested begin/commit — that would
+                /// split it back out). commit + waitUntilScheduled guarantees the drawing command buffer
+                /// (submitted by Skia earlier, ahead of this one in the queue) is scheduled first.
+                [commandBuffer commit];
+                [commandBuffer waitUntilScheduled];
 
-                int layerWidth = device.layer.drawableSize.width;
-                int layerHeight = device.layer.drawableSize.height;
-
-                /// Avoid presenting drawable on layer that has already changed size by the moment it was scheduled
-                if (drawableWidth == layerWidth && drawableHeight == layerHeight) {
+                /// Only present if the drawable still matches the layer size (it should, since setBounds
+                /// set drawableSize and we rendered to it just now, but stay defensive).
+                if (currentDrawable.texture.width == (NSUInteger) device.layer.drawableSize.width &&
+                    currentDrawable.texture.height == (NSUInteger) device.layer.drawableSize.height) {
                     [currentDrawable present];
                 }
-            }];
+            } else {
+                [commandBuffer addScheduledHandler:^(id<MTLCommandBuffer> buffer) {
+                    /// Avoid presenting a drawable on a layer that has already changed size by the moment
+                    /// this was scheduled.
+                    if (currentDrawable.texture.width == (NSUInteger) device.layer.drawableSize.width &&
+                        currentDrawable.texture.height == (NSUInteger) device.layer.drawableSize.height) {
+                        [currentDrawable present];
+                    }
+                }];
 
-            [commandBuffer commit];
+                [commandBuffer commit];
+            }
             device.drawableHandle = nil;
         }
     }

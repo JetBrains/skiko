@@ -152,17 +152,76 @@ internal class MetalRedrawer(
         }
     }
 
-    override fun syncBounds() = synchronized(drawLock) {
-        check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-        val rootPane = getRootPane(layer)
-        val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
-        setContentScale(device.ptr, layer.contentScale)
-        val x = globalPosition.x
-        val y = rootPane.height - globalPosition.y - layer.height
-        val width = layer.backedLayer.width.coerceAtLeast(0)
-        val height = layer.backedLayer.height.coerceAtLeast(0)
-        Logger.debug { "MetalRedrawer#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}" }
-        resizeLayers(device.ptr, x, y, width, height)
+    /** True while the window is in an interactive live resize (see [drawInLiveResize]). */
+    private val isInLiveResize: Boolean
+        get() = nativeIsInLiveResize(device.ptr)
+
+    /**
+     * Called from `AWTMetalLayer.setBounds` on the AppKit main thread during a live resize.
+     *
+     * Records fresh content at exactly [scaledWidth] x [scaledHeight] pixels on the EDT (synchronously,
+     * so no other frame can slip in between), then presents it 1:1 on this (main) thread. Rendering at
+     * the present size avoids any scaling, and presenting here — with presentsWithTransaction = YES —
+     * joins the same CATransaction that is committing the window's new size, so content, drawableSize
+     * and the window backing all update together.
+     *
+     * The EDT is idle during live resize (its frame loop is gated off), so the synchronous hop can't
+     * deadlock against it.
+     */
+    fun drawInLiveResize(scaledWidth: Int, scaledHeight: Int) {
+        if (isDisposed || scaledWidth <= 0 || scaledHeight <= 0) return
+
+        // 1. Record content at exactly the present size, on the EDT.
+        try {
+            invokeAndWait {
+                if (!isDisposed && layer.isShowing) {
+                    layer.update(System.nanoTime(), scaledWidth, scaledHeight)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.warn(e) { "Failed to record live-resize frame" }
+            return
+        }
+
+        // 2. Present that frame 1:1 within the window's resize transaction. performDraw takes drawLock
+        // and skips if disposed; we can't use inDrawScope here since it asserts the EDT and we're on
+        // the AppKit main thread.
+        with(LayerDrawScope(layer.pixelGeometry, scaledWidth, scaledHeight)) {
+            performDraw()
+        }
+    }
+
+    /**
+     * Called from the native live-resize observers on the AppKit main thread. When a resize ends, force
+     * one more render so the normal EDT-driven present path takes over from a clean, current frame.
+     * Hops to the EDT so [FrameDispatcher.scheduleFrame] is only ever touched from that thread.
+     */
+    @Suppress("unused")
+    fun onLiveResizeChanged(isInLiveResize: Boolean) {
+        if (!isInLiveResize) {
+            invokeLater {
+                if (!isDisposed) needRender(throttledToVsync = false)
+            }
+        }
+    }
+
+    override fun syncBounds() {
+        // During a live resize, geometry (drawableSize) and presentation are handled on the main thread
+        // in AWTMetalLayer.setBounds, within the window's resize transaction. Doing it from the EDT here
+        // would race that transaction, so skip it.
+        if (isInLiveResize) return
+        synchronized(drawLock) {
+            check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
+            val rootPane = getRootPane(layer)
+            val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
+            setContentScale(device.ptr, layer.contentScale)
+            val x = globalPosition.x
+            val y = rootPane.height - globalPosition.y - layer.height
+            val width = layer.backedLayer.width.coerceAtLeast(0)
+            val height = layer.backedLayer.height.coerceAtLeast(0)
+            Logger.debug { "MetalRedrawer#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}" }
+            resizeLayers(device.ptr, x, y, width, height)
+        }
     }
 
     override fun setVisible(isVisible: Boolean) {
@@ -175,6 +234,7 @@ internal class MetalRedrawer(
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
+    private external fun nativeIsInLiveResize(device: Long): Boolean
 
     /**
      * Set this value to true to synchronize the presentation of the layer’s contents with the display’s refresh,
@@ -195,13 +255,16 @@ internal class MetalRedrawer(
         }
 
         private val updateDispatcher = FrameDispatcher(MainUIDispatcher) {
-            if (layer.isShowing) {
+            // Skip while resizing: content is recorded and presented from the main thread
+            // (drawInLiveResize) instead, and an EDT update here could overwrite the picture the main
+            // thread is about to present.
+            if (layer.isShowing && !isInLiveResize) {
                 updateIfRequested()
             }
         }
 
         private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            if (layer.isShowing) {
+            if (layer.isShowing && !isInLiveResize) {
                 updateIfRequested()
                 draw()
             }

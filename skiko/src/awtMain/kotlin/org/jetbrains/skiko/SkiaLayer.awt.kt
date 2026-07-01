@@ -591,7 +591,14 @@ actual open class SkiaLayer internal constructor(
         redrawer?.renderImmediately()
     }
 
-    internal fun update(nanoTime: Long) {
+    /**
+     * Records the current content into a picture.
+     *
+     * [forcedPixelWidth]/[forcedPixelHeight], when non-negative, override the picture size instead of
+     * deriving it from the component bounds. The Metal live-resize path uses this to record content at
+     * exactly the size the main thread is about to present, so the frame needs no scaling.
+     */
+    internal fun update(nanoTime: Long, forcedPixelWidth: Int = -1, forcedPixelHeight: Int = -1) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
@@ -603,8 +610,15 @@ actual open class SkiaLayer internal constructor(
         // https://github.com/JetBrains/compose-multiplatform/blob/e4e2d329709cded91a09cc612d4defbce37aad96/benchmarks/multiplatform/benchmarks/src/commonMain/kotlin/MeasureComposable.kt#L151 as well
 
         val contentScale = this.contentScale
-        val pictureWidth = (backedLayer.width * contentScale).coerceAtLeast(0f)
-        val pictureHeight = (backedLayer.height * contentScale).coerceAtLeast(0f)
+        val pictureWidth: Float
+        val pictureHeight: Float
+        if (forcedPixelWidth >= 0 && forcedPixelHeight >= 0) {
+            pictureWidth = forcedPixelWidth.toFloat()
+            pictureHeight = forcedPixelHeight.toFloat()
+        } else {
+            pictureWidth = (backedLayer.width * contentScale).coerceAtLeast(0f)
+            pictureHeight = (backedLayer.height * contentScale).coerceAtLeast(0f)
+        }
         val intWidth = pictureWidth.toInt()
         val intHeight = pictureHeight.toInt()
 
