@@ -21,7 +21,6 @@ private val SkikoProjectContext.publishing get() = project.extensions.getByType(
 
 /**
  * Shared POM metadata for all Skiko publications (license, project URL, SCM, developers).
- *
  */
 fun MavenPom.configureSkikoPomMetadata() {
     licenses {
