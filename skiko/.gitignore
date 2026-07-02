@@ -5,6 +5,9 @@ local.properties
 .DS_Store
 dependencies/
 
+# CI-only directory for the AWT runtime fat jar
+awtRuntimeAllInputs/
+
 # Screenshot test actual files
 **/src/**/screenshots/*_actual.png
 
