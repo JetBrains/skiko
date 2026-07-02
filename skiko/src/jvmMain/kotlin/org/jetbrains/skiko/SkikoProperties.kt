@@ -51,6 +51,17 @@ object SkikoProperties {
         return getProperty("skiko.rendering.macos.waitForPreviousFrameVsyncOnRedrawImmediately")?.toBoolean() ?: true
     }
 
+    /**
+     * macOS/Metal: during an interactive live resize (dragging a window edge), render and present
+     * synchronously on the AppKit main thread, inside the same CATransaction that commits the window's
+     * new size, so content and window backing stay in sync (no white borders). When disabled, resize
+     * falls back to the previous behavior: geometry is updated from the EDT, and frames are presented
+     * asynchronously off the resize transaction. Enabled by default.
+     */
+    val macOSSynchronousLiveResize: Boolean get() {
+        return getProperty("skiko.rendering.macos.synchronousLiveResize")?.toBoolean() ?: true
+    }
+
     val windowsWaitForVsyncOnRedrawImmediately: Boolean get() {
         return getProperty("skiko.rendering.windows.waitForFrameVsyncOnRedrawImmediately")?.toBoolean() ?: false
     }

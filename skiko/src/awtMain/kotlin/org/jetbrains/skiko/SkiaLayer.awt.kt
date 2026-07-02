@@ -33,6 +33,13 @@ actual open class SkiaLayer internal constructor(
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+    /**
+     * Whether this layer fills its entire host window. When true, platform-specific window-level
+     * optimizations may be used (e.g., on macOS, driving the interactive live-resize redraw from the
+     * window). Set to false when the layer is embedded as a Swing component somewhere in the window's
+     * hierarchy rather than covering the whole window, so those window-level paths are disabled.
+     */
+    internal val fillsWindow: Boolean = false,
 ) : JComponent(), Accessible {
 
     internal companion object {
@@ -56,17 +63,19 @@ actual open class SkiaLayer internal constructor(
         renderApi: GraphicsApi = SkikoProperties.renderApi,
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
         pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+        fillsWindow: Boolean = false,
     ) : this(
-        accessibleContextProvider,
-        SkiaLayerProperties(
+        accessibleContextProvider = accessibleContextProvider,
+        properties = SkiaLayerProperties(
             isVsyncEnabled,
             isVsyncFramelimitFallbackEnabled,
             frameBuffering,
             renderApi
         ),
-        RenderFactory.Default,
-        analytics,
-        pixelGeometry
+        renderFactory = RenderFactory.Default,
+        analytics = analytics,
+        pixelGeometry = pixelGeometry,
+        fillsWindow = fillsWindow
     )
 
     constructor(
@@ -74,12 +83,14 @@ actual open class SkiaLayer internal constructor(
         properties: SkiaLayerProperties,
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
         pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+        fillsWindow: Boolean = false,
     ) : this(
-        accessibleContextProvider,
-        properties,
-        RenderFactory.Default,
-        analytics,
-        pixelGeometry
+        accessibleContextProvider = accessibleContextProvider,
+        properties = properties,
+        renderFactory = RenderFactory.Default,
+        analytics = analytics,
+        pixelGeometry = pixelGeometry,
+        fillsWindow = fillsWindow
     )
 
     val canvas: java.awt.Canvas

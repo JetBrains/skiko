@@ -68,8 +68,20 @@ internal class MetalRedrawer(
     init {
         onDeviceChosen(adapter.name)
         val numberOfBuffers = properties.frameBuffering.numberOfBuffers() ?: 0 // zero means default for system
+        // Live resize is driven from the window, so only enable it when this layer covers the whole
+        // window. When embedded as a Swing component (fillsWindow = false), fall back to the legacy path.
+        val liveResizeEnabled = SkikoProperties.macOSSynchronousLiveResize && layer.fillsWindow
         val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
-            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, numberOfBuffers, adapter.ptr, it))
+            MetalDevice(
+                createMetalDevice(
+                    window = layer.windowHandle,
+                    transparency = layer.transparency,
+                    frameBuffering = numberOfBuffers,
+                    adapter = adapter.ptr,
+                    platformInfo = it,
+                    liveResizeEnabled = liveResizeEnabled
+                )
+            )
         }
         _device = initDevice
         contextHandler = MetalContextHandler(layer, initDevice, adapter)
@@ -229,7 +241,7 @@ internal class MetalRedrawer(
         setLayerVisible(device.ptr, isVisible)
     }
 
-    private external fun createMetalDevice(window: Long, transparency: Boolean, frameBuffering: Int, adapter: Long, platformInfo: Long): Long
+    private external fun createMetalDevice(window: Long, transparency: Boolean, frameBuffering: Int, adapter: Long, platformInfo: Long, liveResizeEnabled: Boolean): Long
     private external fun disposeDevice(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)

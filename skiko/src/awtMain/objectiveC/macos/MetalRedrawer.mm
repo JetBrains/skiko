@@ -167,7 +167,7 @@ extern "C"
 {
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint frameBuffering, jlong adapterPtr, jlong platformInfoPtr)
+    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint frameBuffering, jlong adapterPtr, jlong platformInfoPtr, jboolean liveResizeEnabled)
 {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
@@ -222,37 +222,42 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
 
         /// Toggle transactional presentation around an interactive live resize. These fire on the
         /// AppKit main thread, so mutating the layer's presentsWithTransaction here is thread-safe.
-        /// weakDevice avoids a device -> observer -> block -> device retain cycle.
-        __weak MetalDevice *weakDevice = device;
-        device.liveResizeStartObserver =
-            [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowWillStartLiveResizeNotification
-                                                              object:window
-                                                               queue:nil
-                                                          usingBlock:^(NSNotification * _Nonnull note) {
-                MetalDevice *strongDevice = weakDevice;
-                if (!strongDevice) return;
-                strongDevice.inLiveResize = YES;
-                strongDevice.layer.presentsWithTransaction = YES;
-                strongDevice.layer.liveResizing = YES;
-                JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-                jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)YES);
-            }];
-        device.liveResizeEndObserver =
-            [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidEndLiveResizeNotification
-                                                              object:window
-                                                               queue:nil
-                                                          usingBlock:^(NSNotification * _Nonnull note) {
-                MetalDevice *strongDevice = weakDevice;
-                if (!strongDevice) return;
-                /// Order matters: stop the main-thread live-resize draw and clear presentsWithTransaction
-                /// before inLiveResize, so the async present path (taken when inLiveResize is NO) never
-                /// runs while presentsWithTransaction is YES.
-                strongDevice.layer.liveResizing = NO;
-                strongDevice.layer.presentsWithTransaction = NO;
-                strongDevice.inLiveResize = NO;
-                JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-                jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)NO);
-            }];
+        /// weakDevice avoids a device -> observer -> block -> device retain cycle. Gated by
+        /// liveResizeEnabled: when disabled the observers aren't installed, so inLiveResize/liveResizing
+        /// stay NO and every path (setBounds, finishFrame, syncBounds, the frame loop) uses the legacy
+        /// behavior.
+        if (liveResizeEnabled) {
+            __weak MetalDevice *weakDevice = device;
+            device.liveResizeStartObserver =
+                [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowWillStartLiveResizeNotification
+                                                                  object:window
+                                                                   queue:nil
+                                                              usingBlock:^(NSNotification * _Nonnull note) {
+                    MetalDevice *strongDevice = weakDevice;
+                    if (!strongDevice) return;
+                    strongDevice.inLiveResize = YES;
+                    strongDevice.layer.presentsWithTransaction = YES;
+                    strongDevice.layer.liveResizing = YES;
+                    JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
+                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)YES);
+                }];
+            device.liveResizeEndObserver =
+                [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidEndLiveResizeNotification
+                                                                  object:window
+                                                                   queue:nil
+                                                              usingBlock:^(NSNotification * _Nonnull note) {
+                    MetalDevice *strongDevice = weakDevice;
+                    if (!strongDevice) return;
+                    /// Order matters: stop the main-thread live-resize draw and clear presentsWithTransaction
+                    /// before inLiveResize, so the async present path (taken when inLiveResize is NO) never
+                    /// runs while presentsWithTransaction is YES.
+                    strongDevice.layer.liveResizing = NO;
+                    strongDevice.layer.presentsWithTransaction = NO;
+                    strongDevice.inLiveResize = NO;
+                    JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
+                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)NO);
+                }];
+        }
 
         return (jlong) (__bridge_retained void *) device;
     }
@@ -337,8 +342,13 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
         MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
         env->DeleteGlobalRef(device.layer.javaRef);
         [[NSNotificationCenter defaultCenter] removeObserver:device.occlusionObserver];
-        [[NSNotificationCenter defaultCenter] removeObserver:device.liveResizeStartObserver];
-        [[NSNotificationCenter defaultCenter] removeObserver:device.liveResizeEndObserver];
+        /// These two are only installed when live resize is enabled (see createMetalDevice).
+        if (device.liveResizeStartObserver) {
+            [[NSNotificationCenter defaultCenter] removeObserver:device.liveResizeStartObserver];
+        }
+        if (device.liveResizeEndObserver) {
+            [[NSNotificationCenter defaultCenter] removeObserver:device.liveResizeEndObserver];
+        }
         device.layer.displaySyncEnabled = false;  // Prevents window background flashing when the window is disposed
         [device.layer removeFromSuperlayer];
     }
