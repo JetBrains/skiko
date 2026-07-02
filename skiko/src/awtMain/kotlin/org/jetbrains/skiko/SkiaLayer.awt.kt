@@ -113,9 +113,9 @@ actual open class SkiaLayer internal constructor(
                 //    For example, on macOs when we resize window or change DPI
                 //
                 // 3. to avoid double paint in one single frame, use needRender instead of renderImmediately
-                if (!redrawer.isAutoResizing()) {
-                    redrawer?.needRender(throttledToVsync = false)
-                }
+//                if (!redrawer.isAutoResizing()) {
+                redrawer?.needRender(throttledToVsync = false)
+//                }
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
@@ -464,9 +464,7 @@ actual open class SkiaLayer internal constructor(
     override fun paint(g: Graphics) {
         Logger.debug { "paint called on SkiaLayer $this" }
         checkContentScale()
-        if (!redrawer.isAutoResizing()) {
-            redrawer?.needRender(throttledToVsync = false)
-        }
+        redrawer?.needRender(throttledToVsync = false)
     }
 
     // Workaround for JBR-5274 and JBR-5305
