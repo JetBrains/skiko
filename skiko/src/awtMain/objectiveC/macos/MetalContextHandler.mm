@@ -74,19 +74,19 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
                 dispatch_semaphore_signal(device.inflightSemaphore);
             }];
 
-            /// The transactional present is only valid on the AppKit main thread: it relies on the
-            /// ambient CATransaction (from AWTMetalLayer.setBounds, committing the window's new size) to
-            /// flush the present. Animation-driven frames during a live resize reach finishFrame on a
-            /// background render thread with no such transaction, so they must take the async branch
-            /// below — gating only on inLiveResize would deadlock them (their present would never commit).
+            /// Present transactionally only on the AppKit main thread, where the ambient CATransaction —
+            /// from AWTMetalLayer.setBounds, committing the window's new size — flushes the present.
+            /// During a resize every real frame arrives here on the main thread (setBounds and
+            /// drawResizeFrame both draw + finishFrame there). A frame that reaches finishFrame off the
+            /// main thread during a resize is a background straggler from just before it began; it falls
+            /// to the async branch below and is dropped.
             if (device.inLiveResize && NSThread.isMainThread) {
-                /// Scope presentsWithTransaction to just this main-thread frame rather than holding it
-                /// for the whole resize: enabling it layer-wide would wedge the async background presents
-                /// (their [drawable present] would defer forever on a transaction that never commits).
-                /// This runs inside the drawLock critical section, which serializes it against background
-                /// frames, so they never observe presentsWithTransaction = YES.
-                device.layer.presentsWithTransaction = YES;
-
+                /// presentsWithTransaction is already YES for the whole resize session — the live-resize
+                /// start observer (MetalRedrawer.mm) sets it, the end observer clears it. Holding it
+                /// layer-wide is safe because during a resize the main thread is the sole presenter; the
+                /// only frames that could reach the async branch below are stragglers, and they're dropped
+                /// there rather than presenting under YES.
+                ///
                 /// Present synchronously so the drawable swap joins the ambient window resize transaction
                 /// (no nested begin/commit — that would split it back out). commit + waitUntilScheduled
                 /// guarantees the drawing command buffer (submitted by Skia earlier, ahead of this one in
@@ -101,11 +101,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
                 if (sizeMatches) {
                     [currentDrawable present];
                 }
-
-                /// Restore before releasing drawLock so subsequent background frames present async. The
-                /// present issued above stays transactional — its binding is captured at the
-                /// [drawable present] call, so it still flushes with the window transaction.
-                device.layer.presentsWithTransaction = NO;
             } else {
                 [commandBuffer addScheduledHandler:^(id<MTLCommandBuffer> buffer) {
                     /// Normal (non-resize) frames present here, off the main thread — skiko's default, so
@@ -116,7 +111,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
                     /// drawResizeFrame, transactional branch above). A frame reaching this branch then is a
                     /// stale straggler that passed the frame-loop gate just before the resize began; drop
                     /// it rather than let its deferred present race the main-thread transactional present
-                    /// under the layer-wide presentsWithTransaction flag — that was the original deadlock.
+                    /// under the layer-wide presentsWithTransaction flag.
                     /// inLiveResize is a plain atomic ivar (not a CoreAnimation property), so reading it on
                     /// the scheduler thread takes no CA lock and can't block.
                     if (device.inLiveResize) {

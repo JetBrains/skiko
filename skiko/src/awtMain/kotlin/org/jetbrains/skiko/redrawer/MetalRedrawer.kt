@@ -121,7 +121,7 @@ internal class MetalRedrawer(
             // The background frame loop is gated off during a resize (two presenters deadlock / starve
             // the drawable pool), so drive animation frames from the AppKit main thread instead — the
             // same single serialized presenter that setBounds uses.
-            scheduleResizeFrame()
+            scheduleFrameOnAppKitThread()
         } else {
             frameDispatcher.scheduleFrame(needUpdate = true, throttledToVsync = throttledToVsync)
         }
@@ -181,7 +181,7 @@ internal class MetalRedrawer(
     }
 
     /**
-     * True while the window is in an interactive (edge-drag) live resize. During that window, resize
+     * Whether the window is in an interactive (edge-drag) live resize. During that window, resize
      * geometry and presentation are driven from the main thread (`AWTMetalLayer.setBounds` ->
      * [drawInLiveResize]); [SkiaLayer] reads this to suppress the reshape-driven syncBounds/needRender
      * that would otherwise race that path. Regular content/animation needRender still flows through.
@@ -190,12 +190,13 @@ internal class MetalRedrawer(
         get() = isInLiveResize
 
     /**
-     * Requests one animation-driven frame on the AppKit main thread during a live resize. Coalescing
-     * (at most one pending frame) lives natively in `scheduleFrameOnAppKitThread`, which hops to the
+     * Requests one frame on the AppKit main thread (during a live resize).
+     *
+     * Coalescing (at most one pending frame) lives natively in `scheduleFrameOnAppKitThread`, which hops to the
      * main queue and calls back into [drawResizeFrame], where the frame is rendered and presented through
      * the same transactional path as [drawInLiveResize].
      */
-    private fun scheduleResizeFrame() {
+    private fun scheduleFrameOnAppKitThread() {
         if (isDisposed) return
         scheduleFrameOnAppKitThread(device.ptr)
     }
@@ -266,7 +267,7 @@ internal class MetalRedrawer(
     fun onLiveResizeChanged(isInLiveResize: Boolean) {
         this@MetalRedrawer.isInLiveResize = isInLiveResize
         if (isInLiveResize) {
-            scheduleResizeFrame()
+            scheduleFrameOnAppKitThread()
         } else {
             invokeLater {
                 if (!isDisposed) needRender(throttledToVsync = false)

@@ -234,11 +234,14 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         /// disabled the observers aren't installed, so inLiveResize/liveResizing stay NO and every path
         /// (setBounds, finishFrame, syncBounds, the frame loop) uses the legacy behavior.
         ///
-        /// Note: presentsWithTransaction is deliberately NOT toggled here. It's scoped per-frame to the
-        /// main-thread present in MetalContextHandler.finishFrame instead, so animation frames that run
-        /// the async present path on a background thread during the resize never observe it as YES —
-        /// otherwise their [drawable present] would defer forever on a transaction that never commits,
-        /// wedging the command queue.
+        /// presentsWithTransaction is scoped to the whole resize session here (not per-frame): the start
+        /// observer sets it YES, the end observer clears it. This is safe because during a resize the
+        /// main thread is the sole presenter (setBounds + drawResizeFrame) and any frame that reaches the
+        /// async present path in finishFrame is dropped there. The ordering below keeps
+        /// presentsWithTransaction = YES a strict subset of inLiveResize = YES (set inLiveResize first at
+        /// start, clear the flag first at end) so that whenever the flag is YES a background straggler is
+        /// already being dropped — it can never present async under YES and defer forever on a
+        /// transaction that never commits.
         if (liveResizeEnabled) {
             __weak MetalDevice *weakDevice = device;
             device.liveResizeStartObserver =
@@ -249,6 +252,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     MetalDevice *strongDevice = weakDevice;
                     if (!strongDevice) return;
                     strongDevice.inLiveResize = YES;
+                    strongDevice.layer.presentsWithTransaction = YES;
                     strongDevice.layer.liveResizing = YES;
                     JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
                     jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)YES);
@@ -261,8 +265,11 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     MetalDevice *strongDevice = weakDevice;
                     if (!strongDevice) return;
                     /// Stop the main-thread live-resize draw (liveResizing) before clearing inLiveResize,
-                    /// so setBounds stops driving frames as the resize winds down.
+                    /// so setBounds stops driving frames as the resize winds down. Clear
+                    /// presentsWithTransaction before inLiveResize so background frames, which resume
+                    /// presenting async once inLiveResize goes NO, never observe the flag as YES.
                     strongDevice.layer.liveResizing = NO;
+                    strongDevice.layer.presentsWithTransaction = NO;
                     strongDevice.inLiveResize = NO;
                     JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
                     jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)NO);
