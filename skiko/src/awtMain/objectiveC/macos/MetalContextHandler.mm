@@ -15,6 +15,8 @@
 
 #import "MetalDevice.h"
 
+#import <stdatomic.h>
+
 extern "C"
 {
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_makeMetalContext(
@@ -72,30 +74,55 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
                 dispatch_semaphore_signal(device.inflightSemaphore);
             }];
 
-            if (device.inLiveResize) {
-                /// During live resize this runs on the AppKit main thread (driven from
-                /// AWTMetalLayer.setBounds) with presentsWithTransaction = YES, inside the ambient
-                /// CATransaction that is also committing the window's new size. Present synchronously so
-                /// the drawable swap joins that same transaction (no nested begin/commit — that would
-                /// split it back out). commit + waitUntilScheduled guarantees the drawing command buffer
-                /// (submitted by Skia earlier, ahead of this one in the queue) is scheduled first.
+            /// The transactional present is only valid on the AppKit main thread: it relies on the
+            /// ambient CATransaction (from AWTMetalLayer.setBounds, committing the window's new size) to
+            /// flush the present. Animation-driven frames during a live resize reach finishFrame on a
+            /// background render thread with no such transaction, so they must take the async branch
+            /// below — gating only on inLiveResize would deadlock them (their present would never commit).
+            if (device.inLiveResize && NSThread.isMainThread) {
+                /// Scope presentsWithTransaction to just this main-thread frame rather than holding it
+                /// for the whole resize: enabling it layer-wide would wedge the async background presents
+                /// (their [drawable present] would defer forever on a transaction that never commits).
+                /// This runs inside the drawLock critical section, which serializes it against background
+                /// frames, so they never observe presentsWithTransaction = YES.
+                device.layer.presentsWithTransaction = YES;
+
+                /// Present synchronously so the drawable swap joins the ambient window resize transaction
+                /// (no nested begin/commit — that would split it back out). commit + waitUntilScheduled
+                /// guarantees the drawing command buffer (submitted by Skia earlier, ahead of this one in
+                /// the queue) is scheduled first.
                 [commandBuffer commit];
                 [commandBuffer waitUntilScheduled];
 
                 /// Only present if the drawable still matches the layer size (it should, since setBounds
                 /// set drawableSize and we rendered to it just now, but stay defensive).
-                if (currentDrawable.texture.width == (NSUInteger) device.layer.drawableSize.width &&
-                    currentDrawable.texture.height == (NSUInteger) device.layer.drawableSize.height) {
+                BOOL sizeMatches = (currentDrawable.texture.width == (NSUInteger) device.layer.drawableSize.width &&
+                                    currentDrawable.texture.height == (NSUInteger) device.layer.drawableSize.height);
+                if (sizeMatches) {
                     [currentDrawable present];
                 }
+
+                /// Restore before releasing drawLock so subsequent background frames present async. The
+                /// present issued above stays transactional — its binding is captured at the
+                /// [drawable present] call, so it still flushes with the window transaction.
+                device.layer.presentsWithTransaction = NO;
             } else {
                 [commandBuffer addScheduledHandler:^(id<MTLCommandBuffer> buffer) {
-                    /// Avoid presenting a drawable on a layer that has already changed size by the moment
-                    /// this was scheduled.
-                    if (currentDrawable.texture.width == (NSUInteger) device.layer.drawableSize.width &&
-                        currentDrawable.texture.height == (NSUInteger) device.layer.drawableSize.height) {
-                        [currentDrawable present];
+                    /// Normal (non-resize) frames present here, off the main thread — skiko's default, so
+                    /// present work doesn't destabilize FPS on the main thread. Outside a resize
+                    /// presentsWithTransaction is always NO, so this is an immediate, non-deferred present.
+                    ///
+                    /// During a live resize the main thread is the sole presenter (setBounds +
+                    /// drawResizeFrame, transactional branch above). A frame reaching this branch then is a
+                    /// stale straggler that passed the frame-loop gate just before the resize began; drop
+                    /// it rather than let its deferred present race the main-thread transactional present
+                    /// under the layer-wide presentsWithTransaction flag — that was the original deadlock.
+                    /// inLiveResize is a plain atomic ivar (not a CoreAnimation property), so reading it on
+                    /// the scheduler thread takes no CA lock and can't block.
+                    if (device.inLiveResize) {
+                        return;
                     }
+                    [currentDrawable present];
                 }];
 
                 [commandBuffer commit];

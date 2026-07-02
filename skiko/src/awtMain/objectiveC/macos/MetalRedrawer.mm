@@ -163,6 +163,15 @@ static jmethodID getOnLiveResizeChangedMethodID(JNIEnv *env, jobject redrawer) {
     return onLiveResizeChanged;
 }
 
+static jmethodID getDrawResizeFrameMethodID(JNIEnv *env, jobject redrawer) {
+    static jmethodID drawResizeFrame = NULL;
+    if (drawResizeFrame == NULL) {
+        jclass redrawerClass = env->GetObjectClass(redrawer);
+        drawResizeFrame = env->GetMethodID(redrawerClass, "drawResizeFrame", "(II)V");
+    }
+    return drawResizeFrame;
+}
+
 extern "C"
 {
 
@@ -220,12 +229,16 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                 jniEnv->CallObjectMethod(layer.javaRef, onOcclusionStateChanged, isOccluded);
             }];
 
-        /// Toggle transactional presentation around an interactive live resize. These fire on the
-        /// AppKit main thread, so mutating the layer's presentsWithTransaction here is thread-safe.
-        /// weakDevice avoids a device -> observer -> block -> device retain cycle. Gated by
-        /// liveResizeEnabled: when disabled the observers aren't installed, so inLiveResize/liveResizing
-        /// stay NO and every path (setBounds, finishFrame, syncBounds, the frame loop) uses the legacy
-        /// behavior.
+        /// Track interactive live-resize state. These fire on the AppKit main thread. weakDevice avoids
+        /// a device -> observer -> block -> device retain cycle. Gated by liveResizeEnabled: when
+        /// disabled the observers aren't installed, so inLiveResize/liveResizing stay NO and every path
+        /// (setBounds, finishFrame, syncBounds, the frame loop) uses the legacy behavior.
+        ///
+        /// Note: presentsWithTransaction is deliberately NOT toggled here. It's scoped per-frame to the
+        /// main-thread present in MetalContextHandler.finishFrame instead, so animation frames that run
+        /// the async present path on a background thread during the resize never observe it as YES —
+        /// otherwise their [drawable present] would defer forever on a transaction that never commits,
+        /// wedging the command queue.
         if (liveResizeEnabled) {
             __weak MetalDevice *weakDevice = device;
             device.liveResizeStartObserver =
@@ -236,7 +249,6 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     MetalDevice *strongDevice = weakDevice;
                     if (!strongDevice) return;
                     strongDevice.inLiveResize = YES;
-                    strongDevice.layer.presentsWithTransaction = YES;
                     strongDevice.layer.liveResizing = YES;
                     JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
                     jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)YES);
@@ -248,11 +260,9 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                                                               usingBlock:^(NSNotification * _Nonnull note) {
                     MetalDevice *strongDevice = weakDevice;
                     if (!strongDevice) return;
-                    /// Order matters: stop the main-thread live-resize draw and clear presentsWithTransaction
-                    /// before inLiveResize, so the async present path (taken when inLiveResize is NO) never
-                    /// runs while presentsWithTransaction is YES.
+                    /// Stop the main-thread live-resize draw (liveResizing) before clearing inLiveResize,
+                    /// so setBounds stops driving frames as the resize winds down.
                     strongDevice.layer.liveResizing = NO;
-                    strongDevice.layer.presentsWithTransaction = NO;
                     strongDevice.inLiveResize = NO;
                     JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
                     jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)NO);
@@ -263,13 +273,43 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     }
 }
 
-/// True while the window is in an interactive live resize. Used by the Kotlin side to hand
-/// presentation over to the main-thread path (AWTMetalLayer.setBounds) during the resize.
-JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_nativeIsInLiveResize(
+/// Schedules a frame on the AppKit main thread. Called from Kotlin (MetalRedrawer.needRender) during a live resize,
+// when the background frame loop is gated off. The main queue serializes this with setBounds-driven frames, so there
+// is only ever one presenter and one drawable in flight — no async present, no drawable-pool contention. The current
+// pixel size is read on the main thread right before the callback, so the frame is rendered at the layer's live size.
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_scheduleFrameOnAppKitThread(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
-    return device.inLiveResize ? JNI_TRUE : JNI_FALSE;
+    /// javaRef is a global ref (created in createMetalDevice), safe to use from the deferred block.
+    jobject javaRef = device.layer.javaRef;
+    /// Coalesce: only dispatch if no resize frame is already pending. atomic_exchange returns the prior
+    /// value, so a `true` return means one is in flight and we skip. Scheduling may come from the EDT or
+    /// the main thread, hence the atomic.
+    if (atomic_exchange(&device->frameOnAppKitThreadScheduled, true)) {
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        /// Clear FIRST, unconditionally — before any guard below can bail. This keeps the flag honest
+        /// even when the frame is dropped (e.g. the resize already ended), so a later resize can schedule
+        /// again; and it lets an onRender -> needRender inside drawResizeFrame re-arm the next frame,
+        /// sustaining the animation while the pointer is held still.
+        atomic_store(&device->frameOnAppKitThreadScheduled, false);
+        if (!device.inLiveResize) {
+            return;
+        }
+        CGSize size = device.layer.drawableSize;
+        int pixelWidth = (int) size.width;
+        int pixelHeight = (int) size.height;
+        if (pixelWidth <= 0 || pixelHeight <= 0) {
+            return;
+        }
+        JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
+        jmethodID drawResizeFrame = getDrawResizeFrameMethodID(jniEnv, javaRef);
+        if (drawResizeFrame) {
+            jniEnv->CallVoidMethod(javaRef, drawResizeFrame, (jint)pixelWidth, (jint)pixelHeight);
+        }
+    });
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLayers(

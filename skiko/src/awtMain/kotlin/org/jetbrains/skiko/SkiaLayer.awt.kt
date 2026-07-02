@@ -113,7 +113,9 @@ actual open class SkiaLayer internal constructor(
                 //    For example, on macOs when we resize window or change DPI
                 //
                 // 3. to avoid double paint in one single frame, use needRender instead of renderImmediately
-                redrawer?.needRender(throttledToVsync = false)
+                if (!redrawer.isAutoResizing()) {
+                    redrawer?.needRender(throttledToVsync = false)
+                }
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
@@ -122,8 +124,14 @@ actual open class SkiaLayer internal constructor(
                 @Suppress("DEPRECATION")
                 super.reshape(x, y, width, height)
 
-                redrawer?.syncBounds()
-                redrawer?.needRender(throttledToVsync = false)
+                // While the platform drives an interactive resize itself (macOS/Metal live resize),
+                // geometry and presentation are handled there (AWTMetalLayer.setBounds). Calling
+                // syncBounds/needRender from here would race that path, so skip them. Regular
+                // content/animation needRender still flows through the normal channels.
+                if (!redrawer.isAutoResizing()) {
+                    redrawer?.syncBounds()
+                    redrawer?.needRender(throttledToVsync = false)
+                }
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -431,7 +439,7 @@ actual open class SkiaLayer internal constructor(
         //
         // Calling redraw during layout might break software renderers,
         // so apply this fix only for the Direct3D case.
-        if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
+        if (renderApi == GraphicsApi.DIRECT3D && isShowing && !redrawer.isAutoResizing()) {
             redrawer?.syncBounds()
             redrawer?.renderImmediately()
         }
@@ -456,7 +464,9 @@ actual open class SkiaLayer internal constructor(
     override fun paint(g: Graphics) {
         Logger.debug { "paint called on SkiaLayer $this" }
         checkContentScale()
-        redrawer?.needRender(throttledToVsync = false)
+        if (!redrawer.isAutoResizing()) {
+            redrawer?.needRender(throttledToVsync = false)
+        }
     }
 
     // Workaround for JBR-5274 and JBR-5305
@@ -799,3 +809,6 @@ private fun adjustSizeToContentScale(contentScale: Float, value: Int): Int {
         value
     }
 }
+
+
+private fun Redrawer?.isAutoResizing() = (this != null) && this.isAutoResizing

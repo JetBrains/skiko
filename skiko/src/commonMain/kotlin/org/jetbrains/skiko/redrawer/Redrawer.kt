@@ -12,6 +12,13 @@ internal interface Redrawer {
     fun needRender(throttledToVsync: Boolean)
     fun renderImmediately()
     fun syncBounds() = Unit
+
+    /**
+     * Whether the platform is driving an interactive window resize itself (e.g., the macOS/Metal
+     * live resize). While set, [SkiaLayer] suppresses the reshape-driven [syncBounds]/[needRender]
+     * so they don't race that path.
+     */
+    val isAutoResizing: Boolean get() = false
     fun update(nanoTime: Long = initialTime.elapsedNow().inWholeNanoseconds)
     fun setVisible(isVisible: Boolean) = Unit
     val renderInfo: String
