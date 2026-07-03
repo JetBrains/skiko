@@ -4,10 +4,13 @@ import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmEnvironment
 import org.gradle.api.component.SoftwareComponentFactory
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.publish.PublicationContainer
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.MavenPom
 import org.gradle.jvm.tasks.Jar
+import org.gradle.api.tasks.Copy
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.support.serviceOf
@@ -17,6 +20,33 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 
 private val SkikoProjectContext.publishing get() = project.extensions.getByType(PublishingExtension::class.java)
+
+/**
+ * Shared POM metadata for all Skiko publications (license, project URL, SCM, developers).
+ */
+fun MavenPom.configureSkikoPomMetadata() {
+    licenses {
+        license {
+            name.set("The Apache License, Version 2.0")
+            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+        }
+    }
+    val repoUrl = "https://www.github.com/JetBrains/skiko"
+    url.set(repoUrl)
+    scm {
+        url.set(repoUrl)
+        val repoConnection = "scm:git:$repoUrl.git"
+        connection.set(repoConnection)
+        developerConnection.set(repoConnection)
+    }
+    developers {
+        developer {
+            name.set("Compose Multiplatform Team")
+            organization.set("JetBrains")
+            organizationUrl.set("https://www.jetbrains.com")
+        }
+    }
+}
 
 private val awtRuntimeTargets = listOf(
     OS.MacOS to Arch.X64, OS.MacOS to Arch.Arm64,
@@ -34,6 +64,11 @@ private class SkikoPublishingContext(
     val additionalRuntimeLibraries = projectContext.additionalRuntimeLibraries
 
     val pomNameForPublication: MutableMap<String, String> = HashMap()
+    val awtRuntimeAllInputsDirName = "awtRuntimeAllInputs"
+    val awtRuntimeAllModuleInputsDir =
+        project.rootProject.layout.projectDirectory.dir("dependencies/$awtRuntimeAllInputsDirName/${skikoArtifacts.artifactIdPrefix}")
+    val awtRuntimeAllInputJarPattern =
+        "${skikoArtifacts.artifactIdPrefix}-${skiko.deployVersion}-*.jar"
 
     fun publishing(configure: PublishingExtension.() -> Unit) {
         projectContext.publishing.apply(configure)
@@ -42,6 +77,9 @@ private class SkikoPublishingContext(
     fun publications(configure: PublicationContainer.() -> Unit) {
         projectContext.publishing.publications.apply(configure)
     }
+
+    fun awtRuntimeAllInputJarName(os: OS, arch: Arch) =
+        "${skikoArtifacts.artifactIdPrefix}-${skiko.deployVersion}-${targetId(os, arch)}.jar"
 }
 
 fun SkikoProjectContext.declarePublications() {
@@ -49,6 +87,7 @@ fun SkikoProjectContext.declarePublications() {
     ctx.configurePublishingRepositories()
     ctx.configurePublicationDefaults()
     ctx.configureAllJvmRuntimeJarPublications()
+    ctx.configureAwtRuntimeAllJarPublication()
     ctx.configureAwtRuntimeJarPublication()
     ctx.configureAwtPublicationConstraints()
     ctx.configureAdditionalRuntimeLibrariesPublication()
@@ -110,27 +149,7 @@ private fun SkikoPublishingContext.configurePublicationDefaults() {
 
             pom {
                 description.set(skikoArtifacts.pomDescription)
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                val repoUrl = "https://www.github.com/JetBrains/skiko"
-                url.set(repoUrl)
-                scm {
-                    url.set(repoUrl)
-                    val repoConnection = "scm:git:$repoUrl.git"
-                    connection.set(repoConnection)
-                    developerConnection.set(repoConnection)
-                }
-                developers {
-                    developer {
-                        name.set("Compose Multiplatform Team")
-                        organization.set("JetBrains")
-                        organizationUrl.set("https://www.jetbrains.com")
-                    }
-                }
+                configureSkikoPomMetadata()
             }
         }
     }
@@ -156,6 +175,70 @@ private fun SkikoPublishingContext.configureAllJvmRuntimeJarPublications() = pub
                         appendNode("scope", "compile")
                     }
             }
+        }
+        if (skiko.isTeamcityCIBuild) {
+            val stageTask = project.tasks.registerOrGetTask<Copy>(
+                "stage${toTitleCase(os.id)}${toTitleCase(arch.id)}AwtRuntimeJarForAwtRuntimeAllJar"
+            ) {
+                from(entry.value.map { it.archiveFile })
+                into(awtRuntimeAllModuleInputsDir)
+            }
+            project.tasks
+                .named("publishSkikoJvmRuntime${toTitleCase(os.id)}${toTitleCase(arch.id)}PublicationToComposeRepoRepository")
+                .configure { dependsOn(stageTask) }
+        }
+    }
+}
+
+private fun SkikoPublishingContext.configureAwtRuntimeAllJarPublication() {
+    if (!project.supportAwt) return
+
+    val allArtifactId = "${skikoArtifacts.jvmRuntimeArtifactId}-all"
+    val allJar = project.tasks.registerOrGetTask<Jar>("awtRuntimeAllJar") {
+        isZip64 = true
+        archiveBaseName.set(allArtifactId)
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+        // CI bundle all defined targets read directly from the staging directory.
+        if (skiko.isTeamcityCIBuild) {
+            from({
+                project.fileTree(awtRuntimeAllModuleInputsDir) {
+                    include(awtRuntimeAllInputJarPattern)
+                }.files.sortedBy { it.name }.map { project.zipTree(it) }
+            }) {
+                exclude("**/META-INF/**")
+            }
+
+            doFirst {
+                val missingInputJars = awtRuntimeTargets
+                    .map { (os, arch) -> awtRuntimeAllInputJarName(os, arch) }
+                    .filterNot { awtRuntimeAllModuleInputsDir.file(it).asFile.isFile }
+                if (missingInputJars.isNotEmpty()) {
+                    error(
+                        "Missing AWT runtime input jars for ${skiko.deployVersion} in " +
+                            "${awtRuntimeAllModuleInputsDir.asFile}. Expected files matching " +
+                            "'$awtRuntimeAllInputJarPattern', missing: ${missingInputJars.joinToString()}"
+                    )
+                }
+            }
+        } else {
+            awtRuntimeTargets
+                .filter { projectContext.allJvmRuntimeJars.containsKey(it) }
+                .associateWith { projectContext.allJvmRuntimeJars.getValue(it) }
+                .values.forEach { runtimeJar ->
+                    from(project.zipTree(runtimeJar.flatMap { it.archiveFile })) {
+                        exclude("**/META-INF/**")
+                    }
+                }
+        }
+    }
+
+    publications {
+        create("awtRuntimeAll", MavenPublication::class.java) {
+            pomNameForPublication[name] = "Composition of all ${skikoArtifacts.displayName} AWT Runtimes"
+            artifactId = allArtifactId
+            artifact(allJar)
+            artifact(emptySourcesJar)
         }
     }
 }

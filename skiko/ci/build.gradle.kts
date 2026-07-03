@@ -31,6 +31,8 @@ val skikoArtifactIds: List<String> =
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+
+        "${skikoArtifacts.jvmRuntimeArtifactId}-all",
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
@@ -109,3 +111,4 @@ fun connectToGitHub() =
     GitHubBuilder()
         .withOAuthToken(System.getenv("SKIKO_GH_RELEASE_TOKEN"))
         .build()
+
