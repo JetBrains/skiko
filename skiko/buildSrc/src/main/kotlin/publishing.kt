@@ -66,7 +66,7 @@ private class SkikoPublishingContext(
     val pomNameForPublication: MutableMap<String, String> = HashMap()
     val awtRuntimeAllInputsDirName = "awtRuntimeAllInputs"
     val awtRuntimeAllModuleInputsDir =
-        project.rootProject.layout.projectDirectory.dir("$awtRuntimeAllInputsDirName/${skikoArtifacts.artifactIdPrefix}")
+        project.rootProject.layout.projectDirectory.dir("dependencies/$awtRuntimeAllInputsDirName/${skikoArtifacts.artifactIdPrefix}")
     val awtRuntimeAllInputJarPattern =
         "${skikoArtifacts.artifactIdPrefix}-${skiko.deployVersion}-*.jar"
 
