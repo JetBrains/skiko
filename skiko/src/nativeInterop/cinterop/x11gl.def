@@ -1,0 +1,9 @@
+headers = X11/Xlib.h X11/Xutil.h X11/Xatom.h X11/XKBlib.h X11/keysym.h GL/gl.h GL/glx.h
+# X11/GL headers are not part of the Konan sysroot; take them from the host via
+# -idirafter so the sysroot's per-arch glibc headers keep priority (a plain -I
+# breaks cross-compilation to linux_arm64 by shadowing glibc with host headers).
+compilerOpts.linux = -D_GNU_SOURCE -idirafter /usr/include
+compilerOpts.linux_x64 = -idirafter /usr/include/x86_64-linux-gnu
+compilerOpts.linux_arm64 = -idirafter /usr/include/aarch64-linux-gnu
+linkerOpts.linux_x64 = -L/usr/lib/x86_64-linux-gnu -lX11 -lGL -lfontconfig -lfreetype
+linkerOpts.linux_arm64 = -L/usr/lib/aarch64-linux-gnu -lX11 -lGL -lfontconfig -lfreetype

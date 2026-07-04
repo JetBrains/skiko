@@ -340,6 +340,11 @@ fun SkikoProjectContext.configureNativeTarget(
         outputFile.set(hiddenSymbolsFile)
     }
 
+    // Windowing lives only in the core module. Extensions such as skiko-skottie reuse this
+    // function but must not get their own copies of the windowing cinterop bindings, which
+    // would duplicate core's symbols at the final link.
+    val configuresLinuxWindowing = os == OS.Linux && kind == SkikoModuleKind.CORE
+
     val linkerFlags = when (os) {
         OS.MacOS -> {
             configureCinterop(cinteropName, os, arch, target, targetString, resolvedBinaryInputs.frameworks)
@@ -367,6 +372,13 @@ fun SkikoProjectContext.configureNativeTarget(
             ))
         }
         OS.Linux -> {
+            if (configuresLinuxWindowing) {
+                target.compilations.getByName("main") {
+                    cinterops.create("x11gl").apply {
+                        definitionFile.set(project.file("src/nativeInterop/cinterop/x11gl.def"))
+                    }
+                }
+            }
             val options = mutableListOf(
                 "-L/usr/lib64",
                 "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
