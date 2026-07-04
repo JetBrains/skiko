@@ -148,7 +148,15 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 )
                 // Add sysroot for ARM64 cross-compilation
                 if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
-                    linuxFlags.add(0, "--sysroot=/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc")
+                    val armToolchainSysroot = file("/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc")
+                    if (armToolchainSysroot.exists()) {
+                        linuxFlags.add(0, "--sysroot=${armToolchainSysroot.absolutePath}")
+                    } else {
+                        // Distro cross toolchain (e.g. Ubuntu g++-aarch64-linux-gnu): libc comes
+                        // from the toolchain's own sysroot; arch-neutral X11/GL/fontconfig headers
+                        // are taken from the host after the sysroot search paths.
+                        linuxFlags.add("-idirafter /usr/include")
+                    }
                 }
                 flags.set(linuxFlags)
             }
