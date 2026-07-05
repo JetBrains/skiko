@@ -2,6 +2,7 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import org.jetbrains.skia.ISize
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import java.util.concurrent.atomic.AtomicBoolean
@@ -67,19 +68,20 @@ internal class MetalRedrawer(
     @Volatile private var isWindowOccluded = false
 
     /**
-     * Cached mirror of the native live-resize state, flipped from [onLiveResizeChanged] (called on the
-     * AppKit main thread by the window's start/end live-resize observers). Read on the hot [needRender]
-     * path and by the frame loop to avoid a JNI hop per frame. See [isAutoResizing].
+     * The layer size during a live resize session; `null` when not in live resize.
      */
     @Volatile
-    private var isInLiveResize = false
+    private var layerSizeInLiveResize: ISize? = null
+
+    private val isInLiveResize: Boolean
+        get() = layerSizeInLiveResize != null
+
+    override val layerSizeWhileHandlingSizing: ISize?
+        get() = layerSizeInLiveResize
 
     init {
         onDeviceChosen(adapter.name)
         val numberOfBuffers = properties.frameBuffering.numberOfBuffers() ?: 0 // zero means default for system
-        // Live resize is driven from the window, so only enable it when this layer covers the whole
-        // window. When embedded as a Swing component (fillsWindow = false), fall back to the legacy path.
-        val liveResizeEnabled = SkikoProperties.macOSSynchronousLiveResize && layer.fillsWindow
         val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
             MetalDevice(
                 createMetalDevice(
@@ -88,7 +90,9 @@ internal class MetalRedrawer(
                     frameBuffering = numberOfBuffers,
                     adapter = adapter.ptr,
                     platformInfo = it,
-                    liveResizeEnabled = liveResizeEnabled
+                    // Live resize is driven from the window, so only enable it when this layer covers the whole
+                    // window. When embedded as a Swing component (fillsWindow = false), fall back to the legacy path.
+                    liveResizeEnabled = layer.fillsWindow && SkikoProperties.metalSynchronousLiveResize
                 )
             )
         }
@@ -132,7 +136,7 @@ internal class MetalRedrawer(
         update()
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw()
+                performDraw(flush = true)
                 // Trying to draw immediately in Metal will result in lost (undrawn)
                 // frames if there are more than two between consecutive vsync events.
                 if (SkikoProperties.macOSWaitForPreviousFrameVsyncOnRedrawImmediately) {
@@ -144,13 +148,13 @@ internal class MetalRedrawer(
         }
     }
 
-    private suspend fun draw() {
+    private suspend fun draw(flush: Boolean = true) {
         inDrawScope {
             // Move drawing to another thread to free the main thread
-            // It can be expensive to run it in the main thread and FPS can become unstable.
+            // It can be expensive to run it in the main thread, and FPS can become unstable.
             // This is visible by running [SkiaLayerPerformanceTest], standard deviation is increased significantly.
             withContext(dispatcherToBlockOn) {
-                performDraw()
+                performDraw(flush = flush)
             }
         }
         if (isDisposed) throw CancellationException()
@@ -172,111 +176,83 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun LayerDrawScope.performDraw() = synchronized(drawLock) {
-        if (!isDisposed) {
-            autoreleasepool {
-                contextHandler.draw()
+    private fun LayerDrawScope.performDraw(flush: Boolean) {
+        synchronized(drawLock) {
+            if (!isDisposed) {
+                autoreleasepool {
+                    contextHandler.draw(flush)
+                }
             }
         }
     }
 
     /**
-     * Whether the window is in an interactive (edge-drag) live resize. During that window, resize
-     * geometry and presentation are driven from the main thread (`AWTMetalLayer.setBounds` ->
-     * [drawInLiveResize]); [SkiaLayer] reads this to suppress the reshape-driven syncBounds/needRender
-     * that would otherwise race that path. Regular content/animation needRender still flows through.
-     */
-    override val isAutoResizing: Boolean
-        get() = isInLiveResize
-
-    /**
-     * Requests one frame on the AppKit main thread (during a live resize).
-     *
-     * Coalescing (at most one pending frame) lives natively in `scheduleFrameOnAppKitThread`, which hops to the
-     * main queue and calls back into [drawResizeFrame], where the frame is rendered and presented through
-     * the same transactional path as [drawInLiveResize].
-     */
-    private fun scheduleFrameOnAppKitThread() {
-        if (isDisposed) return
-        scheduleFrameOnAppKitThread(device.ptr)
-    }
-
-    /**
-     * Called from native (`scheduleFrameOnAppKitThread`) on the AppKit main thread. Renders and
-     * presents one frame at the layer's current pixel size ([scaledWidth] x [scaledHeight], read on the
-     * main thread just before this call). This is the animation counterpart to the setBounds-driven
-     * [drawInLiveResize] — both share the one main-thread presenter, so they never race.
-     *
-     * The native side clears the coalescing flag before this call, so if `onRender` calls [needRender]
-     * while this frame draws, the next frame is scheduled and the animation keeps advancing even when the
-     * pointer is held still.
+     * Called from native code, on the AppKit main thread, when a live resizing session starts.
      */
     @Suppress("unused")
-    fun drawResizeFrame(scaledWidth: Int, scaledHeight: Int) {
-        if (isDisposed || !isInLiveResize) return
-        drawInLiveResize(scaledWidth, scaledHeight)
+    fun onLiveResizeStarted(width: Int, height: Int) {
+        layerSizeInLiveResize = ISize(width, height)
+        scheduleFrameOnAppKitThread()
     }
 
     /**
-     * Called from `AWTMetalLayer.setBounds` on the AppKit main thread during a live resize.
-     *
-     * Records fresh content at exactly [width] x [height] pixels on the EDT (synchronously,
-     * so no other frame can slip in between), then presents it 1:1 on this (main) thread. Rendering at
-     * the present size avoids any scaling, and presenting here — with presentsWithTransaction = YES —
-     * joins the same CATransaction that is committing the window's new size, so content, drawableSize
-     * and the window backing all update together.
-     *
-     * The EDT is idle during live resize (its frame loop is gated off), so the synchronous hop can't
-     * deadlock against it.
+     * Called from native code, on the AppKit main thread, when a live resizing session ends.
      */
-    fun drawInLiveResize(width: Int, height: Int) {
+    @Suppress("unused")
+    fun onLiveResizeEnded() {
+        layerSizeInLiveResize = null
+        invokeLater {
+            if (!isDisposed) {
+                needRender(throttledToVsync = false)
+            }
+        }
+    }
+
+    /**
+     * Called from native code, on the AppKit main thread, to draw a frame during live resize.
+     */
+    @Suppress("unused")
+    fun drawFrameWhileLiveResizing(width: Int, height: Int) {
         if (isDisposed || width <= 0 || height <= 0) return
 
-        // 1. Record content at exactly the present size, on the EDT.
+        layerSizeInLiveResize = ISize(width, height)
+
+        // Record content at exactly the present size, on the EDT.
         try {
-            invokeAndWait {
-                if (!isDisposed && layer.isShowing) {
-                    layer.update(System.nanoTime(), width, height)
-                }
+            runBlocking(MainUIDispatcher) {
+                update()
+                // During live resize `finishFrame` (called by `MetalContextHandler.flush()`)
+                // must be called on the AppKit main thread to join the resize transaction.
+                draw(flush = false)
             }
         } catch (e: Exception) {
             Logger.warn(e) { "Failed to record live-resize frame" }
             return
         }
 
-        // 2. Present that frame 1:1 within the window's resize transaction. performDraw takes drawLock
-        // and skips if disposed; we can't use inDrawScope here since it asserts the EDT and we're on
-        // the AppKit main thread.
-        with(LayerDrawScope(layer.pixelGeometry, width, height)) {
-            performDraw()
-        }
-    }
-
-    /**
-     * Called from the native live-resize observers on the AppKit main thread on both edges of a resize.
-     *
-     * On start: cache the flag (so [needRender] and the frame loop switch to the main-thread path) and
-     * bootstrap one main-thread frame, so an ongoing animation keeps advancing even if the pointer is
-     * held still from the very first moment of the resize.
-     *
-     * On end: clear the flag and force one more render on the EDT, so the normal EDT-driven present path
-     * takes over from a clean, current frame. Hops to the EDT so [FrameDispatcher.scheduleFrame] is only
-     * ever touched from that thread.
-     */
-    @Suppress("unused")
-    fun onLiveResizeChanged(isInLiveResize: Boolean) {
-        this@MetalRedrawer.isInLiveResize = isInLiveResize
-        if (isInLiveResize) {
-            scheduleFrameOnAppKitThread()
-        } else {
-            invokeLater {
-                if (!isDisposed) needRender(throttledToVsync = false)
+        // `finishFrame` (called by `MetalContextHandler.flush()`) needs to be called back on the AppKit main thread
+        synchronized(drawLock) {
+            if (!isDisposed) {
+                contextHandler.flush()
             }
         }
     }
 
-    override fun syncBounds() = synchronized(drawLock) {
+    /**
+     * Requests one frame on the AppKit main thread (during a live resize).
+     *
+     * Coalescing (at most one pending frame) lives natively in `scheduleFrameOnAppKitThread`, which hops to the
+     * main queue and calls back into [drawFrameWhileLiveResizing], where the frame is rendered and presented.
+     */
+    private fun scheduleFrameOnAppKitThread() {
+        if (isDisposed) return
+        scheduleFrameOnAppKitThread(device.ptr)
+    }
+
+    override fun syncBoundsFromPlatformComponent() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
+        if (isInLiveResize) return
+
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
         setContentScale(device.ptr, layer.contentScale)
@@ -300,7 +276,7 @@ internal class MetalRedrawer(
     private external fun setContentScale(device: Long, contentScale: Float)
 
     /**
-     * Hops to the AppKit main thread (main dispatch queue) and calls back into [drawResizeFrame] with
+     * Hops to the AppKit main thread (main dispatch queue) and calls back into [drawFrameWhileLiveResizing] with
      * the layer's current pixel size. Used to drive frames through the single main-thread presenter during
      * a live resize.
      */

@@ -8,6 +8,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.internal.fastForEach
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
+import org.jetbrains.skiko.redrawer.isHandlingSizing
 import java.awt.Color
 import java.awt.Component
 import java.awt.Graphics
@@ -128,8 +129,8 @@ actual open class SkiaLayer internal constructor(
                 // geometry and presentation are handled there (AWTMetalLayer.setBounds). Calling
                 // syncBounds/needRender from here would race that path, so skip them. Regular
                 // content/animation needRender still flows through the normal channels.
-                if (!redrawer.isAutoResizing()) {
-                    redrawer?.syncBounds()
+                if (!redrawer.isHandlingSizing) {
+                    redrawer?.syncBoundsFromPlatformComponent()
                     redrawer?.needRender(throttledToVsync = false)
                 }
             }
@@ -298,7 +299,7 @@ actual open class SkiaLayer internal constructor(
             }
         }
         if (isShowingNow) {
-            redrawer?.syncBounds()
+            redrawer?.syncBoundsFromPlatformComponent()
             repaint()
         }
     }
@@ -364,7 +365,7 @@ actual open class SkiaLayer internal constructor(
         redrawerFactory = { renderApi, oldRedrawer ->
             oldRedrawer?.dispose()
             renderFactory.createRedrawer(this, renderApi, analytics, properties).also {
-                it.syncBounds()
+                it.syncBoundsFromPlatformComponent()
             }
         },
         onRenderApiChanged = {
@@ -439,8 +440,8 @@ actual open class SkiaLayer internal constructor(
         //
         // Calling redraw during layout might break software renderers,
         // so apply this fix only for the Direct3D case.
-        if (renderApi == GraphicsApi.DIRECT3D && isShowing && !redrawer.isAutoResizing()) {
-            redrawer?.syncBounds()
+        if (renderApi == GraphicsApi.DIRECT3D && isShowing && !redrawer.isHandlingSizing) {
+            redrawer?.syncBoundsFromPlatformComponent()
             redrawer?.renderImmediately()
         }
 
@@ -610,14 +611,7 @@ actual open class SkiaLayer internal constructor(
         redrawer?.renderImmediately()
     }
 
-    /**
-     * Records the current content into a picture.
-     *
-     * [forcedPixelWidth]/[forcedPixelHeight], when non-negative, override the picture size instead of
-     * deriving it from the component bounds. The Metal live-resize path uses this to record content at
-     * exactly the size the main thread is about to present, so the frame needs no scaling.
-     */
-    internal fun update(nanoTime: Long, forcedPixelWidth: Int = -1, forcedPixelHeight: Int = -1) {
+    internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
@@ -631,9 +625,10 @@ actual open class SkiaLayer internal constructor(
         val contentScale = this.contentScale
         val pictureWidth: Float
         val pictureHeight: Float
-        if (forcedPixelWidth >= 0 && forcedPixelHeight >= 0) {
-            pictureWidth = forcedPixelWidth.toFloat()
-            pictureHeight = forcedPixelHeight.toFloat()
+        val handledLayerSize = redrawer?.layerSizeWhileHandlingSizing
+        if (handledLayerSize != null) {
+            pictureWidth = handledLayerSize.width.toFloat().coerceAtLeast(0f)
+            pictureHeight = handledLayerSize.height.toFloat().coerceAtLeast(0f)
         } else {
             pictureWidth = (backedLayer.width * contentScale).coerceAtLeast(0f)
             pictureHeight = (backedLayer.height * contentScale).coerceAtLeast(0f)
@@ -678,12 +673,23 @@ actual open class SkiaLayer internal constructor(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    private fun createDrawScope() = LayerDrawScope(
-        pixelGeometry = pixelGeometry,
-        layerWidth = width,
-        layerHeight = height,
-        scale = contentScale
-    )
+    private fun createDrawScope(): LayerDrawScope {
+        val layerSizeWhileHandlingSizing = redrawer?.layerSizeWhileHandlingSizing
+        return if (layerSizeWhileHandlingSizing != null) {
+            LayerDrawScope(
+                pixelGeometry = pixelGeometry,
+                scaledLayerWidth = layerSizeWhileHandlingSizing.width,
+                scaledLayerHeight = layerSizeWhileHandlingSizing.height
+            )
+        } else {
+            LayerDrawScope(
+                pixelGeometry = pixelGeometry,
+                layerWidth = width,
+                layerHeight = height,
+                scale = contentScale
+            )
+        }
+    }
 
     internal inline fun inDrawScope(body: LayerDrawScope.() -> Unit) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
@@ -807,6 +813,3 @@ private fun adjustSizeToContentScale(contentScale: Float, value: Int): Int {
         value
     }
 }
-
-
-private fun Redrawer?.isAutoResizing() = (this != null) && this.isAutoResizing

@@ -77,7 +77,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
             /// Present transactionally only on the AppKit main thread, where the ambient CATransaction —
             /// from AWTMetalLayer.setBounds, committing the window's new size — flushes the present.
             /// During a resize every real frame arrives here on the main thread (setBounds and
-            /// drawResizeFrame both draw + finishFrame there). A frame that reaches finishFrame off the
+            /// drawFrameWhileLiveResizing both draw + finishFrame there). A frame that reaches finishFrame off the
             /// main thread during a resize is a background straggler from just before it began; it falls
             /// to the async branch below and is dropped.
             if (device.inLiveResize && NSThread.isMainThread) {
@@ -108,7 +108,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
                     /// presentsWithTransaction is always NO, so this is an immediate, non-deferred present.
                     ///
                     /// During a live resize the main thread is the sole presenter (setBounds +
-                    /// drawResizeFrame, transactional branch above). A frame reaching this branch then is a
+                    /// drawFrameWhileLiveResizing, transactional branch above). A frame reaching this branch then is a
                     /// stale straggler that passed the frame-loop gate just before the resize began; drop
                     /// it rather than let its deferred present race the main-thread transactional present
                     /// under the layer-wide presentsWithTransaction flag.

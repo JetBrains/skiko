@@ -22,7 +22,7 @@
 
 // Defined later in this file; forward-declared so AWTMetalLayer (below) can use them.
 static JNIEnv *resolveJNIEnvForCurrentThread();
-static jmethodID getDrawInLiveResizeMethodID(JNIEnv *env, jobject redrawer);
+static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject redrawer);
 
 @implementation AWTMetalLayer
 
@@ -39,6 +39,14 @@ static jmethodID getDrawInLiveResizeMethodID(JNIEnv *env, jobject redrawer);
     return self;
 }
 
+- (CGSize)pixelSize
+{
+    CGFloat scale = self.contentsScale;
+    int pixelWidth = (int)(self.bounds.size.width * scale);
+    int pixelHeight = (int)(self.bounds.size.height * scale);
+    return CGSizeMake(pixelWidth, pixelHeight);
+}
+
 /// During a live resize this fires (on the AppKit main thread) when the layer autoresizes to track the
 /// window. We update drawableSize and synchronously draw + present, all within the ambient
 /// CATransaction that is also committing the window's new size, so content and backing stay in sync.
@@ -49,20 +57,16 @@ static jmethodID getDrawInLiveResizeMethodID(JNIEnv *env, jobject redrawer);
         return;
     }
 
-    CGFloat scale = self.contentsScale;
-    int pixelWidth = (int)(bounds.size.width * scale);
-    int pixelHeight = (int)(bounds.size.height * scale);
-    if (pixelWidth <= 0 || pixelHeight <= 0) {
+    CGSize pixelSize = self.pixelSize;
+    if (pixelSize.width <= 0 || pixelSize.height <= 0) {
         return;
     }
 
-    self.drawableSize = CGSizeMake(pixelWidth, pixelHeight);
+    self.drawableSize = pixelSize;
 
     JNIEnv *env = resolveJNIEnvForCurrentThread();
-    jmethodID drawInLiveResize = getDrawInLiveResizeMethodID(env, self.javaRef);
-    if (drawInLiveResize) {
-        env->CallVoidMethod(self.javaRef, drawInLiveResize, (jint)pixelWidth, (jint)pixelHeight);
-    }
+    jmethodID drawFrameWhileLiveResizing = getDrawFrameWhileLiveResizingMethodID(env, self.javaRef);
+    env->CallVoidMethod(self.javaRef, drawFrameWhileLiveResizing, (jint)pixelSize.width, (jint)pixelSize.height);
 }
 
 @end
@@ -145,31 +149,31 @@ static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawe
     return onOcclusionStateChanged;
 }
 
-static jmethodID getDrawInLiveResizeMethodID(JNIEnv *env, jobject redrawer) {
-    static jmethodID drawInLiveResize = NULL;
-    if (drawInLiveResize == NULL) {
+static jmethodID getOnLiveResizeStartedMethodID(JNIEnv *env, jobject redrawer) {
+    static jmethodID onLiveResizeStarted = NULL;
+    if (onLiveResizeStarted == NULL) {
         jclass redrawerClass = env->GetObjectClass(redrawer);
-        drawInLiveResize = env->GetMethodID(redrawerClass, "drawInLiveResize", "(II)V");
+        onLiveResizeStarted = env->GetMethodID(redrawerClass, "onLiveResizeStarted", "(II)V");
     }
-    return drawInLiveResize;
+    return onLiveResizeStarted;
 }
 
-static jmethodID getOnLiveResizeChangedMethodID(JNIEnv *env, jobject redrawer) {
-    static jmethodID onLiveResizeChanged = NULL;
-    if (onLiveResizeChanged == NULL) {
+static jmethodID getOnLiveResizeEndedMethodID(JNIEnv *env, jobject redrawer) {
+    static jmethodID onLiveResizeEnded = NULL;
+    if (onLiveResizeEnded == NULL) {
         jclass redrawerClass = env->GetObjectClass(redrawer);
-        onLiveResizeChanged = env->GetMethodID(redrawerClass, "onLiveResizeChanged", "(Z)V");
+        onLiveResizeEnded = env->GetMethodID(redrawerClass, "onLiveResizeEnded", "()V");
     }
-    return onLiveResizeChanged;
+    return onLiveResizeEnded;
 }
 
-static jmethodID getDrawResizeFrameMethodID(JNIEnv *env, jobject redrawer) {
-    static jmethodID drawResizeFrame = NULL;
-    if (drawResizeFrame == NULL) {
+static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject redrawer) {
+    static jmethodID drawFrameWhileLiveResizing = NULL;
+    if (drawFrameWhileLiveResizing == NULL) {
         jclass redrawerClass = env->GetObjectClass(redrawer);
-        drawResizeFrame = env->GetMethodID(redrawerClass, "drawResizeFrame", "(II)V");
+        drawFrameWhileLiveResizing = env->GetMethodID(redrawerClass, "drawFrameWhileLiveResizing", "(II)V");
     }
-    return drawResizeFrame;
+    return drawFrameWhileLiveResizing;
 }
 
 extern "C"
@@ -236,8 +240,8 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         ///
         /// presentsWithTransaction is scoped to the whole resize session here (not per-frame): the start
         /// observer sets it YES, the end observer clears it. This is safe because during a resize the
-        /// main thread is the sole presenter (setBounds + drawResizeFrame) and any frame that reaches the
-        /// async present path in finishFrame is dropped there. The ordering below keeps
+        /// main thread is the sole presenter (setBounds + drawFrameWhileLiveResizing) and any frame that
+        /// reaches the async present path in finishFrame is dropped there. The ordering below keeps
         /// presentsWithTransaction = YES a strict subset of inLiveResize = YES (set inLiveResize first at
         /// start, clear the flag first at end) so that whenever the flag is YES a background straggler is
         /// already being dropped — it can never present async under YES and defer forever on a
@@ -254,8 +258,10 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     strongDevice.inLiveResize = YES;
                     strongDevice.layer.presentsWithTransaction = YES;
                     strongDevice.layer.liveResizing = YES;
+                    CGSize pixelSize = strongDevice.layer.pixelSize;
                     JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)YES);
+                    jmethodID onLiveResizeStarted = getOnLiveResizeStartedMethodID(jniEnv, strongDevice.layer.javaRef);
+                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, onLiveResizeStarted, (jint)pixelSize.width, (jint)pixelSize.height);
                 }];
             device.liveResizeEndObserver =
                 [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidEndLiveResizeNotification
@@ -272,7 +278,8 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     strongDevice.layer.presentsWithTransaction = NO;
                     strongDevice.inLiveResize = NO;
                     JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, getOnLiveResizeChangedMethodID(jniEnv, strongDevice.layer.javaRef), (jboolean)NO);
+                    jmethodID onLiveResizeEnded = getOnLiveResizeEndedMethodID(jniEnv, strongDevice.layer.javaRef);
+                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, onLiveResizeEnded);
                 }];
         }
 
@@ -299,7 +306,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_scheduleF
     dispatch_async(dispatch_get_main_queue(), ^{
         /// Clear FIRST, unconditionally — before any guard below can bail. This keeps the flag honest
         /// even when the frame is dropped (e.g. the resize already ended), so a later resize can schedule
-        /// again; and it lets an onRender -> needRender inside drawResizeFrame re-arm the next frame,
+        /// again; and it lets an onRender -> needRender inside drawFrameWhileLiveResizing re-arm the next frame,
         /// sustaining the animation while the pointer is held still.
         atomic_store(&device->frameOnAppKitThreadScheduled, false);
         if (!device.inLiveResize) {
@@ -312,10 +319,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_scheduleF
             return;
         }
         JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-        jmethodID drawResizeFrame = getDrawResizeFrameMethodID(jniEnv, javaRef);
-        if (drawResizeFrame) {
-            jniEnv->CallVoidMethod(javaRef, drawResizeFrame, (jint)pixelWidth, (jint)pixelHeight);
-        }
+        jmethodID drawFrameWhileLiveResizing = getDrawFrameWhileLiveResizingMethodID(jniEnv, javaRef);
+        jniEnv->CallVoidMethod(javaRef, drawFrameWhileLiveResizing, (jint)pixelWidth, (jint)pixelHeight);
     });
 }
 
