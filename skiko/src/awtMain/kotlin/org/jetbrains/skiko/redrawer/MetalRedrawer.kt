@@ -5,6 +5,7 @@ import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.ISize
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
+import java.awt.Component
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.SwingUtilities.*
 import kotlin.time.Duration.Companion.milliseconds
@@ -148,13 +149,13 @@ internal class MetalRedrawer(
         }
     }
 
-    private suspend fun draw(flush: Boolean = true) {
+    private suspend fun draw() {
         inDrawScope {
             // Move drawing to another thread to free the main thread
             // It can be expensive to run it in the main thread, and FPS can become unstable.
             // This is visible by running [SkiaLayerPerformanceTest], standard deviation is increased significantly.
             withContext(dispatcherToBlockOn) {
-                performDraw(flush = flush)
+                performDraw()
             }
         }
         if (isDisposed) throw CancellationException()
@@ -176,7 +177,7 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun LayerDrawScope.performDraw(flush: Boolean) {
+    private fun LayerDrawScope.performDraw(flush: Boolean = true) {
         synchronized(drawLock) {
             if (!isDisposed) {
                 autoreleasepool {
@@ -219,11 +220,14 @@ internal class MetalRedrawer(
 
         // Record content at exactly the present size, on the EDT.
         try {
-            runBlocking(MainUIDispatcher) {
+            invokeOnEventThreadAndWait {
                 update()
-                // During live resize `finishFrame` (called by `MetalContextHandler.flush()`)
-                // must be called on the AppKit main thread to join the resize transaction.
-                draw(flush = false)
+                inDrawScope {
+                    if (!isDisposed) {
+                        // `finishFrame` must run on the AppKit main thread to join the resize transaction, so no flush
+                        performDraw(flush = false)
+                    }
+                }
             }
         } catch (e: Exception) {
             Logger.warn(e) { "Failed to record live-resize frame" }
@@ -281,6 +285,20 @@ internal class MetalRedrawer(
      * a live resize.
      */
     private external fun scheduleFrameOnAppKitThread(device: Long)
+
+    /**
+     * Like [javax.swing.SwingUtilities.invokeAndWait], but keeps the AppKit run loop spinning while waiting, so
+     * synchronous Java->AppKit calls made from [runnable] are serviced rather than deadlocking.
+     * [component] provides the AWT context for the call.
+     *
+     * This is done via `LWCToolkit.invokeAndWait`. `LWCToolkit` lives in a non-exported JDK package, but JNI is not
+     * subject to module access checks, so this needs no `--add-opens`.
+     */
+    private external fun invokeOnEventThreadAndWait(runnable: Runnable, component: Component)
+
+    private fun invokeOnEventThreadAndWait(runnable: Runnable) {
+        invokeOnEventThreadAndWait(runnable, layer)
+    }
 
     /**
      * Set this value to true to synchronize the presentation of the layer’s contents with the display’s refresh,
