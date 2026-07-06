@@ -84,14 +84,12 @@ internal class AngleRedrawer(
         }
     }
 
-    private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
+    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
         if (isDisposed) {
             return
         }
         makeCurrent(device)
-        layer.inDrawScope {
-            contextHandler.draw()
-        }
+        contextHandler.draw()
         swapBuffers(device, withVsync)
     }
 
