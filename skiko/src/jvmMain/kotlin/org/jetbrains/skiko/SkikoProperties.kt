@@ -67,7 +67,7 @@ object SkikoProperties {
      * asynchronously off the resize transaction. Enabled by default.
      */
     val metalSynchronousLiveResize: Boolean get() {
-        return getProperty("skiko.rendering.macos.metalSynchronousLiveResize")?.toBoolean() ?: true
+        return getProperty("skiko.rendering.macos.metalSynchronousLiveResize")?.toBoolean() ?: false
     }
 
     /**
