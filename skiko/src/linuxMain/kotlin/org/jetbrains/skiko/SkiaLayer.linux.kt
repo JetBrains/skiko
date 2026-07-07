@@ -2,8 +2,8 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color
-import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skia.PictureRecorder
+import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.redrawer.Redrawer
 
 actual open class SkiaLayer {
@@ -20,7 +20,7 @@ actual open class SkiaLayer {
 
     actual var fullscreen: Boolean = false
 
-    lateinit var window: X11Window
+    internal lateinit var window: LinuxWindow
         private set
 
     actual val component: Any?
@@ -32,12 +32,13 @@ actual open class SkiaLayer {
 
     actual fun attachTo(container: Any) {
         check(!this::window.isInitialized) { "Already attached to another window" }
-        check(container is X11Window) { "container should be an instance of X11Window" }
+        check(container is LinuxWindow) { "container should be an instance of LinuxWindow (e.g. X11Window)" }
         window = container
-        redrawer = createNativeRedrawer(this, renderApi).apply {
-            syncBounds()
-            needRender()
-        }
+        redrawer =
+            createNativeRedrawer(this, renderApi).apply {
+                syncBounds()
+                needRender()
+            }
     }
 
     actual fun detach() {
@@ -51,7 +52,7 @@ actual open class SkiaLayer {
 
     @Deprecated(
         message = "Use needRender() instead",
-        replaceWith = ReplaceWith("needRender()")
+        replaceWith = ReplaceWith("needRender()"),
     )
     actual fun needRedraw() = needRender()
 
@@ -65,9 +66,10 @@ actual open class SkiaLayer {
         val pictureWidth = (width * contentScale).coerceAtLeast(0.0f)
         val pictureHeight = (height * contentScale).coerceAtLeast(0.0f)
 
-        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight).apply {
-            clear(Color.WHITE)
-        }
+        val canvas =
+            pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight).apply {
+                clear(Color.WHITE)
+            }
         renderDelegate?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
 
         val picture = pictureRecorder.finishRecordingAsPicture()
@@ -83,12 +85,13 @@ actual open class SkiaLayer {
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
 
-    private fun createDrawScope() = LayerDrawScope(
-        pixelGeometry = pixelGeometry,
-        layerWidth = window.width.toDouble(),
-        layerHeight = window.height.toDouble(),
-        scale = contentScale
-    )
+    private fun createDrawScope() =
+        LayerDrawScope(
+            pixelGeometry = pixelGeometry,
+            layerWidth = window.width.toDouble(),
+            layerHeight = window.height.toDouble(),
+            scale = contentScale,
+        )
 
     internal fun inDrawScope(block: LayerDrawScope.() -> Unit) {
         createDrawScope().block()

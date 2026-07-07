@@ -1,27 +1,30 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.*
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.context.LinuxOpenGLContextHandler
 import kotlin.time.TimeSource
 
 internal class LinuxOpenGLRedrawer(
-    private val skiaLayer: SkiaLayer
+    private val skiaLayer: SkiaLayer,
 ) : Redrawer {
     private val contextHandler = LinuxOpenGLContextHandler(skiaLayer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val win = skiaLayer.window
-    private val gl = GlContext(win).apply {
-        makeCurrent()
-        setSwapInterval(1) // Vsync enabled
-    }
+    private val gl =
+        win.createGlContext().apply {
+            makeCurrent()
+            setSwapInterval(1) // Vsync enabled
+        }
 
     private val initialTime = TimeSource.Monotonic.markNow()
 
-    private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
-        renderImmediately()
-    }
+    private val frameDispatcher =
+        FrameDispatcher(SkikoDispatchers.Main) {
+            renderImmediately()
+        }
 
     override fun dispose() {
         frameDispatcher.cancel()
