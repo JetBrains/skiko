@@ -7,6 +7,12 @@ import org.gradle.api.tasks.TaskAction
 
 abstract class WriteCInteropDefFile : DefaultTask() {
     @get:Input
+    abstract val headers: ListProperty<String>
+
+    @get:Input
+    abstract val compilerOpts: ListProperty<String>
+
+    @get:Input
     abstract val linkerOpts: ListProperty<String>
 
     @get:OutputFile
@@ -18,6 +24,14 @@ abstract class WriteCInteropDefFile : DefaultTask() {
         outputFile.parentFile.mkdirs()
 
         outputFile.bufferedWriter().use { writer ->
+            val headers = headers.get()
+            if (headers.isNotEmpty()) {
+                writer.appendLine("headers=${headers.joinToString(" ")}")
+            }
+            val compilerOpts = compilerOpts.get()
+            if (compilerOpts.isNotEmpty()) {
+                writer.appendLine("compilerOpts=${compilerOpts.joinToString(" ")}")
+            }
             val linkerOpts = linkerOpts.get()
             if (linkerOpts.isNotEmpty()) {
                 writer.appendLine("linkerOpts=${linkerOpts.joinToString(" ")}")
