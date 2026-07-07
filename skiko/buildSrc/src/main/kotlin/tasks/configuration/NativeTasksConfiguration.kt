@@ -211,12 +211,19 @@ fun configureCinterop(
 /**
  * The Wayland protocols the Linux native backend binds beyond the core `wayland.xml`
  * (which ships pre-generated in libwayland-client itself): `xdg-shell` for toplevel
- * windowing, `viewporter` and `fractional-scale-v1` for HiDPI scale.
+ * windowing, `viewporter` and `fractional-scale-v1` for HiDPI scale,
+ * `xdg-decoration-unstable-v1` for server-side decorations, and — consumed by the
+ * compose event pump rather than skiko itself — `cursor-shape-v1` (with `tablet-v2`,
+ * whose generated code cursor-shape's references) and `text-input-unstable-v3`.
  */
 private val waylandProtocolXmlPaths = listOf(
     "stable/xdg-shell/xdg-shell.xml",
     "stable/viewporter/viewporter.xml",
+    "stable/tablet/tablet-v2.xml",
     "staging/fractional-scale/fractional-scale-v1.xml",
+    "staging/cursor-shape/cursor-shape-v1.xml",
+    "unstable/xdg-decoration/xdg-decoration-unstable-v1.xml",
+    "unstable/text-input/text-input-unstable-v3.xml",
 )
 
 fun SkikoProjectContext.registerGenerateWaylandProtocolsTask(
