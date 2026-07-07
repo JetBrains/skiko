@@ -1,0 +1,9 @@
+headers = xkbcommon/xkbcommon.h
+# xkbcommon headers are not part of the Konan sysroot; take them from the host via
+# -idirafter so the sysroot's per-arch glibc headers keep priority (a plain -I
+# breaks cross-compilation to linux_arm64 by shadowing glibc with host headers).
+compilerOpts.linux = -D_GNU_SOURCE -idirafter /usr/include
+compilerOpts.linux_x64 = -idirafter /usr/include/x86_64-linux-gnu
+compilerOpts.linux_arm64 = -idirafter /usr/include/aarch64-linux-gnu
+linkerOpts.linux_x64 = -L/usr/lib/x86_64-linux-gnu -lxkbcommon
+linkerOpts.linux_arm64 = -L/usr/lib/aarch64-linux-gnu -lxkbcommon
