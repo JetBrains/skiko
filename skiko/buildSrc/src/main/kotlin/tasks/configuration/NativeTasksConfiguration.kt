@@ -3,7 +3,9 @@ package tasks.configuration
 import Arch
 import CompileSkikoCppTask
 import MergeAppleStaticArchivesTask
+import GenerateWaylandProtocolsTask
 import PatchSkiaSymbolsTask
+import runPkgConfigVariable
 import OS
 import SkiaBuildType
 import SkikoModuleKind
@@ -118,7 +120,8 @@ fun SkikoProjectContext.nativeSymbolSourcesFor(
 }
 
 fun SkikoProjectContext.compileNativeBridgesTask(
-    os: OS, arch: Arch, isUikitSim: Boolean
+    os: OS, arch: Arch, isUikitSim: Boolean,
+    waylandProtocols: TaskProvider<GenerateWaylandProtocolsTask>? = null,
 ): TaskProvider<CompileSkikoCppTask> = with (this.project) {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isUikitSim = isUikitSim)
 
@@ -233,6 +236,12 @@ fun SkikoProjectContext.compileNativeBridgesTask(
         val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
+        if (waylandProtocols != null) {
+            dependsOn(waylandProtocols)
+            sourceRoots.add(waylandProtocols.flatMap { it.outDir })
+            // wayland-util.h comes from the host even when a cross-compilation sysroot is active
+            flags.add("-idirafter /usr/include")
+        }
 
         includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
@@ -267,6 +276,77 @@ fun configureCinterop(
     }
     target.compilations.getByName("main") {
         cinterops.create(cinteropName).apply {
+            definitionFile.set(writeCInteropDef.flatMap { it.outputFile })
+        }
+    }
+}
+
+/**
+ * The Wayland protocols the Linux native backend binds beyond the core `wayland.xml`
+ * (which ships pre-generated in libwayland-client itself): `xdg-shell` for toplevel
+ * windowing, `viewporter` and `fractional-scale-v1` for HiDPI scale.
+ */
+private val waylandProtocolXmlPaths = listOf(
+    "stable/xdg-shell/xdg-shell.xml",
+    "stable/viewporter/viewporter.xml",
+    "staging/fractional-scale/fractional-scale-v1.xml",
+)
+
+fun SkikoProjectContext.registerGenerateWaylandProtocolsTask(
+    os: OS, arch: Arch, targetString: String
+): TaskProvider<GenerateWaylandProtocolsTask> = with(this.project) {
+    registerSkikoTask<GenerateWaylandProtocolsTask>("generateWaylandProtocols", os, arch) {
+        val protocolsRoot = runPkgConfigVariable("wayland-protocols", "pkgdatadir")
+        protocolXmlFiles.from(waylandProtocolXmlPaths.map { "$protocolsRoot/$it" })
+        outDir.set(layout.buildDirectory.dir("generated/wayland/$targetString"))
+    }
+}
+
+/**
+ * Registers the `waylandegl` cinterop: libwayland-client + wayland-egl + EGL plus the
+ * client headers codegen'd by [GenerateWaylandProtocolsTask]. The def file is generated
+ * per target because the generated-header include path points into the build directory.
+ */
+fun configureWaylandEglCinterop(
+    arch: Arch,
+    target: KotlinNativeTarget,
+    targetString: String,
+    generateProtocols: TaskProvider<GenerateWaylandProtocolsTask>,
+) {
+    val project = target.project
+    val gnuArch = if (arch == Arch.Arm64) "aarch64" else "x86_64"
+    val writeCInteropDef = project.tasks.register(
+        "writeWaylandEglCInteropDef${joinToTitleCamelCase(OS.Linux.id, arch.id)}",
+        WriteCInteropDefFile::class.java
+    ) {
+        headers.set(
+            listOf("wayland-client.h", "wayland-egl.h", "EGL/egl.h", "EGL/eglext.h") +
+                    waylandProtocolXmlPaths.map {
+                        "${File(it).nameWithoutExtension}-client-protocol.h"
+                    }
+        )
+        compilerOpts.set(generateProtocols.flatMap { it.outDir }.map {
+            listOf(
+                "-D_GNU_SOURCE",
+                "-I${it.asFile.absolutePath}",
+                // Host headers after the Konan sysroot, same reasoning as x11gl.def
+                "-idirafter", "/usr/include",
+                "-idirafter", "/usr/include/$gnuArch-linux-gnu",
+            )
+        })
+        linkerOpts.set(
+            listOf("-L/usr/lib/$gnuArch-linux-gnu", "-lwayland-client", "-lwayland-egl", "-lEGL")
+        )
+        outputFile.set(project.layout.buildDirectory.file("cinterop/$targetString/waylandegl.def"))
+    }
+    project.tasks.withType(CInteropProcess::class.java).configureEach {
+        if (konanTarget == target.konanTarget) {
+            dependsOn(writeCInteropDef)
+            dependsOn(generateProtocols)
+        }
+    }
+    target.compilations.getByName("main") {
+        cinterops.create("waylandegl").apply {
             definitionFile.set(writeCInteropDef.flatMap { it.outputFile })
         }
     }
@@ -348,10 +428,16 @@ fun SkikoProjectContext.configureNativeTarget(
         outputFile.set(hiddenSymbolsFile)
     }
 
-    // Windowing lives only in the core module. Extensions such as skiko-skottie reuse this
-    // function but must not get their own copies of the windowing cinterop bindings, which
-    // would duplicate core's symbols at the final link.
+    // Windowing (X11/GLX, Wayland/EGL, xkbcommon) lives only in the core module. Extensions
+    // such as skiko-skottie reuse this function but must not get their own copies of the
+    // windowing cinterop bindings or the generated protocol code, which would duplicate
+    // core's symbols at the final link.
     val configuresLinuxWindowing = os == OS.Linux && kind == SkikoModuleKind.CORE
+
+    // Feeds both the waylandegl cinterop (client headers) and the native bridges
+    // compile (protocol marshalling code).
+    val waylandProtocolsTask =
+        if (configuresLinuxWindowing) registerGenerateWaylandProtocolsTask(os, arch, targetString) else null
 
     val linkerFlags = when (os) {
         OS.MacOS -> {
@@ -380,12 +466,13 @@ fun SkikoProjectContext.configureNativeTarget(
             ))
         }
         OS.Linux -> {
-            if (configuresLinuxWindowing) {
+            if (waylandProtocolsTask != null) {
                 target.compilations.getByName("main") {
                     cinterops.create("x11gl").apply {
                         definitionFile.set(project.file("src/nativeInterop/cinterop/x11gl.def"))
                     }
                 }
+                configureWaylandEglCinterop(arch, target, targetString, waylandProtocolsTask)
             }
             val options = mutableListOf(
                 "-L/usr/lib64",
@@ -410,6 +497,9 @@ fun SkikoProjectContext.configureNativeTarget(
             OS.Linux -> listOf(
                 "-linker-option", "-lX11",
                 "-linker-option", "-lGLX",
+                "-linker-option", "-lwayland-client",
+                "-linker-option", "-lwayland-egl",
+                "-linker-option", "-lEGL",
             )
             else -> emptyList()
         })
@@ -429,7 +519,8 @@ fun SkikoProjectContext.configureNativeTarget(
         }
     }
 
-    val crossCompileTask = compileNativeBridgesTask(os, arch, isUikitSim = isUikitSim)
+    val crossCompileTask =
+        compileNativeBridgesTask(os, arch, isUikitSim = isUikitSim, waylandProtocols = waylandProtocolsTask)
 
     // TODO: move to LinkSkikoTask.
     val actionName = "linkNativeBridges".withSuffix(isUikitSim = isUikitSim)
