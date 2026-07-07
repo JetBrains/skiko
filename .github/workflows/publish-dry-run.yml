@@ -61,13 +61,16 @@ jobs:
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
+      # No -Pskiko.native.enabled here: the Linux native targets carry cinterops,
+      # and cinterop tasks cannot run in linux-compat (its glibc 2.26 predates the
+      # GLIBC_2.29 required by Konan's bundled libclang). The native publications
+      # are produced by the next step in the linux-amd64 image instead.
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish x64 Maven Local'
         with:
           image_name: linux-compat
           command: |
             ./gradlew --no-daemon --stacktrace \
-              -Pskiko.native.enabled=true \
               -Pskiko.awt.enabled=true \
               -Pskiko.arch=x64 \
                :skiko:publishToMavenLocal
