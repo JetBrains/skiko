@@ -49,6 +49,12 @@ class WaylandWindow(
     private val arena = Arena()
     private val self = StableRef.create(this)
 
+    /**
+     * The Wayland display connection. Owned by this window: consumers (e.g. the compose
+     * event pump binding its own `wl_registry` for `wl_seat` and friends) may create
+     * additional objects on it, but must not disconnect it and must do all their
+     * dispatching through this window's [dispatchPendingEvents].
+     */
     val display: CPointer<wl_display> =
         wl_display_connect(null)
             ?: throw RenderSetupException("Cannot connect to Wayland display; is WAYLAND_DISPLAY set?")
@@ -60,7 +66,12 @@ class WaylandWindow(
     private var decorationManager: CPointer<zxdg_decoration_manager_v1>? = null
     private var outputScale = 1
 
-    internal val surface: CPointer<wl_surface>
+    /**
+     * The window's `wl_surface`. Owned by this window: consumers may compare it against
+     * surfaces delivered in their own listeners (e.g. `wl_pointer.enter`) but must not
+     * destroy it or attach buffers to it.
+     */
+    val surface: CPointer<wl_surface>
     private val xdgSurface: CPointer<xdg_surface>
     private val toplevel: CPointer<xdg_toplevel>
     private var viewport: CPointer<wp_viewport>? = null
