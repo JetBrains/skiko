@@ -47,6 +47,9 @@ internal class LinuxOpenGLRedrawer(
         skiaLayer.inDrawScope {
             contextHandler.draw()
         }
+        // Requested before the swap because the frame request rides the commit that
+        // swapBuffers performs. No-op on X11, which paces via vsync-throttled swaps.
+        win.frameCallback { needRender(throttledToVsync = true) }
         gl.swapBuffers()
     }
 

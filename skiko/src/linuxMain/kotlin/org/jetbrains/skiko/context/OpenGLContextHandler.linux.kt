@@ -1,6 +1,5 @@
 package org.jetbrains.skiko.context
 
-import kotlinx.cinterop.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
@@ -17,6 +16,15 @@ internal class LinuxOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
             return false
         }
         return true
+    }
+
+    override fun flush(scope: LayerDrawScope) {
+        val s = surface
+        if (s != null) {
+            context?.flush(s)
+        } else {
+            super.flush(scope)
+        }
     }
 
     private var currentWidth = 0

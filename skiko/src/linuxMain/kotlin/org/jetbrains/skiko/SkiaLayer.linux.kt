@@ -34,11 +34,10 @@ actual open class SkiaLayer {
         check(!this::window.isInitialized) { "Already attached to another window" }
         check(container is LinuxWindow) { "container should be an instance of LinuxWindow (e.g. X11Window)" }
         window = container
-        redrawer =
-            createNativeRedrawer(this, renderApi).apply {
-                syncBounds()
-                needRender()
-            }
+        redrawer = createNativeRedrawer(this, renderApi).apply {
+            syncBounds()
+            needRender()
+        }
     }
 
     actual fun detach() {
@@ -60,20 +59,18 @@ actual open class SkiaLayer {
     private val pictureRecorder = PictureRecorder()
 
     internal fun update(nanoTime: Long) {
-        val width = window.width
-        val height = window.height
+        // LinuxWindow geometry is physical pixels (unlike macOS points), so the surface
+        // size is the window size as-is; contentScale only informs UI density.
+        val width = window.width.coerceAtLeast(0)
+        val height = window.height.coerceAtLeast(0)
 
-        val pictureWidth = (width * contentScale).coerceAtLeast(0.0f)
-        val pictureHeight = (height * contentScale).coerceAtLeast(0.0f)
-
-        val canvas =
-            pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight).apply {
-                clear(Color.WHITE)
-            }
-        renderDelegate?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
+        val canvas = pictureRecorder.beginRecording(0f, 0f, width.toFloat(), height.toFloat()).apply {
+            clear(Color.WHITE)
+        }
+        renderDelegate?.onRender(canvas, width, height, nanoTime)
 
         val picture = pictureRecorder.finishRecordingAsPicture()
-        this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
+        this.picture = PictureHolder(picture, width, height)
     }
 
     internal actual fun draw(canvas: Canvas) {
@@ -85,13 +82,11 @@ actual open class SkiaLayer {
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
 
-    private fun createDrawScope() =
-        LayerDrawScope(
-            pixelGeometry = pixelGeometry,
-            layerWidth = window.width.toDouble(),
-            layerHeight = window.height.toDouble(),
-            scale = contentScale,
-        )
+    private fun createDrawScope() = LayerDrawScope(
+        pixelGeometry = pixelGeometry,
+        scaledLayerWidth = window.width.coerceAtLeast(0),
+        scaledLayerHeight = window.height.coerceAtLeast(0),
+    )
 
     internal fun inDrawScope(block: LayerDrawScope.() -> Unit) {
         createDrawScope().block()

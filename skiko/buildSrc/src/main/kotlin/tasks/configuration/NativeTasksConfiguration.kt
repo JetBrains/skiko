@@ -6,7 +6,6 @@ import GenerateWaylandProtocolsTask
 import PatchSkiaSymbolsTask
 import runPkgConfigVariable
 import OS
-import SkiaBuildType
 import SkikoProjectContext
 import WriteCInteropDefFile
 import compilerForTarget

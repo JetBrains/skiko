@@ -1,5 +1,6 @@
 #include "ganesh/GrDirectContext.h"
 #include "ganesh/gl/GrGLInterface.h"
+#include "ganesh/gl/GrGLAssembleInterface.h"
 #include "common.h"
 #include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
 
@@ -13,8 +14,31 @@
 #include "ganesh/d3d/GrD3DDirectContext.h"
 #endif
 
+#ifdef __linux__
+#include <EGL/egl.h>
+#include <dlfcn.h>
+#endif
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
   () {
+#ifdef __linux__
+    EGLContext eglCtx = eglGetCurrentContext();
+    if (eglCtx != EGL_NO_CONTEXT) {
+        sk_sp<const GrGLInterface> glInterface = GrGLMakeAssembledInterface(
+            nullptr,
+            [](void* ctx, const char name[]) -> GrGLFuncPtr {
+                GrGLFuncPtr proc = (GrGLFuncPtr) eglGetProcAddress(name);
+                if (!proc) {
+                    proc = (GrGLFuncPtr) dlsym(RTLD_DEFAULT, name);
+                }
+                return proc;
+            }
+        );
+        if (glInterface) {
+            return static_cast<KNativePointer>(GrDirectContexts::MakeGL(glInterface).release());
+        }
+    }
+#endif
     return static_cast<KNativePointer>(GrDirectContexts::MakeGL().release());
 }
 
