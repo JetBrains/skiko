@@ -84,6 +84,10 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         }
     }
 
+    // SPIKE 2b: expose the live GrDirectContext ptr so the resize path can render into the frame swapchain on
+    // the SAME context (avoids a second context sharing the D3D12 queue). 0 until the first draw creates it.
+    fun spikeContextPtr(): Long = context?.let { getPtr(it) } ?: 0L
+
     override fun rendererInfo(): String {
         return super.rendererInfo() +
             "Video card: ${directXRedrawer.adapterName}\n" +

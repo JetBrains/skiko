@@ -42,10 +42,91 @@ internal class Direct3DRedrawer(
         onDeviceChosen(adapterName)
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
             .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
+
+        // SPIKE: install the throwaway WndProc subclass that drives a synchronous solid-color present
+        // during interactive (drag) resize. Throwaway — remove along with the native `installSpikeResizeHook`.
+        installSpikeResizeHook(device, layer.windowHandle, layer.contentHandle)
+    }
+
+    // SPIKE: true while the native modal resize loop is active; suppresses normal Skia presents so the
+    // WM_SIZE-driven native present is the sole writer to the swapchain during the drag.
+    @Volatile
+    private var spikeResizing = false
+
+    // SPIKE: called from native (toolkit thread) at the first real resize step (WM_NCCALCSIZE engage), NOT at
+    // WM_ENTERSIZEMOVE — so plain moves don't suppress the EDT and keep animating the (visible) canvas.
+    @Suppress("unused")
+    private fun onSpikeResizeEngaged() {
+        spikeResizing = true
+    }
+
+    // SPIKE: called from native on the toolkit thread on WM_EXITSIZEMOVE.
+    @Suppress("unused")
+    private fun onSpikeResizeEnded() {
+        spikeResizing = false
+        frameDispatcher.scheduleFrame() // resume the normal animation loop
+    }
+
+    // SPIKE 2b: called from native (toolkit thread, pump-waited) at drag-end while the overlay still covers the
+    // canvas. Runs on the EDT: the contentPane/layer/canvas lag the final window size by one resize step (Swing
+    // knows the final window size but never re-lays-out at rest), so force a layout pass to catch the canvas up
+    // to the exact native client size, then render it — so revealing it doesn't snap a frame later.
+    @Suppress("unused")
+    private fun onSpikeResizeFinalize() {
+        javax.swing.SwingUtilities.invokeLater {
+            try {
+                javax.swing.SwingUtilities.getWindowAncestor(layer)?.let { it.invalidate(); it.validate() }
+                spikeResizing = false
+                renderImmediately() // render the canvas at the final size before it's revealed
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            } finally {
+                signalSpikeRenderDone()
+            }
+        }
+    }
+
+    // SPIKE 2b: called from native (toolkit thread) inside WM_NCCALCSIZE during a drag. Renders the REAL
+    // renderDelegate content at the new client size straight into the NOREDIR frame's comp swapchain and
+    // presents it synchronously. Shares the live render context (via contextHandler) and serializes on
+    // drawLock so it never races an in-flight EDT draw.
+    // Called from native (toolkit thread) in WM_NCCALCSIZE. onRender (user/Compose code) requires the EDT, so
+    // we hop to it via invokeAndWait — the toolkit thread blocks until the EDT finishes rendering+presenting,
+    // so the present still completes before WM_NCCALCSIZE returns (atomicity preserved). This is the Windows
+    // analog of the Metal fix's LWCToolkit.invokeAndWait; de-risks the toolkit→EDT hop during the modal loop.
+    @Suppress("unused")
+    private fun onSpikeRenderFrame(width: Int, height: Int) {
+        // Native (toolkit thread) called us and is now pump-waiting on signalSpikeRenderDone(). POST the render
+        // to the EDT (onRender requires it) and return immediately; the toolkit pump keeps servicing the EDT's
+        // cross-thread window ops so this doesn't deadlock. Signal native when the EDT render completes.
+        javax.swing.SwingUtilities.invokeLater {
+            try {
+                renderFrameLocked(width, height)
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            } finally {
+                signalSpikeRenderDone()
+            }
+        }
+    }
+
+    private fun renderFrameLocked(width: Int, height: Int): Unit = synchronized(drawLock) {
+        if (isDisposed || width <= 0 || height <= 0) return
+        val delegate = layer.renderDelegate ?: return
+        val ctxPtr = contextHandler.spikeContextPtr()
+        if (ctxPtr == 0L) return
+        val surfacePtr = makeSpikeFrameSurface(device, ctxPtr, width, height)
+        if (surfacePtr == 0L) return
+        val surface = Surface(surfacePtr)
+        surface.use { surface ->
+            delegate.onRender(surface.canvas, width, height, System.nanoTime())
+            flushSpikeFrame(ctxPtr, surfacePtr)
+        }
+        presentSpikeFrame()
     }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing) {
+        if (layer.isShowing && !spikeResizing) {
             update()
             draw()
         }
@@ -87,7 +168,7 @@ internal class Direct3DRedrawer(
     }
 
     private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
-        if (isDisposed) {
+        if (isDisposed || spikeResizing) { // SPIKE: `spikeResizing` gate
             return
         }
         contextHandler.draw()
@@ -140,4 +221,14 @@ internal class Direct3DRedrawer(
     private external fun initFence(device: Long)
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long
+
+    // SPIKE: throwaway — installs a WndProc subclass on the top-level window (GA_ROOT of `window`) that,
+    // during an interactive resize, resizes the content HWND and synchronously clears+presents a solid color.
+    private external fun installSpikeResizeHook(device: Long, window: Long, content: Long)
+
+    // SPIKE 2b: render the real renderDelegate content into the NOREDIR frame's own comp swapchain.
+    private external fun makeSpikeFrameSurface(device: Long, context: Long, width: Int, height: Int): Long
+    private external fun flushSpikeFrame(context: Long, surface: Long)
+    private external fun presentSpikeFrame()
+    private external fun signalSpikeRenderDone()
 }
