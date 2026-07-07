@@ -304,7 +304,11 @@ kotlin {
         skikoProjectContext.configureNativeTarget(OS.MacOS, Arch.X64, macosX64())
         skikoProjectContext.configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
     }
-    if (supportNativeLinux) {
+    // Unlike the Apple targets (whose platform libs ship with Konan on every host), the
+    // Linux targets carry custom cinterops (x11gl, waylandegl) that can only be processed
+    // where the system headers exist, so they are host-gated: metadata for linuxMain
+    // cannot compile on macOS/Windows hosts.
+    if (supportNativeLinux && hostOs.isLinux) {
         skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
         skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
     }

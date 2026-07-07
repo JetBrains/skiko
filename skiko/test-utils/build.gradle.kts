@@ -65,7 +65,9 @@ kotlin {
         macosX64()
         macosArm64()
     }
-    if (supportNativeLinux) {
+    // Host-gated like skiko itself: the Linux targets' custom cinterops only process on
+    // Linux hosts, and skiko publishes no Linux variants from other hosts to resolve.
+    if (supportNativeLinux && hostOs.isLinux) {
         linuxX64()
         linuxArm64()
     }
