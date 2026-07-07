@@ -1,5 +1,6 @@
 #include <SkNWayCanvas.h>
 #include <SkPathBuilder.h>
+#include <SkPaintFilterCanvas.h>
 #include <SkPicture.h>
 #include <SkShadowUtils.h>
 #include "node/RenderNode.h"
@@ -54,6 +55,25 @@ protected:
     void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) override {
         drawable->draw(this, matrix);
     }
+};
+
+class AlphaModulateFilterCanvas : public SkPaintFilterCanvas {
+public:
+    AlphaModulateFilterCanvas(SkCanvas* canvas, float alpha)
+        : SkPaintFilterCanvas(canvas), alpha(alpha) {}
+
+protected:
+    bool onFilter(SkPaint& paint) const override {
+        paint.setAlphaf(paint.getAlphaf() * alpha);
+        return true;
+    }
+
+    void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) override {
+        drawable->draw(this, matrix);
+    }
+
+private:
+    float alpha;
 };
 
 RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
@@ -252,7 +272,12 @@ void RenderNode::onDraw(SkCanvas* canvas) {
         canvas->save();
     }
 
-    canvas->drawDrawable(this->contentCache.get());
+    if (this->alpha < 1.0f && !this->layerPaint) {
+        AlphaModulateFilterCanvas alphaCanvas(canvas, this->alpha);
+        alphaCanvas.drawDrawable(this->contentCache.get());
+    } else {
+        canvas->drawDrawable(this->contentCache.get());
+    }
 }
 
 SkRect RenderNode::onGetBounds() {
