@@ -11,7 +11,13 @@ import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.runRestoringState
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.LayerDrawScope
+import org.jetbrains.skiko.RenderException
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkikoDispatchers
+import org.jetbrains.skiko.hostArch
+import org.jetbrains.skiko.hostOs
 import kotlin.time.TimeSource
 
 /**
@@ -19,7 +25,7 @@ import kotlin.time.TimeSource
  * [Surface] wrapping the window's default framebuffer.
  */
 internal class LinuxOpenGLRedrawer(
-    private val skiaLayer: SkiaLayer
+    private val skiaLayer: SkiaLayer,
 ) : Redrawer {
     private var context: DirectContext? = null
     private var renderTarget: BackendRenderTarget? = null
@@ -33,16 +39,18 @@ internal class LinuxOpenGLRedrawer(
         get() = "GraphicsApi: ${skiaLayer.renderApi}\nOS: ${hostOs.id} ${hostArch.id}\n"
 
     private val win = skiaLayer.window
-    private val gl = GlContext(win).apply {
-        makeCurrent()
-        setSwapInterval(1) // Vsync enabled
-    }
+    private val gl =
+        win.createGlContext().apply {
+            makeCurrent()
+            setSwapInterval(1) // Vsync enabled
+        }
 
     private val initialTime = TimeSource.Monotonic.markNow()
 
-    private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
-        renderImmediately()
-    }
+    private val frameDispatcher =
+        FrameDispatcher(SkikoDispatchers.Main) {
+            renderImmediately()
+        }
 
     override fun dispose() {
         frameDispatcher.cancel()
