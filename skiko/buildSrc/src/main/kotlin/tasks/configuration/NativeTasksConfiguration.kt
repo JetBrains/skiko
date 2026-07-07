@@ -477,6 +477,11 @@ fun SkikoProjectContext.configureNativeTarget(
                     cinterops.create("x11gl").apply {
                         definitionFile.set(project.file("src/nativeInterop/cinterop/x11gl.def"))
                     }
+                    // No Kotlin consumer inside skiko: the klib is published for the compose
+                    // event pump's wl_keyboard keymap handling.
+                    cinterops.create("xkbcommon").apply {
+                        definitionFile.set(project.file("src/nativeInterop/cinterop/xkbcommon.def"))
+                    }
                 }
                 configureWaylandEglCinterop(arch, target, targetString, waylandProtocolsTask)
             }
