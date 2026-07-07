@@ -75,6 +75,9 @@ internal class LinuxOpenGLRedrawer(
         skiaLayer.inDrawScope {
             performDraw()
         }
+        // Requested before the swap because the frame request rides the commit that
+        // swapBuffers performs. No-op on X11, which paces via vsync-throttled swaps.
+        win.frameCallback { needRender(throttledToVsync = true) }
         gl.swapBuffers()
     }
 
@@ -87,7 +90,12 @@ internal class LinuxOpenGLRedrawer(
             clear(Color.TRANSPARENT)
             skiaLayer.draw(this)
         }
-        context?.flush()
+        val s = surface
+        if (s != null) {
+            context?.flush(s)
+        } else {
+            context?.flush()
+        }
     }
 
     private fun initContext(): Boolean {
