@@ -622,26 +622,29 @@ static gr_cp<IDCompositionTarget> g_spikeFrameTarget;
 static gr_cp<IDCompositionVisual> g_spikeFrameVisual;
 static gr_cp<IDXGISwapChain3> g_spikeFrameSwapChain;
 static gr_cp<ID3D12Resource> g_spikeFrameBuffers[BuffersCount]; // SPIKE 2b: wrapped-as-Skia backbuffers
-static gr_cp<ID3D12Fence> g_spikeFrameFence;                    // SPIKE 2b: drain the queue before ResizeBuffers
+// SPIKE: per-buffer fence discipline, mirroring the on-screen swapchain (DirectXDevice). This is what lets the
+// overlay tolerate many presents per size and still ResizeBuffers cleanly — the earlier frame-latency-waitable
+// approach wedged after ~2 presents at one size. presentSpikeFrame signals fenceValues[bufferIndex] after Present;
+// the next frame waits it before reusing that buffer; ResizeBuffers waits ALL buffers' fences.
+static gr_cp<ID3D12Fence> g_spikeFrameFence;
 static HANDLE g_spikeFrameFenceEvent = nullptr;
-static uint64_t g_spikeFrameFenceValue = 0;
-static HANDLE g_spikeFrameWaitable = nullptr;                   // SPIKE 2b: frame-latency waitable (retire presents)
+static uint64_t g_spikeFrameFenceValues[BuffersCount] = {0};
+static unsigned int g_spikeFrameBufferIndex = 0;
 
-// Block until the command queue has finished all submitted work — crucially the DXGI Present operations, which
-// hold references to the swapchain backbuffers on the GPU timeline. Without this ResizeBuffers fails with
-// DXGI_ERROR_INVALID_CALL even though the buffers have no CPU/COM references (mirrors the device swapchain's
-// per-buffer fence wait in resizeBuffers).
-static void spikeFrameGpuSync()
+// Create the overlay swapchain's fence (mirrors initFence for the on-screen swapchain). Once per swapchain.
+static void spikeFrameInitFence()
 {
-    if (!g_spikeDevice) return;
-    if (!g_spikeFrameFence.get())
-    {
-        g_spikeDevice->device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&g_spikeFrameFence));
-        g_spikeFrameFenceEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
-    }
-    const uint64_t fv = ++g_spikeFrameFenceValue;
-    g_spikeDevice->queue->Signal(g_spikeFrameFence.get(), fv);
-    if (g_spikeFrameFence->GetCompletedValue() < fv)
+    if (!g_spikeDevice || g_spikeFrameFence.get()) return;
+    for (int i = 0; i < BuffersCount; i++) g_spikeFrameFenceValues[i] = 10000;
+    g_spikeDevice->device->CreateFence(g_spikeFrameFenceValues[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&g_spikeFrameFence));
+    g_spikeFrameFenceEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    g_spikeFrameBufferIndex = 0;
+}
+
+// Block until the GPU fence reaches fv (a buffer's prior present finished).
+static void spikeFrameWaitFence(uint64_t fv)
+{
+    if (g_spikeFrameFence.get() && g_spikeFrameFence->GetCompletedValue() < fv)
     {
         g_spikeFrameFence->SetEventOnCompletion(fv, g_spikeFrameFenceEvent);
         WaitForSingleObjectEx(g_spikeFrameFenceEvent, INFINITE, FALSE);
@@ -666,13 +669,11 @@ static void spikeEnsureFrameDComp()
     desc.Scaling = DXGI_SCALING_STRETCH;
     desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
-    desc.Flags = DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT; // bound outstanding presents so ResizeBuffers can proceed
     gr_cp<IDXGISwapChain1> sc1;
     HRESULT hr = factory->CreateSwapChainForComposition(g_spikeDevice->queue.get(), &desc, nullptr, &sc1);
     if (FAILED(hr)) return;
     sc1->QueryInterface(IID_PPV_ARGS(&g_spikeFrameSwapChain));
-    g_spikeFrameSwapChain->SetMaximumFrameLatency(1);
-    g_spikeFrameWaitable = g_spikeFrameSwapChain->GetFrameLatencyWaitableObject();
+    spikeFrameInitFence(); // per-buffer fence discipline (mirrors the on-screen swapchain), no waitable
 
     hr = DCompLibrary::DCompositionCreateDevice(nullptr, IID_PPV_ARGS(&g_spikeFrameDComp));
     if (FAILED(hr)) return;
@@ -894,6 +895,16 @@ static void spikeGdiFillClient(HWND hWnd)
 // DwmFlush). Expectation: atomic on ALL edges incl. top/left origin-move (no redirection surface to race).
 static bool g_spikeEngaged = false; // frame overlay active (only during actual RESIZE, not plain moves)
 
+// SPIKE: on-demand stationary-animation driver. needRender (EDT) posts one coalesced WM_SPIKE_RENDER to the
+// toolkit thread; the handler does the SAME synchronized present as WM_NCCALCSIZE, but ONLY when no input is
+// queued. During an active drag there's always pending mouse input (a resize step is imminent and WILL present),
+// so the handler skips — the WM_NCCALCSIZE steps stay the sole presenter and we never land a 2nd present at the
+// same size (which wedges the flip swapchain's next ResizeBuffers). When the drag goes idle (no input), the post
+// presents and self-perpetuates via onRender -> needRender. Checking queue STATE (not dequeue order) is robust
+// even though posted messages outrank input.
+#define WM_SPIKE_RENDER (WM_APP + 0x11)
+static volatile LONG g_spikePostPending = 0;
+
 static LRESULT CALLBACK SpikeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
@@ -947,6 +958,18 @@ static LRESULT CALLBACK SpikeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             }
             return r;
         }
+        case WM_SPIKE_RENDER:
+            // On-demand animation (posted by needRender). Present the overlay at the current size — but ONLY if no
+            // input (mouse/key) is queued: pending input means a resize step is imminent and WILL present, so we'd
+            // otherwise land a redundant 2nd present at this size and wedge the next ResizeBuffers. Checking queue
+            // STATE (not dequeue order) makes this robust even though posted messages outrank input.
+            InterlockedExchange(&g_spikePostPending, 0);
+            if (g_spikeEngaged && HIWORD(GetQueueStatus(QS_INPUT)) == 0)
+            {
+                RECT rc; GetClientRect(hWnd, &rc);
+                spikeCallRenderFrame(rc.right - rc.left, rc.bottom - rc.top);
+            }
+            return 0;
         case WM_EXITSIZEMOVE:
             if (g_spikeEngaged)
             {
@@ -1278,29 +1301,11 @@ extern "C"
     // SPIKE 2b: wrap the NOREDIR frame's comp-swapchain backbuffer as a Skia SkSurface so the renderDelegate
     // can draw REAL content into it during resize (mirrors makeDirectXSurface but targets g_spikeFrameSwapChain).
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeSpikeFrameSurface(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height)
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height, jint index)
     {
         GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
-        if (!g_spikeFrameSwapChain.get() || width <= 0 || height <= 0) return 0;
-
-        // Throttle to the compositor and, critically, ensure the previous Present has RETIRED (left the DXGI
-        // present queue) so its backbuffers are free — otherwise ResizeBuffers fails with DXGI_ERROR_INVALID_CALL.
-        if (g_spikeFrameWaitable) WaitForSingleObjectEx(g_spikeFrameWaitable, 1000, TRUE);
-
-        DXGI_SWAP_CHAIN_DESC1 d = {};
-        g_spikeFrameSwapChain->GetDesc1(&d);
-        if (d.Width != (UINT)width || d.Height != (UINT)height)
-        {
-            context->flush();
-            context->submit(GrSyncCpu::kYes);
-            for (int i = 0; i < BuffersCount; i++) g_spikeFrameBuffers[i].reset(nullptr);
-            spikeFrameGpuSync(); // also drain GPU-side work referencing the buffers
-            g_spikeFrameSwapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN,
-                                                 DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT);
-        }
-
-        UINT index = g_spikeFrameSwapChain->GetCurrentBackBufferIndex();
-        if (FAILED(g_spikeFrameSwapChain->GetBuffer(index, IID_PPV_ARGS(&g_spikeFrameBuffers[index])))) return 0;
+        if (!g_spikeFrameSwapChain.get() || width <= 0 || height <= 0 || index < 0 || index >= BuffersCount) return 0;
+        if (FAILED(g_spikeFrameSwapChain->GetBuffer((UINT)index, IID_PPV_ARGS(&g_spikeFrameBuffers[index])))) return 0;
 
         GrD3DTextureResourceInfo info(nullptr, nullptr, D3D12_RESOURCE_STATE_PRESENT, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, 0);
         info.fResource = g_spikeFrameBuffers[index];
@@ -1310,6 +1315,39 @@ extern "C"
                                  kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), nullptr)
                                  .release();
         return toJavaPointer(result);
+    }
+
+    // SPIKE 2b: resize the overlay swapchain on size change (mirrors the on-screen resizeBuffers): flush Skia's
+    // refs, wait EACH buffer's last-present fence so no backbuffer is still in flight, drop refs, ResizeBuffers.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeSpikeFrame(
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height)
+    {
+        GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
+        if (!g_spikeFrameSwapChain.get() || width <= 0 || height <= 0) return;
+        DXGI_SWAP_CHAIN_DESC1 d = {};
+        g_spikeFrameSwapChain->GetDesc1(&d);
+        if (d.Width == (UINT)width && d.Height == (UINT)height) return; // no size change
+        context->flush();
+        context->submit(GrSyncCpu::kYes);
+        for (int i = 0; i < BuffersCount; i++)
+        {
+            spikeFrameWaitFence(g_spikeFrameFenceValues[i]);
+            g_spikeFrameBuffers[i].reset(nullptr);
+        }
+        g_spikeFrameSwapChain->ResizeBuffers(BuffersCount, (UINT)width, (UINT)height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+    }
+
+    // SPIKE 2b: getBufferIndex discipline (mirrors the on-screen swapchain) — rotate to the current back buffer,
+    // wait its previous present's fence, bump its next fence value. Returns the buffer index to draw into.
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_spikeFrameBufferIndex(
+        JNIEnv *env, jobject redrawer)
+    {
+        if (!g_spikeFrameSwapChain.get()) return 0;
+        const uint64_t fv = g_spikeFrameFenceValues[g_spikeFrameBufferIndex];
+        g_spikeFrameBufferIndex = g_spikeFrameSwapChain->GetCurrentBackBufferIndex();
+        spikeFrameWaitFence(fv);
+        g_spikeFrameFenceValues[g_spikeFrameBufferIndex] = fv + 1;
+        return (jint)g_spikeFrameBufferIndex;
     }
 
     // SPIKE 2b: flush the renderDelegate's draw into the frame backbuffer and transition it to PRESENT.
@@ -1326,10 +1364,13 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_presentSpikeFrame(
         JNIEnv *env, jobject redrawer)
     {
-        if (!g_spikeFrameSwapChain.get()) return;
-        // Vblank-synced double-present (the top/left-jump fix from 2a).
-        g_spikeFrameSwapChain->Present(0, DXGI_PRESENT_RESTART);
-        g_spikeFrameSwapChain->Present(1, DXGI_PRESENT_DO_NOT_SEQUENCE);
+        if (!g_spikeFrameSwapChain.get() || !g_spikeDevice) return;
+        // Present, then signal this buffer's fence (mirrors the on-screen swap()). Sync interval 0 (IMMEDIATE): the
+        // flip lands in the same DWM compose pass as the geometry change, so content stays welded to the window
+        // edge (interval 1 queued it a vsync late → content trailed the edge / top-left jump). The per-buffer
+        // fence discipline is what keeps ResizeBuffers healthy under animation.
+        g_spikeFrameSwapChain->Present(0, 0);
+        g_spikeDevice->queue->Signal(g_spikeFrameFence.get(), g_spikeFrameFenceValues[g_spikeFrameBufferIndex]);
         if (g_spikeFrameDComp) g_spikeFrameDComp->Commit();
     }
 
@@ -1338,6 +1379,15 @@ extern "C"
         JNIEnv *env, jobject redrawer)
     {
         if (g_spikeRenderDoneEvent) SetEvent(g_spikeRenderDoneEvent);
+    }
+
+    // SPIKE: needRender during a resize routes here — post a single (coalesced) WM_SPIKE_RENDER to the toolkit
+    // thread so it drives a synchronized overlay present (stationary animation) without an async EDT present.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_postSpikeRender(
+        JNIEnv *env, jobject redrawer)
+    {
+        if (g_spikeTopHwnd && InterlockedExchange(&g_spikePostPending, 1) == 0)
+            PostMessageW(g_spikeTopHwnd, WM_SPIKE_RENDER, 0, 0);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeBuffers(

@@ -110,18 +110,31 @@ internal class Direct3DRedrawer(
         }
     }
 
+    // SPIKE 2b: cached overlay surfaces (one per swapchain buffer), recreated only on size change — mirrors the
+    // on-screen Direct3DContextHandler. Re-wrapping a fresh SkSurface every frame churns Skia's wrapped render
+    // targets and wedges ResizeBuffers.
+    private val spikeFrameSurfaces = arrayOfNulls<Surface>(2)
+    private var spikeFrameW = 0
+    private var spikeFrameH = 0
+
     private fun renderFrameLocked(width: Int, height: Int): Unit = synchronized(drawLock) {
         if (isDisposed || width <= 0 || height <= 0) return
         val delegate = layer.renderDelegate ?: return
         val ctxPtr = contextHandler.spikeContextPtr()
         if (ctxPtr == 0L) return
-        val surfacePtr = makeSpikeFrameSurface(device, ctxPtr, width, height)
-        if (surfacePtr == 0L) return
-        val surface = Surface(surfacePtr)
-        surface.use { surface ->
-            delegate.onRender(surface.canvas, width, height, System.nanoTime())
-            flushSpikeFrame(ctxPtr, surfacePtr)
+        if (width != spikeFrameW || height != spikeFrameH || spikeFrameSurfaces[0] == null) {
+            for (i in spikeFrameSurfaces.indices) { spikeFrameSurfaces[i]?.close(); spikeFrameSurfaces[i] = null }
+            resizeSpikeFrame(device, ctxPtr, width, height)
+            for (i in 0 until 2) {
+                val p = makeSpikeFrameSurface(device, ctxPtr, width, height, i)
+                if (p == 0L) return
+                spikeFrameSurfaces[i] = Surface(p)
+            }
+            spikeFrameW = width; spikeFrameH = height
         }
+        val surface = spikeFrameSurfaces[spikeFrameBufferIndex()] ?: return
+        delegate.onRender(surface.canvas, width, height, System.nanoTime())
+        flushSpikeFrame(ctxPtr, org.jetbrains.skia.impl.getPtr(surface))
         presentSpikeFrame()
     }
 
@@ -138,6 +151,7 @@ internal class Direct3DRedrawer(
 
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
+        for (i in spikeFrameSurfaces.indices) { spikeFrameSurfaces[i]?.close(); spikeFrameSurfaces[i] = null } // SPIKE
         contextHandler.dispose()
         disposeDevice(device)
         device = 0L
@@ -146,7 +160,11 @@ internal class Direct3DRedrawer(
 
     override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
-        frameDispatcher.scheduleFrame()
+        // SPIKE: during a resize the overlay must be presented only from the toolkit thread (synchronized with the
+        // resize loop) — an async EDT present corrupts the flip swapchain. Route needRender to a coalesced toolkit
+        // present (postSpikeRender), which self-gates to fire only when a resize step isn't already presenting
+        // (i.e. a stationary hold). Active-drag animation is driven by the WM_NCCALCSIZE renders themselves.
+        if (spikeResizing) postSpikeRender() else frameDispatcher.scheduleFrame()
     }
 
     override fun renderImmediately() {
@@ -227,8 +245,11 @@ internal class Direct3DRedrawer(
     private external fun installSpikeResizeHook(device: Long, window: Long, content: Long)
 
     // SPIKE 2b: render the real renderDelegate content into the NOREDIR frame's own comp swapchain.
-    private external fun makeSpikeFrameSurface(device: Long, context: Long, width: Int, height: Int): Long
+    private external fun resizeSpikeFrame(device: Long, context: Long, width: Int, height: Int)
+    private external fun makeSpikeFrameSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
+    private external fun spikeFrameBufferIndex(): Int
     private external fun flushSpikeFrame(context: Long, surface: Long)
     private external fun presentSpikeFrame()
     private external fun signalSpikeRenderDone()
+    private external fun postSpikeRender()
 }
