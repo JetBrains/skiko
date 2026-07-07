@@ -13,6 +13,8 @@ import cnames.structs.wp_viewporter
 import cnames.structs.xdg_surface
 import cnames.structs.xdg_toplevel
 import cnames.structs.xdg_wm_base
+import cnames.structs.zxdg_decoration_manager_v1
+import cnames.structs.zxdg_toplevel_decoration_v1
 import kotlinx.cinterop.*
 import platform.posix.POLLIN
 import platform.posix.poll
@@ -55,6 +57,7 @@ class WaylandWindow(
     private var wmBase: CPointer<xdg_wm_base>? = null
     private var viewporter: CPointer<wp_viewporter>? = null
     private var fractionalScaleManager: CPointer<wp_fractional_scale_manager_v1>? = null
+    private var decorationManager: CPointer<zxdg_decoration_manager_v1>? = null
     private var outputScale = 1
 
     internal val surface: CPointer<wl_surface>
@@ -62,6 +65,7 @@ class WaylandWindow(
     private val toplevel: CPointer<xdg_toplevel>
     private var viewport: CPointer<wp_viewport>? = null
     private var fractionalScale: CPointer<wp_fractional_scale_v1>? = null
+    private var toplevelDecoration: CPointer<zxdg_toplevel_decoration_v1>? = null
 
     /** Logical (compositor-space) size; physical size is derived via [contentScale]. */
     private var logicalWidth = width
@@ -160,6 +164,14 @@ class WaylandWindow(
         }
     }
 
+    // The compositor may pick either mode; there is no client-side fallback yet
+    // (libdecor is deferred), so a client-side answer just leaves the window borderless.
+    private val toplevelDecorationListener = arena.alloc<zxdg_toplevel_decoration_v1_listener>().apply {
+        configure = staticCFunction {
+                _: COpaquePointer?, _: CPointer<zxdg_toplevel_decoration_v1>?, _: UInt ->
+        }
+    }
+
     private val frameListener = arena.alloc<wl_callback_listener>().apply {
         done = staticCFunction { data: COpaquePointer?, callback: CPointer<wl_callback>?, _: UInt ->
             callback?.let { wl_callback_destroy(it) }
@@ -190,6 +202,16 @@ class WaylandWindow(
             ?: throw RenderSetupException("xdg_surface_get_toplevel failed")
         xdg_toplevel_add_listener(toplevel, toplevelListener.ptr, self.asCPointer())
         xdg_toplevel_set_title(toplevel, title)
+
+        // Ask for server-side decorations where the compositor offers the choice (KWin,
+        // sway); GNOME does not advertise the manager and the window stays borderless.
+        decorationManager?.let { manager ->
+            toplevelDecoration =
+                zxdg_decoration_manager_v1_get_toplevel_decoration(manager, toplevel)?.also {
+                    zxdg_toplevel_decoration_v1_add_listener(it, toplevelDecorationListener.ptr, self.asCPointer())
+                    zxdg_toplevel_decoration_v1_set_mode(it, ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE)
+                }
+        }
 
         val fractionalScaleManager = fractionalScaleManager
         if (fractionalScaleManager != null && viewporter != null) {
@@ -226,6 +248,10 @@ class WaylandWindow(
             "wp_fractional_scale_manager_v1" ->
                 fractionalScaleManager =
                     wl_registry_bind(registry, name, wp_fractional_scale_manager_v1_interface.ptr, 1u)
+                        ?.reinterpret()
+            "zxdg_decoration_manager_v1" ->
+                decorationManager =
+                    wl_registry_bind(registry, name, zxdg_decoration_manager_v1_interface.ptr, 1u)
                         ?.reinterpret()
             "wl_output" -> {
                 val output = wl_registry_bind(registry, name, wl_output_interface.ptr, minOf(version, 2u))
@@ -307,6 +333,7 @@ class WaylandWindow(
         pendingFrame = null
         fractionalScale?.let { wp_fractional_scale_v1_destroy(it) }
         viewport?.let { wp_viewport_destroy(it) }
+        toplevelDecoration?.let { zxdg_toplevel_decoration_v1_destroy(it) }
         xdg_toplevel_destroy(toplevel)
         xdg_surface_destroy(xdgSurface)
         wl_surface_destroy(surface)
