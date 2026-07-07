@@ -133,7 +133,7 @@ internal class Direct3DRedrawer(
             spikeFrameW = width; spikeFrameH = height
         }
         val surface = spikeFrameSurfaces[spikeFrameBufferIndex()] ?: return
-        delegate.onRender(surface.canvas, width, height, System.nanoTime())
+        delegate.onRender(surface.canvas, width, height, skikoNanoTime())
         flushSpikeFrame(ctxPtr, org.jetbrains.skia.impl.getPtr(surface))
         presentSpikeFrame()
     }

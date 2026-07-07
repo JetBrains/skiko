@@ -1365,11 +1365,12 @@ extern "C"
         JNIEnv *env, jobject redrawer)
     {
         if (!g_spikeFrameSwapChain.get() || !g_spikeDevice) return;
-        // Present, then signal this buffer's fence (mirrors the on-screen swap()). Sync interval 0 (IMMEDIATE): the
-        // flip lands in the same DWM compose pass as the geometry change, so content stays welded to the window
-        // edge (interval 1 queued it a vsync late → content trailed the edge / top-left jump). The per-buffer
-        // fence discipline is what keeps ResizeBuffers healthy under animation.
-        g_spikeFrameSwapChain->Present(0, 0);
+        // Present, then signal this buffer's fence (mirrors the on-screen swap()). Present(0, RESTART) is the
+        // IMMEDIATE flip (content welded to the window edge in the same DWM compose as the geometry change);
+        // Present(1, DO_NOT_SEQUENCE) re-presents the SAME buffer vblank-synced (top/left-jump stabilizer) WITHOUT
+        // advancing the swapchain, so the per-buffer fence rotation still alternates buffers correctly.
+        g_spikeFrameSwapChain->Present(0, DXGI_PRESENT_RESTART);
+        g_spikeFrameSwapChain->Present(1, DXGI_PRESENT_DO_NOT_SEQUENCE);
         g_spikeDevice->queue->Signal(g_spikeFrameFence.get(), g_spikeFrameFenceValues[g_spikeFrameBufferIndex]);
         if (g_spikeFrameDComp) g_spikeFrameDComp->Commit();
     }
