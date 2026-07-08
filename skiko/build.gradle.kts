@@ -84,6 +84,12 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
 
             windows {
                     staticSkiaLibs("d3d12allocator")
+                    // m151 SkSL adopted Chromium's raw_ptr<T> (BackupRefPtr/MiraclePtr), which is
+                    // active on Windows (no-op elsewhere). skia.lib now references partition_alloc
+                    // and raw_ptr symbols that live in these split-out static libs, so link them.
+                    // allocator_shim is intentionally omitted: it overrides global malloc and is not
+                    // referenced by skia.
+                    staticSkiaLibs("raw_ptr", "allocator_core", "allocator_base")
             }
 
             linux {
