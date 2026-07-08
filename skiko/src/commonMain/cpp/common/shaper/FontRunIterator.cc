@@ -1,6 +1,6 @@
 #include "SkShaper.h"
 #include "FontRunIterator.hh"
-#include "src/base/SkUTF.h"
+#include "src/core/SkUTF.h"
 #include "unicode/uchar.h"
 #include <iostream>
 

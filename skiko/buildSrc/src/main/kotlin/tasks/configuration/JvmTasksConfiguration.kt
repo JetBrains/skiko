@@ -376,6 +376,9 @@ fun SkikoProjectContext.createLinkJvmBindings(
                         "shcore.lib",
                         "Shlwapi.lib",
                         "user32.lib",
+                        // partition_alloc (allocator_base.time_win.obj, linked since m151 for
+                        // raw_ptr/BackupRefPtr) calls timeGetTime, which lives in winmm.
+                        "winmm.lib",
                     )
                 )
                 if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
