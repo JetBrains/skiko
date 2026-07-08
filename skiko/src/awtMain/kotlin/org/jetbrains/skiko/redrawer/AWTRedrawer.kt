@@ -1,7 +1,9 @@
 package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.LockFile.Companion.skiko
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
+import java.awt.Dimension
 
 /**
  * Common class for all AWT redrawers.
@@ -50,11 +52,15 @@ internal abstract class AWTRedrawer(
     }
 
     override fun update(nanoTime: Long) {
-        checkDisposed()
-        layer.update(nanoTime)
+        update(nanoTime, forcedSize = null)
     }
 
-    protected inline fun inDrawScope(body: LayerDrawScope.() -> Unit) {
+    fun update(nanoTime: Long = renderTime(), forcedSize: Dimension?) {
+        checkDisposed()
+        layer.update(nanoTime, forcedSize = forcedSize)
+    }
+
+    protected inline fun inDrawScope(forcedSize: Dimension? = null, body: LayerDrawScope.() -> Unit) {
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         if (!isDisposed) {
             val isFirstFrame = !isFirstFrameRendered
@@ -63,7 +69,9 @@ internal abstract class AWTRedrawer(
                 deviceAnalytics?.beforeFirstFrameRender()
             }
             deviceAnalytics?.beforeFrameRender()
-            layer.inDrawScope(body)
+            layer.inDrawScope(forcedSize) {
+                body()
+            }
             if (isFirstFrame && !isDisposed) {
                 deviceAnalytics?.afterFirstFrameRender()
             }

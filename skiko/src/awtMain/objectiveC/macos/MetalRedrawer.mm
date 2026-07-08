@@ -153,7 +153,7 @@ static jmethodID getOnLiveResizeStartedMethodID(JNIEnv *env, jobject redrawer) {
     static jmethodID onLiveResizeStarted = NULL;
     if (onLiveResizeStarted == NULL) {
         jclass redrawerClass = env->GetObjectClass(redrawer);
-        onLiveResizeStarted = env->GetMethodID(redrawerClass, "onLiveResizeStarted", "(II)V");
+        onLiveResizeStarted = env->GetMethodID(redrawerClass, "onLiveResizeStarted", "()V");
     }
     return onLiveResizeStarted;
 }
@@ -258,10 +258,9 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     strongDevice.inLiveResize = YES;
                     strongDevice.layer.presentsWithTransaction = YES;
                     strongDevice.layer.liveResizing = YES;
-                    CGSize pixelSize = strongDevice.layer.pixelSize;
                     JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
                     jmethodID onLiveResizeStarted = getOnLiveResizeStartedMethodID(jniEnv, strongDevice.layer.javaRef);
-                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, onLiveResizeStarted, (jint)pixelSize.width, (jint)pixelSize.height);
+                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, onLiveResizeStarted);
                 }];
             device.liveResizeEndObserver =
                 [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidEndLiveResizeNotification

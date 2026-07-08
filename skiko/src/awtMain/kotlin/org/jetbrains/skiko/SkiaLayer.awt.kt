@@ -8,9 +8,9 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.internal.fastForEach
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
-import org.jetbrains.skiko.redrawer.isHandlingSizing
 import java.awt.Color
 import java.awt.Component
+import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Point
 import java.awt.event.*
@@ -114,9 +114,7 @@ actual open class SkiaLayer internal constructor(
                 //    For example, on macOs when we resize window or change DPI
                 //
                 // 3. to avoid double paint in one single frame, use needRender instead of renderImmediately
-//                if (!redrawer.isAutoResizing()) {
                 redrawer?.needRender(throttledToVsync = false)
-//                }
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
@@ -125,14 +123,7 @@ actual open class SkiaLayer internal constructor(
                 @Suppress("DEPRECATION")
                 super.reshape(x, y, width, height)
 
-                // While the platform drives an interactive resize itself (macOS/Metal live resize),
-                // geometry and presentation are handled there (AWTMetalLayer.setBounds). Calling
-                // syncBounds/needRender from here would race that path, so skip them. Regular
-                // content/animation needRender still flows through the normal channels.
-                if (!redrawer.isHandlingSizing) {
-                    redrawer?.syncBoundsFromPlatformComponent()
-                    redrawer?.needRender(throttledToVsync = false)
-                }
+                redrawer?.onPlatformComponentResized()
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -440,7 +431,7 @@ actual open class SkiaLayer internal constructor(
         //
         // Calling redraw during layout might break software renderers,
         // so apply this fix only for the Direct3D case.
-        if (renderApi == GraphicsApi.DIRECT3D && isShowing && !redrawer.isHandlingSizing) {
+        if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
             redrawer?.syncBoundsFromPlatformComponent()
             redrawer?.renderImmediately()
         }
@@ -611,7 +602,7 @@ actual open class SkiaLayer internal constructor(
         redrawer?.renderImmediately()
     }
 
-    internal fun update(nanoTime: Long) {
+    internal fun update(nanoTime: Long, forcedSize: Dimension? = null) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
@@ -625,10 +616,9 @@ actual open class SkiaLayer internal constructor(
         val contentScale = this.contentScale
         val pictureWidth: Float
         val pictureHeight: Float
-        val handledLayerSize = redrawer?.layerSizeWhileHandlingSizing
-        if (handledLayerSize != null) {
-            pictureWidth = handledLayerSize.width.toFloat().coerceAtLeast(0f)
-            pictureHeight = handledLayerSize.height.toFloat().coerceAtLeast(0f)
+        if (forcedSize != null) {
+            pictureWidth = forcedSize.width.toFloat().coerceAtLeast(0f)
+            pictureHeight = forcedSize.height.toFloat().coerceAtLeast(0f)
         } else {
             pictureWidth = (backedLayer.width * contentScale).coerceAtLeast(0f)
             pictureHeight = (backedLayer.height * contentScale).coerceAtLeast(0f)
@@ -673,13 +663,12 @@ actual open class SkiaLayer internal constructor(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    private fun createDrawScope(): LayerDrawScope {
-        val layerSizeWhileHandlingSizing = redrawer?.layerSizeWhileHandlingSizing
-        return if (layerSizeWhileHandlingSizing != null) {
+    private fun createDrawScope(forcedSize: Dimension?): LayerDrawScope {
+        return if (forcedSize != null) {
             LayerDrawScope(
                 pixelGeometry = pixelGeometry,
-                scaledLayerWidth = layerSizeWhileHandlingSizing.width,
-                scaledLayerHeight = layerSizeWhileHandlingSizing.height
+                scaledLayerWidth = forcedSize.width,
+                scaledLayerHeight = forcedSize.height
             )
         } else {
             LayerDrawScope(
@@ -691,12 +680,12 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    internal inline fun inDrawScope(body: LayerDrawScope.() -> Unit) {
+    internal inline fun inDrawScope(forcedSize: Dimension? = null, body: LayerDrawScope.() -> Unit) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
         try {
             fpsCounter?.tick()
-            with(createDrawScope()) {
+            with(createDrawScope(forcedSize)) {
                 body()
             }
         } catch (_: CancellationException) {

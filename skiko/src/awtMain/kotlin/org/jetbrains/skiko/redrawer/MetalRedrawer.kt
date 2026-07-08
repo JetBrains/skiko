@@ -6,6 +6,7 @@ import org.jetbrains.skia.ISize
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import java.awt.Component
+import java.awt.Dimension
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.SwingUtilities.*
 import kotlin.time.Duration.Companion.milliseconds
@@ -69,16 +70,10 @@ internal class MetalRedrawer(
     @Volatile private var isWindowOccluded = false
 
     /**
-     * The layer size during a live resize session; `null` when not in live resize.
+     * Whether the window is in live-resize mode.
      */
     @Volatile
-    private var layerSizeInLiveResize: ISize? = null
-
-    private val isInLiveResize: Boolean
-        get() = layerSizeInLiveResize != null
-
-    override val layerSizeWhileHandlingSizing: ISize?
-        get() = layerSizeInLiveResize
+    private var isInLiveResize: Boolean = false
 
     init {
         onDeviceChosen(adapter.name)
@@ -137,7 +132,7 @@ internal class MetalRedrawer(
         update()
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw(flush = true)
+                performDraw()
                 // Trying to draw immediately in Metal will result in lost (undrawn)
                 // frames if there are more than two between consecutive vsync events.
                 if (SkikoProperties.macOSWaitForPreviousFrameVsyncOnRedrawImmediately) {
@@ -177,11 +172,14 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun LayerDrawScope.performDraw(flush: Boolean = true) {
+    private fun LayerDrawScope.performDraw(finishFrame: Boolean = true) {
         synchronized(drawLock) {
             if (!isDisposed) {
                 autoreleasepool {
-                    contextHandler.draw(flush)
+                    contextHandler.draw()
+                    if (finishFrame) {
+                        contextHandler.finishFrame()
+                    }
                 }
             }
         }
@@ -191,8 +189,8 @@ internal class MetalRedrawer(
      * Called from native code, on the AppKit main thread, when a live resizing session starts.
      */
     @Suppress("unused")
-    fun onLiveResizeStarted(width: Int, height: Int) {
-        layerSizeInLiveResize = ISize(width, height)
+    fun onLiveResizeStarted() {
+        isInLiveResize = true
         scheduleFrameOnAppKitThread()
     }
 
@@ -201,11 +199,18 @@ internal class MetalRedrawer(
      */
     @Suppress("unused")
     fun onLiveResizeEnded() {
-        layerSizeInLiveResize = null
+        isInLiveResize = false
         invokeLater {
             if (!isDisposed) {
                 needRender(throttledToVsync = false)
             }
+        }
+    }
+
+    override fun onPlatformComponentResized() {
+        // During live resize, the layer tells us its size directly; the AWT size is not in sync
+        if (!isInLiveResize) {
+            super.onPlatformComponentResized()
         }
     }
 
@@ -216,16 +221,16 @@ internal class MetalRedrawer(
     fun drawFrameWhileLiveResizing(width: Int, height: Int) {
         if (isDisposed || width <= 0 || height <= 0) return
 
-        layerSizeInLiveResize = ISize(width, height)
-
         // Record content at exactly the present size, on the EDT.
         try {
             invokeOnEventThreadAndWait {
-                update()
-                inDrawScope {
+                val layerSize = Dimension(width, height)
+                update(forcedSize = layerSize)
+                inDrawScope(forcedSize = layerSize) {
                     if (!isDisposed) {
-                        // `finishFrame` must run on the AppKit main thread to join the resize transaction, so no flush
-                        performDraw(flush = false)
+                        // The present must run on the AppKit main thread to join the resize transaction, so
+                        // only record here; `finishFrameInLiveResize` presents below on the AppKit main thread
+                        performDraw(finishFrame = false)
                     }
                 }
             }
@@ -234,10 +239,10 @@ internal class MetalRedrawer(
             return
         }
 
-        // `finishFrame` (called by `MetalContextHandler.flush()`) needs to be called back on the AppKit main thread
+        // The present must run on the AppKit main thread to join the resize transaction
         synchronized(drawLock) {
             if (!isDisposed) {
-                contextHandler.flush()
+                contextHandler.finishFrameInLiveResize()
             }
         }
     }

@@ -7,33 +7,26 @@ import org.jetbrains.skiko.hostOs
 import kotlin.time.TimeSource
 
 private val initialTime = TimeSource.Monotonic.markNow()
+fun renderTime() = initialTime.elapsedNow().inWholeNanoseconds
 
 internal interface Redrawer {
     fun dispose()
     fun needRender(throttledToVsync: Boolean)
     fun renderImmediately()
     fun syncBoundsFromPlatformComponent() = Unit
-    fun update(nanoTime: Long = initialTime.elapsedNow().inWholeNanoseconds)
+    fun update(nanoTime: Long = renderTime())
     fun setVisible(isVisible: Boolean) = Unit
     val renderInfo: String
     fun isTransparentBackgroundSupported(): Boolean
 
     /**
-     * When the redrawer itself is handling and driving the resizing of the layer, this is the current real size of
-     * the layer, in pixels.
+     * Invoked by [SkiaLayer] when the underlying platform component is resized.
      */
-    val layerSizeWhileHandlingSizing: ISize? get() = null
+    fun onPlatformComponentResized() {
+        syncBoundsFromPlatformComponent()
+        needRender(throttledToVsync = false)
+    }
 }
-
-/**
- * Whether the redrawer itself is handling and driving the resizing of the layer.
- *
- * When this returns `true`, [SkiaLayer] should not respond to resize events from the underlying platform component.
- * Note that this value is not necessarily fixed over time.
- */
-internal val Redrawer?.isHandlingSizing: Boolean
-    get() = this?.layerSizeWhileHandlingSizing != null
-
 
 internal fun defaultIsTransparentBackgroundSupported(layer: SkiaLayer): Boolean {
     if (hostOs == OS.MacOS) {
