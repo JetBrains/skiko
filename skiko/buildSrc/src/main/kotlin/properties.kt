@@ -93,8 +93,8 @@ enum class SkiaBuildType(
         id = "Release",
         flags = arrayOf("-DNDEBUG"),
         clangFlags = arrayOf("-std=c++2a", "-O3"),
-        winCompilerFlags = arrayOf("/O2", "/std:c++20"),
-        winLinkerFlags = arrayOf("/DEBUG"),
+        winCompilerFlags = arrayOf("/O2", "/Zc:inline", "/std:c++20"),
+        winLinkerFlags = arrayOf("/DEBUG", "/OPT:ICF"),
     );
     override fun toString() = id
 }
