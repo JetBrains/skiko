@@ -2,6 +2,10 @@
 
 * Prepare the system
   * `macOs` Install Xcode Command Line Tools
+  * `macOs` Install LLVM — its `llvm-objcopy` is needed to patch symbols when building iOS/tvOS targets:
+    ```
+    brew install llvm
+    ```
   * `Linux` Install these tools:
     ```
     sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip multistrap libx11-dev
