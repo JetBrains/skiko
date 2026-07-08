@@ -5,8 +5,11 @@ package org.jetbrains.skiko
  * concrete Linux display-server backend (X11/GLX today, Wayland/EGL landing alongside
  * it). Geometry is always physical pixels; [contentScale] is the separate factor that
  * feeds UI density, matching the model X11 already established.
+ *
+ * Public so consumers outside skiko (e.g. a compose-multiplatform-core event pump) can
+ * hold a window reference typed by this seam rather than the concrete backend class.
  */
-internal interface LinuxWindow {
+interface LinuxWindow {
     val width: Int
     val height: Int
     val contentScale: Float
@@ -34,9 +37,8 @@ internal interface LinuxWindow {
 
 /**
  * GL context bound to a [LinuxWindow]'s native surface (GLX context vs EGL
- * context/surface). Public only because implementers of the internal [LinuxWindow] seam
- * (e.g. [X11Window]) are themselves public classes whose `createGlContext()` return type
- * must not leak an internal type; there is no supported use of this type outside skiko.
+ * context/surface). There is no supported use of this type outside the call chain that
+ * creates it (`Redrawer` construction); it is public only because [LinuxWindow] is.
  */
 interface LinuxGlContext {
     fun makeCurrent()
