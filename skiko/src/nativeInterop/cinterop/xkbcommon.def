@@ -5,5 +5,8 @@ headers = xkbcommon/xkbcommon.h
 compilerOpts.linux = -D_GNU_SOURCE -idirafter /usr/include
 compilerOpts.linux_x64 = -idirafter /usr/include/x86_64-linux-gnu
 compilerOpts.linux_arm64 = -idirafter /usr/include/aarch64-linux-gnu
-linkerOpts.linux_x64 = -L/usr/lib/x86_64-linux-gnu -lxkbcommon
+# -L/usr/lib lets the same def link on distros without Debian multiarch (Arch,
+# Fedora); the multiarch dir stays first for the Ubuntu CI image. x64 only: adding
+# it under linux_arm64 would leak host x64 libs into the arm64 cross-link.
+linkerOpts.linux_x64 = -L/usr/lib/x86_64-linux-gnu -L/usr/lib -lxkbcommon
 linkerOpts.linux_arm64 = -L/usr/lib/aarch64-linux-gnu -lxkbcommon
