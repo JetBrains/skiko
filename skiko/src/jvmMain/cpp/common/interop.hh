@@ -164,14 +164,6 @@ namespace skija {
         }
     }
 
-    namespace FontMetrics {
-        extern jclass cls;
-        extern jmethodID ctor;
-        void onLoad(JNIEnv* env);
-        void onUnload(JNIEnv* env);
-        jobject toJava(JNIEnv* env, const SkFontMetrics& m);
-    }
-
     namespace FontMgr {
         extern jclass cls;
         void onLoad(JNIEnv* env);

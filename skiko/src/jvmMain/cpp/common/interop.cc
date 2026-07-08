@@ -342,41 +342,6 @@ namespace skija {
         }
     }
 
-    namespace FontMetrics {
-        jclass cls;
-        jmethodID ctor;
-
-        void onLoad(JNIEnv* env) {
-            jclass local = env->FindClass("org/jetbrains/skia/FontMetrics");
-            cls  = static_cast<jclass>(env->NewGlobalRef(local));
-            ctor = env->GetMethodID(cls, "<init>", "(FFFFFFFFFFFLjava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;)V");
-        }
-
-        void onUnload(JNIEnv* env) {
-            env->DeleteGlobalRef(cls);
-        }
-
-        jobject toJava(JNIEnv* env, const SkFontMetrics& m) {
-            float f1, f2, f3, f4;
-            return env->NewObject(cls, ctor,
-                m.fTop,
-                m.fAscent,
-                m.fDescent,
-                m.fBottom,
-                m.fLeading,
-                m.fAvgCharWidth,
-                m.fMaxCharWidth,
-                m.fXMin,
-                m.fXMax,
-                m.fXHeight,
-                m.fCapHeight,
-                m.hasUnderlineThickness(&f1) ? javaFloat(env, f1) : nullptr,
-                m.hasUnderlinePosition(&f2)  ? javaFloat(env, f2) : nullptr,
-                m.hasStrikeoutThickness(&f3) ? javaFloat(env, f3) : nullptr,
-                m.hasStrikeoutPosition(&f4)  ? javaFloat(env, f4) : nullptr);
-        }
-    }
-
     namespace FontMgr {
         jclass cls;
 
@@ -887,7 +852,6 @@ namespace skija {
         Drawable::onLoad(env);
         FontFamilyName::onLoad(env);
         FontFeature::onLoad(env);
-        FontMetrics::onLoad(env);
         FontVariation::onLoad(env);
         FontVariationAxis::onLoad(env);
         ImageInfo::onLoad(env);
@@ -917,7 +881,6 @@ namespace skija {
         ImageInfo::onUnload(env);
         FontVariationAxis::onUnload(env);
         FontVariation::onUnload(env);
-        FontMetrics::onUnload(env);
         FontFeature::onUnload(env);
         FontFamilyName::onUnload(env);
         Drawable::onUnload(env);
