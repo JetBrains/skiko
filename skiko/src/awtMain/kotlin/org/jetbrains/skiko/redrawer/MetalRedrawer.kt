@@ -2,10 +2,8 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import org.jetbrains.skia.ISize
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
-import java.awt.Component
 import java.awt.Dimension
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.SwingUtilities.*
@@ -40,7 +38,7 @@ internal class MetalRedrawer(
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.METAL) {
-    private val contextHandler: MetalContextHandler
+    val contextHandler: MetalContextHandler
 
     companion object {
         init {
@@ -48,7 +46,7 @@ internal class MetalRedrawer(
         }
     }
 
-    private var drawLock = Any()
+    var drawLock = Any()
 
     /**
      * [MetalDevice] initialized for given [layer] or null if [MetalRedrawer] is disposed,
@@ -70,10 +68,10 @@ internal class MetalRedrawer(
     @Volatile private var isWindowOccluded = false
 
     /**
-     * Whether the window is in live-resize mode.
+     * Handles the interactive (edge-drag) live-resize path. Registered with the native device so it can
+     * receive the live-resize upcalls; see [MetalLiveResize].
      */
-    @Volatile
-    private var isInLiveResize: Boolean = false
+    private val liveResize = MetalLiveResize(redrawer = this, layer = layer)
 
     init {
         onDeviceChosen(adapter.name)
@@ -88,7 +86,8 @@ internal class MetalRedrawer(
                     platformInfo = it,
                     // Live resize is driven from the window, so only enable it when this layer covers the whole
                     // window. When embedded as a Swing component (fillsWindow = false), fall back to the legacy path.
-                    liveResizeEnabled = layer.fillsWindow && SkikoProperties.metalSynchronousLiveResize
+                    liveResizeEnabled = layer.fillsWindow && SkikoProperties.metalSynchronousLiveResize,
+                    liveResize = liveResize
                 )
             )
         }
@@ -117,11 +116,11 @@ internal class MetalRedrawer(
 
     override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
-        if (isInLiveResize) {
+        if (liveResize.isActive) {
             // The background frame loop is gated off during a resize (two presenters deadlock / starve
             // the drawable pool), so drive animation frames from the AppKit main thread instead — the
             // same single serialized presenter that setBounds uses.
-            scheduleFrameOnAppKitThread()
+            liveResize.scheduleFrame()
         } else {
             frameDispatcher.scheduleFrame(needUpdate = true, throttledToVsync = throttledToVsync)
         }
@@ -172,7 +171,7 @@ internal class MetalRedrawer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun LayerDrawScope.performDraw(finishFrame: Boolean = true) {
+    fun LayerDrawScope.performDraw(finishFrame: Boolean = true) {
         synchronized(drawLock) {
             if (!isDisposed) {
                 autoreleasepool {
@@ -185,21 +184,50 @@ internal class MetalRedrawer(
         }
     }
 
-    /**
-     * Called from native code, on the AppKit main thread, when a live resizing session starts.
-     */
-    @Suppress("unused")
-    fun onLiveResizeStarted() {
-        isInLiveResize = true
-        scheduleFrameOnAppKitThread()
+    override fun onPlatformComponentResized() {
+        // During live resize, the layer tells us its size directly; the AWT size is not in sync
+        if (!liveResize.isActive) {
+            super.onPlatformComponentResized()
+        }
     }
 
     /**
-     * Called from native code, on the AppKit main thread, when a live resizing session ends.
+     * The native device pointer, or `null` if the redrawer is disposed.
+     *
+     * Used by [MetalLiveResize] to schedule frames on the AppKit main thread only while the device is alive.
      */
-    @Suppress("unused")
-    fun onLiveResizeEnded() {
-        isInLiveResize = false
+    internal val liveResizeDevicePtr: Long?
+        get() = if (isDisposed) null else device.ptr
+
+    /**
+     * Records a live-resize frame at [size] on the AWT event thread (called by [MetalLiveResize] from inside
+     * its EDT hop). Only records; the present is deferred to [presentLiveResizeFrame] on the AppKit main
+     * thread so it can join the window's resize transaction.
+     */
+    internal fun recordLiveResizeFrame(size: Dimension) {
+        update(forcedSize = size)
+        inDrawScope(forcedSize = size) {
+            if (!isDisposed) {
+                performDraw(finishFrame = false)
+            }
+        }
+    }
+
+    /**
+     * Presents the previously [recorded][recordLiveResizeFrame] live-resize frame. Must run on the AppKit
+     * main thread so the present joins the resize transaction (see `finishFrameInLiveResize`).
+     */
+    internal fun presentLiveResizeFrame() = synchronized(drawLock) {
+        if (!isDisposed) {
+            contextHandler.finishFrameInLiveResize()
+        }
+    }
+
+    /**
+     * Requests a normal (background-loop) render once a live resize has ended. Posted to the EDT because the
+     * live-resize end notification arrives on the AppKit main thread.
+     */
+    internal fun requestRenderAfterLiveResize() {
         invokeLater {
             if (!isDisposed) {
                 needRender(throttledToVsync = false)
@@ -207,60 +235,9 @@ internal class MetalRedrawer(
         }
     }
 
-    override fun onPlatformComponentResized() {
-        // During live resize, the layer tells us its size directly; the AWT size is not in sync
-        if (!isInLiveResize) {
-            super.onPlatformComponentResized()
-        }
-    }
-
-    /**
-     * Called from native code, on the AppKit main thread, to draw a frame during live resize.
-     */
-    @Suppress("unused")
-    fun drawFrameWhileLiveResizing(width: Int, height: Int) {
-        if (isDisposed || width <= 0 || height <= 0) return
-
-        // Record content at exactly the present size, on the EDT.
-        try {
-            invokeOnEventThreadAndWait {
-                val layerSize = Dimension(width, height)
-                update(forcedSize = layerSize)
-                inDrawScope(forcedSize = layerSize) {
-                    if (!isDisposed) {
-                        // The present must run on the AppKit main thread to join the resize transaction, so
-                        // only record here; `finishFrameInLiveResize` presents below on the AppKit main thread
-                        performDraw(finishFrame = false)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Logger.warn(e) { "Failed to record live-resize frame" }
-            return
-        }
-
-        // The present must run on the AppKit main thread to join the resize transaction
-        synchronized(drawLock) {
-            if (!isDisposed) {
-                contextHandler.finishFrameInLiveResize()
-            }
-        }
-    }
-
-    /**
-     * Requests one frame on the AppKit main thread (during a live resize).
-     *
-     * Coalescing (at most one pending frame) lives natively in `scheduleFrameOnAppKitThread`, which hops to the
-     * main queue and calls back into [drawFrameWhileLiveResizing], where the frame is rendered and presented.
-     */
-    private fun scheduleFrameOnAppKitThread() {
-        if (isDisposed) return
-        scheduleFrameOnAppKitThread(device.ptr)
-    }
-
     override fun syncBoundsFromPlatformComponent() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-        if (isInLiveResize) return
+        if (liveResize.isActive) return
 
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
@@ -278,32 +255,11 @@ internal class MetalRedrawer(
         setLayerVisible(device.ptr, isVisible)
     }
 
-    private external fun createMetalDevice(window: Long, transparency: Boolean, frameBuffering: Int, adapter: Long, platformInfo: Long, liveResizeEnabled: Boolean): Long
+    private external fun createMetalDevice(window: Long, transparency: Boolean, frameBuffering: Int, adapter: Long, platformInfo: Long, liveResizeEnabled: Boolean, liveResize: MetalLiveResize): Long
     private external fun disposeDevice(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
-
-    /**
-     * Hops to the AppKit main thread (main dispatch queue) and calls back into [drawFrameWhileLiveResizing] with
-     * the layer's current pixel size. Used to drive frames through the single main-thread presenter during
-     * a live resize.
-     */
-    private external fun scheduleFrameOnAppKitThread(device: Long)
-
-    /**
-     * Like [javax.swing.SwingUtilities.invokeAndWait], but keeps the AppKit run loop spinning while waiting, so
-     * synchronous Java->AppKit calls made from [runnable] are serviced rather than deadlocking.
-     * [component] provides the AWT context for the call.
-     *
-     * This is done via `LWCToolkit.invokeAndWait`. `LWCToolkit` lives in a non-exported JDK package, but JNI is not
-     * subject to module access checks, so this needs no `--add-opens`.
-     */
-    private external fun invokeOnEventThreadAndWait(runnable: Runnable, component: Component)
-
-    private fun invokeOnEventThreadAndWait(runnable: Runnable) {
-        invokeOnEventThreadAndWait(runnable, layer)
-    }
 
     /**
      * Set this value to true to synchronize the presentation of the layer’s contents with the display’s refresh,
@@ -325,13 +281,13 @@ internal class MetalRedrawer(
 
         private val updateDispatcher = FrameDispatcher(MainUIDispatcher) {
             // Gated off during a live resize: presentation is driven from the AppKit main thread
-            if (layer.isShowing && !isInLiveResize) {
+            if (layer.isShowing && !liveResize.isActive) {
                 updateIfRequested()
             }
         }
 
         private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            if (layer.isShowing && !isInLiveResize) {
+            if (layer.isShowing && !liveResize.isActive) {
                 updateIfRequested()
                 draw()
             }

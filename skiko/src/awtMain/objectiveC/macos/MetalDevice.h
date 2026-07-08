@@ -4,7 +4,12 @@
 
 @interface AWTMetalLayer : CAMetalLayer
 
+/// Global ref to the Kotlin MetalRedrawer. Receives non-live-resize upcalls (e.g. occlusion changes).
 @property jobject javaRef;
+
+/// Global ref to the Kotlin MetalLiveResize. Receives the live-resize upcalls (onLiveResizeStarted /
+/// onLiveResizeEnded / drawFrameWhileLiveResizing). Only used while live resize is enabled.
+@property jobject liveResizeRef;
 
 /// True while an interactive live resize is in progress. When set, the layer drives a synchronous,
 /// transactional redraw from its own bounds change (on the main thread) so content, drawableSize and

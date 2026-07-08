@@ -22,7 +22,7 @@
 
 // Defined later in this file; forward-declared so AWTMetalLayer (below) can use them.
 static JNIEnv *resolveJNIEnvForCurrentThread();
-static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject redrawer);
+static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject liveResize);
 
 @implementation AWTMetalLayer
 
@@ -53,7 +53,7 @@ static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject redr
 - (void)setBounds:(CGRect)bounds
 {
     [super setBounds:bounds];
-    if (!self.liveResizing || self.javaRef == NULL) {
+    if (!self.liveResizing || self.liveResizeRef == NULL) {
         return;
     }
 
@@ -65,8 +65,8 @@ static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject redr
     self.drawableSize = pixelSize;
 
     JNIEnv *env = resolveJNIEnvForCurrentThread();
-    jmethodID drawFrameWhileLiveResizing = getDrawFrameWhileLiveResizingMethodID(env, self.javaRef);
-    env->CallVoidMethod(self.javaRef, drawFrameWhileLiveResizing, (jint)pixelSize.width, (jint)pixelSize.height);
+    jmethodID drawFrameWhileLiveResizing = getDrawFrameWhileLiveResizingMethodID(env, self.liveResizeRef);
+    env->CallVoidMethod(self.liveResizeRef, drawFrameWhileLiveResizing, (jint)pixelSize.width, (jint)pixelSize.height);
 }
 
 @end
@@ -149,29 +149,29 @@ static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawe
     return onOcclusionStateChanged;
 }
 
-static jmethodID getOnLiveResizeStartedMethodID(JNIEnv *env, jobject redrawer) {
+static jmethodID getOnLiveResizeStartedMethodID(JNIEnv *env, jobject liveResize) {
     static jmethodID onLiveResizeStarted = NULL;
     if (onLiveResizeStarted == NULL) {
-        jclass redrawerClass = env->GetObjectClass(redrawer);
-        onLiveResizeStarted = env->GetMethodID(redrawerClass, "onLiveResizeStarted", "()V");
+        jclass liveResizeClass = env->GetObjectClass(liveResize);
+        onLiveResizeStarted = env->GetMethodID(liveResizeClass, "onLiveResizeStarted", "()V");
     }
     return onLiveResizeStarted;
 }
 
-static jmethodID getOnLiveResizeEndedMethodID(JNIEnv *env, jobject redrawer) {
+static jmethodID getOnLiveResizeEndedMethodID(JNIEnv *env, jobject liveResize) {
     static jmethodID onLiveResizeEnded = NULL;
     if (onLiveResizeEnded == NULL) {
-        jclass redrawerClass = env->GetObjectClass(redrawer);
-        onLiveResizeEnded = env->GetMethodID(redrawerClass, "onLiveResizeEnded", "()V");
+        jclass liveResizeClass = env->GetObjectClass(liveResize);
+        onLiveResizeEnded = env->GetMethodID(liveResizeClass, "onLiveResizeEnded", "()V");
     }
     return onLiveResizeEnded;
 }
 
-static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject redrawer) {
+static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject liveResize) {
     static jmethodID drawFrameWhileLiveResizing = NULL;
     if (drawFrameWhileLiveResizing == NULL) {
-        jclass redrawerClass = env->GetObjectClass(redrawer);
-        drawFrameWhileLiveResizing = env->GetMethodID(redrawerClass, "drawFrameWhileLiveResizing", "(II)V");
+        jclass liveResizeClass = env->GetObjectClass(liveResize);
+        drawFrameWhileLiveResizing = env->GetMethodID(liveResizeClass, "drawFrameWhileLiveResizing", "(II)V");
     }
     return drawFrameWhileLiveResizing;
 }
@@ -180,7 +180,7 @@ extern "C"
 {
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint frameBuffering, jlong adapterPtr, jlong platformInfoPtr, jboolean liveResizeEnabled)
+    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint frameBuffering, jlong adapterPtr, jlong platformInfoPtr, jboolean liveResizeEnabled, jobject liveResize)
 {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
@@ -201,6 +201,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
 
         [container addSublayer: layer];
         layer.javaRef = env->NewGlobalRef(redrawer);
+        layer.liveResizeRef = env->NewGlobalRef(liveResize);
 
         id<MTLCommandQueue> fQueue = [MTLCommandQueueCache.sharedCache commandQueueForDevice:adapter];
 
@@ -259,8 +260,8 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     strongDevice.layer.presentsWithTransaction = YES;
                     strongDevice.layer.liveResizing = YES;
                     JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-                    jmethodID onLiveResizeStarted = getOnLiveResizeStartedMethodID(jniEnv, strongDevice.layer.javaRef);
-                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, onLiveResizeStarted);
+                    jmethodID onLiveResizeStarted = getOnLiveResizeStartedMethodID(jniEnv, strongDevice.layer.liveResizeRef);
+                    jniEnv->CallVoidMethod(strongDevice.layer.liveResizeRef, onLiveResizeStarted);
                 }];
             device.liveResizeEndObserver =
                 [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidEndLiveResizeNotification
@@ -277,8 +278,8 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     strongDevice.layer.presentsWithTransaction = NO;
                     strongDevice.inLiveResize = NO;
                     JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-                    jmethodID onLiveResizeEnded = getOnLiveResizeEndedMethodID(jniEnv, strongDevice.layer.javaRef);
-                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, onLiveResizeEnded);
+                    jmethodID onLiveResizeEnded = getOnLiveResizeEndedMethodID(jniEnv, strongDevice.layer.liveResizeRef);
+                    jniEnv->CallVoidMethod(strongDevice.layer.liveResizeRef, onLiveResizeEnded);
                 }];
         }
 
@@ -286,16 +287,17 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     }
 }
 
-/// Schedules a frame on the AppKit main thread. Called from Kotlin (MetalRedrawer.needRender) during a live resize,
-// when the background frame loop is gated off. The main queue serializes this with setBounds-driven frames, so there
-// is only ever one presenter and one drawable in flight — no async present, no drawable-pool contention. The current
-// pixel size is read on the main thread right before the callback, so the frame is rendered at the layer's live size.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_scheduleFrameOnAppKitThread(
-    JNIEnv *env, jobject redrawer, jlong devicePtr)
+/// Schedules a frame on the AppKit main thread. Called from Kotlin (MetalLiveResize.scheduleFrame) during a live
+// resize, when the background frame loop is gated off. The main queue serializes this with setBounds-driven frames, so
+// there is only ever one presenter and one drawable in flight — no async present, no drawable-pool contention. The
+// current pixel size is read on the main thread right before the callback, so the frame is rendered at the layer's live
+// size.
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalLiveResize_scheduleFrameOnAppKitThread(
+    JNIEnv *env, jobject liveResize, jlong devicePtr)
 {
     MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
-    /// javaRef is a global ref (created in createMetalDevice), safe to use from the deferred block.
-    jobject javaRef = device.layer.javaRef;
+    /// liveResizeRef is a global ref (created in createMetalDevice), safe to use from the deferred block.
+    jobject liveResizeRef = device.layer.liveResizeRef;
     /// Coalesce: only dispatch if no resize frame is already pending. atomic_exchange returns the prior
     /// value, so a `true` return means one is in flight and we skip. Scheduling may come from the EDT or
     /// the main thread, hence the atomic.
@@ -318,8 +320,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_scheduleF
             return;
         }
         JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-        jmethodID drawFrameWhileLiveResizing = getDrawFrameWhileLiveResizingMethodID(jniEnv, javaRef);
-        jniEnv->CallVoidMethod(javaRef, drawFrameWhileLiveResizing, (jint)pixelWidth, (jint)pixelHeight);
+        jmethodID drawFrameWhileLiveResizing = getDrawFrameWhileLiveResizingMethodID(jniEnv, liveResizeRef);
+        jniEnv->CallVoidMethod(liveResizeRef, drawFrameWhileLiveResizing, (jint)pixelWidth, (jint)pixelHeight);
     });
 }
 
@@ -330,8 +332,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_scheduleF
 /// thread on a coroutine. LWCToolkit lives in a non-exported JDK package, but JNI does not perform module
 /// access checks, so no `--add-opens` is required. The class (global ref) and method id are stable for the
 /// JVM lifetime and cached; any exception thrown by invokeAndWait is left pending so it propagates to Kotlin.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_invokeOnEventThreadAndWait(
-    JNIEnv *env, jobject redrawer, jobject runnable, jobject component)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalLiveResize_invokeOnEventThreadAndWait(
+    JNIEnv *env, jobject liveResize, jobject runnable, jobject component)
 {
     static jclass lwcToolkitClass = NULL;
     static jmethodID invokeAndWaitMethodID = NULL;
@@ -422,6 +424,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
     @autoreleasepool {
         MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
         env->DeleteGlobalRef(device.layer.javaRef);
+        if (device.layer.liveResizeRef) {
+            env->DeleteGlobalRef(device.layer.liveResizeRef);
+        }
         [[NSNotificationCenter defaultCenter] removeObserver:device.occlusionObserver];
         /// These two are only installed when live resize is enabled (see createMetalDevice).
         if (device.liveResizeStartObserver) {
