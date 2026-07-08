@@ -1623,13 +1623,12 @@ $dokka.location:org.jetbrains.skia/FontHinting/values/#/PointingToDeclaration/s
 $dokka.location:org.jetbrains.skia/FontMetrics.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/-companion/index.html
 $dokka.location:org.jetbrains.skia/FontMetrics///PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/index.html
 $dokka.location:org.jetbrains.skia/FontMetrics/FontMetrics/#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float?#kotlin.Float?#kotlin.Float?#kotlin.Float?/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/-font-metrics.html
+$dokka.location:org.jetbrains.skia/FontMetrics/FontMetrics/#kotlin.FloatArray/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/-font-metrics.html
 $dokka.location:org.jetbrains.skia/FontMetrics/ascent/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/ascent.html
 $dokka.location:org.jetbrains.skia/FontMetrics/avgCharWidth/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/avg-char-width.html
 $dokka.location:org.jetbrains.skia/FontMetrics/bottom/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/bottom.html
 $dokka.location:org.jetbrains.skia/FontMetrics/capHeight/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/cap-height.html
 $dokka.location:org.jetbrains.skia/FontMetrics/descent/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/descent.html
-$dokka.location:org.jetbrains.skia/FontMetrics/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/equals.html
-$dokka.location:org.jetbrains.skia/FontMetrics/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/hash-code.html
 $dokka.location:org.jetbrains.skia/FontMetrics/height/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/height.html
 $dokka.location:org.jetbrains.skia/FontMetrics/leading/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/leading.html
 $dokka.location:org.jetbrains.skia/FontMetrics/maxCharWidth/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/max-char-width.html
@@ -1670,10 +1669,8 @@ $dokka.location:org.jetbrains.skia/FontStyle.Companion/BOLD_ITALIC/#/PointingToD
 $dokka.location:org.jetbrains.skia/FontStyle.Companion/ITALIC/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/-companion/-i-t-a-l-i-c.html
 $dokka.location:org.jetbrains.skia/FontStyle.Companion/NORMAL/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/-companion/-n-o-r-m-a-l.html
 $dokka.location:org.jetbrains.skia/FontStyle///PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/index.html
-$dokka.location:org.jetbrains.skia/FontStyle/FontStyle/#kotlin.Int#kotlin.Int#org.jetbrains.skia.FontSlant/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/-font-style.html
+$dokka.location:org.jetbrains.skia/FontStyle/FontStyle/#org.jetbrains.skia.FontWeight#org.jetbrains.skia.FontWidth#org.jetbrains.skia.FontSlant/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/-font-style.html
 $dokka.location:org.jetbrains.skia/FontStyle/_value/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/_value.html
-$dokka.location:org.jetbrains.skia/FontStyle/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/equals.html
-$dokka.location:org.jetbrains.skia/FontStyle/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/hash-code.html
 $dokka.location:org.jetbrains.skia/FontStyle/slant/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/slant.html
 $dokka.location:org.jetbrains.skia/FontStyle/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/to-string.html
 $dokka.location:org.jetbrains.skia/FontStyle/weight/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/weight.html
@@ -1728,6 +1725,9 @@ $dokka.location:org.jetbrains.skia/FontWeight.Companion/NORMAL/#/PointingToDecla
 $dokka.location:org.jetbrains.skia/FontWeight.Companion/SEMI_BOLD/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-weight/-companion/-s-e-m-i_-b-o-l-d.html
 $dokka.location:org.jetbrains.skia/FontWeight.Companion/THIN/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-weight/-companion/-t-h-i-n.html
 $dokka.location:org.jetbrains.skia/FontWeight///PointingToDeclaration/skiko/org.jetbrains.skia/-font-weight/index.html
+$dokka.location:org.jetbrains.skia/FontWeight/FontWeight/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-font-weight/-font-weight.html
+$dokka.location:org.jetbrains.skia/FontWeight/compareTo/#org.jetbrains.skia.FontWeight/PointingToDeclaration/skiko/org.jetbrains.skia/-font-weight/compare-to.html
+$dokka.location:org.jetbrains.skia/FontWeight/value/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-weight/value.html
 $dokka.location:org.jetbrains.skia/FontWidth.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-font-width/-companion/index.html
 $dokka.location:org.jetbrains.skia/FontWidth.Companion/CONDENSED/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-width/-companion/-c-o-n-d-e-n-s-e-d.html
 $dokka.location:org.jetbrains.skia/FontWidth.Companion/EXPANDED/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-width/-companion/-e-x-p-a-n-d-e-d.html
@@ -1739,6 +1739,9 @@ $dokka.location:org.jetbrains.skia/FontWidth.Companion/SEMI_EXPANDED/#/PointingT
 $dokka.location:org.jetbrains.skia/FontWidth.Companion/ULTRA_CONDENSED/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-width/-companion/-u-l-t-r-a_-c-o-n-d-e-n-s-e-d.html
 $dokka.location:org.jetbrains.skia/FontWidth.Companion/ULTRA_EXPANDED/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-width/-companion/-u-l-t-r-a_-e-x-p-a-n-d-e-d.html
 $dokka.location:org.jetbrains.skia/FontWidth///PointingToDeclaration/skiko/org.jetbrains.skia/-font-width/index.html
+$dokka.location:org.jetbrains.skia/FontWidth/FontWidth/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-font-width/-font-width.html
+$dokka.location:org.jetbrains.skia/FontWidth/compareTo/#org.jetbrains.skia.FontWeight/PointingToDeclaration/skiko/org.jetbrains.skia/-font-width/compare-to.html
+$dokka.location:org.jetbrains.skia/FontWidth/value/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-width/value.html
 $dokka.location:org.jetbrains.skia/FourByteTag.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-four-byte-tag/-companion/index.html
 $dokka.location:org.jetbrains.skia/FourByteTag.Companion/fromString/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-four-byte-tag/-companion/from-string.html
 $dokka.location:org.jetbrains.skia/FourByteTag.Companion/toString/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-four-byte-tag/-companion/to-string.html
