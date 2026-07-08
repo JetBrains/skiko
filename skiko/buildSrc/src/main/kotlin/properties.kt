@@ -157,6 +157,9 @@ class SkikoProperties(private val myProject: Project) {
     val releaseGithubCommit: String
         get() = (myProject.property("release.github.commit") as String)
 
+    val releaseGithubPrerelease: Boolean
+        get() = myProject.findProperty("release.github.prerelease") == "true"
+
     val visualStudioBuildToolsDir: File?
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
 

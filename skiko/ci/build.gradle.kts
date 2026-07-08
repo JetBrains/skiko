@@ -48,10 +48,12 @@ val createGithubRelease by tasks.registering {
         val gh = connectToGitHub()
         val githubVersion = skiko.releaseGithubVersion
         val githubCommit = skiko.releaseGithubCommit
+        val githubPrerelease = skiko.releaseGithubPrerelease
         val repo = gh.getRepository(GITHUB_REPO)
         val release = repo.createRelease("v$githubVersion")
             .name("Version $githubVersion")
             .generateReleaseNotes(true)
+            .prerelease(githubPrerelease)
             .commitish(githubCommit)
             .create()
 
