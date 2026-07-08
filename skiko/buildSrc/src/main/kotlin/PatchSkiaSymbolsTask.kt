@@ -141,11 +141,15 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
      */
     private fun runOrNull(vararg args: String): String? {
         val stdout = ByteArrayOutputStream()
-        val result = execOperations.exec {
-            commandLine(*args)
-            standardOutput = stdout
-            errorOutput = ByteArrayOutputStream()
-            isIgnoreExitValue = true
+        val result = try {
+            execOperations.exec {
+                commandLine(*args)
+                standardOutput = stdout
+                errorOutput = ByteArrayOutputStream()
+                isIgnoreExitValue = true
+            }
+        } catch (_: Exception) {
+            return null
         }
         return if (result.exitValue == 0) stdout.toString(Charsets.UTF_8).trim() else null
     }
@@ -183,13 +187,17 @@ abstract class PatchSkiaSymbolsTask : DefaultTask() {
      */
     private fun findLlvmObjcopy(): String {
         // Homebrew LLVM (installed by CI, or manually via `brew install llvm`).
-        runOrNull("brew", "--prefix", "llvm")?.let { prefix ->
-            val candidate = File(prefix, "bin/llvm-objcopy")
-            if (candidate.exists()) return candidate.absolutePath
-        }
+        val wellKnownDirs = listOf(
+            "/opt/homebrew/opt/llvm/bin",
+            "/usr/local/opt/llvm/bin",
+        )
+        wellKnownDirs.map { File(it, "llvm-objcopy") }
+            .firstOrNull { it.canExecute() }
+            ?.let { return it.absolutePath }
+
         // xcrun works on some local setups where the tool is registered.
         runOrNull("xcrun", "-f", "llvm-objcopy")?.let { path ->
-            if (path.isNotEmpty()) return path
+            if (path.isNotEmpty() && File(path).canExecute()) return path
         }
         // Last resort: PATH.
         runOrNull("which", "llvm-objcopy")?.let { path ->
