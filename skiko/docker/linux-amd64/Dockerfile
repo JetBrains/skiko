@@ -71,6 +71,18 @@ RUN mkdir -p $ARM_TOOLCHAIN_SYSROOT/usr/include && \
         cp -r /usr/include/$dir $ARM_TOOLCHAIN_SYSROOT/usr/include/ || exit 1; \
     done
 
+# Android SDK for :skiko:dokkaHtml (skiko.android.enabled needs android.jar from
+# compileSdk 35). No NDK: the Android target declares no externalNativeBuild, so
+# docs generation never invokes it. Kept last so it doesn't invalidate the cache
+# of the layers above.
+ENV ANDROID_SDK_ROOT=/android/sdk
+RUN cd /tmp && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip -O cmd-tools.zip && \
+    unzip -q cmd-tools.zip && rm cmd-tools.zip && \
+    yes | cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses && \
+    cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-35" && \
+    rm -rf cmdline-tools
+
 # Use UTF-8 by default
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 ENV JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF

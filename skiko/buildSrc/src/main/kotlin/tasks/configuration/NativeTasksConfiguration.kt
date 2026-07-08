@@ -269,7 +269,14 @@ fun configureWaylandEglCinterop(
             )
         })
         linkerOpts.set(
-            listOf("-L/usr/lib/$gnuArch-linux-gnu", "-lwayland-client", "-lwayland-egl", "-lEGL")
+            buildList {
+                add("-L/usr/lib/$gnuArch-linux-gnu")
+                // Distros without Debian multiarch (Arch, Fedora) keep the host libs in
+                // /usr/lib. x64 only: adding it under arm64 would leak host x64 libs into
+                // the cross-link, same reasoning as x11gl.def / xkbcommon.def.
+                if (arch != Arch.Arm64) add("-L/usr/lib")
+                addAll(listOf("-lwayland-client", "-lwayland-egl", "-lEGL"))
+            }
         )
         outputFile.set(project.layout.buildDirectory.file("cinterop/$targetString/waylandegl.def"))
     }
