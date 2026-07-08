@@ -12,11 +12,11 @@ class StrutStyleTests {
     @Test
     fun strutStyleTest() {
         StrutStyle().use { strutStyle ->
-            assertEquals(FontStyle(400, 5, FontSlant.UPRIGHT), strutStyle.fontStyle)
+            assertEquals(FontStyle(FontWeight.NORMAL, FontWidth.NORMAL, FontSlant.UPRIGHT), strutStyle.fontStyle)
 
-            strutStyle.fontStyle = FontStyle(300, 4, FontSlant.ITALIC)
+            strutStyle.fontStyle = FontStyle(FontWeight.LIGHT, FontWidth.SEMI_CONDENSED, FontSlant.ITALIC)
 
-            assertEquals(FontStyle(300, 4, FontSlant.ITALIC), strutStyle.fontStyle)
+            assertEquals(FontStyle(FontWeight.LIGHT, FontWidth.SEMI_CONDENSED, FontSlant.ITALIC), strutStyle.fontStyle)
 
 
             strutStyle.setFontFamilies(arrayOf("MonacoShmonaco"))
