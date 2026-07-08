@@ -630,6 +630,7 @@ static gr_cp<ID3D12Fence> g_spikeFrameFence;
 static HANDLE g_spikeFrameFenceEvent = nullptr;
 static uint64_t g_spikeFrameFenceValues[BuffersCount] = {0};
 static unsigned int g_spikeFrameBufferIndex = 0;
+static gr_cp<IDXGIOutput> g_spikeFrameOutput; // for WaitForVBlank (vsync pacing of the resize render loop)
 
 // Create the overlay swapchain's fence (mirrors initFence for the on-screen swapchain). Once per swapchain.
 static void spikeFrameInitFence()
@@ -895,15 +896,27 @@ static void spikeGdiFillClient(HWND hWnd)
 // DwmFlush). Expectation: atomic on ALL edges incl. top/left origin-move (no redirection surface to race).
 static bool g_spikeEngaged = false; // frame overlay active (only during actual RESIZE, not plain moves)
 
-// SPIKE: on-demand stationary-animation driver. needRender (EDT) posts one coalesced WM_SPIKE_RENDER to the
-// toolkit thread; the handler does the SAME synchronized present as WM_NCCALCSIZE, but ONLY when no input is
-// queued. During an active drag there's always pending mouse input (a resize step is imminent and WILL present),
-// so the handler skips — the WM_NCCALCSIZE steps stay the sole presenter and we never land a 2nd present at the
-// same size (which wedges the flip swapchain's next ResizeBuffers). When the drag goes idle (no input), the post
-// presents and self-perpetuates via onRender -> needRender. Checking queue STATE (not dequeue order) is robust
-// even though posted messages outrank input.
-#define WM_SPIKE_RENDER (WM_APP + 0x11)
-static volatile LONG g_spikePostPending = 0;
+// SPIKE: on-demand stationary-animation driver, driven by WM_PAINT (NOT a posted message). needRender (EDT)
+// calls InvalidateRect on the frame window; the WM_PAINT handler does the SAME synchronized present as
+// WM_NCCALCSIZE, at the size the last resize step used (g_spikeLastW/H — GetClientRect lags a step behind
+// during a drag, which caused the content to trail the window edge).
+//
+// Why WM_PAINT and not a posted message: GetMessage priority is  sent > posted > INPUT > WM_PAINT > WM_TIMER.
+// A posted message (the earlier WM_SPIKE_RENDER) outranks input, so a render that re-posts itself permanently
+// beats the modal loop's queued mouse moves and the drag locks up (validated: a run of renders at a frozen size
+// with no NCCALC between). We cannot instead peek-and-yield, because the modal size loop's input is invisible to
+// GetQueueStatus/PeekMessage from in here (also validated). WM_PAINT sits BELOW input in that ladder: GetMessage
+// only hands it to us when no input is waiting, so it physically cannot starve the drag — during an active drag
+// the mouse moves win and WM_NCCALCSIZE drives the frame (carrying the animation via onRender); only in an input
+// lull (a genuine stationary hold) does WM_PAINT fire. We ValidateRect first, then render; onRender's needRender
+// InvalidateRect's again, re-arming the next frame — so the animation self-perpetuates while held and stops
+// cleanly when needRender stops, all without ever outranking input.
+static int g_spikeLastW = 0, g_spikeLastH = 0; // client size the last resize step used (the true current size)
+// SPIKE: whether presentSpikeFrame should WaitForVBlank for THIS frame. FALSE for the WM_NCCALCSIZE (active-drag)
+// present — waiting there blocks inside NCCALCSIZE and displays the new-size content a full refresh BEFORE the
+// frame geometry is applied (content leads the edge). TRUE only for the WM_PAINT (stationary-hold) present, to
+// cap the idle animation loop at the refresh rate. Set on the toolkit thread right before the synchronous render.
+static bool g_spikePaceVBlank = false;
 
 static LRESULT CALLBACK SpikeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -936,18 +949,22 @@ static LRESULT CALLBACK SpikeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
                 bool justEngaged = false;
                 if (!g_spikeEngaged)
                 {
-                    // First real resize step: stop the EDT (so drawLock is ours). Create the overlay now but do
-                    // NOT reveal it yet — we reveal it below, only after it has content, so DWM never composites
-                    // an empty (transparent) overlay frame. Deferred to here (not WM_ENTERSIZEMOVE) so plain
-                    // moves keep animating.
+                    // First real resize step: create the overlay now but do NOT reveal it yet — we reveal it
+                    // below, only after it has content, so DWM never composites an empty (transparent) overlay
+                    // frame. Deferred to here (not WM_ENTERSIZEMOVE) so plain moves keep animating. The redrawer
+                    // learns the resize started from the first onSpikeRenderFrame below (it sets spikeHandledSize,
+                    // which stops the EDT loop) — no separate engage callback needed.
                     g_spikeEngaged = true;
                     justEngaged = true;
-                    spikeCallRedrawer("onSpikeResizeEngaged"); // spikeResizing=true
                     spikeEnsureFrameDComp();
                 }
                 NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *)lParam;
                 RECT c = p->rgrc[0]; // now holds the new CLIENT rect
-                spikeCallRenderFrame(c.right - c.left, c.bottom - c.top); // 2b: real Skia content
+                g_spikeLastW = c.right - c.left;
+                g_spikeLastH = c.bottom - c.top;
+                fprintf(stderr, "[spike-diag] NCCALC %dx%d\n", g_spikeLastW, g_spikeLastH); fflush(stderr);
+                g_spikePaceVBlank = false; // atomic with the geometry change — no vblank wait (would lead the edge)
+                spikeCallRenderFrame(g_spikeLastW, g_spikeLastH); // 2b: real Skia content
                 if (justEngaged)
                 {
                     // The overlay now holds a presented frame: reveal it (topmost, opaque) and hide the canvas
@@ -958,23 +975,28 @@ static LRESULT CALLBACK SpikeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             }
             return r;
         }
-        case WM_SPIKE_RENDER:
-            // On-demand animation (posted by needRender). Present the overlay at the current size — but ONLY if no
-            // input (mouse/key) is queued: pending input means a resize step is imminent and WILL present, so we'd
-            // otherwise land a redundant 2nd present at this size and wedge the next ResizeBuffers. Checking queue
-            // STATE (not dequeue order) makes this robust even though posted messages outrank input.
-            InterlockedExchange(&g_spikePostPending, 0);
-            if (g_spikeEngaged && HIWORD(GetQueueStatus(QS_INPUT)) == 0)
+        case WM_PAINT:
+            // On-demand stationary animation (armed by needRender's InvalidateRect). WM_PAINT is BELOW input in
+            // GetMessage priority, so it only reaches us in an input lull — an active drag's mouse moves are
+            // serviced first (WM_NCCALCSIZE drives those frames), so this cannot starve the drag. Validate the
+            // region FIRST (before rendering) so the InvalidateRect that onRender→needRender issues during our
+            // synchronous render re-arms the NEXT frame instead of being cleared. Only handle it while engaged;
+            // otherwise let AWT's proc paint normally.
+            if (g_spikeEngaged)
             {
-                RECT rc; GetClientRect(hWnd, &rc);
-                spikeCallRenderFrame(rc.right - rc.left, rc.bottom - rc.top);
+                ValidateRect(hWnd, nullptr);
+                fprintf(stderr, "[spike-diag] PAINT-RENDER %dx%d\n", g_spikeLastW, g_spikeLastH); fflush(stderr);
+                g_spikePaceVBlank = true; // idle-hold animation: cap at the refresh rate (no geometry change here)
+                spikeCallRenderFrame(g_spikeLastW, g_spikeLastH);
+                return 0;
             }
-            return 0;
+            break;
         case WM_EXITSIZEMOVE:
             if (g_spikeEngaged)
             {
                 // Render one last overlay frame at the SETTLED client size (it keeps covering the canvas).
                 RECT rc; GetClientRect(hWnd, &rc);
+                g_spikePaceVBlank = false;
                 spikeCallRenderFrame(rc.right - rc.left, rc.bottom - rc.top);
                 // Show the canvas UNDER the still-topmost overlay, then finalize it (validate + render at the
                 // final size) while it's hidden behind the overlay, then detach the overlay to reveal a
@@ -1362,7 +1384,7 @@ extern "C"
 
     // SPIKE 2b: present the frame comp swapchain (vblank-synced double-present) + DComp Commit.
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_presentSpikeFrame(
-        JNIEnv *env, jobject redrawer)
+        JNIEnv *env, jobject redrawer, jboolean vsync)
     {
         if (!g_spikeFrameSwapChain.get() || !g_spikeDevice) return;
         // Present, then signal this buffer's fence (mirrors the on-screen swap()). Present(0, RESTART) is the
@@ -1373,6 +1395,23 @@ extern "C"
         g_spikeFrameSwapChain->Present(1, DXGI_PRESENT_DO_NOT_SEQUENCE);
         g_spikeDevice->queue->Signal(g_spikeFrameFence.get(), g_spikeFrameFenceValues[g_spikeFrameBufferIndex]);
         if (g_spikeFrameDComp) g_spikeFrameDComp->Commit();
+        // Block on the display's vblank — but ONLY for the WM_PAINT stationary-hold present (g_spikePaceVBlank),
+        // to cap that idle loop at the refresh rate. NEVER for the WM_NCCALCSIZE active-drag present: waiting there
+        // blocks inside NCCALCSIZE and shows the new-size content a full refresh before the frame geometry lands,
+        // making the content lead the window edge.
+        if (vsync && g_spikePaceVBlank)
+        {
+            if (!g_spikeFrameOutput.get())
+            {
+                gr_cp<IDXGIFactory1> factory;
+                if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory))))
+                {
+                    gr_cp<IDXGIAdapter1> adapter;
+                    if (SUCCEEDED(factory->EnumAdapters1(0, &adapter))) adapter->EnumOutputs(0, &g_spikeFrameOutput);
+                }
+            }
+            if (g_spikeFrameOutput.get()) g_spikeFrameOutput->WaitForVBlank();
+        }
     }
 
     // SPIKE 2b: the EDT calls this after rendering to release the pump-waiting toolkit thread.
@@ -1382,13 +1421,14 @@ extern "C"
         if (g_spikeRenderDoneEvent) SetEvent(g_spikeRenderDoneEvent);
     }
 
-    // SPIKE: needRender during a resize routes here — post a single (coalesced) WM_SPIKE_RENDER to the toolkit
-    // thread so it drives a synchronized overlay present (stationary animation) without an async EDT present.
+    // SPIKE: needRender during a resize routes here — invalidate the frame window so a WM_PAINT drives a
+    // synchronized overlay present (stationary animation). WM_PAINT sits below input in GetMessage priority, so
+    // (unlike a posted message) it yields to the modal resize loop instead of starving it. InvalidateRect
+    // coalesces naturally (the update region just accumulates into one WM_PAINT), so no explicit gate is needed.
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_postSpikeRender(
         JNIEnv *env, jobject redrawer)
     {
-        if (g_spikeTopHwnd && InterlockedExchange(&g_spikePostPending, 1) == 0)
-            PostMessageW(g_spikeTopHwnd, WM_SPIKE_RENDER, 0, 0);
+        if (g_spikeTopHwnd) InvalidateRect(g_spikeTopHwnd, nullptr, FALSE);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeBuffers(

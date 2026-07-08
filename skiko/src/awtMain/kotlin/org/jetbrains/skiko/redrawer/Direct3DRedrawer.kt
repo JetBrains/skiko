@@ -2,6 +2,7 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.ISize
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.InteropPointer
@@ -48,22 +49,25 @@ internal class Direct3DRedrawer(
         installSpikeResizeHook(device, layer.windowHandle, layer.contentHandle)
     }
 
-    // SPIKE: true while the native modal resize loop is active; suppresses normal Skia presents so the
-    // WM_SIZE-driven native present is the sole writer to the swapchain during the drag.
+    // SPIKE: the live client size while we (the native modal resize loop) drive the resize; null otherwise. This
+    // is the single source of truth for "a spike resize is in progress" (spikeResizing below is derived from it):
+    //  - Non-null makes SkiaLayer report isHandlingSizing — the designed hook that stops AWT's reshape from
+    //    issuing its own renderImmediately/needRender during the drag (the overlay owns all rendering, so those
+    //    would be pure waste: an extra onRender per step). Mirrors Metal's layerSizeInLiveResize.
+    //  - spikeResizing gates the normal Skia present path so the native WM_NCCALCSIZE/WM_PAINT present is the sole
+    //    writer to the swapchain during the drag.
+    // Set on the first resize step (onSpikeRenderFrame, at WM_NCCALCSIZE — NOT at WM_ENTERSIZEMOVE, so plain moves
+    // keep animating the visible canvas), cleared at drag end.
     @Volatile
-    private var spikeResizing = false
+    private var spikeHandledSize: ISize? = null
+    override val layerSizeWhileHandlingSizing: ISize? get() = spikeHandledSize
 
-    // SPIKE: called from native (toolkit thread) at the first real resize step (WM_NCCALCSIZE engage), NOT at
-    // WM_ENTERSIZEMOVE — so plain moves don't suppress the EDT and keep animating the (visible) canvas.
-    @Suppress("unused")
-    private fun onSpikeResizeEngaged() {
-        spikeResizing = true
-    }
+    private val spikeResizing: Boolean get() = spikeHandledSize != null
 
     // SPIKE: called from native on the toolkit thread on WM_EXITSIZEMOVE.
     @Suppress("unused")
     private fun onSpikeResizeEnded() {
-        spikeResizing = false
+        spikeHandledSize = null
         frameDispatcher.scheduleFrame() // resume the normal animation loop
     }
 
@@ -76,7 +80,7 @@ internal class Direct3DRedrawer(
         javax.swing.SwingUtilities.invokeLater {
             try {
                 javax.swing.SwingUtilities.getWindowAncestor(layer)?.let { it.invalidate(); it.validate() }
-                spikeResizing = false
+                spikeHandledSize = null // clear BEFORE renderImmediately so it uses the real backedLayer size
                 renderImmediately() // render the canvas at the final size before it's revealed
             } catch (t: Throwable) {
                 t.printStackTrace()
@@ -96,6 +100,9 @@ internal class Direct3DRedrawer(
     // analog of the Metal fix's LWCToolkit.invokeAndWait; de-risks the toolkit→EDT hop during the modal loop.
     @Suppress("unused")
     private fun onSpikeRenderFrame(width: Int, height: Int) {
+        // Report the live size so SkiaLayer.isHandlingSizing is true — AWT's reshape then skips its own
+        // renderImmediately/needRender for the duration of the drag (the overlay is the sole renderer).
+        spikeHandledSize = ISize(width, height)
         // Native (toolkit thread) called us and is now pump-waiting on signalSpikeRenderDone(). POST the render
         // to the EDT (onRender requires it) and return immediately; the toolkit pump keeps servicing the EDT's
         // cross-thread window ops so this doesn't deadlock. Signal native when the EDT render completes.
@@ -135,7 +142,7 @@ internal class Direct3DRedrawer(
         val surface = spikeFrameSurfaces[spikeFrameBufferIndex()] ?: return
         delegate.onRender(surface.canvas, width, height, skikoNanoTime())
         flushSpikeFrame(ctxPtr, org.jetbrains.skia.impl.getPtr(surface))
-        presentSpikeFrame()
+        presentSpikeFrame(properties.isVsyncEnabled)
     }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
@@ -249,7 +256,7 @@ internal class Direct3DRedrawer(
     private external fun makeSpikeFrameSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     private external fun spikeFrameBufferIndex(): Int
     private external fun flushSpikeFrame(context: Long, surface: Long)
-    private external fun presentSpikeFrame()
+    private external fun presentSpikeFrame(vsync: Boolean)
     private external fun signalSpikeRenderDone()
     private external fun postSpikeRender()
 }
