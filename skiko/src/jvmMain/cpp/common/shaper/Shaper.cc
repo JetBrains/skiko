@@ -7,7 +7,7 @@
 #include "SkShaper.h"
 #include "SkShaper_harfbuzz.h"
 #include "SkUnicode.h"
-#include "src/base/SkUTF.h"
+#include "src/core/SkUTF.h"
 #include "TextLineRunHandler.hh"
 #include "unicode/ubidi.h"
 #include "SkUnicode_icu.h"
