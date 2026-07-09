@@ -40,7 +40,7 @@ val OS.isCompatibleWithHost: Boolean
         OS.Android -> true
     }
 
-fun compilerForTarget(os: OS, arch: Arch): String =
+fun compilerForTarget(project: Project, os: OS, arch: Arch): String =
     when (os) {
         // TODO: Use clang++ for all Linux targets
         OS.Linux -> when (arch) {
@@ -51,11 +51,11 @@ fun compilerForTarget(os: OS, arch: Arch): String =
         OS.Android -> "clang++"
         OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
-        OS.Wasm -> if (Os.isFamily(Os.FAMILY_WINDOWS)) "emcc.bat" else "emcc"
+        OS.Wasm -> project.findProperty("wasi.sdk")?.toString()?.let { "$it/bin/clang++" } ?: "/opt/wasi-sdk-33.0-arm64-macos/bin/clang++"
     }
 
-fun linkerForTarget(os: OS, arch: Arch): String =
-    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch)
+fun linkerForTarget(project: Project, os: OS, arch: Arch): String =
+    if (os.isWindows) "lld-link.exe" else compilerForTarget(project, os, arch)
 
 val OS.dynamicLibExt: String
     get() = when (this) {
@@ -195,12 +195,32 @@ class SkikoProperties(private val myProject: Project) {
                 ?: myProject.findProperty("skia.repo.dir")?.toString()
                 ?: myProject.findProperty("skia.pack.dir")?.toString()
             )?.let { skiaRepoDirProp ->
-                val file = File(skiaRepoDirProp)
+                val file = findFile(skiaRepoDirProp)
                 if (!file.isDirectory) {
                     throw GradleException("\"skia.repo.dir\" property was explicitly set to $skiaRepoDirProp which is not resolved as a directory")
                 }
                 file
             }
+
+    /**
+     * Target-specific Skia repository root directory.
+     *
+     * Usage: `-Pskia.repo.dir.wasm=/path/to/skia`
+     */
+    fun skiaRepoDir(os: OS): File? {
+        val targetSpecific = myProject.findProperty("skia.repo.dir.${os.id}")?.toString()
+            ?: myProject.findProperty("skia.pack.dir.${os.id}")?.toString()
+            ?: System.getenv("SKIA_REPO_DIR_${os.id.uppercase()}")
+            ?: System.getenv("SKIA_PACK_DIR_${os.id.uppercase()}")
+            ?: System.getProperty("skia.repo.dir.${os.id}")
+            ?: System.getProperty("skia.pack.dir.${os.id}")
+
+        return targetSpecific?.let {
+            val file = findFile(it)
+            if (!file.isDirectory) throw (GradleException("\"skia.repo.dir.${os.id}\" property was explicitly set to $it which is not resolved as a directory"))
+            file
+        } ?: skiaRepoDir
+    }
 
     /**
      * Skia source directory for publishing.
@@ -219,10 +239,46 @@ class SkikoProperties(private val myProject: Project) {
     val skiaDir: File?
         get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir") ?: myProject.findProperty("skia.dir")
             ?.toString())?.let { skiaDirProp ->
-                val file = File(skiaDirProp)
+                val file = findFile(skiaDirProp)
                 if (!file.isDirectory) throw (GradleException("\"skia.dir\" property was explicitly set to ${skiaDirProp} which is not resolved as a directory"))
                 file
             }
+
+    /**
+     * Target-specific Skia source directory.
+     *
+     * Usage: `-Pskia.dir.wasm=/path/to/skia`
+     */
+    fun skiaDir(os: OS): File? {
+        val targetSpecific = myProject.findProperty("skia.dir.${os.id}")?.toString()
+            ?: System.getenv("SKIA_DIR_${os.id.uppercase()}")
+            ?: System.getProperty("skia.dir.${os.id}")
+
+        return targetSpecific?.let {
+            val file = findFile(it)
+            if (!file.isDirectory) throw (GradleException("\"skia.dir.${os.id}\" property was explicitly set to $it which is not resolved as a directory"))
+            file
+        } ?: skiaDir
+    }
+
+    private fun findFile(path: String): File {
+        val file = File(path)
+        if (file.isAbsolute) return file
+
+        val projectFile = myProject.file(path)
+        if (projectFile.exists()) return projectFile
+
+        // Try top-level build root if we are in an included build
+        var g = myProject.gradle
+        while (g.parent != null) {
+            g = g.parent!!
+        }
+        val topLevelRoot = g.rootProject.projectDir
+        val topLevelFile = File(topLevelRoot, path)
+        if (topLevelFile.exists()) return topLevelFile
+
+        return projectFile
+    }
 
     val composeRepoUrl: String
         get() = System.getenv("COMPOSE_REPO_URL") ?: "https://packages.jetbrains.team/maven/p/cmp/dev"

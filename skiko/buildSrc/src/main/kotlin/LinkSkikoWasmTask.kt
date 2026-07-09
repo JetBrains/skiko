@@ -15,9 +15,5 @@ abstract class LinkSkikoWasmTask : LinkSkikoTask() {
     abstract val emccOutputFileName: Property<String>
 
     override fun configureArgs() =
-        super.configureArgs().apply {
-            arg("-o", outDir.resolveToIoFile(emccOutputFileName))
-            // https://emscripten.org/docs/tools_reference/emcc.html
-            repeatedArg("--extern-post-js", externPostJs.files)
-        }
+        super.configureArgs()
 }
