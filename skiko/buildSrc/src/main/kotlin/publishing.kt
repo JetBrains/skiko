@@ -1,3 +1,4 @@
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
@@ -404,19 +405,23 @@ private fun SkikoPublishingContext.configureAdditionalRuntimeLibrariesPublicatio
 }
 
 private fun SkikoPublishingContext.configureWebPublication() {
-    if (!project.supportWeb) return
-
-    val skikoWasmRuntimeConfig = project.configurations.create("skikoWasmRuntimeElements") {
-        isCanBeConsumed = true
-        isCanBeResolved = false
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-js-wasm-runtime"))
-            attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
-        }
-        outgoing.artifact(project.tasks.named("skikoWasmJar"))
-    }
-
     kotlin.targets.withType(KotlinJsIrTarget::class.java).all {
+        val skikoWasmRuntimeConfig = project.configurations.create("skikoWasmRuntimeElementsFor${toTitleCase(name)}") {
+            isCanBeConsumed = true
+            isCanBeResolved = false
+            attributes {
+                val runtimeConf = this@all.project.configurations.getByName(
+                    this@all.compilations.getByName("main").runtimeDependencyConfigurationName
+                )
+                runtimeConf.attributes.keySet().forEach {
+                    attribute(it as Attribute<Any>, runtimeConf.attributes.getAttribute(it) as Any)
+                }
+                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
+            }
+            outgoing.artifact(project.tasks.named("skikoWasmJar")) {
+                classifier = "skiko-runtime"
+            }
+        }
         addVariantToKotlinTarget(this, skikoWasmRuntimeConfig)
     }
 }
