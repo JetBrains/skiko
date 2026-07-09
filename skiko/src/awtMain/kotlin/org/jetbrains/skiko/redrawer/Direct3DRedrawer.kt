@@ -44,9 +44,13 @@ internal class Direct3DRedrawer(
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
             .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
 
-        // Install the WndProc subclass that drives synchronous overlay presents during an interactive
-        // (drag) resize (see the native live-resize block).
-        installLiveResizeHook(device, layer.windowHandle, layer.contentHandle)
+        // Live resize is driven from the window, so only enable it when this layer covers the whole window.
+        // When embedded as a Swing component (fillsWindow = false), fall back to the legacy resize path.
+        if (layer.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize) {
+            // Install the WndProc subclass that drives synchronous overlay presents during an interactive
+            // (drag) resize (see the native live-resize block).
+            installLiveResizeHook(device, layer.windowHandle, layer.contentHandle)
+        }
     }
 
     // the live client size while we (the native modal resize loop) drive the resize; null otherwise. This
