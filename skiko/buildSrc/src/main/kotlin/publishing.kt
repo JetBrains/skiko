@@ -17,6 +17,8 @@ import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.nativeplatform.MachineArchitecture
 import org.gradle.nativeplatform.OperatingSystemFamily
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import kotlin.jvm.java
 
 
 private val SkikoProjectContext.publishing get() = project.extensions.getByType(PublishingExtension::class.java)
@@ -401,13 +403,21 @@ private fun SkikoPublishingContext.configureAdditionalRuntimeLibrariesPublicatio
     }
 }
 
-private fun SkikoPublishingContext.configureWebPublication() = publications {
-    if (!project.supportWeb) return@publications
-    create("skikoWasmRuntime", MavenPublication::class.java) {
-        pomNameForPublication[name] = "${skikoArtifacts.displayName} WASM Runtime"
-        artifactId = skikoArtifacts.jsWasmArtifactId
-        artifact(project.tasks.named("skikoWasmJar").get())
-        artifact(emptySourcesJar)
+private fun SkikoPublishingContext.configureWebPublication() {
+    if (!project.supportWeb) return
+
+    val skikoWasmRuntimeConfig = project.configurations.create("skikoWasmRuntimeElements") {
+        isCanBeConsumed = true
+        isCanBeResolved = false
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-js-wasm-runtime"))
+            attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
+        }
+        outgoing.artifact(project.tasks.named("skikoWasmJar"))
+    }
+
+    kotlin.targets.withType(KotlinJsIrTarget::class.java).all {
+        addVariantToKotlinTarget(this, skikoWasmRuntimeConfig)
     }
 }
 
