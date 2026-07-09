@@ -91,7 +91,7 @@ internal class Direct3DRedrawer(
     }
 
     // called from native (toolkit thread) inside WM_NCCALCSIZE during a drag. Renders the REAL
-    // renderDelegate content at the new client size straight into the NOREDIR frame's comp swapchain and
+    // renderDelegate content at the new client size straight into the frame overlay's comp swapchain and
     // presents it synchronously. Shares the live render context (via contextHandler) and serializes on
     // drawLock so it never races an in-flight EDT draw.
     // Called from native (toolkit thread) in WM_NCCALCSIZE. onRender (user/Compose code) requires the EDT, so
@@ -251,7 +251,7 @@ internal class Direct3DRedrawer(
     // resize, renders the real content into the frame's overlay swapchain and presents it synchronously.
     private external fun installLiveResizeHook(device: Long, window: Long, content: Long)
 
-    // render the real renderDelegate content into the NOREDIR frame's own comp swapchain.
+    // render the real renderDelegate content into the frame overlay's own comp swapchain.
     private external fun resizeFrameBuffers(device: Long, context: Long, width: Int, height: Int)
     private external fun makeFrameSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     private external fun frameBufferIndex(): Int
