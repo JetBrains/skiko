@@ -15,6 +15,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Canvas__1nGetFinalizer() {
     return reinterpret_cast<KNativePointer>((&deleteCanvas));
 }
 
+SKIKO_EXPORT void this_is_a_test() {
+    deleteCanvas;
+}
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Canvas__1nMakeFromBitmap
   (KNativePointer bitmapPtr, KInt flags, KInt pixelGeometry) {
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
