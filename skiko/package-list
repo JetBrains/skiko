@@ -961,7 +961,6 @@ $dokka.location:org.jetbrains.skia.webext////PointingToDeclaration/skiko/org.je
 $dokka.location:org.jetbrains.skia.webext//installPixelsFromArrayBuffer/org.jetbrains.skia.Bitmap#org.jetbrains.skia.ImageInfo#org.khronos.webgl.ArrayBuffer#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.webext/install-pixels-from-array-buffer.html
 $dokka.location:org.jetbrains.skia////PointingToDeclaration/skiko/org.jetbrains.skia/index.html
 $dokka.location:org.jetbrains.skia//LANG/#/PointingToDeclaration/skiko/org.jetbrains.skia/-l-a-n-g.html
-$dokka.location:org.jetbrains.skia//_nAdoptTextureFrom/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/_n-adopt-texture-from.html
 $dokka.location:org.jetbrains.skia//makeFromEncoded/org.jetbrains.skia.Image.Companion#[Error type: Unresolved type for NSData]/PointingToDeclaration/skiko/org.jetbrains.skia/make-from-encoded.html
 $dokka.location:org.jetbrains.skia//makeFromFileName/org.jetbrains.skia.Data.Companion#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file-name.html
 $dokka.location:org.jetbrains.skia//makeGLWithInterface/org.jetbrains.skia.DirectContext.Companion#org.jetbrains.skia.GLAssembledInterface/PointingToDeclaration/skiko/org.jetbrains.skia/make-g-l-with-interface.html
@@ -1222,6 +1221,7 @@ $dokka.location:org.jetbrains.skia/Canvas/drawVertices/#org.jetbrains.skia.Verte
 $dokka.location:org.jetbrains.skia/Canvas/localToDevice/#/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/local-to-device.html
 $dokka.location:org.jetbrains.skia/Canvas/localToDeviceAsMatrix33/#/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/local-to-device-as-matrix33.html
 $dokka.location:org.jetbrains.skia/Canvas/readPixels/#org.jetbrains.skia.Bitmap#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/read-pixels.html
+$dokka.location:org.jetbrains.skia/Canvas/recordingContext/#/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/recording-context.html
 $dokka.location:org.jetbrains.skia/Canvas/resetMatrix/#/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/reset-matrix.html
 $dokka.location:org.jetbrains.skia/Canvas/restore/#/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/restore.html
 $dokka.location:org.jetbrains.skia/Canvas/restoreToCount/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-canvas/restore-to-count.html
@@ -1974,6 +1974,7 @@ $dokka.location:org.jetbrains.skia/ISize/isZero/#/PointingToDeclaration/skiko/o
 $dokka.location:org.jetbrains.skia/ISize/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia/-i-size/to-string.html
 $dokka.location:org.jetbrains.skia/ISize/width/#/PointingToDeclaration/skiko/org.jetbrains.skia/-i-size/width.html
 $dokka.location:org.jetbrains.skia/Image.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/index.html
+$dokka.location:org.jetbrains.skia/Image.Companion/adoptTextureFrom/#org.jetbrains.skia.DirectContext#org.jetbrains.skia.BackendTexture#org.jetbrains.skia.SurfaceOrigin#org.jetbrains.skia.ColorType#org.jetbrains.skia.ColorAlphaType/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/adopt-texture-from.html
 $dokka.location:org.jetbrains.skia/Image.Companion/adoptTextureFrom/#org.jetbrains.skia.DirectContext#org.jetbrains.skia.BackendTexture#org.jetbrains.skia.SurfaceOrigin#org.jetbrains.skia.ColorType/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/adopt-texture-from.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeFromBitmap/#org.jetbrains.skia.Bitmap/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-from-bitmap.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeFromEncoded/#kotlin.ByteArray/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-from-encoded.html
@@ -2941,12 +2942,14 @@ $dokka.location:org.jetbrains.skiko//kotlinBackend/#/PointingToDeclaration/skik
 $dokka.location:org.jetbrains.skiko//loadBytesFromPath/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/load-bytes-from-path.html
 $dokka.location:org.jetbrains.skiko//numberOfBuffers/org.jetbrains.skiko.FrameBuffering#/PointingToDeclaration/skiko/org.jetbrains.skiko/number-of-buffers.html
 $dokka.location:org.jetbrains.skiko//orderEmojiAndSymbolsPopup/#/PointingToDeclaration/skiko/org.jetbrains.skiko/order-emoji-and-symbols-popup.html
+$dokka.location:org.jetbrains.skiko//pushTexture/#[Error type: Unresolved type for JsAny]/PointingToDeclaration/skiko/org.jetbrains.skiko/push-texture.html
 $dokka.location:org.jetbrains.skiko//setSystemLookAndFeel/#/PointingToDeclaration/skiko/org.jetbrains.skiko/set-system-look-and-feel.html
 $dokka.location:org.jetbrains.skiko//setupSkikoLoggerFactory/#kotlin.Function0[org.jetbrains.skiko.SkikoLoggerInterface]/PointingToDeclaration/skiko/org.jetbrains.skiko/setup-skiko-logger-factory.html
 $dokka.location:org.jetbrains.skiko//toBitmap/java.awt.image.BufferedImage#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-bitmap.html
 $dokka.location:org.jetbrains.skiko//toBufferedImage/[Error type: Unresolved type for Bitmap]#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-buffered-image.html
 $dokka.location:org.jetbrains.skiko//toImage/java.awt.image.BufferedImage#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-image.html
 $dokka.location:org.jetbrains.skiko//transparentWindowBackgroundHack/#[Error type: Unresolved type for GraphicsApi]/PointingToDeclaration/skiko/org.jetbrains.skiko/transparent-window-background-hack.html
+$dokka.location:org.jetbrains.skiko//unregisterTexture/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skiko/unregister-texture.html
 $dokka.location:org.jetbrains.skiko/Arch.Arm64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-arm64/index.html
 $dokka.location:org.jetbrains.skiko/Arch.Unknown///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-unknown/index.html
 $dokka.location:org.jetbrains.skiko/Arch.X64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-x64/index.html
