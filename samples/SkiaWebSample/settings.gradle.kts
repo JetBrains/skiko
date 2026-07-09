@@ -32,8 +32,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "SkiaWebSample"
 
-if (extra.properties.getOrDefault("skiko.composite.build", "") == "1") {
-    includeBuild("../../skiko") {
+val skikoDir = file("../../skiko")
+if (skikoDir.exists() && extra.properties.getOrDefault("skiko.composite.build", "1") == "1") {
+    includeBuild(skikoDir) {
         dependencySubstitution {
             substitute(module("org.jetbrains.skiko:skiko")).using(project(":"))
         }

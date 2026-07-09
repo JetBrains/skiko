@@ -59,7 +59,7 @@ fun SkikoProjectContext.declareWasmTasks() {
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
         dependsOn(skiaWasmDir)
-        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
+        compiler.set(compilerForTarget(project, OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -85,6 +85,15 @@ fun SkikoProjectContext.declareWasmTasks() {
                 add("-fno-rtti")
                 add("-fno-exceptions")
                 add("-fPIC")
+                add("--target=wasm32-wasip1")
+                add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
+                add("-D_WASI_EMULATED_MMAN")
+                add("-D_WASI_EMULATED_SIGNAL")
+                add("-D_WASI_EMULATED_PROCESS_CLOCKS")
+                add("-D_WASI_EMULATED_GETPID")
+                add("-mllvm")
+                add("-wasm-enable-sjlj")
+                add("-mexception-handling")
                 if (skiko.isWasmBuildWithProfiling) add("--profiling")
             }
         )
@@ -96,7 +105,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
         val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
-        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
+        linker.set(linkerForTarget(project, OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -113,16 +122,16 @@ fun SkikoProjectContext.declareWasmTasks() {
         )
 
         flags.addAll(buildList {
-            addAll(
-                listOf(
-                    "-s", "OFFSCREEN_FRAMEBUFFER=1",
-                    "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
-                    "-s", "SUPPORT_LONGJMP=wasm",
-                    // -O2 saves 800kB for the output file, and ~100kB for transferred size.
-                    // -O3 breaks the exports in js/mjs files. skiko.wasm size is the same though
-                    "-O2"
-                )
-            )
+            add("-O2")
+            add("-fuse-ld=lld")
+            add("-Wl,--export-all")
+            add("-Wl,--no-entry")
+            add("-Wl,--allow-undefined")
+            add("--target=wasm32-wasip1")
+            add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
+            add("-mllvm")
+            add("-wasm-enable-sjlj")
+            add("-mexception-handling")
 
             if (skiko.isWasmBuildWithProfiling) add("--profiling")
             addAll(resolvedBinaryInputs.linkFlags)
@@ -137,16 +146,9 @@ fun SkikoProjectContext.declareWasmTasks() {
             }
 
             val emccOutputFile = outDir.asFile.get().walk().first { it.name == outputFileName }
-
-            val isEnvironmentNodeCheckRegex = Regex(
-                // spacing is different in release and debug builds
-                """if\s*\(ENVIRONMENT_IS_NODE\)\s*\{"""
-            )
-
-            val originalContent = emccOutputFile.readText()
-            val newContent = originalContent
-                .replace(isEnvironmentNodeCheckRegex, "if (false) {") // to make webpack erase this part
-            emccOutputFile.writeText(newContent)
+            val callbacks = project.layout.projectDirectory.file("src/webMain/resources/skikoCallbacks.js").asFile.readText()
+            val setup = project.file(prefixPath).readText()
+            emccOutputFile.writeText(callbacks + "\n" + setup)
         }
     }
 
@@ -185,6 +187,8 @@ fun SkikoProjectContext.declareWasmTasks() {
             project.setupMjs.normalize().absolutePath
         }
         configureCommon(prefixPath)
+        configureCommon(project.setupMjs.normalize().absolutePath)
+
     }
 
     // skikoWasmJar is used by task name
