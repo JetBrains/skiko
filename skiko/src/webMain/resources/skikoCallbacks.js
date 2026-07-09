@@ -1,6 +1,5 @@
 
-// This file is merged with skiko.js and skiko.mjs by emcc
-// It used by setup.js and setup.mjs (see in the same directory)
+// This file provides callback support for the Skiko WASM module
 
 const CB_NULL = {
     callback: () => { throw new RangeError("attempted to call a callback at NULL") },

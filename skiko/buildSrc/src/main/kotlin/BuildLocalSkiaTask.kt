@@ -29,6 +29,9 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
     @get:Internal
     abstract val skikoTargetFlags: ListProperty<String>
 
+    @get:Internal
+    abstract val wasiSdkPath: Property<String>
+
     @TaskAction
     fun buildSkia() {
         val version = skiaVersion.get()
@@ -71,12 +74,20 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
         // Build and archive for each machine
         machines.forEach { machine ->
             logger.lifecycle("Building for ${machine.id}...")
-            runPythonScript(
-                skiaRepoRoot, "build.py",
+            val buildArgs = mutableListOf(
                 "--skia-dir", ".",
                 "--target", target.id,
                 "--machine", machine.id,
                 "--build-type", type.id
+            )
+            if (target == SkiaTarget.WASM && wasiSdkPath.isPresent) {
+                buildArgs.add("--wasi-sdk")
+                buildArgs.add(wasiSdkPath.get())
+            }
+
+            runPythonScript(
+                skiaRepoRoot, "build.py",
+                *buildArgs.toTypedArray()
             )
 
             logger.lifecycle("Archiving ${machine.id}...")
