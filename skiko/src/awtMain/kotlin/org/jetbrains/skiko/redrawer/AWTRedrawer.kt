@@ -19,7 +19,7 @@ internal abstract class AWTRedrawer(
 
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
     private var deviceAnalytics: DeviceAnalytics? = null
-    var isDisposed = false
+    protected var isDisposed = false
         private set
 
     init {
@@ -60,7 +60,7 @@ internal abstract class AWTRedrawer(
         layer.update(nanoTime, forcedSize = forcedSize)
     }
 
-    inline fun inDrawScope(forcedSize: Dimension? = null, body: LayerDrawScope.() -> Unit) {
+    protected inline fun inDrawScope(forcedSize: Dimension? = null, body: LayerDrawScope.() -> Unit) {
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         if (!isDisposed) {
             val isFirstFrame = !isFirstFrameRendered
