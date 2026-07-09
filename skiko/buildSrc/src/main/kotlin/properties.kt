@@ -289,8 +289,6 @@ class SkikoArtifacts(
     val jsArtifactId = "$artifactIdPrefix-js"
     // an artifact (klib) for k/wasm targets
     val wasmArtifactId = "$artifactIdPrefix-wasm-js"
-    // an artifact with skiko.wasm and supporting js code - jar
-    val jsWasmArtifactId = "$artifactIdPrefix-js-wasm-runtime"
     fun jvmRuntimeArtifactIdFor(os: OS, arch: Arch) =
         if (os == OS.Android)
             "$artifactIdPrefix-android-runtime-${arch.id}"

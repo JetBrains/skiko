@@ -136,17 +136,13 @@ fun Project.configureSignAndPublishDependencies() {
     if (supportWeb) {
         tasks.configureEach {
             val publishJs = "publishJsPublicationTo"
-            val publishWasm = "publishSkikoWasmRuntimePublicationTo"
             val publishWasmPub = "publishWasmJsPublicationTo"
-            val signWasm = "signSkikoWasmRuntimePublication"
             val signJs = "signJsPublication"
             val signWasmPub = "signWasmJsPublication"
 
             when {
-                name.startsWith(publishJs) -> dependsOn(signWasm, signWasmPub)
-                name.startsWith(publishWasm) -> dependsOn(signJs)
+                name.startsWith(publishJs) -> dependsOn(signWasmPub)
                 name.startsWith(publishWasmPub) -> dependsOn(signJs)
-                name.startsWith(signWasmPub) -> dependsOn(signWasm)
             }
         }
     }

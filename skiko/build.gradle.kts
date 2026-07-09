@@ -529,11 +529,6 @@ project.tasks.withType<KotlinJsCompile>().configureEach {
     ))
 }
 
-tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
-    ?.dependsOn("publishWasmJsPublicationToComposeRepoRepository")
-tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
-    ?.dependsOn("publishWasmJsPublicationToMavenLocal")
-
 skikoProjectContext.additionalRuntimeLibraries.forEach {
     it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))
 }
