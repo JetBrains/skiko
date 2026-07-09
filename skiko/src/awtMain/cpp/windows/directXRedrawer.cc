@@ -142,95 +142,90 @@ static HWND g_contentHwnd = nullptr;
 static DirectXDevice *g_device = nullptr;
 static jobject g_redrawer = nullptr;
 
-// Calls a no-arg method on the Direct3DRedrawer from the current (toolkit) thread.
-static void callRedrawerVoidMethod(const char *method)
+// Attach the current (toolkit) thread to the JVM if needed and return its JNIEnv (nullptr if unavailable).
+static JNIEnv *getJniEnv()
 {
-    if (!g_redrawer || !jvm) return;
+    if (!jvm) return nullptr;
     JNIEnv *env = nullptr;
-    jint stat = jvm->GetEnv((void **)&env, JNI_VERSION_1_6);
-    if (stat == JNI_EDETACHED)
-    {
+    if (jvm->GetEnv((void **)&env, JNI_VERSION_1_6) == JNI_EDETACHED)
         jvm->AttachCurrentThread((void **)&env, nullptr);
-    }
-    if (!env) return;
-    jclass cls = env->GetObjectClass(g_redrawer);
-    jmethodID mid = env->GetMethodID(cls, method, "()V");
-    if (mid) env->CallVoidMethod(g_redrawer, mid);
-    env->DeleteLocalRef(cls);
+    return env;
 }
 
-// ask the redrawer (on this toolkit thread) to render the REAL renderDelegate content at (w,h) into
-// the frame's comp swapchain and present it. drawFrameWhileLiveResizing calls back into makeFrameSurface /
-// flushFrame / presentFrame below.
-static HANDLE g_renderDoneEvent = nullptr; // signaled by the EDT (signalRenderDone) when done
-static bool g_rendering = false;            // re-entrancy guard while pump-waiting
+// ---- One dedicated invoker per Direct3DRedrawer method called from native (g_redrawer + env must be valid).
+// Each caches its jmethodID in a local static on first use (the class is stable for the app's lifetime, and all
+// callers run on the single toolkit thread, so the lazy init needs no synchronization). ----
+static void drawFrameWhileLiveResizing(JNIEnv *env, int w, int h)
+{
+    static jmethodID mid = nullptr;
+    if (!mid)
+    {
+        jclass cls = env->GetObjectClass(g_redrawer);
+        mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(II)V");
+        env->DeleteLocalRef(cls);
+    }
+    if (mid) env->CallVoidMethod(g_redrawer, mid, (jint)w, (jint)h);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
+}
+
+static void onLiveResizeFinalize(JNIEnv *env)
+{
+    static jmethodID mid = nullptr;
+    if (!mid)
+    {
+        jclass cls = env->GetObjectClass(g_redrawer);
+        mid = env->GetMethodID(cls, "onLiveResizeFinalize", "()V");
+        env->DeleteLocalRef(cls);
+    }
+    if (mid) env->CallVoidMethod(g_redrawer, mid);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
+}
+
+static void onLiveResizeEnded(JNIEnv *env)
+{
+    static jmethodID mid = nullptr;
+    if (!mid)
+    {
+        jclass cls = env->GetObjectClass(g_redrawer);
+        mid = env->GetMethodID(cls, "onLiveResizeEnded", "()V");
+        env->DeleteLocalRef(cls);
+    }
+    if (mid) env->CallVoidMethod(g_redrawer, mid);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
+}
+
+// ask the redrawer (on this toolkit thread) to render the REAL renderDelegate content at (w,h) into the frame's
+// comp swapchain and present it. drawFrameWhileLiveResizing (Kotlin) hops to the EDT and blocks there via
+// EdtInvoker.invokeAndWaitWhilePumping; the render calls back into makeLiveResizeSurface / presentLiveResizeFrame.
+//
+// g_rendering guards against re-entrant renders while an EDT round-trip is pump-waiting on THIS thread: the
+// EDT's own window ops (SetWindowPos) are SENT back here and serviced during the wait, and one can re-enter
+// WM_NCCALCSIZE — a nested pump-wait there would deadlock (the EDT is blocked in SendMessage). So the two
+// callers below set it around their blocking round-trip and renderFrameOnEdt skips while it's set. (This is a
+// live-resize coalescing concern, so it lives here in the callers, not in the general invoke-and-wait utility.)
+static bool g_rendering = false;
 
 static void renderFrameOnEdt(int w, int h)
 {
-    if (!g_redrawer || !jvm || g_rendering) return;
-    JNIEnv *env = nullptr;
-    jint stat = jvm->GetEnv((void **)&env, JNI_VERSION_1_6);
-    if (stat == JNI_EDETACHED)
-    {
-        jvm->AttachCurrentThread((void **)&env, nullptr);
-    }
+    if (!g_redrawer || g_rendering) return;
+    JNIEnv *env = getJniEnv();
     if (!env) return;
-
-    if (!g_renderDoneEvent) g_renderDoneEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
-    ResetEvent(g_renderDoneEvent);
-
     g_rendering = true;
-    // drawFrameWhileLiveResizing POSTS the render to the EDT (invokeLater) and returns immediately.
-    jclass cls = env->GetObjectClass(g_redrawer);
-    jmethodID mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(II)V");
-    if (mid) env->CallVoidMethod(g_redrawer, mid, (jint)w, (jint)h);
-    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
-    env->DeleteLocalRef(cls);
-
-    // Pump-wait: block until the EDT signals it finished rendering, but keep servicing cross-thread SENT
-    // messages so the EDT's own window ops (beginValidate/SetWindowPos marshaled to this toolkit thread) can
-    // complete instead of deadlocking against us. Windows analog of LWCToolkit.invokeAndWait spinning the loop.
-    for (;;)
-    {
-        DWORD r = MsgWaitForMultipleObjectsEx(1, &g_renderDoneEvent, INFINITE, QS_SENDMESSAGE, MWMO_INPUTAVAILABLE);
-        if (r == WAIT_OBJECT_0) break; // render done
-        MSG msg;
-        PeekMessageW(&msg, nullptr, 0, 0, PM_NOREMOVE); // deliver pending sent messages (does not consume input)
-    }
+    drawFrameWhileLiveResizing(env, w, h); // blocks until the EDT render completes (EdtInvoker.invokeAndWaitWhilePumping)
     g_rendering = false;
 }
 
-// at drag-end, synchronously (same pump-wait) run onLiveResizeFinalize on the EDT — validate the
-// frame so the canvas HWND catches up to the final client size AND renderImmediately so the canvas has
-// correct-size content — BEFORE we detach the overlay. Otherwise revealing the still-lagging canvas snaps
-// a frame later (the visible 1-frame jump).
+// at drag-end, run onLiveResizeFinalize on the EDT (blocking, via EdtInvoker.invokeAndWaitWhilePumping) — validate the frame
+// so the canvas HWND catches up to the final client size AND renderImmediately so the canvas has correct-size
+// content — BEFORE we detach the overlay. Otherwise revealing the still-lagging canvas snaps a frame later.
 static void finalizeLiveResizeOnEdt()
 {
-    if (!g_redrawer || !jvm) return;
-    JNIEnv *env = nullptr;
-    jint stat = jvm->GetEnv((void **)&env, JNI_VERSION_1_6);
-    if (stat == JNI_EDETACHED)
-    {
-        jvm->AttachCurrentThread((void **)&env, nullptr);
-    }
+    if (!g_redrawer) return;
+    JNIEnv *env = getJniEnv();
     if (!env) return;
-
-    if (!g_renderDoneEvent) g_renderDoneEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
-    ResetEvent(g_renderDoneEvent);
-
-    jclass cls = env->GetObjectClass(g_redrawer);
-    jmethodID mid = env->GetMethodID(cls, "onLiveResizeFinalize", "()V");
-    if (mid) env->CallVoidMethod(g_redrawer, mid);
-    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
-    env->DeleteLocalRef(cls);
-
-    for (;;)
-    {
-        DWORD r = MsgWaitForMultipleObjectsEx(1, &g_renderDoneEvent, INFINITE, QS_SENDMESSAGE, MWMO_INPUTAVAILABLE);
-        if (r == WAIT_OBJECT_0) break;
-        MSG msg;
-        PeekMessageW(&msg, nullptr, 0, 0, PM_NOREMOVE);
-    }
+    g_rendering = true;
+    onLiveResizeFinalize(env);
+    g_rendering = false;
 }
 
 // ---- The overlay: a DComp target + composition swapchain on the AWT frame HWND ----------------------
@@ -246,7 +241,7 @@ static gr_cp<IDXGISwapChain3> g_frameSwapChain;
 static gr_cp<ID3D12Resource> g_frameBuffers[BuffersCount]; // wrapped-as-Skia backbuffers
 // per-buffer fence discipline, mirroring the on-screen swapchain (DirectXDevice). This is what lets the
 // overlay tolerate many presents per size and still ResizeBuffers cleanly — the earlier frame-latency-waitable
-// approach wedged after ~2 presents at one size. presentFrame signals fenceValues[bufferIndex] after Present;
+// approach wedged after ~2 presents at one size. presentLiveResizeFrame signals fenceValues[bufferIndex] after Present;
 // the next frame waits it before reusing that buffer; ResizeBuffers waits ALL buffers' fences.
 static gr_cp<ID3D12Fence> g_frameFence;
 static HANDLE g_frameFenceEvent = nullptr;
@@ -339,7 +334,7 @@ static bool g_liveResizeEngaged = false;   // frame overlay active (only during 
 // InvalidateRect's again, re-arming the next frame — so the animation self-perpetuates while held and stops
 // cleanly when needRender stops, all without ever outranking input.
 static int g_lastClientWidth = 0, g_lastClientHeight = 0; // client size the last resize step used (the true current size)
-// whether presentFrame should WaitForVBlank for THIS frame. FALSE for the WM_NCCALCSIZE (active-drag)
+// whether presentLiveResizeFrame should WaitForVBlank for THIS frame. FALSE for the WM_NCCALCSIZE (active-drag)
 // present — waiting there blocks inside NCCALCSIZE and displays the new-size content a full refresh BEFORE the
 // frame geometry is applied (content leads the edge). TRUE only for the WM_PAINT (stationary-hold) present, to
 // cap the idle animation loop at the refresh rate. Set on the toolkit thread right before the synchronous render.
@@ -432,7 +427,9 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                 g_liveResizeEngaged = false;
             }
             g_inSizeMoveLoop = false;
-            callRedrawerVoidMethod("onLiveResizeEnded");
+            // Notify the redrawer (toolkit thread) that the live resize ended so it resumes the normal loop.
+            if (g_redrawer)
+                if (JNIEnv *env = getJniEnv()) onLiveResizeEnded(env);
             break;
     }
     return CallWindowProcW(g_originalWndProc, hWnd, msg, wParam, lParam);
@@ -747,7 +744,7 @@ extern "C"
 
     // wrap the frame overlay's comp-swapchain backbuffer as a Skia SkSurface so the renderDelegate
     // can draw REAL content into it during resize (mirrors makeDirectXSurface but targets g_frameSwapChain).
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeFrameSurface(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeLiveResizeSurface(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height, jint index)
     {
         GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
@@ -766,7 +763,7 @@ extern "C"
 
     // resize the overlay swapchain on size change (mirrors the on-screen resizeBuffers): flush Skia's
     // refs, wait EACH buffer's last-present fence so no backbuffer is still in flight, drop refs, ResizeBuffers.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeFrameBuffers(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeLiveResizeBuffers(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height)
     {
         GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
@@ -786,7 +783,7 @@ extern "C"
 
     // getBufferIndex discipline (mirrors the on-screen swapchain) — rotate to the current back buffer,
     // wait its previous present's fence, bump its next fence value. Returns the buffer index to draw into.
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_frameBufferIndex(
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_liveResizeBufferIndex(
         JNIEnv *env, jobject redrawer)
     {
         if (!g_frameSwapChain.get()) return 0;
@@ -797,18 +794,8 @@ extern "C"
         return (jint)g_frameBufferIndex;
     }
 
-    // flush the renderDelegate's draw into the frame backbuffer and transition it to PRESENT.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_flushFrame(
-        JNIEnv *env, jobject redrawer, jlong contextPtr, jlong surfacePtr)
-    {
-        SkSurface *surface = fromJavaPointer<SkSurface *>(surfacePtr);
-        GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
-        context->flush(surface, SkSurfaces::BackendSurfaceAccess::kPresent, GrFlushInfo());
-        context->submit(GrSyncCpu::kYes);
-    }
-
     // present the frame comp swapchain (vblank-synced double-present) + DComp Commit.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_presentFrame(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_presentLiveResizeFrame(
         JNIEnv *env, jobject redrawer, jboolean vsync)
     {
         if (!g_frameSwapChain.get() || !g_device) return;
@@ -837,13 +824,6 @@ extern "C"
             }
             if (g_frameOutput.get()) g_frameOutput->WaitForVBlank();
         }
-    }
-
-    // the EDT calls this after rendering to release the pump-waiting toolkit thread.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_signalRenderDone(
-        JNIEnv *env, jobject redrawer)
-    {
-        if (g_renderDoneEvent) SetEvent(g_renderDoneEvent);
     }
 
     // needRender during a resize routes here — invalidate the frame window so a WM_PAINT drives a

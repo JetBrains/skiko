@@ -21,14 +21,10 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
 
     private var currentWidth = 0
     private var currentHeight = 0
-    private fun isSizeChanged(width: Int, height: Int): Boolean {
-        if (width != currentWidth || height != currentHeight) {
-            currentWidth = width
-            currentHeight = height
-            return true
-        }
-        return false
-    }
+
+    // True while the last initCanvas selected the frame-overlay surface (a live-resize draw), so the next
+    // on-screen draw knows to rebuild its surfaces instead of reusing a stale overlay surface/canvas.
+    private var lastDrawWasOverlay = false
 
     override fun LayerDrawScope.initCanvas() {
         val context = context ?: return
@@ -39,7 +35,28 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         val width = scaledLayerWidth.coerceAtLeast(1)
         val height = scaledLayerHeight.coerceAtLeast(1)
 
-        if (isSizeChanged(width, height) || isSurfacesNull()) {
+        if (directXRedrawer.isInLiveResize) {
+            // During a live resize, draw into the frame overlay swapchain (presented synchronously in
+            // WM_NCCALCSIZE by presentLiveResizeFrame) instead of the on-screen swapchain. The redrawer owns the overlay
+            // surfaces; everything downstream (clear, drawContent, flush) is identical to the on-screen path.
+            lastDrawWasOverlay = true
+            try {
+                surface = directXRedrawer.liveResizeSurface(getPtr(context), width, height)
+                canvas = surface?.canvas
+            } finally {
+                Reference.reachabilityFence(context)
+            }
+            return
+        }
+
+        val sizeChanged = (width != currentWidth || height != currentHeight)
+        if (sizeChanged) {
+            currentWidth = width
+            currentHeight = height
+        }
+
+        if (lastDrawWasOverlay || sizeChanged || isSurfacesNull()) {
+            lastDrawWasOverlay = false
             disposeCanvas()
             context.flush()
 
@@ -83,10 +100,6 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
             surfaces[bufferIndex]?.close()
         }
     }
-
-    // Expose the live GrDirectContext ptr so the live-resize path can render into the frame swapchain on the
-    // SAME context (avoids a second context sharing the D3D12 queue). 0 until the first draw creates it.
-    fun contextPtr(): Long = context?.let { getPtr(it) } ?: 0L
 
     override fun rendererInfo(): String {
         return super.rendererInfo() +

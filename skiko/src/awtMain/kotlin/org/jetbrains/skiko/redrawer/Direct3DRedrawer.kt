@@ -66,7 +66,7 @@ internal class Direct3DRedrawer(
     private var layerSizeInLiveResize: ISize? = null
     override val layerSizeWhileHandlingSizing: ISize? get() = layerSizeInLiveResize
 
-    private val isInLiveResize: Boolean get() = layerSizeInLiveResize != null
+    internal val isInLiveResize: Boolean get() = layerSizeInLiveResize != null
 
     // called from native on the toolkit thread on WM_EXITSIZEMOVE.
     @Suppress("unused")
@@ -81,15 +81,13 @@ internal class Direct3DRedrawer(
     // to the exact native client size, then render it — so revealing it doesn't snap a frame later.
     @Suppress("unused")
     private fun onLiveResizeFinalize() {
-        javax.swing.SwingUtilities.invokeLater {
+        EdtInvoker.invokeAndWaitWhilePumping {
             try {
                 javax.swing.SwingUtilities.getWindowAncestor(layer)?.let { it.invalidate(); it.validate() }
                 layerSizeInLiveResize = null // clear BEFORE renderImmediately so it uses the real backedLayer size
                 renderImmediately() // render the canvas at the final size before it's revealed
             } catch (t: Throwable) {
                 t.printStackTrace()
-            } finally {
-                signalRenderDone()
             }
         }
     }
@@ -107,16 +105,13 @@ internal class Direct3DRedrawer(
         // Report the live size so SkiaLayer.isHandlingSizing is true — AWT's reshape then skips its own
         // renderImmediately/needRender for the duration of the drag (the overlay is the sole renderer).
         layerSizeInLiveResize = ISize(width, height)
-        // Native (toolkit thread) called us and is now pump-waiting on signalRenderDone(). POST the render
-        // to the EDT (onRender requires it) and return immediately; the toolkit pump keeps servicing the EDT's
-        // cross-thread window ops so this doesn't deadlock. Signal native when the EDT render completes.
-        javax.swing.SwingUtilities.invokeLater {
+        // onRender requires the EDT, but we're on the toolkit thread. Run the render on the EDT and block here
+        // until it finishes — so the present still completes before WM_NCCALCSIZE returns (atomicity preserved).
+        EdtInvoker.invokeAndWaitWhilePumping {
             try {
-                renderFrameLocked(width, height)
+                renderLiveResizeFrame()
             } catch (t: Throwable) {
                 t.printStackTrace()
-            } finally {
-                signalRenderDone()
             }
         }
     }
@@ -128,25 +123,38 @@ internal class Direct3DRedrawer(
     private var frameWidth = 0
     private var frameHeight = 0
 
-    private fun renderFrameLocked(width: Int, height: Int): Unit = synchronized(drawLock) {
-        if (isDisposed || width <= 0 || height <= 0) return
-        val delegate = layer.renderDelegate ?: return
-        val ctxPtr = contextHandler.contextPtr()
-        if (ctxPtr == 0L) return
+    private fun renderLiveResizeFrame(): Unit = synchronized(drawLock) {
+        if (isDisposed) return
+        // Exactly the shape of renderImmediately()/drawAndSwap: record the frame (update), then draw + present.
+        // The ONLY differences from the on-screen path are the target surface and the present:
+        //  - contextHandler.draw() renders into the frame overlay surface, which Direct3DContextHandler.initCanvas
+        //    selects (instead of the on-screen swapchain surface) while isInLiveResize;
+        //  - presentLiveResizeFrame() presents the overlay comp-swapchain synchronously in WM_NCCALCSIZE (vs swap()).
+        // inDrawScope wraps it so it ticks the FPS counter and per-frame analytics like any normal frame.
+        update()
+        inDrawScope {
+            contextHandler.draw()
+            presentLiveResizeFrame(properties.isVsyncEnabled)
+        }
+    }
+
+    // Current frame-overlay surface for the live-resize draw; (re)creates the cached per-buffer surfaces on a
+    // size change (mirrors Direct3DContextHandler's on-screen surface caching — re-wrapping a fresh SkSurface
+    // every frame churns Skia's wrapped render targets and wedges ResizeBuffers). Called from that handler's
+    // initCanvas while a live resize is in progress.
+    fun liveResizeSurface(context: Long, width: Int, height: Int): Surface? {
+        if (width <= 0 || height <= 0) return null
         if (width != frameWidth || height != frameHeight || frameSurfaces[0] == null) {
             for (i in frameSurfaces.indices) { frameSurfaces[i]?.close(); frameSurfaces[i] = null }
-            resizeFrameBuffers(device, ctxPtr, width, height)
+            resizeLiveResizeBuffers(device, context, width, height)
             for (i in 0 until 2) {
-                val p = makeFrameSurface(device, ctxPtr, width, height, i)
-                if (p == 0L) return
+                val p = makeLiveResizeSurface(device, context, width, height, i)
+                if (p == 0L) return null
                 frameSurfaces[i] = Surface(p)
             }
             frameWidth = width; frameHeight = height
         }
-        val surface = frameSurfaces[frameBufferIndex()] ?: return
-        delegate.onRender(surface.canvas, width, height, skikoNanoTime())
-        flushFrame(ctxPtr, org.jetbrains.skia.impl.getPtr(surface))
-        presentFrame(properties.isVsyncEnabled)
+        return frameSurfaces[liveResizeBufferIndex()]
     }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
@@ -256,11 +264,9 @@ internal class Direct3DRedrawer(
     private external fun installLiveResizeHook(device: Long, window: Long, content: Long)
 
     // render the real renderDelegate content into the frame overlay's own comp swapchain.
-    private external fun resizeFrameBuffers(device: Long, context: Long, width: Int, height: Int)
-    private external fun makeFrameSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
-    private external fun frameBufferIndex(): Int
-    private external fun flushFrame(context: Long, surface: Long)
-    private external fun presentFrame(vsync: Boolean)
-    private external fun signalRenderDone()
+    private external fun resizeLiveResizeBuffers(device: Long, context: Long, width: Int, height: Int)
+    private external fun makeLiveResizeSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
+    private external fun liveResizeBufferIndex(): Int
+    private external fun presentLiveResizeFrame(vsync: Boolean)
     private external fun postLiveResizeRender()
 }
