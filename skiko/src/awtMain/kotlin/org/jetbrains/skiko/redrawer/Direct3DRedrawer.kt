@@ -44,53 +44,53 @@ internal class Direct3DRedrawer(
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
             .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
 
-        // SPIKE: install the throwaway WndProc subclass that drives a synchronous solid-color present
-        // during interactive (drag) resize. Throwaway — remove along with the native `installSpikeResizeHook`.
-        installSpikeResizeHook(device, layer.windowHandle, layer.contentHandle)
+        // Install the WndProc subclass that drives synchronous overlay presents during an interactive
+        // (drag) resize (see the native live-resize block).
+        installLiveResizeHook(device, layer.windowHandle, layer.contentHandle)
     }
 
-    // SPIKE: the live client size while we (the native modal resize loop) drive the resize; null otherwise. This
-    // is the single source of truth for "a spike resize is in progress" (spikeResizing below is derived from it):
+    // the live client size while we (the native modal resize loop) drive the resize; null otherwise. This
+    // is the single source of truth for "a live resize is in progress" (isInLiveResize below is derived from it):
     //  - Non-null makes SkiaLayer report isHandlingSizing — the designed hook that stops AWT's reshape from
     //    issuing its own renderImmediately/needRender during the drag (the overlay owns all rendering, so those
     //    would be pure waste: an extra onRender per step). Mirrors Metal's layerSizeInLiveResize.
-    //  - spikeResizing gates the normal Skia present path so the native WM_NCCALCSIZE/WM_PAINT present is the sole
+    //  - isInLiveResize gates the normal Skia present path so the native WM_NCCALCSIZE/WM_PAINT present is the sole
     //    writer to the swapchain during the drag.
-    // Set on the first resize step (onSpikeRenderFrame, at WM_NCCALCSIZE — NOT at WM_ENTERSIZEMOVE, so plain moves
+    // Set on the first resize step (drawFrameWhileLiveResizing, at WM_NCCALCSIZE — NOT at WM_ENTERSIZEMOVE, so plain moves
     // keep animating the visible canvas), cleared at drag end.
     @Volatile
-    private var spikeHandledSize: ISize? = null
-    override val layerSizeWhileHandlingSizing: ISize? get() = spikeHandledSize
+    private var layerSizeInLiveResize: ISize? = null
+    override val layerSizeWhileHandlingSizing: ISize? get() = layerSizeInLiveResize
 
-    private val spikeResizing: Boolean get() = spikeHandledSize != null
+    private val isInLiveResize: Boolean get() = layerSizeInLiveResize != null
 
-    // SPIKE: called from native on the toolkit thread on WM_EXITSIZEMOVE.
+    // called from native on the toolkit thread on WM_EXITSIZEMOVE.
     @Suppress("unused")
-    private fun onSpikeResizeEnded() {
-        spikeHandledSize = null
+    private fun onLiveResizeEnded() {
+        layerSizeInLiveResize = null
         frameDispatcher.scheduleFrame() // resume the normal animation loop
     }
 
-    // SPIKE 2b: called from native (toolkit thread, pump-waited) at drag-end while the overlay still covers the
+    // called from native (toolkit thread, pump-waited) at drag-end while the overlay still covers the
     // canvas. Runs on the EDT: the contentPane/layer/canvas lag the final window size by one resize step (Swing
     // knows the final window size but never re-lays-out at rest), so force a layout pass to catch the canvas up
     // to the exact native client size, then render it — so revealing it doesn't snap a frame later.
     @Suppress("unused")
-    private fun onSpikeResizeFinalize() {
+    private fun onLiveResizeFinalize() {
         javax.swing.SwingUtilities.invokeLater {
             try {
                 javax.swing.SwingUtilities.getWindowAncestor(layer)?.let { it.invalidate(); it.validate() }
-                spikeHandledSize = null // clear BEFORE renderImmediately so it uses the real backedLayer size
+                layerSizeInLiveResize = null // clear BEFORE renderImmediately so it uses the real backedLayer size
                 renderImmediately() // render the canvas at the final size before it's revealed
             } catch (t: Throwable) {
                 t.printStackTrace()
             } finally {
-                signalSpikeRenderDone()
+                signalRenderDone()
             }
         }
     }
 
-    // SPIKE 2b: called from native (toolkit thread) inside WM_NCCALCSIZE during a drag. Renders the REAL
+    // called from native (toolkit thread) inside WM_NCCALCSIZE during a drag. Renders the REAL
     // renderDelegate content at the new client size straight into the NOREDIR frame's comp swapchain and
     // presents it synchronously. Shares the live render context (via contextHandler) and serializes on
     // drawLock so it never races an in-flight EDT draw.
@@ -99,11 +99,11 @@ internal class Direct3DRedrawer(
     // so the present still completes before WM_NCCALCSIZE returns (atomicity preserved). This is the Windows
     // analog of the Metal fix's LWCToolkit.invokeAndWait; de-risks the toolkit→EDT hop during the modal loop.
     @Suppress("unused")
-    private fun onSpikeRenderFrame(width: Int, height: Int) {
+    private fun drawFrameWhileLiveResizing(width: Int, height: Int) {
         // Report the live size so SkiaLayer.isHandlingSizing is true — AWT's reshape then skips its own
         // renderImmediately/needRender for the duration of the drag (the overlay is the sole renderer).
-        spikeHandledSize = ISize(width, height)
-        // Native (toolkit thread) called us and is now pump-waiting on signalSpikeRenderDone(). POST the render
+        layerSizeInLiveResize = ISize(width, height)
+        // Native (toolkit thread) called us and is now pump-waiting on signalRenderDone(). POST the render
         // to the EDT (onRender requires it) and return immediately; the toolkit pump keeps servicing the EDT's
         // cross-thread window ops so this doesn't deadlock. Signal native when the EDT render completes.
         javax.swing.SwingUtilities.invokeLater {
@@ -112,41 +112,41 @@ internal class Direct3DRedrawer(
             } catch (t: Throwable) {
                 t.printStackTrace()
             } finally {
-                signalSpikeRenderDone()
+                signalRenderDone()
             }
         }
     }
 
-    // SPIKE 2b: cached overlay surfaces (one per swapchain buffer), recreated only on size change — mirrors the
+    // cached overlay surfaces (one per swapchain buffer), recreated only on size change — mirrors the
     // on-screen Direct3DContextHandler. Re-wrapping a fresh SkSurface every frame churns Skia's wrapped render
     // targets and wedges ResizeBuffers.
-    private val spikeFrameSurfaces = arrayOfNulls<Surface>(2)
-    private var spikeFrameW = 0
-    private var spikeFrameH = 0
+    private val frameSurfaces = arrayOfNulls<Surface>(2)
+    private var frameWidth = 0
+    private var frameHeight = 0
 
     private fun renderFrameLocked(width: Int, height: Int): Unit = synchronized(drawLock) {
         if (isDisposed || width <= 0 || height <= 0) return
         val delegate = layer.renderDelegate ?: return
-        val ctxPtr = contextHandler.spikeContextPtr()
+        val ctxPtr = contextHandler.contextPtr()
         if (ctxPtr == 0L) return
-        if (width != spikeFrameW || height != spikeFrameH || spikeFrameSurfaces[0] == null) {
-            for (i in spikeFrameSurfaces.indices) { spikeFrameSurfaces[i]?.close(); spikeFrameSurfaces[i] = null }
-            resizeSpikeFrame(device, ctxPtr, width, height)
+        if (width != frameWidth || height != frameHeight || frameSurfaces[0] == null) {
+            for (i in frameSurfaces.indices) { frameSurfaces[i]?.close(); frameSurfaces[i] = null }
+            resizeFrameBuffers(device, ctxPtr, width, height)
             for (i in 0 until 2) {
-                val p = makeSpikeFrameSurface(device, ctxPtr, width, height, i)
+                val p = makeFrameSurface(device, ctxPtr, width, height, i)
                 if (p == 0L) return
-                spikeFrameSurfaces[i] = Surface(p)
+                frameSurfaces[i] = Surface(p)
             }
-            spikeFrameW = width; spikeFrameH = height
+            frameWidth = width; frameHeight = height
         }
-        val surface = spikeFrameSurfaces[spikeFrameBufferIndex()] ?: return
+        val surface = frameSurfaces[frameBufferIndex()] ?: return
         delegate.onRender(surface.canvas, width, height, skikoNanoTime())
-        flushSpikeFrame(ctxPtr, org.jetbrains.skia.impl.getPtr(surface))
-        presentSpikeFrame(properties.isVsyncEnabled)
+        flushFrame(ctxPtr, org.jetbrains.skia.impl.getPtr(surface))
+        presentFrame(properties.isVsyncEnabled)
     }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing && !spikeResizing) {
+        if (layer.isShowing && !isInLiveResize) {
             update()
             draw()
         }
@@ -158,7 +158,7 @@ internal class Direct3DRedrawer(
 
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
-        for (i in spikeFrameSurfaces.indices) { spikeFrameSurfaces[i]?.close(); spikeFrameSurfaces[i] = null } // SPIKE
+        for (i in frameSurfaces.indices) { frameSurfaces[i]?.close(); frameSurfaces[i] = null }
         contextHandler.dispose()
         disposeDevice(device)
         device = 0L
@@ -167,11 +167,11 @@ internal class Direct3DRedrawer(
 
     override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
-        // SPIKE: during a resize the overlay must be presented only from the toolkit thread (synchronized with the
+        // during a resize the overlay must be presented only from the toolkit thread (synchronized with the
         // resize loop) — an async EDT present corrupts the flip swapchain. Route needRender to a coalesced toolkit
-        // present (postSpikeRender), which self-gates to fire only when a resize step isn't already presenting
+        // present (postLiveResizeRender), which self-gates to fire only when a resize step isn't already presenting
         // (i.e. a stationary hold). Active-drag animation is driven by the WM_NCCALCSIZE renders themselves.
-        if (spikeResizing) postSpikeRender() else frameDispatcher.scheduleFrame()
+        if (isInLiveResize) postLiveResizeRender() else frameDispatcher.scheduleFrame()
     }
 
     override fun renderImmediately() {
@@ -193,7 +193,7 @@ internal class Direct3DRedrawer(
     }
 
     private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
-        if (isDisposed || spikeResizing) { // SPIKE: `spikeResizing` gate
+        if (isDisposed || isInLiveResize) { // `isInLiveResize` gate
             return
         }
         contextHandler.draw()
@@ -247,16 +247,16 @@ internal class Direct3DRedrawer(
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long
 
-    // SPIKE: throwaway — installs a WndProc subclass on the top-level window (GA_ROOT of `window`) that,
-    // during an interactive resize, resizes the content HWND and synchronously clears+presents a solid color.
-    private external fun installSpikeResizeHook(device: Long, window: Long, content: Long)
+    // Installs a WndProc subclass on the top-level window (GA_ROOT of `window`) that, during an interactive
+    // resize, renders the real content into the frame's overlay swapchain and presents it synchronously.
+    private external fun installLiveResizeHook(device: Long, window: Long, content: Long)
 
-    // SPIKE 2b: render the real renderDelegate content into the NOREDIR frame's own comp swapchain.
-    private external fun resizeSpikeFrame(device: Long, context: Long, width: Int, height: Int)
-    private external fun makeSpikeFrameSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
-    private external fun spikeFrameBufferIndex(): Int
-    private external fun flushSpikeFrame(context: Long, surface: Long)
-    private external fun presentSpikeFrame(vsync: Boolean)
-    private external fun signalSpikeRenderDone()
-    private external fun postSpikeRender()
+    // render the real renderDelegate content into the NOREDIR frame's own comp swapchain.
+    private external fun resizeFrameBuffers(device: Long, context: Long, width: Int, height: Int)
+    private external fun makeFrameSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
+    private external fun frameBufferIndex(): Int
+    private external fun flushFrame(context: Long, surface: Long)
+    private external fun presentFrame(vsync: Boolean)
+    private external fun signalRenderDone()
+    private external fun postLiveResizeRender()
 }
