@@ -4,7 +4,7 @@
 #include "ports/SkFontMgr_mac_ct.h"
 #endif
 
-#ifdef SK_BUILD_FOR_WIN
+#if defined(SK_BUILD_FOR_WIN) && !defined(SKIKO_WASM)
 #include "ports/SkTypeface_win.h"
 #endif
 
@@ -13,7 +13,7 @@
 #include "ports/SkFontScanner_FreeType.h"
 #endif
 
-#ifdef SK_BUILD_FOR_ANDROID
+#if defined(SK_BUILD_FOR_ANDROID) && !defined(SKIKO_WASM)
 #include "ports/SkFontMgr_android.h"
 #include "ports/SkFontScanner_FreeType.h"
 #endif

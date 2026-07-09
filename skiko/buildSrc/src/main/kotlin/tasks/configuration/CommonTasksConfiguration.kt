@@ -123,6 +123,10 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         )
         OS.Wasm -> listOf(
             "-DSKIKO_WASM",
+<<<<<<< HEAD
+=======
+//            "-sSUPPORT_LONGJMP=wasm"
+>>>>>>> eeeabe625 (feat: got a working startup of a wasm environment in browser without emcc)
         )
         OS.Android -> listOf(
             "-DSK_BUILD_FOR_ANDROID"

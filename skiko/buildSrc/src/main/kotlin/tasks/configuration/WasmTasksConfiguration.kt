@@ -158,6 +158,10 @@ fun SkikoProjectContext.declareWasmTasks() {
                 add("-fno-rtti")
                 add("-fno-exceptions")
                 add("-fPIC")
+=======
+                add("--target=wasm32-wasip1")
+                add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
+>>>>>>> eeeabe625 (feat: got a working startup of a wasm environment in browser without emcc)
                 add("-D_WASI_EMULATED_MMAN")
                 add("-D_WASI_EMULATED_SIGNAL")
                 add("-D_WASI_EMULATED_PROCESS_CLOCKS")
@@ -178,6 +182,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
         val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
+<<<<<<< HEAD
         linker.set(wasiSdkBinaryToolPath(linkerForTarget(OS.Wasm, Arch.Wasm)))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
