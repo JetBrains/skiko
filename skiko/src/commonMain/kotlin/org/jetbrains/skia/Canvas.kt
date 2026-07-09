@@ -55,6 +55,23 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         reachabilityBarrier(bitmap)
     }
 
+    /**
+     * Returns the recording context being used by this Canvas.
+     *
+     * The returned context is borrowed from the Canvas and must not be closed.
+     *
+     * @return the recording context, if available; null otherwise
+     */
+    val recordingContext: DirectContext?
+        get() = try {
+            Stats.onNativeCall()
+            val ptr = _nGetCanvasRecordingContext(_ptr)
+            if (ptr == NullPointer) null else DirectContext(ptr, managed = false)
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(_owner)
+        }
+
     fun drawPoint(x: Float, y: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
@@ -1594,6 +1611,9 @@ private external fun Canvas_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nMakeFromBitmap")
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetRecordingContext")
+private external fun _nGetCanvasRecordingContext(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoint")
 private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)

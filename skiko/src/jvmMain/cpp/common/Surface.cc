@@ -269,7 +269,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_SurfaceKt__1nNotifyCon
     surface->notifyContentWillChange(static_cast<SkSurface::ContentChangeMode>(mode));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nGetRecordingContext
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nGetSurfaceRecordingContext
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(surface->recordingContext());

@@ -629,13 +629,15 @@ class Surface : RefCnt {
      *
      * Returns the recording context being used by the Surface.
      *
+     * The returned context is borrowed from the Surface and must not be closed.
+     *
      * @return the recording context, if available; null otherwise
      */
     val recordingContext: DirectContext?
         get() = try {
             Stats.onNativeCall()
-            val ptr = _nGetRecordingContext(_ptr)
-            if (ptr == NullPointer) null else DirectContext(ptr)
+            val ptr = _nGetSurfaceRecordingContext(_ptr)
+            if (ptr == NullPointer) null else DirectContext(ptr, managed = false)
         } finally {
             reachabilityBarrier(this)
         }
@@ -1114,8 +1116,8 @@ private external fun _nGenerationId(ptr: NativePointer): Int
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nNotifyContentWillChange")
 private external fun _nNotifyContentWillChange(ptr: NativePointer, mode: Int)
 
-@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetRecordingContext")
-private external fun _nGetRecordingContext(ptr: NativePointer): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetSurfaceRecordingContext")
+private external fun _nGetSurfaceRecordingContext(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetCanvas")
 private external fun _nGetCanvas(ptr: NativePointer): NativePointer
