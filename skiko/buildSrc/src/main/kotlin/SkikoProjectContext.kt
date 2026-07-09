@@ -60,8 +60,14 @@ class SkikoProjectContext(
             else -> ".a"
         }
 
-        return libBaseNames.map { baseName ->
-            "$skiaBinDir/$prefix$baseName$suffix"
+        return libBaseNames.mapNotNull { baseName ->
+            val path = "$skiaBinDir/$prefix$baseName$suffix"
+            if (skiko.skiaDir(os) != null && !File(path).exists()) {
+                project.logger.warn("Skia library $path not found, skipping linking.")
+                null
+            } else {
+                path
+            }
         }
     }
 
@@ -158,7 +164,7 @@ fun SkikoProjectContext.registerOrGetSkiaDirProvider(
 ): Provider<File> {
     val taskNameSuffix = joinToTitleCamelCase(buildType.id, os.idWithSuffix(isUikitSim = isUikitSim), arch.id)
 
-    val skiaDir = skiko.skiaDir
+    val skiaDir = skiko.skiaDir(os)
     return if (skiaDir != null) {
         project.tasks.registerOrGetTask<DefaultTask>("skiaDir$taskNameSuffix") {
             // dummy task to simplify usage of the resulting provider (see `else` branch)
@@ -228,7 +234,7 @@ val Project.supportAnyNative: Boolean
     get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
 
 val Project.supportWeb: Boolean
-    get() = findProperty(SkikoGradleProperties.WASM_ENABLED) == "true" || isInIdea
+    get() = findProperty(SkikoGradleProperties.WASM_ENABLED) == "true" || isInIdea || SkikoProperties(this).skiaDir(OS.Wasm) != null
 
 fun Project.skiaVersion(target: String): String {
     val platformSpecificVersion = "dependencies.skia.$target"

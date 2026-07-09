@@ -164,16 +164,29 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "brotli",
             )
             linkFlags(
-                "-s", "MAIN_MODULE=2",
+//                "-s", "MAIN_MODULE=2",
                 "-s", "AUTOLOAD_DYLIBS=0",
                 "-l", "GL",
-                "-s", "MAX_WEBGL_VERSION=2",
-                "-s", "MIN_WEBGL_VERSION=2",
-                "-s", "MODULARIZE=1",
+//                "-s", "MAX_WEBGL_VERSION=2",
+//                "-s", "MIN_WEBGL_VERSION=2",
+//                "-s", "MODULARIZE=1",
                 "-s", "EXPORT_ES6=1",
-                "-s", "EXPORT_NAME=loadSkikoWASM",
-                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
-                "--bind",
+//                "-s", "EXPORT_NAME=loadSkikoWASM",
+//                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
+//                "--bind",
+//                "-nostdlib",
+                "--sysroot=${findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot",
+                "-lsetjmp",
+                "-lwasi-emulated-mman",
+                "-lwasi-emulated-signal",
+                "-lwasi-emulated-process-clocks",
+                "-lwasi-emulated-getpid",
+                "-mllvm", "-wasm-enable-sjlj",
+                "-mexception-handling",
+                "-fuse-ld=lld",
+                "-Wl,--export-all",
+                "-Wl,--no-entry",
+                "-Wl,--error-limit=0",
             )
         }
     }
@@ -572,6 +585,10 @@ tasks.register<BuildLocalSkiaTask>("prepareLocalSkiaBuild") {
     skikoTargetFlags.set(provider {
         skiko.skiaTarget.getGradleFlags(skiko.targetArch)
     })
+
+    findProperty("wasi.sdk")?.toString()?.let {
+        wasiSdkPath.set(it)
+    }
 }
 
 tasks.register("printSkiaVersion") {
