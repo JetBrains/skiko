@@ -1,13 +1,12 @@
 package org.jetbrains.skiko.redrawer
 
-import org.jetbrains.skia.ISize
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
 import kotlin.time.TimeSource
 
 private val initialTime = TimeSource.Monotonic.markNow()
-fun renderTime() = initialTime.elapsedNow().inWholeNanoseconds
+internal fun renderTime() = initialTime.elapsedNow().inWholeNanoseconds
 
 internal interface Redrawer {
     fun dispose()

@@ -64,7 +64,7 @@ object SkikoProperties {
      * synchronously on the AppKit main thread, inside the same CATransaction that commits the window's
      * new size, so content and window backing stay in sync (no white borders). When disabled, resize
      * falls back to the previous behavior: geometry is updated from the EDT, and frames are presented
-     * asynchronously off the resize transaction. Enabled by default.
+     * asynchronously off the resize transaction.
      */
     val metalSynchronousLiveResize: Boolean get() {
         return getProperty("skiko.rendering.macos.metalSynchronousLiveResize")?.toBoolean() ?: false
