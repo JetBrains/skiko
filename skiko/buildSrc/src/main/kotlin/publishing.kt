@@ -1,3 +1,4 @@
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
@@ -17,6 +18,8 @@ import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.nativeplatform.MachineArchitecture
 import org.gradle.nativeplatform.OperatingSystemFamily
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import kotlin.jvm.java
 
 
 private val SkikoProjectContext.publishing get() = project.extensions.getByType(PublishingExtension::class.java)
@@ -401,13 +404,25 @@ private fun SkikoPublishingContext.configureAdditionalRuntimeLibrariesPublicatio
     }
 }
 
-private fun SkikoPublishingContext.configureWebPublication() = publications {
-    if (!project.supportWeb) return@publications
-    create("skikoWasmRuntime", MavenPublication::class.java) {
-        pomNameForPublication[name] = "${skikoArtifacts.displayName} WASM Runtime"
-        artifactId = skikoArtifacts.jsWasmArtifactId
-        artifact(project.tasks.named("skikoWasmJar").get())
-        artifact(emptySourcesJar)
+private fun SkikoPublishingContext.configureWebPublication() {
+    kotlin.targets.withType(KotlinJsIrTarget::class.java).all {
+        val skikoWasmRuntimeConfig = project.configurations.create("skikoWasmRuntimeElementsFor${toTitleCase(name)}") {
+            isCanBeConsumed = true
+            isCanBeResolved = false
+            attributes {
+                val runtimeConf = this@all.project.configurations.getByName(
+                    this@all.compilations.getByName("main").runtimeDependencyConfigurationName
+                )
+                runtimeConf.attributes.keySet().forEach {
+                    attribute(it as Attribute<Any>, runtimeConf.attributes.getAttribute(it) as Any)
+                }
+                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
+            }
+            outgoing.artifact(project.tasks.named("skikoWasmJar")) {
+                classifier = "skiko-runtime"
+            }
+        }
+        addVariantToKotlinTarget(this, skikoWasmRuntimeConfig)
     }
 }
 
