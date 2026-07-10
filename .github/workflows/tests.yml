@@ -50,12 +50,9 @@ jobs:
         with:
           name: test-reports-macos
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/skiko-skottie/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/*_actual.png
-            ./skiko/skiko-skottie/src/jvmTest/screenshots/*_actual.png
-            ./skiko/hs_err_pid*.log
-            ./skiko/skiko-skottie/hs_err_pid*.log
+            ./skiko/**/build/reports/tests
+            ./skiko/**/src/jvmTest/screenshots/*_actual.png
+            ./skiko/**/hs_err_pid*.log
           retention-days: 5
 
       - uses: test-summary/action@v2
@@ -121,8 +118,7 @@ jobs:
         with:
           name: test-reports-ios
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/skiko-skottie/build/reports/tests
+            ./skiko/**/build/reports/tests
           retention-days: 5
 
   tvos:
@@ -163,8 +159,7 @@ jobs:
         with:
           name: test-reports-tvos
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/skiko-skottie/build/reports/tests
+            ./skiko/**/build/reports/tests
           retention-days: 5
 
   linux-amd64:
@@ -296,12 +291,9 @@ jobs:
         with:
           name: test-reports-linux-arm
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/skiko-skottie/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/*_actual.png
-            ./skiko/skiko-skottie/src/jvmTest/screenshots/*_actual.png
-            ./skiko/hs_err_pid*.log
-            ./skiko/skiko-skottie/hs_err_pid*.log
+            ./skiko/**/build/reports/tests
+            ./skiko/**/src/jvmTest/screenshots/*_actual.png
+            ./skiko/**/hs_err_pid*.log
           retention-days: 5
 
       - name: Test Summary
@@ -347,12 +339,9 @@ jobs:
         with:
           name: test-reports-windows
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/skiko-skottie/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/*_actual.png
-            ./skiko/skiko-skottie/src/jvmTest/screenshots/*_actual.png
-            ./skiko/hs_err_pid*.log
-            ./skiko/skiko-skottie/hs_err_pid*.log
+            ./skiko/**/build/reports/tests
+            ./skiko/**/src/jvmTest/screenshots/*_actual.png
+            ./skiko/**/hs_err_pid*.log
           retention-days: 5
 
       - uses: test-summary/action@v2
@@ -429,8 +418,7 @@ jobs:
         with:
           name: test-reports-web
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/skiko-skottie/build/reports/tests
+            ./skiko/**/build/reports/tests
           retention-days: 5
 
       - uses: test-summary/action@v2
