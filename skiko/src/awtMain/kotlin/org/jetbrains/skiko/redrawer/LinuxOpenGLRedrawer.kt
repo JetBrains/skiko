@@ -1,20 +1,17 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.OpenGLContextHandler
 
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
+) : AbstractOpenGLRedrawer(layer, analytics) {
     init {
         loadOpenGLLibrary()
     }
-
-    private val contextHandler = OpenGLContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var context = 0L
     private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
@@ -36,8 +33,6 @@ internal class LinuxOpenGLRedrawer(
         }
         onContextInit()
     }
-
-    private val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
 
     private val frameJob = Job()
     @Volatile
@@ -66,7 +61,7 @@ internal class LinuxOpenGLRedrawer(
             // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
             // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
             it.makeCurrent(context)
-            contextHandler.dispose()
+            disposeGlResources()
             it.destroyContext(context)
         }
         super.dispose()
@@ -83,7 +78,7 @@ internal class LinuxOpenGLRedrawer(
         update()
         inDrawScope {
             it.makeCurrent(context)
-            contextHandler.draw()
+            drawFrame()
             val turnOfVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately
             if (turnOfVsync) {
                 it.setSwapInterval(0)
@@ -97,7 +92,7 @@ internal class LinuxOpenGLRedrawer(
     }
 
     private fun draw() {
-        inDrawScope { contextHandler.draw() }
+        inDrawScope { drawFrame() }
     }
 
     companion object {

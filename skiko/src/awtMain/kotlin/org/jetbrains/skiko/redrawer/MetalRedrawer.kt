@@ -2,8 +2,8 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.MetalContextHandler
 import java.awt.Component
 import java.awt.Dimension
 import java.util.concurrent.atomic.AtomicBoolean
@@ -31,7 +31,6 @@ internal value class MetalDevice(val ptr: Long)
  *
  * Content to draw is provided by [SkiaLayer.draw].
  *
- * @see MetalContextHandler
  * @see FrameDispatcher
  */
 internal class MetalRedrawer(
@@ -39,7 +38,6 @@ internal class MetalRedrawer(
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.METAL) {
-    private val contextHandler: MetalContextHandler
 
     companion object {
         init {
@@ -71,11 +69,16 @@ internal class MetalRedrawer(
     /**
      * Whether this redrawer is currently driving an interactive live-resize itself (only ever true when
      * [SkikoProperties.metalSynchronousLiveResize] is enabled and this layer fills the window). Set for the
-     * duration of a drag; it quiesces the async EDT renders (frameDispatcher loop, onPlatformComponentResized) so
+     * duration of a drag; it quiesces the async EDT renders (frameDispatcher loop, onLayerComponentResized) so
      * the synchronous AppKit-main-thread render is the only thing painting during a drag.
      */
     @Volatile
     private var isHandlingLiveResizeNow: Boolean = false
+
+    private var context: DirectContext? = null
+    private var renderTarget: BackendRenderTarget? = null
+    private var surface: Surface? = null
+    private var canvas: Canvas? = null
 
     init {
         onDeviceChosen(adapter.name)
@@ -95,11 +98,13 @@ internal class MetalRedrawer(
             )
         }
         _device = initDevice
-        contextHandler = MetalContextHandler(layer, initDevice, adapter)
         setDisplaySyncEnabled(initDevice.ptr, properties.isVsyncEnabled)
     }
 
-    override val renderInfo: String get() = contextHandler.rendererInfo()
+    override val renderInfo: String
+        get() = renderInfoHeader(layer.renderApi) +
+                "Video card: ${adapter.name}\n" +
+                "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
 
     private val frameDispatcher = FrameScheduler()
 
@@ -109,7 +114,9 @@ internal class MetalRedrawer(
 
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
-        contextHandler.dispose()
+        disposeSurface()
+        context?.close()
+        context = null
         disposeDevice(device.ptr)
         adapter.dispose()
         vSyncer?.dispose()
@@ -155,7 +162,7 @@ internal class MetalRedrawer(
             }
         }
         performNativeDrawAction {
-            contextHandler.finishFrameSync()
+            finishFrameSync(device.ptr)
         }
         return true
     }
@@ -190,9 +197,9 @@ internal class MetalRedrawer(
 
     private fun LayerDrawScope.performDraw(finishFrame: Boolean = true) {
         performNativeDrawAction {
-            contextHandler.draw()
+            drawFrame()
             if (finishFrame) {
-                contextHandler.finishFrameAsync()
+                finishFrameAsync(device.ptr)
             }
         }
     }
@@ -241,7 +248,7 @@ internal class MetalRedrawer(
                 inDrawScope(forcedSize = layerSize) {
                     if (!isDisposed) {  // Redrawer may be disposed in user code, during `update`
                         // The present must run on the AppKit main thread to join the resize transaction, so
-                        // only record here; `finishFrameInLiveResize` presents below on the AppKit main thread
+                        // only record here; `finishFrameSync` presents below on the AppKit main thread
                         performDraw(finishFrame = false)
                     }
                 }
@@ -254,7 +261,7 @@ internal class MetalRedrawer(
         // The present must run on the AppKit main thread to join the resize transaction
         synchronized(drawLock) {
             if (!isDisposed) {
-                contextHandler.finishFrameSync()
+                finishFrameSync(device.ptr)
             }
         }
     }
@@ -268,6 +275,68 @@ internal class MetalRedrawer(
     private fun scheduleFrameOnAppKitThread() {
         if (isDisposed) return
         scheduleFrameOnAppKitThread(device.ptr)
+    }
+
+    private fun LayerDrawScope.drawFrame() {
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic Metal context")
+        }
+        initSurface()
+        canvas?.runRestoringState {
+            clear(Color.TRANSPARENT)
+            layer.draw(this)
+        }
+        surface?.flushAndSubmit()
+        // Records only; the caller presents.
+        Logger.debug { "MetalRedrawer finished drawing frame" }
+    }
+
+    private fun ensureContext(): Boolean {
+        if (context == null) {
+            try {
+                val newContext = DirectContext(makeMetalContext(device.ptr))
+                context = newContext
+                onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
+            } catch (e: Exception) {
+                Logger.warn(e) { "Failed to create Skia Metal context!" }
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun LayerDrawScope.initSurface() {
+        disposeSurface()
+
+        val width = scaledLayerWidth
+        val height = scaledLayerHeight
+
+        if (width > 0 && height > 0) {
+            renderTarget = BackendRenderTarget(makeMetalRenderTarget(device.ptr, width, height))
+
+            surface = Surface.makeFromBackendRenderTarget(
+                context!!,
+                renderTarget!!,
+                SurfaceOrigin.TOP_LEFT,
+                SurfaceColorFormat.BGRA_8888,
+                ColorSpace.sRGB,
+                SurfaceProps(pixelGeometry = pixelGeometry)
+            ) ?: throw RenderException("Cannot create surface")
+
+            canvas = surface!!.canvas
+        } else {
+            renderTarget = null
+            surface = null
+            canvas = null
+        }
+    }
+
+    private fun disposeSurface() {
+        surface?.close()
+        renderTarget?.close()
+        surface = null
+        renderTarget = null
+        canvas = null
     }
 
     override fun syncBoundsFromPlatformComponent() = synchronized(drawLock) {
@@ -287,7 +356,9 @@ internal class MetalRedrawer(
 
     override fun setVisible(isVisible: Boolean) {
         Logger.debug { "MetalRedrawer#setVisible($isVisible)" }
-        setLayerVisible(device.ptr, isVisible)
+        if (!isDisposed) {
+            setLayerVisible(device.ptr, isVisible)
+        }
     }
 
     /**
@@ -338,6 +409,23 @@ internal class MetalRedrawer(
      * @note see https://developer.apple.com/documentation/quartzcore/cametallayer/2887087-displaysyncenabled
      */
     private external fun setDisplaySyncEnabled(device: Long, enabled: Boolean)
+
+    private external fun makeMetalContext(device: Long): Long
+    private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
+    /**
+     * Presents the frame asynchronously (off the AppKit main thread).
+     */
+    private external fun finishFrameAsync(device: Long)
+
+    /**
+     * Presents the frame synchronously, in the calling thread.
+     *
+     * Used in two scenarios:
+     * - During live-resize it is called on the AppKit main thread, to join the ambient window-resize transaction.
+     * - Before showing the window, it is called while the layer is already displayable (but not yet showing), so the
+     *   window's first on-screen frame draws content instead of flashing its background.
+     */
+    private external fun finishFrameSync(device: Long)
 
     private inner class FrameScheduler {
         private var updateRequested = AtomicBoolean(false)

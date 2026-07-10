@@ -1,20 +1,17 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.OpenGLContextHandler
 
 internal class WindowsOpenGLRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
+) : AbstractOpenGLRedrawer(layer, analytics) {
     init {
         loadOpenGLLibrary()
     }
-
-    private val contextHandler = OpenGLContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val device: Long = layer.backedLayer.useDrawingSurfacePlatformInfo {
         getDevice(it).also { devicePtr ->
@@ -35,8 +32,6 @@ internal class WindowsOpenGLRedrawer(
         onDeviceChosen(adapterName)
     }
 
-    private val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
-
     init {
         makeCurrent()
         // For vsync we will use dwmFlush instead of swapInterval,
@@ -50,7 +45,7 @@ internal class WindowsOpenGLRedrawer(
     override fun dispose() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         makeCurrent()
-        contextHandler.dispose()
+        disposeGlResources()
         deleteContext(context)
         super.dispose()
     }
@@ -67,7 +62,7 @@ internal class WindowsOpenGLRedrawer(
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 makeCurrent()
-                contextHandler.draw()
+                drawFrame()
                 swapBuffers()
                 OpenGLApi.instance.glFinish()
                 if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
@@ -78,7 +73,7 @@ internal class WindowsOpenGLRedrawer(
     }
 
     private fun draw() {
-        inDrawScope { contextHandler.draw() }
+        inDrawScope { drawFrame() }
     }
 
     private fun makeCurrent() = makeCurrent(device, context)
