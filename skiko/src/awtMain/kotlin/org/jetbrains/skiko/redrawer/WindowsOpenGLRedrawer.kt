@@ -1,9 +1,20 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.OpenGLContextHandler
 
+/**
+ * This is the single per-window Windows (WGL) OpenGL render context: it owns the native WGL device/context
+ * lifecycle, the Skia [DirectContext] and on-screen GPU surface for the current frame, and the
+ * frame-loop/presentation plumbing.
+ *
+ * Frame pacing stays batched across all visible windows via the companion object's [FrameDispatcher]:
+ * every visible window draws and swaps, then (if all of them want vsync) the loop waits once for
+ * [dwmFlush] off the EDT, instead of each window waiting for vsync independently.
+ *
+ * Content to draw is provided by [SkiaLayer.draw].
+ */
 internal class WindowsOpenGLRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
@@ -12,9 +23,6 @@ internal class WindowsOpenGLRedrawer(
     init {
         loadOpenGLLibrary()
     }
-
-    private val contextHandler = OpenGLContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val device: Long = layer.backedLayer.useDrawingSurfacePlatformInfo {
         getDevice(it).also { devicePtr ->
@@ -37,6 +45,23 @@ internal class WindowsOpenGLRedrawer(
 
     private val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
 
+    // GPU surface for the current frame.
+    private var glContext: DirectContext? = null
+    private var renderTarget: BackendRenderTarget? = null
+    private var surface: Surface? = null
+    private var canvas: Canvas? = null
+    private var currentWidth = 0
+    private var currentHeight = 0
+
+    override val renderInfo: String
+        get() {
+            val gl = OpenGLApi.instance
+            return renderInfoHeader(layer.renderApi) +
+                    "Vendor: ${gl.glGetString(gl.GL_VENDOR)}\n" +
+                    "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
+                    "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
+        }
+
     init {
         makeCurrent()
         // For vsync we will use dwmFlush instead of swapInterval,
@@ -50,7 +75,9 @@ internal class WindowsOpenGLRedrawer(
     override fun dispose() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         makeCurrent()
-        contextHandler.dispose()
+        disposeSurface()
+        glContext?.close()
+        glContext = null
         deleteContext(context)
         super.dispose()
     }
@@ -67,7 +94,7 @@ internal class WindowsOpenGLRedrawer(
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 makeCurrent()
-                contextHandler.draw()
+                drawFrame()
                 swapBuffers()
                 OpenGLApi.instance.glFinish()
                 if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
@@ -78,7 +105,81 @@ internal class WindowsOpenGLRedrawer(
     }
 
     private fun draw() {
-        inDrawScope { contextHandler.draw() }
+        inDrawScope { drawFrame() }
+    }
+
+    private fun LayerDrawScope.drawFrame() {
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic context")
+        }
+        initSurface()
+        canvas?.runRestoringState {
+            clear(Color.TRANSPARENT)
+            layer.draw(this)
+        }
+        glContext?.flush()
+    }
+
+    private fun ensureContext(): Boolean {
+        if (glContext == null) {
+            try {
+                val newContext = makeGLContext()
+                glContext = newContext
+                onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
+            } catch (e: Exception) {
+                Logger.warn(e) { "Failed to create Skia OpenGL context!" }
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun LayerDrawScope.initSurface() {
+        val glContext = glContext ?: return
+
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
+
+        if (isSizeChanged(w, h) || surface == null) {
+            disposeSurface()
+            val gl = OpenGLApi.instance
+            val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
+            renderTarget = makeGLRenderTarget(
+                w,
+                h,
+                0,
+                8,
+                fbId,
+                FramebufferFormat.GR_GL_RGBA8
+            )
+            surface = Surface.makeFromBackendRenderTarget(
+                glContext,
+                renderTarget!!,
+                SurfaceOrigin.BOTTOM_LEFT,
+                SurfaceColorFormat.RGBA_8888,
+                ColorSpace.sRGB,
+                SurfaceProps(pixelGeometry = pixelGeometry)
+            ) ?: throw RenderException("Cannot create surface")
+        }
+
+        canvas = surface!!.canvas
+    }
+
+    private fun isSizeChanged(width: Int, height: Int): Boolean {
+        if (width != currentWidth || height != currentHeight) {
+            currentWidth = width
+            currentHeight = height
+            return true
+        }
+        return false
+    }
+
+    private fun disposeSurface() {
+        surface?.close()
+        renderTarget?.close()
+        surface = null
+        renderTarget = null
+        canvas = null
     }
 
     private fun makeCurrent() = makeCurrent(device, context)

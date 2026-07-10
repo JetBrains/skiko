@@ -1,10 +1,17 @@
 package org.jetbrains.skiko.redrawer
 
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.AngleContextHandler
 
+/**
+ * This is the single per-window ANGLE render context: it owns the native ANGLE (EGL-over-D3D11) device
+ * lifecycle, the Skia [DirectContext] and on-screen GPU surface for the current frame, and the
+ * frame-loop/presentation plumbing, mirroring [MetalRedrawer].
+ *
+ * Content to draw is provided by [SkiaLayer.draw].
+ *
+ * @see "src/awtMain/cpp/windows/AngleRedrawer.cc" -- native implementation
+ */
 internal class AngleRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
@@ -18,10 +25,11 @@ internal class AngleRedrawer(
         }
     }
 
-    private val contextHandler = AngleContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
-
-    private var drawLock = Any()
+    /**
+     * Guards every native touch point; [dispose] and the frame path ([drawAndSwap]) both take it and
+     * re-check [isDisposed] inside, matching the other backends' discipline.
+     */
+    private val drawLock = Any()
 
     private var device: Long = 0L
         get() {
@@ -54,10 +62,26 @@ internal class AngleRedrawer(
         onContextInit()
     }
 
+    // GPU surface for the current frame; only touched under `drawLock`.
+    private var context: DirectContext? = null
+    private var renderTarget: BackendRenderTarget? = null
+    private var surface: Surface? = null
+    private var canvas: Canvas? = null
+    private var currentWidth = 0
+    private var currentHeight = 0
+
+    override val renderInfo: String
+        get() = renderInfoHeader(layer.renderApi) +
+                "Vendor: ${AngleApi.glGetString(AngleApi.GL_VENDOR)}\n" +
+                "Model: ${AngleApi.glGetString(AngleApi.GL_RENDERER)}\n" +
+                "Version: ${AngleApi.glGetString(AngleApi.GL_VERSION)}\n"
+
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         makeCurrent(device)
-        contextHandler.dispose()
+        disposeSurface()
+        context?.close()
+        context = null
         disposeDevice(device)
         device = 0L
         super.dispose()
@@ -89,19 +113,82 @@ internal class AngleRedrawer(
             return
         }
         makeCurrent(device)
-        contextHandler.draw()
+        drawFrame()
         swapBuffers(device, withVsync)
     }
 
-    fun makeContext() = DirectContext(
-        makeAngleContext(device).takeIf { it != 0L }
-            ?: throw RenderException("Failed to make GL context.")
-    )
+    private fun LayerDrawScope.drawFrame() {
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic context")
+        }
+        initSurface()
+        canvas?.runRestoringState {
+            clear(Color.TRANSPARENT)
+            layer.draw(this)
+        }
+        context?.flush()
+    }
 
-    fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
-        makeAngleRenderTarget(device, width, height).takeIf { it != 0L }
-            ?: throw RenderException("Failed to make ANGLE render target.")
-    )
+    private fun ensureContext(): Boolean {
+        if (context == null) {
+            try {
+                val newContext = DirectContext(
+                    makeAngleContext(device).takeIf { it != 0L }
+                        ?: throw RenderException("Failed to make GL context.")
+                )
+                context = newContext
+                onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
+            } catch (e: Exception) {
+                Logger.warn(e) { "Failed to create Skia ANGLE context!" }
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun LayerDrawScope.initSurface() {
+        val context = context ?: return
+
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
+
+        if (isSizeChanged(w, h) || surface == null) {
+            disposeSurface()
+            context.flush()
+
+            renderTarget = BackendRenderTarget(
+                makeAngleRenderTarget(device, w, h).takeIf { it != 0L }
+                    ?: throw RenderException("Failed to make ANGLE render target.")
+            )
+            surface = Surface.makeFromBackendRenderTarget(
+                context,
+                renderTarget!!,
+                SurfaceOrigin.BOTTOM_LEFT,
+                SurfaceColorFormat.RGBA_8888,
+                ColorSpace.sRGB,
+                SurfaceProps(pixelGeometry = pixelGeometry)
+            ) ?: throw RenderException("Cannot create surface")
+        }
+
+        canvas = surface!!.canvas
+    }
+
+    private fun isSizeChanged(width: Int, height: Int): Boolean {
+        if (width != currentWidth || height != currentHeight) {
+            currentWidth = width
+            currentHeight = height
+            return true
+        }
+        return false
+    }
+
+    private fun disposeSurface() {
+        surface?.close()
+        renderTarget?.close()
+        surface = null
+        renderTarget = null
+        canvas = null
+    }
 }
 
 private external fun createAngleDevice(platformInfo: Long, transparency: Boolean): Long

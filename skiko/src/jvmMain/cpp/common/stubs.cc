@@ -54,9 +54,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt
     skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_swapBuffers");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_Direct3DContextHandler_flush(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_flush(
         JNIEnv *env, jobject redrawer, jlong contextPtr, jlong surfacePtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_context_Direct3DContextHandler_flush");
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_flush");
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_chooseAdapter(JNIEnv *env, jobject redrawer, jint adapterPriority) {

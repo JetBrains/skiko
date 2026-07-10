@@ -19,8 +19,8 @@
 
 extern "C"
 {
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_makeMetalContext(
-    JNIEnv* env, jobject contextHandler, jlong devicePtr)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalContext(
+    JNIEnv* env, jobject redrawer, jlong devicePtr)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void*) devicePtr;
@@ -31,8 +31,8 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_makeMetalRenderTarget(
-    JNIEnv* env, jobject contextHandler, jlong devicePtr, jint width, jint height)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalRenderTarget(
+    JNIEnv* env, jobject redrawer, jlong devicePtr, jint width, jint height)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
@@ -86,8 +86,8 @@ static void finishFrame(jlong devicePtr, void (^present)(MetalDevice *device, id
 /// Presents the current drawable asynchronously — skiko's default, used for every frame outside a live
 /// resize. Called off the AppKit main thread (from the background frame loop) so present work doesn't
 /// destabilize FPS on the main thread.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrame(
-    JNIEnv *env, jobject contextHandler, jlong devicePtr)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFrame(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     finishFrame(devicePtr, ^(MetalDevice *device, id<CAMetalDrawable> currentDrawable, id<MTLCommandBuffer> commandBuffer) {
         [commandBuffer addScheduledHandler:^(id<MTLCommandBuffer> buffer) {
@@ -124,8 +124,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
 /// Must be called on the AppKit main thread during a live resize (from drawFrameWhileLiveResizing),
 /// where the ambient CATransaction — from AWTMetalLayer.setBounds, committing the window's new size —
 /// flushes the present. This is the sole presenter for the duration of the resize.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrameInLiveResize(
-    JNIEnv *env, jobject contextHandler, jlong devicePtr)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFrameInLiveResize(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     finishFrame(devicePtr, ^(MetalDevice *device, id<CAMetalDrawable> currentDrawable, id<MTLCommandBuffer> commandBuffer) {
         /// presentsWithTransaction is YES for the whole resize session — the live-resize start
