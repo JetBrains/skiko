@@ -183,7 +183,8 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "-mllvm", "-wasm-enable-sjlj",
                 "-mexception-handling",
                 "-fuse-ld=lld",
-                "-Wl,--export-all",
+                "-Wl,--gc-sections",
+//                "-Wl,--export-all",
                 "-Wl,--no-entry",
                 "-Wl,--error-limit=0",
             )
