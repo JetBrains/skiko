@@ -580,6 +580,30 @@ extern "C"
         return toJavaPointer(d3dDevice);
     }
 
+    // GPU-interop accessors: return the IDXGIAdapter1/ID3D12Device/ID3D12CommandQueue skiko renders on, as
+    // native pointers, without transferring ownership (the consumer must not release them). Back the public
+    // RenderContext.direct3D*Pointer accessors.
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getDirectXAdapterPointer(
+        JNIEnv *env, jobject redrawer, jlong devicePtr)
+    {
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
+        return toJavaPointer(d3dDevice->backendContext.fAdapter.get());
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getDirectXDevicePointer(
+        JNIEnv *env, jobject redrawer, jlong devicePtr)
+    {
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
+        return toJavaPointer(d3dDevice->backendContext.fDevice.get());
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getDirectXQueuePointer(
+        JNIEnv *env, jobject redrawer, jlong devicePtr)
+    {
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
+        return toJavaPointer(d3dDevice->backendContext.fQueue.get());
+    }
+
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initSwapChain(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height, jboolean transparency, jboolean preferNoneScaling)
     {

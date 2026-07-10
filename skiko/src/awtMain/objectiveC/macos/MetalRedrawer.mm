@@ -425,6 +425,24 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setDispla
     }
 }
 
+// GPU-interop accessor: the id<MTLDevice> skiko renders on. Returns the object address without transferring
+// ownership; the consumer must not release it (see RenderContext.metalDevicePointer).
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getMetalDevicePointer(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
+{
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+    return (jlong) (__bridge void *) device.adapter;
+}
+
+// GPU-interop accessor: the id<MTLCommandQueue> skiko submits its frames on. Same ownership rules as
+// getMetalDevicePointer above.
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getMetalCommandQueuePointer(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
+{
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+    return (jlong) (__bridge void *) device.queue;
+}
+
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDevice(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {

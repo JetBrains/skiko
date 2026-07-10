@@ -57,6 +57,18 @@ internal class WebGLRenderContext(
     override val directContext: DirectContext get() = context
 
     /**
+     * The WebGL context handle (emscripten GL context id) skiko renders through. Backs the public
+     * [org.jetbrains.skiko.openGLContextHandle] GPU-interop accessor.
+     *
+     * @throws IllegalStateException if this context has been closed.
+     */
+    internal val glContextHandle: NativePointer
+        get() {
+            check(!closed) { "WebGLRenderContext is closed" }
+            return contextPointer
+        }
+
+    /**
      * Returns a [Surface] of the requested size, backed by the WebGL default framebuffer. The surface is
      * reused across frames while [width]/[height] are unchanged, and recreated when they differ (which is how
      * a resized `<canvas>` takes effect on the next frame).

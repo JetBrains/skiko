@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @OptIn(ExperimentalSkikoApi::class)
 internal class OnScreenRedrawer(
     private val layer: SkiaLayer,
-    private val renderer: AWTRedrawer,
+    internal val renderer: AWTRedrawer,
 ) : Redrawer, FrameHost {
     private val deviceAnalytics: DeviceAnalytics? get() = renderer.deviceAnalytics
     private var isFirstFrameRendered = false
