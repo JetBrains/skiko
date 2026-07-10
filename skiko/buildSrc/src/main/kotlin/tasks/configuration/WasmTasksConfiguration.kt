@@ -29,9 +29,11 @@ import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
+import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import projectDirs
@@ -158,10 +160,6 @@ fun SkikoProjectContext.declareWasmTasks() {
                 add("-fno-rtti")
                 add("-fno-exceptions")
                 add("-fPIC")
-=======
-                add("--target=wasm32-wasip1")
-                add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
->>>>>>> eeeabe625 (feat: got a working startup of a wasm environment in browser without emcc)
                 add("-D_WASI_EMULATED_MMAN")
                 add("-D_WASI_EMULATED_SIGNAL")
                 add("-D_WASI_EMULATED_PROCESS_CLOCKS")
@@ -182,7 +180,6 @@ fun SkikoProjectContext.declareWasmTasks() {
         val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
         val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
-<<<<<<< HEAD
         linker.set(wasiSdkBinaryToolPath(linkerForTarget(OS.Wasm, Arch.Wasm)))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
@@ -210,7 +207,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
 
         flags.addAll(buildList {
-            add("-O2")
+            add("-Oz")
             add("-fuse-ld=lld")
             add("-flto")
             if (isSideModule) {
@@ -359,6 +356,31 @@ fun SkikoProjectContext.declareWasmTasks() {
         doLast {
             println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
         }
+    }
+
+    val optimizeWasm by project.tasks.registering(Exec::class) {
+        dependsOn(linkWasm)
+        val wasmFileProvider = linkWasm.flatMap { it.outDir.file(it.libOutputFileName) }
+
+        executable = "wasm-opt"
+
+        argumentProviders.add(CommandLineArgumentProvider {
+            val wasmFile = wasmFileProvider.get().asFile
+            listOf("-Oz", "--strip-debug", "--converge", "--strip-producers", wasmFile.absolutePath, "-o", wasmFile.absolutePath + ".opt")
+        })
+
+        doLast {
+            val wasmFile = wasmFileProvider.get().asFile
+            val optimizedFile = File(wasmFile.absolutePath + ".opt")
+            if (optimizedFile.exists()) {
+                wasmFile.delete()
+                optimizedFile.renameTo(wasmFile)
+                println("WASM optimized: ${optimizedFile.length() / 1024} KB")
+            }
+        }
+    }
+    project.tasks.named("skikoWasmJar") {
+        dependsOn(optimizeWasm)
     }
 }
 
