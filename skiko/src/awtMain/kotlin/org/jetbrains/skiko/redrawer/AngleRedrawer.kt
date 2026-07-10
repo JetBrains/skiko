@@ -4,7 +4,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 internal class AngleRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.ANGLE) {
@@ -25,13 +25,6 @@ internal class AngleRedrawer(
             }
             return field
         }
-
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing) {
-            update(System.nanoTime())
-            draw()
-        }
-    }
 
     private val adapterName get() = AngleApi.glGetString(AngleApi.GL_RENDERER)
 
@@ -63,44 +56,26 @@ internal class AngleRedrawer(
                 "Version: ${AngleApi.glGetString(AngleApi.GL_VERSION)}\n"
                 // "Total VRAM: ${AngleApi.glGetIntegerv(AngleApi.GL_TOTAL_MEMORY) / 1024} MB\n"
 
-    override fun dispose() = synchronized(drawLock) {
-        frameDispatcher.cancel()
+    override fun releaseResources() = synchronized(drawLock) {
         makeCurrent(device)
         disposeSurface()
         context?.close()
         context = null
         disposeDevice(device)
         device = 0L
-        super.dispose()
     }
 
-    override fun needRender(throttledToVsync: Boolean) {
-        checkDisposed()
-        frameDispatcher.scheduleFrame()
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        val withVsync = if (immediate) SkikoProperties.windowsWaitForVsyncOnRedrawImmediately else properties.isVsyncEnabled
+        drawAndSwap(scope, withVsync)
     }
 
-    override fun renderImmediately() {
-        checkDisposed()
-        update()
-        inDrawScope {
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
-            }
-        }
-    }
-
-    private fun draw() {
-        inDrawScope {
-            drawAndSwap(withVsync = properties.isVsyncEnabled)
-        }
-    }
-
-    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
+    private fun drawAndSwap(scope: LayerDrawScope, withVsync: Boolean) = synchronized(drawLock) {
         if (isDisposed) {
             return
         }
         makeCurrent(device)
-        drawFrame()
+        with(scope) { drawFrame() }
         swapBuffers(device, withVsync)
     }
 

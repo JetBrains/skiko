@@ -10,7 +10,7 @@ import java.awt.Dimension
 import java.lang.ref.Reference
 
 internal class Direct3DRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.DIRECT3D) {
@@ -23,12 +23,15 @@ internal class Direct3DRedrawer(
      * the only thing painting.
      */
     @Volatile
-    internal var isHandlingLiveResizeNow: Boolean = false
+    final override var isHandlingLiveResizeNow: Boolean = false
+        private set
 
     // Native LiveResizeState, 0 if the hook isn't installed.
     private var liveResizeHandle: Long = 0L
     private val liveResizeInstalled: Boolean
         get() = liveResizeHandle != 0L
+
+    private var frameHost: FrameHost? = null
 
     private var device: Long = 0L
         get() {
@@ -62,16 +65,8 @@ internal class Direct3DRedrawer(
                 "Video card: $adapterName\n" +
                 "Total VRAM: ${adapterMemorySize / 1024 / 1024} MB\n"
 
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing && !isHandlingLiveResizeNow) {
-            update()
-            draw()
-        }
-    }
-
-    init {
-        onContextInit()
-    }
+    override val presentsOnLayout: Boolean
+        get() = !isHandlingLiveResizeNow
 
     private var context: DirectContext? = null
     private val bufferCount = 2
@@ -82,61 +77,54 @@ internal class Direct3DRedrawer(
     private var currentHeight = 0
     private fun isSurfacesNull() = surfaces.all { it == null }
 
-    override fun dispose() = synchronized(drawLock) {
+    init {
+        onContextInit()
+    }
+
+    override fun attachFrameHost(host: FrameHost) {
+        frameHost = host
+    }
+
+    override fun releaseResources() = synchronized(drawLock) {
         if (liveResizeInstalled) {
             uninstallLiveResizeHook(liveResizeHandle)
             liveResizeHandle = 0L
         }
-        frameDispatcher.cancel()
         disposeSurfaces()
         context?.close()
         context = null
         disposeDevice(device)
         device = 0L
-        super.dispose()
     }
 
-    override fun onLayerComponentResized() {
-        // During live resize, the layer tells us its size directly; the AWT size is not in sync
-        if (!isHandlingLiveResizeNow) {
-            super.onLayerComponentResized()
-        }
+    override suspend fun runFrame(frame: suspend () -> Unit) {
+        if (isHandlingLiveResizeNow) return
+        frame()
     }
 
-    override fun needRender(throttledToVsync: Boolean) {
-        checkDisposed()
+    override fun onFrameRequested(throttledToVsync: Boolean) {
         if (isHandlingLiveResizeNow) {
             // An async EDT present would race the synchronous render on the toolkit thread.
             postLiveResizeRender(liveResizeHandle)
+        }
+    }
+
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        if (immediate) {
+            drawAndSwap(scope, withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
         } else {
-            frameDispatcher.scheduleFrame()
-        }
-    }
-
-    override fun renderImmediately() {
-        checkDisposed()
-        update()
-        inDrawScope {
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
-            }
-        }
-    }
-
-    private suspend fun draw() {
-        inDrawScope {
             withContext(dispatcherToBlockOn) {
-                drawAndSwap(withVsync = properties.isVsyncEnabled)
+                drawAndSwap(scope, withVsync = properties.isVsyncEnabled)
             }
         }
     }
 
-    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean, waitForComposition: Boolean = false) {
+    private fun drawAndSwap(scope: LayerDrawScope, withVsync: Boolean, waitForComposition: Boolean = false) {
         synchronized(drawLock) {
             if (isDisposed) {
                 return
             }
-            drawFrame()
+            with(scope) { drawFrame() }
             if (waitForComposition) {
                 waitForComposition()
             }
@@ -290,7 +278,7 @@ internal class Direct3DRedrawer(
                 it.validate()
             }
             isHandlingLiveResizeNow = false
-            renderImmediately()
+            frameHost?.renderImmediately()
         }
     }
 
@@ -304,11 +292,10 @@ internal class Direct3DRedrawer(
     private fun drawFrameWhileLiveResizing(width: Int, height: Int, isResizeFrame: Boolean) {
         WinApiEdtInvoker.invokeAndWaitWhilePumping {
             if (isDisposed) return@invokeAndWaitWhilePumping
-            val size = Dimension(width, height)
-            update(forcedSize = size)
-            inDrawScope(forcedSize = size) {
-                if (!isDisposed) {
+            frameHost?.inForcedSizeFrame(Dimension(width, height)) { scope ->
+                if (!isDisposed) { // may be disposed in user code, during `update`
                     drawAndSwap(
+                        scope,
                         withVsync = !isResizeFrame,
                         waitForComposition = isResizeFrame
                     )

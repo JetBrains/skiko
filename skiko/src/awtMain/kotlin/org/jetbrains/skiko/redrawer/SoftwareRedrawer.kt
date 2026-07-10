@@ -10,7 +10,7 @@ import java.awt.color.ColorSpace
 import java.awt.image.*
 
 internal class SoftwareRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
@@ -36,46 +36,20 @@ internal class SoftwareRedrawer(
         layerFrameLimiter(CoroutineScope(it), layer.backedLayer)
     }
 
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        frameLimiter?.awaitNextFrame()
-
-        if (layer.isShowing) {
-            update()
-            inDrawScope { performDraw() }
-        }
-    }
-
     init {
         onContextInit()
     }
 
-    override fun dispose() {
+    override suspend fun runFrame(frame: suspend () -> Unit) {
+        frameLimiter?.awaitNextFrame()
+        frame()
+    }
+
+    override fun releaseResources() {
         frameJob?.cancel()
-        frameDispatcher.cancel()
         canvas?.close()
         canvas = null
         storage.close()
-        super.dispose()
-    }
-
-    override fun needRender(throttledToVsync: Boolean) {
-        frameDispatcher.scheduleFrame()
-    }
-
-    override fun renderBeforeShown(): Boolean {
-        // renderImmediately() doesn't help with software renderer and actually makes it look worse
-        // TODO: Implement a special solution for the software renderer
-        return false
-    }
-
-    override fun renderImmediately() {
-        checkDisposed()
-        update()
-        inDrawScope {
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw()
-            }
-        }
     }
 
     override fun isTransparentBackgroundSupported(): Boolean {
@@ -83,9 +57,17 @@ internal class SoftwareRedrawer(
         return hostOs == OS.MacOS
     }
 
-    private fun LayerDrawScope.performDraw() {
+    // renderImmediately() doesn't help with software renderer and actually makes it look worse
+    // TODO: Implement a special solution for the software renderer
+    override val presentsBeforeShown: Boolean get() = false
+
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        performDraw(scope)
+    }
+
+    private fun performDraw(scope: LayerDrawScope) {
         if (!isDisposed) {
-            drawFrame()
+            with(scope) { drawFrame() }
         }
     }
 

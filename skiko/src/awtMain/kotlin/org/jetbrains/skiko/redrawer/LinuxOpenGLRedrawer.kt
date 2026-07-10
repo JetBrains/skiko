@@ -5,7 +5,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 internal class LinuxOpenGLRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
 ) : AbstractOpenGLRedrawer(layer, analytics) {
@@ -54,8 +54,20 @@ internal class LinuxOpenGLRedrawer(
         }
     }
 
-    override fun dispose() {
-        checkDisposed()
+    override val schedulesOwnFrames: Boolean get() = true
+
+    private lateinit var frameHost: FrameHost
+
+    override fun attachFrameHost(host: FrameHost) {
+        frameHost = host
+    }
+
+    override fun onFrameRequested(throttledToVsync: Boolean) {
+        toRedraw.add(this)
+        frameDispatcher.scheduleFrame()
+    }
+
+    override fun releaseResources() {
         frameJob.cancel()
         layer.backedLayer.lockLinuxDrawingSurface {
             // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
@@ -64,21 +76,12 @@ internal class LinuxOpenGLRedrawer(
             disposeGlResources()
             it.destroyContext(context)
         }
-        super.dispose()
     }
 
-    override fun needRender(throttledToVsync: Boolean) {
-        checkDisposed()
-        toRedraw.add(this)
-        frameDispatcher.scheduleFrame()
-    }
-
-    override fun renderImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
-        checkDisposed()
-        update()
-        inDrawScope {
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        layer.backedLayer.lockLinuxDrawingSurface {
             it.makeCurrent(context)
-            drawFrame()
+            with(scope) { drawFrame() }
             val turnOfVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately
             if (turnOfVsync) {
                 it.setSwapInterval(0)
@@ -91,8 +94,8 @@ internal class LinuxOpenGLRedrawer(
         }
     }
 
-    private fun draw() {
-        inDrawScope { drawFrame() }
+    private fun drawInBatch() {
+        frameHost.inFrame { scope -> with(scope) { drawFrame() } }
     }
 
     companion object {
@@ -113,7 +116,7 @@ internal class LinuxOpenGLRedrawer(
             val nanoTime = System.nanoTime()
             for (redrawer in toRedrawVisible) {
                 try {
-                    redrawer.update(nanoTime)
+                    redrawer.frameHost.updateIfRequested(nanoTime)
                 } catch (e: CancellationException) {
                     // continue
                 }
@@ -123,7 +126,7 @@ internal class LinuxOpenGLRedrawer(
             try {
                 for (redrawer in toRedrawVisible) {
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
-                    redrawer.draw()
+                    redrawer.drawInBatch()
                 }
 
                 // TODO(demin): How can we properly synchronize multiple windows with multiple displays?

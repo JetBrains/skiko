@@ -4,7 +4,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 internal abstract class AbstractOpenGLRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
 ) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
 

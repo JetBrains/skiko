@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.fastForEach
-import org.jetbrains.skiko.redrawer.Direct3DRedrawer
+import org.jetbrains.skiko.redrawer.OnScreenRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.*
@@ -431,9 +431,9 @@ actual open class SkiaLayer internal constructor(
         // scaled in the other direction from the window size), but this seems to
         // happen less often.
         //
-        // Calling redraw during layout might break software renderers,
-        // so apply this fix only for the Direct3D case.
-        if (isShowing && (redrawer as? Direct3DRedrawer)?.isHandlingLiveResizeNow == false) {
+        // Calling redraw during layout might break software renderers, so only backends that ask for it
+        // present here.
+        if (isShowing && (redrawer as? OnScreenRedrawer)?.presentsOnLayout == true) {
             redrawer?.syncBoundsFromPlatformComponent()
             redrawer?.renderImmediately()
         }

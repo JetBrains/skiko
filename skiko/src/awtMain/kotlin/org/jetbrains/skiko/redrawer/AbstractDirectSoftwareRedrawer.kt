@@ -8,7 +8,7 @@ import org.jetbrains.skiko.layerFrameLimiter
 import java.lang.ref.Reference
 
 internal abstract class AbstractDirectSoftwareRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
@@ -24,53 +24,37 @@ internal abstract class AbstractDirectSoftwareRedrawer(
 
     private val frameJob = Job()
     private val frameLimiter = layerFrameLimiter(CoroutineScope(frameJob), layer.backedLayer)
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
+
+    override suspend fun runFrame(frame: suspend () -> Unit) {
         if (properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) {
             frameLimiter.awaitNextFrame()
         }
-
-        if (layer.isShowing) {
-            update()
-            draw()
-        }
+        frame()
     }
 
     protected var device = 0L
 
-    override fun needRender(throttledToVsync: Boolean) {
-        frameDispatcher.scheduleFrame()
-    }
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) = draw(scope)
 
-    protected open fun draw() = inDrawScope { performDraw() }
-
-    override fun renderImmediately() {
-        update()
-        if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-            draw()
-        }
-    }
+    protected open fun draw(scope: LayerDrawScope) = performDraw(scope)
 
     open fun resize(width: Int, height: Int) = resize(device, width, height)
     open fun finishFrame(surface: Long) = finishFrame(device, surface)
 
-    override fun dispose() {
+    override fun releaseResources() {
         frameJob.cancel()
-        frameDispatcher.cancel()
         disposeSurface()
         disposeDevice(device)
-        super.dispose()
     }
 
-    private fun LayerDrawScope.performDraw() {
+    private fun performDraw(scope: LayerDrawScope) {
         if (!isDisposed) {
-            drawFrame()
+            with(scope) { drawFrame() }
         }
     }
 
     private fun LayerDrawScope.drawFrame() {
-        if (!ensureContext()) {
-            throw RenderException("Cannot init graphic context")
-        }
+        ensureContext()
         initCanvas()
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
@@ -79,12 +63,11 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         flushFrame()
     }
 
-    private fun ensureContext(): Boolean {
+    private fun ensureContext() {
         if (!isContextInitialized) {
             isContextInitialized = true
             logRendererInfo { renderInfo }
         }
-        return isContextInitialized
     }
 
     private fun LayerDrawScope.initCanvas() {
