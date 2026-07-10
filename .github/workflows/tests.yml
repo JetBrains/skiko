@@ -238,7 +238,9 @@ jobs:
         name: 'Upload linuxArm64 test binary as artifact'
         with:
           name: test-binary-linuxArm64
-          path: ./skiko/**/build/bin/linuxArm64
+          path: |
+            ./skiko/build/bin/linuxArm64
+            ./skiko/*/build/bin/linuxArm64
           if-no-files-found: error
           retention-days: 5
 
