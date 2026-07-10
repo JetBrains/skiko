@@ -7,6 +7,11 @@ import org.jetbrains.skia.PixelGeometry
 /**
  * Generic layer for Skiko rendering.
  */
+@Deprecated(
+    message = "SkiaLayer is superseded by the view-decoupled render-context APIs: acquire a RenderContext, " +
+        "drive frames with a DisplayFrameTicker, and present each frame yourself. The entry points are " +
+        "platform-specific. The replacement is not a drop-in expression, so no automatic ReplaceWith is offered."
+)
 expect open class SkiaLayer {
     /**
      * Current graphics API used for rendering.

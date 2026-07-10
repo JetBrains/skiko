@@ -4,10 +4,10 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 internal class AngleRedrawer(
-    layer: SkiaLayer,
+    host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.ANGLE) {
+) : AWTRedrawer(host, analytics, GraphicsApi.ANGLE) {
     init {
         try {
             loadAngleLibrary()
@@ -31,8 +31,8 @@ internal class AngleRedrawer(
     override val directContext: DirectContext? get() = context
 
     init {
-        device = layer.backedLayer.useDrawingSurfacePlatformInfo { platformInfo ->
-            createAngleDevice(platformInfo, layer.transparency).takeIf { it != 0L }
+        device = host.backedLayer.useDrawingSurfacePlatformInfo { platformInfo ->
+            createAngleDevice(platformInfo, host.transparency).takeIf { it != 0L }
                 ?: throw RenderException("Failed to create ANGLE device.")
         }
         adapterName.let { adapterName ->
@@ -44,6 +44,7 @@ internal class AngleRedrawer(
         onContextInit()
     }
 
+    // Only ever touched under `drawLock`.
     private var context: DirectContext? = null
     private var renderTarget: BackendRenderTarget? = null
     private var surface: Surface? = null
@@ -52,7 +53,7 @@ internal class AngleRedrawer(
     private var currentHeight = 0
 
     override val renderInfo: String
-        get() = renderInfoHeader(layer.renderApi) +
+        get() = renderInfoHeader(host.renderApi) +
                 "Vendor: ${AngleApi.glGetString(AngleApi.GL_VENDOR)}\n" +
                 "Model: ${AngleApi.glGetString(AngleApi.GL_RENDERER)}\n" +
                 "Version: ${AngleApi.glGetString(AngleApi.GL_VERSION)}\n"
@@ -73,6 +74,8 @@ internal class AngleRedrawer(
     }
 
     private fun drawAndSwap(scope: LayerDrawScope, withVsync: Boolean) = synchronized(drawLock) {
+        // Re-check inside the lock (not just at the call site): this is what makes `dispose` and an
+        // in-flight frame mutually exclusive rather than merely racing on `isDisposed`.
         if (isDisposed) {
             return
         }
@@ -87,7 +90,7 @@ internal class AngleRedrawer(
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")
         }
-        createSurface(width, height, layer.pixelGeometry)
+        createSurface(width, height, host.pixelGeometry)
         surface ?: throw RenderException("Cannot create surface for ${width}x$height")
     }
 
@@ -106,7 +109,7 @@ internal class AngleRedrawer(
         initSurface()
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
-            layer.draw(this)
+            host.draw(this)
         }
         context?.flush()
     }
@@ -119,7 +122,7 @@ internal class AngleRedrawer(
                         ?: throw RenderException("Failed to make GL context.")
                 )
                 context = newContext
-                onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
+                onContextInitialized(newContext, properties.gpuResourceCacheLimit) { renderInfo }
             } catch (e: Exception) {
                 Logger.warn(e) { "Failed to create Skia ANGLE context!" }
                 return false

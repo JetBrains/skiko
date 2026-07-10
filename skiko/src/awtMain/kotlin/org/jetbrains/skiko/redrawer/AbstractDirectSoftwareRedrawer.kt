@@ -8,10 +8,10 @@ import org.jetbrains.skiko.layerFrameLimiter
 import java.lang.ref.Reference
 
 internal abstract class AbstractDirectSoftwareRedrawer(
-    layer: SkiaLayer,
+    host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
+) : AWTRedrawer(host, analytics, GraphicsApi.SOFTWARE_FAST) {
 
     /** [acquireSurface] and [present] are public API, so unlike the frame loop they are not EDT-confined. */
     private val drawLock = Any()
@@ -19,6 +19,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     // Direct software rasterizes on the CPU into a native window-backed raster surface: no Ganesh DirectContext.
     override val directContext: DirectContext? get() = null
 
+    // Only ever touched under `drawLock`.
     private var isContextInitialized = false
     private var surface: Surface? = null
     private var canvas: Canvas? = null
@@ -26,10 +27,10 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     private var currentHeight = 0
 
     override val renderInfo: String
-        get() = renderInfoHeader(layer.renderApi)
+        get() = renderInfoHeader(host.renderApi)
 
     private val frameJob = Job()
-    private val frameLimiter = layerFrameLimiter(CoroutineScope(frameJob), layer.backedLayer)
+    private val frameLimiter = layerFrameLimiter(CoroutineScope(frameJob), host.backedLayer)
 
     override suspend fun runFrame(frame: suspend () -> Unit) {
         if (properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) {
@@ -66,7 +67,9 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         disposeDevice(device)
     }
 
-    private fun performDraw(scope: LayerDrawScope) {
+    private fun performDraw(scope: LayerDrawScope) = synchronized(drawLock) {
+        // Re-check inside the lock (not just at the call site), matching MetalRedrawer/SoftwareRedrawer:
+        // this is what makes `dispose` and an in-flight frame mutually exclusive.
         if (!isDisposed) {
             with(scope) { drawFrame() }
         }
@@ -77,7 +80,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         initCanvas()
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
-            layer.draw(this)
+            host.draw(this)
         }
         flushFrame()
     }

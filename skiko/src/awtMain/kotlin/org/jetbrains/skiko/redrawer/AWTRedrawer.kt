@@ -9,13 +9,13 @@ import java.awt.Dimension
  * Common class for all AWT redrawers.
  *
  * It extends the public [RenderContext], so one per-API class backs both the on-screen path and a
- * standalone consumer.
+ * standalone consumer, and reaches its host surface through [AwtSurfaceHost] rather than a `SkiaLayer`.
  *
  * Don't forget to call [onDeviceChosen] and [onContextInit] to send necessary analytics.
  */
 @OptIn(ExperimentalSkikoApi::class)
 internal abstract class AWTRedrawer(
-    protected val layer: SkiaLayer,
+    protected val host: AwtSurfaceHost,
     private val analytics: SkiaLayerAnalytics,
     final override val graphicsApi: GraphicsApi,
 ) : RenderContext {
@@ -132,7 +132,7 @@ internal abstract class AWTRedrawer(
         releaseResources()
     }
 
-    open fun isTransparentBackgroundSupported(): Boolean = defaultIsTransparentBackgroundSupported(layer)
+    open fun isTransparentBackgroundSupported(): Boolean = defaultIsTransparentBackgroundSupported(host)
 }
 
 /**
@@ -141,11 +141,9 @@ internal abstract class AWTRedrawer(
 internal interface FrameHost {
     fun requestFrame(throttledToVsync: Boolean)
 
-    fun updateIfRequested(nanoTime: Long = renderTime())
+    fun updateIfRequested()
 
     fun renderImmediately()
-
-    fun inFrame(body: (LayerDrawScope) -> Unit)
 
     fun inForcedSizeFrame(size: Dimension, body: (LayerDrawScope) -> Unit)
 }

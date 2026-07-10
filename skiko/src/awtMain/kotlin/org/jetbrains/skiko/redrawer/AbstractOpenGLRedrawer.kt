@@ -4,9 +4,10 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 internal abstract class AbstractOpenGLRedrawer(
-    layer: SkiaLayer,
+    host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
-) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
+    private val properties: SkiaLayerProperties,
+) : AWTRedrawer(host, analytics, GraphicsApi.OPENGL) {
 
     override val directContext: DirectContext? get() = glContext
 
@@ -22,7 +23,7 @@ internal abstract class AbstractOpenGLRedrawer(
     override val renderInfo: String
         get() {
             val gl = OpenGLApi.instance
-            return renderInfoHeader(layer.renderApi) +
+            return renderInfoHeader(host.renderApi) +
                     "Vendor: ${gl.glGetString(gl.GL_VENDOR)}\n" +
                     "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
                     "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
@@ -35,7 +36,7 @@ internal abstract class AbstractOpenGLRedrawer(
         initSurface()
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
-            layer.draw(this)
+            host.draw(this)
         }
         glContext?.flush()
     }
@@ -59,7 +60,7 @@ internal abstract class AbstractOpenGLRedrawer(
             try {
                 val newContext = makeGLContext()
                 glContext = newContext
-                onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
+                onContextInitialized(newContext, properties.gpuResourceCacheLimit) { renderInfo }
             } catch (e: Exception) {
                 Logger.warn(e) { "Failed to create Skia OpenGL context!" }
                 return false

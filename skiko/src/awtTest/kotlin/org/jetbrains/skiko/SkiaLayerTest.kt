@@ -15,6 +15,7 @@ import org.jetbrains.skiko.redrawer.AWTRedrawer
 import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.OnScreenRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -643,7 +644,7 @@ class SkiaLayerTest {
         layer: SkiaLayer,
         analytics: SkiaLayerAnalytics,
         graphicsApi: GraphicsApi,
-    ) : AWTRedrawer(layer, analytics, graphicsApi) {
+    ) : AWTRedrawer(layer.surfaceHost, analytics, graphicsApi) {
         init {
             onDeviceChosen("Test")
             onContextInit()

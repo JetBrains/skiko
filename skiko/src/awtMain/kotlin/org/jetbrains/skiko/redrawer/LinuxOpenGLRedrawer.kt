@@ -5,27 +5,29 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 internal class LinuxOpenGLRedrawer(
-    layer: SkiaLayer,
+    host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AbstractOpenGLRedrawer(layer, analytics) {
+) : AbstractOpenGLRedrawer(host, analytics, properties) {
     init {
         loadOpenGLLibrary()
     }
 
     /**
-     * Serialises every native touch point. Frames run on the EDT, but [acquireSurface] and [present] are
-     * public entry points a caller drives from its own render thread, and [releaseResources] can arrive on the EDT
-     * while one of those is in flight. Each takes this lock and re-checks [isDisposed] inside it, so
-     * [releaseResources] cannot free the GLX context out from under a running JNI call.
+     * Guards every native/JNI touch point: the GLX context lifetime, the Skia [DirectContext]/surface, and
+     * presentation. Frames run on the EDT, but [acquireSurface] and [present] are public entry points a
+     * caller drives from its own render thread, and [releaseResources] can arrive on the EDT while one of those is in
+     * flight. Each takes this lock and re-checks [isDisposed] *inside* it before any native call, mirroring
+     * [MetalRedrawer]'s and [Direct3DRedrawer]'s discipline, so [releaseResources] cannot free the GLX context out
+     * from under a running JNI call.
      */
     private val drawLock = Any()
 
     private var context = 0L
 
     init {
-    	layer.backedLayer.lockLinuxDrawingSurface {
-            context = it.createContext(layer.transparency)
+    	host.backedLayer.lockLinuxDrawingSurface {
+            context = it.createContext(host.transparency)
             if (context == 0L) {
                 throw RenderException("Cannot create Linux GL context")
             }
@@ -46,7 +48,7 @@ internal class LinuxOpenGLRedrawer(
     private var frameLimit = 0.0
     private val frameLimiter = layerFrameLimiter(
         CoroutineScope(frameJob),
-        layer.backedLayer,
+        host.backedLayer,
         onNewFrameLimit = { frameLimit = it }
     )
 
@@ -63,7 +65,7 @@ internal class LinuxOpenGLRedrawer(
 
     override suspend fun runFrame(frame: suspend () -> Unit) {
         // Gate the software frame limiter on visibility: pace only while the window is showing.
-        if (layer.isShowing) {
+        if (host.isShowing) {
             limitFramesIfNeeded()
         }
         frame()
@@ -73,7 +75,7 @@ internal class LinuxOpenGLRedrawer(
         liveContexts.remove(this)
         frameJob.cancel()
         synchronized(drawLock) {
-            layer.backedLayer.lockLinuxDrawingSurface {
+            host.backedLayer.lockLinuxDrawingSurface {
                 // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
                 // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
                 it.makeCurrent(context)
@@ -84,10 +86,12 @@ internal class LinuxOpenGLRedrawer(
     }
 
     override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) = synchronized(drawLock) {
+        // Re-check inside the lock (not just at the call site): this is what makes `dispose` and an
+        // in-flight frame mutually exclusive rather than merely racing on `isDisposed`.
         if (isDisposed) {
             return
         }
-        layer.backedLayer.lockLinuxDrawingSurface {
+        host.backedLayer.lockLinuxDrawingSurface {
             it.makeCurrent(context)
             with(scope) { drawFrame() }
             it.setSwapInterval(swapIntervalForFrame(immediate))
@@ -98,11 +102,11 @@ internal class LinuxOpenGLRedrawer(
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
-        layer.backedLayer.lockLinuxDrawingSurface { it.makeCurrent(context) }
+        host.backedLayer.lockLinuxDrawingSurface { it.makeCurrent(context) }
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")
         }
-        createSurface(width, height, layer.pixelGeometry)
+        createSurface(width, height, host.pixelGeometry)
         glSurface ?: throw RenderException("Cannot create surface for ${width}x$height")
     }
 
@@ -110,7 +114,7 @@ internal class LinuxOpenGLRedrawer(
         if (isDisposed) return
         synchronized(drawLock) {
             if (isDisposed) return
-            layer.backedLayer.lockLinuxDrawingSurface {
+            host.backedLayer.lockLinuxDrawingSurface {
                 it.makeCurrent(context)
                 flushGl()
                 it.swapBuffers()
@@ -145,7 +149,7 @@ internal class LinuxOpenGLRedrawer(
         val liveContexts = mutableListOf<LinuxOpenGLRedrawer>()
 
         fun vsyncPacedContext(): LinuxOpenGLRedrawer? = liveContexts
-            .filter { !it.isDisposed && it.layer.isShowing && it.properties.isVsyncEnabled }
+            .filter { !it.isDisposed && it.host.isShowing && it.properties.isVsyncEnabled }
             .maxByOrNull { it.frameLimit }
     }
 }

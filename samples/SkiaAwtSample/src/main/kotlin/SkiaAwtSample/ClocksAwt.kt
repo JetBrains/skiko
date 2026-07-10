@@ -13,10 +13,6 @@ open class ClocksAwt(
     private val scaleProvider: () -> Float,
     private val renderProvider: () -> GraphicsApi = { GraphicsApi.UNKNOWN }
 ) : SkikoRenderDelegate, MouseMotionListener {
-    constructor(layer: SkiaLayer) : this(
-        { layer.contentScale },
-        { layer.renderApi }
-    )
 
     private val typeface = FontMgr.default.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 13f).apply {

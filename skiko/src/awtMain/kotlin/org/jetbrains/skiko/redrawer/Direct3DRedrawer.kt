@@ -10,10 +10,10 @@ import java.awt.Dimension
 import java.lang.ref.Reference
 
 internal class Direct3DRedrawer(
-    layer: SkiaLayer,
+    host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.DIRECT3D) {
+) : AWTRedrawer(host, analytics, GraphicsApi.DIRECT3D) {
 
     private var drawLock = Any()
     private var isSwapChainInitialized = false
@@ -93,22 +93,23 @@ internal class Direct3DRedrawer(
         adapterName = getAdapterName(adapter)
         adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
-        device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
+        device = createDirectXDevice(adapter, host.contentHandle, host.transparency)
             .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
 
-        if (layer.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize) {
-            liveResizeHandle = installLiveResizeHook(layer.windowHandle, layer.contentHandle)
+        if (host.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize) {
+            liveResizeHandle = installLiveResizeHook(host.windowHandle, host.contentHandle)
         }
     }
 
     override val renderInfo: String
-        get() = renderInfoHeader(layer.renderApi) +
+        get() = renderInfoHeader(host.renderApi) +
                 "Video card: $adapterName\n" +
                 "Total VRAM: ${adapterMemorySize / 1024 / 1024} MB\n"
 
     override val presentsOnLayout: Boolean
         get() = !isHandlingLiveResizeNow
 
+    // Only ever touched under `drawLock`.
     private var context: DirectContext? = null
     private val bufferCount = 2
     private val surfaces: Array<Surface?> = arrayOfNulls(bufferCount)
@@ -162,6 +163,8 @@ internal class Direct3DRedrawer(
 
     private fun drawAndSwap(scope: LayerDrawScope, withVsync: Boolean, waitForComposition: Boolean = false) {
         synchronized(drawLock) {
+            // Re-check inside the lock (not just at the call site): this is what makes `dispose` and an
+            // in-flight frame mutually exclusive rather than merely racing on `isDisposed`.
             if (isDisposed) {
                 return
             }
@@ -178,7 +181,7 @@ internal class Direct3DRedrawer(
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic Direct3D context")
         }
-        createSurface(width, height, layer.pixelGeometry)
+        createSurface(width, height, host.pixelGeometry)
         // Capture the frame's back buffer, exactly as the on-screen path does in `initSurface` and for the
         // same reason: `getBufferIndex` advances the swap chain and waits on the buffer's fence, so it runs
         // once per frame and [present] must flush the surface it returned, not call it again.
@@ -200,7 +203,7 @@ internal class Direct3DRedrawer(
         initSurface()
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
-            layer.draw(this)
+            host.draw(this)
         }
         flushFrame()
     }
@@ -210,7 +213,7 @@ internal class Direct3DRedrawer(
             try {
                 val newContext = DirectContext(makeDirectXContext(device))
                 context = newContext
-                onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
+                onContextInitialized(newContext, properties.gpuResourceCacheLimit) { renderInfo }
             } catch (e: Exception) {
                 Logger.warn(e) { "Failed to create Skia Direct3D context!" }
                 return false
@@ -299,7 +302,7 @@ internal class Direct3DRedrawer(
                 device = device,
                 width = width,
                 height = height,
-                transparency = layer.transparency,
+                transparency = host.transparency,
                 preferNoneScaling = liveResizeInstalled
             )
             isSwapChainInitialized = true
@@ -336,7 +339,7 @@ internal class Direct3DRedrawer(
     private fun onLiveResizeEnded() {
         WinApiEdtInvoker.invokeAndWaitWhilePumping {
             if (isDisposed) return@invokeAndWaitWhilePumping
-            javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
+            javax.swing.SwingUtilities.getWindowAncestor(host.backedLayer)?.let {
                 it.invalidate()
                 it.validate()
             }

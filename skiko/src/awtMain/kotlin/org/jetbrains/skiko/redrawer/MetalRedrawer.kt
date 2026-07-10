@@ -23,20 +23,20 @@ import kotlin.time.Duration.Companion.milliseconds
 internal value class MetalDevice(val ptr: Long)
 
 /**
- * Provides a way to request draws on Skia canvas created in [layer] bounds using Metal GPU acceleration.
+ * Provides a way to request draws on Skia canvas created in [host] bounds using Metal GPU acceleration.
  *
  * This [MetalRedrawer] draws content on-screen for maximum efficiency,
  * but it may prevent for using it in embedded components (such as interop with Swing).
  *
- * Content to draw is provided by [SkiaLayer.draw].
+ * Content to draw is provided by [AwtSurfaceHost.draw].
  *
  * @see FrameDispatcher
  */
 internal class MetalRedrawer(
-    layer: SkiaLayer,
+    host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
-    properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.METAL) {
+    private val properties: SkiaLayerProperties
+) : AWTRedrawer(host, analytics, GraphicsApi.METAL) {
 
     companion object {
         init {
@@ -47,7 +47,7 @@ internal class MetalRedrawer(
     private var drawLock = Any()
 
     /**
-     * [MetalDevice] initialized for given [layer] or null if [MetalRedrawer] is disposed,
+     * [MetalDevice] initialized for the given [host] or null if [MetalRedrawer] is disposed,
      * so future calls of [device] will throw exception
      */
     private var _device: MetalDevice?
@@ -60,7 +60,7 @@ internal class MetalRedrawer(
         }
 
     private val adapter = chooseMetalAdapter(properties.adapterPriority)
-    private val vSyncer = if (properties.isVsyncEnabled) MetalVSyncer(layer.windowHandle) else null
+    private val vSyncer = if (properties.isVsyncEnabled) MetalVSyncer(host.windowHandle) else null
 
     private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
     @Volatile private var isWindowOccluded = false
@@ -77,6 +77,7 @@ internal class MetalRedrawer(
 
     private var frameHost: FrameHost? = null
 
+    // Only ever touched under `drawLock`.
     private var context: DirectContext? = null
     private var renderTarget: BackendRenderTarget? = null
     private var surface: Surface? = null
@@ -113,17 +114,17 @@ internal class MetalRedrawer(
     init {
         onDeviceChosen(adapter.name)
         val numberOfBuffers = properties.frameBuffering.numberOfBuffers() ?: 0 // zero means default for system
-        val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
+        val initDevice = host.backedLayer.useDrawingSurfacePlatformInfo {
             MetalDevice(
                 createMetalDevice(
-                    window = layer.windowHandle,
-                    transparency = layer.transparency,
+                    window = host.windowHandle,
+                    transparency = host.transparency,
                     frameBuffering = numberOfBuffers,
                     adapter = adapter.ptr,
                     platformInfo = it,
-                    // Live resize is driven from the window, so only enable it when this layer covers the whole
+                    // Live resize is driven from the window, so only enable it when the surface covers the whole
                     // window. When embedded as a Swing component (fillsWindow = false), fall back to the legacy path.
-                    liveResizeEnabled = layer.fillsWindow && SkikoProperties.metalSynchronousLiveResize
+                    liveResizeEnabled = host.fillsWindow && SkikoProperties.metalSynchronousLiveResize
                 )
             )
         }
@@ -132,12 +133,12 @@ internal class MetalRedrawer(
     }
 
     override val renderInfo: String
-        get() = renderInfoHeader(layer.renderApi) +
+        get() = renderInfoHeader(host.renderApi) +
                 "Video card: ${adapter.name}\n" +
                 "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
 
     private val earlyRecordDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing && !isHandlingLiveResizeNow) frameHost?.updateIfRequested()
+        if (host.isShowing && !isHandlingLiveResizeNow) frameHost?.updateIfRequested()
     }
 
     init {
@@ -298,7 +299,7 @@ internal class MetalRedrawer(
         createSurface(scaledLayerWidth, scaledLayerHeight, pixelGeometry)
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
-            layer.draw(this)
+            host.draw(this)
         }
         context?.flush()
         surface?.flushAndSubmit()
@@ -313,7 +314,7 @@ internal class MetalRedrawer(
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic Metal context")
         }
-        createSurface(width, height, layer.pixelGeometry)
+        createSurface(width, height, host.pixelGeometry)
         surface ?: throw RenderException("Cannot create surface for ${width}x$height")
     }
 
@@ -329,7 +330,7 @@ internal class MetalRedrawer(
             try {
                 val newContext = DirectContext(makeMetalContext(device.ptr))
                 context = newContext
-                onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
+                onContextInitialized(newContext, properties.gpuResourceCacheLimit) { renderInfo }
             } catch (e: Exception) {
                 Logger.warn(e) { "Failed to create Skia Metal context!" }
                 return false
@@ -371,15 +372,18 @@ internal class MetalRedrawer(
 
     override fun syncBounds() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
+        // During a live resize the window, not AWT, dictates the layer geometry; adopting AWT's lagging
+        // bounds here would fight the resize transaction.
         if (isHandlingLiveResizeNow) return
 
-        val rootPane = getRootPane(layer)
-        val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
-        setContentScale(device.ptr, layer.contentScale)
+        val backedLayer = host.backedLayer
+        val rootPane = getRootPane(backedLayer)
+        val globalPosition = convertPoint(backedLayer, 0, 0, rootPane)
+        setContentScale(device.ptr, host.contentScale)
         val x = globalPosition.x
-        val y = rootPane.height - globalPosition.y - layer.height
-        val width = layer.backedLayer.width.coerceAtLeast(0)
-        val height = layer.backedLayer.height.coerceAtLeast(0)
+        val y = rootPane.height - globalPosition.y - host.height
+        val width = backedLayer.width.coerceAtLeast(0)
+        val height = backedLayer.height.coerceAtLeast(0)
         Logger.debug { "MetalRedrawer#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}" }
         resizeLayers(device.ptr, x, y, width, height)
     }
@@ -428,7 +432,7 @@ internal class MetalRedrawer(
     private external fun invokeOnEventThreadAndWait(runnable: Runnable, component: Component)
 
     private fun invokeOnEventThreadAndWait(runnable: Runnable) {
-        invokeOnEventThreadAndWait(runnable, layer)
+        invokeOnEventThreadAndWait(runnable, host.backedLayer)
     }
 
     /**

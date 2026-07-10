@@ -10,10 +10,10 @@ import java.awt.color.ColorSpace
 import java.awt.image.*
 
 internal class SoftwareRedrawer(
-    layer: SkiaLayer,
+    host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
+) : AWTRedrawer(host, analytics, GraphicsApi.SOFTWARE_FAST) {
     init {
         onDeviceChosen("Software")
     }
@@ -41,11 +41,11 @@ internal class SoftwareRedrawer(
     private var standaloneHeight = 0
 
     override val renderInfo: String
-        get() = renderInfoHeader(layer.renderApi)
+        get() = renderInfoHeader(host.renderApi)
 
     private val frameJob = if (properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) Job() else null
     private val frameLimiter = frameJob?.let {
-        layerFrameLimiter(CoroutineScope(it), layer.backedLayer)
+        layerFrameLimiter(CoroutineScope(it), host.backedLayer)
     }
 
     init {
@@ -106,7 +106,9 @@ internal class SoftwareRedrawer(
         performDraw(scope)
     }
 
-    private fun performDraw(scope: LayerDrawScope) {
+    private fun performDraw(scope: LayerDrawScope) = synchronized(drawLock) {
+        // Re-check inside the lock (not just at the call site), matching MetalRedrawer: this is what makes
+        // `dispose` and an in-flight frame mutually exclusive.
         if (!isDisposed) {
             with(scope) { drawFrame() }
         }
@@ -117,7 +119,7 @@ internal class SoftwareRedrawer(
         initCanvas()
         canvas?.runRestoringState {
             clear(org.jetbrains.skia.Color.TRANSPARENT)
-            layer.draw(this)
+            host.draw(this)
         }
         flushFrame()
     }
@@ -160,12 +162,12 @@ internal class SoftwareRedrawer(
                 null
             )
             val image = BufferedImage(colorModel, raster, false, null)
-            val graphics = layer.backedLayer.graphics
-            if (!layer.fullscreen && layer.transparency && hostOs == OS.MacOS) {
+            val graphics = host.backedLayer.graphics
+            if (!host.fullscreen && host.transparency && hostOs == OS.MacOS) {
                 graphics?.color = Color(0, 0, 0, 0)
                 graphics?.clearRect(0, 0, w, h)
             }
-            graphics?.drawImage(image, 0, 0, layer.width, layer.height, null)
+            graphics?.drawImage(image, 0, 0, host.width, host.height, null)
         }
     }
 }

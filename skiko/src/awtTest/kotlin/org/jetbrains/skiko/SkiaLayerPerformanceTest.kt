@@ -38,7 +38,7 @@ class SkiaLayerPerformanceTest {
         private val expectedDeviatePercent3 = 0.30
         private val expectedDeviatePercentTerminal = 0.50
 
-        private val expectedFrameNanos get() = 1E9 / window.layer.backedLayer.getDisplayRefreshRate()
+        private val expectedFrameNanos get() = 1E9 / window.layer.backedLayer!!.getDisplayRefreshRate()
         private val frameTimes = mutableListOf<Long>()
         private var canCollect = false
 

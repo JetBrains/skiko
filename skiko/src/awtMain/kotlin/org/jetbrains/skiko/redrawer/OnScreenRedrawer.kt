@@ -33,19 +33,17 @@ internal class OnScreenRedrawer(
     val presentsOnLayout: Boolean get() = renderer.presentsOnLayout
 
     private val updateRequested = AtomicBoolean(false)
-    override fun updateIfRequested(nanoTime: Long) {
+    override fun updateIfRequested() {
         if (updateRequested.getAndSet(false)) {
-            layer.update(nanoTime)
+            layer.update(renderTime())
         }
     }
 
-    private val frameDispatcher = if (renderer.schedulesOwnFrames) null else {
-        FrameDispatcher(MainUIDispatcher) {
-            renderer.runFrame {
-                if (layer.isShowing) {
-                    updateIfRequested()
-                    drawFrame(immediate = false)
-                }
+    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
+        renderer.runFrame {
+            if (layer.isShowing) {
+                updateIfRequested()
+                drawFrame(immediate = false)
             }
         }
     }
@@ -59,7 +57,7 @@ internal class OnScreenRedrawer(
         }
         renderer.onFrameRequested(throttledToVsync)
         if (!platformDrivesFrame) {
-            frameDispatcher?.scheduleFrame()
+            frameDispatcher.scheduleFrame()
         }
     }
 
@@ -91,13 +89,6 @@ internal class OnScreenRedrawer(
     }
 
     override fun requestFrame(throttledToVsync: Boolean) = needRender(throttledToVsync)
-
-    override fun inFrame(body: (LayerDrawScope) -> Unit) {
-        if (isDisposed) return
-        withFrameAnalytics {
-            layer.inDrawScope { body(this) }
-        }
-    }
 
     override fun inForcedSizeFrame(size: Dimension, body: (LayerDrawScope) -> Unit) {
         if (isDisposed) return
@@ -140,7 +131,7 @@ internal class OnScreenRedrawer(
     override fun dispose() {
         if (isDisposed) return
         isDisposed = true
-        frameDispatcher?.cancel()
+        frameDispatcher.cancel()
         renderer.close()
     }
 }

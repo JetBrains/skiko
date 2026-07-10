@@ -3,17 +3,17 @@ package org.jetbrains.skiko.redrawer
 import org.jetbrains.skiko.*
 
 internal class LinuxSoftwareRedrawer(
-    layer: SkiaLayer,
+    host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-) : AbstractDirectSoftwareRedrawer(layer, analytics, properties) {
+) : AbstractDirectSoftwareRedrawer(host, analytics, properties) {
 
     init {
         onDeviceChosen("Software")
-        val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
-        layer.backedLayer.lockLinuxDrawingSurface {
+        val scale = host.contentScale
+        val w = (host.width * scale).toInt().coerceAtLeast(0)
+        val h = (host.height * scale).toInt().coerceAtLeast(0)
+        host.backedLayer.lockLinuxDrawingSurface {
             device = createDevice(it.display, it.window, w, h).also {
                 if (it == 0L) {
                     throw RenderException("Failed to create Software device")
@@ -23,19 +23,19 @@ internal class LinuxSoftwareRedrawer(
         onContextInit()
     }
 
-    override fun releaseResources() = layer.backedLayer.lockLinuxDrawingSurface {
+    override fun releaseResources() = host.backedLayer.lockLinuxDrawingSurface {
         super.releaseResources()
     }
 
-    override fun draw(scope: LayerDrawScope) = layer.backedLayer.lockLinuxDrawingSurface {
+    override fun draw(scope: LayerDrawScope) = host.backedLayer.lockLinuxDrawingSurface {
         super.draw(scope)
     }
 
-    override fun resize(width: Int, height: Int) = layer.backedLayer.lockLinuxDrawingSurface {
+    override fun resize(width: Int, height: Int) = host.backedLayer.lockLinuxDrawingSurface {
         super.resize(width, height)
     }
 
-    override fun finishFrame(surface: Long) = layer.backedLayer.lockLinuxDrawingSurface {
+    override fun finishFrame(surface: Long) = host.backedLayer.lockLinuxDrawingSurface {
         super.finishFrame(surface)
     }
 

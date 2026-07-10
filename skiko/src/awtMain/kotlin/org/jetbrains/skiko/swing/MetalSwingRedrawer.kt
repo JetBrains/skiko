@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.Color
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.PixelGeometry
@@ -9,124 +8,127 @@ import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skia.SurfaceProps
+import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.jetbrains.skiko.GpuPriority
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.Library
+import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.MetalAdapter
+import org.jetbrains.skiko.RenderContext
 import org.jetbrains.skiko.RenderException
-import org.jetbrains.skiko.SkiaLayerAnalytics
-import org.jetbrains.skiko.SkikoRenderDelegate
-import org.jetbrains.skiko.autoCloseScope
-import org.jetbrains.skiko.autoreleasepool
+import org.jetbrains.skiko.SkikoProperties
 import org.jetbrains.skiko.chooseMetalAdapter
 import org.jetbrains.skiko.dispose
-import org.jetbrains.skiko.swing.SharedTexturesAdapter.Companion.createSharedTexturesAdapter
-import java.awt.Graphics2D
+import org.jetbrains.skiko.hostArch
+import org.jetbrains.skiko.hostOs
 
 /**
- * Provides a way to draw on Skia canvas rendered off-screen with Metal
- * GPU acceleration and then pass it to [java.awt.Graphics2D]. It provides
- * better interoperability with Swing, but it is less efficient than
- * on-screen rendering.
+ * A genuinely view-less **offscreen** Metal [RenderContext]: it renders into an offscreen `MTLTexture`
+ * (created from a [MetalAdapter], **not** from an AWT window/JAWT surface) and hands back the backing Skia
+ * [Surface]. There is no on-screen peer, no `CAMetalLayer`, and no AWT component — this is the AWT counterpart
+ * of the view-less GPU factories on darwin/android.
  *
- * For now, it uses drawing to [java.awt.image.BufferedImage] that cause
- * VRAM <-> RAM memory transfer and so increased CPU usage.
+ * It backs both:
+ *  * the public `RenderContext.createOffscreen(w, h, GraphicsApi.METAL)` factory (a caller drives
+ *    `acquireSurface` → draw → `present`, then reads pixels back), and
+ *  * [SkiaSwingLayer]'s Swing-interop pull model, where a [SwingRenderer] drives the same acquire→draw→present
+ *    and then blits the surface onto a `Graphics2D` via a [SwingPainter] (zero-copy when the JBR shared-texture
+ *    path is available — see [texturePtr] / [AcceleratedSwingPainter]).
  *
- * Content to draw is provided by [SkikoRenderDelegate].
- *
- * For on-screen rendering see
- * [org.jetbrains.skiko.redrawer.MetalRedrawer].
- *
- * @see SwingRedrawerBase
- * @see SoftwareSwingPainter
+ * Not thread-safe — drive it from a single render thread, mirroring [RenderContext]'s contract.
  */
+@OptIn(ExperimentalSkikoApi::class)
 internal class MetalSwingRedrawer(
-    swingLayerProperties: SwingLayerProperties,
-    private val renderDelegate: SkikoRenderDelegate,
-    analytics: SkiaLayerAnalytics
-) : SwingRedrawerBase(swingLayerProperties, analytics, GraphicsApi.METAL) {
+    adapterPriority: GpuPriority = SkikoProperties.gpuPriority,
+    private val gpuResourceCacheLimit: Long = SkikoProperties.gpuResourceCacheLimit,
+) : SwingRenderContext {
     companion object {
         init {
             Library.load()
         }
+    }
 
-        private fun createSwingPainter(swingLayerProperties: SwingLayerProperties): SwingPainter = try {
-            AcceleratedSwingPainter(
-                sharedTextures = createSharedTexturesAdapter()
-            ) { SoftwareSwingPainter(swingLayerProperties) }
-        } catch (_: RenderException) {
-            SoftwareSwingPainter(swingLayerProperties)
+    private val adapter: MetalAdapter = chooseMetalAdapter(adapterPriority)
+
+    private val context: DirectContext = DirectContext(makeMetalContext(adapter.ptr)).also {
+        if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
+            Logger.info { "Renderer info:\n ${rendererInfo()}" }
+        }
+        if (gpuResourceCacheLimit >= 0) {
+            it.resourceCacheLimit = gpuResourceCacheLimit
         }
     }
 
-    private val adapter: MetalAdapter = chooseMetalAdapter(swingLayerProperties.adapterPriority).also {
-        onDeviceChosen(it.name)
-    }
-    private val context: DirectContext = makeMetalContext()
+    private var renderTarget: BackendRenderTarget? = null
+    private var surface: Surface? = null
+    private var surfaceWidth = 0
+    private var surfaceHeight = 0
+    private var closed = false
 
-    private var texturePtr: Long = 0
+    override var texturePtr: Long = 0
+        private set
 
-    init {
-        onContextInit(context)
-    }
+    override val graphicsApi: GraphicsApi get() = GraphicsApi.METAL
+    override val deviceName: String get() = adapter.name
+    override val directContext: DirectContext get() = context
 
-    private val painter: SwingPainter = createSwingPainter(swingLayerProperties)
-
-    override fun dispose() {
-        disposeMetalTexture(texturePtr)
-        context.close()
-        adapter.dispose()
-        painter.dispose()
-        super.dispose()
-    }
-
-    override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) {
-        if (width < 1 || height < 1) {
-            return
-        }
-
+    override fun acquireSurface(width: Int, height: Int): Surface {
+        check(!closed) { "MetalSwingRedrawer is disposed" }
+        require(width > 0 && height > 0) { "Surface size must be positive, was ${width}x$height" }
         require(width <= adapter.maxTextureSize && height <= adapter.maxTextureSize) {
             "Texture dimensions must be less than maximum allowed size: ${adapter.maxTextureSize}, got $width x $height"
         }
-
-        autoreleasepool {
-            autoCloseScope {
-                texturePtr = makeMetalTexture(adapter.ptr, texturePtr, width, height)
-                val renderTarget = makeRenderTarget().autoClose()
-                val surface = Surface.makeFromBackendRenderTarget(
-                    context,
-                    renderTarget,
-                    SurfaceOrigin.TOP_LEFT,
-                    SurfaceColorFormat.BGRA_8888,
-                    ColorSpace.sRGB,
-                    SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
-                )?.autoClose() ?: throw RenderException("Cannot create surface")
-
-                val canvas = surface.canvas
-                canvas.clear(Color.TRANSPARENT)
-                renderDelegate.onRender(canvas, width, height, nanoTime)
-                flush(surface, g)
-            }
+        if (surface == null || width != surfaceWidth || height != surfaceHeight) {
+            createSurface(width, height)
         }
+        return surface!!
     }
 
-    private fun flush(surface: Surface, g: Graphics2D) {
-        surface.flushAndSubmit(syncCpu = true)
-        painter.paint(g, surface, texturePtr)
+    override fun present() {
+        if (closed) return
+        surface?.flushAndSubmit(syncCpu = true)
     }
 
-    override fun rendererInfo(): String {
-        return super.rendererInfo() +
+    override fun close() {
+        if (closed) return
+        closed = true
+        disposeSurface()
+        disposeMetalTexture(texturePtr)
+        texturePtr = 0
+        context.close()
+        adapter.dispose()
+    }
+
+    private fun createSurface(width: Int, height: Int) {
+        disposeSurface()
+        texturePtr = makeMetalTexture(adapter.ptr, texturePtr, width, height)
+        renderTarget = BackendRenderTarget(makeMetalRenderTargetOffScreen(texturePtr))
+        surface = Surface.makeFromBackendRenderTarget(
+            context,
+            renderTarget!!,
+            SurfaceOrigin.TOP_LEFT,
+            SurfaceColorFormat.BGRA_8888,
+            ColorSpace.sRGB,
+            SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
+        ) ?: throw RenderException("Cannot create surface")
+        surfaceWidth = width
+        surfaceHeight = height
+    }
+
+    private fun disposeSurface() {
+        surface?.close()
+        renderTarget?.close()
+        surface = null
+        renderTarget = null
+        surfaceWidth = 0
+        surfaceHeight = 0
+    }
+
+    private fun rendererInfo(): String =
+        "GraphicsApi: ${GraphicsApi.METAL}\n" +
+            "OS: ${hostOs.id} ${hostArch.id}\n" +
             "Video card: ${adapter.name}\n" +
             "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
-    }
-
-    private fun makeRenderTarget() = BackendRenderTarget(
-        makeMetalRenderTargetOffScreen(texturePtr)
-    )
-
-    private fun makeMetalContext(): DirectContext = DirectContext(
-        makeMetalContext(adapter.ptr)
-    )
 
     private external fun makeMetalContext(adapter: Long): Long
 

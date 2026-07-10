@@ -6,6 +6,11 @@ import org.jetbrains.skia.Color
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skia.Surface
 
+@Deprecated(
+    message = "SkiaLayer is superseded by the view-decoupled render-context APIs: acquire a RenderContext with " +
+        "RenderContext.createFromMetalLayer(layer), drive frames with DisplayFrameTicker(), and present each " +
+        "frame yourself. The replacement is not a drop-in expression, so no automatic ReplaceWith is offered."
+)
 actual open class SkiaLayer {
     internal var needRedrawCallback: () -> Unit = {}
 

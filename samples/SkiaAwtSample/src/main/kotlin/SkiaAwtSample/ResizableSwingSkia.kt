@@ -18,7 +18,7 @@ fun swingSkiaResize() = SwingUtilities.invokeLater {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             fpsCounter.tick()
             super.onRender(canvas, width, height, nanoTime)
-            skiaPanel!!.repaint()
+            // No manual repaint here: the SwingCompositedDriver owned by SkiaSwingPanel pushes each frame.
         }
     }
 

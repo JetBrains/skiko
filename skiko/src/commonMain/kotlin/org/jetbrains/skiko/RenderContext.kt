@@ -64,7 +64,8 @@ interface RenderContext : AutoCloseable {
     /**
      * Anchor for the per-platform factories, which are declared as extensions on it:
      * `RenderContext.createFromCanvas(canvas)` on web, `RenderContext.createFromMetalLayer(layer)` on
-     * darwin, and `RenderContext.createFromCurrentGLContext()` on Android.
+     * darwin, `RenderContext.createFromCurrentGLContext()` on Android, and
+     * `RenderContext.createOffscreen(width, height, api)` on AWT.
      */
     companion object
 }

@@ -16,6 +16,11 @@ import platform.darwin.NSObject
  * Supports only [GraphicsApi.METAL]
  */
 @OptIn(BetaInteropApi::class)
+@Deprecated(
+    message = "SkiaLayer is superseded by the view-decoupled render-context APIs: acquire a RenderContext with " +
+        "RenderContext.createFromMetalLayer(layer), drive frames with DisplayFrameTicker(), and present each " +
+        "frame yourself. The replacement is not a drop-in expression, so no automatic ReplaceWith is offered."
+)
 actual open class SkiaLayer {
     fun isShowing(): Boolean {
         return true

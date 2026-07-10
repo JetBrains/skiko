@@ -18,6 +18,11 @@ import org.w3c.dom.HTMLCanvasElement
  * `requestAnimationFrame` loop: each scheduled frame re-reads the `<canvas>` size, acquires a surface of that
  * size, hands its canvas to [renderDelegate], then presents.
  */
+@Deprecated(
+    message = "SkiaLayer is superseded by the view-decoupled render-context APIs: acquire a RenderContext with " +
+        "RenderContext.createFromCanvas(canvas), drive frames with DisplayFrameTicker(), and present each frame " +
+        "yourself. The replacement is not a drop-in expression, so no automatic ReplaceWith is offered."
+)
 actual open class SkiaLayer {
     internal var renderContext: WebGLRenderContext? = null
 

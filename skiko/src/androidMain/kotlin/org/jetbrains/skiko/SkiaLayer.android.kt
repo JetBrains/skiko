@@ -6,6 +6,12 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skia.Color
 
+@Deprecated(
+    message = "SkiaLayer is superseded by the view-decoupled render-context APIs: acquire a RenderContext with " +
+        "RenderContext.createFromCurrentGLContext(), drive frames with DisplayFrameTicker(), and present each frame yourself. " +
+        "SkikoSurfaceView hosts the surface. The replacement is not a drop-in expression, so no automatic " +
+        "ReplaceWith is offered."
+)
 actual open class SkiaLayer {
     private var glView: SkikoSurfaceView? = null
     private var container: ViewGroup? = null

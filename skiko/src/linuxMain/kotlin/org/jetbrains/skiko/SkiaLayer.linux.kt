@@ -3,6 +3,11 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
 
+@Deprecated(
+    message = "SkiaLayer is superseded by the view-decoupled render-context APIs: acquire a RenderContext, " +
+        "drive frames with a DisplayFrameTicker, and present each frame yourself. The entry points are " +
+        "platform-specific. The replacement is not a drop-in expression, so no automatic ReplaceWith is offered."
+)
 actual open class SkiaLayer  {
     actual var renderApi: GraphicsApi
         get() = TODO("Not yet implemented")
