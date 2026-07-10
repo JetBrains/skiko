@@ -16,13 +16,16 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
+import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import projectDirs
@@ -82,6 +85,9 @@ fun SkikoProjectContext.declareWasmTasks() {
             buildList {
                 addAll(skiaPreprocessorFlags(OS.Wasm, buildType))
                 addAll(buildType.clangFlags)
+                add("-Oz")
+                add("-flto")
+                add("-fvisibility=hidden")
                 add("-fno-rtti")
                 add("-fno-exceptions")
                 add("-fPIC")
@@ -121,12 +127,25 @@ fun SkikoProjectContext.declareWasmTasks() {
             project.layout.projectDirectory.file(prefixPath)
         )
 
+        val exportsProvider = project.provider {
+            val setupMjs = project.setupMjs
+            if (!setupMjs.exists()) return@provider emptyList<String>()
+            val text = setupMjs.readText()
+            val fromBrackets = Regex("""loadedWasm\._\["([a-zA-Z0-9_]+)"\]""").findAll(text).map { it.groupValues[1] }
+            val fromDot = Regex("""wasmExports\.([a-zA-Z0-9_]+)""").findAll(text).map { it.groupValues[1] }
+            val fromOrg = Regex("""org_jetbrains_[a-zA-Z0-9_]+""").findAll(text).map { it.value }
+            (fromBrackets + fromDot + fromOrg + listOf("malloc", "free", "memory", "__wasm_call_ctors", "_initialize")).distinct().toList()
+        }
+
         flags.addAll(buildList {
-            add("-O2")
+            add("-Oz")
             add("-fuse-ld=lld")
-            add("-Wl,--export-all")
+//            add("-Wl,--export-all")
+            add("-Wl,--gc-sections")
             add("-Wl,--no-entry")
             add("-Wl,--allow-undefined")
+            add("-Wl,--strip-all")
+            add("-flto")
             add("--target=wasm32-wasip1")
             add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
             add("-mllvm")
@@ -135,6 +154,9 @@ fun SkikoProjectContext.declareWasmTasks() {
 
             if (skiko.isWasmBuildWithProfiling) add("--profiling")
             addAll(resolvedBinaryInputs.linkFlags)
+        })
+        flags.addAll(exportsProvider.map { exports ->
+            exports.map { "-Wl,--export=$it" }
         })
 
         doLast {
@@ -218,6 +240,31 @@ fun SkikoProjectContext.declareWasmTasks() {
         doLast {
             println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
         }
+    }
+
+    val optimizeWasm by project.tasks.registering(Exec::class) {
+        dependsOn(linkWasm)
+        val wasmFileProvider = linkWasm.flatMap { it.outDir.file(it.libOutputFileName) }
+
+        executable = "wasm-opt"
+
+        argumentProviders.add(CommandLineArgumentProvider {
+            val wasmFile = wasmFileProvider.get().asFile
+            listOf("-Oz", "--strip-debug", "--converge", "--strip-producers", wasmFile.absolutePath, "-o", wasmFile.absolutePath + ".opt")
+        })
+
+        doLast {
+            val wasmFile = wasmFileProvider.get().asFile
+            val optimizedFile = File(wasmFile.absolutePath + ".opt")
+            if (optimizedFile.exists()) {
+                wasmFile.delete()
+                optimizedFile.renameTo(wasmFile)
+                println("WASM optimized: ${optimizedFile.length() / 1024} KB")
+            }
+        }
+    }
+    project.tasks.named("skikoWasmJar") {
+        dependsOn(optimizeWasm)
     }
 }
 
