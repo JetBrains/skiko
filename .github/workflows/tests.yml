@@ -208,12 +208,9 @@ jobs:
         with:
           name: test-reports-linux
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/skiko-skottie/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/*_actual.png
-            ./skiko/skiko-skottie/src/jvmTest/screenshots/*_actual.png
-            ./skiko/hs_err_pid*.log
-            ./skiko/skiko-skottie/hs_err_pid*.log
+            ./skiko/**/build/reports/tests
+            ./skiko/**/src/jvmTest/screenshots/*_actual.png
+            ./skiko/**/hs_err_pid*.log
 
       - uses: test-summary/action@v2
         name: 'Test Summary'
