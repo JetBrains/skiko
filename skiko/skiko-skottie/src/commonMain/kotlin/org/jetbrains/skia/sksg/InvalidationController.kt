@@ -11,11 +11,17 @@ import org.jetbrains.skia.impl.*
  * Tracks dirty regions for repaint.
  */
 class InvalidationController internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
+    companion object {
+        init {
+            SkottieLibrary.load()
+        }
+    }
+
     internal object _FinalizerHolder {
         val PTR = InvalidationController_nGetFinalizer()
     }
 
-    constructor() : this(makeInvalidationController()) {}
+    constructor() : this(InvalidationController_nMake()) {}
 
     fun invalidate(left: Float, top: Float, right: Float, bottom: Float, matrix: Matrix33?): InvalidationController {
         Stats.onNativeCall()
@@ -47,11 +53,6 @@ class InvalidationController internal constructor(ptr: NativePointer) : Managed(
         InvalidationController_nReset(nativePtr)
         return this
     }
-}
-
-private fun makeInvalidationController(): NativePointer {
-    SkottieLibrary.load()
-    return InvalidationController_nMake()
 }
 
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nGetFinalizer")

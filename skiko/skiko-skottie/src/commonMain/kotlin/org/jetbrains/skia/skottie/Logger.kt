@@ -11,7 +11,13 @@ import org.jetbrains.skia.impl.Stats
  * A Logger subclass can be used to receive
  * [org.jetbrains.skia.skottie.AnimationBuilder] parsing errors and warnings.
  */
-abstract class Logger : RefCnt(makeLogger()) {
+abstract class Logger : RefCnt(_nMake()) {
+    companion object {
+        init {
+            SkottieLibrary.load()
+        }
+    }
+
     abstract fun log(level: LogLevel, message: String, json: String?)
 
     init {
@@ -19,11 +25,6 @@ abstract class Logger : RefCnt(makeLogger()) {
         Stats.onNativeCall()
         doInit(nativePtr)
     }
-}
-
-private fun makeLogger(): NativePointer {
-    SkottieLibrary.load()
-    return _nMake()
 }
 
 internal expect fun Logger.doInit(ptr: NativePointer)
