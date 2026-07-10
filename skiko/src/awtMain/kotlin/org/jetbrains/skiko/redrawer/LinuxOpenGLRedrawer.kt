@@ -13,8 +13,15 @@ internal class LinuxOpenGLRedrawer(
         loadOpenGLLibrary()
     }
 
+    /**
+     * Serialises every native touch point. Frames run on the EDT, but [acquireSurface] and [present] are
+     * public entry points a caller drives from its own render thread, and [releaseResources] can arrive on the EDT
+     * while one of those is in flight. Each takes this lock and re-checks [isDisposed] inside it, so
+     * [releaseResources] cannot free the GLX context out from under a running JNI call.
+     */
+    private val drawLock = Any()
+
     private var context = 0L
-    private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
 
     init {
     	layer.backedLayer.lockLinuxDrawingSurface {
@@ -29,9 +36,9 @@ internal class LinuxOpenGLRedrawer(
                 }
             }
             onDeviceChosen(adapterName)
-            it.setSwapInterval(swapInterval)
         }
         onContextInit()
+        liveContexts.add(this)
     }
 
     private val frameJob = Job()
@@ -54,112 +61,92 @@ internal class LinuxOpenGLRedrawer(
         }
     }
 
-    override val schedulesOwnFrames: Boolean get() = true
-
-    private lateinit var frameHost: FrameHost
-
-    override fun attachFrameHost(host: FrameHost) {
-        frameHost = host
-    }
-
-    override fun onFrameRequested(throttledToVsync: Boolean) {
-        toRedraw.add(this)
-        frameDispatcher.scheduleFrame()
+    override suspend fun runFrame(frame: suspend () -> Unit) {
+        // Gate the software frame limiter on visibility: pace only while the window is showing.
+        if (layer.isShowing) {
+            limitFramesIfNeeded()
+        }
+        frame()
     }
 
     override fun releaseResources() {
+        liveContexts.remove(this)
         frameJob.cancel()
-        layer.backedLayer.lockLinuxDrawingSurface {
-            // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
-            // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
-            it.makeCurrent(context)
-            disposeGlResources()
-            it.destroyContext(context)
+        synchronized(drawLock) {
+            layer.backedLayer.lockLinuxDrawingSurface {
+                // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
+                // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
+                it.makeCurrent(context)
+                disposeGlResources()
+                it.destroyContext(context)
+            }
         }
     }
 
-    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) = synchronized(drawLock) {
+        if (isDisposed) {
+            return
+        }
         layer.backedLayer.lockLinuxDrawingSurface {
             it.makeCurrent(context)
             with(scope) { drawFrame() }
-            val turnOfVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately
-            if (turnOfVsync) {
-                it.setSwapInterval(0)
-            }
+            it.setSwapInterval(swapIntervalForFrame(immediate))
             it.swapBuffers()
             OpenGLApi.instance.glFlush()
-            if (turnOfVsync) {
-                it.setSwapInterval(swapInterval)
+        }
+    }
+
+    override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
+        check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
+        layer.backedLayer.lockLinuxDrawingSurface { it.makeCurrent(context) }
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic context")
+        }
+        createSurface(width, height, layer.pixelGeometry)
+        glSurface ?: throw RenderException("Cannot create surface for ${width}x$height")
+    }
+
+    override fun present() {
+        if (isDisposed) return
+        synchronized(drawLock) {
+            if (isDisposed) return
+            layer.backedLayer.lockLinuxDrawingSurface {
+                it.makeCurrent(context)
+                flushGl()
+                it.swapBuffers()
+                OpenGLApi.instance.glFlush()
             }
         }
     }
 
-    private fun drawInBatch() {
-        frameHost.inFrame { scope -> with(scope) { drawFrame() } }
+    /**
+     * The GLX swap interval for the frame about to be presented: 1 blocks [swapBuffers] until the next
+     * vblank, 0 returns immediately.
+     *
+     * At most one window in the process may block. The wait is fused into the swap and the swap runs on the
+     * EDT, so N blocking windows would spend N vblanks per frame there and cap the whole toolkit at
+     * `refreshRate / N`. The window with the highest frame limit is the one that waits, so a window on a
+     * slower monitor cannot pace down the rest; the others swap unblocked and are paced by [frameLimiter].
+     */
+    private fun swapIntervalForFrame(immediate: Boolean): Int = when {
+        !properties.isVsyncEnabled -> 0
+        immediate -> if (SkikoProperties.linuxWaitForVsyncOnRedrawImmediately) 1 else 0
+        else -> if (this === vsyncPacedContext()) 1 else 0
     }
 
-    companion object {
-        private val toRedraw = mutableSetOf<LinuxOpenGLRedrawer>()
-        private val toRedrawCopy = mutableSetOf<LinuxOpenGLRedrawer>()
-        private val toRedrawVisible = toRedrawCopy
-            .asSequence()
-            .filterNot(LinuxOpenGLRedrawer::isDisposed)
-            .filter { it.layer.isShowing }
+    private companion object {
+        /**
+         * Every live on-screen GLX context in the process, in creation order. Windows pace themselves
+         * independently, so electing the one that waits for vblank ([swapIntervalForFrame]) needs a view of
+         * all of them rather than of one window's frame.
+         *
+         * Mutated from the EDT alongside context creation and destruction, and read there per frame.
+         */
+        val liveContexts = mutableListOf<LinuxOpenGLRedrawer>()
 
-        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            toRedrawCopy.addAll(toRedraw)
-            toRedraw.clear()
-
-            // we should wait for the window with the maximum frame limit to avoid bottleneck when there is a window on a slower monitor
-            toRedrawVisible.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
-
-            val nanoTime = System.nanoTime()
-            for (redrawer in toRedrawVisible) {
-                try {
-                    redrawer.frameHost.updateIfRequested(nanoTime)
-                } catch (e: CancellationException) {
-                    // continue
-                }
-            }
-
-            val drawingSurfaces = toRedrawVisible.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
-            try {
-                for (redrawer in toRedrawVisible) {
-                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
-                    redrawer.drawInBatch()
-                }
-
-                // TODO(demin): How can we properly synchronize multiple windows with multiple displays?
-                //  I checked, and without vsync there is no tearing. Is it only my case (Ubuntu, Nvidia, X11),
-                //  or Ubuntu write all the screen content into an intermediate buffer? If so, then we probably only
-                //  need a frame limiter.
-
-                // Synchronize with vsync only for the fastest monitor, for the single window.
-                // Otherwise, 5 windows will wait for vsync 5 times.
-                val vsyncRedrawer = toRedrawVisible
-                    .filter { it.properties.isVsyncEnabled }
-                    .maxByOrNull { it.frameLimit }
-
-                for (redrawer in toRedrawVisible.filter { it != vsyncRedrawer }) {
-                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
-                    drawingSurfaces[redrawer]!!.setSwapInterval(0)
-                    drawingSurfaces[redrawer]!!.swapBuffers()
-                    OpenGLApi.instance.glFlush()
-                }
-
-                if (vsyncRedrawer != null) {
-                    drawingSurfaces[vsyncRedrawer]!!.makeCurrent(vsyncRedrawer.context)
-                    drawingSurfaces[vsyncRedrawer]!!.setSwapInterval(1)
-                    drawingSurfaces[vsyncRedrawer]!!.swapBuffers()
-                    OpenGLApi.instance.glFlush()
-                }
-            } finally {
-                drawingSurfaces.values.forEach(::unlockLinuxDrawingSurface)
-            }
-
-            // Without clearing we will have a memory leak
-            toRedrawCopy.clear()
-        }
+        fun vsyncPacedContext(): LinuxOpenGLRedrawer? = liveContexts
+            .filter { !it.isDisposed && it.layer.isShowing && it.properties.isVsyncEnabled }
+            .maxByOrNull { it.frameLimit }
     }
 }
 

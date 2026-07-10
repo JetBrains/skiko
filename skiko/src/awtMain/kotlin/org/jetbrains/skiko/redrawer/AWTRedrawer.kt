@@ -7,14 +7,18 @@ import java.awt.Dimension
 
 /**
  * Common class for all AWT redrawers.
+ *
+ * It extends the public [RenderContext], so one per-API class backs both the on-screen path and a
+ * standalone consumer.
+ *
  * Don't forget to call [onDeviceChosen] and [onContextInit] to send necessary analytics.
  */
 @OptIn(ExperimentalSkikoApi::class)
 internal abstract class AWTRedrawer(
     protected val layer: SkiaLayer,
     private val analytics: SkiaLayerAnalytics,
-    private val graphicsApi: GraphicsApi,
-) : AutoCloseable {
+    final override val graphicsApi: GraphicsApi,
+) : RenderContext {
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
 
     var deviceAnalytics: DeviceAnalytics? = null

@@ -82,6 +82,8 @@ internal class MetalRedrawer(
     private var surface: Surface? = null
     private var canvas: Canvas? = null
 
+    override val directContext: DirectContext? get() = context
+
     init {
         onDeviceChosen(adapter.name)
         val numberOfBuffers = properties.frameBuffering.numberOfBuffers() ?: 0 // zero means default for system
@@ -267,7 +269,7 @@ internal class MetalRedrawer(
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic Metal context")
         }
-        initSurface()
+        createSurface(scaledLayerWidth, scaledLayerHeight, pixelGeometry)
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
             layer.draw(this)
@@ -276,6 +278,24 @@ internal class MetalRedrawer(
         surface?.flushAndSubmit()
         // Records only; the caller presents.
         Logger.debug { "MetalRedrawer finished drawing frame" }
+    }
+
+    // --- Public standalone RenderContext surface (acquire → draw → present), backed by the same code the
+    // on-screen loop uses above. On-screen the loop calls drawFrame; a standalone caller drives these.
+    override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
+        check(!isDisposed) { "MetalRedrawer is disposed" }
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic Metal context")
+        }
+        createSurface(width, height, layer.pixelGeometry)
+        surface ?: throw RenderException("Cannot create surface for ${width}x$height")
+    }
+
+    override fun present() = synchronized(drawLock) {
+        if (!isDisposed) {
+            surface?.flushAndSubmit()
+            finishFrameAsync(device.ptr)
+        }
     }
 
     private fun ensureContext(): Boolean {
@@ -292,11 +312,8 @@ internal class MetalRedrawer(
         return true
     }
 
-    private fun LayerDrawScope.initSurface() {
+    private fun createSurface(width: Int, height: Int, pixelGeometry: PixelGeometry) {
         disposeSurface()
-
-        val width = scaledLayerWidth
-        val height = scaledLayerHeight
 
         if (width > 0 && height > 0) {
             renderTarget = BackendRenderTarget(makeMetalRenderTarget(device.ptr, width, height))

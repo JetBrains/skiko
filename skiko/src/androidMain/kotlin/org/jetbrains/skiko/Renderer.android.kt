@@ -157,8 +157,10 @@ private class SkikoSurfaceRender(
         try {
             if (width == 0 || height == 0) return
             val context = renderContext ?: AndroidGLRenderContext().also { renderContext = it }
-            // A null surface means the context was closed after this frame was requested: safely no-op.
-            val surface = context.acquireSurface(width, height) ?: return
+            // A closed context means it was disposed after this frame was requested: safely no-op instead of
+            // touching freed native objects (or recreating one during teardown, since the reference is kept).
+            if (context.isClosed) return
+            val surface = context.acquireSurface(width, height)
             surface.canvas.clear(Color.WHITE)
             lockPicture { surface.canvas.drawPicture(it.instance) }
             context.present()

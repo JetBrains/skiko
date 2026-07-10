@@ -44,6 +44,8 @@ internal class Direct3DRedrawer(
     val adapterName: String
     val adapterMemorySize: Long
 
+    override val directContext: DirectContext? get() = context
+
     init {
         val adapter = chooseAdapter(properties.adapterPriority.ordinal)
         if (adapter == 0L) {
@@ -132,6 +134,26 @@ internal class Direct3DRedrawer(
         }
     }
 
+    override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
+        check(!isDisposed) { "Direct3DRedrawer is disposed" }
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic Direct3D context")
+        }
+        createSurface(width, height, layer.pixelGeometry)
+        // Capture the frame's back buffer, exactly as the on-screen path does in `initSurface` and for the
+        // same reason: `getBufferIndex` advances the swap chain and waits on the buffer's fence, so it runs
+        // once per frame and [present] must flush the surface it returned, not call it again.
+        surface = surfaces[getBufferIndex(device)]
+        surface ?: throw RenderException("Cannot create surface for ${width}x$height")
+    }
+
+    override fun present() = synchronized(drawLock) {
+        if (!isDisposed) {
+            flushFrame()
+            swap(properties.isVsyncEnabled)
+        }
+    }
+
     private fun LayerDrawScope.drawFrame() {
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic Direct3D context")
@@ -158,14 +180,16 @@ internal class Direct3DRedrawer(
         return true
     }
 
-    private fun LayerDrawScope.initSurface() {
+    private fun LayerDrawScope.initSurface() = createSurface(scaledLayerWidth, scaledLayerHeight, pixelGeometry)
+
+    private fun createSurface(rawWidth: Int, rawHeight: Int, pixelGeometry: PixelGeometry) {
         val context = context ?: return
 
         // Direct3D can't work with zero size.
         // Don't rewrite code to skipping, as we need the whole pipeline in zero case too
         // (drawing -> flushing -> swapping -> waiting for vsync)
-        val width = scaledLayerWidth.coerceAtLeast(1)
-        val height = scaledLayerHeight.coerceAtLeast(1)
+        val width = rawWidth.coerceAtLeast(1)
+        val height = rawHeight.coerceAtLeast(1)
 
         if (isSizeChanged(width, height) || isSurfacesNull()) {
             disposeSurfaces()

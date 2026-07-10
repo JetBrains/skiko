@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSkikoApi::class)
+
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.runBlocking

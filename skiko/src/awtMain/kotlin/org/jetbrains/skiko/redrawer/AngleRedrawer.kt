@@ -28,6 +28,8 @@ internal class AngleRedrawer(
 
     private val adapterName get() = AngleApi.glGetString(AngleApi.GL_RENDERER)
 
+    override val directContext: DirectContext? get() = context
+
     init {
         device = layer.backedLayer.useDrawingSurfacePlatformInfo { platformInfo ->
             createAngleDevice(platformInfo, layer.transparency).takeIf { it != 0L }
@@ -79,6 +81,24 @@ internal class AngleRedrawer(
         swapBuffers(device, withVsync)
     }
 
+    override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
+        check(!isDisposed) { "AngleRedrawer is disposed" }
+        makeCurrent(device)
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic context")
+        }
+        createSurface(width, height, layer.pixelGeometry)
+        surface ?: throw RenderException("Cannot create surface for ${width}x$height")
+    }
+
+    override fun present() = synchronized(drawLock) {
+        if (!isDisposed) {
+            makeCurrent(device)
+            context?.flush()
+            swapBuffers(device, properties.isVsyncEnabled)
+        }
+    }
+
     private fun LayerDrawScope.drawFrame() {
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")
@@ -108,11 +128,10 @@ internal class AngleRedrawer(
         return true
     }
 
-    private fun LayerDrawScope.initSurface() {
-        val context = context ?: return
+    private fun LayerDrawScope.initSurface() = createSurface(scaledLayerWidth, scaledLayerHeight, pixelGeometry)
 
-        val w = scaledLayerWidth
-        val h = scaledLayerHeight
+    private fun createSurface(w: Int, h: Int, pixelGeometry: PixelGeometry) {
+        val context = context ?: return
 
         if (isSizeChanged(w, h) || surface == null) {
             disposeSurface()

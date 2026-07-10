@@ -76,6 +76,24 @@ internal class WindowsOpenGLRedrawer(
         frameHost.inFrame { scope -> with(scope) { drawFrame() } }
     }
 
+    override fun acquireSurface(width: Int, height: Int): Surface {
+        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
+        makeCurrent()
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic context")
+        }
+        createSurface(width, height, layer.pixelGeometry)
+        return glSurface ?: throw RenderException("Cannot create surface for ${width}x$height")
+    }
+
+    override fun present() {
+        if (isDisposed) return
+        makeCurrent()
+        flushGl()
+        swapBuffers()
+        OpenGLApi.instance.glFinish()
+    }
+
     private fun makeCurrent() = makeCurrent(device, context)
     private fun swapBuffers() = swapBuffers(device)
 

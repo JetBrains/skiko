@@ -13,6 +13,12 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
 
+    /** [acquireSurface] and [present] are public API, so unlike the frame loop they are not EDT-confined. */
+    private val drawLock = Any()
+
+    // Direct software rasterizes on the CPU into a native window-backed raster surface: no Ganesh DirectContext.
+    override val directContext: DirectContext? get() = null
+
     private var isContextInitialized = false
     private var surface: Surface? = null
     private var canvas: Canvas? = null
@@ -35,6 +41,19 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     protected var device = 0L
 
     override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) = draw(scope)
+
+    override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
+        check(!isDisposed) { "DirectSoftwareRedrawer is disposed" }
+        ensureContext()
+        createSurface(width, height)
+        surface ?: throw RenderException("Cannot create surface for ${width}x$height")
+    }
+
+    override fun present() = synchronized(drawLock) {
+        if (!isDisposed) {
+            flushFrame()
+        }
+    }
 
     protected open fun draw(scope: LayerDrawScope) = performDraw(scope)
 
@@ -70,9 +89,9 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         }
     }
 
-    private fun LayerDrawScope.initCanvas() {
-        val w = scaledLayerWidth
-        val h = scaledLayerHeight
+    private fun LayerDrawScope.initCanvas() = createSurface(scaledLayerWidth, scaledLayerHeight)
+
+    private fun createSurface(w: Int, h: Int) {
         if (isSizeChanged(w, h) || surface == null) {
             disposeSurface()
             if (w > 0 && h > 0) {
