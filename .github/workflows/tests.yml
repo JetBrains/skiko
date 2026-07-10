@@ -243,14 +243,6 @@ jobs:
         name: 'Upload linuxArm64 test binary as artifact'
         with:
           name: test-binary-linuxArm64
-          path: ./skiko/build/bin/linuxArm64
-          if-no-files-found: error
-          retention-days: 5
-
-      - uses: actions/upload-artifact@v4
-        name: 'Upload skiko-skottie linuxArm64 test binary as artifact'
-        with:
-          name: test-binary-skiko-skottie-linuxArm64
           path: ./skiko/**/build/bin/linuxArm64
           if-no-files-found: error
           retention-days: 5
@@ -270,13 +262,7 @@ jobs:
         name: 'Download precompiled linuxArm64 test binary'
         with:
           name: test-binary-linuxArm64
-          path: ./skiko/build/bin/linuxArm64
-
-      - uses: actions/download-artifact@v4
-        name: 'Download precompiled skiko-skottie linuxArm64 test binary'
-        with:
-          name: test-binary-skiko-skottie-linuxArm64
-          path: ./skiko/skiko-skottie/build/bin/linuxArm64
+          path: ./skiko
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Run Linux (arm64) Tests'
