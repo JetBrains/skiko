@@ -5,54 +5,64 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 /**
- * This is the single per-window Linux (GLX) OpenGL render context: it owns the native GLX context lifecycle
- * (created from the window's X11 display), the Skia [DirectContext] and on-screen GPU surface for the
- * current frame, and the frame-loop/presentation plumbing, all in one type, mirroring [MetalRedrawer].
+ * The single per-window Linux (GLX) OpenGL on-screen render context ([AWTRedrawer]): it owns the native
+ * GLX context lifecycle (created from the window's X11 display), the Skia [DirectContext] and on-screen GPU
+ * surface for the current frame, and the present/swap. The frame loop itself lives in the generic
+ * [OnScreenRedrawer].
  *
- * Pacing is per-window: every GLX call (create / make-current / swap / swap-interval / destroy) runs inside
- * [org.jetbrains.skiko.lockLinuxDrawingSurface], and [draw] moves the *entire* per-frame body (lock, make
- * current, draw, swap, unlock) onto [dispatcherToBlockOn] rather than just the vsync wait, since GLX has no
- * decoupled vsync-wait primitive like Windows' `dwmFlush` -- the vblank wait is fused into `glXSwapBuffers`
- * itself. Per-window pacing off the EDT keeps that fused vblank wait from starving the EDT and is
- * consistent with how [MetalRedrawer] and [WindowsOpenGLRedrawer] pace.
+ * Pacing is per window: every GLX call (create / make-current / swap / swap-interval / destroy) runs inside
+ * [org.jetbrains.skiko.lockLinuxDrawingSurface], and [renderFrame] moves the *entire* per-frame body (lock,
+ * make current, draw, swap, unlock) onto [dispatcherToBlockOn] rather than just the vsync wait, since GLX has
+ * no decoupled vsync-wait primitive like Windows' `dwmFlush` -- the vblank wait is fused into
+ * `glXSwapBuffers` itself. An additional software frame limiter runs in [paceBeforeFrame] (some Linuxes don't
+ * honour vsync).
+ *
+ * The class name is bound to its JNI symbols, including the file facade
+ * `Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_*` for the top-level `external fun`s; renaming it
+ * alone unbinds them (UnsatisfiedLinkError at runtime, not a compile error).
  *
  * Content to draw is provided by [SkiaLayer.draw].
  */
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
-    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
+) : AWTRedrawer {
     init {
         loadOpenGLLibrary()
     }
 
     /**
-     * Guards every native touch point. Frames render off the EDT (see [draw]) while [dispose] can run on the
-     * EDT concurrently; both take this lock and re-check [isDisposed] inside it, so [dispose] can't free the
-     * GLX context out from under an in-flight JNI call.
+     * Guards every native touch point. Frames render off the EDT (see [renderFrame]) while [dispose] can run
+     * on the EDT concurrently; both take this lock and re-check [isDisposed] inside it, so [dispose] can't
+     * free the GLX context out from under an in-flight JNI call.
      */
     private val drawLock = Any()
+
+    @Volatile
+    private var isDisposed = false
 
     private var context = 0L
     private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
 
+    override val graphicsApi: GraphicsApi get() = GraphicsApi.OPENGL
+    override val deviceName: String?
+
     init {
+        var name: String? = null
         layer.backedLayer.lockLinuxDrawingSurface {
             context = it.createContext(layer.transparency)
             if (context == 0L) {
                 throw RenderException("Cannot create Linux GL context")
             }
             it.makeCurrent(context)
-            adapterName.also { adapterName ->
+            name = adapterName.also { adapterName ->
                 if (adapterName != null && !isVideoCardSupported(GraphicsApi.OPENGL, hostOs, adapterName)) {
                     throw RenderException("Cannot create Linux GL context")
                 }
             }
-            onDeviceChosen(adapterName)
             it.setSwapInterval(swapInterval)
         }
-        onContextInit()
+        deviceName = name
     }
 
     private val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
@@ -74,6 +84,8 @@ internal class LinuxOpenGLRedrawer(
                     "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
         }
 
+    override fun isTransparentBackgroundSupported(): Boolean = defaultIsTransparentBackgroundSupported(layer)
+
     private val frameJob = Job()
     @Volatile
     private var frameLimit = 0.0
@@ -94,19 +106,17 @@ internal class LinuxOpenGLRedrawer(
         }
     }
 
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
+    override suspend fun paceBeforeFrame() {
+        // Gate the software frame limiter on visibility: pace only while the window is showing.
         if (layer.isShowing) {
             limitFramesIfNeeded()
-            update()
-            draw()
         }
     }
 
     override fun dispose() {
-        checkDisposed()
+        isDisposed = true
         frameJob.cancel()
         synchronized(drawLock) {
-            frameDispatcher.cancel()
             layer.backedLayer.lockLinuxDrawingSurface {
                 // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
                 // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
@@ -116,44 +126,30 @@ internal class LinuxOpenGLRedrawer(
                 glContext = null
                 it.destroyContext(context)
             }
-            super.dispose()
         }
     }
 
-    override fun needRender(throttledToVsync: Boolean) {
-        checkDisposed()
-        frameDispatcher.scheduleFrame()
-    }
-
-    override fun renderImmediately() {
-        checkDisposed()
-        update()
-        inDrawScope {
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                val turnOffVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately
-                drawAndSwap(turnOffVsync)
-            }
-        }
-    }
-
-    private suspend fun draw() {
-        inDrawScope {
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        if (immediate) {
+            val turnOffVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately
+            drawAndSwap(scope, turnOffVsync)
+        } else {
             // Move the entire per-frame body (JAWT lock, make current, draw, swap, unlock) off the EDT: see
             // the class kdoc for why this can't be limited to just the swap call the way Windows does it
             // with dwmFlush.
             withContext(dispatcherToBlockOn) {
-                drawAndSwap(turnOffVsync = false)
+                drawAndSwap(scope, turnOffVsync = false)
             }
         }
     }
 
-    private fun LayerDrawScope.drawAndSwap(turnOffVsync: Boolean) = synchronized(drawLock) {
+    private fun drawAndSwap(scope: LayerDrawScope, turnOffVsync: Boolean) = synchronized(drawLock) {
         if (isDisposed) {
             return
         }
         layer.backedLayer.lockLinuxDrawingSurface {
             it.makeCurrent(context)
-            drawFrame()
+            with(scope) { drawFrame() }
             if (turnOffVsync) {
                 it.setSwapInterval(0)
             }

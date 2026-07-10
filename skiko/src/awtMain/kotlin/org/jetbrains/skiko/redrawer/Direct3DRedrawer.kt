@@ -9,10 +9,13 @@ import org.jetbrains.skiko.*
 import java.lang.ref.Reference
 
 /**
- * This is the single per-window Direct3D render context: it owns the native DirectX12 device/adapter and
- * swap chain lifecycle, the Skia [DirectContext] and double-buffered on-screen GPU surfaces for the current
- * frame, and the frame-loop/presentation plumbing. Device, swap chain, Skia surfaces, and frame loop all
- * live in this one type, mirroring [MetalRedrawer].
+ * The single per-window Direct3D on-screen render context ([AWTRedrawer]): it owns the native DirectX12
+ * device/adapter and swap chain lifecycle, the Skia [DirectContext] and double-buffered on-screen GPU
+ * surfaces for the current frame, and the present/swap (with vsync fused into the swap). The frame loop
+ * itself lives in the generic [OnScreenRedrawer].
+ *
+ * The class name is bound to its statically name-mangled JNI symbols; renaming it alone unbinds them
+ * (UnsatisfiedLinkError at runtime, not a compile error).
  *
  * Content to draw is provided by [SkiaLayer.draw].
  *
@@ -21,16 +24,18 @@ import java.lang.ref.Reference
  */
 internal class Direct3DRedrawer(
     private val layer: SkiaLayer,
-    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.DIRECT3D) {
+) : AWTRedrawer {
 
     /**
-     * Guards every native touch point. Frames render off the EDT (see [draw]) while [dispose] can run on the
-     * EDT concurrently; both take this lock and re-check [isDisposed] inside it, so [dispose] can't free the
-     * native device out from under an in-flight JNI call.
+     * Guards every native touch point. Frames render off the EDT (see [renderFrame]) while [dispose] can run
+     * on the EDT concurrently; both take this lock and re-check [isDisposed] inside it, so [dispose] can't
+     * free the native device out from under an in-flight JNI call.
      */
     private val drawLock = Any()
+
+    @Volatile
+    private var isDisposed = false
     private var isSwapChainInitialized = false
 
     private var device: Long = 0L
@@ -44,6 +49,9 @@ internal class Direct3DRedrawer(
     val adapterName: String
     val adapterMemorySize: Long
 
+    override val graphicsApi: GraphicsApi get() = GraphicsApi.DIRECT3D
+    override val deviceName: String?
+
     init {
         val adapter = chooseAdapter(properties.adapterPriority.ordinal)
         if (adapter == 0L) {
@@ -51,7 +59,7 @@ internal class Direct3DRedrawer(
         }
         adapterName = getAdapterName(adapter)
         adapterMemorySize = getAdapterMemorySize(adapter)
-        onDeviceChosen(adapterName)
+        deviceName = adapterName
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
             .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
     }
@@ -61,16 +69,7 @@ internal class Direct3DRedrawer(
                 "Video card: $adapterName\n" +
                 "Total VRAM: ${adapterMemorySize / 1024 / 1024} MB\n"
 
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing) {
-            update()
-            draw()
-        }
-    }
-
-    init {
-        onContextInit()
-    }
+    override fun isTransparentBackgroundSupported(): Boolean = defaultIsTransparentBackgroundSupported(layer)
 
     // GPU surfaces for the current frame; only touched under `drawLock`.
     private var context: DirectContext? = null
@@ -84,43 +83,29 @@ internal class Direct3DRedrawer(
     private fun isSurfacesNull() = surfaces.all { it == null }
 
     override fun dispose() = synchronized(drawLock) {
-        frameDispatcher.cancel()
+        isDisposed = true
         disposeSurfaces()
         context?.close()
         context = null
         disposeDevice(device)
         device = 0L
-        super.dispose()
     }
 
-    override fun needRender(throttledToVsync: Boolean) {
-        checkDisposed()
-        frameDispatcher.scheduleFrame()
-    }
-
-    override fun renderImmediately() {
-        checkDisposed()
-        update()
-        inDrawScope {
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
-            }
-        }
-    }
-
-    private suspend fun draw() {
-        inDrawScope {
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        if (immediate) {
+            drawAndSwap(scope, withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
+        } else {
             withContext(dispatcherToBlockOn) {
-                drawAndSwap(withVsync = properties.isVsyncEnabled)
+                drawAndSwap(scope, withVsync = properties.isVsyncEnabled)
             }
         }
     }
 
-    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
+    private fun drawAndSwap(scope: LayerDrawScope, withVsync: Boolean) = synchronized(drawLock) {
         if (isDisposed) {
             return
         }
-        drawFrame()
+        with(scope) { drawFrame() }
         swap(withVsync)
     }
 

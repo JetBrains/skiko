@@ -4,9 +4,14 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 /**
- * This is the single per-window ANGLE render context: it owns the native ANGLE (EGL-over-D3D11) device
- * lifecycle, the Skia [DirectContext] and on-screen GPU surface for the current frame, and the
- * frame-loop/presentation plumbing, mirroring [MetalRedrawer].
+ * The single per-window ANGLE (EGL-over-D3D11) on-screen render context ([AWTRedrawer]): it owns the
+ * native ANGLE device lifecycle, the Skia [DirectContext] and on-screen GPU surface for the current frame,
+ * and the present/swap (with vsync in the swap). The frame loop itself lives in the generic
+ * [OnScreenRedrawer].
+ *
+ * The class name is bound to its JNI symbols, including the file facade
+ * `Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_*` for the top-level `external fun`s; renaming it alone
+ * unbinds them (UnsatisfiedLinkError at runtime, not a compile error).
  *
  * Content to draw is provided by [SkiaLayer.draw].
  *
@@ -14,9 +19,8 @@ import org.jetbrains.skiko.*
  */
 internal class AngleRedrawer(
     private val layer: SkiaLayer,
-    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.ANGLE) {
+) : AWTRedrawer {
     init {
         try {
             loadAngleLibrary()
@@ -31,6 +35,9 @@ internal class AngleRedrawer(
      */
     private val drawLock = Any()
 
+    @Volatile
+    private var isDisposed = false
+
     private var device: Long = 0L
         get() {
             if (field == 0L) {
@@ -39,27 +46,21 @@ internal class AngleRedrawer(
             return field
         }
 
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing) {
-            update(System.nanoTime())
-            draw()
-        }
-    }
-
     private val adapterName get() = AngleApi.glGetString(AngleApi.GL_RENDERER)
+
+    override val graphicsApi: GraphicsApi get() = GraphicsApi.ANGLE
+    override val deviceName: String?
 
     init {
         device = layer.backedLayer.useDrawingSurfacePlatformInfo { platformInfo ->
             createAngleDevice(platformInfo, layer.transparency).takeIf { it != 0L }
                 ?: throw RenderException("Failed to create ANGLE device.")
         }
-        adapterName.let { adapterName ->
+        deviceName = adapterName.also { adapterName ->
             if (adapterName != null && !isVideoCardSupported(GraphicsApi.ANGLE, hostOs, adapterName)) {
                 throw RenderException("Cannot create ANGLE redrawer.")
             }
-            onDeviceChosen(adapterName)
         }
-        onContextInit()
     }
 
     // GPU surface for the current frame; only touched under `drawLock`.
@@ -76,44 +77,30 @@ internal class AngleRedrawer(
                 "Model: ${AngleApi.glGetString(AngleApi.GL_RENDERER)}\n" +
                 "Version: ${AngleApi.glGetString(AngleApi.GL_VERSION)}\n"
 
+    override fun isTransparentBackgroundSupported(): Boolean = defaultIsTransparentBackgroundSupported(layer)
+
     override fun dispose() = synchronized(drawLock) {
-        frameDispatcher.cancel()
+        isDisposed = true
         makeCurrent(device)
         disposeSurface()
         context?.close()
         context = null
         disposeDevice(device)
         device = 0L
-        super.dispose()
     }
 
-    override fun needRender(throttledToVsync: Boolean) {
-        checkDisposed()
-        frameDispatcher.scheduleFrame()
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        // ANGLE renders on the EDT (there is no off-EDT hand-off); vsync is applied inside the swap.
+        val withVsync = if (immediate) SkikoProperties.windowsWaitForVsyncOnRedrawImmediately else properties.isVsyncEnabled
+        drawAndSwap(scope, withVsync)
     }
 
-    override fun renderImmediately() {
-        checkDisposed()
-        update()
-        inDrawScope {
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
-            }
-        }
-    }
-
-    private fun draw() {
-        inDrawScope {
-            drawAndSwap(withVsync = properties.isVsyncEnabled)
-        }
-    }
-
-    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
+    private fun drawAndSwap(scope: LayerDrawScope, withVsync: Boolean) = synchronized(drawLock) {
         if (isDisposed) {
             return
         }
         makeCurrent(device)
-        drawFrame()
+        with(scope) { drawFrame() }
         swapBuffers(device, withVsync)
     }
 

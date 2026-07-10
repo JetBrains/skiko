@@ -8,23 +8,34 @@ import org.jetbrains.skiko.layerFrameLimiter
 import java.lang.ref.Reference
 
 /**
- * The direct-software (CPU, blit-straight-to-window) on-screen render context shared by Windows and Linux.
- * It owns the native window-backed raster device (created by the platform subclass, [WindowsSoftwareRedrawer]
- * / [LinuxSoftwareRedrawer]), the Skia raster [Surface] for the current frame, and the frame-loop plumbing.
+ * The direct-software (CPU, blit-straight-to-window) on-screen render context ([AWTRedrawer]) shared by
+ * Windows and Linux. It owns the native window-backed raster device (created by the platform subclass,
+ * [WindowsSoftwareRedrawer] / [LinuxSoftwareRedrawer]) and the Skia raster [Surface] for the current frame.
+ * The generic [OnScreenRedrawer] drives the frame loop. An optional software frame limiter runs in
+ * [paceBeforeFrame].
+ *
+ * The platform subclass wraps the per-frame body and the native lifecycle calls in its drawing-surface lock
+ * by overriding [draw]/[resize]/[finishFrame]/[dispose] (Linux); [renderFrame] and the synchronous
+ * `renderImmediately` path both flow through [draw], so the subclass only needs to wrap it once.
  *
  * Content to draw is provided by [SkiaLayer.draw].
  */
 internal abstract class AbstractDirectSoftwareRedrawer(
     private val layer: SkiaLayer,
-    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
+) : AWTRedrawer {
 
     /**
      * Guards the native device and the raster [surface]/[canvas]. Frame loop and [dispose] both run on the
      * EDT here, so they can't actually race; the lock is kept for uniformity with the off-EDT backends.
      */
     private val drawLock = Any()
+
+    @Volatile
+    private var isDisposed = false
+
+    override val graphicsApi: GraphicsApi get() = GraphicsApi.SOFTWARE_FAST
+    override val deviceName: String? get() = "Software"
 
     // Raster surface for the current frame, recreated on resize; only touched under `drawLock`.
     private var isContextInitialized = false
@@ -36,48 +47,40 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     override val renderInfo: String
         get() = renderInfoHeader(layer.renderApi)
 
+    override fun isTransparentBackgroundSupported(): Boolean = defaultIsTransparentBackgroundSupported(layer)
+
     private val frameJob = Job()
     private val frameLimiter = layerFrameLimiter(CoroutineScope(frameJob), layer.backedLayer)
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
+
+    override suspend fun paceBeforeFrame() {
         if (properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) {
             frameLimiter.awaitNextFrame()
-        }
-
-        if (layer.isShowing) {
-            update()
-            draw()
         }
     }
 
     protected var device = 0L
 
-    override fun needRender(throttledToVsync: Boolean) {
-        frameDispatcher.scheduleFrame()
-    }
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) = draw(scope)
 
-    protected open fun draw() = inDrawScope { performDraw() }
-
-    override fun renderImmediately() {
-        update()
-        if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-            draw()
-        }
-    }
+    /**
+     * Renders one frame. Kept `open` so the platform subclass ([LinuxSoftwareRedrawer]) can wrap the whole
+     * body in its drawing-surface lock, mirroring the `draw()` override point.
+     */
+    protected open fun draw(scope: LayerDrawScope) = performDraw(scope)
 
     open fun resize(width: Int, height: Int) = resize(device, width, height)
     open fun finishFrame(surface: Long) = finishFrame(device, surface)
 
     override fun dispose() = synchronized(drawLock) {
+        isDisposed = true
         frameJob.cancel()
-        frameDispatcher.cancel()
         disposeSurface()
         disposeDevice(device)
-        super.dispose()
     }
 
-    private fun LayerDrawScope.performDraw() = synchronized(drawLock) {
+    private fun performDraw(scope: LayerDrawScope) = synchronized(drawLock) {
         if (!isDisposed) {
-            drawFrame()
+            with(scope) { drawFrame() }
         }
     }
 

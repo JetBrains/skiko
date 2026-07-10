@@ -5,30 +5,39 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 /**
- * This is the single per-window Windows (WGL) OpenGL render context: it owns the native WGL device/context
- * lifecycle, the Skia [DirectContext] and on-screen GPU surface for the current frame, and the
- * frame-loop/presentation plumbing.
+ * The single per-window Windows (WGL) OpenGL on-screen render context ([AWTRedrawer]): it owns the
+ * native WGL device/context lifecycle, the Skia [DirectContext] and on-screen GPU surface for the current
+ * frame, and the present/swap. The frame loop itself lives in the generic [OnScreenRedrawer], which
+ * drives this per-window render context.
  *
- * Frame pacing stays batched across all visible windows via the companion object's [FrameDispatcher]:
- * every visible window draws and swaps, then (if all of them want vsync) the loop waits once for
- * [dwmFlush] off the EDT, instead of each window waiting for vsync independently.
+ * Pacing is **per window**: each frame draws + swaps + `glFinish`es on the EDT, then (if vsync is enabled)
+ * waits once for [dwmFlush] off the EDT in [paceAfterFrame]. GL resource calls stay on the EDT, so (unlike
+ * the GPU backends that hop off the EDT to render) this type does not need a `drawLock`: draw and [dispose]
+ * never run concurrently. Only the [dwmFlush] vsync wait is moved off the EDT, and it touches no GL resource
+ * that [dispose] frees.
  *
  * Content to draw is provided by [SkiaLayer.draw].
  */
 internal class WindowsOpenGLRedrawer(
     private val layer: SkiaLayer,
-    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
+) : AWTRedrawer {
     init {
         loadOpenGLLibrary()
     }
+
+    @Volatile
+    private var isDisposed = false
 
     private val device: Long = layer.backedLayer.useDrawingSurfacePlatformInfo {
         getDevice(it).also { devicePtr ->
             check(devicePtr != 0L) { "Can't get device" }
         }
     }
+
+    override val graphicsApi: GraphicsApi get() = GraphicsApi.OPENGL
+    override var deviceName: String? = null
+        private set
 
     private val context = createContext(device, layer.contentHandle, layer.transparency).also {
         if (it == 0L) {
@@ -39,8 +48,8 @@ internal class WindowsOpenGLRedrawer(
             if (adapterName != null && !isVideoCardSupported(GraphicsApi.OPENGL, hostOs, adapterName)) {
                 throw RenderException("Cannot create Windows GL context")
             }
+            deviceName = adapterName
         }
-        onDeviceChosen(adapterName)
     }
 
     private val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
@@ -62,6 +71,8 @@ internal class WindowsOpenGLRedrawer(
                     "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
         }
 
+    override fun isTransparentBackgroundSupported(): Boolean = defaultIsTransparentBackgroundSupported(layer)
+
     init {
         makeCurrent()
         // For vsync we will use dwmFlush instead of swapInterval,
@@ -69,43 +80,35 @@ internal class WindowsOpenGLRedrawer(
         // With dwmFlush it is stable (16.6-16.8 ms)
         // GLFW also uses dwmFlush (https://www.glfw.org/docs/3.0/window.html#window_swap)
         setSwapInterval(0)
-        onContextInit()
     }
 
     override fun dispose() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
+        isDisposed = true
         makeCurrent()
         disposeSurface()
         glContext?.close()
         glContext = null
         deleteContext(context)
-        super.dispose()
     }
 
-    override fun needRender(throttledToVsync: Boolean) {
-        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
-        toRedraw.add(this)
-        frameDispatcher.scheduleFrame()
-    }
-
-    override fun renderImmediately() {
-        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
-        update()
-        inDrawScope {
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                makeCurrent()
-                drawFrame()
-                swapBuffers()
-                OpenGLApi.instance.glFinish()
-                if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
-                    dwmFlush()
-                }
-            }
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        makeCurrent()
+        with(scope) { drawFrame() }
+        swapBuffers()
+        OpenGLApi.instance.glFinish()
+        if (immediate && SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
+            // The looped path waits for vsync off the EDT in paceAfterFrame; the immediate path waits inline.
+            dwmFlush()
         }
     }
 
-    private fun draw() {
-        inDrawScope { drawFrame() }
+    override suspend fun paceAfterFrame() {
+        if (properties.isVsyncEnabled) {
+            withContext(dispatcherToBlockOn) {
+                dwmFlush() // wait for vsync
+            }
+        }
     }
 
     private fun LayerDrawScope.drawFrame() {
@@ -184,53 +187,6 @@ internal class WindowsOpenGLRedrawer(
 
     private fun makeCurrent() = makeCurrent(device, context)
     private fun swapBuffers() = swapBuffers(device)
-
-    companion object {
-        private val toRedraw = mutableSetOf<WindowsOpenGLRedrawer>()
-        private val toRedrawCopy = mutableSetOf<WindowsOpenGLRedrawer>()
-        private val toRedrawVisible = toRedrawCopy
-            .asSequence()
-            .filterNot(WindowsOpenGLRedrawer::isDisposed)
-            .filter { it.layer.isShowing }
-
-        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            toRedrawCopy.addAll(toRedraw)
-            toRedraw.clear()
-
-            val nanoTime = System.nanoTime()
-            for (redrawer in toRedrawVisible) {
-                try {
-                    redrawer.update(nanoTime)
-                } catch (e: CancellationException) {
-                    // continue
-                }
-            }
-
-            for (redrawer in toRedrawVisible) {
-                redrawer.makeCurrent()
-                redrawer.draw()
-            }
-
-            for (redrawer in toRedrawVisible) {
-                redrawer.swapBuffers()
-            }
-
-            for (redrawer in toRedrawVisible) {
-                redrawer.makeCurrent()
-                OpenGLApi.instance.glFinish()
-            }
-
-            val isVsyncEnabled = toRedrawVisible.all { it.properties.isVsyncEnabled }
-            if (isVsyncEnabled) {
-                withContext(dispatcherToBlockOn) {
-                    dwmFlush() // wait for vsync
-                }
-            }
-
-            // Without clearing we will have a memory leak
-            toRedrawCopy.clear()
-        }
-    }
 }
 
 private external fun makeCurrent(device: Long, context: Long)
