@@ -62,7 +62,7 @@ internal class MacOsOpenGLRedrawer(
     private fun syncContentScale() {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        glLayer.contentsScale = skiaLayer.nsView.window!!.backingScaleFactor
+        glLayer.contentsScale = skiaLayer.nsView.window?.backingScaleFactor ?: 1.0
         CATransaction.commit()
         CATransaction.flush()
     }

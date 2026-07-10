@@ -64,7 +64,8 @@ actual open class SkiaLayer {
     }
 
     actual fun detach() {
-        // TODO: when switch to the frame dispatcher - stop it here.
+        state?.dispose()
+        state = null
     }
 
     actual val component: Any?
@@ -79,7 +80,7 @@ actual open class SkiaLayer {
     private fun attachTo(htmlCanvas: HTMLCanvasElement) {
         this.htmlCanvas = htmlCanvas
 
-        state = object: CanvasRenderer(createWebGLContext(htmlCanvas), htmlCanvas.width, htmlCanvas.height) {
+        state = object: CanvasRenderer(createWebGLContext(htmlCanvas), htmlCanvas) {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
                 val currentNanos = currentTimestamp * 1_000_000

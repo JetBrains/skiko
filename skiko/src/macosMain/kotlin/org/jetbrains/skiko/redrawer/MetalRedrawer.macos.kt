@@ -126,7 +126,7 @@ internal class MacOsMetalRedrawer(
     private fun syncContentScale() {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        metalLayer.contentsScale = skiaLayer.nsView.window!!.backingScaleFactor
+        metalLayer.contentsScale = skiaLayer.nsView.window?.backingScaleFactor ?: 1.0
         CATransaction.commit()
         CATransaction.flush()
     }

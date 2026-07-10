@@ -68,7 +68,7 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manag
     // This method is called from the main thread.
     fun update() {
         layer.renderDelegate?.let {
-            val bounds = Rect.makeWH(width.toFloat(), width.toFloat())
+            val bounds = Rect.makeWH(width.toFloat(), height.toFloat())
             val canvas = pictureRecorder.beginRecording(bounds)
             try {
                 it.onRender(canvas, width, height, System.nanoTime())
