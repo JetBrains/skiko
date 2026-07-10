@@ -1,5 +1,6 @@
 // This file is used for loading skiko.wasm and provides the environment for it
 let gl = null;
+const contexts = [null];
 let wasmExports = null;
 
 const resources = {
@@ -982,30 +983,39 @@ export const GL = new Proxy({}, {
     get(target, prop) {
         if (prop === 'createContext') {
             return (canvas, attr) => {
-                gl = canvas.getContext('webgl2', attr);
-                if (!gl) {
-                    console.error("Failed to create WebGL2 context. Trying WebGL1...");
-                    gl = canvas.getContext('webgl', attr);
+                const newGl = canvas.getContext('webgl2', attr) || canvas.getContext('webgl', attr);
+                if (newGl) {
+                    const id = contexts.length;
+                    contexts.push(newGl);
+                    // gl = newGl;
+                    console.log("WebGL context created successfully, id:", id);
+                    return id;
                 }
-                if (gl) {
-                    // console.log("WebGL context created successfully:", gl.getParameter(0x1F02 /* VERSION */));
-                    console.log("WebGL context created successfully");
-                } else {
-                    console.error("Failed to create any WebGL context.");
-                }
-                return 1; // For now we only support one context
+                console.error("Failed to create any WebGL context.");
+                return 0;
             };
         }
         if (prop === 'makeContextCurrent') {
-            return (context) => {
-                console.log("Setting WebGL context:", context);
-                return true;
+            return (contextId) => {
+                const newGl = contexts[contextId];
+                if (newGl) {
+                    gl = newGl;
+                    console.log("Setting WebGL context:", contextId);
+                    return true;
+                }
+                console.error("Failed to set WebGL context:", contextId);
+                return false;
             };
         }
         return (...args) => {
             console.log("GL call:", prop, args);
-            if (gl && typeof gl[prop] === 'function') {
-                return gl[prop](...args);
+            let methodName = prop;
+            if (prop.startsWith('gl')) {
+                methodName = prop.substring(2);
+                methodName = methodName.charAt(0).toLowerCase() + methodName.slice(1);
+            }
+            if (gl && typeof gl[methodName] === 'function') {
+                return gl[methodName](...args);
             }
             if (!gl) {
                 console.warn(`GL call while gl is null: ${prop}`);
