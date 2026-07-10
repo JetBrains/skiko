@@ -17,7 +17,7 @@
 extern "C"
 {
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMetalContext(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRenderContext_makeMetalContext(
         JNIEnv *env, jobject contextHandler, jlong adapterPtr) {
     @autoreleasepool {
         id <MTLDevice> adapter = (__bridge id <MTLDevice>) (void *) adapterPtr;
@@ -29,7 +29,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMe
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMetalTexture(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRenderContext_makeMetalTexture(
         JNIEnv *env, jobject contextHandler, jlong adapterPtr, jlong oldTexturePtr, jint width, jint height
 ) {
     @autoreleasepool {
@@ -53,13 +53,13 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMe
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_disposeMetalTexture(JNIEnv *env, jobject contextHandler, jlong texturePtr) {
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRenderContext_disposeMetalTexture(JNIEnv *env, jobject contextHandler, jlong texturePtr) {
     @autoreleasepool {
         id <MTLTexture> oldTexture = (__bridge_transfer id <MTLTexture>) (void *) texturePtr;
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMetalRenderTargetOffScreen(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRenderContext_makeMetalRenderTargetOffScreen(
         JNIEnv *env, jobject contextHandler, jlong texturePtr) {
     @autoreleasepool {
         id <MTLTexture> texture = (__bridge id <MTLTexture>) (void *) texturePtr;

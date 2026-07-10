@@ -20,64 +20,64 @@ JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_SetupKt_linuxGetSystemDpiScale
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_setSwapInterval");
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_setSwapInterval");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_swapBuffers");
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_swapBuffers");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jlong contextPtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_makeCurrent");
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jlong contextPtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_makeCurrent");
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jboolean transparency) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext");
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jboolean transparency) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_createContext");
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_destroyContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong contextPtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_destroyContext");
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_destroyContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong contextPtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_destroyContext");
 }
 
 #endif
 
 
 #ifndef SK_BUILD_FOR_WIN
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jlong platformInfoPtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice");
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_getDevice(JNIEnv *env, jobject redrawer, jlong platformInfoPtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_getDevice");
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong devicePtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_swapBuffers");
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong devicePtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_swapBuffers");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_flush(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_flush(
         JNIEnv *env, jobject redrawer, jlong contextPtr, jlong surfacePtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_flush");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_flush");
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_chooseAdapter(JNIEnv *env, jobject redrawer, jint adapterPriority) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_chooseAdapter");
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_chooseAdapter(JNIEnv *env, jobject redrawer, jint adapterPriority) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_chooseAdapter");
     return 0;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_createDirectXDevice(
         JNIEnv *env, jobject redrawer, jint adapterPriority, jlong contentHandle, jboolean transparency) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_createDirectXDevice");
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initSwapChain(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_initSwapChain(
         JNIEnv *env, jobject redrawer, jlong devicePtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initSwapChain");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_initSwapChain");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initFence(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_initFence(
         JNIEnv *env, jobject redrawer, jlong devicePtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initFence");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_initFence");
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1init(JNIEnv *env, jobject obj) {
@@ -132,82 +132,82 @@ JNIEXPORT void Java_org_jetbrains_skiko_PlatformOperationsKt_osxOrderEmojiAndSym
     skikoUnimplemented("Java_org_jetbrains_skiko_PlatformOperationsKt_osxOrderEmojiAndSymbolsPopup");
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalContext(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_makeMetalContext(
     JNIEnv* env, jobject redrawer, jlong devicePtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalContext");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_makeMetalContext");
     return 0;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalRenderTarget(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_makeMetalRenderTarget(
     JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalRenderTarget");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_makeMetalRenderTarget");
     return 0;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRendering(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_startRendering(
     JNIEnv * env, jobject redrawer)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRendering");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_startRendering");
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_endRendering(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_endRendering(
     JNIEnv * env, jobject redrawer, jlong handle)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_endRendering");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_endRendering");
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_createMetalDevice(
     JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint adapterPriority, jlong platformInfoPtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_createMetalDevice");
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLayers(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_resizeLayers(
     JNIEnv *env, jobject redrawer, jlong devicePtr, jint x, jint y, jint width, jint height)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLayers");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_resizeLayers");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerVisible(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_setLayerVisible(
     JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean isVisible)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerVisible");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_setLayerVisible");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_setContentScale");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setVSyncEnabled(JNIEnv *env, jobject obj, jlong devicePtr, jboolean enabled)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_setVSyncEnabled(JNIEnv *env, jobject obj, jlong devicePtr, jboolean enabled)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setVSyncEnabled");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_setVSyncEnabled");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFrameAsync(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_finishFrameAsync(
+    JNIEnv *env, jobject renderContext, jlong devicePtr)
+{
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_finishFrameAsync");
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_disposeDevice(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFrameAsync");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_disposeDevice");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDevice(
+JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_getAdapterName(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDevice");
-}
-
-JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterName(
-    JNIEnv *env, jobject redrawer, jlong devicePtr)
-{
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterName");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_getAdapterName");
     return 0;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterMemorySize(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_getAdapterMemorySize(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterMemorySize");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_getAdapterMemorySize");
     return 0;
 }
 
@@ -217,51 +217,51 @@ JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_NativeApplicationKt_getApplicati
     return 0;
 }
 
-JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_isOccluded(JNIEnv *env, jobject redrawer, jlong windowPtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_isOccluded");
+JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_isOccluded(JNIEnv *env, jobject redrawer, jlong windowPtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_isOccluded");
     return false;
 }
 #endif
 
 
 #ifndef SK_ANGLE
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_createAngleDevice(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_createAngleDevice(
     JNIEnv *env, jobject redrawer, jlong platformInfoPtr, jboolean transparency)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_createAngleDevice");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_createAngleDevice");
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeCurrent(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_makeCurrent(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeCurrent");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_makeCurrent");
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleContext(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_makeAngleContext(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleContext");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_makeAngleContext");
     return 0;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleRenderTarget(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_makeAngleRenderTarget(
     JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleRenderTarget");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_makeAngleRenderTarget");
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_swapBuffers(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_swapBuffers(
     JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean waitForVsync)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_swapBuffers");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_swapBuffers");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_disposeDevice(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_disposeDevice(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_disposeDevice");
+    skikoUnimplemented("Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_disposeDevice");
 }
 
 JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_AngleApi_glGetString(

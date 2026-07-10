@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import kotlinx.coroutines.*
 import org.jetbrains.skia.*
@@ -9,11 +9,11 @@ import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.*
 
-internal class SoftwareRedrawer(
+internal class SoftwareRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-) : AWTRedrawer(host, analytics, GraphicsApi.SOFTWARE_FAST) {
+) : AwtRenderContext(host, analytics, GraphicsApi.SOFTWARE_FAST) {
     init {
         onDeviceChosen("Software")
     }
@@ -67,7 +67,7 @@ internal class SoftwareRedrawer(
     }
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "SoftwareRedrawer is disposed" }
+        check(!isDisposed) { "SoftwareRenderContext is disposed" }
         if (standaloneSurface == null || width != standaloneWidth || height != standaloneHeight) {
             standaloneSurface?.close()
             standaloneSurface = Surface.makeRaster(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL))
@@ -107,7 +107,7 @@ internal class SoftwareRedrawer(
     }
 
     private fun performDraw(scope: LayerDrawScope) = synchronized(drawLock) {
-        // Re-check inside the lock (not just at the call site), matching MetalRedrawer: this is what makes
+        // Re-check inside the lock (not just at the call site), matching MetalRenderContext: this is what makes
         // `dispose` and an in-flight frame mutually exclusive.
         if (!isDisposed) {
             with(scope) { drawFrame() }

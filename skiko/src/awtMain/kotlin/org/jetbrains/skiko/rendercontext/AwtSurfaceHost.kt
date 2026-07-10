@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
@@ -8,9 +8,9 @@ import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 
 /**
- * The on-screen AWT host an [AWTRedrawer] renders into and presents to.
+ * The on-screen AWT host an [AwtRenderContext] renders into and presents to.
  *
- * This is the seam that decouples the per-API AWT render contexts (the `*Redrawer` classes) from the concrete
+ * This is the seam that decouples the per-API AWT render contexts from the concrete
  * [org.jetbrains.skiko.SkiaLayer]. It captures **exactly** what those contexts read from their host — nothing
  * more — so a render context can be driven by any AWT surface owner, not just `SkiaLayer`:
  *

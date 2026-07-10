@@ -23,7 +23,7 @@ public:
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsSoftwareRedrawer_createDevice(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsSoftwareRenderContext_createDevice(
         JNIEnv *env, jobject redrawer, jlong contentHandle, jintArray surfacePropsInts, jboolean transparency)
     {
         SoftwareDevice *device = new SoftwareDevice();
@@ -38,7 +38,7 @@ extern "C"
         return toJavaPointer(device);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_resize(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_AbstractDirectSoftwareRenderContext_resize(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
         __try
@@ -68,14 +68,14 @@ extern "C"
         }
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_acquireSurface(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_AbstractDirectSoftwareRenderContext_acquireSurface(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);
         return toJavaPointer(device->surface.release());
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_finishFrame(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_AbstractDirectSoftwareRenderContext_finishFrame(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jlong surfacePtr)
     {
         __try
@@ -95,7 +95,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_disposeDevice(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_AbstractDirectSoftwareRenderContext_disposeDevice(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);

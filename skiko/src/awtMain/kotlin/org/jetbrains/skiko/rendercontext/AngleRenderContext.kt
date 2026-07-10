@@ -1,13 +1,13 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
-internal class AngleRedrawer(
+internal class AngleRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(host, analytics, GraphicsApi.ANGLE) {
+) : AwtRenderContext(host, analytics, GraphicsApi.ANGLE) {
     init {
         try {
             loadAngleLibrary()
@@ -37,7 +37,7 @@ internal class AngleRedrawer(
         }
         adapterName.let { adapterName ->
             if (adapterName != null && !isVideoCardSupported(GraphicsApi.ANGLE, hostOs, adapterName)) {
-                throw RenderException("Cannot create ANGLE redrawer.")
+                throw RenderException("Cannot create ANGLE render context.")
             }
             onDeviceChosen(adapterName)
         }
@@ -85,7 +85,7 @@ internal class AngleRedrawer(
     }
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "AngleRedrawer is disposed" }
+        check(!isDisposed) { "AngleRenderContext is disposed" }
         makeCurrent(device)
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")

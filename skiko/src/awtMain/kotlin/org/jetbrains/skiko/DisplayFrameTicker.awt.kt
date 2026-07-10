@@ -2,7 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skiko.linux.LinuxVsyncTicker
-import org.jetbrains.skiko.redrawer.MetalVSyncer
+import org.jetbrains.skiko.rendercontext.MetalVSyncer
 import org.jetbrains.skiko.windows.WindowsVsyncTicker
 import java.awt.Component
 import java.awt.Container

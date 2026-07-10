@@ -11,7 +11,7 @@
 
 extern "C"
 {
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_flush(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_Direct3DRenderContext_flush(
         JNIEnv *env, jobject redrawer, jlong contextPtr, jlong surfacePtr)
     {
         __try

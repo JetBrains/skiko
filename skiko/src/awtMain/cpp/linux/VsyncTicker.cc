@@ -21,7 +21,7 @@ namespace {
  * LinuxVsyncTicker is a *separate*, render-path-independent tick source: one dedicated background
  * thread per window that blocks on the driver's real vblank counter and reports the observed
  * vsync time back to Kotlin. It never touches the GLX context / drawing-surface-locking machinery
- * that LinuxOpenGLRedrawer's swapBuffers/makeCurrent use (see redrawer.cc) and must stay that way.
+ * that LinuxOpenGLRenderContext's swapBuffers/makeCurrent use (see redrawer.cc) and must stay that way.
  *
  * Both glXWaitForMscOML (GLX_OML_sync_control) and glXGetVideoSyncSGI/glXWaitVideoSyncSGI
  * (GLX_SGI_video_sync) REQUIRE a GLXContext to be current on the calling thread - per their
@@ -43,7 +43,7 @@ namespace {
  * iteration. That is why createDedicatedContext() must obtain and validate one up front.
  *
  * That does NOT mean the wait thread needs (or should have) any involvement with
- * LinuxOpenGLRedrawer's real render/present context: it needs *a* current, direct GLXContext, not
+ * LinuxOpenGLRenderContext's real render/present context: it needs *a* current, direct GLXContext, not
  * *that* context. So this thread creates and makes current its own minimal, dedicated, offscreen
  * GLXContext backed by a 1x1 GLXPbuffer (see createDedicatedContext()) - a context that never
  * renders anything and is never shared with (no share-context) or made current outside this one
@@ -202,7 +202,7 @@ void resolveMode(Display *display, int screen, VsyncTicker *ticker) {
 // Opens the dedicated, second X11 connection (see the file-level comment for why) and creates a
 // minimal, dedicated, *direct* GLXContext + 1x1 GLXPbuffer on it: this is what both OML and SGI's
 // Wait variant require to be current on the calling thread, decoupled from any real window or from
-// LinuxOpenGLRedrawer's render/present context (no share-context; never made current anywhere else).
+// LinuxOpenGLRenderContext's render/present context (no share-context; never made current anywhere else).
 //
 // Populates ticker->display/pbuffer/context and returns true only if a genuinely *direct* context
 // was obtained. On any failure (connection failure, no pbuffer-capable FBConfig, pbuffer/context

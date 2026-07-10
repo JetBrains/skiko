@@ -119,7 +119,7 @@ internal fun createSwingRenderer(
     }
     return when (hostOs) {
         OS.MacOS -> {
-            val context = MetalSwingRedrawer(
+            val context = MetalSwingRenderContext(
                 adapterPriority = swingLayerProperties.adapterPriority,
                 gpuResourceCacheLimit = swingLayerProperties.gpuResourceCacheLimit,
             )
@@ -133,7 +133,7 @@ internal fun createSwingRenderer(
             SwingRenderer(swingLayerProperties, renderDelegate, context, SoftwareSwingPainter(swingLayerProperties), analytics)
         }
         OS.Linux -> {
-            val context = LinuxOpenGLSwingRedrawer(
+            val context = LinuxOpenGLSwingRenderContext(
                 gpuResourceCacheLimit = swingLayerProperties.gpuResourceCacheLimit,
             )
             SwingRenderer(swingLayerProperties, renderDelegate, context, SoftwareSwingPainter(swingLayerProperties), analytics)

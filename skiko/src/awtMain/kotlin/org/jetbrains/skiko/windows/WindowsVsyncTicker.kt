@@ -8,7 +8,7 @@ import org.jetbrains.skiko.hostOs
  *
  * Windows has no EDT-deliverable vsync callback today: on this platform vsync is fused into
  * the dwmFlush/D3D `swap()` calls that happen as part of rendering a frame (see
- * `Direct3DRedrawer.swap` and `directXRedrawer.cc`). This class is a *separate* tick source -
+ * `Direct3DRenderContext.swap` and `directXRedrawer.cc`). This class is a *separate* tick source -
  * it does not participate in and must not interfere with that render path. It drives a
  * dedicated native thread per window that predicts the next compositor vblank (via
  * `DwmGetCompositionTimingInfo`, falling back to a fixed-interval poll if that is unavailable)

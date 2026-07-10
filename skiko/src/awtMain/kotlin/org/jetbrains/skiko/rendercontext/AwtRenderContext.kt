@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.LockFile.Companion.skiko
@@ -6,7 +6,7 @@ import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 import java.awt.Dimension
 
 /**
- * Common class for all AWT redrawers.
+ * Common class for all AWT render contexts.
  *
  * It extends the public [RenderContext], so one per-API class backs both the on-screen path and a
  * standalone consumer, and reaches its host surface through [AwtSurfaceHost] rather than a `SkiaLayer`.
@@ -14,7 +14,7 @@ import java.awt.Dimension
  * Don't forget to call [onDeviceChosen] and [onContextInit] to send necessary analytics.
  */
 @OptIn(ExperimentalSkikoApi::class)
-internal abstract class AWTRedrawer(
+internal abstract class AwtRenderContext(
     protected val host: AwtSurfaceHost,
     private val analytics: SkiaLayerAnalytics,
     final override val graphicsApi: GraphicsApi,

@@ -7,7 +7,7 @@ import org.jetbrains.skiko.hostOs
  * Internal per-window/per-display vsync tick source for Linux (X11/GLX).
  *
  * This class is a *separate*, render-path-independent tick source - it does not participate in
- * and must not interfere with `LinuxOpenGLRedrawer`'s render/present path (`swapBuffers`, the JAWT
+ * and must not interfere with `LinuxOpenGLRenderContext`'s render/present path (`swapBuffers`, the JAWT
  * drawing-surface locking, etc.). It drives a dedicated native thread that blocks on the driver's
  * real vblank counter - preferring `GLX_OML_sync_control` (`glXWaitForMscOML`, which reports a real
  * UST timestamp), and falling back to `GLX_SGI_video_sync` (`glXWaitVideoSyncSGI`, which does not)

@@ -10,7 +10,7 @@
 // source sets (jvmMain/common, awtMain/common, awtMain/<os>) are linked into a single
 // "skiko-<hostId>" shared library (see Library.kt), so this extern resolves at link time even
 // though it is defined in a different source set. Same pattern as
-// awtMain/objectiveC/macos/MetalRedrawer.mm's `extern JavaVM *jvm;`.
+// awtMain/objectiveC/macos/MetalRenderContext.mm's `extern JavaVM *jvm;`.
 extern "C" JavaVM *jvm;
 
 namespace {
@@ -75,7 +75,7 @@ DWORD WINAPI vsyncThreadProc(LPVOID param) {
     // Deliberately NOT env->FindClass("org/jetbrains/skiko/windows/WindowsVsyncTicker") cached
     // in a static: FindClass with a hardcoded class name aborts the JVM if that name ever drifts
     // out of sync with the loaded class. GetObjectClass on the live receiver instance always resolves
-    // the class that is actually loaded, the same way MetalRedrawer.mm's
+    // the class that is actually loaded, the same way MetalRenderContext.mm's
     // getOnOcclusionStateChangedMethodID does for the analogous macOS callback.
     jclass receiverClass = env->GetObjectClass(ticker->receiver);
     jmethodID onTick = env->GetMethodID(receiverClass, "onVsyncTick", "(J)V");

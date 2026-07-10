@@ -13,7 +13,7 @@ typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLX
 
 extern "C"
 {
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
         Window window = fromJavaPointer<Window>(windowPtr);
@@ -46,7 +46,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
         Window window = fromJavaPointer<Window>(windowPtr);
@@ -54,7 +54,7 @@ extern "C"
         glXSwapBuffers(display, window);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jlong contextPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jlong contextPtr)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
         Window window = fromJavaPointer<Window>(windowPtr);
@@ -63,7 +63,7 @@ extern "C"
         glXMakeCurrent(display, window, *context);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jboolean transparency)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jboolean transparency)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
         if (!display) return 0;
@@ -93,7 +93,7 @@ extern "C"
         return toJavaPointer(context);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_destroyContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong contextPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_destroyContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong contextPtr)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
         GLXContext *context = fromJavaPointer<GLXContext *>(contextPtr);

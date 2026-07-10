@@ -89,7 +89,7 @@ bool initAngleSurface(JNIEnv *env, AngleDevice *angleDevice, EGLint width, EGLin
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_createAngleDevice(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_createAngleDevice(
         JNIEnv *env, jobject redrawer, jlong platformInfoPtr, jboolean transparency)
     {
         __try
@@ -179,7 +179,7 @@ extern "C"
         return (jlong) 0;
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeCurrent(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_makeCurrent(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         AngleDevice *angleDevice = fromJavaPointer<AngleDevice *>(devicePtr);
@@ -189,7 +189,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleContext(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_makeAngleContext(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         AngleDevice *angleDevice = fromJavaPointer<AngleDevice *>(devicePtr);
@@ -197,7 +197,7 @@ extern "C"
         return toJavaPointer(GrDirectContexts::MakeGL(backendContext).release());
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_makeAngleRenderTarget(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_makeAngleRenderTarget(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
         __try
@@ -233,7 +233,7 @@ extern "C"
         return (jlong) 0;
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_swapBuffers(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_swapBuffers(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean waitForVsync)
     {
         __try
@@ -252,7 +252,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_disposeDevice(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_AngleRenderContextKt_disposeDevice(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         AngleDevice *angleDevice = fromJavaPointer<AngleDevice *>(devicePtr);

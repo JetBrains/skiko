@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.getPtr
@@ -7,11 +7,11 @@ import org.jetbrains.skiko.*
 import org.jetbrains.skiko.layerFrameLimiter
 import java.lang.ref.Reference
 
-internal abstract class AbstractDirectSoftwareRedrawer(
+internal abstract class AbstractDirectSoftwareRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(host, analytics, GraphicsApi.SOFTWARE_FAST) {
+) : AwtRenderContext(host, analytics, GraphicsApi.SOFTWARE_FAST) {
 
     /** [acquireSurface] and [present] are public API, so unlike the frame loop they are not EDT-confined. */
     private val drawLock = Any()
@@ -44,7 +44,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) = draw(scope)
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "DirectSoftwareRedrawer is disposed" }
+        check(!isDisposed) { "DirectSoftwareRenderContext is disposed" }
         ensureContext()
         createSurface(width, height)
         surface ?: throw RenderException("Cannot create surface for ${width}x$height")
@@ -68,7 +68,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     }
 
     private fun performDraw(scope: LayerDrawScope) = synchronized(drawLock) {
-        // Re-check inside the lock (not just at the call site), matching MetalRedrawer/SoftwareRedrawer:
+        // Re-check inside the lock (not just at the call site), matching MetalRenderContext/SoftwareRenderContext:
         // this is what makes `dispose` and an in-flight frame mutually exclusive.
         if (!isDisposed) {
             with(scope) { drawFrame() }

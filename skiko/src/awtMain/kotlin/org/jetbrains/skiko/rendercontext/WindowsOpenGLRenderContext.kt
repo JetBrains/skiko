@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import kotlinx.coroutines.*
 import org.jetbrains.skia.*
@@ -7,11 +7,11 @@ import org.jetbrains.skiko.*
 /**
  * Every GL call stays on the EDT, so this backend needs no `drawLock`.
  */
-internal class WindowsOpenGLRedrawer(
+internal class WindowsOpenGLRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AbstractOpenGLRedrawer(host, analytics, properties) {
+) : AbstractOpenGLRenderContext(host, analytics, properties) {
     init {
         loadOpenGLLibrary()
     }
@@ -57,7 +57,7 @@ internal class WindowsOpenGLRedrawer(
         swapBuffers()
         OpenGLApi.instance.glFinish()
         if (immediate && SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
-            // The looped path waits for vsync off the EDT in paceAfterFrame; the immediate path waits inline.
+            // The looped path waits for vsync off the EDT in runFrame; the immediate path waits inline.
             dwmFlush()
         }
     }
@@ -72,7 +72,7 @@ internal class WindowsOpenGLRedrawer(
     }
 
     override fun acquireSurface(width: Int, height: Int): Surface {
-        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
+        check(!isDisposed) { "WindowsOpenGLRenderContext is disposed" }
         makeCurrent()
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")

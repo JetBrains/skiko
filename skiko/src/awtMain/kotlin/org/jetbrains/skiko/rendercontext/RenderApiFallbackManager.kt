@@ -1,18 +1,18 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkikoProperties
 
-internal class RedrawerManager<R>(
+internal class RenderApiFallbackManager<R>(
     defaultRenderApi: GraphicsApi,
-    private val redrawerFactory: (renderApi: GraphicsApi, oldRedrawer: R?) -> R,
+    private val factory: (renderApi: GraphicsApi, previous: R?) -> R,
     private val onRenderApiChanged: ((GraphicsApi) -> Unit)? = null
 ) {
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue(defaultRenderApi).toMutableList()
 
-    var redrawer: R? = null
+    var current: R? = null
         private set
 
     var renderApi: GraphicsApi = fallbackRenderApiQueue[0]
@@ -30,9 +30,9 @@ internal class RedrawerManager<R>(
             thrown = false
             try {
                 renderApi = fallbackRenderApiQueue.removeAt(0)
-                redrawer = redrawerFactory(renderApi, redrawer)
+                current = factory(renderApi, current)
             } catch (e: RenderException) {
-                redrawer = null
+                current = null
                 Logger.warn(e) { "Fallback to next API" }
                 thrown = true
             }
@@ -44,6 +44,6 @@ internal class RedrawerManager<R>(
     }
 
     fun dispose() {
-        redrawer = null
+        current = null
     }
 }

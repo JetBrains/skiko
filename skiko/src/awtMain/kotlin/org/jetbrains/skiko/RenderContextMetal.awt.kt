@@ -1,6 +1,6 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.redrawer.MetalRedrawer
+import org.jetbrains.skiko.rendercontext.MetalRenderContext
 
 /**
  * The `id<MTLDevice>` this [RenderContext] renders on as a native pointer (a `__bridge`-castable address),
@@ -21,7 +21,7 @@ import org.jetbrains.skiko.redrawer.MetalRedrawer
  */
 @ExperimentalSkikoApi
 val RenderContext.metalDevicePointer: Long?
-    get() = (this as? MetalRedrawer)?.metalDeviceObjcPtr
+    get() = (this as? MetalRenderContext)?.metalDeviceObjcPtr
 
 /**
  * The `id<MTLCommandQueue>` skiko submits its frames on as a native pointer, or `null` if this context is not
@@ -36,4 +36,4 @@ val RenderContext.metalDevicePointer: Long?
  */
 @ExperimentalSkikoApi
 val RenderContext.metalCommandQueuePointer: Long?
-    get() = (this as? MetalRedrawer)?.metalCommandQueueObjcPtr
+    get() = (this as? MetalRenderContext)?.metalCommandQueueObjcPtr

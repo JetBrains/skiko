@@ -11,7 +11,7 @@ import org.jetbrains.skiko.RenderContext
  * two small internal extras the Swing blit path needs:
  *
  *  * [deviceName] — the adapter/device name for [org.jetbrains.skiko.SkiaLayerAnalytics], captured at
- *    construction (the on-screen contexts expose the same via `AWTRedrawer.deviceName`);
+ *    construction (the on-screen contexts expose the same via `AwtRenderContext.deviceName`);
  *  * [texturePtr] — the current offscreen GPU texture handle a zero-copy [AcceleratedSwingPainter] samples;
  *    `0` for the raster/software and non-shared-texture backends, whose painters read the surface's pixels
  *    instead.

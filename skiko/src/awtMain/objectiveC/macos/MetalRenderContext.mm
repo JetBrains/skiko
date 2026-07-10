@@ -196,7 +196,7 @@ static void javaDrawFrameWhileLiveResizing(jobject redrawer, jint width, jint he
 extern "C"
 {
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_createMetalDevice(
     JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint frameBuffering, jlong adapterPtr, jlong platformInfoPtr, jboolean liveResizeEnabled)
 {
     @autoreleasepool {
@@ -297,11 +297,11 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     }
 }
 
-/// Schedules a frame on the AppKit main thread. Called from Kotlin (MetalRedrawer.needRender) during a live resize,
+/// Schedules a frame on the AppKit main thread. Called from Kotlin (MetalRenderContext.needRender) during a live resize,
 // when the background frame loop is gated off. The main queue serializes this with setBounds-driven frames, so there
 // is only ever one presenter and one drawable in flight — no async present, no drawable-pool contention. The current
 // pixel size is read on the main thread right before the callback, so the frame is rendered at the layer's live size.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_scheduleFrameOnAppKitThread(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_scheduleFrameOnAppKitThread(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
@@ -339,7 +339,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_scheduleF
 /// thread on a coroutine. LWCToolkit lives in a non-exported JDK package, but JNI does not perform module
 /// access checks, so no `--add-opens` is required. The class (global ref) and method id are stable for the
 /// JVM lifetime and cached; any exception thrown by invokeAndWait is left pending so it propagates to Kotlin.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_invokeOnEventThreadAndWait(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_invokeOnEventThreadAndWait(
     JNIEnv *env, jobject redrawer, jobject runnable, jobject component)
 {
     static jclass lwcToolkitClass = NULL;
@@ -362,7 +362,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_invokeOnE
     env->CallStaticVoidMethod(lwcToolkitClass, invokeAndWaitMethodID, runnable, component);
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLayers(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_resizeLayers(
     JNIEnv *env, jobject redrawer, jlong devicePtr, jint x, jint y, jint width, jint height)
 {
     @autoreleasepool {
@@ -383,7 +383,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerVisible(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_setLayerVisible(
     JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean isVisible)
 {
     @autoreleasepool {
@@ -400,7 +400,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerV
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
@@ -417,7 +417,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setConten
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setDisplaySyncEnabled(JNIEnv *env, jobject obj, jlong devicePtr, jboolean enabled)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_setDisplaySyncEnabled(JNIEnv *env, jobject obj, jlong devicePtr, jboolean enabled)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
@@ -427,7 +427,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setDispla
 
 // GPU-interop accessor: the id<MTLDevice> skiko renders on. Returns the object address without transferring
 // ownership; the consumer must not release it (see RenderContext.metalDevicePointer).
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getMetalDevicePointer(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_getMetalDevicePointer(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
@@ -436,14 +436,14 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getMetal
 
 // GPU-interop accessor: the id<MTLCommandQueue> skiko submits its frames on. Same ownership rules as
 // getMetalDevicePointer above.
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getMetalCommandQueuePointer(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_getMetalCommandQueuePointer(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
     return (jlong) (__bridge void *) device.queue;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDevice(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_MetalRenderContext_disposeDevice(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     @autoreleasepool {

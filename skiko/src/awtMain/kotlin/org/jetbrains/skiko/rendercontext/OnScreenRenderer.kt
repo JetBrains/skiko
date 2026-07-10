@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalSkikoApi::class)
 
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.skiko.ExperimentalSkikoApi
@@ -9,13 +9,15 @@ import org.jetbrains.skiko.MainUIDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 import org.jetbrains.skiko.LayerDrawScope
+import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.renderTime
 import java.awt.Dimension
 import java.util.concurrent.atomic.AtomicBoolean
 
 @OptIn(ExperimentalSkikoApi::class)
-internal class OnScreenRedrawer(
+internal class OnScreenRenderer(
     private val layer: SkiaLayer,
-    internal val renderer: AWTRedrawer,
+    internal val renderer: AwtRenderContext,
 ) : Redrawer, FrameHost {
     private val deviceAnalytics: DeviceAnalytics? get() = renderer.deviceAnalytics
     private var isFirstFrameRendered = false
@@ -49,7 +51,7 @@ internal class OnScreenRedrawer(
     }
 
     override fun needRender(throttledToVsync: Boolean) {
-        check(!isDisposed) { "OnScreenRedrawer is disposed" }
+        check(!isDisposed) { "OnScreenRenderer is disposed" }
 
         val platformDrivesFrame = renderer.isHandlingLiveResizeNow
         if (!platformDrivesFrame) {
@@ -62,7 +64,7 @@ internal class OnScreenRedrawer(
     }
 
     override fun renderImmediately() {
-        check(!isDisposed) { "OnScreenRedrawer is disposed" }
+        check(!isDisposed) { "OnScreenRenderer is disposed" }
         layer.update(renderTime())
         if (!isDisposed) { // layer may be disposed in user code during `update`
             runBlocking { drawFrame(immediate = true) }

@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -25,18 +25,18 @@ internal value class MetalDevice(val ptr: Long)
 /**
  * Provides a way to request draws on Skia canvas created in [host] bounds using Metal GPU acceleration.
  *
- * This [MetalRedrawer] draws content on-screen for maximum efficiency,
+ * This [MetalRenderContext] draws content on-screen for maximum efficiency,
  * but it may prevent for using it in embedded components (such as interop with Swing).
  *
  * Content to draw is provided by [AwtSurfaceHost.draw].
  *
  * @see FrameDispatcher
  */
-internal class MetalRedrawer(
+internal class MetalRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(host, analytics, GraphicsApi.METAL) {
+) : AwtRenderContext(host, analytics, GraphicsApi.METAL) {
 
     companion object {
         init {
@@ -47,7 +47,7 @@ internal class MetalRedrawer(
     private var drawLock = Any()
 
     /**
-     * [MetalDevice] initialized for the given [host] or null if [MetalRedrawer] is disposed,
+     * [MetalDevice] initialized for the given [host] or null if [MetalRenderContext] is disposed,
      * so future calls of [device] will throw exception
      */
     private var _device: MetalDevice?
@@ -94,7 +94,7 @@ internal class MetalRedrawer(
      */
     internal val metalDeviceObjcPtr: Long
         get() = synchronized(drawLock) {
-            check(!isDisposed) { "MetalRedrawer is disposed" }
+            check(!isDisposed) { "MetalRenderContext is disposed" }
             getMetalDevicePointer(device.ptr)
         }
 
@@ -107,7 +107,7 @@ internal class MetalRedrawer(
      */
     internal val metalCommandQueueObjcPtr: Long
         get() = synchronized(drawLock) {
-            check(!isDisposed) { "MetalRedrawer is disposed" }
+            check(!isDisposed) { "MetalRenderContext is disposed" }
             getMetalCommandQueuePointer(device.ptr)
         }
 
@@ -210,7 +210,7 @@ internal class MetalRedrawer(
         vSyncer?.waitForVSync()
     }
 
-    // Called from MetalRedrawer.mm
+    // Called from MetalRenderContext.mm
     @Suppress("unused")
     fun onOcclusionStateChanged(isOccluded: Boolean) {
         isWindowOccluded = isOccluded
@@ -304,13 +304,13 @@ internal class MetalRedrawer(
         context?.flush()
         surface?.flushAndSubmit()
         // Records only; the caller presents.
-        Logger.debug { "MetalRedrawer finished drawing frame" }
+        Logger.debug { "MetalRenderContext finished drawing frame" }
     }
 
     // --- Public standalone RenderContext surface (acquire → draw → present), backed by the same code the
     // on-screen loop uses above. On-screen the loop calls drawFrame; a standalone caller drives these.
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
+        check(!isDisposed) { "MetalRenderContext is disposed" }
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic Metal context")
         }
@@ -384,12 +384,12 @@ internal class MetalRedrawer(
         val y = rootPane.height - globalPosition.y - host.height
         val width = backedLayer.width.coerceAtLeast(0)
         val height = backedLayer.height.coerceAtLeast(0)
-        Logger.debug { "MetalRedrawer#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}" }
+        Logger.debug { "MetalRenderContext#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}" }
         resizeLayers(device.ptr, x, y, width, height)
     }
 
     override fun setVisible(isVisible: Boolean) {
-        Logger.debug { "MetalRedrawer#setVisible($isVisible)" }
+        Logger.debug { "MetalRenderContext#setVisible($isVisible)" }
         if (!isDisposed) {
             setLayerVisible(device.ptr, isVisible)
         }
@@ -462,7 +462,7 @@ internal class MetalRedrawer(
     private external fun finishFrameSync(device: Long)
 
     // GPU-interop handle getters: read the id<MTLDevice>/id<MTLCommandQueue> address out of the native
-    // MetalDevice struct. Implemented in MetalRedrawer.mm.
+    // MetalDevice struct. Implemented in MetalRenderContext.mm.
     private external fun getMetalDevicePointer(device: Long): Long
     private external fun getMetalCommandQueuePointer(device: Long): Long
 }

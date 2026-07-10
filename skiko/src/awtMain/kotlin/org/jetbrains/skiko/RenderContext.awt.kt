@@ -1,8 +1,8 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skiko.swing.Direct3DSwingRenderContext
-import org.jetbrains.skiko.swing.LinuxOpenGLSwingRedrawer
-import org.jetbrains.skiko.swing.MetalSwingRedrawer
+import org.jetbrains.skiko.swing.LinuxOpenGLSwingRenderContext
+import org.jetbrains.skiko.swing.MetalSwingRenderContext
 
 /**
  * Create a genuinely view-less, offscreen [RenderContext] of exactly [api], sized [width] x [height] device
@@ -26,13 +26,13 @@ fun RenderContext.Companion.createOffscreen(width: Int, height: Int, api: Graphi
     GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT ->
         AwtOffscreenSoftwareRenderContext(api, width, height)
     GraphicsApi.METAL ->
-        if (hostOs == OS.MacOS) MetalSwingRedrawer()
+        if (hostOs == OS.MacOS) MetalSwingRenderContext()
         else throw RenderException("$api offscreen rendering is only available on macOS (host is $hostOs)")
     GraphicsApi.DIRECT3D ->
         if (hostOs == OS.Windows) Direct3DSwingRenderContext()
         else throw RenderException("$api offscreen rendering is only available on Windows (host is $hostOs)")
     GraphicsApi.OPENGL ->
-        if (hostOs == OS.Linux) LinuxOpenGLSwingRedrawer()
+        if (hostOs == OS.Linux) LinuxOpenGLSwingRenderContext()
         else throw RenderException("$api offscreen rendering is only available on Linux (host is $hostOs)")
     else -> throw RenderException("$api cannot render offscreen standalone on AWT")
 }

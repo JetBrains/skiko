@@ -38,7 +38,7 @@ import org.jetbrains.skiko.hostOs
  * Not thread-safe — drive it from a single render thread, mirroring [RenderContext]'s contract.
  */
 @OptIn(ExperimentalSkikoApi::class)
-internal class MetalSwingRedrawer(
+internal class MetalSwingRenderContext(
     adapterPriority: GpuPriority = SkikoProperties.gpuPriority,
     private val gpuResourceCacheLimit: Long = SkikoProperties.gpuResourceCacheLimit,
 ) : SwingRenderContext {
@@ -73,7 +73,7 @@ internal class MetalSwingRedrawer(
     override val directContext: DirectContext get() = context
 
     override fun acquireSurface(width: Int, height: Int): Surface {
-        check(!closed) { "MetalSwingRedrawer is disposed" }
+        check(!closed) { "MetalSwingRenderContext is disposed" }
         require(width > 0 && height > 0) { "Surface size must be positive, was ${width}x$height" }
         require(width <= adapter.maxTextureSize && height <= adapter.maxTextureSize) {
             "Texture dimensions must be less than maximum allowed size: ${adapter.maxTextureSize}, got $width x $height"

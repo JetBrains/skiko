@@ -31,14 +31,12 @@ import org.jetbrains.skiko.makeGLRenderTarget
  * A frame is opened lazily in [acquireSurface] (make pbuffer, `startRendering`, bind a fresh texture+FBO, make
  * a per-frame GL [DirectContext] and surface) and stays **current** through [present] so the caller can read
  * pixels back off the surface immediately after presenting. The GL context is only reset (`finishRendering` +
- * texture/context teardown) when the next [acquireSurface] opens the following frame, or at [close]. This
- * keeps the native GL calls (`startRendering` through `finishRendering`) grouped as one per-frame
- * sequence within the acquire→draw→present shape.
+ * texture/context teardown) when the next [acquireSurface] opens the following frame, or at [close].
  *
  * Not thread-safe — drive it from a single render thread, mirroring [RenderContext]'s contract.
  */
 @OptIn(ExperimentalSkikoApi::class)
-internal class LinuxOpenGLSwingRedrawer(
+internal class LinuxOpenGLSwingRenderContext(
     private val gpuResourceCacheLimit: Long = SkikoProperties.gpuResourceCacheLimit,
 ) : SwingRenderContext {
 
@@ -64,7 +62,7 @@ internal class LinuxOpenGLSwingRedrawer(
     override val directContext: DirectContext? get() = context
 
     override fun acquireSurface(width: Int, height: Int): Surface {
-        check(!closed) { "LinuxOpenGLSwingRedrawer is disposed" }
+        check(!closed) { "LinuxOpenGLSwingRenderContext is disposed" }
         require(width > 0 && height > 0) { "Surface size must be positive, was ${width}x$height" }
 
         // Finish the previous frame (its context was left current for pixel readback) before starting a new one.

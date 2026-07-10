@@ -1,12 +1,12 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import org.jetbrains.skiko.*
 
-internal class LinuxSoftwareRedrawer(
+internal class LinuxSoftwareRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-) : AbstractDirectSoftwareRedrawer(host, analytics, properties) {
+) : AbstractDirectSoftwareRenderContext(host, analytics, properties) {
 
     init {
         onDeviceChosen("Software")

@@ -15,7 +15,7 @@ static const DWORD kPumpTimeoutMs = 1000;
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WinApiEdtInvoker_preparePumping(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_WinApiEdtInvoker_preparePumping(
         JNIEnv *env, jobject invoker)
     {
         return toJavaPointer(CreateEventW(nullptr, /*manualReset*/ FALSE, /*initialState*/ FALSE, nullptr));
@@ -27,7 +27,7 @@ extern "C"
     // The EDT can send POSTED messages (focus/IME) back here and wait for them.
     // Do not handle input messages as they are handled by the parent event loop. Handling them here would, for example,
     // stop the window following the cursor in a live-resize session.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WinApiEdtInvoker_pumpUntilDone(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_WinApiEdtInvoker_pumpUntilDone(
         JNIEnv *env, jobject invoker, jlong doneEventPtr)
     {
         HANDLE doneEvent = fromJavaPointer<HANDLE>(doneEventPtr);
@@ -68,7 +68,7 @@ extern "C"
         if (completed) CloseHandle(doneEvent);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WinApiEdtInvoker_signalDone(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_WinApiEdtInvoker_signalDone(
         JNIEnv *env, jobject invoker, jlong doneEvent)
     {
         HANDLE ev = fromJavaPointer<HANDLE>(doneEvent);

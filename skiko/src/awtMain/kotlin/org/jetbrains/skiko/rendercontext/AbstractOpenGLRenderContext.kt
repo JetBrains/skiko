@@ -1,13 +1,13 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
-internal abstract class AbstractOpenGLRedrawer(
+internal abstract class AbstractOpenGLRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties,
-) : AWTRedrawer(host, analytics, GraphicsApi.OPENGL) {
+) : AwtRenderContext(host, analytics, GraphicsApi.OPENGL) {
 
     override val directContext: DirectContext? get() = glContext
 

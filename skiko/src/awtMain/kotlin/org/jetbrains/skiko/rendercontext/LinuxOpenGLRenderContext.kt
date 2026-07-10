@@ -1,14 +1,14 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import kotlinx.coroutines.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
-internal class LinuxOpenGLRedrawer(
+internal class LinuxOpenGLRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AbstractOpenGLRedrawer(host, analytics, properties) {
+) : AbstractOpenGLRenderContext(host, analytics, properties) {
     init {
         loadOpenGLLibrary()
     }
@@ -18,8 +18,8 @@ internal class LinuxOpenGLRedrawer(
      * presentation. Frames run on the EDT, but [acquireSurface] and [present] are public entry points a
      * caller drives from its own render thread, and [releaseResources] can arrive on the EDT while one of those is in
      * flight. Each takes this lock and re-checks [isDisposed] *inside* it before any native call, mirroring
-     * [MetalRedrawer]'s and [Direct3DRedrawer]'s discipline, so [releaseResources] cannot free the GLX context out
-     * from under a running JNI call.
+     * [MetalRenderContext]'s and [Direct3DRenderContext]'s discipline, so [releaseResources] cannot free the GLX
+     * context out from under a running JNI call.
      */
     private val drawLock = Any()
 
@@ -101,7 +101,7 @@ internal class LinuxOpenGLRedrawer(
     }
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
+        check(!isDisposed) { "LinuxOpenGLRenderContext is disposed" }
         host.backedLayer.lockLinuxDrawingSurface { it.makeCurrent(context) }
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")
@@ -146,9 +146,9 @@ internal class LinuxOpenGLRedrawer(
          *
          * Mutated from the EDT alongside context creation and destruction, and read there per frame.
          */
-        val liveContexts = mutableListOf<LinuxOpenGLRedrawer>()
+        val liveContexts = mutableListOf<LinuxOpenGLRenderContext>()
 
-        fun vsyncPacedContext(): LinuxOpenGLRedrawer? = liveContexts
+        fun vsyncPacedContext(): LinuxOpenGLRenderContext? = liveContexts
             .filter { !it.isDisposed && it.host.isShowing && it.properties.isVsyncEnabled }
             .maxByOrNull { it.frameLimit }
     }

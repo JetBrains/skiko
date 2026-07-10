@@ -9,10 +9,10 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.internal.fastForEach
-import org.jetbrains.skiko.redrawer.AWTRedrawer
-import org.jetbrains.skiko.redrawer.AwtSurfaceHost
-import org.jetbrains.skiko.redrawer.RedrawerManager
-import org.jetbrains.skiko.redrawer.createRedrawer
+import org.jetbrains.skiko.rendercontext.AwtRenderContext
+import org.jetbrains.skiko.rendercontext.AwtSurfaceHost
+import org.jetbrains.skiko.rendercontext.RenderApiFallbackManager
+import org.jetbrains.skiko.rendercontext.createRenderContext
 import org.jetbrains.skiko.swing.SwingLayerProperties
 import org.jetbrains.skiko.swing.SwingRenderer
 import org.jetbrains.skiko.swing.createSwingRenderer
@@ -209,7 +209,7 @@ open class SkiaPanel internal constructor(
 
     private fun isTransparentBackgroundSupported(): Boolean =
         directSurfaceRenderer?.isTransparentBackgroundSupported()
-            ?: org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported(surfaceHost)
+            ?: org.jetbrains.skiko.rendercontext.defaultIsTransparentBackgroundSupported(surfaceHost)
 
     /**
      * Make the current stored picture visible. Base presents synchronously (DirectSurface) or repaints for a
@@ -297,30 +297,30 @@ open class SkiaPanel internal constructor(
      * The pull-model [SkiaLayer] does not go through this — it builds its frame loop from its own injectable
      * `RenderFactory` instead (see [SkiaLayer]).
      */
-    internal fun createRedrawer(renderApi: GraphicsApi): AWTRedrawer =
-        createRedrawer(surfaceHost, renderApi, analytics, properties)
+    internal fun createRenderContext(renderApi: GraphicsApi): AwtRenderContext =
+        createRenderContext(surfaceHost, renderApi, analytics, properties)
 
     /**
      * The push-only per-API context selector for [RenderMode.DirectSurface]; `null` in [RenderMode.SwingComposited]
-     * and unused by the pull-model [SkiaLayer], which drives its own [org.jetbrains.skiko.redrawer.OnScreenRedrawer]
+     * and unused by the pull-model [SkiaLayer], which drives its own [org.jetbrains.skiko.rendercontext.OnScreenRenderer]
      * loop.
      */
-    internal val redrawerFactory: RedrawerManager<AWTRedrawer>? =
+    internal val renderContextFactory: RenderApiFallbackManager<AwtRenderContext>? =
         if (renderMode == RenderMode.DirectSurface) {
-            RedrawerManager(
+            RenderApiFallbackManager(
                 defaultRenderApi = properties.renderApi,
-                redrawerFactory = { renderApi, _ -> createRedrawer(renderApi) },
+                factory = { renderApi, _ -> createRenderContext(renderApi) },
                 onRenderApiChanged = { onRenderApiChanged() },
             )
         } else null
 
     /** The live per-API render context for [RenderMode.DirectSurface], or `null` before init/after dispose. */
-    internal open val currentRedrawer: AWTRedrawer?
-        get() = redrawerFactory?.redrawer
+    internal open val currentRenderContext: AwtRenderContext?
+        get() = renderContextFactory?.current
 
     /** The direct-surface render API currently selected (used by [surfaceHost] and `renderInfo`). */
     internal open val directSurfaceRenderApi: GraphicsApi
-        get() = redrawerFactory?.renderApi ?: properties.renderApi
+        get() = renderContextFactory?.renderApi ?: properties.renderApi
 
     private var _fullscreenAdapter: FullscreenAdapter? =
         backedLayer?.let { FullscreenAdapter(it) }
@@ -364,13 +364,13 @@ open class SkiaPanel internal constructor(
 
     /** The SwingComposited render API (analogue of [directSurfaceRenderApi]). */
     internal val swingRenderApi: GraphicsApi
-        get() = swingRedrawerManager?.renderApi ?: properties.renderApi
+        get() = swingRenderApiManager?.renderApi ?: properties.renderApi
 
-    private val swingRedrawerManager =
+    private val swingRenderApiManager =
         if (renderMode == RenderMode.SwingComposited) {
-            org.jetbrains.skiko.redrawer.RedrawerManager<SwingRenderer>(
+            org.jetbrains.skiko.rendercontext.RenderApiFallbackManager<SwingRenderer>(
                 properties.renderApi,
-                redrawerFactory = { renderApi, oldRenderer ->
+                factory = { renderApi, oldRenderer ->
                     oldRenderer?.dispose()
                     createSwingRenderer(swingLayerProperties, swingRenderDelegate, renderApi, analytics)
                 }
@@ -378,8 +378,8 @@ open class SkiaPanel internal constructor(
         } else null
 
     /** The live DirectSurface renderer for `isTransparentBackgroundSupported`; `null` until presented once. */
-    private val directSurfaceRenderer: AWTRedrawer?
-        get() = currentRedrawer
+    private val directSurfaceRenderer: AwtRenderContext?
+        get() = currentRenderContext
 
     // --- AWT integration -------------------------------------------------------------------------------------
 
@@ -453,11 +453,11 @@ open class SkiaPanel internal constructor(
         if (wasShowing != isShowingNow) {
             val window = SwingUtilities.getWindowAncestor(this)
             if (window != null && window.isShowing) {
-                currentRedrawer?.setVisible(isShowingNow)
+                currentRenderContext?.setVisible(isShowingNow)
             }
         }
         if (isShowingNow) {
-            currentRedrawer?.syncBounds()
+            currentRenderContext?.syncBounds()
             repaint()
         }
     }
@@ -487,20 +487,20 @@ open class SkiaPanel internal constructor(
                 backedLayer!!.init()
                 initDirectSurfaceDriver(recreation)
             }
-            RenderMode.SwingComposited -> swingRedrawerManager!!.findNextWorkingRenderApi(recreation)
+            RenderMode.SwingComposited -> swingRenderApiManager!!.findNextWorkingRenderApi(recreation)
         }
         isInited = true
     }
 
     /**
      * Build the [RenderMode.DirectSurface] render driver over the freshly initialised heavyweight peer. Base
-     * selects a push-only per-API context through [redrawerFactory]; the pull-model [SkiaLayer] overrides this
-     * to build its [org.jetbrains.skiko.redrawer.OnScreenRedrawer] frame loop instead (so [redrawerFactory]
+     * selects a push-only per-API context through [renderContextFactory]; the pull-model [SkiaLayer] overrides this
+     * to build its [org.jetbrains.skiko.rendercontext.OnScreenRenderer] frame loop instead (so [renderContextFactory]
      * stays dormant for it).
      */
     protected open fun initDirectSurfaceDriver(recreation: Boolean) {
-        redrawerFactory!!.findNextWorkingRenderApi(recreation)
-        currentRedrawer?.syncBounds()
+        renderContextFactory!!.findNextWorkingRenderApi(recreation)
+        currentRenderContext?.syncBounds()
     }
 
     /** Release native/GPU resources; overridable so [SkiaLayer] can tear down its pull loop first. */
@@ -509,14 +509,14 @@ open class SkiaPanel internal constructor(
         if (isInited && !isDisposed) {
             when (renderMode) {
                 RenderMode.DirectSurface -> {
-                    disposeRedrawer()
-                    redrawerFactory!!.dispose()
+                    disposeRenderContext()
+                    renderContextFactory!!.dispose()
                     backedLayer!!.dispose()
                     peerBufferSizeFixJob?.cancel()
                 }
                 RenderMode.SwingComposited -> {
-                    swingRedrawerManager!!.redrawer?.dispose()
-                    swingRedrawerManager.dispose()
+                    swingRenderApiManager!!.current?.dispose()
+                    swingRenderApiManager.dispose()
                 }
             }
             synchronized(pictureLock) {
@@ -536,17 +536,17 @@ open class SkiaPanel internal constructor(
 
     /** Called when the heavyweight peer's bounds change. Base resizes the surface and re-presents. */
     protected open fun onBackedLayerReshape() {
-        currentRedrawer?.syncBounds()
+        currentRenderContext?.syncBounds()
         if (isInited && !isDisposed && isShowing) presentNow(immediate = false)
     }
 
     /**
      * Close the current render context. Base closes it directly (push-only path); [SkiaLayer] overrides it
-     * to a no-op because its frame loop ([org.jetbrains.skiko.redrawer.OnScreenRedrawer]) owns the context's
-     * lifetime and closes it there.
+     * to a no-op because its frame loop ([org.jetbrains.skiko.rendercontext.OnScreenRenderer]) owns the
+     * context's lifetime and closes it there.
      */
-    protected open fun disposeRedrawer() {
-        currentRedrawer?.close()
+    protected open fun disposeRenderContext() {
+        currentRenderContext?.close()
     }
 
     /** Called on a content-scale (HiDPI) change. Base does nothing extra. */
@@ -590,7 +590,7 @@ open class SkiaPanel internal constructor(
         } catch (e: RenderException) {
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
-                recreateRedrawerAfterFailure()
+                recreateRenderContextAfterFailure()
             }
         }
     }
@@ -599,11 +599,11 @@ open class SkiaPanel internal constructor(
      * Recover after a runtime render failure. Base (push-only) rebuilds the next working context and
      * re-presents the stored picture; [SkiaLayer] overrides it to rebuild its pull-model frame loop instead.
      */
-    protected open fun recreateRedrawerAfterFailure() {
+    protected open fun recreateRenderContextAfterFailure() {
         if (isDisposed) return
         try {
-            redrawerFactory?.findNextWorkingRenderApi(recreation = false)
-            currentRedrawer?.syncBounds()
+            renderContextFactory?.findNextWorkingRenderApi(recreation = false)
+            currentRenderContext?.syncBounds()
             presentNow(immediate = false)
         } catch (e: RenderException) {
             Logger.error(e) { "Cannot recreate render context after a render failure" }
@@ -615,7 +615,7 @@ open class SkiaPanel internal constructor(
      * The context owns the JAWT drawing-surface lock internally; a render failure falls back to the next API.
      */
     private fun presentNow(immediate: Boolean) {
-        val ctx = currentRedrawer ?: return
+        val ctx = currentRenderContext ?: return
         inDrawScope {
             runBlocking { ctx.renderFrame(this@inDrawScope, immediate) }
         }
@@ -639,7 +639,7 @@ open class SkiaPanel internal constructor(
         @Suppress("DEPRECATION")
         super.reshape(x, y, w, h)
         if (renderMode == RenderMode.DirectSurface) {
-            if (isShowing && currentRedrawer?.presentsOnLayout == true) {
+            if (isShowing && currentRenderContext?.presentsOnLayout == true) {
                 presentImmediatelyForResize()
             }
             validate()
@@ -651,7 +651,7 @@ open class SkiaPanel internal constructor(
      * the stored picture; [SkiaLayer] overrides it to re-record via its render delegate first.
      */
     protected open fun presentImmediatelyForResize() {
-        currentRedrawer?.syncBounds()
+        currentRenderContext?.syncBounds()
         presentNow(immediate = true)
     }
 
@@ -663,11 +663,11 @@ open class SkiaPanel internal constructor(
             }
             RenderMode.SwingComposited -> {
                 try {
-                    swingRedrawerManager?.redrawer?.redraw(g as Graphics2D)
+                    swingRenderApiManager?.current?.redraw(g as Graphics2D)
                 } catch (e: RenderException) {
                     if (!isDisposed) {
                         Logger.warn(e) { "Exception in draw scope" }
-                        swingRedrawerManager?.findNextWorkingRenderApi()
+                        swingRenderApiManager?.findNextWorkingRenderApi()
                         repaint()
                     }
                 }

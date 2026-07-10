@@ -129,14 +129,14 @@ public:
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_makeOffScreenContext(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRenderContext_makeOffScreenContext(
         JNIEnv *env, jobject redrawer)
     {
         OffScreenContext* context = OffScreenContext::create();
         return toJavaPointer(context);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_disposeOffScreenContext(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRenderContext_disposeOffScreenContext(
         JNIEnv *env, jobject redrawer, jlong contextPtr)
     {
         OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
@@ -146,7 +146,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_makeOffScreenBuffer(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRenderContext_makeOffScreenBuffer(
         JNIEnv *env, jobject redrawer, jlong contextPtr, jlong oldBufferPtr, jint width, jint height)
     {
         OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
@@ -165,7 +165,7 @@ extern "C"
         return toJavaPointer(buffer);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_disposeOffScreenBuffer(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRenderContext_disposeOffScreenBuffer(
         JNIEnv *env, jobject redrawer, jlong bufferPtr)
     {
         OffScreenBuffer* buffer = fromJavaPointer<OffScreenBuffer *>(bufferPtr);
@@ -174,7 +174,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_startRendering(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRenderContext_startRendering(
         JNIEnv *env, jobject redrawer, jlong contextPtr, jlong bufferPtr)
     {
         OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
@@ -183,14 +183,14 @@ extern "C"
         glXMakeCurrent(context->display, buffer->pbuffer, context->context);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_finishRendering(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRenderContext_finishRendering(
         JNIEnv *env, jobject redrawer, jlong contextPtr)
     {
         OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
         glXMakeCurrent(context->display, None, nullptr);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_createAndBindTexture(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRenderContext_createAndBindTexture(
         JNIEnv *env, jobject redrawer, jint width, jint height)
     {
         GLuint tex;
@@ -209,7 +209,7 @@ extern "C"
         return toJavaPointer(texture);
     }
 
-    JNIEXPORT GLuint JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_getFboId(
+    JNIEXPORT GLuint JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRenderContext_getFboId(
         JNIEnv *env, jobject redrawer, jlong texturePtr)
     {
         OffScreenTexture *texture = fromJavaPointer<OffScreenTexture *>(texturePtr);
@@ -217,7 +217,7 @@ extern "C"
         return texture->fbo;
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_unbindAndDisposeTexture(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRenderContext_unbindAndDisposeTexture(
         JNIEnv *env, jobject redrawer, jlong texturePtr)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

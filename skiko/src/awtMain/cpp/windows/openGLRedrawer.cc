@@ -9,7 +9,7 @@
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_getDevice(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
     {
         __try
         {
@@ -39,7 +39,7 @@ extern "C"
         return (jlong) 0;
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jint interval)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_setSwapInterval(JNIEnv *env, jobject redrawer, jint interval)
     {
         __try
         {
@@ -58,7 +58,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong devicePtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         __try
         {
@@ -71,14 +71,14 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr)
     {
         HDC device = fromJavaPointer<HDC>(devicePtr);
         HGLRC context = fromJavaPointer<HGLRC>(contextPtr);
         wglMakeCurrent(device, context);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contentHandle, jboolean transparency)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_createContext(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contentHandle, jboolean transparency)
     {
         __try
         {
@@ -98,13 +98,13 @@ extern "C"
         return (jlong) 0;
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_deleteContext(JNIEnv *env, jobject redrawer, jlong contextPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_deleteContext(JNIEnv *env, jobject redrawer, jlong contextPtr)
     {
         HGLRC context = fromJavaPointer<HGLRC>(contextPtr);
         wglDeleteContext(context);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_dwmFlush(JNIEnv *env, jobject redrawer)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_WindowsOpenGLRenderContextKt_dwmFlush(JNIEnv *env, jobject redrawer)
     {
         DwmFlush();
     }

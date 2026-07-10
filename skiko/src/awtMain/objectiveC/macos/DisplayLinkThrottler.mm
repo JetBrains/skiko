@@ -284,19 +284,19 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
 extern "C" {
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_create(JNIEnv *env, jobject obj, jlong windowPtr) {
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_DisplayLinkThrottler_create(JNIEnv *env, jobject obj, jlong windowPtr) {
     NSWindow *window = (__bridge NSWindow *) (void *) windowPtr;
     DisplayLinkThrottler *throttler = [[DisplayLinkThrottler alloc] initWithWindow:window];
 
     return (jlong) (__bridge_retained void *) throttler;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_dispose(JNIEnv *env, jobject obj, jlong throttlerPtr) {
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_DisplayLinkThrottler_dispose(JNIEnv *env, jobject obj, jlong throttlerPtr) {
     DisplayLinkThrottler *throttler = (__bridge_transfer DisplayLinkThrottler *) (void *) throttlerPtr;
     // throttler will be released by ARC and deallocated in the end of this scope.
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_waitVSync(JNIEnv *env, jobject obj, jlong throttlerPtr) {
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_DisplayLinkThrottler_waitVSync(JNIEnv *env, jobject obj, jlong throttlerPtr) {
     DisplayLinkThrottler *throttler = (__bridge DisplayLinkThrottler *) (void *) throttlerPtr;
 
     return (jlong) [throttler waitVSync];

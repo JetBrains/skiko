@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.rendercontext
 
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
@@ -9,11 +9,11 @@ import org.jetbrains.skiko.*
 import java.awt.Dimension
 import java.lang.ref.Reference
 
-internal class Direct3DRedrawer(
+internal class Direct3DRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(host, analytics, GraphicsApi.DIRECT3D) {
+) : AwtRenderContext(host, analytics, GraphicsApi.DIRECT3D) {
 
     private var drawLock = Any()
     private var isSwapChainInitialized = false
@@ -55,7 +55,7 @@ internal class Direct3DRedrawer(
      */
     internal val direct3DAdapterPtr: Long
         get() = synchronized(drawLock) {
-            check(!isDisposed) { "Direct3DRedrawer is disposed" }
+            check(!isDisposed) { "Direct3DRenderContext is disposed" }
             getDirectXAdapterPointer(device)
         }
 
@@ -68,7 +68,7 @@ internal class Direct3DRedrawer(
      */
     internal val direct3DDevicePtr: Long
         get() = synchronized(drawLock) {
-            check(!isDisposed) { "Direct3DRedrawer is disposed" }
+            check(!isDisposed) { "Direct3DRenderContext is disposed" }
             getDirectXDevicePointer(device)
         }
 
@@ -81,7 +81,7 @@ internal class Direct3DRedrawer(
      */
     internal val direct3DQueuePtr: Long
         get() = synchronized(drawLock) {
-            check(!isDisposed) { "Direct3DRedrawer is disposed" }
+            check(!isDisposed) { "Direct3DRenderContext is disposed" }
             getDirectXQueuePointer(device)
         }
 
@@ -177,7 +177,7 @@ internal class Direct3DRedrawer(
     }
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "Direct3DRedrawer is disposed" }
+        check(!isDisposed) { "Direct3DRenderContext is disposed" }
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic Direct3D context")
         }

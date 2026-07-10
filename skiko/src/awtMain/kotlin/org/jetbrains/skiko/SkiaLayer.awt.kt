@@ -2,10 +2,10 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.internal.fastForEach
-import org.jetbrains.skiko.redrawer.AWTRedrawer
-import org.jetbrains.skiko.redrawer.OnScreenRedrawer
+import org.jetbrains.skiko.rendercontext.AwtRenderContext
+import org.jetbrains.skiko.rendercontext.OnScreenRenderer
 import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.RedrawerManager
+import org.jetbrains.skiko.rendercontext.RenderApiFallbackManager
 import java.awt.Component
 import java.awt.Dimension
 import javax.accessibility.Accessible
@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
  *
  * It is now a thin pull-model layer over the push-only [SkiaPanel] presenter: [SkiaPanel] owns the on-screen
  * heavyweight surface, the per-API render context, and the present path; [SkiaLayer] adds the deprecated
- * self-driven mode — a [renderDelegate] plus a coalescing frame loop ([OnScreenRedrawer]) that, on each
+ * self-driven mode — a [renderDelegate] plus a coalescing frame loop ([OnScreenRenderer]) that, on each
  * scheduled frame, records the delegate into a [Picture] and hands that stored picture to the very same
  * present path. New code should present a [Picture] through [SkiaPanel] and schedule frames with a
  * [DisplayFrameTicker]; see the class-level `@Deprecated`.
@@ -130,12 +130,12 @@ actual open class SkiaLayer internal constructor(
     override fun checkContentScale() = super.checkContentScale()
 
     /**
-     * The single generic pull-model frame loop selector. Builds an [OnScreenRedrawer] through the injectable
+     * The single generic pull-model frame loop selector. Builds an [OnScreenRenderer] through the injectable
      * [renderFactory] (the seam skiko's UI tests override to force a backend), owning the fallback queue.
      */
-    private val redrawerManager = RedrawerManager<Redrawer>(
+    private val redrawerManager = RenderApiFallbackManager<Redrawer>(
         defaultRenderApi = properties.renderApi,
-        redrawerFactory = { renderApi, oldRedrawer ->
+        factory = { renderApi, oldRedrawer ->
             oldRedrawer?.dispose()
             renderFactory.createRedrawer(this, renderApi, analytics, properties).also {
                 it.syncBoundsFromPlatformComponent()
@@ -150,12 +150,12 @@ actual open class SkiaLayer internal constructor(
      * The current pull-model frame loop driving the render context, or `null` before init / after [dispose] /
      * after a total fallback failure.
      */
-    internal val redrawer: Redrawer? by redrawerManager::redrawer
+    internal val redrawer: Redrawer? by redrawerManager::current
 
     // The push-model SkiaPanel present machinery (checkShowing/reshape/transparency) reads the live per-API
     // context and its API from here; for the pull model both come from the loop's wrapped context.
-    internal override val currentRedrawer: AWTRedrawer?
-        get() = (redrawer as? OnScreenRedrawer)?.renderer
+    internal override val currentRenderContext: AwtRenderContext?
+        get() = (redrawer as? OnScreenRenderer)?.renderer
 
     internal override val directSurfaceRenderApi: GraphicsApi
         get() = renderApi
@@ -202,7 +202,7 @@ actual open class SkiaLayer internal constructor(
     private var isRendering = false
 
     override fun initDirectSurfaceDriver(recreation: Boolean) {
-        // The pull model drives its own loop, so SkiaPanel's push-only redrawerFactory stays dormant: build
+        // The pull model drives its own loop, so SkiaPanel's push-only renderContextFactory stays dormant: build
         // the frame loop here instead. The manager disposes any previous loop and syncBounds the new one.
         pictureRecorder = PictureRecorder()
         redrawerManager.findNextWorkingRenderApi(recreation)
@@ -219,10 +219,10 @@ actual open class SkiaLayer internal constructor(
         super.dispose()
     }
 
-    // The frame loop (OnScreenRedrawer.dispose) already disposed the render context; don't dispose it again.
-    override fun disposeRedrawer() {}
+    // The frame loop (OnScreenRenderer.dispose) already disposed the render context; don't dispose it again.
+    override fun disposeRenderContext() {}
 
-    override fun recreateRedrawerAfterFailure() {
+    override fun recreateRenderContextAfterFailure() {
         if (isDisposed) return
         try {
             redrawerManager.findNextWorkingRenderApi(recreation = false)
@@ -292,7 +292,7 @@ actual open class SkiaLayer internal constructor(
 
     /**
      * Records [renderDelegate] into the stored [Picture] (background and cutouts are NOT recorded — they are
-     * applied on the present path by [SkiaPanel]). Called by [OnScreenRedrawer] once per scheduled frame.
+     * applied on the present path by [SkiaPanel]). Called by [OnScreenRenderer] once per scheduled frame.
      */
     internal fun update(nanoTime: Long, forcedSize: Dimension? = null) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
