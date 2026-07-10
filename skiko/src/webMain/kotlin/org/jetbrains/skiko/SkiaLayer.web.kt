@@ -13,9 +13,13 @@ import org.w3c.dom.HTMLCanvasElement
  *
  * SkikoLayer needs to be initialized with [HTMLCanvasElement] instance
  * using [attachTo] method.
+ *
+ * Internally this drives an internal [WebGLRenderContext] (which owns the WebGL Skia surface) from a
+ * `requestAnimationFrame` loop: each scheduled frame re-reads the `<canvas>` size, acquires a surface of that
+ * size, hands its canvas to [renderDelegate], then presents.
  */
 actual open class SkiaLayer {
-    internal var state: CanvasRenderer? = null
+    internal var renderContext: WebGLRenderContext? = null
 
     /**
      * [GraphicsApi.WEBGL] is the only supported renderApi for k/js (browser).
@@ -41,7 +45,7 @@ actual open class SkiaLayer {
      * Schedules a drawFrame to the appropriate moment.
      */
     actual fun needRender(throttledToVsync: Boolean) {
-        state?.needRedraw()
+        scheduleFrame()
     }
 
     @Deprecated(
@@ -64,8 +68,9 @@ actual open class SkiaLayer {
     }
 
     actual fun detach() {
-        state?.dispose()
-        state = null
+        renderContext?.close()
+        renderContext = null
+        htmlCanvas = null
     }
 
     actual val component: Any?
@@ -73,27 +78,68 @@ actual open class SkiaLayer {
 
     private var htmlCanvas: HTMLCanvasElement? = null
 
+    private var redrawScheduled = false
+
     /**
-     * Initializes the [CanvasRenderer] and events listeners.
+     * Initializes the internal [WebGLRenderContext].
      * Delegates rendering and events processing to [renderDelegate].
      */
     private fun attachTo(htmlCanvas: HTMLCanvasElement) {
         this.htmlCanvas = htmlCanvas
+        renderContext = WebGLRenderContext(createWebGLContext(htmlCanvas))
+    }
 
-        state = object: CanvasRenderer(createWebGLContext(htmlCanvas), htmlCanvas) {
-            override fun drawFrame(currentTimestamp: Double) {
-                // currentTimestamp is in milliseconds.
-                val currentNanos = currentTimestamp * 1_000_000
-                renderDelegate?.onRender(canvas!!, width, height, currentNanos.toLong())
-            }
+    /**
+     * Coalescing `requestAnimationFrame` scheduler: multiple [scheduleFrame] calls before the next animation
+     * frame collapse to a single [renderFrame].
+     */
+    @OptIn(ExperimentalWasmJsInterop::class)
+    private fun scheduleFrame() {
+        if (redrawScheduled || renderContext == null) {
+            return
+        }
+        redrawScheduled = true
+        windowRequestAnimationFrame { timestamp ->
+            redrawScheduled = false
+            renderFrame(timestamp)
         }
     }
 
+    /**
+     * Renders a single frame: re-reads the `<canvas>` size, acquires a surface of that size from the
+     * [renderContext], clears it, lets [renderDelegate] draw, then presents.
+     *
+     * @param timestampMillis the `requestAnimationFrame` timestamp, in milliseconds.
+     */
+    private fun renderFrame(timestampMillis: Double) {
+        val context = renderContext ?: return
+        val canvasElement = htmlCanvas ?: return
+        val width = canvasElement.width
+        val height = canvasElement.height
+        if (width <= 0 || height <= 0) return
+
+        val nanoTime = (timestampMillis * 1_000_000).toLong()
+        val surface = context.acquireSurface(width, height)
+        // `clear` and `resetMatrix` make the canvas not accumulate previous effects.
+        surface.canvas.clear(Color.WHITE)
+        surface.canvas.resetMatrix()
+        renderDelegate?.onRender(surface.canvas, width, height, nanoTime)
+        context.present()
+    }
+
     internal actual fun draw(canvas: Canvas) {
+        val canvasElement = htmlCanvas
+        val width = canvasElement?.width ?: 0
+        val height = canvasElement?.height ?: 0
         canvas.clear(Color.WHITE)
-        renderDelegate?.onRender(canvas, state!!.width, state!!.height, currentNanoTime())
+        renderDelegate?.onRender(canvas, width, height, currentNanoTime())
     }
 
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
 }
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private fun windowRequestAnimationFrame(callback: (Double) -> Unit): Int =
+    //language=JavaScript
+    js("window.requestAnimationFrame(callback)")

@@ -11,13 +11,20 @@ import kotlinx.cinterop.useContents
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Color
+import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.SurfaceColorFormat
+import org.jetbrains.skia.SurfaceOrigin
+import org.jetbrains.skia.SurfaceProps
+import org.jetbrains.skia.runRestoringState
 import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.LayerDrawScope
+import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.context.ContextHandler
-import org.jetbrains.skiko.context.draw
-import org.jetbrains.skiko.context.MacOsMetalContextHandler
 import org.jetbrains.skiko.currentNanoTime
 import platform.AppKit.NSWindowDidChangeOcclusionStateNotification
 import platform.AppKit.NSWindowOcclusionStateVisible
@@ -41,27 +48,40 @@ import platform.darwin.NSObjectProtocol
 import kotlin.concurrent.Volatile
 
 /**
- * Metal [Redrawer] implementation for MacOs.
+ * Metal [Redrawer] implementation for the native (Kotlin/Native) macOS target.
  *
- * See [MacOsMetalContextHandler]
+ * Everything here runs on the main run loop ([SkikoDispatchers.Main] for the frame loop, the main thread for
+ * the [MetalLayer]'s own `drawInContext:` and for [dispose]), so per-frame state is guarded by [isDisposed]
+ * checks rather than a lock.
  */
 internal class MacOsMetalRedrawer(
     private val skiaLayer: SkiaLayer
 ) : Redrawer {
-    private val contextHandler = MacOsMetalContextHandler(skiaLayer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
-
     private var isDisposed = false
     internal val device = MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
+
+    // GPU surface for the current frame.
+    private var context: DirectContext? = null
+    private var renderTarget: BackendRenderTarget? = null
+    private var surface: Surface? = null
+    private var canvas: Canvas? = null
+
+    /**
+     * The [CAMetalDrawable][CAMetalDrawableProtocol] acquired for the current frame, held until it is either
+     * presented (see [finishFrame]) or dropped (see [releasePendingDrawable]). `CAMetalLayer`'s drawable pool
+     * is small (~3), so a drawable that is acquired but neither presented nor released stalls `nextDrawable()`
+     * for up to ~1s on the next frame — hence it must be dropped on every exception path and on [dispose].
+     */
     private var currentDrawable: CAMetalDrawableProtocol? = null
+
     private val metalLayer = MetalLayer()
     private val occlusionObserver: NSObjectProtocol
     private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
     @Volatile private var isWindowOccluded = false
 
     init {
-        metalLayer.init(skiaLayer, contextHandler, device)
+        metalLayer.init(skiaLayer, this, device)
 
         val window = skiaLayer.nsView.window!!
         occlusionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
@@ -76,37 +96,28 @@ internal class MacOsMetalRedrawer(
         )
     }
 
+    override val renderInfo: String get() = "Native Metal: device ${device.name}"
+
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         if (skiaLayer.isShowing()) {
             draw()
         }
     }
 
-    /**
-     * Creates and returns an instances of [DirectContext]
-     */
-    fun makeContext(): DirectContext = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
-
-    /**
-     * Creates and returns an instances of [BackendRenderTarget] ready for rendering.
-     *
-     * https://developer.apple.com/documentation/quartzcore/cametallayer/1478172-nextdrawable
-     */
-    fun makeRenderTarget(width: Int, height: Int): BackendRenderTarget {
-        currentDrawable = metalLayer.nextDrawable()!!
-        return BackendRenderTarget.makeMetal(width, height, currentDrawable!!.texture.objcPtr())
-    }
-
     override fun dispose() {
         if (!isDisposed) {
+            isDisposed = true
+            releasePendingDrawable()
+            disposeSurface()
+            context?.close()
+            context = null
             metalLayer.dispose()
             NSNotificationCenter.defaultCenter.removeObserver(occlusionObserver)
-            isDisposed = true
         }
     }
 
     /**
-     * Synchronizes the [metalLayer] size with the size of underlying nsView
+     * Synchronizes the [metalLayer] size with the size of the underlying nsView.
      */
     override fun syncBoundsFromPlatformComponent() {
         syncContentScale()
@@ -117,7 +128,7 @@ internal class MacOsMetalRedrawer(
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         metalLayer.frame = osFrame
-        metalLayer.init(skiaLayer, contextHandler, device)
+        metalLayer.init(skiaLayer, this, device)
         metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
         CATransaction.commit()
         CATransaction.flush()
@@ -159,7 +170,7 @@ internal class MacOsMetalRedrawer(
             }
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 skiaLayer.inDrawScope {
-                    draw(contextHandler)
+                    performDraw()
                 }
             }
         }
@@ -170,7 +181,7 @@ internal class MacOsMetalRedrawer(
             if (!isDisposed) {
                 update()
                 skiaLayer.inDrawScope {
-                    draw(contextHandler)
+                    performDraw()
                 }
             }
         }
@@ -185,7 +196,94 @@ internal class MacOsMetalRedrawer(
         }
     }
 
-    fun finishFrame() {
+    /**
+     * Invoked from the [MetalLayer]'s own `drawInContext:` (e.g. on bounds change).
+     */
+    internal fun drawInLayerContext() {
+        if (isDisposed) return
+        skiaLayer.update(currentNanoTime())
+        skiaLayer.inDrawScope {
+            performDraw()
+        }
+    }
+
+    /**
+     * Renders one frame into a freshly acquired drawable and presents it. On any failure the acquired (but
+     * un-presented) drawable is dropped so it returns to `CAMetalLayer`'s pool instead of stalling the next
+     * `nextDrawable()` call.
+     */
+    private fun LayerDrawScope.performDraw() {
+        if (isDisposed) return
+        try {
+            if (!initContext()) {
+                throw RenderException("Cannot init graphic Metal context")
+            }
+            initSurface()
+            canvas?.runRestoringState {
+                clear(Color.TRANSPARENT)
+                skiaLayer.draw(this)
+            }
+            context?.flush()
+            surface?.flushAndSubmit()
+            finishFrame()
+        } catch (t: Throwable) {
+            releasePendingDrawable()
+            throw t
+        }
+    }
+
+    private fun initContext(): Boolean {
+        try {
+            if (context == null) {
+                context = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
+            }
+        } catch (e: Exception) {
+            println("${e.message}\nFailed to create Skia Metal context!")
+            return false
+        }
+        return true
+    }
+
+    private fun LayerDrawScope.initSurface() {
+        disposeSurface()
+
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
+
+        if (w > 0 && h > 0) {
+            currentDrawable = metalLayer.nextDrawable()
+                ?: throw RenderException("No Metal drawable available")
+            renderTarget = BackendRenderTarget.makeMetal(w, h, currentDrawable!!.texture.objcPtr())
+
+            surface = Surface.makeFromBackendRenderTarget(
+                context!!,
+                renderTarget!!,
+                SurfaceOrigin.TOP_LEFT,
+                SurfaceColorFormat.BGRA_8888,
+                ColorSpace.sRGB,
+                SurfaceProps(pixelGeometry = skiaLayer.pixelGeometry)
+            ) ?: throw RenderException("Cannot create surface")
+
+            canvas = surface!!.canvas
+        } else {
+            renderTarget = null
+            surface = null
+            canvas = null
+        }
+    }
+
+    private fun disposeSurface() {
+        surface?.close()
+        surface = null
+        renderTarget?.close()
+        renderTarget = null
+        canvas = null
+    }
+
+    /**
+     * Presents the current frame's drawable and clears [currentDrawable].
+     */
+    private fun finishFrame() {
         autoreleasepool {
             currentDrawable?.let {
                 val commandBuffer = queue.commandBuffer()!!
@@ -197,12 +295,19 @@ internal class MacOsMetalRedrawer(
         }
     }
 
+    /**
+     * Drops the current frame's drawable without presenting it, releasing it back to `CAMetalLayer`'s pool.
+     */
+    private fun releasePendingDrawable() {
+        currentDrawable = null
+    }
+
     override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(skiaLayer)
 }
 
 internal class MetalLayer : CAMetalLayer {
     private lateinit var skiaLayer: SkiaLayer
-    private lateinit var contextHandler: ContextHandler
+    private lateinit var redrawer: MacOsMetalRedrawer
 
     @OverrideInit
     constructor(): super()
@@ -211,11 +316,11 @@ internal class MetalLayer : CAMetalLayer {
 
     fun init(
         layer: SkiaLayer,
-        contextHandler: ContextHandler,
+        redrawer: MacOsMetalRedrawer,
         theDevice: MTLDeviceProtocol
     ) {
         this.skiaLayer = layer
-        this.contextHandler = contextHandler
+        this.redrawer = redrawer
         this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
@@ -232,14 +337,20 @@ internal class MetalLayer : CAMetalLayer {
         this.contentsGravity = kCAGravityTopLeft
     }
 
+    /**
+     * Tears the layer down and unwires it from the nsView, so that a later reattach (a fresh [SkiaLayer] on
+     * the same `NSView`) does not end up with a dead `CAMetalLayer` still installed as the view's backing
+     * layer. Only clears the view wiring if this layer is still the installed one.
+     */
     fun dispose() {
         this.removeFromSuperlayer()
+        if (this::skiaLayer.isInitialized && skiaLayer.nsView.layer == this) {
+            skiaLayer.nsView.layer = null
+            skiaLayer.nsView.wantsLayer = false
+        }
     }
 
     override fun drawInContext(ctx: CGContextRef?) {
-        skiaLayer.update(currentNanoTime())
-        skiaLayer.inDrawScope {
-            draw(contextHandler)
-        }
+        redrawer.drawInLayerContext()
     }
 }

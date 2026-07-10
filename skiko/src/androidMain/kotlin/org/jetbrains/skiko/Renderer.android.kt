@@ -1,15 +1,11 @@
 package org.jetbrains.skiko
 
 import android.content.Context
-import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.widget.LinearLayout
-import android.view.MotionEvent
-import android.view.KeyEvent
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.*
-import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -17,12 +13,56 @@ internal interface FrameManager {
     fun onFrameCompleted()
 }
 
-class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(context), FrameManager {
-    private val renderer = SkikoSurfaceRender(layer, this)
+/**
+ * A [GLSurfaceView] that renders a [SkikoRenderDelegate] through the internal Android GLES render context.
+ *
+ * The render loop is **demand-driven**: the view uses [GLSurfaceView.RENDERMODE_WHEN_DIRTY] and renders
+ * exactly one frame per [scheduleFrame], gated by [frameAck]. It does NOT animate continuously at the
+ * display refresh rate. The [frameDispatcher] lives for the view instance's lifetime (it is not cancelled on
+ * detach), so a recycled/reattached view keeps rendering.
+ *
+ * Construction is decoupled from [SkiaLayer]: it takes a render-delegate provider. The
+ * `(Context, SkiaLayer)` constructor and the [layer] accessor remain for one deprecation cycle.
+ */
+class SkikoSurfaceView internal constructor(
+    context: Context,
+    renderDelegateProvider: () -> SkikoRenderDelegate?,
+) : GLSurfaceView(context), FrameManager {
+
+    /**
+     * Renders [layer]'s delegate into this view.
+     */
+    @Deprecated(
+        message = "SkikoSurfaceView is being decoupled from SkiaLayer. Construct it from a " +
+            "SkikoRenderDelegate provider instead; this constructor (and the `layer` property) will be " +
+            "removed in a future release.",
+        level = DeprecationLevel.WARNING,
+    )
+    constructor(context: Context, layer: SkiaLayer) : this(context, { layer.renderDelegate }) {
+        deprecatedLayer = layer
+    }
+
+    private var deprecatedLayer: SkiaLayer? = null
+
+    /**
+     * The [SkiaLayer] this view was constructed with, if the deprecated `(Context, SkiaLayer)` constructor
+     * was used. Kept for one deprecation cycle only.
+     */
+    @Deprecated(
+        message = "SkikoSurfaceView is being decoupled from SkiaLayer; this accessor will be removed in a " +
+            "future release.",
+        level = DeprecationLevel.WARNING,
+    )
+    val layer: SkiaLayer
+        get() = deprecatedLayer
+            ?: error("This SkikoSurfaceView was not constructed with a SkiaLayer")
+
+    private val renderer = SkikoSurfaceRender(renderDelegateProvider, this)
+
     init {
         layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        setEGLConfigChooser (8, 8, 8, 0, 24, 8)
+        setEGLConfigChooser(8, 8, 8, 0, 24, 8)
         setEGLContextClientVersion(2)
         setRenderer(renderer)
         setRenderMode(RENDERMODE_WHEN_DIRTY)
@@ -43,9 +83,21 @@ class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(c
     fun scheduleFrame() {
         frameDispatcher.scheduleFrame()
     }
+
+    override fun onDetachedFromWindow() {
+        // Tear the GLES render context down on the GL thread, while its EGL context is still current, so we
+        // never free Skia GPU objects concurrently with an in-flight frame. The queued event runs before the
+        // GL thread stops in super.onDetachedFromWindow(). The frameDispatcher is intentionally left alive so
+        // a recycled/reattached view keeps working (its render context is rebuilt lazily on the next frame).
+        queueEvent { renderer.dispose() }
+        super.onDetachedFromWindow()
+    }
 }
 
-private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manager: FrameManager) : GLSurfaceView.Renderer {
+private class SkikoSurfaceRender(
+    private val renderDelegateProvider: () -> SkikoRenderDelegate?,
+    private val manager: FrameManager,
+) : GLSurfaceView.Renderer {
     private var width: Int = 0
     private var height: Int = 0
 
@@ -53,6 +105,9 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manag
     private var picture: PictureHolder? = null
     private var pictureRecorder: PictureRecorder = PictureRecorder()
     private val pictureLock = Any()
+
+    // Owned and driven exclusively on the GL thread.
+    private var renderContext: AndroidGLRenderContext? = null
 
     private fun <T : Any> lockPicture(action: (PictureHolder) -> T): T? {
         return synchronized(pictureLock) {
@@ -67,7 +122,7 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manag
 
     // This method is called from the main thread.
     fun update() {
-        layer.renderDelegate?.let {
+        renderDelegateProvider()?.let {
             val bounds = Rect.makeWH(width.toFloat(), height.toFloat())
             val canvas = pictureRecorder.beginRecording(bounds)
             try {
@@ -82,63 +137,40 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manag
         }
     }
 
-    // This method is called from GL rendering thread.
+    // This method is called from the GL rendering thread whenever the EGL context is (re)created. On resume
+    // after an onPause the previous EGL context is gone, so the cached render context references dead GL
+    // objects; drop it (abandoning its GPU resources without issuing GL calls) so it is rebuilt lazily.
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        gl!!
-        gl.glClearColor(0f, 0f, 0f, 0f)
-        gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
+        renderContext?.abandon()
+        renderContext = null
     }
 
-    // This method is called from GL rendering thread.
+    // This method is called from the GL rendering thread.
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-        gl!!
         this.width = width
         this.height = height
-        initCanvas(gl)
     }
 
-    // This method is called from GL rendering thread, it shall render Skia picture.
+    // This method is called from the GL rendering thread; it rasterizes the recorded Skia picture through
+    // the render context. It always acknowledges the frame so the demand-driven loop never stalls.
     override fun onDrawFrame(gl: GL10?) {
-        lockPicture {
-            canvas?.clear(-1)
-            canvas?.drawPicture(it.instance)
-            Unit
+        try {
+            if (width == 0 || height == 0) return
+            val context = renderContext ?: AndroidGLRenderContext().also { renderContext = it }
+            // A null surface means the context was closed after this frame was requested: safely no-op.
+            val surface = context.acquireSurface(width, height) ?: return
+            surface.canvas.clear(Color.WHITE)
+            lockPicture { surface.canvas.drawPicture(it.instance) }
+            context.present()
+        } finally {
+            manager.onFrameCompleted()
         }
-        context?.flush()
-        manager.onFrameCompleted()
     }
 
-    private var context: DirectContext? = null
-    private var renderTarget: BackendRenderTarget? = null
-    private var surface: Surface? = null
-    private var canvas: Canvas? = null
-
-    private fun initCanvas(gl: GL10) {
-        disposeCanvas()
-        val intBuf1 = IntBuffer.allocate(1)
-        gl.glGetIntegerv(GLES30.GL_DRAW_FRAMEBUFFER_BINDING, intBuf1)
-        val fbId = intBuf1[0]
-        renderTarget = makeGLRenderTarget(
-            width,
-            height,
-            0,
-            8,
-            fbId,
-            FramebufferFormat.GR_GL_RGBA8
-        )
-        context = makeGLContext()
-        surface = Surface.makeFromBackendRenderTarget(
-            context!!,
-            renderTarget!!,
-            SurfaceOrigin.BOTTOM_LEFT,
-            SurfaceColorFormat.RGBA_8888,
-            ColorSpace.sRGB
-        ) ?: throw RenderException("Cannot create surface")
-        canvas = surface!!.canvas
-    }
-
-    private fun disposeCanvas() {
-        surface?.close()
-        renderTarget?.close()
+    // Called on the GL thread (via GLSurfaceView.queueEvent) during detach. The render context is closed but
+    // its reference is intentionally kept: if a late onDrawFrame still fires, it observes a closed context
+    // and no-ops instead of recreating one during teardown.
+    fun dispose() {
+        renderContext?.close()
     }
 }
