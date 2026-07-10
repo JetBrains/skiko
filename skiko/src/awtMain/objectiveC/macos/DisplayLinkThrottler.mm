@@ -6,6 +6,7 @@
 #import <AppKit/AppKit.h>
 #import <stdatomic.h>
 #import <objc/runtime.h>
+#import <mach/mach_time.h>
 
 typedef void (^OnScreenChangeCallback)(void);
 
@@ -35,14 +36,30 @@ static void *OnScreenChangeCallbackKey = &OnScreenChangeCallbackKey;
 
 @interface DisplayLinkThrottler : NSObject
 
-- (void)onVSync;
+- (void)onVSync:(int64_t)outputTimeNanos;
 
 @end
+
+// Converts a mach_absolute_time-based timestamp (as found in CVTimeStamp.hostTime) into nanoseconds.
+static int64_t machHostTimeToNanos(uint64_t hostTime) {
+    static mach_timebase_info_data_t timebaseInfo;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        mach_timebase_info(&timebaseInfo);
+    });
+
+    return (int64_t)(hostTime * timebaseInfo.numer / timebaseInfo.denom);
+}
 
 static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now, const CVTimeStamp *outputTime, CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext) {
     DisplayLinkThrottler *throttler = (__bridge DisplayLinkThrottler *)displayLinkContext;
 
-    [throttler onVSync];
+    int64_t outputTimeNanos = 0;
+    if (outputTime->flags & kCVTimeStampHostTimeValid) {
+        outputTimeNanos = machHostTimeToNanos(outputTime->hostTime);
+    }
+
+    [throttler onVSync:outputTimeNanos];
 
     return kCVReturnSuccess;
 }
@@ -58,6 +75,12 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     NSConditionLock *_vsyncConditionLock;
     BOOL _isSleeping;
     __weak NSWindow *_window;
+
+    // Predicted host time (in nanoseconds) of the most recent vsync, as reported by
+    // CVDisplayLink's outputTime. Atomic because it's written from the CVDisplayLink callback
+    // thread (via onVSync:) and read from whichever thread calls waitVSync, without going
+    // through `_lock` (onVSync: can be invoked while `_lock` is already held, see systemWillSleep).
+    _Atomic(int64_t) _lastOutputTimeNanos;
 }
 
 - (instancetype)initWithWindow:(NSWindow *)window {
@@ -158,7 +181,8 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     _isSleeping = YES;
     [self updateDisplayLink];
-    [self onVSync];
+    // No real vsync happened, so there is no meaningful predicted present time.
+    [self onVSync:0];
 
     [_lock unlock];
 }
@@ -172,13 +196,17 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     [_lock unlock];
 }
 
-- (void)onVSync {
+- (void)onVSync:(int64_t)outputTimeNanos {
+    atomic_store(&_lastOutputTimeNanos, outputTimeNanos);
+
     // Lock condition lock and immediately unlock setting condition variable to 1 (can render now)
     [_vsyncConditionLock lock];
     [_vsyncConditionLock unlockWithCondition:1];
 }
 
-- (void)waitVSync {
+// Returns the predicted present time (host time, in nanoseconds) of the vsync that unblocked
+// this call, or 0 if there was no display link to wait for or no valid prediction was available.
+- (int64_t)waitVSync {
     BOOL hasDisplayLink;
 
     [_lock lock];
@@ -187,12 +215,14 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     // No display link to wait for
     if (!hasDisplayLink) {
-        return;
+        return 0;
     }
 
     // Wait until `onVSync` signals 1, then immediately lock, set it to 0 and unlock again.
     [_vsyncConditionLock lockWhenCondition:1];
     [_vsyncConditionLock unlockWithCondition:0];
+
+    return atomic_load(&_lastOutputTimeNanos);
 }
 
 - (void)invalidateDisplayLink {
@@ -266,10 +296,10 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_di
     // throttler will be released by ARC and deallocated in the end of this scope.
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_waitVSync(JNIEnv *env, jobject obj, jlong throttlerPtr) {
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_waitVSync(JNIEnv *env, jobject obj, jlong throttlerPtr) {
     DisplayLinkThrottler *throttler = (__bridge DisplayLinkThrottler *) (void *) throttlerPtr;
 
-    [throttler waitVSync];
+    return (jlong) [throttler waitVSync];
 }
 
 }

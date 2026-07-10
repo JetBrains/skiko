@@ -10,8 +10,12 @@ import kotlin.coroutines.CoroutineContext
  * Dispatch frame after call of [scheduleFrame].
  *
  * After the creating there should be no scheduled frame in the frame loop.
+ *
+ * An **internal** coalescing frame-loop utility, not a public frame-source contract. The public,
+ * cross-platform frame source is [DisplayFrameTicker]; obtain one from its per-platform factory and
+ * drive frames through that.
  */
-class FrameDispatcher(
+internal class FrameDispatcher(
     scope: CoroutineScope,
     private val onFrame: suspend CoroutineScope.() -> Unit
 ) {

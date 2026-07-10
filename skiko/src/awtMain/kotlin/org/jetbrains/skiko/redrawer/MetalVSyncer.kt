@@ -21,10 +21,21 @@ internal class MetalVSyncer(windowPtr: Long) {
     // A channel to trigger the thread that waits on vsync to doing so
     private val triggerResumeOnVSync = Channel<Unit>(Channel.CONFLATED)
 
+    /**
+     * The predicted host time (in nanoseconds, derived from CVDisplayLink's outputTime) of the
+     * display refresh that unblocked the most recent [waitForVSync], or 0 if unavailable
+     * (e.g. no display link yet, or the wait was released due to system sleep).
+     *
+     * A vsync-driven frame ticker reads this after [waitForVSync] to time the next frame against the
+     * display's refresh, falling back to the wall clock when it is 0.
+     */
+    var lastVSyncOutputTimeNanos: Long = 0
+        private set
+
     private val job = CoroutineScope(dispatcherToBlockOn).launch {
         while (isActive) {
             triggerResumeOnVSync.receive()  // Suspend until needed
-            displayLinkThrottler.waitVSync()  // This blocks (not suspends!) the thread
+            lastVSyncOutputTimeNanos = displayLinkThrottler.waitVSync()  // This blocks (not suspends!) the thread
             if (isActive) {
                 channel.sendAll(Unit)
             }
@@ -59,11 +70,16 @@ private class DisplayLinkThrottler(windowPtr: Long) {
      */
     private external fun create(windowPtr: Long): Long
 
-    fun waitVSync() = waitVSync(implPtr)
+    /**
+     * Blocks until the next vsync (or until there's no display link to wait for), returning the
+     * predicted present time (host time, in nanoseconds) reported by CVDisplayLink's outputTime,
+     * or 0 if unavailable.
+     */
+    fun waitVSync(): Long = waitVSync(implPtr)
 
     private external fun dispose(implPtr: Long)
 
-    private external fun waitVSync(implPtr: Long)
+    private external fun waitVSync(implPtr: Long): Long
 
     companion object {
         init {
