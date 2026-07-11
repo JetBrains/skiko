@@ -77,8 +77,16 @@ internal class MetalContextHandler(
      */
     fun finishFrameInLiveResize() = finishFrameInLiveResize(device.ptr)
 
+    /**
+     * Presents the frame synchronously, so the content is delivered before the window can appear on
+     * screen. Used for a frame rendered while the layer is displayable but not yet showing; see
+     * [org.jetbrains.skiko.redrawer.MetalRedrawer.renderBeforeShown].
+     */
+    fun finishFrameBeforeShown() = finishFrameBeforeShown(device.ptr)
+
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun finishFrame(device: Long)
     private external fun finishFrameInLiveResize(device: Long)
+    private external fun finishFrameBeforeShown(device: Long)
 }

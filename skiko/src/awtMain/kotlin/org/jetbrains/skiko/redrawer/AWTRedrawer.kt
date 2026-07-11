@@ -83,5 +83,35 @@ internal abstract class AWTRedrawer(
         check(!isDisposed) { "${this.javaClass.simpleName} is disposed" }
     }
 
+    override fun onPlatformComponentResized() {
+        syncBoundsFromPlatformComponent()
+        if (supportsRenderingBeforeShown && !layer.isShowing && layer.isDisplayable && layer.width > 0 && layer.height > 0) {
+            // Render eagerly so the window already has content when it first appears on screen; see
+            // supportsRenderingWhileHidden. A scheduled frame would be skipped (rendering is gated on isShowing).
+            renderBeforeShown()
+        } else {
+            needRender(throttledToVsync = false)
+        }
+    }
+
+    /**
+     * Whether this redrawer can render and present a frame while the layer is displayable but not yet
+     * showing (see [renderBeforeShown]). When `true`, [onPlatformComponentResized] renders eagerly so the
+     * window already has content on its first on-screen frame, avoiding a flash of the window background.
+     */
+    protected open val supportsRenderingBeforeShown: Boolean get() = false
+
+    /**
+     * Renders and presents a frame while the layer is displayable but not showing.
+     *
+     * Only called when [supportsRenderingBeforeShown] is `true`. The default is a plain [renderImmediately];
+     * implementations whose regular present is asynchronous should override this to present synchronously,
+     * guaranteeing the content is delivered before the window can appear on screen (an async present could
+     * land only after the window is already showing, defeating the purpose of the early render).
+     */
+    protected open fun renderBeforeShown() {
+        renderImmediately()
+    }
+
     override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 }

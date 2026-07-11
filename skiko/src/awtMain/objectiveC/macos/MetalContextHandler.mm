@@ -148,5 +148,68 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
     });
 }
 
+/// Runs `block` on the AppKit main thread and waits for it to complete (runs it inline when already on
+/// the main thread).
+///
+/// Unlike dispatch_sync(dispatch_get_main_queue(), ...), the block is enqueued directly on the main run
+/// loop with a mode list that includes AWT's special run loop mode, so it is serviced even while the main
+/// thread is spinning inside an AppKit->EDT wait (as can happen around window show). The GCD main queue is
+/// not drained in that special mode, so dispatch_sync could deadlock there; this can't.
+static void performOnMainThreadAndWait(void (^block)(void)) {
+    if (NSThread.isMainThread) {
+        block();
+        return;
+    }
+    dispatch_semaphore_t done = dispatch_semaphore_create(0);
+    // Use string-literal mode names (NSEventTrackingRunLoopMode / NSModalPanelRunLoopMode are AppKit
+    // symbols, not imported here); these match the modes AWT's own performOnMainThread services.
+    NSArray *modes = @[NSDefaultRunLoopMode, @"NSEventTrackingRunLoopMode", @"NSModalPanelRunLoopMode", @"AWTRunLoopMode"];
+    CFRunLoopPerformBlock(CFRunLoopGetMain(), (__bridge CFTypeRef) modes, ^{
+        block();
+        dispatch_semaphore_signal(done);
+    });
+    CFRunLoopWakeUp(CFRunLoopGetMain());
+    dispatch_semaphore_wait(done, DISPATCH_TIME_FOREVER);
+}
+
+/// Presents the current drawable for a frame rendered while the window is not yet showing (the warm-up
+/// frame drawn just before the window is first shown), committing the layer-contents update to the window
+/// server before returning. Otherwise the window's first on-screen frame appears before our content is
+/// committed, briefly flashing the Canvas's background color.
+///
+/// The plain async present ([drawable present] without a transaction) is vsync-paced: it schedules the
+/// contents swap for a later CoreAnimation commit, which can land only after the window is already on
+/// screen. The transactional present (presentsWithTransaction + an explicit committed-and-flushed
+/// CATransaction) makes delivery deterministic — but it must run on the AppKit main thread: committing it
+/// from another thread (the AWT event dispatch thread, where this is called) wedges the layer's present
+/// queue, leaving the window permanently blank.
+///
+/// While the window is hidden there is no other presenter (the frame loop is gated on the layer being
+/// showing, and there is no live resize), so toggling presentsWithTransaction here is safe.
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrameBeforeShown(
+    JNIEnv *env, jobject contextHandler, jlong devicePtr)
+{
+    finishFrame(devicePtr, ^(MetalDevice *device, id<CAMetalDrawable> currentDrawable, id<MTLCommandBuffer> commandBuffer) {
+        /// commit + waitUntilScheduled guarantees the drawing command buffer (submitted by Skia earlier,
+        /// ahead of this one in the queue) is scheduled first, so the present below can't outrun the
+        /// rendering. Done on the calling thread to keep the main-thread block minimal.
+        [commandBuffer commit];
+        [commandBuffer waitUntilScheduled];
+
+        performOnMainThreadAndWait(^{
+            [CATransaction begin];
+            [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+            /// presentsWithTransaction is read at the [present] call, so restoring it right after is safe.
+            device.layer.presentsWithTransaction = YES;
+            [currentDrawable present];
+            device.layer.presentsWithTransaction = NO;
+            [CATransaction commit];
+            /// Push the transaction to the window server now instead of at the end of the current run loop
+            /// cycle — we must return only after the contents swap has been committed.
+            [CATransaction flush];
+        });
+    });
+}
+
 } // extern C
 #endif
