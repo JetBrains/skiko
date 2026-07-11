@@ -143,6 +143,29 @@ internal class MetalRedrawer(
         }
     }
 
+    override val supportsRenderingBeforeShown: Boolean get() = true
+
+    /**
+     * Like [renderImmediately], but presents synchronously: the regular present is asynchronous and
+     * vsync-paced, so a frame rendered just before the window is shown (the warm-up frame) could have its
+     * present land only after the window has already appeared — defeating the purpose of the early render,
+     * with the window still briefly flashing its background color.
+     */
+    override fun renderBeforeShown() {
+        checkDisposed()
+        update()
+        inDrawScope {
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                performDraw(finishFrame = false)
+            }
+        }
+        synchronized(drawLock) {
+            if (!isDisposed) {
+                contextHandler.finishFrameBeforeShown()
+            }
+        }
+    }
+
     private suspend fun draw() {
         inDrawScope {
             // Move drawing to another thread to free the main thread

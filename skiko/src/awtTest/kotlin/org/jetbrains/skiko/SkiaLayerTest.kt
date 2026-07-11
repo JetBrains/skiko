@@ -40,13 +40,17 @@ import javax.swing.JLayeredPane
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.thread
+import kotlin.coroutines.resume
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.nanoseconds
 
 @Suppress("SameParameterValue")
 class SkiaLayerTest {
@@ -1120,6 +1124,84 @@ class SkiaLayerTest {
         }
     }
 
+    @OptIn(ExperimentalAtomicApi::class)
+    @Test
+    fun `no window flash on first show`() = uiTest {
+        // Until the issue is fixed in other redrawers
+        // Don't use assumeTrue, as uiTest iterates over multiple renderers,
+        // and if one of them is skipped, the whole test is skipped
+        if ((renderApi != GraphicsApi.METAL) && (renderApi != GraphicsApi.DIRECT3D)) return@uiTest
+
+        val bgColor = Color.GREEN
+        val fgColor = Color.BLACK
+
+        // Put up a large green window, and then repeatedly show a smaller black window on top of it while
+        // screenshotting the pixel at the center, making sure that pixel is always either black (the
+        // window's content) or green (the background window) - never a flash of some other color.
+
+        val backgroundWindow = JFrame().also {
+            it.size = Dimension(1000, 1000)
+            it.location = Point(200, 200)
+            it.contentPane.background = bgColor
+        }
+        backgroundWindow.isVisible = true
+        backgroundWindow.waitUntilOpened()
+        delay(200)
+
+        val pixelLocation = backgroundWindow.bounds.let {
+            Point(it.x + it.width / 2, it.y + it.height / 2)
+        }
+        val nonBlackPixelDetected = AtomicReference<Color?>(null)
+        val stopThread = AtomicBoolean(false)
+        val semaphore = Semaphore(0, true)
+
+        val t = thread {
+            val robot = Robot()
+            while (!stopThread.get()) {
+                val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
+                if (!pixel.closeTo(fgColor) && !pixel.closeTo(bgColor)) {
+                    nonBlackPixelDetected.store(pixel)
+                    return@thread
+                }
+                semaphore.release()
+            }
+        }
+        // Wait for the thread to start reading pixels
+        semaphore.acquire()
+
+        try {
+            repeat(20) { testRun ->
+                delay(250)
+                lateinit var renderDelegate: SolidColorRenderer
+                val window = UiTestWindow {
+                    size = Dimension(600, 600)
+                    location = Point(400, 400)
+                    background = bgColor
+                    renderDelegate = SolidColorRenderer(
+                        layer = layer,
+                        color = fgColor,
+                    )
+                    layer.renderDelegate = renderDelegate
+                    contentPane.add(layer, BorderLayout.CENTER)
+                }
+
+                try {
+                    // Wait for the thread to start reading pixels
+                    window.isVisible = true
+                    window.waitUntilOpened()
+                    delay(250)
+                    assertNull(nonBlackPixelDetected.load(), "Detected a non-black pixel on window show in run ${testRun + 1}.")
+                } finally {
+                    stopThread.getAndSet(true)
+                    t.join()
+                    window.dispose()
+                }
+            }
+        } finally {
+            backgroundWindow.dispose()
+        }
+    }
+
     @Test
     fun `temporary change is not visible with needRender(throttledToVsync = false)`() = uiTest {
         assumeTrue(hostOs.isMacOS)
@@ -1532,3 +1614,12 @@ class SkiaLayerTest {
 }
 
 internal fun JFrame.close() = dispatchEvent(WindowEvent(this, WindowEvent.WINDOW_CLOSING))
+
+private suspend fun Window.waitUntilOpened() = suspendCancellableCoroutine { continuation ->
+    addWindowListener(object : WindowAdapter() {
+        override fun windowOpened(e: WindowEvent?) {
+            removeWindowListener(this)
+            continuation.resume(Unit)
+        }
+    })
+}
