@@ -1,7 +1,12 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.Usage
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 buildscript {
     repositories {
@@ -48,23 +53,6 @@ val hostArch = when (osArch) {
 
 val host = "${hostOs}-${hostArch}"
 val skikoVersion = findProperty("skiko.version")?.toString() ?: "0.0.0-SNAPSHOT"
-
-val skikoWasm by configurations.creating
-
-dependencies {
-    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
-    skikoWasm("org.jetbrains.skiko:skiko-skottie-js-wasm-runtime:$skikoVersion")
-}
-
-val unpackWasmRuntime = tasks.register("unpackWasmRuntime", Copy::class) {
-    destinationDir = file("$buildDir/resources/")
-    from(skikoWasm.map { zipTree(it) })
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
-    dependsOn(unpackWasmRuntime)
-}
 
 kotlin {
     if (hostOs == "macos") {
@@ -135,8 +123,6 @@ kotlin {
 
         val webMain by creating {
             dependsOn(commonMain)
-            resources.setSrcDirs(resources.srcDirs)
-            resources.srcDirs(unpackWasmRuntime.map { it.destinationDir })
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
             }
@@ -192,6 +178,7 @@ kotlin {
             }
         }
     }
+    targets.withType<KotlinJsIrTarget>().all { configureSkikoWebRuntime(project, this) }
 }
 
 if (hostOs == "macos") {
@@ -244,7 +231,8 @@ if (hostOs == "macos") {
                 }
             }
 
-            val appDir = project.layout.buildDirectory.dir("iosSimulator/${iosSimAppName}.app").get().asFile.absolutePath
+            val appDir =
+                project.layout.buildDirectory.dir("iosSimulator/${iosSimAppName}.app").get().asFile.absolutePath
             val device = iosSimDevice.get()
             val launchTarget = if (device == "booted") "booted" else device
 
@@ -386,4 +374,55 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
     compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
+}
+
+private fun configureSkikoWebRuntime(
+    project: Project,
+    target: KotlinJsIrTarget,
+) {
+    val titledTargetName = target.name.replaceFirstChar { it.titlecase() }
+    val mainCompilation = target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)!!
+    val runtimeDepsConfig = project.configurations.findByName(mainCompilation.runtimeDependencyConfigurationName)!!
+    val skikoWebRuntimeJarFiles = runtimeDepsConfig.incoming.artifactView {
+        @Suppress("UnstableApiUsage")
+        withVariantReselection()
+        attributes {
+            runtimeDepsConfig.attributes.keySet().forEach {
+                @Suppress("UNCHECKED_CAST")
+                attribute(it as Attribute<Any>, runtimeDepsConfig.attributes.getAttribute(it) as Any)
+            }
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
+        }
+    }.files
+    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-${target.name}-runtime")
+
+    val unpackRuntime = project.tasks.register("unpackSkikoRuntimeFor$titledTargetName", Copy::class.java) {
+        destinationDir = unpackedRuntimeDir.get().asFile
+        from(
+            skikoWebRuntimeJarFiles.map { artifact -> project.zipTree(artifact) }
+        )
+        exclude("META-INF/**")
+    }
+
+    target.compilations.all {
+        if (target.wasmTargetType != null) {
+            // Kotlin/Wasm uses ES module system to depend on skiko through skiko.mjs.
+            // Further bundler could process all files by its own (both skiko.mjs and skiko.wasm) and then emits its own version.
+            // So that’s why we need to provide skiko.mjs and skiko.wasm only for webpack, but not in the final dist.
+            binaries.all {
+                linkSyncTask.configure {
+                    dependsOn(unpackRuntime)
+                    from.from(unpackedRuntimeDir)
+                }
+            }
+        } else {
+            // Kotlin/JS depends on Skiko through global space.
+            // Bundler cannot know anything about global externals, so that’s why we need to copy it to final dist
+            project.tasks.named(processResourcesTaskName, ProcessResources::class.java) {
+                from(unpackedRuntimeDir)
+                dependsOn(unpackRuntime)
+                exclude("META-INF")
+            }
+        }
+    }
 }
