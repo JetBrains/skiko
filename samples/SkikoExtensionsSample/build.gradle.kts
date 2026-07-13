@@ -116,8 +116,8 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.skiko:skiko:$skikoVersion")
                 implementation("org.jetbrains.skiko:skiko-skottie:$skikoVersion")
-                implementation("org.jetbrains.skiko:skiko-awt-runtime-$host:$skikoVersion")
-                implementation("org.jetbrains.skiko:skiko-skottie-awt-runtime-$host:$skikoVersion")
+                implementation("org.jetbrains.skiko:skiko-awt-runtime-all:$skikoVersion")
+                implementation("org.jetbrains.skiko:skiko-skottie-awt-runtime-all:$skikoVersion")
             }
         }
 
