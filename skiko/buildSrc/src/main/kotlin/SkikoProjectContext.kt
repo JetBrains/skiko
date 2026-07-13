@@ -105,7 +105,7 @@ fun SkikoProjectContext.declareSkiaTasks() {
 
             val skiaReleaseTag = project.skiaVersion(target)
 
-            val skiaBaseUrl = "https://github.com/hub-bla/skia/releases/download/$skiaReleaseTag"
+            val skiaBaseUrl = "https://github.com/JetBrains/skia/releases/download/$skiaReleaseTag"
 
             val artifactId = "Skia-${skiaReleaseTag}-${config}-$buildType-${arch}"
 
