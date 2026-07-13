@@ -2,9 +2,10 @@ package tasks.configuration
 
 import Arch
 import CompileSkikoCppTask
+import GenerateWaylandProtocolsTask
 import PatchSkiaSymbolsTask
+import runPkgConfigVariable
 import OS
-import SkiaBuildType
 import SkikoProjectContext
 import WriteCInteropDefFile
 import compilerForTarget
@@ -51,7 +52,8 @@ fun Project.findXcodeSdkRoot(): String {
 }
 
 fun SkikoProjectContext.compileNativeBridgesTask(
-    os: OS, arch: Arch, isUikitSim: Boolean
+    os: OS, arch: Arch, isUikitSim: Boolean,
+    waylandProtocols: TaskProvider<GenerateWaylandProtocolsTask>? = null,
 ): TaskProvider<CompileSkikoCppTask> = with (this.project) {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isUikitSim = isUikitSim)
 
@@ -148,7 +150,15 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 )
                 // Add sysroot for ARM64 cross-compilation
                 if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
-                    linuxFlags.add(0, "--sysroot=/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc")
+                    val armToolchainSysroot = file("/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc")
+                    if (armToolchainSysroot.exists()) {
+                        linuxFlags.add(0, "--sysroot=${armToolchainSysroot.absolutePath}")
+                    } else {
+                        // Distro cross toolchain (e.g. Ubuntu g++-aarch64-linux-gnu): libc comes
+                        // from the toolchain's own sysroot; arch-neutral X11/GL/fontconfig headers
+                        // are taken from the host after the sysroot search paths.
+                        linuxFlags.add("-idirafter /usr/include")
+                    }
                 }
                 flags.set(linuxFlags)
             }
@@ -158,6 +168,12 @@ fun SkikoProjectContext.compileNativeBridgesTask(
         val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
+        if (waylandProtocols != null) {
+            dependsOn(waylandProtocols)
+            sourceRoots.add(waylandProtocols.flatMap { it.outDir })
+            // wayland-util.h comes from the host even when a cross-compilation sysroot is active
+            flags.add("-idirafter /usr/include")
+        }
 
         includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
@@ -187,6 +203,91 @@ fun configureCinterop(
     }
     target.compilations.getByName("main") {
         cinterops.create(cinteropName).apply {
+            definitionFile.set(writeCInteropDef.flatMap { it.outputFile })
+        }
+    }
+}
+
+/**
+ * The Wayland protocols the Linux native backend binds beyond the core `wayland.xml`
+ * (which ships pre-generated in libwayland-client itself): `xdg-shell` for toplevel
+ * windowing, `viewporter` and `fractional-scale-v1` for HiDPI scale,
+ * `xdg-decoration-unstable-v1` for server-side decorations, and — consumed by the
+ * compose event pump rather than skiko itself — `cursor-shape-v1` (with `tablet-v2`,
+ * whose generated code cursor-shape's references) and `text-input-unstable-v3`.
+ */
+private val waylandProtocolXmlPaths = listOf(
+    "stable/xdg-shell/xdg-shell.xml",
+    "stable/viewporter/viewporter.xml",
+    "stable/tablet/tablet-v2.xml",
+    "staging/fractional-scale/fractional-scale-v1.xml",
+    "staging/cursor-shape/cursor-shape-v1.xml",
+    "unstable/xdg-decoration/xdg-decoration-unstable-v1.xml",
+    "unstable/text-input/text-input-unstable-v3.xml",
+)
+
+fun SkikoProjectContext.registerGenerateWaylandProtocolsTask(
+    os: OS, arch: Arch, targetString: String
+): TaskProvider<GenerateWaylandProtocolsTask> = with(this.project) {
+    registerSkikoTask<GenerateWaylandProtocolsTask>("generateWaylandProtocols", os, arch) {
+        val protocolsRoot = runPkgConfigVariable("wayland-protocols", "pkgdatadir")
+        protocolXmlFiles.from(waylandProtocolXmlPaths.map { "$protocolsRoot/$it" })
+        outDir.set(layout.buildDirectory.dir("generated/wayland/$targetString"))
+    }
+}
+
+/**
+ * Registers the `waylandegl` cinterop: libwayland-client + wayland-egl + EGL plus the
+ * client headers codegen'd by [GenerateWaylandProtocolsTask]. The def file is generated
+ * per target because the generated-header include path points into the build directory.
+ */
+fun configureWaylandEglCinterop(
+    arch: Arch,
+    target: KotlinNativeTarget,
+    targetString: String,
+    generateProtocols: TaskProvider<GenerateWaylandProtocolsTask>,
+) {
+    val project = target.project
+    val gnuArch = if (arch == Arch.Arm64) "aarch64" else "x86_64"
+    val writeCInteropDef = project.tasks.register(
+        "writeWaylandEglCInteropDef${joinToTitleCamelCase(OS.Linux.id, arch.id)}",
+        WriteCInteropDefFile::class.java
+    ) {
+        headers.set(
+            listOf("wayland-client.h", "wayland-egl.h", "EGL/egl.h", "EGL/eglext.h") +
+                    waylandProtocolXmlPaths.map {
+                        "${File(it).nameWithoutExtension}-client-protocol.h"
+                    }
+        )
+        compilerOpts.set(generateProtocols.flatMap { it.outDir }.map {
+            listOf(
+                "-D_GNU_SOURCE",
+                "-I${it.asFile.absolutePath}",
+                // Host headers after the Konan sysroot, same reasoning as x11gl.def
+                "-idirafter", "/usr/include",
+                "-idirafter", "/usr/include/$gnuArch-linux-gnu",
+            )
+        })
+        linkerOpts.set(
+            buildList {
+                add("-L/usr/lib/$gnuArch-linux-gnu")
+                // Distros without Debian multiarch (Arch, Fedora) keep the host libs in
+                // /usr/lib. x64 only: adding it under arm64 would leak host x64 libs into
+                // the cross-link, same reasoning as x11gl.def / xkbcommon.def.
+                if (arch != Arch.Arm64) add("-L/usr/lib")
+                addAll(listOf("-lwayland-client", "-lwayland-egl", "-lEGL"))
+            }
+        )
+        outputFile.set(project.layout.buildDirectory.file("cinterop/$targetString/waylandegl.def"))
+    }
+    project.tasks.withType(CInteropProcess::class.java).configureEach {
+        if (konanTarget == target.konanTarget) {
+            dependsOn(writeCInteropDef)
+            dependsOn(generateProtocols)
+        }
+    }
+    target.compilations.getByName("main") {
+        cinterops.create("waylandegl").apply {
             definitionFile.set(writeCInteropDef.flatMap { it.outputFile })
         }
     }
@@ -247,6 +348,11 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         outputFile.set(hiddenSymbolsFile)
     }
 
+    // Feeds both the waylandegl cinterop (client headers) and the native bridges
+    // compile (protocol marshalling code).
+    val waylandProtocolsTask =
+        if (os == OS.Linux) registerGenerateWaylandProtocolsTask(os, arch, targetString) else null
+
     val linkerFlags = when (os) {
         OS.MacOS -> {
             configureCinterop(cinteropName, os, arch, target, targetString, resolvedBinaryInputs.frameworks)
@@ -274,6 +380,17 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             ))
         }
         OS.Linux -> {
+            target.compilations.getByName("main") {
+                cinterops.create("x11gl").apply {
+                    definitionFile.set(project.file("src/nativeInterop/cinterop/x11gl.def"))
+                }
+                // No Kotlin consumer inside skiko: the klib is published for the compose
+                // event pump's wl_keyboard keymap handling.
+                cinterops.create("xkbcommon").apply {
+                    definitionFile.set(project.file("src/nativeInterop/cinterop/xkbcommon.def"))
+                }
+            }
+            configureWaylandEglCinterop(arch, target, targetString, waylandProtocolsTask!!)
             val options = mutableListOf(
                 "-L/usr/lib64",
                 "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
@@ -297,6 +414,9 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             OS.Linux -> listOf(
                 "-linker-option", "-lX11",
                 "-linker-option", "-lGLX",
+                "-linker-option", "-lwayland-client",
+                "-linker-option", "-lwayland-egl",
+                "-linker-option", "-lEGL",
             )
             else -> emptyList()
         })
@@ -316,7 +436,8 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         }
     }
 
-    val crossCompileTask = compileNativeBridgesTask(os, arch, isUikitSim = isUikitSim)
+    val crossCompileTask =
+        compileNativeBridgesTask(os, arch, isUikitSim = isUikitSim, waylandProtocols = waylandProtocolsTask)
 
     // TODO: move to LinkSkikoTask.
     val actionName = "linkNativeBridges".withSuffix(isUikitSim = isUikitSim)
