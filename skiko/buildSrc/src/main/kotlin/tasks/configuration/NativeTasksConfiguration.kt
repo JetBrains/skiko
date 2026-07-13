@@ -5,6 +5,7 @@ import CompileSkikoCppTask
 import PatchSkiaSymbolsTask
 import OS
 import SkiaBuildType
+import SkikoModuleKind
 import SkikoProjectContext
 import WriteCInteropDefFile
 import compilerForTarget
@@ -269,7 +270,9 @@ fun SkikoProjectContext.configureNativeTarget(
 ) = with(this.project) {
     if (!os.isCompatibleWithHost) return
 
-    target.generateVersion(os, arch, skiko)
+    if (kind != SkikoModuleKind.EXTENSION) {
+        target.generateVersion(os, arch, skiko)
+    }
     val isUikitSim = target.isUikitSimulator()
 
     val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"

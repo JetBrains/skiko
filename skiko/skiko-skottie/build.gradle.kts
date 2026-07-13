@@ -98,7 +98,6 @@ kotlin {
                     compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
                 }
             }
-            generateVersion(targetOs, targetArch, skiko)
         }
     }
 
@@ -130,7 +129,6 @@ kotlin {
                 }
             }
             binaries.executable()
-            generateVersion(OS.Wasm, Arch.Wasm, skiko)
 
             val test by compilations.getting
             project.tasks.named<Copy>(test.processResourcesTaskName) {
@@ -154,7 +152,6 @@ kotlin {
                     }
                 }
             }
-            generateVersion(OS.Wasm, Arch.Wasm, skiko)
 
             val test by compilations.getting
             project.tasks.named<Copy>(test.processResourcesTaskName) {
@@ -293,7 +290,6 @@ if (supportWeb) {
 
 if (supportAndroid) {
     val os = OS.Android
-    kotlin.targets.getByName("android").generateVersion(os, Arch.Arm64, skiko)
     val skikoSkottieAndroidArtifact by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-skottie-android")
         from(kotlin.targets.getByName("android").compilations.getByName("main").output.allOutputs)
