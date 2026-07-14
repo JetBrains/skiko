@@ -22,11 +22,7 @@
 #include "mppinterop.h"
 
 #ifdef _WIN32
-#ifdef SKIKO_JVM_BUILDING_CORE
-#define SKIKO_JVM_EXPORT __declspec(dllexport)
-#else
 #define SKIKO_JVM_EXPORT __declspec(dllimport)
-#endif
 #else
 #define SKIKO_JVM_EXPORT __attribute__((visibility("default")))
 #endif
