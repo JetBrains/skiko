@@ -25,9 +25,12 @@ class SkikoProjectContext(
     configureDependencies: (SkikoDependencyScope.() -> Unit)
 ) {
     val dependencyRegistry = BinaryRegistry()
+    val dependsOnCore: Boolean
 
     init {
-        SkikoDependencyScope(dependencyRegistry).configureDependencies()
+        val dependencyScope = SkikoDependencyScope(dependencyRegistry)
+        dependencyScope.configureDependencies()
+        dependsOnCore = dependencyScope.dependsOnCore
     }
 
     val buildType = skiko.buildType
@@ -167,7 +170,7 @@ fun SkikoProjectContext.registerOrGetSkiaDirProvider(
             skiaDir.absoluteFile
         }
     } else {
-        project.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
+        project.rootProject.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
     }
 }
 

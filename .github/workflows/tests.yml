@@ -29,20 +29,20 @@ jobs:
       - shell: bash
         name: 'Run AWT Tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:awtTest
+            awtTest
 
       - shell: bash
         name: 'Run macOS Tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:macosArm64Test
+            macosArm64Test
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Test Results'
@@ -50,15 +50,16 @@ jobs:
         with:
           name: test-reports-macos
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/*_actual.png
-            ./skiko/hs_err_pid*.log
+            ./skiko/**/build/reports/tests
+            ./skiko/**/src/jvmTest/screenshots/*_actual.png
+            ./skiko/**/hs_err_pid*.log
           retention-days: 5
 
       - uses: test-summary/action@v2
         name: 'Test Summary'
         with:
-          paths: "./skiko/build/test-results/**/TEST-*.xml"
+          paths: |
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
 
   ios:
@@ -92,22 +93,22 @@ jobs:
           timeout_minutes: 60
           shell: bash
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \
               -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" \
-              :skiko:iosX64TestWithMetal
+              iosX64TestWithMetal
 
       # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
       - shell: bash
         name: 'Compile iOS (arm64) tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:iosSimulatorArm64Test
+            iosSimulatorArm64Test
 
       # TODO run iOS specific tests on iPhone simulator
 
@@ -116,7 +117,8 @@ jobs:
         if: failure()
         with:
           name: test-reports-ios
-          path: ./skiko/build/reports/tests
+          path: |
+            ./skiko/**/build/reports/tests
           retention-days: 5
 
   tvos:
@@ -138,25 +140,26 @@ jobs:
       - shell: bash
         name: 'Run tvOS Tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:tvosX64Test
+            tvosX64Test
           
           # tvosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
-            :skiko:tvosSimulatorArm64Test
+            tvosSimulatorArm64Test
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Test Results'
         if: failure()
         with:
           name: test-reports-tvos
-          path: ./skiko/build/reports/tests
+          path: |
+            ./skiko/**/build/reports/tests
           retention-days: 5
 
   linux-amd64:
@@ -175,11 +178,11 @@ jobs:
           image_name: linux-amd64
           virtual-display: true
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \
-              :skiko:linuxX64Test
+              linuxX64Test
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Run AWT Tests'
@@ -188,11 +191,11 @@ jobs:
           image_name: linux-compat
           virtual-display: true
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \
-              :skiko:awtTest
+              awtTest
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Test Results'
@@ -200,14 +203,15 @@ jobs:
         with:
           name: test-reports-linux
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/*_actual.png
-            ./skiko/hs_err_pid*.log
+            ./skiko/**/build/reports/tests
+            ./skiko/**/src/jvmTest/screenshots/*_actual.png
+            ./skiko/**/hs_err_pid*.log
 
       - uses: test-summary/action@v2
         name: 'Test Summary'
         with:
-          paths: "./skiko/build/test-results/**/TEST-*.xml"
+          paths: |
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
 
   linux-cross-compile:
@@ -225,16 +229,18 @@ jobs:
         with:
           image_name: linux-amd64
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.arch=x64 \
               -Pskiko.native.linux.enabled=true \
-              :skiko:linkDebugTestLinuxArm64
+              linkDebugTestLinuxArm64
 
       - uses: actions/upload-artifact@v4
         name: 'Upload linuxArm64 test binary as artifact'
         with:
           name: test-binary-linuxArm64
-          path: ./skiko/build/bin/linuxArm64
+          path: |
+            ./skiko/build/bin/linuxArm64
+            ./skiko/*/build/bin/linuxArm64
           if-no-files-found: error
           retention-days: 5
 
@@ -253,7 +259,7 @@ jobs:
         name: 'Download precompiled linuxArm64 test binary'
         with:
           name: test-binary-linuxArm64
-          path: ./skiko/build/bin/linuxArm64
+          path: ./skiko
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Run Linux (arm64) Tests'
@@ -264,6 +270,9 @@ jobs:
           command: |
             chmod +x ./build/bin/linuxArm64/debugTest/test.kexe
             ./build/bin/linuxArm64/debugTest/test.kexe
+            cd ./skiko-skottie
+            chmod +x ./build/bin/linuxArm64/debugTest/test.kexe
+            ./build/bin/linuxArm64/debugTest/test.kexe
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Run AWT Tests'
@@ -272,11 +281,11 @@ jobs:
           image_name: linux-compat
           virtual-display: true
           command: |
-            ./gradlew --no-daemon --stacktrace \
+            ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \
-              :skiko:awtTest
+              awtTest
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
@@ -284,15 +293,16 @@ jobs:
         with:
           name: test-reports-linux-arm
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/*_actual.png
-            ./skiko/hs_err_pid*.log
+            ./skiko/**/build/reports/tests
+            ./skiko/**/src/jvmTest/screenshots/*_actual.png
+            ./skiko/**/hs_err_pid*.log
           retention-days: 5
 
       - name: Test Summary
         uses: test-summary/action@v2
         with:
-          paths: "./skiko/build/test-results/**/TEST-*.xml"
+          paths: |
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
 
   windows:
@@ -319,11 +329,11 @@ jobs:
       - shell: bash
         name: 'Run AWT tests'
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          ./gradlew -p skiko --no-daemon --stacktrace \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
             -Dskiko.test.ui.renderApi.ignoreAssertsFor=OPENGL \
-            :skiko:awtTest
+            awtTest
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Test Results'
@@ -331,15 +341,16 @@ jobs:
         with:
           name: test-reports-windows
           path: |
-            ./skiko/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/*_actual.png
-            ./skiko/hs_err_pid*.log
+            ./skiko/**/build/reports/tests
+            ./skiko/**/src/jvmTest/screenshots/*_actual.png
+            ./skiko/**/hs_err_pid*.log
           retention-days: 5
 
       - uses: test-summary/action@v2
         name: 'Test Summary'
         with:
-          paths: "./skiko/build/test-results/**/TEST-*.xml"
+          paths: |
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
 
   web-wasm:
@@ -408,11 +419,13 @@ jobs:
         if: failure()
         with:
           name: test-reports-web
-          path: ./skiko/build/reports/tests
+          path: |
+            ./skiko/**/build/reports/tests
           retention-days: 5
 
       - uses: test-summary/action@v2
         name: 'Test Summary'
         with:
-          paths: "./skiko/build/test-results/**/TEST-*.xml"
+          paths: |
+            ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()

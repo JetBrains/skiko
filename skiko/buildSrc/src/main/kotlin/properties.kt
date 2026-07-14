@@ -1,6 +1,7 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import java.io.File
 
 enum class OS(
@@ -121,6 +122,12 @@ val hostArch by lazy {
 fun targetId(os: OS, arch: Arch) = "${os.id}-${arch.id}"
 
 val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
+
+val Project.skikoKotlinLanguageVersion: KotlinVersion
+    get() = KotlinVersion.fromVersion(providers.gradleProperty(SkikoGradleProperties.KOTLIN_LANGUAGE_VERSION).get())
+
+val Project.skikoKotlinApiVersion: KotlinVersion
+    get() = KotlinVersion.fromVersion(providers.gradleProperty(SkikoGradleProperties.KOTLIN_API_VERSION).get())
 
 class SkikoProperties(private val myProject: Project) {
     val isTeamcityCIBuild: Boolean
@@ -260,6 +267,8 @@ class SkikoProperties(private val myProject: Project) {
 }
 
 object SkikoGradleProperties {
+    const val KOTLIN_LANGUAGE_VERSION = "skiko.kotlin.language.version"
+    const val KOTLIN_API_VERSION = "skiko.kotlin.api.version"
     const val AWT_ENABLED = "skiko.awt.enabled"
     const val WASM_ENABLED = "skiko.wasm.enabled"
     const val ANDROID_ENABLED = "skiko.android.enabled"
