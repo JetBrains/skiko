@@ -290,7 +290,7 @@ if (supportWeb) {
 
 if (supportAndroid) {
     val os = OS.Android
-    val skikoSkottieAndroidArtifact by project.tasks.registering(Jar::class) {
+    val skikoAndroidArtifact by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-skottie-android")
         from(kotlin.targets.getByName("android").compilations.getByName("main").output.allOutputs)
     }
@@ -301,7 +301,7 @@ if (supportAndroid) {
         skikoSkottieProjectContext.createSkikoJvmJarTask(
             os,
             arch,
-            skikoSkottieAndroidArtifact,
+            skikoAndroidArtifact,
             files(coreJvmLinkedLibrary)
         )
         skikoSkottieProjectContext.provideJvmRequiredSymbols(os, arch)
