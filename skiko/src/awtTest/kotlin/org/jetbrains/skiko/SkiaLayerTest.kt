@@ -1130,7 +1130,7 @@ class SkiaLayerTest {
         // Until the issue is fixed in other redrawers
         // Don't use assumeTrue, as uiTest iterates over multiple renderers,
         // and if one of them is skipped, the whole test is skipped
-        if ((renderApi != GraphicsApi.METAL) && (renderApi != GraphicsApi.DIRECT3D)) return@uiTest
+        if (renderApi != GraphicsApi.METAL) return@uiTest
 
         val bgColor = Color.GREEN
         val fgColor = Color.BLACK
