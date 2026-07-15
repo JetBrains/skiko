@@ -32,7 +32,7 @@ jobs:
               -Pskiko.native.enabled=true \
               -Pskiko.wasm.enabled=true \
               -Pskiko.android.enabled=true \
-              :skiko:dokkaHtml
+              :skiko:docs:dokkaGeneratePublicationHtml
 
       - name: 'Publish Documentation'
         if: ${{ inputs.publish }}
@@ -40,4 +40,4 @@ jobs:
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: ./skiko/build/dokka/html
+          FOLDER: ./skiko/docs/build/dokka/html
