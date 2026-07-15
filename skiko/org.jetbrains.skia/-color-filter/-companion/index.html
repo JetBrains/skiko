@@ -1,103 +1,131 @@
-<!DOCTYPE html>
-<html class="no-js">
+<!doctype html>
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Companion</title>
-    <link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
-    <script>var pathToRoot = "../../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
-<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
-<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../../../styles/style.css" rel="Stylesheet">
 <link href="../../../../styles/main.css" rel="Stylesheet">
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../../scripts/clipboard.js" async="async"></script>
-<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async="async"></script>
-<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async="async"></script>
-<script type="text/javascript" src="../../../../scripts/main.js" defer="defer"></script>
-<script type="text/javascript" src="../../../../scripts/prism.js" async="async"></script>
-<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
-</head>
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
-                    <a class="library-name--link" href="../../../../index.html">
-                            skiko
-                    </a>
-            </div>
-            <div class="library-version">
-0.0.0-SNAPSHOT            </div>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    skiko
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.0.0-SNAPSHOT
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button>
-        </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/commonMain" data-filter=":/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageIds="skiko::org.jetbrains.skia/ColorFilter.Companion///PointingToDeclaration//788909594">
-  <div class="breadcrumbs"><a href="../../../../index.html">skiko</a><span class="delimiter">/</span><a href="../../index.html">org.jetbrains.skia</a><span class="delimiter">/</span><a href="../index.html">ColorFilter</a><span class="delimiter">/</span><span class="current">Companion</span></div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    skiko
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="skiko::org.jetbrains.skia/ColorFilter.Companion///PointingToDeclaration//1558683979">
+  <div class="breadcrumbs"><a href="../../../index.html">skiko</a><span class="delimiter">/</span><a href="../../index.html">org.jetbrains.skia</a><span class="delimiter">/</span><a href="../index.html">ColorFilter</a><span class="delimiter">/</span><span class="current">Companion</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Companion</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Companion</a></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Companion</a></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
-        <div class="table"><a data-name="-1630851507%2FProperties%2F788909594" anchor-label="luma" id="-1630851507%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-1630851507%2FProperties%2F1558683979" anchor-label="luma" id="-1630851507%2FProperties%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="luma.html"><span><span>luma</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1630851507%2FProperties%2F788909594"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1630851507%2FProperties%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="luma.html">luma</a><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="luma.html">luma</a><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-859118621%2FProperties%2F788909594" anchor-label="sRGBToLinearGamma" id="-859118621%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="-859118621%2FProperties%2F1558683979" anchor-label="sRGBToLinearGamma" id="-859118621%2FProperties%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="s-r-g-b-to-linear-gamma.html"><span>s</span><wbr></wbr><span>RGBTo</span><wbr></wbr><span>Linear</span><wbr></wbr><span><span>Gamma</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-859118621%2FProperties%2F788909594"></span>
+                  <div><a href="s-r-g-b-to-linear-gamma.html"><span>s</span><wbr><span>RGBTo</span><wbr><span>Linear</span><wbr><span><span>Gamma</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-859118621%2FProperties%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="s-r-g-b-to-linear-gamma.html">sRGBToLinearGamma</a><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="s-r-g-b-to-linear-gamma.html">sRGBToLinearGamma</a><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -105,153 +133,153 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
-        <div class="table"><a data-name="753139836%2FFunctions%2F788909594" anchor-label="makeBlend" id="753139836%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="753139836%2FFunctions%2F1558683979" anchor-label="makeBlend" id="753139836%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-blend.html"><span>make</span><wbr></wbr><span><span>Blend</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="753139836%2FFunctions%2F788909594"></span>
+                  <div><a href="make-blend.html"><span>make</span><wbr><span><span>Blend</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="753139836%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-blend.html"><span class="token function">makeBlend</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">color<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">mode<span class="token operator">: </span><a href="../../-blend-mode/index.html">BlendMode</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-blend.html"><span class="token function">makeBlend</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">color<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">mode<span class="token operator">: </span><a href="../../-blend-mode/index.html">BlendMode</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2003357509%2FFunctions%2F788909594" anchor-label="makeComposed" id="-2003357509%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="-2003357509%2FFunctions%2F1558683979" anchor-label="makeComposed" id="-2003357509%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-composed.html"><span>make</span><wbr></wbr><span><span>Composed</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2003357509%2FFunctions%2F788909594"></span>
+                  <div><a href="make-composed.html"><span>make</span><wbr><span><span>Composed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2003357509%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-composed.html"><span class="token function">makeComposed</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">outer<span class="token operator">: </span><a href="../index.html">ColorFilter</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">inner<span class="token operator">: </span><a href="../index.html">ColorFilter</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-composed.html"><span class="token function">makeComposed</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">outer<span class="token operator">: </span><a href="../index.html">ColorFilter</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">inner<span class="token operator">: </span><a href="../index.html">ColorFilter</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="510573640%2FFunctions%2F788909594" anchor-label="makeHighContrast" id="510573640%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="510573640%2FFunctions%2F1558683979" anchor-label="makeHighContrast" id="510573640%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-high-contrast.html"><span>make</span><wbr></wbr><span>High</span><wbr></wbr><span><span>Contrast</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="510573640%2FFunctions%2F788909594"></span>
+                  <div><a href="make-high-contrast.html"><span>make</span><wbr><span>High</span><wbr><span><span>Contrast</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="510573640%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-high-contrast.html"><span class="token function">makeHighContrast</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">grayscale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">mode<span class="token operator">: </span><a href="../../-inversion-mode/index.html">InversionMode</a><span class="token punctuation">, </span></span><span class="parameter ">contrast<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-high-contrast.html"><span class="token function">makeHighContrast</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">grayscale<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">mode<span class="token operator">: </span><a href="../../-inversion-mode/index.html">InversionMode</a><span class="token punctuation">, </span></span><span class="parameter ">contrast<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="153429779%2FFunctions%2F788909594" anchor-label="makeHSLAMatrix" id="153429779%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="153429779%2FFunctions%2F1558683979" anchor-label="makeHSLAMatrix" id="153429779%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-h-s-l-a-matrix.html"><span>make</span><wbr></wbr><span><span>HSLAMatrix</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="153429779%2FFunctions%2F788909594"></span>
+                  <div><a href="make-h-s-l-a-matrix.html"><span>make</span><wbr><span><span>HSLAMatrix</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="153429779%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-h-s-l-a-matrix.html"><span class="token function">makeHSLAMatrix</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">matrix<span class="token operator">: </span><a href="../../-color-matrix/index.html">ColorMatrix</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-h-s-l-a-matrix.html"><span class="token function">makeHSLAMatrix</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">matrix<span class="token operator">: </span><a href="../../-color-matrix/index.html">ColorMatrix</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2093052176%2FFunctions%2F788909594" anchor-label="makeLerp" id="-2093052176%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="-2093052176%2FFunctions%2F1558683979" anchor-label="makeLerp" id="-2093052176%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-lerp.html"><span>make</span><wbr></wbr><span><span>Lerp</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2093052176%2FFunctions%2F788909594"></span>
+                  <div><a href="make-lerp.html"><span>make</span><wbr><span><span>Lerp</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2093052176%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-lerp.html"><span class="token function">makeLerp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">dst<span class="token operator">: </span><a href="../index.html">ColorFilter</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">src<span class="token operator">: </span><a href="../index.html">ColorFilter</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">t<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-lerp.html"><span class="token function">makeLerp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">dst<span class="token operator">: </span><a href="../index.html">ColorFilter</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">src<span class="token operator">: </span><a href="../index.html">ColorFilter</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">t<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="28009807%2FFunctions%2F788909594" anchor-label="makeLighting" id="28009807%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="28009807%2FFunctions%2F1558683979" anchor-label="makeLighting" id="28009807%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-lighting.html"><span>make</span><wbr></wbr><span><span>Lighting</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="28009807%2FFunctions%2F788909594"></span>
+                  <div><a href="make-lighting.html"><span>make</span><wbr><span><span>Lighting</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="28009807%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-lighting.html"><span class="token function">makeLighting</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">colorMul<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">colorAdd<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-lighting.html"><span class="token function">makeLighting</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">colorMul<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">colorAdd<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1947611731%2FFunctions%2F788909594" anchor-label="makeMatrix" id="1947611731%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="1947611731%2FFunctions%2F1558683979" anchor-label="makeMatrix" id="1947611731%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-matrix.html"><span>make</span><wbr></wbr><span><span>Matrix</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1947611731%2FFunctions%2F788909594"></span>
+                  <div><a href="make-matrix.html"><span>make</span><wbr><span><span>Matrix</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1947611731%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-matrix.html"><span class="token function">makeMatrix</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">matrix<span class="token operator">: </span><a href="../../-color-matrix/index.html">ColorMatrix</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-matrix.html"><span class="token function">makeMatrix</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">matrix<span class="token operator">: </span><a href="../../-color-matrix/index.html">ColorMatrix</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1825611353%2FFunctions%2F788909594" anchor-label="makeOverdraw" id="-1825611353%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="-1825611353%2FFunctions%2F1558683979" anchor-label="makeOverdraw" id="-1825611353%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-overdraw.html"><span>make</span><wbr></wbr><span><span>Overdraw</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1825611353%2FFunctions%2F788909594"></span>
+                  <div><a href="make-overdraw.html"><span>make</span><wbr><span><span>Overdraw</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1825611353%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-overdraw.html"><span class="token function">makeOverdraw</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">colors<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int-array/index.html">IntArray</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-overdraw.html"><span class="token function">makeOverdraw</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">colors<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int-array/index.html">IntArray</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="551897260%2FFunctions%2F788909594" anchor-label="makeTable" id="551897260%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="551897260%2FFunctions%2F1558683979" anchor-label="makeTable" id="551897260%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-table.html"><span>make</span><wbr></wbr><span><span>Table</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="551897260%2FFunctions%2F788909594"></span>
+                  <div><a href="make-table.html"><span>make</span><wbr><span><span>Table</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="551897260%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-table.html"><span class="token function">makeTable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">table<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-table.html"><span class="token function">makeTable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">table<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1947680325%2FFunctions%2F788909594" anchor-label="makeTableARGB" id="-1947680325%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="-1947680325%2FFunctions%2F1558683979" anchor-label="makeTableARGB" id="-1947680325%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="make-table-a-r-g-b.html"><span>make</span><wbr></wbr><span>Table</span><wbr></wbr><span><span>ARGB</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1947680325%2FFunctions%2F788909594"></span>
+                  <div><a href="make-table-a-r-g-b.html"><span>make</span><wbr><span>Table</span><wbr><span><span>ARGB</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1947680325%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-table-a-r-g-b.html"><span class="token function">makeTableARGB</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">r<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">g<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">b<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-table-a-r-g-b.html"><span class="token function">makeTableARGB</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">r<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">g<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">b<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">ColorFilter</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -261,13 +289,22 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span
-                class="pull-right"><span>Generated by </span><a
-                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

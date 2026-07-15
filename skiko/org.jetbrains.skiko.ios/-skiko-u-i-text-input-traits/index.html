@@ -1,279 +1,307 @@
-<!DOCTYPE html>
-<html class="no-js">
+<!doctype html>
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>SkikoUITextInputTraits</title>
-    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
-    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
-<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
-<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../../styles/style.css" rel="Stylesheet">
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
-<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
-<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
-<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
-<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
-</head>
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
-                    <a class="library-name--link" href="../../../index.html">
-                            skiko
-                    </a>
-            </div>
-            <div class="library-version">
-0.0.0-SNAPSHOT            </div>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    skiko
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.0.0-SNAPSHOT
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/iosMain">ios</button>
-        </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/iosMain">ios</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/iosMain" data-filter=":/iosMain">
+                                <span class="checkbox--icon"></span>
+                                ios
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageIds="skiko::org.jetbrains.skiko.ios/SkikoUITextInputTraits///PointingToDeclaration//1882441730">
-  <div class="breadcrumbs"><a href="../../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skiko.ios</a><span class="delimiter">/</span><span class="current">SkikoUITextInputTraits</span></div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    skiko
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="skiko::org.jetbrains.skiko.ios/SkikoUITextInputTraits///PointingToDeclaration//-2107788473">
+  <div class="breadcrumbs"><a href="../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skiko.ios</a><span class="delimiter">/</span><span class="current">SkikoUITextInputTraits</span></div>
   <div class="cover ">
-    <h1 class="cover"><span>Skiko</span><wbr></wbr><span>UIText</span><wbr></wbr><span>Input</span><wbr></wbr><span><span>Traits</span></span></h1>
+    <h1 class="cover"><span>Skiko</span><wbr><span>UIText</span><wbr><span>Input</span><wbr><span><span>Traits</span></span></h1>
     <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">SkikoUITextInputTraits</a></div><p class="paragraph">Represents a part of UITextInputTraits protocol. Needs to control onscreen keyboard features. https://developer.apple.com/documentation/uikit/uitextinputtraits?language=objc</p></div>    </div>
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">SkikoUITextInputTraits</a></div><p class="paragraph">Represents a part of UITextInputTraits protocol. Needs to control onscreen keyboard features. https://developer.apple.com/documentation/uikit/uitextinputtraits?language=objc</p></div>    </div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
-        <div class="table"><a data-name="1827021375%2FFunctions%2F1882441730" anchor-label="autocapitalizationType" id="1827021375%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1827021375%2FFunctions%2F-2107788473" anchor-label="autocapitalizationType" id="1827021375%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="autocapitalization-type.html"><span>autocapitalization</span><wbr></wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1827021375%2FFunctions%2F1882441730"></span>
+                  <div><a href="autocapitalization-type.html"><span>autocapitalization</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1827021375%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="autocapitalization-type.html"><span class="token function">autocapitalizationType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="autocapitalization-type.html"><span class="token function">autocapitalizationType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UITextAutocapitalizationType///PointingToDeclaration/">UITextAutocapitalizationType</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-517029859%2FFunctions%2F1882441730" anchor-label="autocorrectionType" id="-517029859%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="-517029859%2FFunctions%2F-2107788473" anchor-label="autocorrectionType" id="-517029859%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="autocorrection-type.html"><span>autocorrection</span><wbr></wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-517029859%2FFunctions%2F1882441730"></span>
+                  <div><a href="autocorrection-type.html"><span>autocorrection</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-517029859%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="autocorrection-type.html"><span class="token function">autocorrectionType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="autocorrection-type.html"><span class="token function">autocorrectionType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UITextAutocorrectionType///PointingToDeclaration/">UITextAutocorrectionType</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1712430094%2FFunctions%2F1882441730" anchor-label="enablesReturnKeyAutomatically" id="-1712430094%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="-1712430094%2FFunctions%2F-2107788473" anchor-label="enablesReturnKeyAutomatically" id="-1712430094%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="enables-return-key-automatically.html"><span>enables</span><wbr></wbr><span>Return</span><wbr></wbr><span>Key</span><wbr></wbr><span><span>Automatically</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1712430094%2FFunctions%2F1882441730"></span>
+                  <div><a href="enables-return-key-automatically.html"><span>enables</span><wbr><span>Return</span><wbr><span>Key</span><wbr><span><span>Automatically</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1712430094%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="enables-return-key-automatically.html"><span class="token function">enablesReturnKeyAutomatically</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="enables-return-key-automatically.html"><span class="token function">enablesReturnKeyAutomatically</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="443299506%2FFunctions%2F1882441730" anchor-label="isSecureTextEntry" id="443299506%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="443299506%2FFunctions%2F-2107788473" anchor-label="isSecureTextEntry" id="443299506%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="is-secure-text-entry.html"><span>is</span><wbr></wbr><span>Secure</span><wbr></wbr><span>Text</span><wbr></wbr><span><span>Entry</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="443299506%2FFunctions%2F1882441730"></span>
+                  <div><a href="is-secure-text-entry.html"><span>is</span><wbr><span>Secure</span><wbr><span>Text</span><wbr><span><span>Entry</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="443299506%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="is-secure-text-entry.html"><span class="token function">isSecureTextEntry</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="is-secure-text-entry.html"><span class="token function">isSecureTextEntry</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1324972007%2FFunctions%2F1882441730" anchor-label="keyboardAppearance" id="-1324972007%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="-1324972007%2FFunctions%2F-2107788473" anchor-label="keyboardAppearance" id="-1324972007%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="keyboard-appearance.html"><span>keyboard</span><wbr></wbr><span><span>Appearance</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1324972007%2FFunctions%2F1882441730"></span>
+                  <div><a href="keyboard-appearance.html"><span>keyboard</span><wbr><span><span>Appearance</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1324972007%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="keyboard-appearance.html"><span class="token function">keyboardAppearance</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="keyboard-appearance.html"><span class="token function">keyboardAppearance</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UIKeyboardAppearance///PointingToDeclaration/">UIKeyboardAppearance</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-222911997%2FFunctions%2F1882441730" anchor-label="keyboardType" id="-222911997%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="-222911997%2FFunctions%2F-2107788473" anchor-label="keyboardType" id="-222911997%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="keyboard-type.html"><span>keyboard</span><wbr></wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-222911997%2FFunctions%2F1882441730"></span>
+                  <div><a href="keyboard-type.html"><span>keyboard</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-222911997%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="keyboard-type.html"><span class="token function">keyboardType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="keyboard-type.html"><span class="token function">keyboardType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UIKeyboardType///PointingToDeclaration/">UIKeyboardType</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="752044781%2FFunctions%2F1882441730" anchor-label="returnKeyType" id="752044781%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="752044781%2FFunctions%2F-2107788473" anchor-label="returnKeyType" id="752044781%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="return-key-type.html"><span>return</span><wbr></wbr><span>Key</span><wbr></wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="752044781%2FFunctions%2F1882441730"></span>
+                  <div><a href="return-key-type.html"><span>return</span><wbr><span>Key</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="752044781%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="return-key-type.html"><span class="token function">returnKeyType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="return-key-type.html"><span class="token function">returnKeyType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UIReturnKeyType///PointingToDeclaration/">UIReturnKeyType</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="554347283%2FFunctions%2F1882441730" anchor-label="smartDashesType" id="554347283%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="554347283%2FFunctions%2F-2107788473" anchor-label="smartDashesType" id="554347283%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="smart-dashes-type.html"><span>smart</span><wbr></wbr><span>Dashes</span><wbr></wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="554347283%2FFunctions%2F1882441730"></span>
+                  <div><a href="smart-dashes-type.html"><span>smart</span><wbr><span>Dashes</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="554347283%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="smart-dashes-type.html"><span class="token function">smartDashesType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="smart-dashes-type.html"><span class="token function">smartDashesType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UITextSmartDashesType///PointingToDeclaration/">UITextSmartDashesType</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-56537201%2FFunctions%2F1882441730" anchor-label="smartInsertDeleteType" id="-56537201%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="-56537201%2FFunctions%2F-2107788473" anchor-label="smartInsertDeleteType" id="-56537201%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="smart-insert-delete-type.html"><span>smart</span><wbr></wbr><span>Insert</span><wbr></wbr><span>Delete</span><wbr></wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-56537201%2FFunctions%2F1882441730"></span>
+                  <div><a href="smart-insert-delete-type.html"><span>smart</span><wbr><span>Insert</span><wbr><span>Delete</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-56537201%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="smart-insert-delete-type.html"><span class="token function">smartInsertDeleteType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="smart-insert-delete-type.html"><span class="token function">smartInsertDeleteType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UITextSmartInsertDeleteType///PointingToDeclaration/">UITextSmartInsertDeleteType</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1955870532%2FFunctions%2F1882441730" anchor-label="smartQuotesType" id="-1955870532%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="-1955870532%2FFunctions%2F-2107788473" anchor-label="smartQuotesType" id="-1955870532%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="smart-quotes-type.html"><span>smart</span><wbr></wbr><span>Quotes</span><wbr></wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1955870532%2FFunctions%2F1882441730"></span>
+                  <div><a href="smart-quotes-type.html"><span>smart</span><wbr><span>Quotes</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1955870532%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="smart-quotes-type.html"><span class="token function">smartQuotesType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="smart-quotes-type.html"><span class="token function">smartQuotesType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UITextSmartQuotesType///PointingToDeclaration/">UITextSmartQuotesType</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="2033584954%2FFunctions%2F1882441730" anchor-label="spellCheckingType" id="2033584954%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="2033584954%2FFunctions%2F-2107788473" anchor-label="spellCheckingType" id="2033584954%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="spell-checking-type.html"><span>spell</span><wbr></wbr><span>Checking</span><wbr></wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2033584954%2FFunctions%2F1882441730"></span>
+                  <div><a href="spell-checking-type.html"><span>spell</span><wbr><span>Checking</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2033584954%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="spell-checking-type.html"><span class="token function">spellCheckingType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="spell-checking-type.html"><span class="token function">spellCheckingType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UITextSpellCheckingType///PointingToDeclaration/">UITextSpellCheckingType</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-655708592%2FFunctions%2F1882441730" anchor-label="textContentType" id="-655708592%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+<a data-name="-655708592%2FFunctions%2F-2107788473" anchor-label="textContentType" id="-655708592%2FFunctions%2F-2107788473" data-filterable-set=":/iosMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="text-content-type.html"><span>text</span><wbr></wbr><span>Content</span><wbr></wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-655708592%2FFunctions%2F1882441730"></span>
+                  <div><a href="text-content-type.html"><span>text</span><wbr><span>Content</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-655708592%2FFunctions%2F-2107788473"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="text-content-type.html"><span class="token function">textContentType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/iosMain" data-filterable-set=":/iosMain" data-active="" data-toggle=":/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="text-content-type.html"><span class="token function">textContentType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="platform.UIKit/UITextContentType///PointingToDeclaration/">UITextContentType</span><span class="token operator">?</span></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -283,13 +311,22 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span
-                class="pull-right"><span>Generated by </span><a
-                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

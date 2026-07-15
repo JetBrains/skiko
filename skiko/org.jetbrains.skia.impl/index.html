@@ -1,73 +1,136 @@
-<!DOCTYPE html>
-<html class="no-js">
+<!doctype html>
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>org.jetbrains.skia.impl</title>
-    <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
-    <script>var pathToRoot = "../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
-<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
-<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../styles/style.css" rel="Stylesheet">
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
-<script type="text/javascript" src="../../scripts/clipboard.js" async="async"></script>
-<script type="text/javascript" src="../../scripts/navigation-loader.js" async="async"></script>
-<script type="text/javascript" src="../../scripts/platform-content-handler.js" async="async"></script>
-<script type="text/javascript" src="../../scripts/main.js" defer="defer"></script>
-<script type="text/javascript" src="../../scripts/prism.js" async="async"></script>
-<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
-</head>
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
-                    <a class="library-name--link" href="../../index.html">
-                            skiko
-                    </a>
-            </div>
-            <div class="library-version">
-0.0.0-SNAPSHOT            </div>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
+                    skiko
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.0.0-SNAPSHOT
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button>
-                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":dokkaHtml/jsMain">js</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/jvmMain">jvm</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/nativeMain">native</button>
-                <button class="platform-tag platform-selector wasm-like" data-active="" data-filter=":dokkaHtml/wasmJsMain">wasmJs</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/webMain">web</button>
-        </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":/commonMain">common</button>
+                <button class="platform-tag platform-selector js-like" data-active="" aria-pressed="true" data-filter=":/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/nativeMain">native</button>
+                <button class="platform-tag platform-selector wasm-like" data-active="" aria-pressed="true" data-filter=":/wasmJsMain">wasmJs</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":/webMain">web</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/commonMain" data-filter=":/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option js-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/jsMain" data-filter=":/jsMain">
+                                <span class="checkbox--icon"></span>
+                                js
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/jvmMain" data-filter=":/jvmMain">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/nativeMain" data-filter=":/nativeMain">
+                                <span class="checkbox--icon"></span>
+                                native
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option wasm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/wasmJsMain" data-filter=":/wasmJsMain">
+                                <span class="checkbox--icon"></span>
+                                wasmJs
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/webMain" data-filter=":/webMain">
+                                <span class="checkbox--icon"></span>
+                                web
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
-<div class="main-content" data-page-type="package" id="content" pageIds="skiko::org.jetbrains.skia.impl////PointingToDeclaration//1926972621">
-  <div class="breadcrumbs"><a href="../../index.html">skiko</a><span class="delimiter">/</span><span class="current">org.jetbrains.skia.impl</span></div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    skiko
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="skiko::org.jetbrains.skia.impl////PointingToDeclaration//318143449">
+  <div class="breadcrumbs"><a href="../index.html">skiko</a><span class="delimiter">/</span><span class="current">org.jetbrains.skia.impl</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
   </div>
@@ -75,188 +138,188 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
-        <div class="table"><a data-name="879375108%2FClasslikes%2F788909594" anchor-label="ArrayInteropDecoder" id="879375108%2FClasslikes%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="879375108%2FClasslikes%2F1558683979" anchor-label="ArrayInteropDecoder" id="879375108%2FClasslikes%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-array-interop-decoder/index.html"><span>Array</span><wbr></wbr><span>Interop</span><wbr></wbr><span><span>Decoder</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="879375108%2FClasslikes%2F788909594"></span>
+                  <div><a href="-array-interop-decoder/index.html"><span>Array</span><wbr><span>Interop</span><wbr><span><span>Decoder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="879375108%2FClasslikes%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-array-interop-decoder/index.html">ArrayInteropDecoder</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-array-interop-decoder/index.html">T</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-array-interop-decoder/index.html">ArrayInteropDecoder</a><span class="token operator">&lt;</span><a href="-array-interop-decoder/index.html">T</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-121757348%2FClasslikes%2F-662098134" anchor-label="BufferUtil" id="-121757348%2FClasslikes%2F-662098134" data-filterable-set=":dokkaHtml/jvmMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+<a data-name="-121757348%2FClasslikes%2F2112555339" anchor-label="BufferUtil" id="-121757348%2FClasslikes%2F2112555339" data-filterable-set=":/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-buffer-util/index.html"><span>Buffer</span><wbr></wbr><span><span>Util</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-121757348%2FClasslikes%2F-662098134"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-active="" data-toggle=":dokkaHtml/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-buffer-util/index.html">BufferUtil</a></div></div>                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="1707640126%2FClasslikes%2F-1970717294" anchor-label="InteropPointer" id="1707640126%2FClasslikes%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="-interop-pointer/index.html"><span>Interop</span><wbr></wbr><span><span>Pointer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1707640126%2FClasslikes%2F-1970717294"></span>
+                  <div><a href="-buffer-util/index.html"><span>Buffer</span><wbr><span><span>Util</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-121757348%2FClasslikes%2F2112555339"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-interop-pointer/index.html">InteropPointer</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-interop-pointer/index.html">InteropPointer</a><span class="token operator"> = </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-interop-pointer/index.html">InteropPointer</a><span class="token operator"> = </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-interop-pointer/index.html">InteropPointer</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-active="" data-toggle=":/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-buffer-util/index.html">BufferUtil</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-469327993%2FClasslikes%2F1819108207" anchor-label="InteropScope" id="-469327993%2FClasslikes%2F1819108207" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/wasmJsMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jsMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/wasmJsMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/wasmJsMain">
+<a data-name="1707640126%2FClasslikes%2F334846452" anchor-label="InteropPointer" id="1707640126%2FClasslikes%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-interop-scope/index.html"><span>Interop</span><wbr></wbr><span><span>Scope</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-469327993%2FClasslikes%2F1819108207"></span>
+                  <div><a href="-interop-pointer/index.html"><span>Interop</span><wbr><span><span>Pointer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1707640126%2FClasslikes%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/wasmJsMain" data-filterable-set=":dokkaHtml/wasmJsMain" data-toggle=":dokkaHtml/wasmJsMain">wasmJs</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-interop-pointer/index.html">InteropPointer</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-interop-pointer/index.html">InteropPointer</a><span class="token operator"> = </span><a href="https://developer.android.com/reference/kotlin/java/lang/Object.html">Object</a></div><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-interop-pointer/index.html">InteropPointer</a><span class="token operator"> = </span><a href="https://developer.android.com/reference/kotlin/java/lang/Object.html">Object</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-interop-pointer/index.html">InteropPointer</a><span class="token operator"> = </span><span data-unresolved-link="kotlin.native.internal/NativePtr///PointingToDeclaration/">NativePtr</span></div><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-interop-pointer/index.html">InteropPointer</a><span class="token operator"> = </span><span data-unresolved-link="kotlin.native.internal/NativePtr///PointingToDeclaration/">NativePtr</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-interop-pointer/index.html">InteropPointer</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-interop-pointer/index.html">InteropPointer</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1235950679%2FClasslikes%2F-1970717294" anchor-label="Library" id="-1235950679%2FClasslikes%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
+<a data-name="-469327993%2FClasslikes%2F-585595292" anchor-label="InteropScope" id="-469327993%2FClasslikes%2F-585595292" data-filterable-set=":/commonMain,:/jsMain,:/jvmMain,:/nativeMain,:/wasmJsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jsMain,:/jvmMain,:/nativeMain,:/wasmJsMain" data-filterable-set=":/commonMain,:/jsMain,:/jvmMain,:/nativeMain,:/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-interop-scope/index.html"><span>Interop</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-469327993%2FClasslikes%2F-585595292"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jsMain" data-filterable-set=":/jsMain" data-toggle=":/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/wasmJsMain" data-filterable-set=":/wasmJsMain" data-toggle=":/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-interop-scope/index.html">InteropScope</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1235950679%2FClasslikes%2F334846452" anchor-label="Library" id="-1235950679%2FClasslikes%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-library/index.html"><span><span>Library</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1235950679%2FClasslikes%2F-1970717294"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1235950679%2FClasslikes%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-library/index.html">Library</a></div><div class="brief "><p class="paragraph">Object representing native library containing non-Kotlin part of Skiko.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-library/index.html">Library</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-library/index.html">Library</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-library/index.html">Library</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-library/index.html">Library</a></div><div class="brief "><p class="paragraph">Object representing native library containing non-Kotlin part of Skiko.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-library/index.html">Library</a></div><div class="brief "><p class="paragraph">Object representing native library containing non-Kotlin part of Skiko.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-library/index.html">Library</a></div><div class="brief "><p class="paragraph">Object representing native library containing non-Kotlin part of Skiko.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-library/index.html">Library</a></div><div class="brief "><p class="paragraph">Object representing native library containing non-Kotlin part of Skiko.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1979531589%2FClasslikes%2F-1970717294" anchor-label="Managed" id="1979531589%2FClasslikes%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
+<a data-name="1979531589%2FClasslikes%2F334846452" anchor-label="Managed" id="1979531589%2FClasslikes%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-managed/index.html"><span><span>Managed</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1979531589%2FClasslikes%2F-1970717294"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1979531589%2FClasslikes%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-managed/index.html">Managed</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ptr<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">finalizer<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">managed<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span> : <a href="-native/index.html">Native</a></div><div class="brief "><p class="paragraph">Peer for a native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-managed/index.html">Managed</a> : <a href="-native/index.html">Native</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-managed/index.html">Managed</a> : <a href="-native/index.html">Native</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-managed/index.html">Managed</a> : <a href="-native/index.html">Native</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-managed/index.html">Managed</a> : <a href="-native/index.html">Native</a></div><div class="brief "><p class="paragraph">Peer for a native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-managed/index.html">Managed</a> : <a href="-native/index.html">Native</a>, <a href="https://developer.android.com/reference/kotlin/java/lang/AutoCloseable.html">AutoCloseable</a></div><div class="brief "><p class="paragraph">Peer for a native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-managed/index.html">Managed</a> : <a href="-native/index.html">Native</a></div><div class="brief "><p class="paragraph">Peer for a native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-managed/index.html">Managed</a> : <a href="-native/index.html">Native</a></div><div class="brief "><p class="paragraph">Peer for a native object.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="490077639%2FClasslikes%2F-1970717294" anchor-label="Native" id="490077639%2FClasslikes%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
+<a data-name="490077639%2FClasslikes%2F334846452" anchor-label="Native" id="490077639%2FClasslikes%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-native/index.html"><span><span>Native</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="490077639%2FClasslikes%2F-1970717294"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="490077639%2FClasslikes%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-native/index.html">Native</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ptr<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-native/index.html">Native</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-native/index.html">Native</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-native/index.html">Native</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-native/index.html">Native</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-native/index.html">Native</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-native/index.html">Native</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-native/index.html">Native</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="68709982%2FClasslikes%2F-1970717294" anchor-label="NativePointer" id="68709982%2FClasslikes%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
+<a data-name="68709982%2FClasslikes%2F334846452" anchor-label="NativePointer" id="68709982%2FClasslikes%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-native-pointer/index.html"><span>Native</span><wbr></wbr><span><span>Pointer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="68709982%2FClasslikes%2F-1970717294"></span>
+                  <div><a href="-native-pointer/index.html"><span>Native</span><wbr><span><span>Pointer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="68709982%2FClasslikes%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-native-pointer/index.html">NativePointer</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-native-pointer/index.html">NativePointer</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-native-pointer/index.html">NativePointer</a><span class="token operator"> = </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-native-pointer/index.html">NativePointer</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-native-pointer/index.html">NativePointer</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-native-pointer/index.html">NativePointer</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-native-pointer/index.html">NativePointer</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-native-pointer/index.html">NativePointer</a><span class="token operator"> = </span><span data-unresolved-link="kotlin.native.internal/NativePtr///PointingToDeclaration/">NativePtr</span></div><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-native-pointer/index.html">NativePointer</a><span class="token operator"> = </span><span data-unresolved-link="kotlin.native.internal/NativePtr///PointingToDeclaration/">NativePtr</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-native-pointer/index.html">NativePointer</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-native-pointer/index.html">NativePointer</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="864391691%2FClasslikes%2F-1970717294" anchor-label="NativePointerArray" id="864391691%2FClasslikes%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
+<a data-name="864391691%2FClasslikes%2F334846452" anchor-label="NativePointerArray" id="864391691%2FClasslikes%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-native-pointer-array/index.html"><span>Native</span><wbr></wbr><span>Pointer</span><wbr></wbr><span><span>Array</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="864391691%2FClasslikes%2F-1970717294"></span>
+                  <div><a href="-native-pointer-array/index.html"><span>Native</span><wbr><span>Pointer</span><wbr><span><span>Array</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="864391691%2FClasslikes%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-native-pointer-array/index.html">NativePointerArray</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-native-pointer-array/index.html">NativePointerArray</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-native-pointer-array/index.html">NativePointerArray</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-native-pointer-array/index.html">NativePointerArray</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-native-pointer-array/index.html">NativePointerArray</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-native-pointer-array/index.html">NativePointerArray</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-native-pointer-array/index.html">NativePointerArray</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-native-pointer-array/index.html">NativePointerArray</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1017540888%2FClasslikes%2F-1970717294" anchor-label="RefCnt" id="-1017540888%2FClasslikes%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
+<a data-name="-1017540888%2FClasslikes%2F334846452" anchor-label="RefCnt" id="-1017540888%2FClasslikes%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-ref-cnt/index.html"><span>Ref</span><wbr></wbr><span><span>Cnt</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1017540888%2FClasslikes%2F-1970717294"></span>
+                  <div><a href="-ref-cnt/index.html"><span>Ref</span><wbr><span><span>Cnt</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1017540888%2FClasslikes%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-ref-cnt/index.html">RefCnt</a> : <a href="-managed/index.html">Managed</a></div><div class="brief "><p class="paragraph">Peer for reference counted native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-ref-cnt/index.html">RefCnt</a> : <a href="-managed/index.html">Managed</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-ref-cnt/index.html">RefCnt</a> : <a href="-managed/index.html">Managed</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-ref-cnt/index.html">RefCnt</a> : <a href="-managed/index.html">Managed</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-ref-cnt/index.html">RefCnt</a> : <a href="-managed/index.html">Managed</a></div><div class="brief "><p class="paragraph">Peer for reference counted native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-ref-cnt/index.html">RefCnt</a> : <a href="-managed/index.html">Managed</a></div><div class="brief "><p class="paragraph">Peer for reference counted native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-ref-cnt/index.html">RefCnt</a> : <a href="-managed/index.html">Managed</a></div><div class="brief "><p class="paragraph">Peer for reference counted native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-ref-cnt/index.html">RefCnt</a> : <a href="-managed/index.html">Managed</a></div><div class="brief "><p class="paragraph">Peer for reference counted native object.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="873170181%2FClasslikes%2F-1970717294" anchor-label="Stats" id="873170181%2FClasslikes%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
+<a data-name="873170181%2FClasslikes%2F334846452" anchor-label="Stats" id="873170181%2FClasslikes%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-stats/index.html"><span><span>Stats</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="873170181%2FClasslikes%2F-1970717294"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="873170181%2FClasslikes%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">object </span><a href="-stats/index.html">Stats</a></div><div class="brief "><p class="paragraph">Statistics of native operations.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-stats/index.html">Stats</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-stats/index.html">Stats</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-stats/index.html">Stats</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">object </span><a href="-stats/index.html">Stats</a></div><div class="brief "><p class="paragraph">Statistics of native operations.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-stats/index.html">Stats</a></div><div class="brief "><p class="paragraph">Statistics of native operations.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-stats/index.html">Stats</a></div><div class="brief "><p class="paragraph">Statistics of native operations.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-stats/index.html">Stats</a></div><div class="brief "><p class="paragraph">Statistics of native operations.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -264,301 +327,301 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
-        <div class="table"><a data-name="1169816771%2FFunctions%2F788909594" anchor-label="getPtr" id="1169816771%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1169816771%2FFunctions%2F1558683979" anchor-label="getPtr" id="1169816771%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="get-ptr.html"><span>get</span><wbr></wbr><span><span>Ptr</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1169816771%2FFunctions%2F788909594"></span>
+                  <div><a href="get-ptr.html"><span>get</span><wbr><span><span>Ptr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1169816771%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-ptr.html"><span class="token function">getPtr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">n<span class="token operator">: </span><a href="-native/index.html">Native</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-ptr.html"><span class="token function">getPtr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">n<span class="token operator">: </span><a href="-native/index.html">Native</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="116110141%2FFunctions%2F-1970717294" anchor-label="interopScope" id="116110141%2FFunctions%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
+<a data-name="116110141%2FFunctions%2F334846452" anchor-label="interopScope" id="116110141%2FFunctions%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="interop-scope.html"><span>interop</span><wbr></wbr><span><span>Scope</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="116110141%2FFunctions%2F-1970717294"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="interop-scope.html">T</a><span class="token operator">&gt; </span><a href="interop-scope.html"><span class="token function">interopScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token keyword"></span><a href="-interop-scope/index.html">InteropScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="interop-scope.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="interop-scope.html">T</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="interop-scope.html">T</a><span class="token operator">&gt; </span><a href="interop-scope.html"><span class="token function">interopScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token keyword"></span><a href="-interop-scope/index.html">InteropScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="interop-scope.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="interop-scope.html">T</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="interop-scope.html">T</a><span class="token operator">&gt; </span><a href="interop-scope.html"><span class="token function">interopScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token keyword"></span><a href="-interop-scope/index.html">InteropScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="interop-scope.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="interop-scope.html">T</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="interop-scope.html">T</a><span class="token operator">&gt; </span><a href="interop-scope.html"><span class="token function">interopScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia.impl/InteropScope///PointingToDeclaration/">InteropScope</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="interop-scope.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="interop-scope.html">T</a></div></div>                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="1700743977%2FFunctions%2F-1970717294" anchor-label="reachabilityBarrier" id="1700743977%2FFunctions%2F-1970717294" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain,:dokkaHtml/webMain">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="reachability-barrier.html"><span>reachability</span><wbr></wbr><span><span>Barrier</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1700743977%2FFunctions%2F-1970717294"></span>
+                  <div><a href="interop-scope.html"><span>interop</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="116110141%2FFunctions%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="reachability-barrier.html"><span class="token function">reachabilityBarrier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obj<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="reachability-barrier.html"><span class="token function">reachabilityBarrier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obj<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="reachability-barrier.html"><span class="token function">reachabilityBarrier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obj<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="reachability-barrier.html"><span class="token function">reachabilityBarrier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obj<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="interop-scope.html">T</a><span class="token operator">&gt; </span><a href="interop-scope.html"><span class="token function">interopScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-interop-scope/index.html">InteropScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="interop-scope.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="interop-scope.html">T</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="interop-scope.html">T</a><span class="token operator">&gt; </span><a href="interop-scope.html"><span class="token function">interopScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-interop-scope/index.html">InteropScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="interop-scope.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="interop-scope.html">T</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="interop-scope.html">T</a><span class="token operator">&gt; </span><a href="interop-scope.html"><span class="token function">interopScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-interop-scope/index.html">InteropScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="interop-scope.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="interop-scope.html">T</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="interop-scope.html">T</a><span class="token operator">&gt; </span><a href="interop-scope.html"><span class="token function">interopScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="../../skiko/org.jetbrains.skia.impl/-interop-scope/index.html">InteropScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="interop-scope.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="interop-scope.html">T</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-661305377%2FFunctions%2F540997904" anchor-label="skia_memGetByte" id="-661305377%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="1700743977%2FFunctions%2F334846452" anchor-label="reachabilityBarrier" id="1700743977%2FFunctions%2F334846452" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain,:/jvmMain,:/nativeMain,:/webMain" data-filterable-set=":/commonMain,:/jvmMain,:/nativeMain,:/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-get-byte.html"><span>skia_mem</span><wbr></wbr><span>Get</span><wbr></wbr><span><span>Byte</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-661305377%2FFunctions%2F540997904"></span>
+                  <div><a href="reachability-barrier.html"><span>reachability</span><wbr><span><span>Barrier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1700743977%2FFunctions%2F334846452"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-byte.html"><span class="token function">skia_memGetByte</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-byte/index.html">Byte</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain" data-active="" data-toggle=":/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-toggle=":/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-toggle=":/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="reachability-barrier.html"><span class="token function">reachabilityBarrier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obj<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="reachability-barrier.html"><span class="token function">reachabilityBarrier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obj<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="reachability-barrier.html"><span class="token function">reachabilityBarrier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obj<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="reachability-barrier.html"><span class="token function">reachabilityBarrier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obj<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1663368495%2FFunctions%2F540997904" anchor-label="skia_memGetChar" id="-1663368495%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="-661305377%2FFunctions%2F67585281" anchor-label="skia_memGetByte" id="-661305377%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-get-char.html"><span>skia_mem</span><wbr></wbr><span>Get</span><wbr></wbr><span><span>Char</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1663368495%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-get-byte.html"><span>skia_</span><wbr><span>memGetByte</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-661305377%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-char.html"><span class="token function">skia_memGetChar</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-char/index.html">Char</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-byte.html"><span class="token function">skia_memGetByte</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte/index.html">Byte</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1453314698%2FFunctions%2F540997904" anchor-label="skia_memGetDouble" id="-1453314698%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="-1663368495%2FFunctions%2F67585281" anchor-label="skia_memGetChar" id="-1663368495%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-get-double.html"><span>skia_mem</span><wbr></wbr><span>Get</span><wbr></wbr><span><span>Double</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1453314698%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-get-char.html"><span>skia_</span><wbr><span>memGetChar</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1663368495%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-double.html"><span class="token function">skia_memGetDouble</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-char.html"><span class="token function">skia_memGetChar</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/index.html">Char</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1845944845%2FFunctions%2F540997904" anchor-label="skia_memGetFloat" id="-1845944845%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="-1453314698%2FFunctions%2F67585281" anchor-label="skia_memGetDouble" id="-1453314698%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-get-float.html"><span>skia_mem</span><wbr></wbr><span>Get</span><wbr></wbr><span><span>Float</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1845944845%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-get-double.html"><span>skia_</span><wbr><span>mem</span><wbr><span>Get</span><wbr><span><span>Double</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1453314698%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-float.html"><span class="token function">skia_memGetFloat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-double.html"><span class="token function">skia_memGetDouble</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1721531264%2FFunctions%2F540997904" anchor-label="skia_memGetInt" id="-1721531264%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="-1845944845%2FFunctions%2F67585281" anchor-label="skia_memGetFloat" id="-1845944845%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-get-int.html"><span>skia_mem</span><wbr></wbr><span>Get</span><wbr></wbr><span><span>Int</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1721531264%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-get-float.html"><span>skia_</span><wbr><span>mem</span><wbr><span>Get</span><wbr><span><span>Float</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1845944845%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-int.html"><span class="token function">skia_memGetInt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-float.html"><span class="token function">skia_memGetFloat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="681543635%2FFunctions%2F540997904" anchor-label="skia_memGetShort" id="681543635%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="-1721531264%2FFunctions%2F67585281" anchor-label="skia_memGetInt" id="-1721531264%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-get-short.html"><span>skia_mem</span><wbr></wbr><span>Get</span><wbr></wbr><span><span>Short</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="681543635%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-get-int.html"><span>skia_</span><wbr><span>memGetInt</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1721531264%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-short.html"><span class="token function">skia_memGetShort</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-short/index.html">Short</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-int.html"><span class="token function">skia_memGetInt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1034541089%2FFunctions%2F540997904" anchor-label="skia_memSetByte" id="1034541089%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="681543635%2FFunctions%2F67585281" anchor-label="skia_memGetShort" id="681543635%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-set-byte.html"><span>skia_mem</span><wbr></wbr><span>Set</span><wbr></wbr><span><span>Byte</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1034541089%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-get-short.html"><span>skia_</span><wbr><span>mem</span><wbr><span>Get</span><wbr><span><span>Short</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="681543635%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-byte.html"><span class="token function">skia_memSetByte</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-byte/index.html">Byte</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-get-short.html"><span class="token function">skia_memGetShort</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-short/index.html">Short</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2090480123%2FFunctions%2F540997904" anchor-label="skia_memSetChar" id="-2090480123%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="1034541089%2FFunctions%2F67585281" anchor-label="skia_memSetByte" id="1034541089%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-set-char.html"><span>skia_mem</span><wbr></wbr><span>Set</span><wbr></wbr><span><span>Char</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2090480123%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-set-byte.html"><span>skia_</span><wbr><span>memSetByte</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1034541089%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-char.html"><span class="token function">skia_memSetChar</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-char/index.html">Char</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-byte.html"><span class="token function">skia_memSetByte</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte/index.html">Byte</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1761446287%2FFunctions%2F540997904" anchor-label="skia_memSetDouble" id="1761446287%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="-2090480123%2FFunctions%2F67585281" anchor-label="skia_memSetChar" id="-2090480123%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-set-double.html"><span>skia_mem</span><wbr></wbr><span>Set</span><wbr></wbr><span><span>Double</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1761446287%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-set-char.html"><span>skia_</span><wbr><span>memSetChar</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2090480123%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-double.html"><span class="token function">skia_memSetDouble</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-double/index.html">Double</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-char.html"><span class="token function">skia_memSetChar</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/index.html">Char</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1417227023%2FFunctions%2F540997904" anchor-label="skia_memSetFloat" id="-1417227023%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="1761446287%2FFunctions%2F67585281" anchor-label="skia_memSetDouble" id="1761446287%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-set-float.html"><span>skia_mem</span><wbr></wbr><span>Set</span><wbr></wbr><span><span>Float</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1417227023%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-set-double.html"><span>skia_</span><wbr><span>mem</span><wbr><span>Set</span><wbr><span><span>Double</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1761446287%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-float.html"><span class="token function">skia_memSetFloat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-double.html"><span class="token function">skia_memSetDouble</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1223129775%2FFunctions%2F540997904" anchor-label="skia_memSetInt" id="-1223129775%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="-1417227023%2FFunctions%2F67585281" anchor-label="skia_memSetFloat" id="-1417227023%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-set-int.html"><span>skia_mem</span><wbr></wbr><span>Set</span><wbr></wbr><span><span>Int</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1223129775%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-set-float.html"><span>skia_</span><wbr><span>mem</span><wbr><span>Set</span><wbr><span><span>Float</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1417227023%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-int.html"><span class="token function">skia_memSetInt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-float.html"><span class="token function">skia_memSetFloat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1223799025%2FFunctions%2F540997904" anchor-label="skia_memSetShort" id="1223799025%2FFunctions%2F540997904" data-filterable-set=":dokkaHtml/webMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain">
+<a data-name="-1223129775%2FFunctions%2F67585281" anchor-label="skia_memSetInt" id="-1223129775%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="skia_mem-set-short.html"><span>skia_mem</span><wbr></wbr><span>Set</span><wbr></wbr><span><span>Short</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1223799025%2FFunctions%2F540997904"></span>
+                  <div><a href="skia_mem-set-int.html"><span>skia_</span><wbr><span>memSetInt</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1223129775%2FFunctions%2F67585281"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/webMain" data-filterable-set=":dokkaHtml/webMain" data-active="" data-toggle=":dokkaHtml/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-short.html"><span class="token function">skia_memSetShort</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-short/index.html">Short</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-int.html"><span class="token function">skia_memSetInt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1516364068%2FFunctions%2F788909594" anchor-label="use" id="1516364068%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="1223799025%2FFunctions%2F67585281" anchor-label="skia_memSetShort" id="1223799025%2FFunctions%2F67585281" data-filterable-set=":/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="skia_mem-set-short.html"><span>skia_</span><wbr><span>mem</span><wbr><span>Set</span><wbr><span><span>Short</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1223799025%2FFunctions%2F67585281"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="skia_mem-set-short.html"><span class="token function">skia_memSetShort</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">address<span class="token operator">: </span><a href="-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-short/index.html">Short</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1516364068%2FFunctions%2F1558683979" anchor-label="use" id="1516364068%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="use.html"><span><span>use</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1516364068%2FFunctions%2F788909594"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1516364068%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="use.html">T</a><span class="token operator"> : </span><a href="-managed/index.html">Managed</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="use.html">R</a><span class="token operator">&gt; </span><a href="use.html">T</a><span class="token punctuation">.</span><a href="use.html"><span class="token function">use</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="use.html">T</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="use.html">R</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="use.html">R</a></div><div class="brief "><p class="paragraph">Utility function to use managed object and them immediately release it.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="use.html">T</a><span class="token operator"> : </span><a href="-managed/index.html">Managed</a><span class="token punctuation">, </span><a href="use.html">R</a><span class="token operator">&gt; </span><a href="use.html">T</a><span class="token punctuation">.</span><a href="use.html"><span class="token function">use</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token punctuation">(</span><a href="use.html">T</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="use.html">R</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="use.html">R</a></div><div class="brief "><p class="paragraph">Utility function to use managed object and them immediately release it.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1872358014%2FFunctions%2F788909594" anchor-label="withStringReferenceNullableResult" id="-1872358014%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="-1872358014%2FFunctions%2F1558683979" anchor-label="withStringReferenceNullableResult" id="-1872358014%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="with-string-reference-nullable-result.html"><span>with</span><wbr></wbr><span>String</span><wbr></wbr><span>Reference</span><wbr></wbr><span>Nullable</span><wbr></wbr><span><span>Result</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1872358014%2FFunctions%2F788909594"></span>
+                  <div><a href="with-string-reference-nullable-result.html"><span>with</span><wbr><span>String</span><wbr><span>Reference</span><wbr><span>Nullable</span><wbr><span><span>Result</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1872358014%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="with-string-reference-nullable-result.html"><span class="token function">withStringReferenceNullableResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="with-string-reference-nullable-result.html"><span class="token function">withStringReferenceNullableResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="642955457%2FFunctions%2F788909594" anchor-label="withStringReferenceResult" id="642955457%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+<a data-name="642955457%2FFunctions%2F1558683979" anchor-label="withStringReferenceResult" id="642955457%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="with-string-reference-result.html"><span>with</span><wbr></wbr><span>String</span><wbr></wbr><span>Reference</span><wbr></wbr><span><span>Result</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="642955457%2FFunctions%2F788909594"></span>
+                  <div><a href="with-string-reference-result.html"><span>with</span><wbr><span>String</span><wbr><span>Reference</span><wbr><span><span>Result</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="642955457%2FFunctions%2F1558683979"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="with-string-reference-result.html"><span class="token function">withStringReferenceResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Creates String from SkString* result. Caller must ensure pointer to be valid. It is caller responsibility to destroy underlying SkString. Use it if pointer is received from reference (SkString&)</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="with-string-reference-result.html"><span class="token function">withStringReferenceResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Creates String from SkString* result. Caller must ensure pointer to be valid. It is caller responsibility to destroy underlying SkString. Use it if pointer is received from reference (SkString&amp;)</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -568,13 +631,22 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span
-                class="pull-right"><span>Generated by </span><a
-                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

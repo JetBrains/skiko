@@ -1,0 +1,30 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:org.jetbrains.skia.impl/Native/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/[web]equals.html
+$dokka.location:org.jetbrains.skia.impl/Native/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-native/[web]hash-code.html
+$dokka.location:org.jetbrains.skia.impl/RefCnt/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-ref-cnt/[web]to-string.html
+$dokka.location:org.jetbrains.skia.impl/Stats/allocated/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-stats/[native]allocated.html
+$dokka.location:org.jetbrains.skia.impl/Stats/enabled/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-stats/[native]enabled.html
+$dokka.location:org.jetbrains.skia.impl/Stats/nativeCalls/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-stats/[native]native-calls.html
+$dokka.location:org.jetbrains.skia.skottie//buildFromFile/org.jetbrains.skia.skottie.AnimationBuilder#kotlin.String/PointingToDeclaration/skiko-skottie/org.jetbrains.skia.skottie/[native]build-from-file.html
+$dokka.location:org.jetbrains.skia.skottie//makeFromFile/org.jetbrains.skia.skottie.Animation.Companion#kotlin.String/PointingToDeclaration/skiko-skottie/org.jetbrains.skia.skottie/[native]make-from-file.html
+$dokka.location:org.jetbrains.skia//makeFromFileName/org.jetbrains.skia.Data.Companion#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file-name.html
+$dokka.location:org.jetbrains.skiko/SkiaLayer/isShowing/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/[macos]is-showing.html
+module:skiko
+org.jetbrains.skia
+org.jetbrains.skia.icu
+org.jetbrains.skia.impl
+org.jetbrains.skia.paragraph
+org.jetbrains.skia.shaper
+org.jetbrains.skia.svg
+org.jetbrains.skia.webext
+org.jetbrains.skiko
+org.jetbrains.skiko.graphicapi
+org.jetbrains.skiko.ios
+org.jetbrains.skiko.node
+org.jetbrains.skiko.swing
+org.jetbrains.skiko.wasm
+org.jetbrains.skiko.windows
+module:skiko-skottie
+org.jetbrains.skia.skottie
+org.jetbrains.skia.sksg
