@@ -1170,13 +1170,13 @@ class SkiaLayerTest {
         semaphore.acquire()
 
         try {
-            repeat(20) { testRun ->
-                delay(250)
+            repeat(50) { testRun ->
+                delay(50)
                 lateinit var renderDelegate: SolidColorRenderer
                 val window = UiTestWindow {
                     size = Dimension(600, 600)
                     location = Point(400, 400)
-                    background = bgColor
+                    background = Color.WHITE
                     renderDelegate = SolidColorRenderer(
                         layer = layer,
                         color = fgColor,
@@ -1186,10 +1186,9 @@ class SkiaLayerTest {
                 }
 
                 try {
-                    // Wait for the thread to start reading pixels
                     window.isVisible = true
                     window.waitUntilOpened()
-                    delay(250)
+                    delay(100)
                     assertNull(nonBlackPixelDetected.load(), "Detected a non-black pixel on window show in run ${testRun + 1}.")
                 } finally {
                     stopThread.getAndSet(true)

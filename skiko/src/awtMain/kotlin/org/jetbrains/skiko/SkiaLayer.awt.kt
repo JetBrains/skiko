@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 import kotlin.math.floor
+import kotlin.time.measureTime
 
 actual open class SkiaLayer internal constructor(
     accessibleContextProvider: ((Component) -> AccessibleContext)? = null,
@@ -112,12 +113,6 @@ actual open class SkiaLayer internal constructor(
                 Logger.debug { "Paint called on HardwareLayer $this" }
                 checkContentScale()
 
-                // Draw the picture into the heavyweight Canvas too, because sometimes it's visible for a frame before
-                // the native layer is visible.
-                onGraphicsPainter?.let {
-                    paintContentOnGraphics(g as Graphics2D, it)
-                }
-
                 // 1. JPanel.paint is not always called (in rare cases).
                 //    For example if we call 'jframe.isResizable = false` on Ubuntu
                 //
@@ -126,39 +121,6 @@ actual open class SkiaLayer internal constructor(
                 //
                 // 3. to avoid double paint in one single frame, use needRender instead of renderImmediately
                 redrawer?.needRender(throttledToVsync = false)
-            }
-
-            /**
-             * Software-renders the current content into [g].
-             *
-             * This is needed because the first frame is occasionally visible before the native layer is ready to draw,
-             * and when that happens, what is drawn on the screen is the [HardwareLayer]'s background, causing a visible
-             * flash.
-             */
-            private fun paintContentOnGraphics(g: Graphics2D, onGraphicsPainter: OnGraphicsPainter) {
-                if (!isInited || isDisposed) return
-                try {
-                    // Ensure we have a picture to blit. On the very first paint, before the render loop has
-                    // run (and before the heavyweight child has been laid out, so backedLayer.width may be 0),
-                    // record one at this component's own — reliably valid — size. Otherwise, reuse the picture
-                    // already recorded by the render loop (or by the other layer's paint), so we don't re-run
-                    // the render delegate more than once.
-                    if (picture == null) {
-                        val scale = contentScale
-                        val forcedSize = Dimension(
-                            (width * scale).toInt().coerceAtLeast(0),
-                            (height * scale).toInt().coerceAtLeast(0)
-                        )
-                        update(renderTime(), forcedSize = forcedSize)
-                    }
-                    lockPicture { picture ->
-                        if (picture.width <= 0 || picture.height <= 0) return@lockPicture
-                        onGraphicsPainter.paint(g, picture)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Logger.warn(e) { "Failed to software-render fallback frame for $this" }
-                }
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
@@ -337,15 +299,6 @@ actual open class SkiaLayer internal constructor(
             redrawer?.syncBoundsFromPlatformComponent()
             repaint()
         }
-
-        if (!wasShowing && isShowingNow) {
-            // Becoming visible: software-render a fallback frame into the heavyweight backedLayer until
-            // the GPU surface composites, so the window's first frame shows content instead of the
-            // Canvas's background (see HardwareLayer.paint / paintContentFallback).
-            onGraphicsPainter = OnGraphicsPainter(this)
-            backedLayer.background = Color.RED
-        }
-
     }
 
     private var isShowingCached = false
@@ -432,10 +385,6 @@ actual open class SkiaLayer internal constructor(
     private var pictureRecorder: PictureRecorder? = null
     private val pictureLock = Any()
 
-    // Paints the picture on the layer's Graphics (allocates and holds the resources needed to do so).
-    // Also doubles as the flag indicating whether we need to draw the picture in paint(Graphics).
-    internal var onGraphicsPainter: OnGraphicsPainter? = null
-
     private fun init(recreation: Boolean = false) {
         isDisposed = false
         backedLayer.init()
@@ -469,8 +418,6 @@ actual open class SkiaLayer internal constructor(
             picture = null
             pictureRecorder?.close()
             pictureRecorder = null
-            onGraphicsPainter?.dispose()
-            onGraphicsPainter = null
             backedLayer.dispose()
             peerBufferSizeFixJob?.cancel()
             isDisposed = true
@@ -747,8 +694,6 @@ actual open class SkiaLayer internal constructor(
             with(createDrawScope(forcedSize)) {
                 body()
             }
-            onGraphicsPainter?.dispose()
-            onGraphicsPainter = null
         } catch (_: CancellationException) {
             // ignore
         } catch (e: RenderException) {
@@ -861,32 +806,5 @@ private fun adjustSizeToContentScale(contentScale: Float, value: Int): Int {
         value + 1
     } else {
         value
-    }
-}
-
-
-internal class OnGraphicsPainter(private val layer: SkiaLayer) {
-
-    private var swingPainter: SoftwareSwingPainter? = null
-
-    fun paint(g: Graphics2D, pictureHolder: PictureHolder) {
-        val painter = swingPainter ?: SoftwareSwingPainter(object : SwingLayerProperties {
-            override val width: Int get() = layer.width
-            override val height: Int get() = layer.height
-            override val graphicsConfiguration: GraphicsConfiguration get() = layer.graphicsConfiguration
-            override val adapterPriority: GpuPriority get() = layer.properties.adapterPriority
-            override val gpuResourceCacheLimit: Long get() = layer.properties.gpuResourceCacheLimit
-        }).also { swingPainter = it }
-
-        Surface.makeRaster(
-            ImageInfo.makeS32(pictureHolder.width, pictureHolder.height, ColorAlphaType.PREMUL)
-        ).use { surface ->
-            surface.canvas.drawPicture(pictureHolder.instance)
-            painter.paint(g, surface, texture = 0)
-        }
-    }
-
-    fun dispose() {
-        swingPainter?.dispose()
     }
 }
