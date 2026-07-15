@@ -5,18 +5,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.fastForEach
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
-import org.jetbrains.skiko.redrawer.renderTime
-import org.jetbrains.skiko.swing.SoftwareSwingPainter
-import org.jetbrains.skiko.swing.SwingLayerProperties
+import java.awt.*
 import java.awt.Color
-import java.awt.Component
-import java.awt.Dimension
 import java.awt.Graphics
-import java.awt.Graphics2D
-import java.awt.GraphicsConfiguration
 import java.awt.Point
 import java.awt.event.*
 import java.awt.geom.AffineTransform
@@ -32,7 +27,6 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 import kotlin.math.floor
-import kotlin.time.measureTime
 
 actual open class SkiaLayer internal constructor(
     accessibleContextProvider: ((Component) -> AccessibleContext)? = null,
