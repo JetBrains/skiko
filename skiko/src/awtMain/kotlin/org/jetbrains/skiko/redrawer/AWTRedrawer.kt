@@ -110,7 +110,7 @@ internal abstract class AWTRedrawer(
      * land only after the window is already showing, defeating the purpose of the early render).
      */
     protected open fun renderBeforeShown() {
-        renderImmediately()
+        error("renderBeforeShown must be implemented if `supportsRenderingBeforeShown` is `true`")
     }
 
     override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
