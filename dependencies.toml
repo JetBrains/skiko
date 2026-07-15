@@ -6,7 +6,7 @@ coroutines = "1.8.0"
 jetbrainsRuntime-api = "1.5.0"
 
 androidGradlePlugin = "9.0.0"
-dokka = "1.9.10"
+dokka = "2.2.0"
 
 buildHelpers-publishing = "0.1.28"
 githubApi = "1.329"
