@@ -2,7 +2,6 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import org.jetbrains.skia.ISize
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import java.awt.Component
@@ -191,7 +190,6 @@ internal class MetalRedrawer(
     @Suppress("unused")
     fun onLiveResizeStarted() {
         isInLiveResize = true
-        scheduleFrameOnAppKitThread()
     }
 
     /**
@@ -224,10 +222,11 @@ internal class MetalRedrawer(
         // Record content at exactly the present size, on the EDT.
         try {
             invokeOnEventThreadAndWait {
+                if (isDisposed) return@invokeOnEventThreadAndWait
                 val layerSize = Dimension(width, height)
                 update(forcedSize = layerSize)
                 inDrawScope(forcedSize = layerSize) {
-                    if (!isDisposed) {
+                    if (!isDisposed) {  // Redrawer may be disposed in user code, during `update`
                         // The present must run on the AppKit main thread to join the resize transaction, so
                         // only record here; `finishFrameInLiveResize` presents below on the AppKit main thread
                         performDraw(finishFrame = false)
