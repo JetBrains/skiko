@@ -6,6 +6,7 @@ import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.SwingUtilities.*
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Holder for pointer on MetalDevice described in "MetalDevice.h"
@@ -119,7 +120,7 @@ internal class MetalRedrawer(
     private suspend fun draw() {
         inDrawScope {
             // Move drawing to another thread to free the main thread
-            // It can be expensive to run it in the main thread and FPS can become unstable.
+            // It can be expensive to run it in the main thread, and FPS can become unstable.
             // This is visible by running [SkiaLayerPerformanceTest], standard deviation is increased significantly.
             withContext(dispatcherToBlockOn) {
                 performDraw()
@@ -129,7 +130,7 @@ internal class MetalRedrawer(
 
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
         if (isWindowOccluded) {
-            withTimeoutOrNull(300) {
+            withTimeoutOrNull(300.milliseconds) {
                 // If the window becomes non-occluded, stop waiting immediately
                 @Suppress("ControlFlowWithEmptyBody")
                 while (windowOcclusionStateChannel.receive()) { }
@@ -152,7 +153,7 @@ internal class MetalRedrawer(
         }
     }
 
-    override fun syncBounds() = synchronized(drawLock) {
+    override fun syncBoundsFromPlatformComponent() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
