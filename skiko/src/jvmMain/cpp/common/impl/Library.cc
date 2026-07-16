@@ -1,3 +1,4 @@
+#include <cassert>
 #include <jni.h>
 #include "../interop.hh"
 #include "../shaper/interop.hh"
@@ -7,6 +8,16 @@
 
 
 extern "C" JavaVM *jvm = NULL;
+
+JNIEnv *resolveJNIEnvForCurrentThread() {
+    JNIEnv *env;
+    int envStat = jvm->GetEnv(reinterpret_cast<void **>(&env), SKIKO_JNI_VERSION);
+    if (envStat == JNI_EDETACHED) {
+        jvm->AttachCurrentThread(AS_JNI_ENV_PTR(&env), NULL);
+    }
+    assert(env);
+    return env;
+}
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     jvm = vm;

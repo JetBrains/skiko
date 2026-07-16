@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
+import java.awt.Dimension
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.SwingUtilities.*
 import kotlin.time.Duration.Companion.milliseconds
@@ -33,6 +34,52 @@ internal value class MetalDevice(val ptr: Long)
  * @see FrameDispatcher
  */
 internal class MetalRedrawer(
+    private val layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics,
+    properties: SkiaLayerProperties,
+    private val awtRedrawer: MetalAWTRedrawer = MetalAWTRedrawer(layer, analytics, properties)
+) : Redrawer by awtRedrawer {
+    private val liveResizer = if (layer.fillsWindow && SkikoProperties.metalSynchronousLiveResize) {
+        MetalLiveResizer(awtRedrawer, layer.windowHandle).also { resizer ->
+            awtRedrawer.onBoundsChangedInAppkitThread = resizer::onBoundsChangedInAppkitThread
+        }
+    } else {
+        null
+    }
+
+    override fun dispose() {
+        liveResizer?.dispose()
+        awtRedrawer.dispose()
+    }
+
+    override fun needRender(throttledToVsync: Boolean) {
+        if (liveResizer?.isInLiveResize == true) {
+            liveResizer.needRender()
+        } else {
+            awtRedrawer.needRender(throttledToVsync)
+        }
+    }
+
+    override fun renderImmediately() {
+        if (liveResizer?.isInLiveResize != true) {
+            awtRedrawer.renderImmediately()
+        }
+    }
+
+    override fun syncBoundsFromPlatformComponent() {
+        if (liveResizer?.isInLiveResize != true) {
+            awtRedrawer.syncBoundsFromPlatformComponent()
+        }
+    }
+
+    override fun onPlatformComponentResized() {
+        if (liveResizer?.isInLiveResize != true) {
+            super.onPlatformComponentResized()
+        }
+    }
+}
+
+internal class MetalAWTRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
@@ -117,6 +164,31 @@ internal class MetalRedrawer(
         }
     }
 
+    /**
+     * Render immediately, called in AppKit thread with a custom size that can be not equal to the AWT layer size.
+     */
+    fun renderImmediatelyInAppKitThread(width: Int, height: Int) {
+        setDrawableSize(device.ptr, width, height)
+
+        // Record content at exactly the present size, on the EDT.
+        macOsInvokeOnEventThreadAndWait(layer) {
+            if (isDisposed) return@macOsInvokeOnEventThreadAndWait
+
+            val layerSize = Dimension(width, height)
+            update(forcedSize = layerSize)
+            inDrawScope(forcedSize = layerSize) {
+                performNativeDrawAction {
+                    contextHandler.draw()
+                }
+            }
+        }
+
+        // The present must run on the AppKit main thread to join the resize transaction
+        performNativeDrawAction {
+            contextHandler.finishFrameInLiveResize()
+        }
+    }
+
     private suspend fun draw() {
         inDrawScope {
             // Move drawing to another thread to free the main thread
@@ -138,17 +210,35 @@ internal class MetalRedrawer(
         }
     }
 
-    // Called from MetalRedrawer.mm
+    fun setPresentsWithNativeTransaction(enabled: Boolean) =
+        setPresentsWithNativeTransaction(device.ptr, enabled)
+
+    private external fun setPresentsWithNativeTransaction(devicePtr: Long, enabled: Boolean)
+
+    // Called from MetalRedrawer.mm in AppKit thread
+    @Suppress("unused")
+    fun onBoundsChangedInAppkitThread(width: Int, height: Int) {
+        onBoundsChangedInAppkitThread?.invoke(width, height)
+    }
+
+    var onBoundsChangedInAppkitThread: ((Int, Int) -> Unit)? = null
+
+    // Called from MetalRedrawer.mm in AppKit thread
     @Suppress("unused")
     fun onOcclusionStateChanged(isOccluded: Boolean) {
         isWindowOccluded = isOccluded
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun LayerDrawScope.performDraw() = synchronized(drawLock) {
+    private fun LayerDrawScope.performDraw() = performNativeDrawAction {
+        contextHandler.draw()
+        contextHandler.finishFrame()
+    }
+
+    private fun performNativeDrawAction(action: () -> Unit) = synchronized(drawLock) {
         if (!isDisposed) {
             autoreleasepool {
-                contextHandler.draw()
+                action()
             }
         }
     }
@@ -174,6 +264,7 @@ internal class MetalRedrawer(
     private external fun createMetalDevice(window: Long, transparency: Boolean, frameBuffering: Int, adapter: Long, platformInfo: Long): Long
     private external fun disposeDevice(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
+    private external fun setDrawableSize(device: Long, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
 

@@ -121,9 +121,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
 }
 
 /// Presents the current drawable synchronously, joining the ambient window-resize CATransaction.
-/// Must be called on the AppKit main thread during a live resize (from drawFrameWhileLiveResizing),
-/// where the ambient CATransaction — from AWTMetalLayer.setBounds, committing the window's new size —
-/// flushes the present. This is the sole presenter for the duration of the resize.
+/// Must be called on the AppKit main thread during a live resize (from renderImmediatelyInAppKitThread),
+/// where the ambient CATransaction — committing the window's new size — flushes the present.
+/// This is the sole presenter for the duration of the resize.
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrameInLiveResize(
     JNIEnv *env, jobject contextHandler, jlong devicePtr)
 {
@@ -139,9 +139,10 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
         /// guarantees the drawing command buffer (submitted by Skia earlier, ahead of this one in
         /// the queue) is scheduled first.
         ///
-        /// No drawable-vs-layer size guard is needed here (unlike the async finishFrame path): setBounds
-        /// set drawableSize, then we acquired the drawable, rendered, committed and present it all
-        /// synchronously on this thread inside one transaction, so the layer size cannot change underneath.
+        /// No drawable-vs-layer size guard is needed here (unlike the async finishFrame path): drawableSize
+        /// was set at the start of renderImmediatelyInAppKitThread, then we acquired the drawable, rendered,
+        /// committed and present it all synchronously on this thread inside one transaction, so the layer
+        /// size cannot change underneath.
         [commandBuffer commit];
         [commandBuffer waitUntilScheduled];
         [currentDrawable present];

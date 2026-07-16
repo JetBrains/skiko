@@ -565,7 +565,6 @@ class SkiaLayerTest {
         override fun dispose() = Unit
         override fun needRender(throttledToVsync: Boolean) = frameDispatcher.scheduleFrame()
         override fun renderImmediately() = Unit
-        override fun update(nanoTime: Long) = layer.update(nanoTime)
         override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 
         override val renderInfo: String

@@ -51,11 +51,11 @@ internal abstract class AWTRedrawer(
         deviceAnalytics?.contextInit()
     }
 
-    override fun update(nanoTime: Long) {
+    protected fun update(nanoTime: Long = renderTime()) {
         update(nanoTime, forcedSize = null)
     }
 
-    fun update(nanoTime: Long = renderTime(), forcedSize: Dimension?) {
+    protected fun update(nanoTime: Long = renderTime(), forcedSize: Dimension?) {
         checkDisposed()
         layer.update(nanoTime, forcedSize = forcedSize)
     }

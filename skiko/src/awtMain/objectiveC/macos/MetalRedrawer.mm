@@ -20,6 +20,9 @@
 
 #include "common/interop.hh"
 
+// Forward-declared so AWTMetalLayer (below) can use them.
+static jmethodID getOnBoundsChangedInAppkitThreadMethodID(JNIEnv *env, jobject redrawer);
+
 @implementation AWTMetalLayer
 
 - (id)init
@@ -33,6 +36,28 @@
     [self setNeedsDisplayOnBoundsChange: YES];
 
     return self;
+}
+
+- (CGSize)pixelSize
+{
+    CGFloat scale = self.contentsScale;
+    int pixelWidth = (int)(self.bounds.size.width * scale);
+    int pixelHeight = (int)(self.bounds.size.height * scale);
+    return CGSizeMake(pixelWidth, pixelHeight);
+}
+
+/// During a live resize this fires (on the AppKit main thread) when the layer autoresizes to track the
+/// window. We synchronously draw + present within the ambient CATransaction that is also committing
+/// the window's new size, so content and backing stay in sync.
+/// presentsWithTransaction is used as the live-resize gate: MetalLiveResizer sets it YES at resize
+/// start and NO at resize end.
+- (void)setBounds:(CGRect)bounds
+{
+    [super setBounds:bounds];
+
+    JNIEnv *env = resolveJNIEnvForCurrentThread();
+    jmethodID onBoundsChangedInAppkitThread = getOnBoundsChangedInAppkitThreadMethodID(env, self.javaRef);
+    env->CallVoidMethod(self.javaRef, onBoundsChangedInAppkitThread, (jint)pixelSize.width, (jint)pixelSize.height);
 }
 
 @end
@@ -89,23 +114,6 @@
 
 @end
 
-/// Linked from skiko/src/jvmMain/cpp/common/impl/Library.cc
-/// clang treats extern symbol declarations as C in Objective-C++(.mm) and doesn't mangle them
-extern JavaVM *jvm;
-
-static JNIEnv *resolveJNIEnvForCurrentThread() {
-    JNIEnv *env;
-    int envStat = jvm->GetEnv((void **)&env, SKIKO_JNI_VERSION);
-
-    if (envStat == JNI_EDETACHED) {
-        jvm->AttachCurrentThread((void **) &env, NULL);
-    }
-
-    assert(env);
-
-    return env;
-}
-
 static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawer) {
     static jmethodID onOcclusionStateChanged = NULL;
     if (onOcclusionStateChanged == NULL) {
@@ -115,10 +123,19 @@ static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawe
     return onOcclusionStateChanged;
 }
 
+static jmethodID getOnBoundsChangedInAppkitThreadMethodID(JNIEnv *env, jobject redrawer) {
+    static jmethodID onBoundsChangedInAppkitThread = NULL;
+    if (onBoundsChangedInAppkitThread == NULL) {
+        jclass redrawerClass = env->GetObjectClass(redrawer);
+        onBoundsChangedInAppkitThread = env->GetMethodID(redrawerClass, "onBoundsChangedInAppkitThread", "(II)V");
+    }
+    return onBoundsChangedInAppkitThread;
+}
+
 extern "C"
 {
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalVsyncRedrawer_createMetalDevice(
     JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint frameBuffering, jlong adapterPtr, jlong platformInfoPtr)
 {
     @autoreleasepool {
@@ -176,7 +193,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLayers(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalVsyncRedrawer_resizeLayers(
     JNIEnv *env, jobject redrawer, jlong devicePtr, jint x, jint y, jint width, jint height)
 {
     @autoreleasepool {
@@ -197,7 +214,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerVisible(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalVsyncRedrawer_setLayerVisible(
     JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean isVisible)
 {
     @autoreleasepool {
@@ -214,7 +231,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerV
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalVsyncRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
@@ -231,7 +248,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setConten
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setDisplaySyncEnabled(JNIEnv *env, jobject obj, jlong devicePtr, jboolean enabled)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalVsyncRedrawer_setDisplaySyncEnabled(JNIEnv *env, jobject obj, jlong devicePtr, jboolean enabled)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
@@ -239,7 +256,25 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setDispla
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDevice(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalVsyncRedrawer_setDrawableSize(
+    JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
+{
+    @autoreleasepool {
+        MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+        device.layer.drawableSize = CGSizeMake(width, height);
+    }
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalVsyncRedrawer_setPresentsWithNativeTransaction(
+    JNIEnv *env, jobject obj, jlong devicePtr, jboolean enabled)
+{
+    @autoreleasepool {
+        MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+        device.layer.presentsWithTransaction = enabled;
+    }
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalVsyncRedrawer_disposeDevice(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     @autoreleasepool {

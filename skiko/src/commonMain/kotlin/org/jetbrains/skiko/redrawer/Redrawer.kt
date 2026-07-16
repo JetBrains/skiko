@@ -13,7 +13,6 @@ internal interface Redrawer {
     fun needRender(throttledToVsync: Boolean)
     fun renderImmediately()
     fun syncBoundsFromPlatformComponent() = Unit
-    fun update(nanoTime: Long = renderTime())
     fun setVisible(isVisible: Boolean) = Unit
     val renderInfo: String
     fun isTransparentBackgroundSupported(): Boolean
