@@ -46,7 +46,7 @@ internal class MacOsOpenGLRedrawer(
         glLayer.dispose()
     }
 
-    override fun syncBounds() {
+    override fun syncBoundsFromPlatformComponent() {
         syncContentScale()
         skiaLayer.nsView.frame.useContents {
             glLayer.setFrame(

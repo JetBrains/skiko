@@ -47,10 +47,10 @@ internal class MetalContextHandler(
         }
     }
 
-    override fun flush(scope: LayerDrawScope) {
-        super.flush(scope)
+    // After `flush` you also need to call `finishFrame` (or `finishFrameInLiveResize`).
+    public override fun flush() {
+        super.flush()
         surface?.flushAndSubmit()
-        finishFrame()
         Logger.debug { "MetalContextHandler finished drawing frame" }
     }
 
@@ -68,9 +68,17 @@ internal class MetalContextHandler(
         makeMetalContext(device.ptr)
     )
 
-    private fun finishFrame() = finishFrame(device.ptr)
+    /** Presents the frame asynchronously (off the main thread). Used for every frame outside a live resize. */
+    fun finishFrame() = finishFrame(device.ptr)
+
+    /**
+     * Presents the frame synchronously, joining the ambient window-resize transaction.
+     * Must be called on the AppKit main thread during a live resize.
+     */
+    fun finishFrameInLiveResize() = finishFrameInLiveResize(device.ptr)
 
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun finishFrame(device: Long)
+    private external fun finishFrameInLiveResize(device: Long)
 }

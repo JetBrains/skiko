@@ -51,9 +51,9 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer
         }
     }
 
-    override fun flush(scope: LayerDrawScope) {
+    override fun flush() {
         // TODO: maybe make flush async as in JVM version.
-        super.flush(scope)
+        super.flush()
         surface?.flushAndSubmit()
         metalRedrawer.finishFrame()
     }

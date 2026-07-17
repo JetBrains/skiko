@@ -6,16 +6,25 @@ import org.jetbrains.skiko.hostOs
 import kotlin.time.TimeSource
 
 private val initialTime = TimeSource.Monotonic.markNow()
+internal fun renderTime() = initialTime.elapsedNow().inWholeNanoseconds
 
 internal interface Redrawer {
     fun dispose()
     fun needRender(throttledToVsync: Boolean)
     fun renderImmediately()
-    fun syncBounds() = Unit
-    fun update(nanoTime: Long = initialTime.elapsedNow().inWholeNanoseconds)
+    fun syncBoundsFromPlatformComponent() = Unit
+    fun update(nanoTime: Long = renderTime())
     fun setVisible(isVisible: Boolean) = Unit
     val renderInfo: String
     fun isTransparentBackgroundSupported(): Boolean
+
+    /**
+     * Invoked by [SkiaLayer] when the underlying platform component is resized.
+     */
+    fun onPlatformComponentResized() {
+        syncBoundsFromPlatformComponent()
+        needRender(throttledToVsync = false)
+    }
 }
 
 internal fun defaultIsTransparentBackgroundSupported(layer: SkiaLayer): Boolean {

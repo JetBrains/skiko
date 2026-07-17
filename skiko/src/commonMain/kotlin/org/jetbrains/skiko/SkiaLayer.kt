@@ -99,7 +99,7 @@ internal class LayerDrawScope(
         scaledLayerHeight = (layerHeight * scale).toInt().coerceAtLeast(0)
     )
 
-    internal fun ContextHandler.draw() {
-        this@LayerDrawScope.draw()
+    internal fun ContextHandler.draw(flush: Boolean = true) {
+        this@LayerDrawScope.draw(flush)
     }
 }

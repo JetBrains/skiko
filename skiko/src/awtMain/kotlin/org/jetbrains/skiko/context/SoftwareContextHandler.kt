@@ -20,7 +20,6 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHand
     )
     val storage = Bitmap()
     var image: BufferedImage? = null
-    var imageData: ByteArray? = null
     var raster: WritableRaster? = null
 
     override fun LayerDrawScope.initCanvas() {
@@ -36,11 +35,11 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHand
         canvas = Canvas(storage, SurfaceProps(pixelGeometry = pixelGeometry))
     }
 
-    override fun flush(scope: LayerDrawScope) {
-        val w = scope.scaledLayerWidth
-        val h = scope.scaledLayerHeight
+    override fun flush() {
+        val w = storage.width
+        val h = storage.height
 
-        val bytes = storage.readPixels(storage.imageInfo, (w * 4), 0, 0)
+        val bytes = storage.readPixels(storage.imageInfo, dstRowBytes = (w * 4), srcX = 0, srcY = 0)
         if (bytes != null) {
             val buffer = DataBufferByte(bytes, bytes.size)
             raster = Raster.createInterleavedRaster(
@@ -52,9 +51,9 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextFreeContextHand
                 null
             )
             image = BufferedImage(colorModel, raster!!, false, null)
-            val graphics = layer.backedLayer.getGraphics()
+            val graphics = layer.backedLayer.graphics
             if (!layer.fullscreen && layer.transparency && hostOs == OS.MacOS) {
-                graphics?.setColor(Color(0, 0, 0, 0))
+                graphics?.color = Color(0, 0, 0, 0)
                 graphics?.clearRect(0, 0, w, h)
             }
             graphics?.drawImage(image!!, 0, 0, layer.width, layer.height, null)
