@@ -104,10 +104,8 @@ internal abstract class AWTRedrawer(
     /**
      * Renders and presents a frame while the layer is displayable but not showing.
      *
-     * Only called when [supportsRenderingBeforeShown] is `true`. The default is a plain [renderImmediately];
-     * implementations whose regular present is asynchronous should override this to present synchronously,
-     * guaranteeing the content is delivered before the window can appear on screen (an async present could
-     * land only after the window is already showing, defeating the purpose of the early render).
+     * Only called when [supportsRenderingBeforeShown] is `true`. Implementations must present the frame in a
+     * way that the window's first on-screen composite reflects it rather than the background.
      */
     protected open fun renderBeforeShown() {
         error("renderBeforeShown must be implemented if `supportsRenderingBeforeShown` is `true`")
