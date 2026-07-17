@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-    <title>addPropertyChangeListener</title>
+    <title>metalSynchronousLiveResize</title>
 <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
     <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
@@ -42,7 +42,7 @@
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
-                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":/awtMain">awt</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":/jvmMain">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
@@ -53,9 +53,9 @@
                     </div>
                         <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
                             <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":/awtMain" data-filter=":/awtMain">
+                                <input type="checkbox" class="checkbox--input" id=":/jvmMain" data-filter=":/jvmMain">
                                 <span class="checkbox--icon"></span>
-                                awt
+                                jvm
                             </label>
                         </li>
                 </ul>
@@ -89,14 +89,14 @@
         </nav>
         <div id="resizer" class="resizer" data-item-type="BAR"></div>
         <div id="main" data-item-type="SECTION" role="main">
-<div class="main-content" data-page-type="member" id="content" pageids="skiko::org.jetbrains.skiko/SkiaLayer/addPropertyChangeListener/#kotlin.String?#java.beans.PropertyChangeListener?/PointingToDeclaration//561814353">
-  <div class="breadcrumbs"><a href="../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skiko</a><span class="delimiter">/</span><a href="index.html">SkiaLayer</a><span class="delimiter">/</span><span class="current">addPropertyChangeListener</span></div>
+<div class="main-content" data-page-type="member" id="content" pageids="skiko::org.jetbrains.skiko/SkikoProperties/metalSynchronousLiveResize/#/PointingToDeclaration//2112555339">
+  <div class="breadcrumbs"><a href="../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skiko</a><span class="delimiter">/</span><a href="index.html">SkikoProperties</a><span class="delimiter">/</span><span class="current">metalSynchronousLiveResize</span></div>
   <div class="cover ">
-    <h1 class="cover"><span>add</span><wbr><span>Property</span><wbr><span>Change</span><wbr><span><span>Listener</span></span></h1>
+    <h1 class="cover"><span>metal</span><wbr><span>Synchronous</span><wbr><span>Live</span><wbr><span><span>Resize</span></span></h1>
   </div>
   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain" data-active="" data-toggle=":/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":/awtMain"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">fun </span><a href="add-property-change-listener.html"><span class="token function">addPropertyChangeListener</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">propertyName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">listener<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/java/beans/PropertyChangeListener.html">PropertyChangeListener</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>  </div>
+    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/jvmMain" data-filterable-set=":/jvmMain" data-active="" data-toggle=":/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="metal-synchronous-live-resize.html">metalSynchronousLiveResize</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><p class="paragraph">Metal on macOS: during an interactive live resize (dragging a window edge), render and present synchronously on the AppKit main thread, inside the same CATransaction that commits the window's new size, so content and window backing stay in sync (no white borders). When disabled, resize falls back to the previous behavior: geometry is updated from the EDT, and frames are presented asynchronously off the resize transaction.</p></div>  </div>
 </div>
     <div class="footer">
         <div class="footer--container">
