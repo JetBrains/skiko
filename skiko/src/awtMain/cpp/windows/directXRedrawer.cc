@@ -938,6 +938,71 @@ extern "C"
         g_frameHwnd = top;
         g_originalWndProc = (WNDPROC)SetWindowLongPtrW(top, GWLP_WNDPROC, (LONG_PTR)LiveResizeWndProc);
     }
+
+    // one-shot INLINE hook on user32!CreateWindowExW that injects
+    // WS_EX_NOREDIRECTIONBITMAP into the frame's creation. `WS_EX_NOREDIRECTIONBITMAP` is creation-only.
+    // IAT hooking couldn't catch AWT's frame (its import of CreateWindowExW isn't discoverable in awt.dll's
+    // import table — ordinal/delay/dynamic), so we patch the function's own prologue: every caller, however
+    // it imports the symbol, reaches this address. Arm AFTER the JFrame constructor and BEFORE the first
+    // pack()/setVisible(): the peer HWND is realized lazily in addNotify(). JDK-agnostic (a runtime hook).
+    // TODO: replace this process-wide inline hook with a supported mechanism for creating the frame NOREDIR.
+    typedef HWND(WINAPI *CreateWindowExW_t)(DWORD, LPCWSTR, LPCWSTR, DWORD, int, int, int, int, HWND, HMENU, HINSTANCE, LPVOID);
+    static CreateWindowExW_t g_realCreateWindowExW = nullptr;
+    static volatile LONG g_armNoRedir = 0;
+    static void *g_hookAddr = nullptr;   // == user32!CreateWindowExW
+    static BYTE g_origPrologue[14];      // saved bytes overwritten by the jmp
+    static BYTE g_jmpPrologue[14];       // FF 25 00000000 <8-byte abs target> = jmp [rip+0]; qword target
+
+    static void patchExecutableMemory(void *dst, const void *src, size_t n)
+    {
+        DWORD old;
+        VirtualProtect(dst, n, PAGE_EXECUTE_READWRITE, &old);
+        memcpy(dst, src, n);
+        VirtualProtect(dst, n, old, &old);
+        FlushInstructionCache(GetCurrentProcess(), dst, n);
+    }
+
+    static HWND WINAPI hookedCreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName,
+        DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
+    {
+        bool applied = false;
+        // Only the top-level frame (not the WS_CHILD canvas / focus proxy). One-shot: disarm on first match.
+        if (g_armNoRedir && !(dwStyle & WS_CHILD)) {
+            dwExStyle |= WS_EX_NOREDIRECTIONBITMAP;
+            InterlockedExchange(&g_armNoRedir, 0);
+            applied = true;
+        }
+        // Temporarily restore the original prologue and call through, then re-arm the hook. This avoids
+        // building a relocated trampoline (no instruction-length decoding needed). The frame is created on
+        // the single AWT-Windows toolkit thread, so the brief unhooked window is safe here.
+        patchExecutableMemory(g_hookAddr, g_origPrologue, sizeof(g_origPrologue));
+        HWND h = g_realCreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight,
+                                       hWndParent, hMenu, hInstance, lpParam);
+        // Rehook to keep watching for our target; but once the one-shot has fired, leave the prologue
+        // restored so we stop intercepting process-wide. A later arm() reinstalls it.
+        if (!applied)
+            patchExecutableMemory(g_hookAddr, g_jmpPrologue, sizeof(g_jmpPrologue));
+        return h;
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_NoRedirectionBitmap_arm(JNIEnv *env, jobject obj)
+    {
+        if (!g_hookAddr) {
+            HMODULE u32 = GetModuleHandleW(L"user32.dll");
+            void *realAddr = u32 ? (void *)GetProcAddress(u32, "CreateWindowExW") : nullptr;
+            if (!realAddr) return;
+            g_hookAddr = realAddr;
+            g_realCreateWindowExW = (CreateWindowExW_t)realAddr;
+            memcpy(g_origPrologue, realAddr, sizeof(g_origPrologue));
+            g_jmpPrologue[0] = 0xFF; // jmp qword ptr [rip+0]
+            g_jmpPrologue[1] = 0x25;
+            *(DWORD *)(g_jmpPrologue + 2) = 0;
+            *(void **)(g_jmpPrologue + 6) = (void *)&hookedCreateWindowExW;
+        }
+        // (Re)install the prologue jmp — the previous one-shot may have uninstalled it.
+        patchExecutableMemory(g_hookAddr, g_jmpPrologue, sizeof(g_jmpPrologue));
+        InterlockedExchange(&g_armNoRedir, 1);
+    }
 }
 
 #endif
