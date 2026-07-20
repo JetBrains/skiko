@@ -18,13 +18,13 @@ namespace node {
 // 2^30 was chosen because it's big enough, leaves quite a lot of room between it
 // and Float.MAX_VALUE, and also lets the width and height fit into int32 (just in
 // case).
-static const float PICTURE_MIN_VALUE = static_cast<float>(-(1L << 30));
-static const float PICTURE_MAX_VALUE = static_cast<float>((1L << 30) - 1);
-static SkRect PICTURE_BOUNDS {
-    PICTURE_MIN_VALUE,
-    PICTURE_MIN_VALUE,
-    PICTURE_MAX_VALUE,
-    PICTURE_MAX_VALUE
+static const float UNKNOWN_BOUNDS_MIN_VALUE = static_cast<float>(-(1L << 30));
+static const float UNKNOWN_BOUNDS_MAX_VALUE = static_cast<float>((1L << 30) - 1);
+static SkRect UNKNOWN_BOUNDS {
+    UNKNOWN_BOUNDS_MIN_VALUE,
+    UNKNOWN_BOUNDS_MIN_VALUE,
+    UNKNOWN_BOUNDS_MAX_VALUE,
+    UNKNOWN_BOUNDS_MAX_VALUE
 };
 
 static const float DEFAULT_CAMERA_DISTANCE = 8.0f;
@@ -224,7 +224,7 @@ const SkMatrix& RenderNode::getMatrix() {
 
 SkCanvas *RenderNode::beginRecording() {
     bool measureDrawBounds = !clip || shadowElevation > 0.0f;
-    const SkRect& bounds = measureDrawBounds ? PICTURE_BOUNDS : SkRect::MakeWH(this->bounds.width(), this->bounds.height());
+    const SkRect& bounds = measureDrawBounds ? UNKNOWN_BOUNDS : SkRect::MakeWH(this->bounds.width(), this->bounds.height());
     SkBBHFactory* bbhFactory = measureDrawBounds ? this->bbhFactory : nullptr;
     return this->recorder.beginRecording(bounds, bbhFactory);
 }
@@ -235,6 +235,32 @@ void RenderNode::endRecording() {
 
 void RenderNode::drawInto(SkCanvas* canvas) {
     canvas->drawDrawable(this);
+}
+
+SkRect RenderNode::onGetBounds() {
+    this->updateMatrix();
+    SkRect result;
+    if (this->contentCache) {
+        result = this->contentCache->getBounds().makeOffset(this->bounds.left(), this->bounds.top());
+    } else {
+        bool measureDrawBounds = !clip || shadowElevation > 0.0f;
+        result = measureDrawBounds ? UNKNOWN_BOUNDS : this->bounds;
+    }
+    if (!this->matrixIdentity) {
+        this->transformMatrix.mapRect(&result);
+    }
+    return result;
+}
+
+size_t RenderNode::onApproximateBytesUsed() {
+    size_t contentSize = 0;
+    if (this->contentCache) {
+        contentSize += this->contentCache->approximateBytesUsed();
+    }
+    if (this->clipPath) {
+        contentSize += this->clipPath->approximateBytesUsed();
+    }
+    return sizeof(*this) + contentSize;
 }
 
 void RenderNode::onDraw(SkCanvas* canvas) {
@@ -280,9 +306,6 @@ void RenderNode::onDraw(SkCanvas* canvas) {
     }
 }
 
-SkRect RenderNode::onGetBounds() {
-    return this->bounds;
-}
 
 sk_sp<SkPicture> RenderNode::onMakePictureSnapshot() {
     SkCanvas* canvas = this->beginRecording();

@@ -68,11 +68,11 @@ public:
 
     void drawInto(SkCanvas *canvas);
 
-    // SkDrawable
-    void onDraw(SkCanvas* canvas) override;
-    SkRect onGetBounds() override;
-
 protected:
+    // SkDrawable
+    SkRect onGetBounds() override;
+    size_t onApproximateBytesUsed() override;
+    void onDraw(SkCanvas* canvas) override;
     sk_sp<SkPicture> onMakePictureSnapshot() override;
 
 private:
