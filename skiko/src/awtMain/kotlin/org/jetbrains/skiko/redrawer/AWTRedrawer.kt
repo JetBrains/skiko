@@ -22,8 +22,21 @@ internal abstract class AWTRedrawer(
     protected var isDisposed = false
         private set
 
+    /**
+     * Whether the window is in live-resize mode.
+     */
+    @Volatile
+    internal var isInLiveResize: Boolean = false
+
     init {
         rendererAnalytics.init()
+    }
+
+    override fun onPlatformComponentResized() {
+        // During live resize, the layer tells us its size directly; the AWT size is not in sync
+        if (!isInLiveResize) {
+            super.onPlatformComponentResized()
+        }
     }
 
     override fun dispose() {

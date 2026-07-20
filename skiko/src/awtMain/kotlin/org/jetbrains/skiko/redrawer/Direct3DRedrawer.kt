@@ -2,13 +2,13 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.DirectContext
-import org.jetbrains.skia.ISize
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.Direct3DContextHandler
+import java.awt.Dimension
 
 internal class Direct3DRedrawer(
     private val layer: SkiaLayer,
@@ -44,34 +44,14 @@ internal class Direct3DRedrawer(
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
             .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
 
-        // Live resize is driven from the window, so only enable it when this layer covers the whole window.
-        // When embedded as a Swing component (fillsWindow = false), fall back to the legacy resize path.
         if (layer.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize) {
-            // Install the WndProc subclass that drives synchronous overlay presents during an interactive
-            // (drag) resize (see the native live-resize block).
             installLiveResizeHook(device, layer.windowHandle, layer.contentHandle)
         }
     }
 
-    // the live client size while we (the native modal resize loop) drive the resize; null otherwise. This
-    // is the single source of truth for "a live resize is in progress" (isInLiveResize below is derived from it):
-    //  - Non-null makes SkiaLayer report isHandlingSizing — the designed hook that stops AWT's reshape from
-    //    issuing its own renderImmediately/needRender during the drag (the overlay owns all rendering, so those
-    //    would be pure waste: an extra onRender per step). Mirrors Metal's layerSizeInLiveResize.
-    //  - isInLiveResize gates the normal Skia present path so the native WM_NCCALCSIZE/WM_PAINT present is the sole
-    //    writer to the swapchain during the drag.
-    // Set on the first resize step (drawFrameWhileLiveResizing, at WM_NCCALCSIZE — NOT at WM_ENTERSIZEMOVE, so plain moves
-    // keep animating the visible canvas), cleared at drag end.
-    @Volatile
-    private var layerSizeInLiveResize: ISize? = null
-    override val layerSizeWhileHandlingSizing: ISize? get() = layerSizeInLiveResize
-
-    internal val isInLiveResize: Boolean get() = layerSizeInLiveResize != null
-
     // called from native on the toolkit thread on WM_EXITSIZEMOVE.
     @Suppress("unused")
     private fun onLiveResizeEnded() {
-        layerSizeInLiveResize = null
         frameDispatcher.scheduleFrame() // resume the normal animation loop
     }
 
@@ -82,13 +62,12 @@ internal class Direct3DRedrawer(
     @Suppress("unused")
     private fun onLiveResizeFinalize() {
         EdtInvoker.invokeAndWaitWhilePumping {
-            try {
-                javax.swing.SwingUtilities.getWindowAncestor(layer)?.let { it.invalidate(); it.validate() }
-                layerSizeInLiveResize = null // clear BEFORE renderImmediately so it uses the real backedLayer size
-                renderImmediately() // render the canvas at the final size before it's revealed
-            } catch (t: Throwable) {
-                t.printStackTrace()
+            javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
+                it.invalidate()
+                it.validate()
             }
+            isInLiveResize = false
+            renderImmediately() // render the canvas at the final size before it's revealed
         }
     }
 
@@ -102,16 +81,25 @@ internal class Direct3DRedrawer(
     // analog of the Metal fix's LWCToolkit.invokeAndWait; de-risks the toolkit→EDT hop during the modal loop.
     @Suppress("unused")
     private fun drawFrameWhileLiveResizing(width: Int, height: Int) {
-        // Report the live size so SkiaLayer.isHandlingSizing is true — AWT's reshape then skips its own
-        // renderImmediately/needRender for the duration of the drag (the overlay is the sole renderer).
-        layerSizeInLiveResize = ISize(width, height)
+        isInLiveResize = true
+
         // onRender requires the EDT, but we're on the toolkit thread. Run the render on the EDT and block here
         // until it finishes — so the present still completes before WM_NCCALCSIZE returns (atomicity preserved).
         EdtInvoker.invokeAndWaitWhilePumping {
-            try {
-                renderLiveResizeFrame()
-            } catch (t: Throwable) {
-                t.printStackTrace()
+            if (isDisposed) return@invokeAndWaitWhilePumping
+            synchronized(drawLock) {
+                // The differences from the usual path are the target surface and the present:
+                //  - contextHandler.draw() renders into the frame overlay surface, which
+                //    Direct3DContextHandler.initCanvas selects (instead of the usual swapchain surface) while
+                //    isInLiveResize;
+                //  - presentLiveResizeFrame() presents the overlay comp-swapchain synchronously in WM_NCCALCSIZE
+                //    (vs swap()).
+                val size = Dimension(width, height)
+                update(forcedSize = size)
+                inDrawScope(forcedSize = size) {
+                    contextHandler.draw()
+                    presentLiveResizeFrame(properties.isVsyncEnabled)
+                }
             }
         }
     }
@@ -122,21 +110,6 @@ internal class Direct3DRedrawer(
     private val frameSurfaces = arrayOfNulls<Surface>(2)
     private var frameWidth = 0
     private var frameHeight = 0
-
-    private fun renderLiveResizeFrame(): Unit = synchronized(drawLock) {
-        if (isDisposed) return
-        // Exactly the shape of renderImmediately()/drawAndSwap: record the frame (update), then draw + present.
-        // The ONLY differences from the on-screen path are the target surface and the present:
-        //  - contextHandler.draw() renders into the frame overlay surface, which Direct3DContextHandler.initCanvas
-        //    selects (instead of the on-screen swapchain surface) while isInLiveResize;
-        //  - presentLiveResizeFrame() presents the overlay comp-swapchain synchronously in WM_NCCALCSIZE (vs swap()).
-        // inDrawScope wraps it so it ticks the FPS counter and per-frame analytics like any normal frame.
-        update()
-        inDrawScope {
-            contextHandler.draw()
-            presentLiveResizeFrame(properties.isVsyncEnabled)
-        }
-    }
 
     // Current frame-overlay surface for the live-resize draw; (re)creates the cached per-buffer surfaces on a
     // size change (mirrors Direct3DContextHandler's on-screen surface caching — re-wrapping a fresh SkSurface
@@ -152,7 +125,8 @@ internal class Direct3DRedrawer(
                 if (p == 0L) return null
                 frameSurfaces[i] = Surface(p)
             }
-            frameWidth = width; frameHeight = height
+            frameWidth = width
+            frameHeight = height
         }
         return frameSurfaces[liveResizeBufferIndex()]
     }
@@ -183,7 +157,11 @@ internal class Direct3DRedrawer(
         // resize loop) — an async EDT present corrupts the flip swapchain. Route needRender to a coalesced toolkit
         // present (postLiveResizeRender), which self-gates to fire only when a resize step isn't already presenting
         // (i.e. a stationary hold). Active-drag animation is driven by the WM_NCCALCSIZE renders themselves.
-        if (isInLiveResize) postLiveResizeRender() else frameDispatcher.scheduleFrame()
+        if (isInLiveResize) {
+            postLiveResizeRender()
+        } else {
+            frameDispatcher.scheduleFrame()
+        }
     }
 
     override fun renderImmediately() {
@@ -205,7 +183,7 @@ internal class Direct3DRedrawer(
     }
 
     private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
-        if (isDisposed || isInLiveResize) { // `isInLiveResize` gate
+        if (isDisposed || isInLiveResize) {
             return
         }
         contextHandler.draw()

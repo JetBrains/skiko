@@ -68,12 +68,6 @@ internal class MetalRedrawer(
     private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
     @Volatile private var isWindowOccluded = false
 
-    /**
-     * Whether the window is in live-resize mode.
-     */
-    @Volatile
-    private var isInLiveResize: Boolean = false
-
     init {
         onDeviceChosen(adapter.name)
         val numberOfBuffers = properties.frameBuffering.numberOfBuffers() ?: 0 // zero means default for system
@@ -202,13 +196,6 @@ internal class MetalRedrawer(
             if (!isDisposed) {
                 needRender(throttledToVsync = false)
             }
-        }
-    }
-
-    override fun onPlatformComponentResized() {
-        // During live resize, the layer tells us its size directly; the AWT size is not in sync
-        if (!isInLiveResize) {
-            super.onPlatformComponentResized()
         }
     }
 

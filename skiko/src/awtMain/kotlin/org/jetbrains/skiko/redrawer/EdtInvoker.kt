@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skiko.Library
+import org.jetbrains.skiko.Logger
 
 /**
  * Runs a block on the AWT event dispatch thread (EDT) from another thread — e.g. the Windows toolkit thread
@@ -38,6 +39,9 @@ internal class EdtInvocationTask(
     override fun run() {
         try {
             runnable.run()
+        } catch (t: Throwable) {
+            // Don't crash the EDT thread
+            Logger.error(t) { "Exception while running task on EDT" }
         } finally {
             signalDone(doneEvent)
         }
