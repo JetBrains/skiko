@@ -157,10 +157,8 @@ internal class MetalRedrawer(
                 performDraw(finishFrame = false)
             }
         }
-        synchronized(drawLock) {
-            if (!isDisposed) {
-                contextHandler.finishFrameBeforeShown()
-            }
+        performNativeDrawAction {
+            contextHandler.finishFrameSync()
         }
     }
 
@@ -193,14 +191,10 @@ internal class MetalRedrawer(
     }
 
     private fun LayerDrawScope.performDraw(finishFrame: Boolean = true) {
-        synchronized(drawLock) {
-            if (!isDisposed) {
-                autoreleasepool {
-                    contextHandler.draw()
-                    if (finishFrame) {
-                        contextHandler.finishFrame()
-                    }
-                }
+        performNativeDrawAction {
+            contextHandler.draw()
+            if (finishFrame) {
+                contextHandler.finishFrameAsync()
             }
         }
     }
@@ -262,7 +256,7 @@ internal class MetalRedrawer(
         // The present must run on the AppKit main thread to join the resize transaction
         synchronized(drawLock) {
             if (!isDisposed) {
-                contextHandler.finishFrameInLiveResize()
+                contextHandler.finishFrameSync()
             }
         }
     }
@@ -296,6 +290,19 @@ internal class MetalRedrawer(
     override fun setVisible(isVisible: Boolean) {
         Logger.debug { "MetalRedrawer#setVisible($isVisible)" }
         setLayerVisible(device.ptr, isVisible)
+    }
+
+    /**
+     * Wraps [block] in the necessary machinery needed to call native, drawing-related, code.
+     */
+    private inline fun performNativeDrawAction(block: () -> Unit) {
+        synchronized(drawLock) {
+            if (!isDisposed) {
+                autoreleasepool {  // This is needed only if the call is not on the AppKit thread
+                    block()
+                }
+            }
+        }
     }
 
     private external fun createMetalDevice(window: Long, transparency: Boolean, frameBuffering: Int, adapter: Long, platformInfo: Long, liveResizeEnabled: Boolean): Long
