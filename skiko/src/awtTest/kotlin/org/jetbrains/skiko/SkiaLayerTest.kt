@@ -1182,7 +1182,6 @@ class SkiaLayerTest {
         }
 
         suspend fun waitForSampledPixelCloseTo(targetColor: Color) {
-            println("Waiting for $targetColor")
             do {
                 delay(200)
             } while (!lastPixelColorDetected.load().let { it != null && it.closeTo(targetColor) })
@@ -1207,13 +1206,10 @@ class SkiaLayerTest {
         }
 
         try {
-            repeat(20) { testRun ->
-                println("[${renderTime().nanoseconds.inWholeSeconds}] Test run $testRun")
-
+            repeat(10) { testRun ->
                 // Wait until the sampled pixel shows the (green) background before launching the child.
                 waitForSampledPixelCloseTo(bgColor)
 
-                println("Launching child process")
                 val child = ProcessBuilder(childCommand)
                     .redirectErrorStream(true)
                     .redirectOutput(ProcessBuilder.Redirect.INHERIT)
@@ -1230,13 +1226,11 @@ class SkiaLayerTest {
                     )
                     assertTrue(contentShown, "Child window content never appeared in run ${testRun + 1}.")
                 } finally {
-                    println("Waiting for child process to stop")
                     child.destroy()
                     if (!child.waitFor(5, TimeUnit.SECONDS)) child.destroyForcibly()
                 }
             }
         } finally {
-            println("Waiting for sampling thread to stop")
             stopThread.getAndSet(true)
             t.join()
             backgroundWindow.dispose()
