@@ -466,18 +466,25 @@ void RenderNode::releaseDependencies() {
 }
 
 void RenderNode::updateDependencies() {
+    // Tracking exists to invalidate the snapshots that inline this node, so it is only
+    // worth its replay of the recording where snapshots are taken at all.
+    if (!this->context->shouldUseSnapshotCache()) {
+        return;
+    }
     this->releaseDependencies();
+    if (this->contentCache) {
+        DependencyTrackerCanvas dependencyTracker(&this->dependencies);
+        this->contentCache->draw(&dependencyTracker);
 
-    DependencyTrackerCanvas dependencyTracker(&this->dependencies);
-    this->contentCache->draw(&dependencyTracker);
-
-    for (auto renderNode : this->dependencies) {
-        renderNode->observers.insert(this);
+        for (auto renderNode : this->dependencies) {
+            renderNode->observers.insert(this);
+        }
     }
 }
 
 void RenderNode::updateSnapshot() {
-    if (!this->contentTransformInvariant || !this->contentCache || this->contentSnapshot) {
+    if (!this->context->shouldUseSnapshotCache() || !this->contentTransformInvariant ||
+        !this->contentCache || this->contentSnapshot) {
         return;
     }
 
