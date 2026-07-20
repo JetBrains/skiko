@@ -16,6 +16,7 @@ import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
+import org.jetbrains.skiko.redrawer.renderTime
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -53,6 +54,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("SameParameterValue")
@@ -1255,6 +1257,7 @@ class SkiaLayerTest {
         }
 
         suspend fun waitForSampledPixelCloseTo(targetColor: Color) {
+            println("Waiting for $targetColor")
             do {
                 delay(200)
             } while (!lastPixelColorDetected.load().let { it != null && it.closeTo(targetColor) })
@@ -1280,9 +1283,12 @@ class SkiaLayerTest {
 
         try {
             repeat(20) { testRun ->
+                println("[${renderTime().nanoseconds.inWholeSeconds}] Test run $testRun")
+
                 // Wait until the sampled pixel shows the (green) background before launching the child.
                 waitForSampledPixelCloseTo(bgColor)
 
+                println("Launching child process")
                 val child = ProcessBuilder(childCommand)
                     .redirectErrorStream(true)
                     .redirectOutput(ProcessBuilder.Redirect.INHERIT)
@@ -1299,11 +1305,13 @@ class SkiaLayerTest {
                     )
                     assertTrue(contentShown, "Child window content never appeared in run ${testRun + 1}.")
                 } finally {
+                    println("Waiting for child process to stop")
                     child.destroy()
                     if (!child.waitFor(5, TimeUnit.SECONDS)) child.destroyForcibly()
                 }
             }
         } finally {
+            println("Waiting for sampling thread to stop")
             stopThread.getAndSet(true)
             t.join()
             backgroundWindow.dispose()
