@@ -30,6 +30,14 @@ static SkRect UNKNOWN_BOUNDS {
 static const float DEFAULT_CAMERA_DISTANCE = 8.0f;
 static const float NON_ZERO_EPSILON = 0.001f;
 
+// Since "kSkDrawable_Type" isn't really used anywhere outside of serialization, we can use it
+// to identify RenderNode objects without RTTI, like SkRuntimeEffect does (even without adding to original enum).
+static const SkFlattenable::Type kRenderNode_Type = static_cast<SkFlattenable::Type>(0x2d2595b6);
+// The value has to stay outside the range Skia assigns, or a node is mistaken for a
+// flattenable of that type. kSkShader_Type is the largest Skia declares.
+static_assert(static_cast<uint32_t>(kRenderNode_Type) > static_cast<uint32_t>(SkFlattenable::kSkShader_Type),
+              "kRenderNode_Type must stay above the SkFlattenable::Type values Skia declares");
+
 /**
  * Check for floats that are close enough to zero.
  */
@@ -42,7 +50,6 @@ inline static bool isZero(float value) {
 static SkColor multiplyAlpha(SkColor color, float alpha) {
     return SkColorSetA(color, alpha * SkColorGetA(color));
 }
-
 
 class UnrollDrawableCanvas : public SkNWayCanvas {
 public:
@@ -76,11 +83,39 @@ private:
     float alpha;
 };
 
+// Collects the render nodes drawn by a recording, taking a reference to each.
+// The set is expected to be empty on entry.
+class DependencyTrackerCanvas : public SkNoDrawCanvas {
+public:
+    DependencyTrackerCanvas(std::set<RenderNode *> *dependencies)
+        : SkNoDrawCanvas(INT_MAX, INT_MAX), dependencies(dependencies) {}
+
+protected:
+    void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) override {
+        if (drawable->getFlattenableType() == kRenderNode_Type) {
+            auto renderNode = static_cast<RenderNode *>(drawable);
+            if (dependencies->insert(renderNode).second) {
+                renderNode->ref();
+            }
+        } else {
+            drawable->draw(this, matrix);
+        }
+    }
+
+private:
+    std::set<RenderNode *> *dependencies;
+};
+
 RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
     : context(context),
       bbhFactory(context->shouldMeasureDrawBounds() ? new SkRTreeFactory() : nullptr),
       recorder(),
       contentCache(),
+      contentSnapshot(),
+      contentTransformInvariant(true),
+      observersNotified(false),
+      dependencies(),
+      observers(),
       layerPaint(),
       bounds { 0.0f, 0.0f, 0.0f, 0.0f },
       pivot { SK_FloatNaN, SK_FloatNaN },
@@ -113,71 +148,97 @@ RenderNode::~RenderNode() {
         delete this->bbhFactory;
         this->bbhFactory = nullptr;
     }
+    // The observers set is necessarily empty: an observer holds a reference to this
+    // node through its own dependencies, so it cannot outlive it.
+    this->releaseDependencies();
 }
 
 void RenderNode::setLayerPaint(const std::optional<SkPaint>& layerPaint) {
     this->layerPaint = layerPaint;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setBounds(const SkRect& bounds) {
     this->bounds = bounds;
     this->matrixDirty = true;
+    // The bounds size is the cull rect of a clipping node's recording.
+    this->invalidateSnapshot(kContent);
 }
 
 void RenderNode::setPivot(const SkPoint& pivot) {
     this->pivot = pivot;
     this->matrixDirty = true;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setAlpha(float alpha) {
     this->alpha = alpha;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setScaleX(float scaleX) {
     this->scaleX = scaleX;
     this->matrixDirty = true;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setScaleY(float scaleY) {
     this->scaleY = scaleY;
     this->matrixDirty = true;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setTranslationX(float translationX) {
     this->translationX = translationX;
     this->matrixDirty = true;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setTranslationY(float translationY) {
     this->translationY = translationY;
     this->matrixDirty = true;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setShadowElevation(float shadowElevation) {
+    bool wasPreventingObserverSnapshot = this->preventsObserverSnapshot();
     this->shadowElevation = shadowElevation;
+    // A shadow makes this node's drawing transform-dependent, which its observers read
+    // when deciding whether they may snapshot, so a change to it has to reach them even
+    // if they were already told stale this frame.
+    if (this->preventsObserverSnapshot() != wasPreventingObserverSnapshot) {
+        this->observersNotified = false;
+    }
+    // A shadow also lets the node draw outside its bounds, widening the cull rect.
+    this->invalidateSnapshot(kContent);
 }
 
 void RenderNode::setAmbientShadowColor(SkColor ambientShadowColor) {
     this->ambientShadowColor = ambientShadowColor;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setSpotShadowColor(SkColor spotShadowColor) {
     this->spotShadowColor = spotShadowColor;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setRotationX(float rotationX) {
     this->rotationX = rotationX;
     this->matrixDirty = true;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setRotationY(float rotationY) {
     this->rotationY = rotationY;
     this->matrixDirty = true;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setRotationZ(float rotationZ) {
     this->rotationZ = rotationZ;
     this->matrixDirty = true;
+    this->invalidateSnapshot(kAppearance);
 }
 
 float RenderNode::getCameraDistance() const {
@@ -187,6 +248,7 @@ float RenderNode::getCameraDistance() const {
 void RenderNode::setCameraDistance(float cameraDistance) {
     this->setCameraLocation(0.0f, 0.0f, cameraDistance);
     this->matrixDirty = true;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setClipRect(const std::optional<SkRect>& clipRect, SkClipOp op, bool doAntiAlias) {
@@ -195,6 +257,7 @@ void RenderNode::setClipRect(const std::optional<SkRect>& clipRect, SkClipOp op,
     this->clipPath.reset();
     this->clipOp = op;
     this->clipAntiAlias = doAntiAlias;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setClipRRect(const std::optional<SkRRect>& clipRRect, SkClipOp op, bool doAntiAlias) {
@@ -203,6 +266,7 @@ void RenderNode::setClipRRect(const std::optional<SkRRect>& clipRRect, SkClipOp 
     this->clipPath.reset();
     this->clipOp = op;
     this->clipAntiAlias = doAntiAlias;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setClipPath(const std::optional<SkPath>& clipPath, SkClipOp op, bool doAntiAlias) {
@@ -211,10 +275,13 @@ void RenderNode::setClipPath(const std::optional<SkPath>& clipPath, SkClipOp op,
     this->clipPath = clipPath;
     this->clipOp = op;
     this->clipAntiAlias = doAntiAlias;
+    this->invalidateSnapshot(kAppearance);
 }
 
 void RenderNode::setClip(bool clip) {
     this->clip = clip;
+    // Clipping bounds the recording's cull rect to the node's own bounds.
+    this->invalidateSnapshot(kContent);
 }
 
 const SkMatrix& RenderNode::getMatrix() {
@@ -222,19 +289,37 @@ const SkMatrix& RenderNode::getMatrix() {
     return this->transformMatrix;
 }
 
-SkCanvas *RenderNode::beginRecording() {
-    bool measureDrawBounds = !clip || shadowElevation > 0.0f;
+bool RenderNode::mayDrawOutOfBounds() const {
+    return !this->clip || this->shadowElevation > 0.0f;
+}
+
+// The content cache and the snapshot recorded from it have to agree on the cull rect
+// and the bounding hierarchy, or the two cull differently and report different bounds.
+// They cannot share a recorder: the snapshot is taken while the member one may be
+// mid-recording.
+SkCanvas *RenderNode::beginRecordingInto(SkPictureRecorder& target) {
+    bool measureDrawBounds = this->mayDrawOutOfBounds();
     const SkRect& bounds = measureDrawBounds ? UNKNOWN_BOUNDS : SkRect::MakeWH(this->bounds.width(), this->bounds.height());
     SkBBHFactory* bbhFactory = measureDrawBounds ? this->bbhFactory : nullptr;
-    return this->recorder.beginRecording(bounds, bbhFactory);
+    return target.beginRecording(bounds, bbhFactory);
+}
+
+SkCanvas *RenderNode::beginRecording() {
+    return this->beginRecordingInto(this->recorder);
 }
 
 void RenderNode::endRecording() {
     this->contentCache = this->recorder.finishRecordingAsDrawable();
+    this->updateDependencies();
+    this->invalidateSnapshot(kContent | kDependencies);
 }
 
 void RenderNode::drawInto(SkCanvas* canvas) {
     canvas->drawDrawable(this);
+}
+
+SkFlattenable::Type RenderNode::getFlattenableType() const {
+    return kRenderNode_Type;
 }
 
 SkRect RenderNode::onGetBounds() {
@@ -243,8 +328,7 @@ SkRect RenderNode::onGetBounds() {
     if (this->contentCache) {
         result = this->contentCache->getBounds().makeOffset(this->bounds.left(), this->bounds.top());
     } else {
-        bool measureDrawBounds = !clip || shadowElevation > 0.0f;
-        result = measureDrawBounds ? UNKNOWN_BOUNDS : this->bounds;
+        result = this->mayDrawOutOfBounds() ? UNKNOWN_BOUNDS : this->bounds;
     }
     if (!this->matrixIdentity) {
         this->transformMatrix.mapRect(&result);
@@ -257,6 +341,12 @@ size_t RenderNode::onApproximateBytesUsed() {
     if (this->contentCache) {
         contentSize += this->contentCache->approximateBytesUsed();
     }
+    if (this->contentSnapshot) {
+        // A snapshot references the snapshots nested in it rather than copying them, and
+        // SkPicture already counts those, so the figure reported here covers the subtree
+        // and must not be summed with the figures its dependencies report.
+        contentSize += this->contentSnapshot->approximateBytesUsed();
+    }
     if (this->clipPath) {
         contentSize += this->clipPath->approximateBytesUsed();
     }
@@ -265,6 +355,9 @@ size_t RenderNode::onApproximateBytesUsed() {
 
 void RenderNode::onDraw(SkCanvas* canvas) {
     this->updateMatrix();
+    // Whatever records this draw inlines the node afresh, so its next change must be
+    // relayed to the observers again.
+    this->observersNotified = false;
 
     canvas->translate(this->bounds.left(), this->bounds.top());
     if (!this->matrixIdentity) {
@@ -299,14 +392,23 @@ void RenderNode::onDraw(SkCanvas* canvas) {
     }
 
     if (this->alpha < 1.0f && !this->layerPaint) {
+        // Modulating alpha at replay time has to reach every recorded paint, which
+        // means unrolling the content. A snapshot is only cheap while it is replayed
+        // whole, so this path neither records nor uses one.
         AlphaModulateFilterCanvas alphaCanvas(canvas, this->alpha);
         alphaCanvas.drawDrawable(this->contentCache.get());
     } else {
-        canvas->drawDrawable(this->contentCache.get());
+        this->updateSnapshot();
+        if (this->contentSnapshot) {
+            canvas->drawPicture(this->contentSnapshot.get());
+        } else {
+            canvas->drawDrawable(this->contentCache.get());
+        }
     }
 }
 
-
+// The shadow is drawn against the context's light geometry, which is expressed in the
+// coordinate space the resulting picture is replayed in.
 sk_sp<SkPicture> RenderNode::onMakePictureSnapshot() {
     SkCanvas* canvas = this->beginRecording();
     UnrollDrawableCanvas unrollCanvas(canvas);
@@ -350,6 +452,87 @@ void RenderNode::updateMatrix() {
     }
     this->matrixDirty = false;
     this->matrixIdentity = this->transformMatrix.isIdentity();
+}
+
+// Maintains the invariant `node in dep->observers` iff `dep in node->dependencies`.
+// Only dependencies holds references: an observer registration is a bare back
+// pointer, so that a parent drawing a child does not form a reference cycle.
+void RenderNode::releaseDependencies() {
+    for (auto renderNode : this->dependencies) {
+        renderNode->observers.erase(this);
+        renderNode->unref();
+    }
+    this->dependencies.clear();
+}
+
+void RenderNode::updateDependencies() {
+    this->releaseDependencies();
+
+    DependencyTrackerCanvas dependencyTracker(&this->dependencies);
+    this->contentCache->draw(&dependencyTracker);
+
+    for (auto renderNode : this->dependencies) {
+        renderNode->observers.insert(this);
+    }
+}
+
+void RenderNode::updateSnapshot() {
+    if (!this->contentTransformInvariant || !this->contentCache || this->contentSnapshot) {
+        return;
+    }
+
+    SkPictureRecorder snapshotRecorder;
+    SkCanvas* recordingCanvas = this->beginRecordingInto(snapshotRecorder);
+    // Force unrolling all drawables to avoid nested snapshotting.
+    UnrollDrawableCanvas unrollCanvas(recordingCanvas);
+    this->contentCache->draw(&unrollCanvas);
+    this->contentSnapshot = snapshotRecorder.finishRecordingAsPicture();
+}
+
+bool RenderNode::drawsTransformDependentContent() const {
+    return this->shadowElevation > 0.0f;
+}
+
+bool RenderNode::preventsObserverSnapshot() const {
+    return this->drawsTransformDependentContent() || !this->contentTransformInvariant;
+}
+
+// Snapshots hold the recorded content only: the transform, clip, layer, alpha and
+// shadow are applied around them in onDraw, so which of those changed decides whether
+// this node's own snapshot survives. None of them leaves the snapshots that inlined
+// this node's drawing valid, so those are dropped whatever the change was.
+void RenderNode::invalidateSnapshot(uint32_t changes) {
+    this->notifyDrawingChanged();
+
+    if (changes & kDependencies) {
+        bool wasPreventingObserverSnapshot = this->preventsObserverSnapshot();
+        this->contentTransformInvariant = true;
+        for (auto renderNode : this->dependencies) {
+            if (renderNode->preventsObserverSnapshot()) {
+                this->contentTransformInvariant = false;
+                break;
+            }
+        }
+        // Observers derive their own snapshottability from this bit, so a change to it has
+        // to reach them even if they were already told stale this frame.
+        if (this->preventsObserverSnapshot() != wasPreventingObserverSnapshot) {
+            this->observersNotified = false;
+        }
+    }
+    if (changes & kContent) {
+        this->contentSnapshot.reset();
+    }
+
+    // Observers inlined this node's drawing when they recorded, so they hold a stale copy
+    // until they record again -- which redraws this node and clears the flag below. One
+    // notification per draw is enough to invalidate them, and telling them once instead of
+    // once per observer path bounds the walk when a node is drawn through several of them.
+    if (!this->observersNotified) {
+        this->observersNotified = true;
+        for (auto renderNode : this->observers) {
+            renderNode->invalidateSnapshot(kContent | kDependencies);
+        }
+    }
 }
 
 void RenderNode::drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo) {

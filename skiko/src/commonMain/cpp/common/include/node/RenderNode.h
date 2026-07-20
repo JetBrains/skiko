@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include <set>
 #include <SkBBHFactory.h>
 #include <SkCamera.h>
 #include <SkCanvas.h>
@@ -68,6 +69,8 @@ public:
 
     void drawInto(SkCanvas *canvas);
 
+    SkFlattenable::Type getFlattenableType() const override;
+
 protected:
     // SkDrawable
     SkRect onGetBounds() override;
@@ -76,7 +79,34 @@ protected:
     sk_sp<SkPicture> onMakePictureSnapshot() override;
 
 private:
+    // What changed about a node, as far as snapshot bookkeeping is concerned.
+    enum SnapshotChange : uint32_t {
+        // Drawing applied around the snapshot: transform, clip, layer, alpha. This
+        // node's own snapshot stays valid; the snapshots that inlined it do not.
+        kAppearance = 1 << 0,
+        // The recorded content, or the cull rect it is recorded with.
+        kContent = 1 << 1,
+        // The set of drawn nodes, or what they draw, may differ, so re-derive from
+        // the current dependencies whether this content can be snapshotted.
+        kDependencies = 1 << 2,
+    };
+
+    SkCanvas *beginRecordingInto(SkPictureRecorder& target);
+    // Whether the content may cover more than the node's own bounds, and so has to be
+    // measured while recording instead of being culled to them.
+    bool mayDrawOutOfBounds() const;
+    // Whether this node's own drawing only replays correctly at the transform it was
+    // recorded under, which bars every node that inlines it from snapshotting too.
+    bool drawsTransformDependentContent() const;
+    // Whether an observer that inlines this node cannot snapshot the result: true when this
+    // node draws a shadow, or when anything in its own content does. This is the single bit
+    // an observer reads from each of its dependencies.
+    bool preventsObserverSnapshot() const;
     void updateMatrix();
+    void updateDependencies();
+    void releaseDependencies();
+    void updateSnapshot();
+    void invalidateSnapshot(uint32_t changes);
     void drawShadow(SkCanvas *canvas, const LightGeometry& lightGeometry, const LightInfo& lightInfo);
     void setCameraLocation(float x, float y, float z);
 
@@ -85,6 +115,20 @@ private:
     SkBBHFactory *bbhFactory;
     SkPictureRecorder recorder;
     sk_sp<SkDrawable> contentCache;
+    sk_sp<SkPicture> contentSnapshot;
+    // Whether the recorded content replays correctly under any transform, and so may be
+    // snapshotted at all. Cleared by drawing whose result depends on the transform it is
+    // replayed under -- today only a shadow, whose spot geometry follows the occluder's
+    // position relative to a light fixed in device space, so replaying the recording
+    // anywhere else yields a different shadow.
+    bool contentTransformInvariant;
+    // Whether the observers have already been told, since this node was last drawn, that
+    // their inlined copy of it is stale. Lets a node reached through several observer paths
+    // propagate once instead of once per path. Cleared when the node is drawn (they inline
+    // it afresh) and when preventsObserverSnapshot() flips (they must re-derive).
+    bool observersNotified;
+
+    std::set<RenderNode *> dependencies, observers;
 
     std::optional<SkPaint> layerPaint;
     SkRect bounds;
