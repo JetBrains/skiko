@@ -1127,7 +1127,7 @@ class SkiaLayerTest {
     }
 
     @OptIn(ExperimentalAtomicApi::class)
-    @Test
+    @Test(timeout = 120000)
     fun `no window flash on first show`() = uiTest {
         // Until the issue is fixed in other redrawers
         // Don't use assumeTrue, as uiTest iterates over multiple renderers,
