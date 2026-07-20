@@ -259,7 +259,7 @@ fun SkikoProjectContext.declareWasmTasks() {
             if (optimizedFile.exists()) {
                 wasmFile.delete()
                 optimizedFile.renameTo(wasmFile)
-                println("WASM optimized: ${optimizedFile.length() / 1024} KB")
+                println("WASM optimized: ${wasmFile.length() / 1024} KB")
             }
         }
     }
