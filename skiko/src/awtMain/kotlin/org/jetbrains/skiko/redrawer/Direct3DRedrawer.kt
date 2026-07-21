@@ -44,7 +44,14 @@ internal class Direct3DRedrawer(
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
             .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
 
-        if (layer.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize) {
+        // The synchronous live-resize overlay only composites cleanly on a frame created WITHOUT a DWM
+        // redirection surface (WS_EX_NOREDIRECTIONBITMAP) — on a redirected frame the shrink case still bleeds
+        // white. Whether the frame has that ex-style depends on the runtime (a JBR that honors the
+        // "jbr.window.noRedirectionBitmap" window property Compose sets). Detect it directly on the realized
+        // frame HWND rather than guessing from the JVM; if it's absent, skip the hook and fall back to the
+        // normal async path (no regression).
+        if (layer.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize &&
+            frameHasNoRedirectionBitmap(layer.windowHandle)) {
             installLiveResizeHook(device, layer.windowHandle, layer.contentHandle)
         }
     }
@@ -236,6 +243,10 @@ internal class Direct3DRedrawer(
     private external fun initFence(device: Long)
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long
+
+    // True iff the top-level window (GA_ROOT of `window`) was created with WS_EX_NOREDIRECTIONBITMAP. Gates the
+    // live-resize hook: the overlay only composites cleanly on a non-redirected frame.
+    private external fun frameHasNoRedirectionBitmap(window: Long): Boolean
 
     // Installs a WndProc subclass on the top-level window (GA_ROOT of `window`) that, during an interactive
     // resize, renders the real content into the frame's overlay swapchain and presents it synchronously.
