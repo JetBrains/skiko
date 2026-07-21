@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.InternalSkikoApi
 
 class Surface : RefCnt {
     companion object {
@@ -1008,7 +1009,8 @@ class Surface : RefCnt {
             reachabilityBarrier(this)
         }
 
-    internal constructor(ptr: NativePointer) : super(ptr) {
+    @InternalSkikoApi
+    constructor(ptr: NativePointer) : super(ptr) {
         _context = null
         _renderTarget = null
     }
