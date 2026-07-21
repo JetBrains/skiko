@@ -6,6 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.internal.fastForEach
+import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
@@ -422,6 +423,19 @@ actual open class SkiaLayer internal constructor(
     override fun reshape(x: Int, y: Int, w: Int, h: Int) {
         @Suppress("DEPRECATION")
         super.reshape(x, y, w, h)
+
+        // Calling renderImmediately as early as possible improves the situation with
+        // the visual glitch when the drawn content is scaled during window resize.
+        // Note, however, that this actually causes the reverse glitch (content appears
+        // scaled in the other direction from the window size), but this seems to
+        // happen less often.
+        //
+        // Calling redraw during layout might break software renderers,
+        // so apply this fix only for the Direct3D case.
+        if (isShowing && (redrawer as? Direct3DRedrawer)?.isInLiveResize != true) {
+            redrawer?.syncBoundsFromPlatformComponent()
+            redrawer?.renderImmediately()
+        }
 
         // Setting the bounds of children should be done only in the layout pass,
         // but unfortunately, Compose expects the drawing area to be resized
