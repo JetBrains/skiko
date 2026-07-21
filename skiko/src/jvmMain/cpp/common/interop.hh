@@ -314,7 +314,9 @@ namespace skija {
     }
 
     namespace SurfaceProps {
-        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(JNIEnv* env, jintArray surfacePropsInts);
+        SKIKO_JVM_EXPORT std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(
+                JNIEnv* env,
+                jintArray surfacePropsInts);
     }
 
     namespace SamplingMode {
