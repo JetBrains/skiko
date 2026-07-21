@@ -13,7 +13,7 @@ import kotlin.js.JsAny
 import kotlin.js.js
 
 internal fun skikoArrayBuffer(skikoWasm: JsAny): ArrayBuffer =
-    js("skikoWasm.HEAPU8.buffer")
+    js("skikoWasm.wasmExports.memory.buffer")
 
 internal suspend fun copyBufferToSkiko(
     src: ArrayBuffer

@@ -46,6 +46,13 @@ const awaitSkikoCore = loadSkikoWASM().then((module) => {
         return originalLocateFile(path, prefix);
     };
     loadedWasm._ = module.wasmExports;
+    if (!module.wasmExports.memory) {
+        module.wasmExports.memory = {
+            get buffer() {
+                return module.HEAPU8.buffer;
+            }
+        };
+    }
     skikoGl = module.GL;
     return module;
 });
