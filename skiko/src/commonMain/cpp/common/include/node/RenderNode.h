@@ -1,6 +1,6 @@
 #pragma once
 #include <optional>
-#include <set>
+#include <unordered_set>
 #include <SkBBHFactory.h>
 #include <SkCamera.h>
 #include <SkCanvas.h>
@@ -128,7 +128,7 @@ private:
     // it afresh) and when preventsObserverSnapshot() flips (they must re-derive).
     bool observersNotified;
 
-    std::set<RenderNode *> dependencies, observers;
+    std::unordered_set<RenderNode *> dependencies, observers;
 
     std::optional<SkPaint> layerPaint;
     SkRect bounds;

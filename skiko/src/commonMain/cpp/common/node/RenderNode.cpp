@@ -87,14 +87,14 @@ private:
 // The set is expected to be empty on entry.
 class DependencyTrackerCanvas : public SkNoDrawCanvas {
 public:
-    DependencyTrackerCanvas(std::set<RenderNode *> *dependencies)
+    DependencyTrackerCanvas(std::unordered_set<RenderNode *>& dependencies)
         : SkNoDrawCanvas(INT_MAX, INT_MAX), dependencies(dependencies) {}
 
 protected:
     void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) override {
         if (drawable->getFlattenableType() == kRenderNode_Type) {
             auto renderNode = static_cast<RenderNode *>(drawable);
-            if (dependencies->insert(renderNode).second) {
+            if (dependencies.insert(renderNode).second) {
                 renderNode->ref();
             }
         } else {
@@ -103,7 +103,7 @@ protected:
     }
 
 private:
-    std::set<RenderNode *> *dependencies;
+    std::unordered_set<RenderNode *>& dependencies;
 };
 
 RenderNode::RenderNode(const sk_sp<RenderNodeContext>& context)
@@ -473,7 +473,7 @@ void RenderNode::updateDependencies() {
     }
     this->releaseDependencies();
     if (this->contentCache) {
-        DependencyTrackerCanvas dependencyTracker(&this->dependencies);
+        DependencyTrackerCanvas dependencyTracker(this->dependencies);
         this->contentCache->draw(&dependencyTracker);
 
         for (auto renderNode : this->dependencies) {
