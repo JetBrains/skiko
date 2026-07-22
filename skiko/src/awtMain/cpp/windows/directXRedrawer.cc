@@ -67,7 +67,7 @@ public:
         gr_cp<IDXGISwapChain1> swapChain1;
         CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
         HRESULT result = S_OK;
-        // NONE only for the redirected-frame fallback (where the WM_NCCALCSIZE pre-render fills the content each
+        // NONE only when the synchronous live-resize hook is installed (where the WM_NCCALCSIZE pre-render fills the content each
         // step, so NONE removes the scaling jitter). Every other window keeps STRETCH — with no pre-render behind
         // it, a NONE swapchain would expose a hard uncovered edge on any size change (maximize/snap/DPI/async).
         DXGI_SCALING scaling = preferNoneScaling ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
@@ -135,10 +135,10 @@ private:
 };
 
 // ===================== Direct3D synchronous live-resize =====================
-// The Windows/Direct3D live-resize fix. Subclasses the frame's WndProc and, during an interactive (drag)
-// resize, renders the real renderDelegate content into a DirectComposition overlay swapchain on the frame,
-// presenting it synchronously in WM_NCCALCSIZE / WM_PAINT — so DWM composites the frame-move and our content
-// atomically and no white/transparent bars appear at the edges. Assumes a single hooked window.
+// The Windows/Direct3D live-resize fix. Subclasses the frame's WndProc and, during an interactive (drag) resize,
+// synchronously renders the real renderDelegate content into the window's on-screen swapchain at the new size and
+// presents it in WM_NCCALCSIZE / WM_PAINT BEFORE the geometry commits — so content and geometry land together and
+// no white bars appear at the edges. Assumes a single hooked window.
 
 static WNDPROC g_originalWndProc = nullptr;
 static HWND g_frameHwnd = nullptr;
@@ -159,19 +159,6 @@ static JNIEnv *getJniEnv()
 // ---- One dedicated invoker per Direct3DRedrawer method called from native (g_redrawer + env must be valid).
 // Each caches its jmethodID in a local static on first use (the class is stable for the app's lifetime, and all
 // callers run on the single toolkit thread, so the lazy init needs no synchronization). ----
-static void drawFrameWhileLiveResizing(JNIEnv *env, int w, int h)
-{
-    static jmethodID mid = nullptr;
-    if (!mid)
-    {
-        jclass cls = env->GetObjectClass(g_redrawer);
-        mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(II)V");
-        env->DeleteLocalRef(cls);
-    }
-    if (mid) env->CallVoidMethod(g_redrawer, mid, (jint)w, (jint)h);
-    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
-}
-
 static void onLiveResizeFinalize(JNIEnv *env)
 {
     static jmethodID mid = nullptr;
@@ -198,59 +185,43 @@ static void onLiveResizeEnded(JNIEnv *env)
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-// Fallback: render the REAL content at (w,h) into the ON-SCREEN swapchain and present it synchronously. Kotlin
-// hops to the EDT and blocks there (invokeAndWaitWhilePumping), same as the overlay path. vsync paces the present
-// at the refresh rate — false during an active drag (unpaced, mouse-driven; a vblank wait here leads the edge),
-// true during a stationary hold so the self-re-arming WM_PAINT animation loop doesn't spin uncapped.
-static void renderOnScreenWhileResizing(JNIEnv *env, int w, int h, bool vsync)
+// Render the REAL content at (w,h) into the on-screen swapchain and present it synchronously. Kotlin hops to the
+// EDT and blocks there (invokeAndWaitWhilePumping). vsync paces the present at the refresh rate — false during an
+// active drag (unpaced, mouse-driven; a vblank wait here leads the edge), true during a stationary hold so the
+// self-re-arming WM_PAINT animation loop doesn't spin uncapped.
+static void drawFrameWhileLiveResizing(JNIEnv *env, int w, int h)
 {
     static jmethodID mid = nullptr;
     if (!mid)
     {
         jclass cls = env->GetObjectClass(g_redrawer);
-        mid = env->GetMethodID(cls, "renderOnScreenWhileResizing", "(IIZ)V");
+        mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(II)V");
         env->DeleteLocalRef(cls);
     }
-    if (mid) env->CallVoidMethod(g_redrawer, mid, (jint)w, (jint)h, (jboolean)vsync);
+    if (mid) env->CallVoidMethod(g_redrawer, mid, (jint)w, (jint)h);
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-// ask the redrawer (on this toolkit thread) to render the REAL renderDelegate content at (w,h) into the frame's
-// comp swapchain and present it. drawFrameWhileLiveResizing (Kotlin) hops to the EDT and blocks there via
-// EdtInvoker.invokeAndWaitWhilePumping; the render calls back into makeLiveResizeSurface / presentLiveResizeFrame.
-//
-// g_rendering guards against re-entrant renders while an EDT round-trip is pump-waiting on THIS thread: the
-// EDT's own window ops (SetWindowPos) are SENT back here and serviced during the wait, and one can re-enter
-// WM_NCCALCSIZE — a nested pump-wait there would deadlock (the EDT is blocked in SendMessage). So the two
-// callers below set it around their blocking round-trip and renderFrameOnEdt skips while it's set. (This is a
-// live-resize coalescing concern, so it lives here in the callers, not in the general invoke-and-wait utility.)
+// g_rendering guards against re-entrant renders while an EDT round-trip is pump-waiting on THIS thread: the EDT's
+// own window ops (SetWindowPos) are SENT back here and serviced during the wait, and one can re-enter
+// WM_NCCALCSIZE — a nested pump-wait there would deadlock (the EDT is blocked in SendMessage). So renderFrameOnEdt
+// sets it around the blocking round-trip and skips while it's set.
 static bool g_rendering = false;
 
+// Synchronous render driver: render+present at (w,h) on the EDT, blocking until done (see g_rendering for the
+// reentrancy guard).
 static void renderFrameOnEdt(int w, int h)
 {
     if (!g_redrawer || g_rendering) return;
     JNIEnv *env = getJniEnv();
     if (!env) return;
     g_rendering = true;
-    drawFrameWhileLiveResizing(env, w, h); // blocks until the EDT render completes (EdtInvoker.invokeAndWaitWhilePumping)
+    drawFrameWhileLiveResizing(env, w, h); // blocks until the EDT render+present completes
     g_rendering = false;
 }
 
-// Non-NOREDIR fallback: synchronous on-screen pre-render. Same reentrancy guard as renderFrameOnEdt (the EDT
-// round-trip is pump-waited on this thread and can re-enter WM_NCCALCSIZE; skip while already rendering).
-static void preRenderOnScreenEdt(int w, int h, bool vsync)
-{
-    if (!g_redrawer || g_rendering) return;
-    JNIEnv *env = getJniEnv();
-    if (!env) return;
-    g_rendering = true;
-    renderOnScreenWhileResizing(env, w, h, vsync); // blocks until the EDT render+present completes
-    g_rendering = false;
-}
-
-// at drag-end, run onLiveResizeFinalize on the EDT (blocking, via EdtInvoker.invokeAndWaitWhilePumping) — validate the frame
-// so the canvas HWND catches up to the final client size AND renderImmediately so the canvas has correct-size
-// content — BEFORE we detach the overlay. Otherwise revealing the still-lagging canvas snaps a frame later.
+// at drag-end, run onLiveResizeFinalize on the EDT (blocking, via invokeAndWaitWhilePumping) — force a layout so
+// the canvas HWND catches up to the final client size AND render it at that size, before the async loop resumes.
 static void finalizeLiveResizeOnEdt()
 {
     if (!g_redrawer) return;
@@ -261,46 +232,8 @@ static void finalizeLiveResizeOnEdt()
     g_rendering = false;
 }
 
-// ---- The overlay: a DComp target + composition swapchain on the AWT frame HWND ----------------------
-// The frame keeps its normal DWM redirection bitmap; our visual is created topmost (CreateTargetForHwnd below)
-// so it composites ABOVE that bitmap and owns the visible content during a resize. The swapchain is presented
-// (and DComp-committed) synchronously in the frame's WM_NCCALCSIZE (no DwmFlush), so DWM composites the
-// frame-move and our content in one pass — clean on all edges incl. top/left origin-move, with no extra
-// child HWND.
-static gr_cp<IDCompositionDevice> g_frameDComp;
-static gr_cp<IDCompositionTarget> g_frameTarget;
-static gr_cp<IDCompositionVisual> g_frameVisual;
-static gr_cp<IDXGISwapChain3> g_frameSwapChain;
-static gr_cp<ID3D12Resource> g_frameBuffers[BuffersCount]; // wrapped-as-Skia backbuffers
-// per-buffer fence discipline, mirroring the on-screen swapchain (DirectXDevice). This is what lets the
-// overlay tolerate many presents per size and still ResizeBuffers cleanly — the earlier frame-latency-waitable
-// approach wedged after ~2 presents at one size. presentLiveResizeFrame signals fenceValues[bufferIndex] after Present;
-// the next frame waits it before reusing that buffer; ResizeBuffers waits ALL buffers' fences.
-static gr_cp<ID3D12Fence> g_frameFence;
-static HANDLE g_frameFenceEvent = nullptr;
-static uint64_t g_frameFenceValues[BuffersCount] = {0};
-static unsigned int g_frameBufferIndex = 0;
-static gr_cp<IDXGIOutput> g_frameOutput; // for WaitForVBlank (vsync pacing of the resize render loop)
-
-// Create the overlay swapchain's fence (mirrors initFence for the on-screen swapchain). Once per swapchain.
-static void frameInitFence()
-{
-    if (!g_device || g_frameFence.get()) return;
-    for (int i = 0; i < BuffersCount; i++) g_frameFenceValues[i] = 10000;
-    g_device->device->CreateFence(g_frameFenceValues[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&g_frameFence));
-    g_frameFenceEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
-    g_frameBufferIndex = 0;
-}
-
-// Block until the GPU fence reaches fv (a buffer's prior present finished).
-static void frameWaitFence(uint64_t fv)
-{
-    if (g_frameFence.get() && g_frameFence->GetCompletedValue() < fv)
-    {
-        g_frameFence->SetEventOnCompletion(fv, g_frameFenceEvent);
-        WaitForSingleObjectEx(g_frameFenceEvent, INFINITE, FALSE);
-    }
-}
+// ===================== state shared by the live-resize WndProc =====================
+static gr_cp<IDXGIOutput> g_monitorOutput; // primary monitor output, for WaitForVBlank pacing
 
 // Block until the primary monitor's next vblank. Used to pace the stationary-hold render loop at the refresh
 // rate. Prefer this over Present(1) on a windowed (DWM-composited) flip swapchain: Present(1)'s sync interval
@@ -308,66 +241,20 @@ static void frameWaitFence(uint64_t fv)
 // pacing on the actual vblank with a non-blocking Present(0) holds a clean refresh rate.
 static void waitForPrimaryVBlank()
 {
-    if (!g_frameOutput.get())
+    if (!g_monitorOutput.get())
     {
         gr_cp<IDXGIFactory1> factory;
         if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory))))
         {
             gr_cp<IDXGIAdapter1> adapter;
-            if (SUCCEEDED(factory->EnumAdapters1(0, &adapter))) adapter->EnumOutputs(0, &g_frameOutput);
+            if (SUCCEEDED(factory->EnumAdapters1(0, &adapter))) adapter->EnumOutputs(0, &g_monitorOutput);
         }
     }
-    if (g_frameOutput.get()) g_frameOutput->WaitForVBlank();
+    if (g_monitorOutput.get()) g_monitorOutput->WaitForVBlank();
 }
 
-static void ensureFrameSwapChain()
-{
-    if (g_frameSwapChain.get() || !g_device || !g_frameHwnd) return;
-    RECT rc; GetClientRect(g_frameHwnd, &rc);
-    UINT w = (rc.right - rc.left) > 0 ? (UINT)(rc.right - rc.left) : 1;
-    UINT h = (rc.bottom - rc.top) > 0 ? (UINT)(rc.bottom - rc.top) : 1;
-
-    gr_cp<IDXGIFactory4> factory;
-    if (FAILED(CreateDXGIFactory2(0, IID_PPV_ARGS(&factory)))) return;
-    DXGI_SWAP_CHAIN_DESC1 desc = {};
-    desc.Width = w; desc.Height = h;
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    desc.SampleDesc.Count = 1;
-    desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    desc.BufferCount = BuffersCount;
-    desc.Scaling = DXGI_SCALING_STRETCH;
-    desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-    desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
-    gr_cp<IDXGISwapChain1> sc1;
-    HRESULT hr = factory->CreateSwapChainForComposition(g_device->queue.get(), &desc, nullptr, &sc1);
-    if (FAILED(hr)) return;
-    sc1->QueryInterface(IID_PPV_ARGS(&g_frameSwapChain));
-    frameInitFence(); // per-buffer fence discipline (mirrors the on-screen swapchain), no waitable
-
-    hr = DCompLibrary::DCompositionCreateDevice(nullptr, IID_PPV_ARGS(&g_frameDComp));
-    if (FAILED(hr)) return;
-    // topmost=TRUE so our visual composites ABOVE the frame's redirection bitmap (and the canvas child).
-    hr = g_frameDComp->CreateTargetForHwnd(g_frameHwnd, TRUE, &g_frameTarget);
-    if (FAILED(hr)) return;
-    g_frameDComp->CreateVisual(&g_frameVisual);
-    g_frameVisual->SetContent(g_frameSwapChain.get());
-}
-
-// Show/hide our overlay by attaching/detaching the visual root (committed).
-static void showFrameOverlay(bool show)
-{
-    if (!g_frameTarget.get() || !g_frameDComp.get()) return;
-    g_frameTarget->SetRoot(show ? g_frameVisual.get() : nullptr);
-    g_frameDComp->Commit();
-}
-
-// Our topmost DComp overlay visual on the frame composites above the frame's redirection bitmap, so it owns
-// the visible content during a resize. During a drag we hide the canvas child and render the real
-// renderDelegate content into the overlay swapchain, presenting synchronously in WM_NCCALCSIZE (the proven
-// sync point, no DwmFlush) so DWM composites the frame-move and our content in one pass — atomic on all edges
-// incl. top/left origin-move.
 static bool g_inSizeMoveLoop = false; // inside a WM_ENTERSIZEMOVE..WM_EXITSIZEMOVE modal loop (resize OR move)
-static bool g_liveResizeEngaged = false;   // frame overlay active (only during actual RESIZE, not plain moves)
+static bool g_liveResizeEngaged = false;   // an actual RESIZE is in progress (not a plain move)
 
 // on-demand stationary-animation driver, driven by WM_PAINT (NOT a posted message). needRender (EDT)
 // calls InvalidateRect on the frame window; the WM_PAINT handler does the SAME synchronized present as
@@ -385,106 +272,6 @@ static bool g_liveResizeEngaged = false;   // frame overlay active (only during 
 // InvalidateRect's again, re-arming the next frame — so the animation self-perpetuates while held and stops
 // cleanly when needRender stops, all without ever outranking input.
 static int g_lastClientWidth = 0, g_lastClientHeight = 0; // client size the last resize step used (the true current size)
-// whether presentLiveResizeFrame should WaitForVBlank for THIS frame. FALSE for the WM_NCCALCSIZE (active-drag)
-// present — waiting there blocks inside NCCALCSIZE and displays the new-size content a full refresh BEFORE the
-// frame geometry is applied (content leads the edge). TRUE only for the WM_PAINT (stationary-hold) present, to
-// cap the idle animation loop at the refresh rate. Set on the toolkit thread right before the synchronous render.
-static bool g_paceVBlank = false;
-
-static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    switch (msg)
-    {
-        case WM_ERASEBKGND:
-            if (g_inSizeMoveLoop) return 1; // overlay owns the content while sizing; skip the erase flash
-            break;
-        case WM_ENTERSIZEMOVE:
-        {
-            g_inSizeMoveLoop = true;
-            g_liveResizeEngaged = false;
-            // WM_ENTERSIZEMOVE fires for plain MOVES too. Do NOT hide the canvas, present, or suppress the EDT
-            // here: during a move the canvas stays visible and must keep animating through the normal EDT loop,
-            // and presenting into the frame swapchain without a resize wedges its flip buffers (the "two moves
-            // then resize" bug). We engage the overlay AND stop the EDT only on the first real size change
-            // (WM_NCCALCSIZE); moves never touch the frame swapchain and translate atomically with the frame.
-            break;
-        }
-        case WM_NCCALCSIZE:
-        {
-            // THE sync point: compute the new client rect, then present our content at that size and
-            // DComp-Commit BEFORE returning — so DWM composites the frame-move and our content in one pass.
-            // Always let AWT's proc handle NCCALCSIZE (even during the drag) so AWT's own client-rect / inset
-            // tracking stays correct — otherwise it lays the canvas out from a stale client rect and leaves a
-            // 1-2px transparent sliver at rest. (DefWindowProc-vs-AWT-proc made no difference to the jump.)
-            LRESULT r = CallWindowProcW(g_originalWndProc, hWnd, msg, wParam, lParam);
-            if (g_inSizeMoveLoop && wParam)
-            {
-                bool justEngaged = false;
-                if (!g_liveResizeEngaged)
-                {
-                    // First real resize step: create the overlay now but do NOT reveal it yet — we reveal it
-                    // below, only after it has content, so DWM never composites an empty (transparent) overlay
-                    // frame. Deferred to here (not WM_ENTERSIZEMOVE) so plain moves keep animating. The redrawer
-                    // learns the resize started from the first drawFrameWhileLiveResizing below (it sets layerSizeInLiveResize,
-                    // which stops the EDT loop) — no separate engage callback needed.
-                    g_liveResizeEngaged = true;
-                    justEngaged = true;
-                    ensureFrameSwapChain();
-                }
-                NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *)lParam;
-                RECT c = p->rgrc[0]; // now holds the new CLIENT rect
-                g_lastClientWidth = c.right - c.left;
-                g_lastClientHeight = c.bottom - c.top;
-                g_paceVBlank = false; // atomic with the geometry change — no vblank wait (would lead the edge)
-                renderFrameOnEdt(g_lastClientWidth, g_lastClientHeight); // 2b: real Skia content
-                if (justEngaged)
-                {
-                    // The overlay now holds a presented frame: reveal it (topmost, opaque) and hide the canvas
-                    // underneath it. Revealing an already-drawn overlay avoids the one transparent engage frame.
-                    showFrameOverlay(true);
-                    if (g_contentHwnd) ShowWindow(g_contentHwnd, SW_HIDE);
-                }
-            }
-            return r;
-        }
-        case WM_PAINT:
-            // On-demand stationary animation (armed by needRender's InvalidateRect). WM_PAINT is BELOW input in
-            // GetMessage priority, so it only reaches us in an input lull — an active drag's mouse moves are
-            // serviced first (WM_NCCALCSIZE drives those frames), so this cannot starve the drag. Validate the
-            // region FIRST (before rendering) so the InvalidateRect that onRender→needRender issues during our
-            // synchronous render re-arms the NEXT frame instead of being cleared. Only handle it while engaged;
-            // otherwise let AWT's proc paint normally.
-            if (g_liveResizeEngaged)
-            {
-                ValidateRect(hWnd, nullptr);
-                g_paceVBlank = true; // idle-hold animation: cap at the refresh rate (no geometry change here)
-                renderFrameOnEdt(g_lastClientWidth, g_lastClientHeight);
-                return 0;
-            }
-            break;
-        case WM_EXITSIZEMOVE:
-            if (g_liveResizeEngaged)
-            {
-                // Render one last overlay frame at the SETTLED client size (it keeps covering the canvas).
-                RECT rc; GetClientRect(hWnd, &rc);
-                g_paceVBlank = false;
-                renderFrameOnEdt(rc.right - rc.left, rc.bottom - rc.top);
-                // Show the canvas UNDER the still-topmost overlay, then finalize it (validate + render at the
-                // final size) while it's hidden behind the overlay, then detach the overlay to reveal a
-                // correct-size canvas — no 1-frame snap.
-                if (g_contentHwnd) ShowWindow(g_contentHwnd, SW_SHOW);
-                finalizeLiveResizeOnEdt();
-                showFrameOverlay(false);            // detach overlay; the canvas becomes the frame content again
-                g_liveResizeEngaged = false;
-            }
-            g_inSizeMoveLoop = false;
-            // Notify the redrawer (toolkit thread) that the live resize ended so it resumes the normal loop.
-            if (g_redrawer)
-                if (JNIEnv *env = getJniEnv()) onLiveResizeEnded(env);
-            break;
-    }
-    return CallWindowProcW(g_originalWndProc, hWnd, msg, wParam, lParam);
-}
 
 // Resize the content child to AT LEAST (w,h), never shrinking it during a drag. Growing ahead of a GROW covers the
 // newly-exposed area; on a SHRINK we must NOT shrink it preemptively — a child narrower than the still-old frame
@@ -501,12 +288,11 @@ static void growContentChildTo(int w, int h)
                  SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
 }
 
-// Non-NOREDIR fallback (redirected frames, no overlay). Keep the window's own on-screen swapchain as the content
-// and, on each resize step, synchronously render+present it at the NEW client size BEFORE letting the geometry
-// commit — "delay the resize until content is drawn" — so DWM never exposes an unrendered (white) region on a
-// redirected frame, without WS_EX_NOREDIRECTIONBITMAP. Shares the globals with the overlay proc; only one proc is
-// ever installed per window (the two are mutually exclusive on frameHasNoRedirectionBitmap).
-static LRESULT CALLBACK FallbackResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+// The live-resize WndProc. Keep the window's own on-screen swapchain as the content and, on each resize step,
+// synchronously render+present it at the NEW client size BEFORE letting the geometry commit — "delay the resize
+// until content is drawn" — so DWM never exposes an unrendered (white) region at the edges. One instance is
+// installed per window (globals are single-window).
+static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
@@ -532,7 +318,7 @@ static LRESULT CALLBACK FallbackResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam
                 // Grow (never shrink) the content child so it covers the soon-to-be-exposed region on a grow and
                 // never exposes a strip on a shrink; see growContentChildTo.
                 growContentChildTo(g_lastClientWidth, g_lastClientHeight);
-                preRenderOnScreenEdt(g_lastClientWidth, g_lastClientHeight, false); // active drag: unpaced
+                renderFrameOnEdt(g_lastClientWidth, g_lastClientHeight); // active drag: unpaced (mouse-driven)
             }
             return r;
         }
@@ -540,7 +326,7 @@ static LRESULT CALLBACK FallbackResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam
             // Stationary hold: while the drag is paused no WM_NCCALCSIZE fires, so drive the animation (and keep
             // content present, no white) from WM_PAINT. It sits BELOW input in GetMessage priority, so it can't
             // starve the active drag (mouse moves win and drive frames via WM_NCCALCSIZE). needRender re-arms it
-            // via postLiveResizeRender's InvalidateRect while isInLiveResize. Same mechanism as the overlay.
+            // via postLiveResizeRender's InvalidateRect while isInLiveResize. The WM_PAINT stationary-hold driver.
             if (g_inSizeMoveLoop && g_liveResizeEngaged)
             {
                 ValidateRect(hWnd, nullptr); // validate FIRST so the re-arm InvalidateRect isn't cleared
@@ -548,7 +334,14 @@ static LRESULT CALLBACK FallbackResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam
                 // doLayout has time to shrink the child to a lagging size, leaving a frame-redirection strip past
                 // its edge. The active drag never drifts because every NCCALCSIZE re-asserts it; the hold must too.
                 growContentChildTo(g_lastClientWidth, g_lastClientHeight);
-                preRenderOnScreenEdt(g_lastClientWidth, g_lastClientHeight, true); // stationary hold: pace at vblank
+                renderFrameOnEdt(g_lastClientWidth, g_lastClientHeight);
+                // Pace the stationary hold at the refresh rate — one present per vblank (a pure monitor wait on
+                // this toolkit thread; no render/Skia state, so it needn't run on the EDT). Beyond capping idle
+                // FPS, this is what keeps ORIGIN-MOVE (top/left) resize clean: real drags are full of micro-pauses
+                // that hit this WM_PAINT path, and an unpaced hold floods DWM's present queue, adding latency that
+                // desyncs content from the moving window origin. A shallow queue keeps top/left welded to the edge
+                // (right/bottom don't move the origin, so they tolerate the latency).
+                waitForPrimaryVBlank();
                 return 0;
             }
             break;
@@ -886,94 +679,8 @@ extern "C"
         return toJavaPointer(result);
     }
 
-    // wrap the frame overlay's comp-swapchain backbuffer as a Skia SkSurface so the renderDelegate
-    // can draw REAL content into it during resize (mirrors makeDirectXSurface but targets g_frameSwapChain).
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeLiveResizeSurface(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height, jint index)
-    {
-        GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
-        if (!g_frameSwapChain.get() || width <= 0 || height <= 0 || index < 0 || index >= BuffersCount) return 0;
-        if (FAILED(g_frameSwapChain->GetBuffer((UINT)index, IID_PPV_ARGS(&g_frameBuffers[index])))) return 0;
-
-        GrD3DTextureResourceInfo info(nullptr, nullptr, D3D12_RESOURCE_STATE_PRESENT, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, 0);
-        info.fResource = g_frameBuffers[index];
-        GrBackendTexture backendTexture = GrBackendTextures::MakeD3D((int)width, (int)height, info);
-        auto result = SkSurfaces::WrapBackendTexture(
-                                 context, backendTexture, kTopLeft_GrSurfaceOrigin, 0,
-                                 kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), nullptr)
-                                 .release();
-        return toJavaPointer(result);
-    }
-
-    // resize the overlay swapchain on size change (mirrors the on-screen resizeBuffers): flush Skia's
-    // refs, wait EACH buffer's last-present fence so no backbuffer is still in flight, drop refs, ResizeBuffers.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeLiveResizeBuffers(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height)
-    {
-        GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
-        if (!g_frameSwapChain.get() || width <= 0 || height <= 0) return;
-        DXGI_SWAP_CHAIN_DESC1 d = {};
-        g_frameSwapChain->GetDesc1(&d);
-        if (d.Width == (UINT)width && d.Height == (UINT)height) return; // no size change
-        context->flush();
-        context->submit(GrSyncCpu::kYes);
-        for (int i = 0; i < BuffersCount; i++)
-        {
-            frameWaitFence(g_frameFenceValues[i]);
-            g_frameBuffers[i].reset(nullptr);
-        }
-        g_frameSwapChain->ResizeBuffers(BuffersCount, (UINT)width, (UINT)height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
-    }
-
-    // getBufferIndex discipline (mirrors the on-screen swapchain) — rotate to the current back buffer,
-    // wait its previous present's fence, bump its next fence value. Returns the buffer index to draw into.
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_liveResizeBufferIndex(
-        JNIEnv *env, jobject redrawer)
-    {
-        if (!g_frameSwapChain.get()) return 0;
-        const uint64_t fv = g_frameFenceValues[g_frameBufferIndex];
-        g_frameBufferIndex = g_frameSwapChain->GetCurrentBackBufferIndex();
-        frameWaitFence(fv);
-        g_frameFenceValues[g_frameBufferIndex] = fv + 1;
-        return (jint)g_frameBufferIndex;
-    }
-
-    // present the frame comp swapchain (vblank-synced double-present) + DComp Commit.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_presentLiveResizeFrame(
-        JNIEnv *env, jobject redrawer, jboolean vsync)
-    {
-        if (!g_frameSwapChain.get() || !g_device) return;
-        // Present, then signal this buffer's fence (mirrors the on-screen swap()). Present(0, RESTART) is the
-        // IMMEDIATE flip (content welded to the window edge in the same DWM compose as the geometry change).
-        g_frameSwapChain->Present(0, DXGI_PRESENT_RESTART);
-        // Present(1, DO_NOT_SEQUENCE) re-presents the SAME buffer vblank-synced (top/left-jump stabilizer) WITHOUT
-        // advancing the swapchain, so the per-buffer fence rotation still alternates buffers correctly. It's only
-        // needed for the active-drag present (origin can move); during a stationary hold it double-paces against
-        // the WaitForVBlank below and drops the idle loop to refresh x 2/3 (~40 on 60 Hz), so skip it there.
-        if (!g_paceVBlank) g_frameSwapChain->Present(1, DXGI_PRESENT_DO_NOT_SEQUENCE);
-        g_device->queue->Signal(g_frameFence.get(), g_frameFenceValues[g_frameBufferIndex]);
-        if (g_frameDComp) g_frameDComp->Commit();
-        // Block on the display's vblank — but ONLY for the WM_PAINT stationary-hold present (g_paceVBlank),
-        // to cap that idle loop at the refresh rate. NEVER for the WM_NCCALCSIZE active-drag present: waiting there
-        // blocks inside NCCALCSIZE and shows the new-size content a full refresh before the frame geometry lands,
-        // making the content lead the window edge.
-        if (vsync && g_paceVBlank)
-        {
-            waitForPrimaryVBlank();
-        }
-    }
-
-    // Fallback stationary-hold pacing: block until the next vblank (see waitForPrimaryVBlank). The fallback path
-    // presents its on-screen swapchain with Present(0) and calls this only for the WM_PAINT hold render, so that
-    // idle animation loop paces at the refresh rate instead of the Present(1) windowed-flip 2/3 beat.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_waitForVBlank(
-        JNIEnv *env, jobject redrawer)
-    {
-        waitForPrimaryVBlank();
-    }
-
     // needRender during a resize routes here — invalidate the frame window so a WM_PAINT drives a
-    // synchronized overlay present (stationary animation). WM_PAINT sits below input in GetMessage priority, so
+    // synchronized present (stationary animation). WM_PAINT sits below input in GetMessage priority, so
     // (unlike a posted message) it yields to the modal resize loop instead of starving it. InvalidateRect
     // coalesces naturally (the update region just accumulates into one WM_PAINT), so no explicit gate is needed.
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_postLiveResizeRender(
@@ -1070,22 +777,11 @@ extern "C"
         return (jlong)result;
     }
 
-    // True iff the top-level window (GA_ROOT of `window`) was created with WS_EX_NOREDIRECTIONBITMAP. Gates the
-    // live-resize hook — the overlay only composites cleanly on a frame with no DWM redirection surface.
-    JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_frameHasNoRedirectionBitmap(
-        JNIEnv *env, jobject redrawer, jlong windowPtr)
-    {
-        HWND passed = fromJavaPointer<HWND>(windowPtr);
-        if (!passed) return JNI_FALSE;
-        HWND top = GetAncestor(passed, GA_ROOT);
-        if (!top) return JNI_FALSE;
-        return (GetWindowLongPtrW(top, GWL_EXSTYLE) & WS_EX_NOREDIRECTIONBITMAP) ? JNI_TRUE : JNI_FALSE;
-    }
-
-    // Shared install: subclass the frame's WndProc with `proc`, capturing the REAL original. NOTE: the globals
-    // are single-window (one hooked frame per process; see the live-resize block) — multiple simultaneous D3D
-    // windows are not supported by this path.
-    static void installFrameHook(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong windowPtr, jlong contentPtr, WNDPROC proc)
+    // Subclass the frame's WndProc with LiveResizeWndProc, capturing the REAL original. NOTE: the globals are
+    // single-window (one hooked frame per process; see the live-resize block) — multiple simultaneous D3D windows
+    // are not supported by this path.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_installLiveResizeHook(
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong windowPtr, jlong contentPtr)
     {
         g_device = fromJavaPointer<DirectXDevice *>(devicePtr);
         g_contentHwnd = fromJavaPointer<HWND>(contentPtr);
@@ -1094,28 +790,13 @@ extern "C"
 
         HWND top = GetAncestor(fromJavaPointer<HWND>(windowPtr), GA_ROOT); // frame that gets WM_ENTERSIZEMOVE / WM_SIZE
         g_frameHwnd = top;
-        WNDPROC prev = (WNDPROC)SetWindowLongPtrW(top, GWLP_WNDPROC, (LONG_PTR)proc);
+        WNDPROC prev = (WNDPROC)SetWindowLongPtrW(top, GWLP_WNDPROC, (LONG_PTR)LiveResizeWndProc);
         // Guard a double-install on the same window (e.g. a recreated redrawer that didn't uninstall): if `prev`
-        // is already one of our procs, capturing it as g_originalWndProc would make CallWindowProc recurse
-        // forever — keep the real original captured on the first install instead.
-        if (prev != LiveResizeWndProc && prev != FallbackResizeWndProc) {
+        // is already our proc, capturing it as g_originalWndProc would make CallWindowProc recurse forever — keep
+        // the real original captured on the first install instead.
+        if (prev != LiveResizeWndProc) {
             g_originalWndProc = prev;
         }
-    }
-
-    // Installs the live-resize WndProc hook (NOREDIR overlay path). See the live-resize block above.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_installLiveResizeHook(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong windowPtr, jlong contentPtr)
-    {
-        installFrameHook(env, redrawer, devicePtr, windowPtr, contentPtr, LiveResizeWndProc);
-    }
-
-    // Installs the non-overlay FallbackResizeWndProc (on-screen synchronous pre-render) for redirected frames
-    // that lack WS_EX_NOREDIRECTIONBITMAP.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_installFallbackResizeHook(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong windowPtr, jlong contentPtr)
-    {
-        installFrameHook(env, redrawer, devicePtr, windowPtr, contentPtr, FallbackResizeWndProc);
     }
 
     // Restores the frame's original WndProc and drops the globals, so a resize after dispose (or a redrawer
@@ -1127,7 +808,7 @@ extern "C"
         if (g_redrawer && !env->IsSameObject(g_redrawer, redrawer)) return;
         if (g_frameHwnd && g_originalWndProc) {
             WNDPROC current = (WNDPROC)GetWindowLongPtrW(g_frameHwnd, GWLP_WNDPROC);
-            if (current == LiveResizeWndProc || current == FallbackResizeWndProc) {
+            if (current == LiveResizeWndProc) {
                 SetWindowLongPtrW(g_frameHwnd, GWLP_WNDPROC, (LONG_PTR)g_originalWndProc);
             }
         }

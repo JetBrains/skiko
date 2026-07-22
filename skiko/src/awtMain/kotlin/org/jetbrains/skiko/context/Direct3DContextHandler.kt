@@ -22,10 +22,6 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
     private var currentWidth = 0
     private var currentHeight = 0
 
-    // True while the last initCanvas selected the frame-overlay surface (a live-resize draw), so the next
-    // on-screen draw knows to rebuild its surfaces instead of reusing a stale overlay surface/canvas.
-    private var lastDrawWasOverlay = false
-
     override fun LayerDrawScope.initCanvas() {
         val context = context ?: return
 
@@ -35,29 +31,13 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         val width = scaledLayerWidth.coerceAtLeast(1)
         val height = scaledLayerHeight.coerceAtLeast(1)
 
-        if (directXRedrawer.isInLiveResize && directXRedrawer.liveResizeUsesOverlay) {
-            // During a live resize on the overlay path, draw into the frame overlay swapchain (presented
-            // synchronously in WM_NCCALCSIZE by presentLiveResizeFrame) instead of the on-screen swapchain. The
-            // redrawer owns the overlay surfaces; everything downstream (clear, drawContent, flush) is identical.
-            // (The fallback path also sets isInLiveResize but keeps liveResizeUsesOverlay false, so it renders here.)
-            lastDrawWasOverlay = true
-            try {
-                surface = directXRedrawer.liveResizeSurface(getPtr(context), width, height)
-                canvas = surface?.canvas
-            } finally {
-                Reference.reachabilityFence(context)
-            }
-            return
-        }
-
         val sizeChanged = (width != currentWidth || height != currentHeight)
         if (sizeChanged) {
             currentWidth = width
             currentHeight = height
         }
 
-        if (lastDrawWasOverlay || sizeChanged || isSurfacesNull()) {
-            lastDrawWasOverlay = false
+        if (sizeChanged || isSurfacesNull()) {
             disposeCanvas()
             context.flush()
 
