@@ -143,7 +143,6 @@ private:
 static WNDPROC g_originalWndProc = nullptr;
 static HWND g_frameHwnd = nullptr;
 static HWND g_contentHwnd = nullptr;
-static DirectXDevice *g_device = nullptr;
 static jobject g_redrawer = nullptr;
 
 // Attach the current (toolkit) thread to the JVM if needed and return its JNIEnv (nullptr if unavailable).
@@ -186,9 +185,9 @@ static void onLiveResizeEnded(JNIEnv *env)
 }
 
 // Render the REAL content at (w,h) into the on-screen swapchain and present it synchronously. Kotlin hops to the
-// EDT and blocks there (invokeAndWaitWhilePumping). vsync paces the present at the refresh rate — false during an
-// active drag (unpaced, mouse-driven; a vblank wait here leads the edge), true during a stationary hold so the
-// self-re-arming WM_PAINT animation loop doesn't spin uncapped.
+// EDT and blocks there (invokeAndWaitWhilePumping). The present itself is always unpaced (Present(0)); the
+// stationary-hold loop is paced separately, natively, by waitForPrimaryVBlank() in the WM_PAINT handler (an
+// active drag stays unpaced, driven by mouse-move WM_NCCALCSIZE).
 static void drawFrameWhileLiveResizing(JNIEnv *env, int w, int h)
 {
     static jmethodID mid = nullptr;
@@ -781,9 +780,8 @@ extern "C"
     // single-window (one hooked frame per process; see the live-resize block) — multiple simultaneous D3D windows
     // are not supported by this path.
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_installLiveResizeHook(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong windowPtr, jlong contentPtr)
+        JNIEnv *env, jobject redrawer, jlong windowPtr, jlong contentPtr)
     {
-        g_device = fromJavaPointer<DirectXDevice *>(devicePtr);
         g_contentHwnd = fromJavaPointer<HWND>(contentPtr);
         if (g_redrawer) env->DeleteGlobalRef(g_redrawer);
         g_redrawer = env->NewGlobalRef(redrawer);
@@ -815,7 +813,6 @@ extern "C"
         g_originalWndProc = nullptr;
         g_frameHwnd = nullptr;
         g_contentHwnd = nullptr;
-        g_device = nullptr;
         if (g_redrawer) { env->DeleteGlobalRef(g_redrawer); g_redrawer = nullptr; }
     }
 

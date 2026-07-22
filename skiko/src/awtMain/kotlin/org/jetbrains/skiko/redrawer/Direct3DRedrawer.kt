@@ -53,7 +53,7 @@ internal class Direct3DRedrawer(
         // the on-screen swapchain at the new size and presents it inside WM_NCCALCSIZE, before the geometry
         // commits, so DWM never exposes an unrendered (white) region at the edges.
         if (layer.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize) {
-            installLiveResizeHook(device, layer.windowHandle, layer.contentHandle)
+            installLiveResizeHook(layer.windowHandle, layer.contentHandle)
             liveResizeInstalled = true
         }
     }
@@ -200,6 +200,7 @@ internal class Direct3DRedrawer(
     fun initFence() = initFence(device)
 
     // Called from native code
+    @Suppress("unused")
     private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
 
     private external fun chooseAdapter(adapterPriority: Int): Long
@@ -217,7 +218,7 @@ internal class Direct3DRedrawer(
 
     // Installs a WndProc subclass on the top-level window (GA_ROOT of `window`) that, during an interactive
     // resize, synchronously renders the real content into the on-screen swapchain and presents it in WM_NCCALCSIZE.
-    private external fun installLiveResizeHook(device: Long, window: Long, content: Long)
+    private external fun installLiveResizeHook(window: Long, content: Long)
 
     // Restores the frame's original WndProc and drops the native globals; called from dispose().
     private external fun uninstallLiveResizeHook()
