@@ -23,7 +23,9 @@ internal abstract class AWTRedrawer(
         private set
 
     /**
-     * Whether the window is in live-resize mode.
+     * Whether the window is in live-resize mode. Set for both the NOREDIR overlay path and the redirected-frame
+     * fallback path; it quiesces the async EDT renders (frameDispatcher loop, reshape workaround,
+     * onPlatformComponentResized) so the synchronous WM_NCCALCSIZE render is the only thing painting during a drag.
      */
     @Volatile
     internal var isInLiveResize: Boolean = false

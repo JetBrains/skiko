@@ -35,10 +35,11 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         val width = scaledLayerWidth.coerceAtLeast(1)
         val height = scaledLayerHeight.coerceAtLeast(1)
 
-        if (directXRedrawer.isInLiveResize) {
-            // During a live resize, draw into the frame overlay swapchain (presented synchronously in
-            // WM_NCCALCSIZE by presentLiveResizeFrame) instead of the on-screen swapchain. The redrawer owns the overlay
-            // surfaces; everything downstream (clear, drawContent, flush) is identical to the on-screen path.
+        if (directXRedrawer.isInLiveResize && directXRedrawer.liveResizeUsesOverlay) {
+            // During a live resize on the overlay path, draw into the frame overlay swapchain (presented
+            // synchronously in WM_NCCALCSIZE by presentLiveResizeFrame) instead of the on-screen swapchain. The
+            // redrawer owns the overlay surfaces; everything downstream (clear, drawContent, flush) is identical.
+            // (The fallback path also sets isInLiveResize but keeps liveResizeUsesOverlay false, so it renders here.)
             lastDrawWasOverlay = true
             try {
                 surface = directXRedrawer.liveResizeSurface(getPtr(context), width, height)

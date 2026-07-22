@@ -62,13 +62,17 @@ public:
         device.reset(nullptr);
     }
 
-    void initSwapChain(UINT width, UINT height, jboolean transparency) {
+    void initSwapChain(UINT width, UINT height, jboolean transparency, jboolean preferNoneScaling) {
         gr_cp<IDXGIFactory4> swapChainFactory4;
         gr_cp<IDXGISwapChain1> swapChain1;
         CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
         HRESULT result = S_OK;
+        // NONE only for the redirected-frame fallback (where the WM_NCCALCSIZE pre-render fills the content each
+        // step, so NONE removes the scaling jitter). Every other window keeps STRETCH — with no pre-render behind
+        // it, a NONE swapchain would expose a hard uncovered edge on any size change (maximize/snap/DPI/async).
+        DXGI_SCALING scaling = preferNoneScaling ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
         if (transparency) {
-            result = CreateSwapChainForComposition(swapChainFactory4.get(), width, height, &swapChain1);
+            result = CreateSwapChainForComposition(swapChainFactory4.get(), width, height, scaling, &swapChain1);
         }
         if (!transparency || FAILED(result)) {
             /*
@@ -76,7 +80,7 @@ public:
              * In this case transparency won't be supported.
              */
             swapChain1.reset(nullptr);
-            CreateSwapChainForHwnd(swapChainFactory4.get(), width, height, &swapChain1);
+            CreateSwapChainForHwnd(swapChainFactory4.get(), width, height, scaling, &swapChain1);
         }
         swapChainFactory4->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
         swapChain1->QueryInterface(IID_PPV_ARGS(&swapChain));
@@ -84,7 +88,7 @@ public:
     }
 
 private:
-    HRESULT CreateSwapChainForComposition(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, IDXGISwapChain1 **swapChain1) {
+    HRESULT CreateSwapChainForComposition(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, DXGI_SCALING scaling, IDXGISwapChain1 **swapChain1) {
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = width;
         swapChainDesc.Height = height;
@@ -93,7 +97,7 @@ private:
         swapChainDesc.SampleDesc.Quality = 0;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.BufferCount = BuffersCount;
-        swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+        swapChainDesc.Scaling = scaling;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_PREMULTIPLIED;
         HRESULT result = swapChainFactory4->CreateSwapChainForComposition(queue.get(), &swapChainDesc, nullptr, swapChain1);
@@ -115,7 +119,7 @@ private:
         return S_OK;
     }
 
-    HRESULT CreateSwapChainForHwnd(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, IDXGISwapChain1 **swapChain1) {
+    HRESULT CreateSwapChainForHwnd(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, DXGI_SCALING scaling, IDXGISwapChain1 **swapChain1) {
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = width;
         swapChainDesc.Height = height;
@@ -124,7 +128,7 @@ private:
         swapChainDesc.SampleDesc.Quality = 0;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.BufferCount = BuffersCount;
-        swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+        swapChainDesc.Scaling = scaling;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         return swapChainFactory4->CreateSwapChainForHwnd(queue.get(), hWnd, &swapChainDesc, nullptr, nullptr, swapChain1);
     }
@@ -194,6 +198,23 @@ static void onLiveResizeEnded(JNIEnv *env)
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
+// Fallback: render the REAL content at (w,h) into the ON-SCREEN swapchain and present it synchronously. Kotlin
+// hops to the EDT and blocks there (invokeAndWaitWhilePumping), same as the overlay path. vsync paces the present
+// at the refresh rate — false during an active drag (unpaced, mouse-driven; a vblank wait here leads the edge),
+// true during a stationary hold so the self-re-arming WM_PAINT animation loop doesn't spin uncapped.
+static void renderOnScreenWhileResizing(JNIEnv *env, int w, int h, bool vsync)
+{
+    static jmethodID mid = nullptr;
+    if (!mid)
+    {
+        jclass cls = env->GetObjectClass(g_redrawer);
+        mid = env->GetMethodID(cls, "renderOnScreenWhileResizing", "(IIZ)V");
+        env->DeleteLocalRef(cls);
+    }
+    if (mid) env->CallVoidMethod(g_redrawer, mid, (jint)w, (jint)h, (jboolean)vsync);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
+}
+
 // ask the redrawer (on this toolkit thread) to render the REAL renderDelegate content at (w,h) into the frame's
 // comp swapchain and present it. drawFrameWhileLiveResizing (Kotlin) hops to the EDT and blocks there via
 // EdtInvoker.invokeAndWaitWhilePumping; the render calls back into makeLiveResizeSurface / presentLiveResizeFrame.
@@ -212,6 +233,18 @@ static void renderFrameOnEdt(int w, int h)
     if (!env) return;
     g_rendering = true;
     drawFrameWhileLiveResizing(env, w, h); // blocks until the EDT render completes (EdtInvoker.invokeAndWaitWhilePumping)
+    g_rendering = false;
+}
+
+// Non-NOREDIR fallback: synchronous on-screen pre-render. Same reentrancy guard as renderFrameOnEdt (the EDT
+// round-trip is pump-waited on this thread and can re-enter WM_NCCALCSIZE; skip while already rendering).
+static void preRenderOnScreenEdt(int w, int h, bool vsync)
+{
+    if (!g_redrawer || g_rendering) return;
+    JNIEnv *env = getJniEnv();
+    if (!env) return;
+    g_rendering = true;
+    renderOnScreenWhileResizing(env, w, h, vsync); // blocks until the EDT render+present completes
     g_rendering = false;
 }
 
@@ -267,6 +300,24 @@ static void frameWaitFence(uint64_t fv)
         g_frameFence->SetEventOnCompletion(fv, g_frameFenceEvent);
         WaitForSingleObjectEx(g_frameFenceEvent, INFINITE, FALSE);
     }
+}
+
+// Block until the primary monitor's next vblank. Used to pace the stationary-hold render loop at the refresh
+// rate. Prefer this over Present(1) on a windowed (DWM-composited) flip swapchain: Present(1)'s sync interval
+// beats against DWM's own composition cadence and lands the loop at refresh x 2/3 (~40 on a 60 Hz screen);
+// pacing on the actual vblank with a non-blocking Present(0) holds a clean refresh rate.
+static void waitForPrimaryVBlank()
+{
+    if (!g_frameOutput.get())
+    {
+        gr_cp<IDXGIFactory1> factory;
+        if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory))))
+        {
+            gr_cp<IDXGIAdapter1> adapter;
+            if (SUCCEEDED(factory->EnumAdapters1(0, &adapter))) adapter->EnumOutputs(0, &g_frameOutput);
+        }
+    }
+    if (g_frameOutput.get()) g_frameOutput->WaitForVBlank();
 }
 
 static void ensureFrameSwapChain()
@@ -430,6 +481,99 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             // Notify the redrawer (toolkit thread) that the live resize ended so it resumes the normal loop.
             if (g_redrawer)
                 if (JNIEnv *env = getJniEnv()) onLiveResizeEnded(env);
+            break;
+    }
+    return CallWindowProcW(g_originalWndProc, hWnd, msg, wParam, lParam);
+}
+
+// Resize the content child to AT LEAST (w,h), never shrinking it during a drag. Growing ahead of a GROW covers the
+// newly-exposed area; on a SHRINK we must NOT shrink it preemptively — a child narrower than the still-old frame
+// exposes a strip on the fixed (origin-moving) edge for one composite (the tiny bar + jump at the very start of a
+// left/top-edge shrink). Left large, the child is simply clipped by the shrinking frame, and settles to the exact
+// size at drag-end finalize (Swing's doLayout).
+static void growContentChildTo(int w, int h)
+{
+    if (!g_contentHwnd) return;
+    RECT cr; GetClientRect(g_contentHwnd, &cr);
+    int childW = (cr.right - cr.left) > w ? (cr.right - cr.left) : w;
+    int childH = (cr.bottom - cr.top) > h ? (cr.bottom - cr.top) : h;
+    SetWindowPos(g_contentHwnd, nullptr, 0, 0, childW, childH,
+                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+}
+
+// Non-NOREDIR fallback (redirected frames, no overlay). Keep the window's own on-screen swapchain as the content
+// and, on each resize step, synchronously render+present it at the NEW client size BEFORE letting the geometry
+// commit — "delay the resize until content is drawn" — so DWM never exposes an unrendered (white) region on a
+// redirected frame, without WS_EX_NOREDIRECTIONBITMAP. Shares the globals with the overlay proc; only one proc is
+// ever installed per window (the two are mutually exclusive on frameHasNoRedirectionBitmap).
+static LRESULT CALLBACK FallbackResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    switch (msg)
+    {
+        case WM_ERASEBKGND:
+            if (g_inSizeMoveLoop) return 1; // suppress the frame's white erase flash while sizing
+            break;
+        case WM_ENTERSIZEMOVE:
+            g_inSizeMoveLoop = true;
+            g_liveResizeEngaged = false; // engage only on the first real size step (not on plain moves)
+            break;
+        case WM_NCCALCSIZE:
+        {
+            // Let AWT compute the new client rect first (keeps its inset/layout tracking correct), then render
+            // our content at that size and present, all before returning (which lets the geometry commit).
+            LRESULT r = CallWindowProcW(g_originalWndProc, hWnd, msg, wParam, lParam);
+            if (g_inSizeMoveLoop && wParam && !g_rendering)
+            {
+                g_liveResizeEngaged = true;
+                NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *)lParam;
+                RECT c = p->rgrc[0]; // now holds the new CLIENT rect
+                g_lastClientWidth = c.right - c.left;
+                g_lastClientHeight = c.bottom - c.top;
+                // Grow (never shrink) the content child so it covers the soon-to-be-exposed region on a grow and
+                // never exposes a strip on a shrink; see growContentChildTo.
+                growContentChildTo(g_lastClientWidth, g_lastClientHeight);
+                preRenderOnScreenEdt(g_lastClientWidth, g_lastClientHeight, false); // active drag: unpaced
+            }
+            return r;
+        }
+        case WM_PAINT:
+            // Stationary hold: while the drag is paused no WM_NCCALCSIZE fires, so drive the animation (and keep
+            // content present, no white) from WM_PAINT. It sits BELOW input in GetMessage priority, so it can't
+            // starve the active drag (mouse moves win and drive frames via WM_NCCALCSIZE). needRender re-arms it
+            // via postLiveResizeRender's InvalidateRect while isInLiveResize. Same mechanism as the overlay.
+            if (g_inSizeMoveLoop && g_liveResizeEngaged)
+            {
+                ValidateRect(hWnd, nullptr); // validate FIRST so the re-arm InvalidateRect isn't cleared
+                // Re-assert the child size (>= client), same as the NCCALCSIZE path: during a hold Swing's async
+                // doLayout has time to shrink the child to a lagging size, leaving a frame-redirection strip past
+                // its edge. The active drag never drifts because every NCCALCSIZE re-asserts it; the hold must too.
+                growContentChildTo(g_lastClientWidth, g_lastClientHeight);
+                preRenderOnScreenEdt(g_lastClientWidth, g_lastClientHeight, true); // stationary hold: pace at vblank
+                return 0;
+            }
+            break;
+        case WM_EXITSIZEMOVE:
+            if (g_liveResizeEngaged)
+            {
+                // Snap the content child to the exact settled client size. growContentChildTo only ever grew it
+                // during the drag, so after a shrink it can be left larger than the client (clipped, so invisible);
+                // Swing's post-drag layout may no-op (its model already matches), leaving the native HWND oversized.
+                // Reset it explicitly here — safe now the frame is settled (child == client, no strip).
+                if (g_contentHwnd)
+                {
+                    RECT rc; GetClientRect(hWnd, &rc);
+                    SetWindowPos(g_contentHwnd, nullptr, 0, 0, rc.right - rc.left, rc.bottom - rc.top,
+                                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+                }
+                // We quiesced onPlatformComponentResized for the whole drag, so the layer's Swing size is stale.
+                // Force a layout to the settled size and render BEFORE the async loop resumes, else it renders at
+                // the stale size and flashes white. finalize also clears isInLiveResize (via onLiveResizeFinalize).
+                finalizeLiveResizeOnEdt();
+                g_liveResizeEngaged = false;
+            }
+            g_inSizeMoveLoop = false;
+            if (g_redrawer)
+                if (JNIEnv *env = getJniEnv()) onLiveResizeEnded(env); // clear the flag + resume the normal loop
             break;
     }
     return CallWindowProcW(g_originalWndProc, hWnd, msg, wParam, lParam);
@@ -673,12 +817,12 @@ extern "C"
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initSwapChain(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height, jboolean transparency)
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height, jboolean transparency, jboolean preferNoneScaling)
     {
         __try
         {
             DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-            d3dDevice->initSwapChain((UINT) width, (UINT) height, transparency);
+            d3dDevice->initSwapChain((UINT) width, (UINT) height, transparency, preferNoneScaling);
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {
             auto code = GetExceptionCode();
@@ -800,11 +944,13 @@ extern "C"
     {
         if (!g_frameSwapChain.get() || !g_device) return;
         // Present, then signal this buffer's fence (mirrors the on-screen swap()). Present(0, RESTART) is the
-        // IMMEDIATE flip (content welded to the window edge in the same DWM compose as the geometry change);
-        // Present(1, DO_NOT_SEQUENCE) re-presents the SAME buffer vblank-synced (top/left-jump stabilizer) WITHOUT
-        // advancing the swapchain, so the per-buffer fence rotation still alternates buffers correctly.
+        // IMMEDIATE flip (content welded to the window edge in the same DWM compose as the geometry change).
         g_frameSwapChain->Present(0, DXGI_PRESENT_RESTART);
-        g_frameSwapChain->Present(1, DXGI_PRESENT_DO_NOT_SEQUENCE);
+        // Present(1, DO_NOT_SEQUENCE) re-presents the SAME buffer vblank-synced (top/left-jump stabilizer) WITHOUT
+        // advancing the swapchain, so the per-buffer fence rotation still alternates buffers correctly. It's only
+        // needed for the active-drag present (origin can move); during a stationary hold it double-paces against
+        // the WaitForVBlank below and drops the idle loop to refresh x 2/3 (~40 on 60 Hz), so skip it there.
+        if (!g_paceVBlank) g_frameSwapChain->Present(1, DXGI_PRESENT_DO_NOT_SEQUENCE);
         g_device->queue->Signal(g_frameFence.get(), g_frameFenceValues[g_frameBufferIndex]);
         if (g_frameDComp) g_frameDComp->Commit();
         // Block on the display's vblank — but ONLY for the WM_PAINT stationary-hold present (g_paceVBlank),
@@ -813,17 +959,17 @@ extern "C"
         // making the content lead the window edge.
         if (vsync && g_paceVBlank)
         {
-            if (!g_frameOutput.get())
-            {
-                gr_cp<IDXGIFactory1> factory;
-                if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory))))
-                {
-                    gr_cp<IDXGIAdapter1> adapter;
-                    if (SUCCEEDED(factory->EnumAdapters1(0, &adapter))) adapter->EnumOutputs(0, &g_frameOutput);
-                }
-            }
-            if (g_frameOutput.get()) g_frameOutput->WaitForVBlank();
+            waitForPrimaryVBlank();
         }
+    }
+
+    // Fallback stationary-hold pacing: block until the next vblank (see waitForPrimaryVBlank). The fallback path
+    // presents its on-screen swapchain with Present(0) and calls this only for the WM_PAINT hold render, so that
+    // idle animation loop paces at the refresh rate instead of the Present(1) windowed-flip 2/3 beat.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_waitForVBlank(
+        JNIEnv *env, jobject redrawer)
+    {
+        waitForPrimaryVBlank();
     }
 
     // needRender during a resize routes here — invalidate the frame window so a WM_PAINT drives a
@@ -936,19 +1082,60 @@ extern "C"
         return (GetWindowLongPtrW(top, GWL_EXSTYLE) & WS_EX_NOREDIRECTIONBITMAP) ? JNI_TRUE : JNI_FALSE;
     }
 
-    // Installs the live-resize WndProc hook. See the live-resize block above.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_installLiveResizeHook(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong windowPtr, jlong contentPtr)
+    // Shared install: subclass the frame's WndProc with `proc`, capturing the REAL original. NOTE: the globals
+    // are single-window (one hooked frame per process; see the live-resize block) — multiple simultaneous D3D
+    // windows are not supported by this path.
+    static void installFrameHook(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong windowPtr, jlong contentPtr, WNDPROC proc)
     {
         g_device = fromJavaPointer<DirectXDevice *>(devicePtr);
         g_contentHwnd = fromJavaPointer<HWND>(contentPtr);
         if (g_redrawer) env->DeleteGlobalRef(g_redrawer);
         g_redrawer = env->NewGlobalRef(redrawer);
 
-        HWND passed = fromJavaPointer<HWND>(windowPtr);
-        HWND top = GetAncestor(passed, GA_ROOT); // the frame that receives WM_ENTERSIZEMOVE / WM_SIZE
+        HWND top = GetAncestor(fromJavaPointer<HWND>(windowPtr), GA_ROOT); // frame that gets WM_ENTERSIZEMOVE / WM_SIZE
         g_frameHwnd = top;
-        g_originalWndProc = (WNDPROC)SetWindowLongPtrW(top, GWLP_WNDPROC, (LONG_PTR)LiveResizeWndProc);
+        WNDPROC prev = (WNDPROC)SetWindowLongPtrW(top, GWLP_WNDPROC, (LONG_PTR)proc);
+        // Guard a double-install on the same window (e.g. a recreated redrawer that didn't uninstall): if `prev`
+        // is already one of our procs, capturing it as g_originalWndProc would make CallWindowProc recurse
+        // forever — keep the real original captured on the first install instead.
+        if (prev != LiveResizeWndProc && prev != FallbackResizeWndProc) {
+            g_originalWndProc = prev;
+        }
+    }
+
+    // Installs the live-resize WndProc hook (NOREDIR overlay path). See the live-resize block above.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_installLiveResizeHook(
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong windowPtr, jlong contentPtr)
+    {
+        installFrameHook(env, redrawer, devicePtr, windowPtr, contentPtr, LiveResizeWndProc);
+    }
+
+    // Installs the non-overlay FallbackResizeWndProc (on-screen synchronous pre-render) for redirected frames
+    // that lack WS_EX_NOREDIRECTIONBITMAP.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_installFallbackResizeHook(
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong windowPtr, jlong contentPtr)
+    {
+        installFrameHook(env, redrawer, devicePtr, windowPtr, contentPtr, FallbackResizeWndProc);
+    }
+
+    // Restores the frame's original WndProc and drops the globals, so a resize after dispose (or a redrawer
+    // recreated on the same window) can't call into freed state. No-op if the globals belong to a different
+    // redrawer (defensive around the single-window limitation). Called from Direct3DRedrawer.dispose().
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_uninstallLiveResizeHook(
+        JNIEnv *env, jobject redrawer)
+    {
+        if (g_redrawer && !env->IsSameObject(g_redrawer, redrawer)) return;
+        if (g_frameHwnd && g_originalWndProc) {
+            WNDPROC current = (WNDPROC)GetWindowLongPtrW(g_frameHwnd, GWLP_WNDPROC);
+            if (current == LiveResizeWndProc || current == FallbackResizeWndProc) {
+                SetWindowLongPtrW(g_frameHwnd, GWLP_WNDPROC, (LONG_PTR)g_originalWndProc);
+            }
+        }
+        g_originalWndProc = nullptr;
+        g_frameHwnd = nullptr;
+        g_contentHwnd = nullptr;
+        g_device = nullptr;
+        if (g_redrawer) { env->DeleteGlobalRef(g_redrawer); g_redrawer = nullptr; }
     }
 
 }
