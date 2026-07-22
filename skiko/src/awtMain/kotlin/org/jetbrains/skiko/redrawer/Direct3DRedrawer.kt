@@ -22,10 +22,12 @@ internal class Direct3DRedrawer(
     private var drawLock = Any()
     private var isSwapChainInitialized = false
 
-    // Whether the synchronous live-resize WndProc hook is installed on this window (fixed at construction). When
-    // it is, the on-screen swapchain uses DXGI_SCALING_NONE and interactive resizes render synchronously in
-    // WM_NCCALCSIZE; isInLiveResize is set for the duration of a drag.
-    private var liveResizeInstalled = false
+    // Opaque handle to this window's native LiveResizeState (0 if the hook isn't installed), returned by
+    // installLiveResizeHook and threaded back through postLiveResizeRender/uninstallLiveResizeHook. Per-window, so
+    // multiple D3D windows can be hooked at once. When installed, the on-screen swapchain uses DXGI_SCALING_NONE and
+    // interactive resizes render synchronously in WM_NCCALCSIZE; isInLiveResize is set for the duration of a drag.
+    private var liveResizeHandle: Long = 0L
+    private val liveResizeInstalled: Boolean get() = liveResizeHandle != 0L
 
     private var device: Long = 0L
         get() {
@@ -53,8 +55,7 @@ internal class Direct3DRedrawer(
         // the on-screen swapchain at the new size and presents it inside WM_NCCALCSIZE, before the geometry
         // commits, so DWM never exposes an unrendered (white) region at the edges.
         if (layer.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize) {
-            installLiveResizeHook(layer.windowHandle, layer.contentHandle)
-            liveResizeInstalled = true
+            liveResizeHandle = installLiveResizeHook(layer.windowHandle, layer.contentHandle)
         }
     }
 
@@ -118,7 +119,8 @@ internal class Direct3DRedrawer(
         // Restore the frame's WndProc and drop the native globals BEFORE freeing the device they reference, so a
         // resize message arriving after this can't call into freed state.
         if (liveResizeInstalled) {
-            uninstallLiveResizeHook()
+            uninstallLiveResizeHook(liveResizeHandle)
+            liveResizeHandle = 0L
         }
         frameDispatcher.cancel()
         contextHandler.dispose()
@@ -134,7 +136,7 @@ internal class Direct3DRedrawer(
         // (postLiveResizeRender), which only fires in a stationary hold; active-drag animation is driven by the
         // WM_NCCALCSIZE renders themselves.
         if (isInLiveResize) {
-            postLiveResizeRender()
+            postLiveResizeRender(liveResizeHandle)
         } else {
             frameDispatcher.scheduleFrame()
         }
@@ -216,13 +218,14 @@ internal class Direct3DRedrawer(
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long
 
-    // Installs a WndProc subclass on the top-level window (GA_ROOT of `window`) that, during an interactive
-    // resize, synchronously renders the real content into the on-screen swapchain and presents it in WM_NCCALCSIZE.
-    private external fun installLiveResizeHook(window: Long, content: Long)
+    // Installs a WndProc subclass on the top-level window (GA_ROOT of `window`) that, during an interactive resize,
+    // synchronously renders the real content into the on-screen swapchain and presents it in WM_NCCALCSIZE. Returns
+    // an opaque handle to the per-window native state (0 on failure), to pass back to the two calls below.
+    private external fun installLiveResizeHook(window: Long, content: Long): Long
 
-    // Restores the frame's original WndProc and drops the native globals; called from dispose().
-    private external fun uninstallLiveResizeHook()
+    // Restores the frame's original WndProc and frees the per-window native state; called from dispose().
+    private external fun uninstallLiveResizeHook(handle: Long)
 
     // Invalidates the frame window so a WM_PAINT drives the stationary-hold render (see needRender).
-    private external fun postLiveResizeRender()
+    private external fun postLiveResizeRender(handle: Long)
 }
