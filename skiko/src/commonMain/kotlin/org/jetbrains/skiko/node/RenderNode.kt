@@ -16,6 +16,11 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  * everything from scratch. A RenderNode only needs its display list re-recorded when its content
  * alone should be changed. RenderNodes can also be transformed without re-recording the display
  * list through the transform properties.</p>
+ *
+ * <p>A tree of RenderNodes is owned by a single thread. Recording, changing a property and drawing
+ * all mutate the node they are called on, and changing a property of one node may also mutate the
+ * nodes drawing it, so none of them may run concurrently with each other. A picture recorded from
+ * a node is immutable and can be replayed on any thread.</p>
  */
 class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     private companion object {
