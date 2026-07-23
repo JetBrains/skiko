@@ -68,46 +68,6 @@ internal class Direct3DRedrawer(
         }
     }
 
-    // ---- Live-resize lifecycle. All three are called from native on the toolkit thread; a drag runs as
-    // onLiveResizeStarted → drawFrameWhileLiveResizing (once per resize step) → onLiveResizeEnded.
-    // isHandlingLiveResizeNow is set by the first and cleared by the last. ----
-
-    /** Called (on the toolkit thread) when the live-resize session starts. */
-    @Suppress("unused")
-    private fun onLiveResizeStarted() {
-        isHandlingLiveResizeNow = true
-    }
-
-    /**
-     * Called (on the toolkit thread) to synchronously draw a single frame at the given size during a live-resize.
-     */
-    @Suppress("unused")
-    private fun drawFrameWhileLiveResizing(width: Int, height: Int) {
-        EdtInvoker.invokeAndWaitWhilePumping {
-            if (isDisposed) return@invokeAndWaitWhilePumping
-            val size = Dimension(width, height)
-            update(forcedSize = size)
-            inDrawScope(forcedSize = size) {
-                if (!isDisposed) {
-                    drawAndSwap(withVsync = false)  // Native code handles the vsync, to avoid blocking the EDT
-                }
-            }
-        }
-    }
-
-    /** Called (on the toolkit thread) when the live-resize session ends. */
-    @Suppress("unused")
-    private fun onLiveResizeEnded() {
-        EdtInvoker.invokeAndWaitWhilePumping {
-            javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
-                it.invalidate()
-                it.validate()
-            }
-            isHandlingLiveResizeNow = false
-            renderImmediately() // render the canvas at the final size before it's revealed
-        }
-    }
-
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing && !isHandlingLiveResizeNow) {
             update()
@@ -191,7 +151,13 @@ internal class Direct3DRedrawer(
 
     fun changeSize(width: Int, height: Int): Boolean {
         return if (!isSwapChainInitialized) {
-            initSwapChain(device, width, height, layer.transparency, liveResizeInstalled)
+            initSwapChain(
+                device = device,
+                width = width,
+                height = height,
+                transparency = layer.transparency,
+                preferNoneScaling = liveResizeInstalled
+            )
             isSwapChainInitialized = true
             true
         } else {
@@ -213,6 +179,46 @@ internal class Direct3DRedrawer(
     // Called from native code
     @Suppress("unused")
     private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
+
+    // ---- Live-resize lifecycle. All three are called from native on the toolkit thread; a drag runs as
+    // onLiveResizeStarted → drawFrameWhileLiveResizing (once per resize step) → onLiveResizeEnded.
+    // isHandlingLiveResizeNow is set by the first and cleared by the last. ----
+
+    /** Called (on the toolkit thread) when the live-resize session starts. */
+    @Suppress("unused")
+    private fun onLiveResizeStarted() {
+        isHandlingLiveResizeNow = true
+    }
+
+    /**
+     * Called (on the toolkit thread) to synchronously draw a single frame at the given size during a live-resize.
+     */
+    @Suppress("unused")
+    private fun drawFrameWhileLiveResizing(width: Int, height: Int) {
+        EdtInvoker.invokeAndWaitWhilePumping {
+            if (isDisposed) return@invokeAndWaitWhilePumping
+            val size = Dimension(width, height)
+            update(forcedSize = size)
+            inDrawScope(forcedSize = size) {
+                if (!isDisposed) {
+                    drawAndSwap(withVsync = false)  // Native code handles the vsync, to avoid blocking the EDT
+                }
+            }
+        }
+    }
+
+    /** Called (on the toolkit thread) when the live-resize session ends. */
+    @Suppress("unused")
+    private fun onLiveResizeEnded() {
+        EdtInvoker.invokeAndWaitWhilePumping {
+            javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
+                it.invalidate()
+                it.validate()
+            }
+            isHandlingLiveResizeNow = false
+            renderImmediately() // render the canvas at the final size before it's revealed
+        }
+    }
 
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXDevice(adapter: Long, contentHandle: Long, transparency: Boolean): Long
