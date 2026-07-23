@@ -50,15 +50,6 @@ internal class MetalRedrawer(
     private var drawLock = Any()
 
     /**
-     * Whether this redrawer is currently driving an interactive live-resize itself (only ever true when
-     * [SkikoProperties.metalSynchronousLiveResize] is enabled and this layer fills the window). Set for the
-     * duration of a drag; it quiesces the async EDT renders (frameDispatcher loop, onPlatformComponentResized) so
-     * the synchronous AppKit-main-thread render is the only thing painting during a drag.
-     */
-    @Volatile
-    private var isHandlingLiveResizeNow: Boolean = false
-
-    /**
      * [MetalDevice] initialized for given [layer] or null if [MetalRedrawer] is disposed,
      * so future calls of [device] will throw exception
      */
@@ -76,6 +67,15 @@ internal class MetalRedrawer(
 
     private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
     @Volatile private var isWindowOccluded = false
+
+    /**
+     * Whether this redrawer is currently driving an interactive live-resize itself (only ever true when
+     * [SkikoProperties.metalSynchronousLiveResize] is enabled and this layer fills the window). Set for the
+     * duration of a drag; it quiesces the async EDT renders (frameDispatcher loop, onPlatformComponentResized) so
+     * the synchronous AppKit-main-thread render is the only thing painting during a drag.
+     */
+    @Volatile
+    private var isHandlingLiveResizeNow: Boolean = false
 
     init {
         onDeviceChosen(adapter.name)
@@ -115,13 +115,6 @@ internal class MetalRedrawer(
         vSyncer?.dispose()
         _device = null
         super.dispose()
-    }
-
-    override fun onPlatformComponentResized() {
-        // During live resize, the layer tells us its size directly; the AWT size is not in sync
-        if (!isHandlingLiveResizeNow) {
-            super.onPlatformComponentResized()
-        }
     }
 
     override fun needRender(throttledToVsync: Boolean) {
@@ -212,6 +205,13 @@ internal class MetalRedrawer(
             if (!isDisposed) {
                 needRender(throttledToVsync = false)
             }
+        }
+    }
+
+    override fun onPlatformComponentResized() {
+        // During live resize, the layer tells us its size directly; the AWT size is not in sync
+        if (!isHandlingLiveResizeNow) {
+            super.onPlatformComponentResized()
         }
     }
 

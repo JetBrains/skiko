@@ -16,9 +16,9 @@ bool isPumpingEdt() { return tlsPumpingEdt; }
 
 extern "C"
 {
-    // java.awt.EventQueue.invokeLater(runnable) — posts the runnable to the EDT. A static JDK method, so it
-    // caches the class as a global ref alongside the method ID (single lookup).
-    static void invokeLaterOnAwtEdtThread(JNIEnv *env, jobject runnable)
+    // Posts `runnable` to the EDT via the static java.awt.EventQueue.invokeLater(Runnable). Caches the class as a
+    // global ref alongside the method ID (single lookup), calls it, and clears any pending exception.
+    static void javaEventQueueInvokeLater(JNIEnv *env, jobject runnable)
     {
         static jclass cls = nullptr;
         static jmethodID mid = nullptr;
@@ -33,9 +33,10 @@ extern "C"
         if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
     }
 
-    // Constructs a new EdtInvocationTask(runnable, doneEvent) — the small Java shim that runs `runnable` on the
-    // EDT and then signals `doneEvent`. Class + ctor cached on first use.
-    static jobject newEdtInvocationTask(JNIEnv *env, jobject runnable, HANDLE doneEvent)
+    // Constructs a new EdtInvocationTask(runnable, doneEvent) — the small Java shim that runs `runnable` on the EDT
+    // and then signals `doneEvent`. Class + ctor cached on first use; clears any pending exception (returns null on
+    // failure, which the caller already handles).
+    static jobject javaNewEdtInvocationTask(JNIEnv *env, jobject runnable, HANDLE doneEvent)
     {
         static jclass cls = nullptr;
         static jmethodID ctor = nullptr;
@@ -46,7 +47,9 @@ extern "C"
             env->DeleteLocalRef(local);
             ctor = env->GetMethodID(cls, "<init>", "(Ljava/lang/Runnable;J)V");
         }
-        return env->NewObject(cls, ctor, runnable, toJavaPointer(doneEvent));
+        jobject task = env->NewObject(cls, ctor, runnable, toJavaPointer(doneEvent));
+        if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
+        return task;
     }
 
     // Runs `runnable` on the EDT and blocks this thread until it finishes, servicing cross-thread SENT messages
@@ -63,13 +66,13 @@ extern "C"
         HANDLE done = CreateEventW(nullptr, /*manualReset*/ FALSE, /*initialState*/ FALSE, nullptr);
         if (!done) return;
 
-        jobject task = newEdtInvocationTask(env, runnable, done);
+        jobject task = javaNewEdtInvocationTask(env, runnable, done);
         if (task)
         {
             // Set before posting so that even if the EDT runs the task and SENDs a message back before we reach the
             // pump loop, a re-entrant caller dispatching it sees us as busy. Cleared once the round-trip completes.
             tlsPumpingEdt = true;
-            invokeLaterOnAwtEdtThread(env, task);
+            javaEventQueueInvokeLater(env, task);
             env->DeleteLocalRef(task);
             for (;;)
             {

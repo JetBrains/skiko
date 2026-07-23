@@ -36,7 +36,8 @@ internal class Direct3DRedrawer(
     // multiple D3D windows can be hooked at once. When installed, the on-screen swapchain uses DXGI_SCALING_NONE and
     // interactive resizes render synchronously in WM_NCCALCSIZE; isHandlingLiveResizeNow is set for the drag.
     private var liveResizeHandle: Long = 0L
-    private val liveResizeInstalled: Boolean get() = liveResizeHandle != 0L
+    private val liveResizeInstalled: Boolean
+        get() = liveResizeHandle != 0L
 
     private var device: Long = 0L
         get() {
@@ -60,9 +61,6 @@ internal class Direct3DRedrawer(
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
             .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
 
-        // Install the synchronous live-resize hook: during an interactive drag it renders the real content into
-        // the on-screen swapchain at the new size and presents it inside WM_NCCALCSIZE, before the geometry
-        // commits, so DWM never exposes an unrendered (white) region at the edges.
         if (layer.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize) {
             liveResizeHandle = installLiveResizeHook(layer.windowHandle, layer.contentHandle)
         }
@@ -80,8 +78,6 @@ internal class Direct3DRedrawer(
     }
 
     override fun dispose() = synchronized(drawLock) {
-        // Restore the frame's WndProc and drop the native globals BEFORE freeing the device they reference, so a
-        // resize message arriving after this can't call into freed state.
         if (liveResizeInstalled) {
             uninstallLiveResizeHook(liveResizeHandle)
             liveResizeHandle = 0L
@@ -103,8 +99,8 @@ internal class Direct3DRedrawer(
     override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
         if (isHandlingLiveResizeNow) {
-            // during a resize, present only from the toolkit thread (synchronized with the resize loop) — an async EDT
-            // present would race the synchronous render.
+            // During live resize, present only from the toolkit thread (synchronized with the resize loop).
+            // An async EDT present would race the synchronous render.
             postLiveResizeRender(liveResizeHandle)
         } else {
             frameDispatcher.scheduleFrame()
@@ -130,8 +126,6 @@ internal class Direct3DRedrawer(
     }
 
     private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
-        // No isHandlingLiveResizeNow guard: the live-resize pre-render deliberately drives drawAndSwap during a
-        // drag, and the async callers (frameDispatcher loop, reshape workaround) are already quiesced by the flag.
         if (isDisposed) {
             return
         }
@@ -190,6 +184,19 @@ internal class Direct3DRedrawer(
         isHandlingLiveResizeNow = true
     }
 
+    /** Called (on the toolkit thread) when the live-resize session ends. */
+    @Suppress("unused")
+    private fun onLiveResizeEnded() {
+        EdtInvoker.invokeAndWaitWhilePumping {
+            javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
+                it.invalidate()
+                it.validate()
+            }
+            isHandlingLiveResizeNow = false
+            renderImmediately() // render the canvas at the final size before it's revealed
+        }
+    }
+
     /**
      * Called (on the toolkit thread) to synchronously draw a single frame at the given size during a live-resize.
      */
@@ -201,22 +208,9 @@ internal class Direct3DRedrawer(
             update(forcedSize = size)
             inDrawScope(forcedSize = size) {
                 if (!isDisposed) {
-                    drawAndSwap(withVsync = false)  // Native code handles the vsync, to avoid blocking the EDT
+                    drawAndSwap(withVsync = false)  // Native code handles the vsync to avoid blocking the EDT
                 }
             }
-        }
-    }
-
-    /** Called (on the toolkit thread) when the live-resize session ends. */
-    @Suppress("unused")
-    private fun onLiveResizeEnded() {
-        EdtInvoker.invokeAndWaitWhilePumping {
-            javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
-                it.invalidate()
-                it.validate()
-            }
-            isHandlingLiveResizeNow = false
-            renderImmediately() // render the canvas at the final size before it's revealed
         }
     }
 
