@@ -46,6 +46,6 @@ internal actual fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextA
         override val renderViaOffscreenBackBuffer = attr?.renderViaOffscreenBackBuffer ?: 0
         override val majorVersion = attr?.majorVersion ?: 2
     }
-
+    patchWebGlContext(canvas)
     return GL.createContext(canvas, contextAttributes.asJsObject())
 }

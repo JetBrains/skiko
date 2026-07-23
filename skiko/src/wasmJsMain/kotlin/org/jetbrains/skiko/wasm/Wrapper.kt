@@ -26,6 +26,7 @@ private external fun createDefaultContextAttributes(): ContextAttributes
 
 internal actual fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes?): NativePointer {
     check(attr === null) { "TODO!" }
+    patchWebGlContext(canvas)
     return GL.createContext(canvas, createDefaultContextAttributes())
 }
 
