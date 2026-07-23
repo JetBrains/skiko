@@ -140,12 +140,20 @@ fun SkikoProjectContext.declareWasmTasks() {
         flags.addAll(buildList {
             add("-Oz")
             add("-fuse-ld=lld")
-//            add("-Wl,--export-all")
-            add("-Wl,--gc-sections")
-            add("-Wl,--no-entry")
-            add("-Wl,--allow-undefined")
-            add("-Wl,--strip-all")
             add("-flto")
+            if (isSideModule) {
+                add("-shared")
+                add("-Wl,--no-entry")
+                add("-Wl,--export-all")
+                add("-Wl,--import-memory")
+                add("-Wl,--import-table")
+            } else {
+//                add("-Wl,--export-all")
+                add("-Wl,--gc-sections")
+                add("-Wl,--no-entry")
+                add("-Wl,--strip-all")
+            }
+            add("-Wl,--allow-undefined")
             add("--target=wasm32-wasip1")
             add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
             add("-mllvm")
@@ -155,19 +163,23 @@ fun SkikoProjectContext.declareWasmTasks() {
             if (skiko.isWasmBuildWithProfiling) add("--profiling")
             addAll(resolvedBinaryInputs.linkFlags)
         })
-        flags.addAll(exportsProvider.map { exports ->
-            exports.map { "-Wl,--export=$it" }
-        })
+        if (!isSideModule) {
+            flags.addAll(exportsProvider.map { exports ->
+                exports.map { "-Wl,--export=$it" }
+            })
+        }
 
         doLast {
             // skiko.mjs is referenced in karma.config.d/*/config.js
-            // so symbols must be replaced right after linking
+            // so symbols must be replaced right after linking.
+            // With WASI SDK (unlike Emscripten), the linker only produces a .wasm file,
+            // so we must create the .mjs file ourselves from the callbacks + setup sources.
             val outputFileName = emccOutputFileName.get()
             if (!outputFileName.endsWith(".mjs")) {
                 return@doLast
             }
 
-            val emccOutputFile = outDir.asFile.get().walk().first { it.name == outputFileName }
+            val emccOutputFile = outDir.asFile.get().resolve(outputFileName)
             val callbacks = project.layout.projectDirectory.file("src/webMain/resources/skikoCallbacks.js").asFile.readText()
             val setup = project.file(prefixPath).readText()
             emccOutputFile.writeText(callbacks + "\n" + setup)
@@ -201,16 +213,12 @@ fun SkikoProjectContext.declareWasmTasks() {
         emccOutputFileName.set(if (isSideModule) "${libBaseName}d8.wasm" else "skikod8.mjs") // this determines the name .wasm file too
         libOutputFileName.set("${libBaseName}d8.wasm")
 
-        flags.addAll(listOf("-s", "ENVIRONMENT=shell"))
-
         val prefixPath = if (isSideModule) {
             project.sideModuleSetupMjs(libBaseName).normalize().absolutePath
         } else {
             project.setupMjs.normalize().absolutePath
         }
         configureCommon(prefixPath)
-        configureCommon(project.setupMjs.normalize().absolutePath)
-
     }
 
     // skikoWasmJar is used by task name
@@ -366,8 +374,17 @@ private fun SkikoProjectContext.configureSideModuleInput(
     mainLinkTaskName: String,
     sideModuleFiles: ConfigurableFileCollection
 ) {
+    // Side modules built with -shared are dynamic wasm modules loaded at runtime.
+    // They must NOT be passed to the core linker (wasm-ld cannot statically link
+    // a dynamic object). Instead, copy them into the core link output directory
+    // so they are bundled alongside the core .wasm for runtime loading.
     project.tasks.named<LinkSkikoWasmTask>(mainLinkTaskName).configure {
-        libFiles += sideModuleFiles
+        dependsOn(sideModuleFiles)
+        doLast {
+            sideModuleFiles.files.forEach { sideWasm ->
+                sideWasm.copyTo(outDir.get().asFile.resolve(sideWasm.name), overwrite = true)
+            }
+        }
     }
 }
 
