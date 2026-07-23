@@ -52,11 +52,6 @@ val skottieDependencies: SkikoDependencyScope.() -> Unit = {
                 "jsonreader"
             )
         }
-        wasm {
-            linkFlags(
-//                "-s", "SIDE_MODULE=2",
-            )
-        }
     }
 }
 val skikoSkottieProjectContext = SkikoProjectContext(
