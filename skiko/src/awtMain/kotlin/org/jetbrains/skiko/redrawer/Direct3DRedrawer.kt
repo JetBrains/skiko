@@ -22,10 +22,19 @@ internal class Direct3DRedrawer(
     private var drawLock = Any()
     private var isSwapChainInitialized = false
 
+    /**
+     * Whether this redrawer is currently driving an interactive live-resize itself (only ever true when
+     * [SkikoProperties.direct3DSynchronousLiveResize] is enabled and this layer fills the window). Set for the
+     * duration of the resize gesture; it quiesces the async EDT renders so the synchronous native render is the only
+     * thing painting during a live-resize.
+     */
+    @Volatile
+    internal var isHandlingLiveResizeNow: Boolean = false
+
     // Opaque handle to this window's native LiveResizeState (0 if the hook isn't installed), returned by
     // installLiveResizeHook and threaded back through postLiveResizeRender/uninstallLiveResizeHook. Per-window, so
     // multiple D3D windows can be hooked at once. When installed, the on-screen swapchain uses DXGI_SCALING_NONE and
-    // interactive resizes render synchronously in WM_NCCALCSIZE; isInLiveResize is set for the duration of a drag.
+    // interactive resizes render synchronously in WM_NCCALCSIZE; isHandlingLiveResizeNow is set for the drag.
     private var liveResizeHandle: Long = 0L
     private val liveResizeInstalled: Boolean get() = liveResizeHandle != 0L
 
@@ -59,36 +68,25 @@ internal class Direct3DRedrawer(
         }
     }
 
-    // called from native on the toolkit thread on WM_EXITSIZEMOVE.
+    // ---- Live-resize lifecycle. All three are called from native on the toolkit thread; a drag runs as
+    // onLiveResizeStarted → drawFrameWhileLiveResizing (once per resize step) → onLiveResizeEnded.
+    // isHandlingLiveResizeNow is set by the first and cleared by the last. ----
+
+    // Start: the first size-changing step of a drag. Flips the flag (before the first draw) so the async EDT renders
+    // (frameDispatcher loop, reshape workaround, onPlatformComponentResized) quiesce for the rest of the drag,
+    // leaving the synchronous WM_NCCALCSIZE render as the only thing painting.
     @Suppress("unused")
-    private fun onLiveResizeEnded() {
-        frameDispatcher.scheduleFrame() // resume the normal animation loop
+    private fun onLiveResizeStarted() {
+        isHandlingLiveResizeNow = true
     }
 
-    // called from native (toolkit thread, pump-waited) at drag-end. Runs on the EDT: the contentPane/layer/canvas
-    // lag the final window size by one resize step (Swing knows the final window size but never re-lays-out at
-    // rest), so force a layout pass to catch the canvas up to the exact native client size, then render it.
-    @Suppress("unused")
-    private fun onLiveResizeFinalize() {
-        EdtInvoker.invokeAndWaitWhilePumping {
-            javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
-                it.invalidate()
-                it.validate()
-            }
-            isInLiveResize = false
-            renderImmediately() // render the canvas at the final size before it's revealed
-        }
-    }
-
-    // Called from native (toolkit thread) in WM_NCCALCSIZE (active drag) and WM_PAINT (stationary hold).
-    // Synchronously renders the real content into the on-screen swapchain at the new client size and presents it,
-    // BEFORE the resize geometry commits — "delay the resize until content is drawn". onRender (user/Compose code)
-    // requires the EDT, so we hop to it via invokeAndWaitWhilePumping — the toolkit thread blocks until the EDT
-    // finishes rendering+presenting, so the present completes before WM_NCCALCSIZE returns. This is the Windows
-    // analog of the Metal fix's setBounds override + LWCToolkit.invokeAndWait.
+    // Draw: called in WM_NCCALCSIZE (active drag) and WM_PAINT (stationary hold). Synchronously renders the real
+    // content into the on-screen swapchain at the new client size and presents it, BEFORE the resize geometry
+    // commits — "delay the resize until content is drawn". onRender (user/Compose code) requires the EDT, so we hop
+    // to it via invokeAndWaitWhilePumping — the toolkit thread blocks until the EDT finishes rendering+presenting,
+    // so the present completes before WM_NCCALCSIZE returns. Windows analog of Metal's setBounds + LWCToolkit.invokeAndWait.
     @Suppress("unused")
     private fun drawFrameWhileLiveResizing(width: Int, height: Int) {
-        isInLiveResize = true // quiesce the async EDT renders for the rest of the drag (cleared at drag end)
         EdtInvoker.invokeAndWaitWhilePumping {
             if (isDisposed) return@invokeAndWaitWhilePumping
             val size = Dimension(width, height)
@@ -104,8 +102,27 @@ internal class Direct3DRedrawer(
         }
     }
 
+    // End (drag-end, toolkit thread, pump-waited): runs blocking on the EDT. The contentPane/layer/canvas lag the
+    // final window size by one resize step (Swing knows the final window size but never re-lays-out at rest), so
+    // force a layout pass to catch the canvas up to the exact native client size, clear the flag, and render at that
+    // size before it's revealed. No explicit frameDispatcher.scheduleFrame() to resume the loop: with the flag now
+    // cleared, renderImmediately's update() lets onRender re-request a frame (needRender -> scheduleFrame) exactly
+    // when content is still animating — the same self-sustaining path the normal loop uses; static content
+    // correctly stays idle.
+    @Suppress("unused")
+    private fun onLiveResizeEnded() {
+        EdtInvoker.invokeAndWaitWhilePumping {
+            javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
+                it.invalidate()
+                it.validate()
+            }
+            isHandlingLiveResizeNow = false
+            renderImmediately() // render the canvas at the final size before it's revealed
+        }
+    }
+
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing && !isInLiveResize) {
+        if (layer.isShowing && !isHandlingLiveResizeNow) {
             update()
             draw()
         }
@@ -129,13 +146,18 @@ internal class Direct3DRedrawer(
         super.dispose()
     }
 
+    override fun onPlatformComponentResized() {
+        // During live resize, the layer tells us its size directly; the AWT size is not in sync
+        if (!isHandlingLiveResizeNow) {
+            super.onPlatformComponentResized()
+        }
+    }
+
     override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
-        // during a resize, present only from the toolkit thread (synchronized with the resize loop) — an async EDT
-        // present would race the synchronous render. Route needRender to a WM_PAINT-driven toolkit present
-        // (postLiveResizeRender), which only fires in a stationary hold; active-drag animation is driven by the
-        // WM_NCCALCSIZE renders themselves.
-        if (isInLiveResize) {
+        if (isHandlingLiveResizeNow) {
+            // during a resize, present only from the toolkit thread (synchronized with the resize loop) — an async EDT
+            // present would race the synchronous render.
             postLiveResizeRender(liveResizeHandle)
         } else {
             frameDispatcher.scheduleFrame()
@@ -161,8 +183,8 @@ internal class Direct3DRedrawer(
     }
 
     private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
-        // No isInLiveResize guard: the live-resize pre-render deliberately drives drawAndSwap during a drag, and
-        // the async callers (frameDispatcher loop, reshape workaround) are already quiesced by isInLiveResize.
+        // No isHandlingLiveResizeNow guard: the live-resize pre-render deliberately drives drawAndSwap during a
+        // drag, and the async callers (frameDispatcher loop, reshape workaround) are already quiesced by the flag.
         if (isDisposed) {
             return
         }

@@ -188,13 +188,13 @@ static JNIEnv *getJniEnv()
 // global ref (from its LiveResizeState). Each caches its jmethodID in a local static on first use (the
 // Direct3DRedrawer class is the same for every window and stable for the app's lifetime, and all callers run on the
 // single toolkit thread, so the lazy init needs no synchronization). ----
-static void onLiveResizeFinalize(JNIEnv *env, jobject redrawer)
+static void onLiveResizeStarted(JNIEnv *env, jobject redrawer)
 {
     static jmethodID mid = nullptr;
     if (!mid)
     {
         jclass cls = env->GetObjectClass(redrawer);
-        mid = env->GetMethodID(cls, "onLiveResizeFinalize", "()V");
+        mid = env->GetMethodID(cls, "onLiveResizeStarted", "()V");
         env->DeleteLocalRef(cls);
     }
     if (mid) env->CallVoidMethod(redrawer, mid);
@@ -250,15 +250,15 @@ static void renderFrameOnEdt(LiveResizeState *s, int w, int h)
     g_rendering = false;
 }
 
-// at drag-end, run onLiveResizeFinalize on the EDT (blocking, via invokeAndWaitWhilePumping) — force a layout so
-// the canvas HWND catches up to the final client size AND render it at that size, before the async loop resumes.
-static void finalizeLiveResizeOnEdt(LiveResizeState *s)
+// at drag-end, run onLiveResizeEnded on the EDT (blocking, via invokeAndWaitWhilePumping) — force a layout so the
+// canvas HWND catches up to the final client size, render it at that size, then resume the normal animation loop.
+static void endLiveResizeOnEdt(LiveResizeState *s)
 {
     if (!s->redrawer) return;
     JNIEnv *env = getJniEnv();
     if (!env) return;
     g_rendering = true;
-    onLiveResizeFinalize(env, s->redrawer);
+    onLiveResizeEnded(env, s->redrawer);
     g_rendering = false;
 }
 
@@ -338,7 +338,13 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             LRESULT r = CallWindowProcW(s->originalProc, hWnd, msg, wParam, lParam);
             if (s->inSizeMoveLoop && wParam && !g_rendering)
             {
-                s->liveResizeEngaged = true;
+                if (!s->liveResizeEngaged)
+                {
+                    // First real (size-changing) step of this drag: tell Kotlin to engage BEFORE the first render,
+                    // so the async EDT renders quiesce for the rest of the drag (see onLiveResizeStarted).
+                    s->liveResizeEngaged = true;
+                    if (JNIEnv *env = getJniEnv()) onLiveResizeStarted(env, s->redrawer);
+                }
                 NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *)lParam;
                 RECT c = p->rgrc[0]; // now holds the new CLIENT rect
                 s->lastClientWidth = c.right - c.left;
@@ -354,7 +360,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             // Stationary hold: while the drag is paused no WM_NCCALCSIZE fires, so drive the animation (and keep
             // content present, no white) from WM_PAINT. It sits BELOW input in GetMessage priority, so it can't
             // starve the active drag (mouse moves win and drive frames via WM_NCCALCSIZE). needRender re-arms it
-            // via postLiveResizeRender's InvalidateRect while isInLiveResize. The WM_PAINT stationary-hold driver.
+            // via postLiveResizeRender's InvalidateRect while isHandlingLiveResizeNow. The WM_PAINT stationary-hold driver.
             if (s->inSizeMoveLoop && s->liveResizeEngaged)
             {
                 ValidateRect(hWnd, nullptr); // validate FIRST so the re-arm InvalidateRect isn't cleared
@@ -374,8 +380,12 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             }
             break;
         case WM_EXITSIZEMOVE:
+            s->inSizeMoveLoop = false;
+            // Only when a real resize engaged. A plain move never sets isHandlingLiveResizeNow (so it never quiesced
+            // the async loop) and never renders here — there's nothing to finalize or resume.
             if (s->liveResizeEngaged)
             {
+                s->liveResizeEngaged = false;
                 // Snap the content child to the exact settled client size. growContentChildTo only ever grew it
                 // during the drag, so after a shrink it can be left larger than the client (clipped, so invisible);
                 // Swing's post-drag layout may no-op (its model already matches), leaving the native HWND oversized.
@@ -387,13 +397,10 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                                  SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
                 }
                 // We quiesced onPlatformComponentResized for the whole drag, so the layer's Swing size is stale.
-                // Force a layout to the settled size and render BEFORE the async loop resumes, else it renders at
-                // the stale size and flashes white. finalize also clears isInLiveResize (via onLiveResizeFinalize).
-                finalizeLiveResizeOnEdt(s);
-                s->liveResizeEngaged = false;
+                // onLiveResizeEnded (on the EDT) forces a layout to the settled size and renders BEFORE the async
+                // loop resumes — else it renders at the stale size and flashes white — then resumes the loop.
+                endLiveResizeOnEdt(s);
             }
-            s->inSizeMoveLoop = false;
-            if (JNIEnv *env = getJniEnv()) onLiveResizeEnded(env, s->redrawer); // clear the flag + resume normal loop
             break;
     }
     return CallWindowProcW(s->originalProc, hWnd, msg, wParam, lParam);

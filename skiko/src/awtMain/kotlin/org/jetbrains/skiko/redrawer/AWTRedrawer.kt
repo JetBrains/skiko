@@ -22,23 +22,8 @@ internal abstract class AWTRedrawer(
     protected var isDisposed = false
         private set
 
-    /**
-     * Whether the window is in interactive live-resize. Set for the duration of a drag; it quiesces the async EDT
-     * renders (frameDispatcher loop, reshape workaround, onPlatformComponentResized) so the synchronous
-     * WM_NCCALCSIZE render is the only thing painting during a drag.
-     */
-    @Volatile
-    internal var isInLiveResize: Boolean = false
-
     init {
         rendererAnalytics.init()
-    }
-
-    override fun onPlatformComponentResized() {
-        // During live resize, the layer tells us its size directly; the AWT size is not in sync
-        if (!isInLiveResize) {
-            super.onPlatformComponentResized()
-        }
     }
 
     override fun dispose() {

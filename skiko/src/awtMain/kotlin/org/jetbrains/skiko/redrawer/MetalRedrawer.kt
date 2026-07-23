@@ -50,6 +50,15 @@ internal class MetalRedrawer(
     private var drawLock = Any()
 
     /**
+     * Whether this redrawer is currently driving an interactive live-resize itself (only ever true when
+     * [SkikoProperties.metalSynchronousLiveResize] is enabled and this layer fills the window). Set for the
+     * duration of a drag; it quiesces the async EDT renders (frameDispatcher loop, onPlatformComponentResized) so
+     * the synchronous AppKit-main-thread render is the only thing painting during a drag.
+     */
+    @Volatile
+    private var isHandlingLiveResizeNow: Boolean = false
+
+    /**
      * [MetalDevice] initialized for given [layer] or null if [MetalRedrawer] is disposed,
      * so future calls of [device] will throw exception
      */
@@ -108,9 +117,16 @@ internal class MetalRedrawer(
         super.dispose()
     }
 
+    override fun onPlatformComponentResized() {
+        // During live resize, the layer tells us its size directly; the AWT size is not in sync
+        if (!isHandlingLiveResizeNow) {
+            super.onPlatformComponentResized()
+        }
+    }
+
     override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
-        if (isInLiveResize) {
+        if (isHandlingLiveResizeNow) {
             // The background frame loop is gated off during a resize (two presenters deadlock / starve
             // the drawable pool), so drive animation frames from the AppKit main thread instead — the
             // same single serialized presenter that setBounds uses.
@@ -183,7 +199,7 @@ internal class MetalRedrawer(
      */
     @Suppress("unused")
     fun onLiveResizeStarted() {
-        isInLiveResize = true
+        isHandlingLiveResizeNow = true
     }
 
     /**
@@ -191,7 +207,7 @@ internal class MetalRedrawer(
      */
     @Suppress("unused")
     fun onLiveResizeEnded() {
-        isInLiveResize = false
+        isHandlingLiveResizeNow = false
         invokeLater {
             if (!isDisposed) {
                 needRender(throttledToVsync = false)
@@ -246,7 +262,7 @@ internal class MetalRedrawer(
 
     override fun syncBoundsFromPlatformComponent() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-        if (isInLiveResize) return
+        if (isHandlingLiveResizeNow) return
 
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
@@ -311,13 +327,13 @@ internal class MetalRedrawer(
 
         private val updateDispatcher = FrameDispatcher(MainUIDispatcher) {
             // Gated off during a live resize: presentation is driven from the AppKit main thread
-            if (layer.isShowing && !isInLiveResize) {
+            if (layer.isShowing && !isHandlingLiveResizeNow) {
                 updateIfRequested()
             }
         }
 
         private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            if (layer.isShowing && !isInLiveResize) {
+            if (layer.isShowing && !isHandlingLiveResizeNow) {
                 updateIfRequested()
                 draw()
             }
