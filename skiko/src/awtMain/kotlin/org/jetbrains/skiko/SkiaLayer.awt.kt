@@ -432,7 +432,7 @@ actual open class SkiaLayer internal constructor(
         //
         // Calling redraw during layout might break software renderers,
         // so apply this fix only for the Direct3D case.
-        if (isShowing && (redrawer as? Direct3DRedrawer)?.isHandlingLiveResizeNow != true) {
+        if (isShowing && (redrawer as? Direct3DRedrawer)?.isHandlingLiveResizeNow == false) {
             redrawer?.syncBoundsFromPlatformComponent()
             redrawer?.renderImmediately()
         }
