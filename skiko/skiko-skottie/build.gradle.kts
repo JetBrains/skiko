@@ -53,7 +53,7 @@ val skottieDependencies: SkikoDependencyScope.() -> Unit = {
         }
         wasm {
             linkFlags(
-                "-s", "SIDE_MODULE=2",
+//                "-s", "SIDE_MODULE=2",
             )
         }
     }
