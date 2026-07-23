@@ -16,6 +16,7 @@ import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
+import org.jetbrains.skiko.redrawer.renderTime
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -31,7 +32,9 @@ import java.awt.Color
 import java.awt.Graphics
 import java.awt.Point
 import java.awt.event.*
+import java.io.File
 import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.Box
 import javax.swing.JComponent
@@ -40,13 +43,18 @@ import javax.swing.JLayeredPane
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.thread
+import kotlin.coroutines.resume
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Suppress("SameParameterValue")
 class SkiaLayerTest {
@@ -1120,6 +1128,115 @@ class SkiaLayerTest {
         }
     }
 
+    @OptIn(ExperimentalAtomicApi::class)
+    @Test(timeout = 120000)
+    fun `no window flash on first show`() = uiTest {
+        // Until the issue is fixed in other redrawers
+        // Don't use assumeTrue, as uiTest iterates over multiple renderers,
+        // and if one of them is skipped, the whole test is skipped
+        if (renderApi != GraphicsApi.METAL) return@uiTest
+
+        val bgColor = Color.GREEN
+        val fgColor = Color.BLACK
+
+        // The first-show flash only reproduces on the very FIRST window displayed in a process. This test's
+        // own JVM warmed that up long ago (earlier tests showed windows), so instead each run spawns a
+        // fresh JVM (FirstShowFlashHarness) whose single black Metal window is genuinely its first. We keep a
+        // large green background window here to provide a known reference color behind the child's window,
+        // then screenshot the center pixel while the child shows, making sure it is always either black (the
+        // child's content) or green (this background) - never a flash of some other color.
+
+        val backgroundWindow = JFrame().also {
+            it.size = Dimension(1000, 1000)
+            it.location = Point(200, 200)
+            it.contentPane.background = bgColor
+        }
+        backgroundWindow.isVisible = true
+        backgroundWindow.waitUntilOpened()
+        delay(200)
+
+        val pixelLocation = backgroundWindow.bounds.let {
+            Point(it.x + it.width / 2, it.y + it.height / 2)
+        }
+        // The child harness hard-codes its window bounds to cover this pixel (the background window's center).
+
+        val flashPixelDetected = AtomicReference<Color?>(null)
+        val lastPixelColorDetected = AtomicReference<Color?>(null)
+        val stopThread = AtomicBoolean(false)
+
+        // Sample continuously (never stops on detection, so every run is still checked) and latch the first
+        // pixel that is neither the background nor the content color.
+        val t = thread {
+            val robot = Robot()
+            try {
+                while (!stopThread.get()) {
+                    val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
+                    lastPixelColorDetected.store(pixel)
+                    if (!pixel.closeTo(fgColor) && !pixel.closeTo(bgColor)) {
+                        flashPixelDetected.compareAndSet(null, pixel)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        suspend fun waitForSampledPixelCloseTo(targetColor: Color) {
+            do {
+                delay(200)
+            } while (!lastPixelColorDetected.load().let { it != null && it.closeTo(targetColor) })
+        }
+
+        // Build the command that launches a child JVM running FirstShowFlashHarness, forwarding this JVM's
+        // classpath, every skiko.* system property (notably skiko.library.path, which is how the native
+        // library is located), and the same --add-opens the test task uses.
+        val javaExe = File(System.getProperty("java.home"), "bin${File.separator}java").absolutePath
+        val childCommand = buildList {
+            add(javaExe)
+            add("-cp")
+            add(System.getProperty("java.class.path"))
+            System.getProperties().stringPropertyNames()
+                .filter { it.startsWith("skiko.") }
+                .forEach { add("-D$it=${System.getProperty(it)}") }
+            add("--add-opens")
+            add("java.desktop/sun.font=ALL-UNNAMED")
+            add(FirstWindowShowFlashHelper::class.java.name)
+            add(renderApi.name)
+            add(fgColor.rgb.toString())
+        }
+
+        try {
+            repeat(10) { testRun ->
+                // Wait until the sampled pixel shows the (green) background before launching the child.
+                waitForSampledPixelCloseTo(bgColor)
+
+                val child = ProcessBuilder(childCommand)
+                    .redirectErrorStream(true)
+                    .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                    .start()
+                try {
+                    // Wait for the child's black content to reach the screen
+                    val contentShown = withTimeoutOrNull(30.seconds) {
+                        waitForSampledPixelCloseTo(fgColor)
+                        true
+                    } ?: false
+                    assertNull(
+                        flashPixelDetected.load(),
+                        "Detected a flash (neither background nor content color) on first show in run ${testRun + 1}."
+                    )
+                    assertTrue(contentShown, "Child window content never appeared in run ${testRun + 1}.")
+                } finally {
+                    child.destroy()
+                    if (!child.waitFor(5, TimeUnit.SECONDS)) child.destroyForcibly()
+                }
+            }
+        } finally {
+            stopThread.getAndSet(true)
+            t.join()
+            backgroundWindow.dispose()
+        }
+    }
+
     @Test
     fun `temporary change is not visible with needRender(throttledToVsync = false)`() = uiTest {
         assumeTrue(hostOs.isMacOS)
@@ -1532,3 +1649,12 @@ class SkiaLayerTest {
 }
 
 internal fun JFrame.close() = dispatchEvent(WindowEvent(this, WindowEvent.WINDOW_CLOSING))
+
+private suspend fun Window.waitUntilOpened() = suspendCancellableCoroutine { continuation ->
+    addWindowListener(object : WindowAdapter() {
+        override fun windowOpened(e: WindowEvent?) {
+            removeWindowListener(this)
+            continuation.resume(Unit)
+        }
+    })
+}

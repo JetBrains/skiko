@@ -5,12 +5,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.fastForEach
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
+import java.awt.*
 import java.awt.Color
-import java.awt.Component
-import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Point
 import java.awt.event.*
@@ -143,8 +143,8 @@ actual open class SkiaLayer internal constructor(
                 return canReceiveFocus(cause) && super.requestFocusInWindow(cause)
             }
 
-            private fun canReceiveFocus(cause: FocusEvent.Cause?) = cause != FocusEvent.Cause.MOUSE_EVENT ||
-                    isRequestFocusEnabled
+            private fun canReceiveFocus(cause: FocusEvent.Cause?) =
+                cause != FocusEvent.Cause.MOUSE_EVENT || isRequestFocusEnabled
         }
         @Suppress("LeakingThis")
         add(backedLayer)

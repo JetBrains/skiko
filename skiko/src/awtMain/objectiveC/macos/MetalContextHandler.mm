@@ -83,10 +83,10 @@ static void finishFrame(jlong devicePtr, void (^present)(MetalDevice *device, id
     }
 }
 
-/// Presents the current drawable asynchronously — skiko's default, used for every frame outside a live
-/// resize. Called off the AppKit main thread (from the background frame loop) so present work doesn't
+/// Presents the current drawable asynchronously — the default, used under normal circumstances.
+/// Called off the AppKit main thread (from the background frame loop) so present work doesn't
 /// destabilize FPS on the main thread.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrame(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrameAsync(
     JNIEnv *env, jobject contextHandler, jlong devicePtr)
 {
     finishFrame(devicePtr, ^(MetalDevice *device, id<CAMetalDrawable> currentDrawable, id<MTLCommandBuffer> commandBuffer) {
@@ -120,28 +120,30 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
     });
 }
 
-/// Presents the current drawable synchronously, joining the ambient window-resize CATransaction.
-/// Must be called on the AppKit main thread during a live resize (from drawFrameWhileLiveResizing),
-/// where the ambient CATransaction — from AWTMetalLayer.setBounds, committing the window's new size —
-/// flushes the present. This is the sole presenter for the duration of the resize.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrameInLiveResize(
+/// Presents the current drawable synchronously
+/// This is used:
+/// - During live-resize, on the AppKit main thread, to join the ambient resize transaction
+/// - When the window is displayable but not yet shown, to make sure the first visible frame already has the content,
+///   avoiding flashing the layer background.
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrameSync(
     JNIEnv *env, jobject contextHandler, jlong devicePtr)
 {
     finishFrame(devicePtr, ^(MetalDevice *device, id<CAMetalDrawable> currentDrawable, id<MTLCommandBuffer> commandBuffer) {
-        /// presentsWithTransaction is YES for the whole resize session — the live-resize start
-        /// observer (MetalRedrawer.mm) sets it, the end observer clears it. Holding it layer-wide is
-        /// safe because during a resize the main thread is the sole presenter; the only frames that
-        /// could reach the async finishFrame path are stragglers, and they're dropped there rather
-        /// than presenting under YES.
+        /// During live-resize:
+        ///   presentsWithTransaction is YES for the whole resize session — the live-resize start
+        ///   observer (MetalRedrawer.mm) sets it, the end observer clears it. Holding it layer-wide is
+        ///   safe because during a resize the main thread is the sole presenter; the only frames that
+        ///   could reach the async finishFrame path are stragglers, and they're dropped there rather
+        ///   than presenting under YES.
+        ///   Present synchronously so the drawable swap joins the ambient window resize transaction
+        ///   (no nested begin/commit — that would split it back out). commit + waitUntilScheduled
+        ///   guarantees the drawing command buffer (submitted by Skia earlier, ahead of this one in
+        ///   the queue) is scheduled first.
         ///
-        /// Present synchronously so the drawable swap joins the ambient window resize transaction
-        /// (no nested begin/commit — that would split it back out). commit + waitUntilScheduled
-        /// guarantees the drawing command buffer (submitted by Skia earlier, ahead of this one in
-        /// the queue) is scheduled first.
-        ///
-        /// No drawable-vs-layer size guard is needed here (unlike the async finishFrame path): setBounds
-        /// set drawableSize, then we acquired the drawable, rendered, committed and present it all
-        /// synchronously on this thread inside one transaction, so the layer size cannot change underneath.
+        /// In draw-before-visible:
+        ///   commit + waitUntilScheduled guarantees the drawing command buffer (submitted by Skia earlier,
+        ///   ahead of this one in the queue) is scheduled first, so the present below can't outrun the
+        ///   rendering.
         [commandBuffer commit];
         [commandBuffer waitUntilScheduled];
         [currentDrawable present];
@@ -150,3 +152,5 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
 
 } // extern C
 #endif
+
+       
