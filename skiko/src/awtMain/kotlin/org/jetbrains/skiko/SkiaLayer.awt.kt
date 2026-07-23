@@ -607,6 +607,10 @@ actual open class SkiaLayer internal constructor(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
+        // Protects against re-entrant calls.
+        // This can actually happen if, for example, renderDelegate.onRender shows a modal dialog during a live-resize.
+        if (isRendering) return
+
         checkContentScale()
         FrameWatcher.nextFrame()
 

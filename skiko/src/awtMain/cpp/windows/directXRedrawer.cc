@@ -342,7 +342,10 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             // content present, no white) from WM_PAINT. It sits BELOW input in GetMessage priority, so it can't
             // starve the active drag (mouse moves win and drive frames via WM_NCCALCSIZE). needRender re-arms it
             // via postLiveResizeRender's InvalidateRect while isHandlingLiveResizeNow. The WM_PAINT stationary-hold driver.
-            if (s->inSizeMoveLoop && s->liveResizeEngaged)
+            // Skip while a render is already pump-waiting on this thread: a WM_PAINT arriving mid-pump (e.g. AWT
+            // synchronously repainting the frame while servicing a round-trip) would re-enter our synchronous render.
+            // Same guard the WM_NCCALCSIZE path uses. Fall through to AWT's proc so its own paint still validates.
+            if (s->inSizeMoveLoop && s->liveResizeEngaged && !isPumpingEdt())
             {
                 ValidateRect(hWnd, nullptr); // validate FIRST so the re-arm InvalidateRect isn't cleared
                 // Re-assert the child size (>= client), same as the NCCALCSIZE path: during a hold Swing's async

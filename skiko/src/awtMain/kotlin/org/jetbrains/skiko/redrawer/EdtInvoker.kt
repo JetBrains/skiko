@@ -5,9 +5,9 @@ import org.jetbrains.skiko.Logger
 
 /**
  * Runs a block on the AWT event dispatch thread (EDT) from another thread — e.g. the Windows toolkit thread
- * that drives a live resize — and blocks the caller until the block completes, pumping Windows SENT messages
- * meanwhile so the EDT's own cross-thread window ops (marshaled back to the calling thread) complete instead
- * of deadlocking against the wait.
+ * that drives a live resize — and blocks the caller until the block completes, pumping the calling thread's
+ * sent and posted messages meanwhile so the EDT's own cross-thread window ops (marshaled back to the calling thread)
+ * complete instead of deadlocking against the wait.
  *
  * The Windows analog of macOS `LWCToolkit.invokeAndWait`, which has no JDK equivalent. The wait event and the
  * message pump are handled entirely natively; see `edtInvoker.cc`.
@@ -18,9 +18,7 @@ internal object EdtInvoker {
     }
 
     /**
-     * Posts [runnable] to the EDT (via `EventQueue.invokeLater`) and blocks the calling thread until it has run,
-     * pumping messages so cross-thread SENT messages are serviced meanwhile. Each call is independent — it waits
-     * on its own native event — so concurrent invocations never cross-signal.
+     * Posts [runnable] to the EDT (via `EventQueue.invokeLater`) and blocks the calling thread until it has run.
      */
     external fun invokeAndWaitWhilePumping(runnable: Runnable)
 }
