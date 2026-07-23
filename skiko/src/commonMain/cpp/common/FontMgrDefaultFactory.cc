@@ -4,16 +4,16 @@
 #include "ports/SkFontMgr_mac_ct.h"
 #endif
 
-#if defined(SK_BUILD_FOR_WIN) && !defined(SKIKO_WASM)
+#ifdef SK_BUILD_FOR_WIN
 #include "ports/SkTypeface_win.h"
 #endif
 
-#if (defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)) && !defined(SKIKO_WASM)
+#if defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)
 #include "ports/SkFontMgr_fontconfig.h"
 #include "ports/SkFontScanner_FreeType.h"
 #endif
 
-#if defined(SK_BUILD_FOR_ANDROID) && !defined(SKIKO_WASM)
+#ifdef SK_BUILD_FOR_ANDROID
 #include "ports/SkFontMgr_android.h"
 #include "ports/SkFontScanner_FreeType.h"
 #endif

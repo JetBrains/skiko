@@ -130,11 +130,6 @@ KNativePointer ptrToInterop(T* ptr) {
 void SKIKO_ASSERT(bool, const char*);
 
 #ifdef SKIKO_WASM
-<<<<<<< HEAD
-=======
-// #include <emscripten.h>
-// #define SKIKO_EXPORT EMSCRIPTEN_KEEPALIVE extern "C"
->>>>>>> eeeabe625 (feat: got a working startup of a wasm environment in browser without emcc)
 #define SKIKO_EXPORT extern "C" __attribute__((visibility("default"), used))
 #else
 #define SKIKO_EXPORT extern "C"
