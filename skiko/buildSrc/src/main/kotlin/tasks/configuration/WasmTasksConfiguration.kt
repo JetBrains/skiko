@@ -148,7 +148,6 @@ fun SkikoProjectContext.declareWasmTasks() {
                 add("-Wl,--import-memory")
                 add("-Wl,--import-table")
             } else {
-//                add("-Wl,--export-all")
                 add("-Wl,--gc-sections")
                 add("-Wl,--no-entry")
                 add("-Wl,--strip-all")
