@@ -68,8 +68,8 @@ public:
         gr_cp<IDXGISwapChain1> swapChain1;
         CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
         HRESULT result = S_OK;
-        // NONE only when the synchronous live-resize hook is installed (where the WM_NCCALCSIZE pre-render fills the content each
-        // step, so NONE removes the scaling jitter). Every other window keeps STRETCH — with no pre-render behind
+        // Use NONE when the synchronous live-resize hook is installed. The WM_NCCALCSIZE pre-render fills the content
+        // each, so NONE removes the scaling jitter). Every other window keeps STRETCH — with no pre-render behind
         // it, a NONE swapchain would expose a hard uncovered edge on any size change (maximize/snap/DPI/async).
         DXGI_SCALING scaling = preferNoneScaling ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
         if (transparency) {
@@ -185,16 +185,8 @@ static JNIEnv *getJniEnv()
     return env;
 }
 
-// ---- One dedicated invoker per Direct3DRedrawer method called from native. Each takes the calling window's
-// LiveResizeState, resolves the toolkit thread's JNIEnv itself, and no-ops if the redrawer ref or the env is
-// missing. Each caches its jmethodID in a local static on first use (the Direct3DRedrawer class is the same for
-// every window and stable for the app's lifetime, and all callers run on the single toolkit thread, so the lazy
-// init needs no synchronization).
-//
-// Reentrancy while an EDT round-trip is pump-waiting is NOT handled here: the two that hop to the EDT
-// (drawFrameWhileLiveResizing, onLiveResizeEnded) do so on the Kotlin side (invokeAndWaitWhilePumping), which owns
-// the pump-wait and its guard. The WndProc consults isPumpingEdt() before starting one — see WM_NCCALCSIZE. ----
-static void onLiveResizeStarted(LiveResizeState *s)
+// One dedicated invoker per Direct3DRedrawer method called from native.
+static void javaOnLiveResizeStarted(LiveResizeState *s)
 {
     if (!s->redrawer) return;
     JNIEnv *env = getJniEnv();
@@ -212,7 +204,7 @@ static void onLiveResizeStarted(LiveResizeState *s)
 
 // At drag-end: the Kotlin side hops to the EDT (blocking) and forces a layout so the canvas catches up to the final
 // client size, renders it, then resumes the normal animation loop.
-static void onLiveResizeEnded(LiveResizeState *s)
+static void javaOnLiveResizeEnded(LiveResizeState *s)
 {
     if (!s->redrawer) return;
     JNIEnv *env = getJniEnv();
@@ -232,7 +224,7 @@ static void onLiveResizeEnded(LiveResizeState *s)
 // and present it synchronously. The Kotlin side hops to the EDT and blocks there (invokeAndWaitWhilePumping). The
 // present itself is always unpaced (Present(0)); the stationary-hold loop is paced separately, natively, by
 // waitForPrimaryVBlank() in the WM_PAINT handler (an active drag stays unpaced, driven by mouse-move WM_NCCALCSIZE).
-static void drawFrameWhileLiveResizing(LiveResizeState *s)
+static void javaDrawFrameWhileLiveResizing(LiveResizeState *s)
 {
     if (!s->redrawer) return;
     JNIEnv *env = getJniEnv();
@@ -332,7 +324,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                     // First real (size-changing) step of this drag: tell Kotlin to engage BEFORE the first render,
                     // so the async EDT renders quiesce for the rest of the drag (see onLiveResizeStarted).
                     s->liveResizeEngaged = true;
-                    onLiveResizeStarted(s);
+                    javaOnLiveResizeStarted(s);
                 }
                 NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *)lParam;
                 RECT c = p->rgrc[0]; // now holds the new CLIENT rect
@@ -341,7 +333,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                 // Grow (never shrink) the content child so it covers the soon-to-be-exposed region on a grow and
                 // never exposes a strip on a shrink; see growContentChildTo.
                 growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
-                drawFrameWhileLiveResizing(s); // active drag: unpaced
+                javaDrawFrameWhileLiveResizing(s); // active drag: unpaced
             }
             return r;
         }
@@ -357,7 +349,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                 // doLayout has time to shrink the child to a lagging size, leaving a frame-redirection strip past
                 // its edge. The active drag never drifts because every NCCALCSIZE re-asserts it; the hold must too.
                 growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
-                drawFrameWhileLiveResizing(s);
+                javaDrawFrameWhileLiveResizing(s);
                 // Pace the stationary hold at the refresh rate — one present per vblank (a pure monitor wait on
                 // this toolkit thread; no render/Skia state, so it needn't run on the EDT). Beyond capping idle
                 // FPS, this is what keeps ORIGIN-MOVE (top/left) resize clean: real drags are full of micro-pauses
@@ -388,7 +380,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                 // We quiesced onPlatformComponentResized for the whole drag, so the layer's Swing size is stale.
                 // onLiveResizeEnded (on the EDT) forces a layout to the settled size and renders BEFORE the async
                 // loop resumes — else it renders at the stale size and flashes white — then resumes the loop.
-                onLiveResizeEnded(s);
+                javaOnLiveResizeEnded(s);
             }
             break;
     }
