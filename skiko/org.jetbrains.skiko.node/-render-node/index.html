@@ -101,7 +101,10 @@ pieces that can then be updated individually more cheaply. Updating part of the 
 to update the display list or properties of a small number of RenderNode instead of redrawing
 everything from scratch. A RenderNode only needs its display list re-recorded when its content
 alone should be changed. RenderNodes can also be transformed without re-recording the display
-list through the transform properties.</p></div></div>
+list through the transform properties.</p><p>A tree of RenderNodes is owned by a single thread. Recording, changing a property and drawing
+all mutate the node they are called on, and changing a property of one node may also mutate the
+nodes drawing it, so none of them may run concurrently with each other. A picture recorded from
+a node is immutable and can be replayed on any thread.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
