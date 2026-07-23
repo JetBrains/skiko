@@ -30,7 +30,7 @@ class RenderNodeContext internal constructor(ptr: NativePointer, managed: Boolea
      */
     constructor(
         measureDrawBounds: Boolean = false,
-        snapshotCache: Boolean = false,
+        snapshotCache: Boolean = true,
     ) : this(RenderNodeContext_nMake(measureDrawBounds, snapshotCache)) {
         Stats.onNativeCall()
     }
