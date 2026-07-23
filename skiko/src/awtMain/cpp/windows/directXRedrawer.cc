@@ -267,8 +267,12 @@ extern "C"
         std::string name(tmp.begin(), tmp.end());
         jstring jname = env->NewStringUTF(name.c_str());
 
-        static jclass cls = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/redrawer/Direct3DRedrawer"));
-        static jmethodID method = env->GetMethodID(cls, "isAdapterSupported", "(Ljava/lang/String;)Z");
+        // Resolve the class from the receiver rather than hardcoding its name: `redrawer` is always an
+        // instance of whichever class this native method is called from, so this stays correct across
+        // renames and avoids a stale FindClass lookup returning NULL with a pending exception (crashing
+        // the JVM on the next JNI call) if that class is ever renamed or moved.
+        jclass cls = env->GetObjectClass(redrawer);
+        jmethodID method = env->GetMethodID(cls, "isAdapterSupported", "(Ljava/lang/String;)Z");
 
         return env->CallBooleanMethod(redrawer, method, jname);
     }

@@ -11,10 +11,11 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skiko.context.JvmContextHandler
+import org.jetbrains.skiko.redrawer.AWTRedrawer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.MetalVSyncer
-import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.OnScreenRedrawer
+import org.jetbrains.skiko.redrawer.SoftwareRedrawer
 import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
@@ -106,7 +107,8 @@ class SkiaLayerTest {
             window.addKeyListener(object : KeyAdapter() {
                 override fun keyTyped(e: KeyEvent?) {
                     launch {
-                        val redrawer = window.layer.redrawer as MetalRedrawer
+                        val redrawer = window.layer.redrawer!! as OnScreenRedrawer
+                        require(redrawer.ctx is MetalRedrawer)
                         redrawer.renderImmediately()
                         counter1 += 1
                         redrawer.renderImmediately()
@@ -558,52 +560,54 @@ class SkiaLayerTest {
         }
     }
 
-    private abstract class BaseTestRedrawer(val layer: SkiaLayer): Redrawer {
-        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            renderImmediately()
-        }
-        override fun dispose() = Unit
-        override fun needRender(throttledToVsync: Boolean) = frameDispatcher.scheduleFrame()
-        override fun renderImmediately() = Unit
-        override fun update(nanoTime: Long) = layer.update(nanoTime)
+    /**
+     * A test [AWTRedrawer] that constructs successfully but fails at frame time (subclasses override
+     * [renderFrame] to throw), used to exercise the runtime render-API fallback. The generic
+     * [org.jetbrains.skiko.redrawer.OnScreenRedrawer] loop drives it, so a failing [renderFrame] override
+     * is enough to trigger the fallback.
+     */
+    private abstract class BaseTestRedrawer(
+        val layer: SkiaLayer,
+        override val graphicsApi: GraphicsApi,
+    ) : AWTRedrawer {
+        override val deviceName: String? get() = "Test"
+        override val renderInfo: String get() = ""
         override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
-
-        override val renderInfo: String
-            get() = ""
+        override fun dispose() = Unit
     }
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on init context`() = uiTest {
-        testFallbackToSoftware { layer, _, _, _ ->
-            object : BaseTestRedrawer(layer) {
-                private val contextHandler = object : JvmContextHandler(layer) {
-                    override fun initContext() = false
-                    override fun LayerDrawScope.initCanvas() = Unit
+        testFallbackToSoftware { layer, renderApi, _ ->
+            object : BaseTestRedrawer(layer, renderApi) {
+                override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+                    throw RenderException("Cannot init graphic context")
                 }
-                override fun renderImmediately() = layer.inDrawScope { contextHandler.draw() }
             }
         }
     }
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on create redrawer`() = uiTest {
-        testFallbackToSoftware { _, _, _, _ -> throw RenderException() }
+        testFallbackToSoftware { _, _, _ -> throw RenderException() }
     }
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on draw`() = uiTest {
-        testFallbackToSoftware { layer, _, _, _ ->
-            object : BaseTestRedrawer(layer) {
-                override fun renderImmediately() = layer.inDrawScope {
+        testFallbackToSoftware { layer, renderApi, _ ->
+            object : BaseTestRedrawer(layer, renderApi) {
+                override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
                     throw RenderException()
                 }
             }
         }
     }
 
-    private suspend fun UiTestScope.testFallbackToSoftware(nonSoftwareRenderFactory: RenderFactory) {
+    private suspend fun UiTestScope.testFallbackToSoftware(
+        nonSoftware: (SkiaLayer, GraphicsApi, SkiaLayerProperties) -> AWTRedrawer
+    ) {
         val window = UiTestWindow(
-            renderFactory = OverrideNonSoftwareRenderFactory(nonSoftwareRenderFactory)
+            renderFactory = overrideNonSoftware(nonSoftware)
         )
         try {
             window.setLocation(200, 200)
@@ -628,29 +632,26 @@ class SkiaLayerTest {
         }
     }
 
-    private class OverrideNonSoftwareRenderFactory(
-        private val nonSoftwareRenderFactory: RenderFactory
-    ) : RenderFactory {
-        override fun createRedrawer(
-            layer: SkiaLayer,
-            renderApi: GraphicsApi,
-            analytics: SkiaLayerAnalytics,
-            properties: SkiaLayerProperties
-        ): Redrawer {
-            return if (renderApi == GraphicsApi.SOFTWARE_COMPAT) {
-                RenderFactory.Default.createRedrawer(layer, renderApi, analytics, properties)
-            } else {
-                nonSoftwareRenderFactory.createRedrawer(layer, renderApi, analytics, properties)
-            }
+    // Builds SOFTWARE_COMPAT with the real backend and every other API with [nonSoftware], so a test can make
+    // the hardware backends fail and assert the fallback to software. Each backend is driven by the real
+    // [OnScreenRedrawer] loop, exactly like the production factory.
+    private fun overrideNonSoftware(
+        nonSoftware: (SkiaLayer, GraphicsApi, SkiaLayerProperties) -> AWTRedrawer
+    ): RenderFactory = RenderFactory { layer, renderApi, analytics, properties ->
+        val backend = if (renderApi == GraphicsApi.SOFTWARE_COMPAT) {
+            SoftwareRedrawer(layer, properties)
+        } else {
+            nonSoftware(layer, renderApi, properties)
         }
+        OnScreenRedrawer(layer, backend, analytics)
     }
 
     @Test(timeout = 60000)
     fun `renderApi change callback is invoked on fallback`() = uiTest {
         val window = UiTestWindow(
-            renderFactory = OverrideNonSoftwareRenderFactory { layer, _, _, _ ->
-                object : BaseTestRedrawer(layer) {
-                    override fun renderImmediately() = layer.inDrawScope {
+            renderFactory = overrideNonSoftware { layer, renderApi, _ ->
+                object : BaseTestRedrawer(layer, renderApi) {
+                    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
                         throw RenderException()
                     }
                 }

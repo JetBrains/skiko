@@ -4,12 +4,10 @@ import org.jetbrains.skiko.*
 
 internal class LinuxSoftwareRedrawer(
     private val layer: SkiaLayer,
-    analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-) : AbstractDirectSoftwareRedrawer(layer, analytics, properties) {
+) : AbstractDirectSoftwareRedrawer(layer, properties) {
 
     init {
-        onDeviceChosen("Software")
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
@@ -20,19 +18,14 @@ internal class LinuxSoftwareRedrawer(
                 }
             }
         }
-        onContextInit()
     }
 
     override fun dispose() = layer.backedLayer.lockLinuxDrawingSurface {
         super.dispose()
     }
 
-    override fun draw() = layer.backedLayer.lockLinuxDrawingSurface {
-        super.draw()
-    }
-
-    override fun renderImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
-        super.renderImmediately()
+    override fun draw(scope: LayerDrawScope) = layer.backedLayer.lockLinuxDrawingSurface {
+        super.draw(scope)
     }
 
     override fun resize(width: Int, height: Int) = layer.backedLayer.lockLinuxDrawingSurface {
