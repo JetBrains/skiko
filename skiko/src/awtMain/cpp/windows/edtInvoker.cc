@@ -5,6 +5,14 @@
 
 #include <Windows.h>
 #include "jni_helpers.h"
+#include "edtInvoker.h"
+
+// Reentrancy flag for invokeAndWaitWhilePumping: true only while THIS thread is blocked in the pump-wait below.
+// thread_local, so it means "this thread is pump-waiting" regardless of which thread drives the invocation — the
+// generic form of the guard a message-dispatching caller needs (see isPumpingEdt in the header).
+static thread_local bool tlsPumpingEdt = false;
+
+bool isPumpingEdt() { return tlsPumpingEdt; }
 
 extern "C"
 {
@@ -58,6 +66,9 @@ extern "C"
         jobject task = newEdtInvocationTask(env, runnable, done);
         if (task)
         {
+            // Set before posting so that even if the EDT runs the task and SENDs a message back before we reach the
+            // pump loop, a re-entrant caller dispatching it sees us as busy. Cleared once the round-trip completes.
+            tlsPumpingEdt = true;
             invokeLaterOnAwtEdtThread(env, task);
             env->DeleteLocalRef(task);
             for (;;)
@@ -67,6 +78,7 @@ extern "C"
                 MSG msg;
                 PeekMessageW(&msg, nullptr, 0, 0, PM_NOREMOVE); // deliver pending sent messages (does not consume input)
             }
+            tlsPumpingEdt = false;
         }
         CloseHandle(done);
     }

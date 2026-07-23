@@ -72,19 +72,15 @@ internal class Direct3DRedrawer(
     // onLiveResizeStarted → drawFrameWhileLiveResizing (once per resize step) → onLiveResizeEnded.
     // isHandlingLiveResizeNow is set by the first and cleared by the last. ----
 
-    // Start: the first size-changing step of a drag. Flips the flag (before the first draw) so the async EDT renders
-    // (frameDispatcher loop, reshape workaround, onPlatformComponentResized) quiesce for the rest of the drag,
-    // leaving the synchronous WM_NCCALCSIZE render as the only thing painting.
+    /** Called (on the toolkit thread) when the live-resize session starts. */
     @Suppress("unused")
     private fun onLiveResizeStarted() {
         isHandlingLiveResizeNow = true
     }
 
-    // Draw: called in WM_NCCALCSIZE (active drag) and WM_PAINT (stationary hold). Synchronously renders the real
-    // content into the on-screen swapchain at the new client size and presents it, BEFORE the resize geometry
-    // commits — "delay the resize until content is drawn". onRender (user/Compose code) requires the EDT, so we hop
-    // to it via invokeAndWaitWhilePumping — the toolkit thread blocks until the EDT finishes rendering+presenting,
-    // so the present completes before WM_NCCALCSIZE returns. Windows analog of Metal's setBounds + LWCToolkit.invokeAndWait.
+    /**
+     * Called (on the toolkit thread) to synchronously draw a single frame at the given size during a live-resize.
+     */
     @Suppress("unused")
     private fun drawFrameWhileLiveResizing(width: Int, height: Int) {
         EdtInvoker.invokeAndWaitWhilePumping {
@@ -93,22 +89,13 @@ internal class Direct3DRedrawer(
             update(forcedSize = size)
             inDrawScope(forcedSize = size) {
                 if (!isDisposed) {
-                    // Always Present(0): DWM composites the windowed swapchain at its own vblank (no tearing);
-                    // Present(1) here would beat against DWM's cadence to refresh x 2/3. The stationary hold is
-                    // paced natively (WaitForVBlank in the WM_PAINT handler); the active drag stays unpaced.
-                    drawAndSwap(withVsync = false)
+                    drawAndSwap(withVsync = false)  // Native code handles the vsync, to avoid blocking the EDT
                 }
             }
         }
     }
 
-    // End (drag-end, toolkit thread, pump-waited): runs blocking on the EDT. The contentPane/layer/canvas lag the
-    // final window size by one resize step (Swing knows the final window size but never re-lays-out at rest), so
-    // force a layout pass to catch the canvas up to the exact native client size, clear the flag, and render at that
-    // size before it's revealed. No explicit frameDispatcher.scheduleFrame() to resume the loop: with the flag now
-    // cleared, renderImmediately's update() lets onRender re-request a frame (needRender -> scheduleFrame) exactly
-    // when content is still animating — the same self-sustaining path the normal loop uses; static content
-    // correctly stays idle.
+    /** Called (on the toolkit thread) when the live-resize session ends. */
     @Suppress("unused")
     private fun onLiveResizeEnded() {
         EdtInvoker.invokeAndWaitWhilePumping {
