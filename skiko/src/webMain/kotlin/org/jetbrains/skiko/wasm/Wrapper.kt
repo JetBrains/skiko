@@ -31,7 +31,15 @@ internal external interface ContextAttributes {
  * Similarly, Skia may try to enable `WEBGL_polygon_mode` which is non-portable and produces
  * a warning in some browsers.
  *
- * Hiding these extensions is safe in browsers and simply removes noisy console warnings.
+ * Also, Skia queries `READ_BUFFER` to save/restore state, which triggers a "READ_BUFFER attachment
+ * is multisampled" warning in Firefox when MSAA is active. Firefox proactively issues this
+ * warning because multisampled buffers cannot be used for `readPixels`, even if the query
+ * is only intended for state capture.
+ *
+ * Hiding these extensions and intercepting noisy parameters is safe and simply removes console clutter.
+ *
+ * To disable this patching manually, set `canvas.getContext.webGlContextPatched = true` before
+ * Skiko initializes the context.
  */
 //language=js
 internal fun patchWebGlContext(canvas: HTMLCanvasElement): Unit = js("""{
@@ -68,6 +76,12 @@ internal fun patchWebGlContext(canvas: HTMLCanvasElement): Unit = js("""{
                         // both belong to WEBGL_debug_renderer_info, so hide them to avoid the INVALID_ENUM warning
                         if (pname === 0x9245 || pname === 0x9246) {
                             return "";
+                        }
+                        // 0x0C02 = READ_BUFFER;
+                        // hide to avoid "The READ_BUFFER attachment is multisampled" warning in Firefox
+                        if (pname === 0x0C02) {
+                            var fbo = oldGetParameter.apply(this, [0x8CAA]); // 0x8CAA = READ_FRAMEBUFFER_BINDING
+                            return fbo ? 0x8CE0 : 0x0405; // 0x8CE0 = COLOR_ATTACHMENT0, 0x0405 = BACK
                         }
                         return oldGetParameter.apply(this, arguments);
                     };
