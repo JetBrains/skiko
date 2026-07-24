@@ -475,11 +475,12 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
     val skiaBindingsDir = skikoProjectContext.registerOrGetSkiaDirProvider(os, arch)
     val coreCompile = tasks.named<CompileSkikoCppTask>("compileJvmBindings$suffix")
     val coreObjcCompile = if (os.isMacOs) tasks.named<CompileSkikoObjCTask>("objcCompile$suffix") else null
-    val requiredSymbolFiles = files(
-        skikoProjectContext.jvmRequiredSymbolsFor(os, arch).also {
-            dependencies.add(it.name, project(":skiko-skottie"))
-        }
-    )
+    val requiredSymbols = skikoProjectContext.jvmRequiredSymbolsFor(os, arch)
+    dependencies.add(requiredSymbols.name, project(":skiko-skottie"))
+    if (os != OS.Android) {
+        dependencies.add(requiredSymbols.name, project(":skiko-graphite"))
+    }
+    val requiredSymbolFiles = files(requiredSymbols)
 
     skikoProjectContext.configureGenerateSymbolsList(
         os, arch, skiaBindingsDir, coreCompile, coreObjcCompile, requiredSymbolFiles

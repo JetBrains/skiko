@@ -16,5 +16,6 @@ dokka {
 
 dependencies {
     dokka(project(":"))
+    dokka(project(":skiko-graphite"))
     dokka(project(":skiko-skottie"))
 }
