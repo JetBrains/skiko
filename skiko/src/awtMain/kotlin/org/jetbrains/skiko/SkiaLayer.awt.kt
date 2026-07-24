@@ -6,6 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.internal.fastForEach
+import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
@@ -431,7 +432,7 @@ actual open class SkiaLayer internal constructor(
         //
         // Calling redraw during layout might break software renderers,
         // so apply this fix only for the Direct3D case.
-        if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
+        if (isShowing && (redrawer as? Direct3DRedrawer)?.isHandlingLiveResizeNow == false) {
             redrawer?.syncBoundsFromPlatformComponent()
             redrawer?.renderImmediately()
         }
@@ -605,6 +606,10 @@ actual open class SkiaLayer internal constructor(
     internal fun update(nanoTime: Long, forcedSize: Dimension? = null) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
+
+        // Protects against re-entrant calls.
+        // This can actually happen if, for example, renderDelegate.onRender shows a modal dialog during a live-resize.
+        if (isRendering) return
 
         checkContentScale()
         FrameWatcher.nextFrame()

@@ -21,14 +21,6 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
 
     private var currentWidth = 0
     private var currentHeight = 0
-    private fun isSizeChanged(width: Int, height: Int): Boolean {
-        if (width != currentWidth || height != currentHeight) {
-            currentWidth = width
-            currentHeight = height
-            return true
-        }
-        return false
-    }
 
     override fun LayerDrawScope.initCanvas() {
         val context = context ?: return
@@ -39,7 +31,13 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextBasedContextHan
         val width = scaledLayerWidth.coerceAtLeast(1)
         val height = scaledLayerHeight.coerceAtLeast(1)
 
-        if (isSizeChanged(width, height) || isSurfacesNull()) {
+        val sizeChanged = (width != currentWidth || height != currentHeight)
+        if (sizeChanged) {
+            currentWidth = width
+            currentHeight = height
+        }
+
+        if (sizeChanged || isSurfacesNull()) {
             disposeCanvas()
             context.flush()
 

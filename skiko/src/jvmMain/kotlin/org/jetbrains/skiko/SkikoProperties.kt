@@ -62,12 +62,25 @@ object SkikoProperties {
     /**
      * Metal on macOS: during an interactive live resize (dragging a window edge), render and present
      * synchronously on the AppKit main thread, inside the same CATransaction that commits the window's
-     * new size, so content and window backing stay in sync (no white borders). When disabled, resize
-     * falls back to the previous behavior: geometry is updated from the EDT, and frames are presented
-     * asynchronously off the resize transaction.
+     * new size, so content and window backing stay in sync (no white borders).
+     *
+     * When disabled, resize falls back to the previous behavior: geometry is updated from the EDT, and frames are
+     * presented asynchronously off the resize transaction.
      */
     val metalSynchronousLiveResize: Boolean get() {
         return getProperty("skiko.rendering.macos.metalSynchronousLiveResize")?.toBoolean() ?: false
+    }
+
+    /**
+     * Direct3D on Windows: during an interactive live resize (dragging a window edge), render and present
+     * the content synchronously on the toolkit thread inside the same resize step that applies the window's
+     * new size.
+     *
+     * When disabled, resize falls back to the previous behavior: geometry is updated from the EDT
+     * and frames are presented asynchronously off the resize.
+     */
+    val direct3DSynchronousLiveResize: Boolean get() {
+        return getProperty("skiko.rendering.windows.direct3DSynchronousLiveResize")?.toBoolean() ?: false
     }
 
     /**
