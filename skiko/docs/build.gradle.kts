@@ -16,5 +16,8 @@ dokka {
 
 dependencies {
     dokka(project(":"))
+    rootProject.findProject(":skiko-graphite")?.let {
+        dokka(it)
+    }
     dokka(project(":skiko-skottie"))
 }

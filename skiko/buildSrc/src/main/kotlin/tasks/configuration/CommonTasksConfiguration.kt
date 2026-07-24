@@ -6,12 +6,13 @@ import SkiaBuildType
 import SkikoProperties
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 import registerSkikoTask
 import skiaVersion
 import supportAndroid
-import supportAwt
 import supportNativeIosArm64
 import supportNativeIosSimulatorArm64
 import supportNativeIosX64
@@ -133,6 +134,8 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
 }
 
 fun Project.configureSignAndPublishDependencies() {
+    val hasAwtTarget = extensions.getByType<KotlinMultiplatformExtension>().targets.findByName("awt") != null
+
     if (supportWeb) {
         tasks.configureEach {
             val publishJs = "publishJsPublicationTo"
@@ -275,7 +278,7 @@ fun Project.configureSignAndPublishDependencies() {
         }
     }
 
-    if (supportAwt) {
+    if (hasAwtTarget) {
         val publishJvmRuntimeAngleX64 = "publishSkikoJvmRuntimeAngleWindowsX64PublicationToComposeRepoRepository"
         val publishJvmRuntimeAngleArm64 = "publishSkikoJvmRuntimeAngleWindowsArm64PublicationToComposeRepoRepository"
         val signJvmRuntimeX64 = "signSkikoJvmRuntimeWindowsX64Publication"
@@ -304,7 +307,7 @@ fun Project.configureSignAndPublishDependencies() {
 
         when {
             name.startsWith(publishKmp) -> {
-                if (supportAwt) {
+                if (hasAwtTarget) {
                     dependsOn(signAwt)
                     dependsOn(signAwtRuntimeElements)
                 }

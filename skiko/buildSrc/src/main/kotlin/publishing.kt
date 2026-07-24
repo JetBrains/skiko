@@ -89,10 +89,12 @@ fun SkikoProjectContext.declarePublications() {
     val ctx = SkikoPublishingContext(this)
     ctx.configurePublishingRepositories()
     ctx.configurePublicationDefaults()
-    ctx.configureAllJvmRuntimeJarPublications()
-    ctx.configureAwtRuntimeAllJarPublication()
-    ctx.configureAwtRuntimeJarPublication()
-    ctx.configureAwtPublicationConstraints()
+    if (kotlin.targets.findByName("awt") != null) {
+        ctx.configureAllJvmRuntimeJarPublications()
+        ctx.configureAwtRuntimeAllJarPublication()
+        ctx.configureAwtRuntimeJarPublication()
+        ctx.configureAwtPublicationConstraints()
+    }
     ctx.configureAdditionalRuntimeLibrariesPublication()
     ctx.configureWebPublication()
     ctx.configureAndroidPublication()
