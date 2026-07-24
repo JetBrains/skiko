@@ -16,13 +16,16 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
+import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import projectDirs
@@ -59,7 +62,7 @@ fun SkikoProjectContext.declareWasmTasks() {
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
         dependsOn(skiaWasmDir)
-        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
+        compiler.set(compilerForTarget(project, OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -82,9 +85,21 @@ fun SkikoProjectContext.declareWasmTasks() {
             buildList {
                 addAll(skiaPreprocessorFlags(OS.Wasm, buildType))
                 addAll(buildType.clangFlags)
+                add("-Oz")
+                add("-flto")
+                add("-fvisibility=hidden")
                 add("-fno-rtti")
                 add("-fno-exceptions")
                 add("-fPIC")
+                add("--target=wasm32-wasip1")
+                add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
+                add("-D_WASI_EMULATED_MMAN")
+                add("-D_WASI_EMULATED_SIGNAL")
+                add("-D_WASI_EMULATED_PROCESS_CLOCKS")
+                add("-D_WASI_EMULATED_GETPID")
+                add("-mllvm")
+                add("-wasm-enable-sjlj")
+                add("-mexception-handling")
                 if (skiko.isWasmBuildWithProfiling) add("--profiling")
             }
         )
@@ -96,7 +111,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
         val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
-        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
+        linker.set(linkerForTarget(project, OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -112,41 +127,61 @@ fun SkikoProjectContext.declareWasmTasks() {
             project.layout.projectDirectory.file(prefixPath)
         )
 
+        val exportsProvider = project.provider {
+            val setupMjs = project.setupMjs
+            if (!setupMjs.exists()) return@provider emptyList<String>()
+            val text = setupMjs.readText()
+            val fromBrackets = Regex("""loadedWasm\._\["([a-zA-Z0-9_]+)"\]""").findAll(text).map { it.groupValues[1] }
+            val fromDot = Regex("""wasmExports\.([a-zA-Z0-9_]+)""").findAll(text).map { it.groupValues[1] }
+            val fromOrg = Regex("""org_jetbrains_[a-zA-Z0-9_]+""").findAll(text).map { it.value }
+            (fromBrackets + fromDot + fromOrg + listOf("malloc", "free", "memory", "__wasm_call_ctors", "_initialize")).distinct().toList()
+        }
+
         flags.addAll(buildList {
-            addAll(
-                listOf(
-                    "-s", "OFFSCREEN_FRAMEBUFFER=1",
-                    "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
-                    "-s", "SUPPORT_LONGJMP=wasm",
-                    // -O2 saves 800kB for the output file, and ~100kB for transferred size.
-                    // -O3 breaks the exports in js/mjs files. skiko.wasm size is the same though
-                    "-O2"
-                )
-            )
+            add("-Oz")
+            add("-fuse-ld=lld")
+            add("-flto")
+            if (isSideModule) {
+                add("-shared")
+                add("-Wl,--no-entry")
+                add("-Wl,--export-all")
+                add("-Wl,--import-memory")
+                add("-Wl,--import-table")
+            } else {
+                add("-Wl,--gc-sections")
+                add("-Wl,--no-entry")
+                add("-Wl,--strip-all")
+            }
+            add("-Wl,--allow-undefined")
+            add("--target=wasm32-wasip1")
+            add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
+            add("-mllvm")
+            add("-wasm-enable-sjlj")
+            add("-mexception-handling")
 
             if (skiko.isWasmBuildWithProfiling) add("--profiling")
             addAll(resolvedBinaryInputs.linkFlags)
         })
+        if (!isSideModule) {
+            flags.addAll(exportsProvider.map { exports ->
+                exports.map { "-Wl,--export=$it" }
+            })
+        }
 
         doLast {
             // skiko.mjs is referenced in karma.config.d/*/config.js
-            // so symbols must be replaced right after linking
+            // so symbols must be replaced right after linking.
+            // With WASI SDK (unlike Emscripten), the linker only produces a .wasm file,
+            // so we must create the .mjs file ourselves from the callbacks + setup sources.
             val outputFileName = emccOutputFileName.get()
             if (!outputFileName.endsWith(".mjs")) {
                 return@doLast
             }
 
-            val emccOutputFile = outDir.asFile.get().walk().first { it.name == outputFileName }
-
-            val isEnvironmentNodeCheckRegex = Regex(
-                // spacing is different in release and debug builds
-                """if\s*\(ENVIRONMENT_IS_NODE\)\s*\{"""
-            )
-
-            val originalContent = emccOutputFile.readText()
-            val newContent = originalContent
-                .replace(isEnvironmentNodeCheckRegex, "if (false) {") // to make webpack erase this part
-            emccOutputFile.writeText(newContent)
+            val emccOutputFile = outDir.asFile.get().resolve(outputFileName)
+            val callbacks = project.layout.projectDirectory.file("src/webMain/resources/skikoCallbacks.js").asFile.readText()
+            val setup = project.file(prefixPath).readText()
+            emccOutputFile.writeText(callbacks + "\n" + setup)
         }
     }
 
@@ -176,8 +211,6 @@ fun SkikoProjectContext.declareWasmTasks() {
         buildSuffix.set("d8")
         emccOutputFileName.set(if (isSideModule) "${libBaseName}d8.wasm" else "skikod8.mjs") // this determines the name .wasm file too
         libOutputFileName.set("${libBaseName}d8.wasm")
-
-        flags.addAll(listOf("-s", "ENVIRONMENT=shell"))
 
         val prefixPath = if (isSideModule) {
             project.sideModuleSetupMjs(libBaseName).normalize().absolutePath
@@ -214,6 +247,31 @@ fun SkikoProjectContext.declareWasmTasks() {
         doLast {
             println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
         }
+    }
+
+    val optimizeWasm by project.tasks.registering(Exec::class) {
+        dependsOn(linkWasm)
+        val wasmFileProvider = linkWasm.flatMap { it.outDir.file(it.libOutputFileName) }
+
+        executable = "wasm-opt"
+
+        argumentProviders.add(CommandLineArgumentProvider {
+            val wasmFile = wasmFileProvider.get().asFile
+            listOf("-Oz", "--strip-debug", "--converge", "--strip-producers", wasmFile.absolutePath, "-o", wasmFile.absolutePath + ".opt")
+        })
+
+        doLast {
+            val wasmFile = wasmFileProvider.get().asFile
+            val optimizedFile = File(wasmFile.absolutePath + ".opt")
+            if (optimizedFile.exists()) {
+                wasmFile.delete()
+                optimizedFile.renameTo(wasmFile)
+                println("WASM optimized: ${wasmFile.length() / 1024} KB")
+            }
+        }
+    }
+    project.tasks.named("skikoWasmJar") {
+        dependsOn(optimizeWasm)
     }
 }
 
@@ -315,8 +373,17 @@ private fun SkikoProjectContext.configureSideModuleInput(
     mainLinkTaskName: String,
     sideModuleFiles: ConfigurableFileCollection
 ) {
+    // Side modules built with -shared are dynamic wasm modules loaded at runtime.
+    // They must NOT be passed to the core linker (wasm-ld cannot statically link
+    // a dynamic object). Instead, copy them into the core link output directory
+    // so they are bundled alongside the core .wasm for runtime loading.
     project.tasks.named<LinkSkikoWasmTask>(mainLinkTaskName).configure {
-        libFiles += sideModuleFiles
+        dependsOn(sideModuleFiles)
+        doLast {
+            sideModuleFiles.files.forEach { sideWasm ->
+                sideWasm.copyTo(outDir.get().asFile.resolve(sideWasm.name), overwrite = true)
+            }
+        }
     }
 }
 

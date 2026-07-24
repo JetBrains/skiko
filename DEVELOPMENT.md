@@ -37,6 +37,8 @@ Gradle build downloads the necessary version of Skia by default.
 However, if downloaded sources are modified, changes are discarded (Gradle
 re-evaluates tasks, when outputs are changed).
 To use custom version of the dependencies, specify `SKIA_DIR` environment variable.
+It is also possible to specify a target-specific directory using `SKIA_DIR_<TARGET>` (e.g. `SKIA_DIR_WASM`) or Gradle property `-Pskia.dir.<target>` (e.g. `-Pskia.dir.wasm`).
+Specifying a target-specific Skia directory for WASM automatically enables WASM support in the build.
 
 #### Running UI tests
 Add `-Dskiko.test.ui.enabled=true` to enable UI tests (integration tests, which run in the native window). Each UI test will be run on every available Graphics API of the current target.
@@ -50,3 +52,5 @@ Don't run any background tasks, click mouse, or press keys during the tests. Oth
 #### Run samples
 - First follow the instruction here: [Building JVM bindings](#building-jvm-bindings)
 - `./gradlew :SkiaAwtSample:run`
+- To run WASM sample: `./gradlew :SkiaWebSample:wasmJsBrowserProductionRun`
+  - To use local Skia build for WASM: `./gradlew :SkiaWebSample:wasmJsBrowserProductionRun -Pskia.dir.wasm=../skia`
