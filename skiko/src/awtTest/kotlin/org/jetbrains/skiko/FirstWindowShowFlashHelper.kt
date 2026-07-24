@@ -8,6 +8,7 @@ import org.jetbrains.skia.Rect
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.Point
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
@@ -25,10 +26,8 @@ import javax.swing.SwingUtilities
 object FirstWindowShowFlashHelper {
     // Hard-coded window bounds. The parent (SkiaLayerTest."no window flash on first show") positions its
     // background window so that the pixel it samples (the background's center) falls within these bounds.
-    private const val X = 400
-    private const val Y = 400
-    private const val WIDTH = 600
-    private const val HEIGHT = 600
+    private val WINDOW_LOCATION = Point(400, 400)
+    private val WINDOW_SIZE = Dimension(600, 600)
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -57,8 +56,8 @@ object FirstWindowShowFlashHelper {
 
             JFrame().apply {
                 contentPane.add(layer, BorderLayout.CENTER)
-                setLocation(X, Y)
-                size = Dimension(WIDTH, HEIGHT)
+                location = WINDOW_LOCATION
+                size = WINDOW_SIZE
                 // Ensure our window lands above the parent's background window at these coordinates.
                 isAlwaysOnTop = true
                 isVisible = true
