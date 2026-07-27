@@ -14,7 +14,7 @@ async function loadSkikoWASM() {
             get(target, prop) {
                 if (prop === 'malloc') return (size) => wasmExports.malloc(size);
                 if (prop === 'free') return (ptr) => wasmExports.free(ptr);
-                
+
                 // Callback support
                 if (prop === '_releaseCallback') return (cb) => skikoApi._releaseCallback(cb);
                 if (prop === '_callBooleanCallback') return (cb) => skikoApi._callCallback(cb) ? 1 : 0;
@@ -45,11 +45,7 @@ async function loadSkikoWASM() {
                     let methodName = glProp.charAt(0).toLowerCase() + glProp.slice(1);
                     return (...args) => {
                         if (gl && typeof gl[methodName] === 'function') {
-                            const res = gl[methodName](...args);
-                            if (prop !== 'glClear' && prop !== 'glFlush' && prop !== 'glFinish' && prop !== 'glViewport' && prop !== 'glScissor') {
-                                console.log(`GL call: ${prop}(${args.join(', ')}) -> ${res}`);
-                            }
-                            return res;
+                            return gl[methodName](...args);
                         }
                         console.warn(`Unimplemented Skiko GL call: ${prop} -> ${methodName}`, args);
                         return 0;
@@ -62,7 +58,9 @@ async function loadSkikoWASM() {
                 if (prop === 'munmap') return () => 0;
                 if (prop === 'getpid') return () => 1;
                 if (prop === 'fiprintf' || prop === '__small_fprintf') return () => 0;
-                if (prop === '__wasm_longjmp') return () => { throw new Error('longjmp not supported'); };
+                if (prop === '__wasm_longjmp') return () => {
+                    throw new Error('longjmp not supported');
+                };
                 if (prop === '__wasm_setjmp' || prop === '__wasm_setjmp_test') return () => 0;
 
                 return (...args) => {
@@ -75,7 +73,9 @@ async function loadSkikoWASM() {
             }
         }),
         wasi_snapshot_preview1: {
-            proc_exit: (code) => { console.log(`WASI exit with code ${code}`); },
+            proc_exit: (code) => {
+                console.log(`WASI exit with code ${code}`);
+            },
             fd_write: (fd, iovs, iovs_len, nwritten_ptr) => {
                 const view = new DataView(wasmExports.memory.buffer);
                 let written = 0;
@@ -163,8 +163,8 @@ async function loadSkikoWASM() {
             sock_shutdown: () => 52,
         }
     };
-    
-    const { instance } = await WebAssembly.instantiateStreaming(response, importObject);
+
+    const {instance} = await WebAssembly.instantiateStreaming(response, importObject);
     wasmExports = instance.exports;
 
     // Initialize Emscripten runtime: HEAP views, $-prefixed globals, and wasmTable
@@ -257,9 +257,7 @@ export const GL = new Proxy({}, {
                         majorVersion: webGLCtx instanceof WebGL2RenderingContext ? 2 : 1,
                         enableExtensionsByDefault: true,
                     };
-                    var handle = _emscriptenGL.registerContext(webGLCtx, contextAttributes);
-                    console.log("WebGL context created and registered, handle:", handle);
-                    return handle;
+                    return _emscriptenGL.registerContext(webGLCtx, contextAttributes);
                 }
                 console.error("Failed to create any WebGL context.");
                 return 0;
@@ -269,11 +267,7 @@ export const GL = new Proxy({}, {
             return (contextId) => {
                 // Delegate to Emscripten's makeContextCurrent which sets
                 // GL.currentContext, GLctx, etc.
-                var result = _emscriptenGL.makeContextCurrent(contextId);
-                if (result) {
-                    console.log("Setting WebGL context:", contextId);
-                }
-                return result;
+                return _emscriptenGL.makeContextCurrent(contextId);
             };
         }
         // Delegate to the Emscripten $GL object for all other properties
