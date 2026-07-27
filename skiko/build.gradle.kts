@@ -164,7 +164,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "brotli",
             )
             linkFlags(
-                "--sysroot=${findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot",
                 "-lsetjmp",
                 "-lwasi-emulated-mman",
                 "-lwasi-emulated-signal",
