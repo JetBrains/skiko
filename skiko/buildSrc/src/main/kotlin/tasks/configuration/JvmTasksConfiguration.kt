@@ -389,7 +389,11 @@ fun SkikoProjectContext.createObjcCompileTask(
 
     val srcDirs = projectDirs(
         "src/awtMain/objectiveC/${os.id}"
-    )
+    ) + if (skiko.includeTestHelpers) {
+        projectDirs("src/jvmTest/objectiveC")
+    } else {
+        emptyList()
+    }
     sourceRoots.set(srcDirs)
     val jdkHome = File(System.getProperty("java.home") ?: error("'java.home' is null"))
 
