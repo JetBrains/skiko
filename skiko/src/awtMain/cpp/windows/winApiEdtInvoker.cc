@@ -1,31 +1,20 @@
-// Native backing for org.jetbrains.skiko.redrawer.WinApiEdtInvoker: run a Runnable on the AWT event dispatch thread
-// (EDT) from another thread (the Windows toolkit thread that drives a live resize) and block until it
-// completes, pumping this thread's sent + posted messages meanwhile (but not its hardware input) so the EDT's
-// cross-thread window ops don't deadlock against the wait. The Windows analog of macOS LWCToolkit.invokeAndWait,
-// which has no JDK equivalent. See invokeAndWaitWhilePumping below for exactly which messages and why.
+// Native backing for org.jetbrains.skiko.redrawer.WinApiEdtInvoker.
 
 #include <Windows.h>
 #include "jni_helpers.h"
 #include "winApiEdtInvoker.h"
 
-// Reentrancy flag for invokeAndWaitWhilePumping: true only while THIS thread is spinning the nested loop below.
-// thread_local, so it means "this thread is pump-waiting" regardless of which thread drives the invocation — the
-// generic form of the guard a message-dispatching caller needs (see isPumpingEdt in the header).
 static thread_local bool tlsPumpingEdt = false;
 
 bool isPumpingEdt() { return tlsPumpingEdt; }
 
-// Safety net for the pump-wait below: the posted EDT task (a live-resize render) finishes in well under this in every
-// normal case. Only a pathological block on the EDT — e.g. render code raising a modal dialog, whose own event loop
-// won't return until dismissed — exceeds it. On expiry we stop waiting and let the toolkit thread return to its normal
-// (full) message loop, which then services that dialog; the abandoned task completes harmlessly later. Set far above
-// any real resize frame (tens to low hundreds of ms) so it never trips normal resizing.
+// Far above any real resize frame, so only a pathological block on the EDT reaches it — render code raising a modal
+// dialog, say, whose own event loop won't return until dismissed. Backing out lets the toolkit thread resume its
+// normal full-input loop and service that dialog, degrading to a stutter rather than a hang.
 static const DWORD kPumpTimeoutMs = 1000;
 
 extern "C"
 {
-    // Posts `runnable` to the EDT via the static java.awt.EventQueue.invokeLater(Runnable). Caches the class as a
-    // global ref alongside the method ID (single lookup), calls it, and clears any pending exception.
     static void javaEventQueueInvokeLater(JNIEnv *env, jobject runnable)
     {
         static jclass cls = nullptr;
@@ -41,8 +30,7 @@ extern "C"
         if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
     }
 
-    // Constructs a new EdtInvocationTask(runnable, doneEvent) — the small Java shim that runs `runnable` on the EDT
-    // and then signals `doneEvent`.
+    // A Java shim is unavoidable here: JNI cannot fabricate a java.lang.Runnable to post.
     static jobject javaNewEdtInvocationTask(JNIEnv *env, jobject runnable, HANDLE doneEvent)
     {
         static jclass cls = nullptr;
@@ -59,30 +47,15 @@ extern "C"
         return task;
     }
 
-    // Runs `runnable` on the EDT and blocks this thread until it finishes, spinning a nested message loop meanwhile —
-    // the Win32 counterpart of the nested CFRunLoop that macOS LWCToolkit.invokeAndWait spins (via doAWTRunLoop). It
-    // must service more than SENT messages: EDT work can make synchronous cross-thread calls back to this toolkit
-    // thread that travel as POSTED messages — e.g. showing/disposing a window from a Compose recomposition posts
-    // focus/IME setup to this thread and blocks the EDT on the reply. A sent-only pump services SetWindowPos
-    // marshaling but starves those, and the EDT deadlocks against us.
+    // The Win32 counterpart of the nested CFRunLoop macOS LWCToolkit.invokeAndWait spins. Which message classes it
+    // pumps is the whole design:
     //
-    // But it must NOT drain hardware input (mouse/keyboard). We block here nested inside Windows' modal move/size
-    // loop, which owns the drag's input; removing that input stalls the drag (the window stops following the cursor).
-    // Input is a distinct message class (QS_INPUT) from the round-trips we need (QS_POSTMESSAGE / QS_SENDMESSAGE), so
-    // we wait on and PeekMessage only the latter two (PM_QS_POSTMESSAGE | PM_QS_SENDMESSAGE), leaving the drag's input
-    // for the modal loop. Both PM_QS_ flags are needed — see the PeekMessage call below. While we pump,
-    // isPumpingEdt() makes the live-resize WndProc inert, so a re-dispatched SetWindowPos (which SENDs WM_NCCALCSIZE
-    // back here) can't re-enter its synchronous render.
+    // POSTED as well as SENT, because EDT work makes synchronous cross-thread calls back to this thread that travel
+    // as posted messages — showing a window from a Compose recomposition posts focus/IME setup here and blocks the
+    // EDT on the reply. A sent-only pump starves those and the EDT deadlocks against us.
     //
-    // Backstop: the wait is capped by kPumpTimeoutMs. Nothing normal reaches it, but if the EDT task blocks forever
-    // (render code raising a modal dialog, whose loop won't return until dismissed) we back out and let the toolkit
-    // thread return to its normal full-input loop, which then services that dialog — so the app degrades to a brief
-    // stutter instead of a hard hang. The abandoned task finishes harmlessly later (see the CloseHandle note below).
-    //
-    // Fully self-contained: creates its own per-call auto-reset event (so independent invocations never
-    // cross-signal), wraps `runnable` to signal that event on completion, posts it (EventQueue.invokeLater),
-    // pump-waits, and closes the event. The only Java involved is the EdtInvocationTask shim, because JNI
-    // cannot fabricate a java.lang.Runnable to post.
+    // But never input: we are nested inside the modal move/size loop, which owns the drag's input, and draining it
+    // stops the window following the cursor.
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WinApiEdtInvoker_invokeAndWaitWhilePumping(
         JNIEnv *env, jobject invoker, jobject runnable)
     {
@@ -92,9 +65,7 @@ extern "C"
         jobject task = javaNewEdtInvocationTask(env, runnable, doneEvent);
         if (!task) { CloseHandle(doneEvent); return; }
 
-        // Set before posting so that even if the EDT runs the task and posts/sends a message back before we reach the
-        // loop, a re-entrant WndProc dispatched from it sees us as busy. Cleared once the round-trip completes.
-        tlsPumpingEdt = true;
+        tlsPumpingEdt = true; // before posting: the EDT may send a message back before we reach the loop
         javaEventQueueInvokeLater(env, task);
         env->DeleteLocalRef(task);
         bool completed = false;
@@ -103,25 +74,21 @@ extern "C"
         {
             ULONGLONG now = GetTickCount64();
             DWORD waitMs = now >= deadline ? 0 : (DWORD)(deadline - now);
-            // Wake on the task finishing, a cross-thread message to service, or the safety-net deadline. Deliberately
-            // no QS_INPUT — see above.
             DWORD r = MsgWaitForMultipleObjectsEx(1, &doneEvent, waitMs, QS_SENDMESSAGE | QS_POSTMESSAGE, MWMO_INPUTAVAILABLE);
-            if (r == WAIT_OBJECT_0) { completed = true; break; } // task signaled done
-            if (r == WAIT_TIMEOUT) break; // safety net expired: back out (see kPumpTimeoutMs); leave `doneEvent` for the task
+            if (r == WAIT_OBJECT_0) { completed = true; break; }
+            if (r == WAIT_TIMEOUT) break;
             MSG msg;
             bool quitting = false;
-            // PM_QS_POSTMESSAGE | PM_QS_SENDMESSAGE restricts processing to posted (app) and sent messages — the
-            // drag's hardware input stays in the queue for the modal loop. PM_QS_SENDMESSAGE is REQUIRED: naming any
-            // PM_QS_* value switches PeekMessage from "process every class" to "process only these", so with
-            // PM_QS_POSTMESSAGE alone a pending SENT message is never dispatched — it just keeps QS_SENDMESSAGE set,
-            // which re-wakes MsgWaitForMultipleObjectsEx immediately (MWMO_INPUTAVAILABLE) for a 100%-CPU spin that
-            // leaves the sender blocked.
+            // PM_QS_SENDMESSAGE is REQUIRED, not redundant: naming any PM_QS_* value switches PeekMessage from
+            // "process every class" to "process only these", so PM_QS_POSTMESSAGE alone never dispatches a pending
+            // SENT message. It just leaves QS_SENDMESSAGE set, which re-wakes the wait above immediately
+            // (MWMO_INPUTAVAILABLE) — a 100%-CPU spin with the sender blocked until the timeout.
             while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE | PM_QS_POSTMESSAGE | PM_QS_SENDMESSAGE))
             {
                 if (msg.message == WM_QUIT)
                 {
-                    // Quit arriving mid-pump: re-post so the outer (modal) loop still tears the app down, and stop
-                    // pumping — the task may never finish if the EDT is itself shutting down, so we must not wait on it.
+                    // Re-post so the outer modal loop still tears down, and stop waiting: the EDT may be shutting
+                    // down too, in which case the task never completes.
                     PostQuitMessage((int)msg.wParam);
                     quitting = true;
                     break;
@@ -132,14 +99,11 @@ extern "C"
             if (quitting) break;
         }
         tlsPumpingEdt = false;
-        // Close the event only on a normal finish. If we bailed early — WM_QUIT, or the safety-net timeout with the
-        // EDT still blocked — the task may still be pending and will SetEvent(doneEvent) when it eventually runs; leave
-        // the handle open (a one-off leak) rather than risk signaling a freed (possibly recycled) handle.
+        // After bailing out the task is still pending and will SetEvent when it runs, so leak the handle rather than
+        // risk signaling a recycled one.
         if (completed) CloseHandle(doneEvent);
     }
 
-    // Called by EdtInvocationTask.run() (on the EDT) once the wrapped runnable finished, to release the
-    // pump-waiting thread. `doneEvent` is the HANDLE created in invokeAndWaitWhilePumping above.
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_EdtInvocationTask_signalDone(
         JNIEnv *env, jobject task, jlong doneEvent)
     {

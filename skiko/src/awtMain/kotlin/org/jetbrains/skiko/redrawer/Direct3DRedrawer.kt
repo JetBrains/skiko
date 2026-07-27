@@ -23,18 +23,13 @@ internal class Direct3DRedrawer(
     private var isSwapChainInitialized = false
 
     /**
-     * Whether this redrawer is currently driving an interactive live-resize itself (only ever true when
-     * [SkikoProperties.direct3DSynchronousLiveResize] is enabled and this layer fills the window). Set for the
-     * duration of the resize gesture; it quiesces the async EDT renders so the synchronous native render is the only
-     * thing painting during a live-resize.
+     * Set for the duration of a resize gesture, to quiesce the async EDT renders so the synchronous native render is
+     * the only thing painting.
      */
     @Volatile
     internal var isHandlingLiveResizeNow: Boolean = false
 
-    // Opaque handle to this window's native LiveResizeState (0 if the hook isn't installed), returned by
-    // installLiveResizeHook and threaded back through postLiveResizeRender/uninstallLiveResizeHook. Per-window, so
-    // multiple D3D windows can be hooked at once. When installed, the on-screen swapchain uses DXGI_SCALING_NONE and
-    // interactive resizes render synchronously in WM_NCCALCSIZE; isHandlingLiveResizeNow is set for the drag.
+    // Native LiveResizeState, 0 if the hook isn't installed.
     private var liveResizeHandle: Long = 0L
     private val liveResizeInstalled: Boolean
         get() = liveResizeHandle != 0L
@@ -99,8 +94,7 @@ internal class Direct3DRedrawer(
     override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
         if (isHandlingLiveResizeNow) {
-            // During live resize, present only from the toolkit thread (synchronized with the resize loop).
-            // An async EDT present would race the synchronous render.
+            // An async EDT present would race the synchronous render on the toolkit thread.
             postLiveResizeRender(liveResizeHandle)
         } else {
             frameDispatcher.scheduleFrame()
@@ -174,17 +168,18 @@ internal class Direct3DRedrawer(
     @Suppress("unused")
     private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
 
-    // ---- Live-resize lifecycle. All three are called from native on the toolkit thread; a drag runs as
-    // onLiveResizeStarted → drawFrameWhileLiveResizing (once per resize step) → onLiveResizeEnded.
-    // isHandlingLiveResizeNow is set by the first and cleared by the last. ----
+    // ---- Live-resize lifecycle, called from directXRedrawer.cc on the toolkit thread: onLiveResizeStarted →
+    // drawFrameWhileLiveResizing (per resize step) → onLiveResizeEnded. ----
 
-    /** Called (on the toolkit thread) when the live-resize session starts. */
     @Suppress("unused")
     private fun onLiveResizeStarted() {
         isHandlingLiveResizeNow = true
     }
 
-    /** Called (on the toolkit thread) when the live-resize session ends. */
+    /**
+     * The drag quiesced [onPlatformComponentResized], so the layer's size is stale. It has to be laid out and
+     * rendered before the async loop resumes, or that loop renders at the stale size and flashes white.
+     */
     @Suppress("unused")
     private fun onLiveResizeEnded() {
         WinApiEdtInvoker.invokeAndWaitWhilePumping {
@@ -194,18 +189,11 @@ internal class Direct3DRedrawer(
                 it.validate()
             }
             isHandlingLiveResizeNow = false
-            renderImmediately() // render the canvas at the final size before it's revealed
+            renderImmediately()
         }
     }
 
-    /**
-     * Called (on the toolkit thread) to synchronously draw a single frame at the given size during a live-resize.
-     *
-     * [withVsync] paces the present: an active drag passes `false` (unpaced — driven at mouse-move cadence by
-     * WM_NCCALCSIZE), while a stationary hold passes `true` so `Present(1)` caps the idle frame rate at the refresh
-     * rate. With the 2-buffer swapchain that also keeps the present queue shallow, which keeps top/left-edge content
-     * welded to the moving window origin.
-     */
+    /** [withVsync] paces the present; see `javaDrawFrameWhileLiveResizing` in `directXRedrawer.cc`. */
     @Suppress("unused")
     private fun drawFrameWhileLiveResizing(width: Int, height: Int, withVsync: Boolean) {
         WinApiEdtInvoker.invokeAndWaitWhilePumping {
@@ -233,14 +221,10 @@ internal class Direct3DRedrawer(
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long
 
-    // Installs a WndProc subclass on the top-level window (GA_ROOT of `window`) that, during an interactive resize,
-    // synchronously renders the real content into the on-screen swapchain and presents it in WM_NCCALCSIZE. Returns
-    // an opaque handle to the per-window native state (0 on failure), to pass back to the two calls below.
+    // See the "Direct3D synchronous live-resize" section of directXRedrawer.cc. Returns 0 on failure.
     private external fun installLiveResizeHook(window: Long, content: Long): Long
 
-    // Restores the frame's original WndProc and frees the per-window native state; called from dispose().
     private external fun uninstallLiveResizeHook(handle: Long)
 
-    // Invalidates the frame window so a WM_PAINT drives the stationary-hold render (see needRender).
     private external fun postLiveResizeRender(handle: Long)
 }

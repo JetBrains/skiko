@@ -24,8 +24,7 @@
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>
 
-// JavaVM global set in JNI_OnLoad (jvmMain/cpp/common/impl/Library.cc); used to reach the JVM from
-// the AWT-Windows toolkit thread that runs the subclassed WndProc.
+// Set in JNI_OnLoad (jvmMain/cpp/common/impl/Library.cc).
 extern "C" JavaVM *jvm;
 
 const int BuffersCount = 2;
@@ -68,9 +67,8 @@ public:
         gr_cp<IDXGISwapChain1> swapChain1;
         CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
         HRESULT result = S_OK;
-        // Use NONE when the synchronous live-resize hook is installed. The WM_NCCALCSIZE pre-render fills the content
-        // each, so NONE removes the scaling jitter). Every other window keeps STRETCH — with no pre-render behind
-        // it, a NONE swapchain would expose a hard uncovered edge on any size change (maximize/snap/DPI/async).
+        // NONE is safe only behind the live-resize pre-render, which fills the content at every new size. Otherwise
+        // it would expose a hard uncovered edge on any size change (maximize/snap/DPI/async).
         DXGI_SCALING scaling = preferNoneScaling ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
         if (transparency) {
             result = CreateSwapChainForComposition(swapChainFactory4.get(), width, height, scaling, &swapChain1);
@@ -136,45 +134,31 @@ private:
 };
 
 // ===================== Direct3D synchronous live-resize =====================
-// The Windows/Direct3D live-resize fix. Subclasses the frame's WndProc and, during an interactive (drag) resize,
-// synchronously renders the real renderDelegate content into the window's on-screen swapchain at the new size and
-// presents it in WM_NCCALCSIZE / WM_PAINT BEFORE the geometry commits — so content and geometry land together and
-// no white bars appear at the edges.
+// Renders and presents the content synchronously inside WM_NCCALCSIZE, before the new geometry commits, so DWM never
+// composites a frame whose edges we haven't painted yet.
 //
-// Multi-window: all identity + drag state lives in a heap LiveResizeState attached to the frame HWND (SetProp), so
-// any number of windows can be hooked independently — LiveResizeWndProc recovers its own state from the hWnd it is
-// handed. (The reentrancy guard for the EDT pump-wait lives in winApiEdtInvoker as isPumpingEdt(), thread-scoped.)
-//
-// Why raw SetWindowLongPtr(GWLP_WNDPROC) + SetProp and NOT the comctl32 SetWindowSubclass helpers (which would give
-// cleaner chaining): SetWindowSubclass must be called from the thread that OWNS the window, but we install from the
-// EDT (Direct3DRedrawer is constructed in SkiaLayer.addNotify), while the AWT frame HWND is owned by the separate
-// AWT-Windows toolkit thread. SetWindowSubclass silently returns FALSE across threads → the hook never attaches →
-// white bars on resize. SetWindowLongPtr(GWLP_WNDPROC) tolerates cross-thread install within a process, so it is
-// the correct primitive here. The subclass proc itself still runs on the toolkit thread (where the frame's messages
-// are dispatched), exactly as intended.
+// Not SetWindowSubclass, which would chain more cleanly: it must be called from the thread that OWNS the window, and
+// we install from the EDT while the AWT frame HWND belongs to the toolkit thread. Cross-thread it just returns FALSE.
 
-// Per-hooked-window state, attached to the frame HWND under kLiveResizeStateProp and recovered in LiveResizeWndProc.
 struct LiveResizeState
 {
-    WNDPROC originalProc = nullptr; // the frame's WndProc we subclassed (the chain target)
-    HWND frameHwnd = nullptr;       // top-level frame (gets WM_ENTERSIZEMOVE/WM_NCCALCSIZE); owns the prop
-    HWND contentHwnd = nullptr;     // the canvas child that must cover the frame during a drag
-    jobject redrawer = nullptr;     // global ref to the owning Direct3DRedrawer
-    int lastClientWidth = 0;        // client size the last resize step used (GetClientRect lags a step during a drag)
+    WNDPROC originalProc = nullptr;
+    HWND frameHwnd = nullptr;
+    HWND contentHwnd = nullptr;
+    jobject redrawer = nullptr;     // global ref
+    int lastClientWidth = 0;
     int lastClientHeight = 0;
-    bool inSizeMoveLoop = false;    // inside a WM_ENTERSIZEMOVE..WM_EXITSIZEMOVE modal loop (resize OR move)
-    bool liveResizeEngaged = false; // an actual RESIZE is in progress (not a plain move)
+    bool inSizeMoveLoop = false;    // WM_ENTERSIZEMOVE..WM_EXITSIZEMOVE, which covers plain moves too
+    bool liveResizeEngaged = false; // ...whereas this means an actual resize
 };
 
 static const wchar_t *kLiveResizeStateProp = L"SkikoLiveResizeState";
 
-// Recover the per-window state a frame's LiveResizeWndProc was installed with (nullptr if not/never hooked).
 static LiveResizeState *liveResizeStateFor(HWND hWnd)
 {
     return reinterpret_cast<LiveResizeState *>(GetPropW(hWnd, kLiveResizeStateProp));
 }
 
-// Attach the current (toolkit) thread to the JVM if needed and return its JNIEnv (nullptr if unavailable).
 static JNIEnv *getJniEnv()
 {
     if (!jvm) return nullptr;
@@ -184,7 +168,6 @@ static JNIEnv *getJniEnv()
     return env;
 }
 
-// One dedicated invoker per Direct3DRedrawer method called from native.
 static void javaOnLiveResizeStarted(LiveResizeState *s)
 {
     if (!s->redrawer) return;
@@ -201,8 +184,6 @@ static void javaOnLiveResizeStarted(LiveResizeState *s)
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-// At drag-end: the Kotlin side hops to the EDT (blocking) and forces a layout so the canvas catches up to the final
-// client size, renders it, then resumes the normal animation loop.
 static void javaOnLiveResizeEnded(LiveResizeState *s)
 {
     if (!s->redrawer) return;
@@ -219,13 +200,13 @@ static void javaOnLiveResizeEnded(LiveResizeState *s)
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-// Render the REAL content at the last recorded client size (s->lastClientWidth/Height) into the on-screen swapchain
-// and present it synchronously. The Kotlin side hops to the EDT and blocks there (invokeAndWaitWhilePumping). `vsync`
-// selects the present's sync interval: an active drag presents unpaced (Present(0)), driven at mouse-move cadence by
-// WM_NCCALCSIZE; a stationary hold presents with vsync (Present(1)), which self-paces to the refresh rate — the
-// 2-buffer FLIP_DISCARD swapchain can queue at most one frame, so the next Present(1) blocks until vblank. That
-// shallow (1-deep) queue is also what keeps top/left-edge content welded to the moving window origin (a deeper queue
-// adds latency that lets the content trail the edge).
+// Uses the size we recorded, not GetClientRect's, which lags a step behind mid-drag.
+//
+// `vsync` is what makes origin-move (top/left) resizes work. An unpaced hold spins ~1000 FPS and floods DWM's present
+// queue; the added latency lets content trail a moving origin. (Right/bottom is anchored top-left, so it only shows a
+// slightly stale size, cleanly clipped — hence only top/left ever broke.) Present(1) keeps the queue 1-deep on its
+// own via back-pressure, since a 2-buffer FLIP_DISCARD swapchain can hold at most one queued frame. An active drag
+// needs none of this, being throttled by the mouse-move cadence that drives WM_NCCALCSIZE.
 static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool vsync)
 {
     if (!s->redrawer) return;
@@ -242,27 +223,8 @@ static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool vsync)
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-// on-demand stationary-animation driver, driven by WM_PAINT (NOT a posted message). needRender (EDT)
-// calls InvalidateRect on the frame window; the WM_PAINT handler does the SAME synchronized present as
-// WM_NCCALCSIZE, at the size the last resize step used (state->lastClientWidth/Height — GetClientRect lags a step
-// behind during a drag, which caused the content to trail the window edge).
-//
-// Why WM_PAINT and not a posted message: GetMessage priority is  sent > posted > INPUT > WM_PAINT > WM_TIMER.
-// A posted message (an earlier posted-message design) outranks input, so a render that re-posts itself permanently
-// beats the modal loop's queued mouse moves and the drag locks up (validated: a run of renders at a frozen size
-// with no NCCALC between). We cannot instead peek-and-yield, because the modal size loop's input is invisible to
-// GetQueueStatus/PeekMessage from in here (also validated). WM_PAINT sits BELOW input in that ladder: GetMessage
-// only hands it to us when no input is waiting, so it physically cannot starve the drag — during an active drag
-// the mouse moves win and WM_NCCALCSIZE drives the frame (carrying the animation via onRender); only in an input
-// lull (a genuine stationary hold) does WM_PAINT fire. We ValidateRect first, then render; onRender's needRender
-// InvalidateRect's again, re-arming the next frame — so the animation self-perpetuates while held and stops
-// cleanly when needRender stops, all without ever outranking input.
-
-// Resize the content child to AT LEAST (w,h), never shrinking it during a drag. Growing ahead of a GROW covers the
-// newly-exposed area; on a SHRINK we must NOT shrink it preemptively — a child narrower than the still-old frame
-// exposes a strip on the fixed (origin-moving) edge for one composite (the tiny bar + jump at the very start of a
-// left/top-edge shrink). Left large, the child is simply clipped by the shrinking frame, and settles to the exact
-// size at drag-end finalize (Swing's doLayout).
+// Grows only. Shrinking the child ahead of the still-old frame would expose a strip on the origin-moving edge for one
+// composite; oversized, it is just clipped, and WM_EXITSIZEMOVE snaps it back.
 static void growContentChildTo(LiveResizeState *s, int w, int h)
 {
     if (!s->contentHwnd) return;
@@ -273,95 +235,69 @@ static void growContentChildTo(LiveResizeState *s, int w, int h)
                  SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
 }
 
-// The live-resize WndProc. Keep the window's own on-screen swapchain as the content and, on each resize step,
-// synchronously render+present it at the NEW client size BEFORE letting the geometry commit — "delay the resize
-// until content is drawn" — so DWM never exposes an unrendered (white) region at the edges. One instance is
-// installed per window; per-window state is recovered from the frame HWND (liveResizeStateFor).
 static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     LiveResizeState *s = liveResizeStateFor(hWnd);
-    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam); // uninstallLiveResizeHook didn't restore the original proc
+    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam);
     switch (msg)
     {
         case WM_ERASEBKGND:
-            if (s->inSizeMoveLoop) return 1; // suppress the frame's white erase flash while sizing
+            if (s->inSizeMoveLoop) return 1;
             break;
         case WM_ENTERSIZEMOVE:
             s->inSizeMoveLoop = true;
-            s->liveResizeEngaged = false; // engage only on the first real size step (not on plain moves)
+            s->liveResizeEngaged = false;
             break;
         case WM_NCCALCSIZE:
         {
-            // Let AWT compute the new client rect first (keeps its inset/layout tracking correct), then render
-            // our content at that size and present, all before returning (which lets the geometry commit).
             LRESULT r = CallWindowProcW(s->originalProc, hWnd, msg, wParam, lParam);
-            // Skip while a render is already pump-waiting on this thread: the EDT's SetWindowPos is SENT back here
-            // and re-enters WM_NCCALCSIZE; starting another EDT round-trip would deadlock (the EDT is blocked in
-            // SendMessage). isPumpingEdt() is that guard, owned by the pump-wait itself (winApiEdtInvoker).
+            // isPumpingEdt(): our own render re-enters here, because the EDT's SetWindowPos is SENT back to this
+            // thread. Starting a second round-trip would deadlock against the EDT already blocked in SendMessage.
             if (s->inSizeMoveLoop && wParam && !isPumpingEdt())
             {
                 if (!s->liveResizeEngaged)
                 {
-                    // First real (size-changing) step of this drag: tell Kotlin to engage BEFORE the first render,
-                    // so the async EDT renders quiesce for the rest of the drag (see onLiveResizeStarted).
                     s->liveResizeEngaged = true;
-                    javaOnLiveResizeStarted(s);
+                    javaOnLiveResizeStarted(s); // must quiesce the async EDT renders before the first render here
                 }
                 NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *)lParam;
-                RECT c = p->rgrc[0]; // now holds the new CLIENT rect
+                RECT c = p->rgrc[0];
                 s->lastClientWidth = c.right - c.left;
                 s->lastClientHeight = c.bottom - c.top;
-                // Grow (never shrink) the content child so it covers the soon-to-be-exposed region on a grow and
-                // never exposes a strip on a shrink; see growContentChildTo.
                 growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
-                javaDrawFrameWhileLiveResizing(s, false); // active drag: unpaced
+                javaDrawFrameWhileLiveResizing(s, /*vsync*/ false);
             }
             return r;
         }
         case WM_PAINT:
-            // Stationary hold: while the drag is paused no WM_NCCALCSIZE fires, so drive the animation (and keep
-            // content present, no white) from WM_PAINT. It sits BELOW input in GetMessage priority, so it can't
-            // starve the active drag (mouse moves win and drive frames via WM_NCCALCSIZE). needRender re-arms it
-            // via postLiveResizeRender's InvalidateRect while isHandlingLiveResizeNow. The WM_PAINT stationary-hold driver.
-            // Skip while a render is already pump-waiting on this thread: a WM_PAINT arriving mid-pump (e.g. AWT
-            // synchronously repainting the frame while servicing a round-trip) would re-enter our synchronous render.
-            // Same guard the WM_NCCALCSIZE path uses. Fall through to AWT's proc so its own paint still validates.
+            // Drives frames while the drag is paused and no WM_NCCALCSIZE fires. It has to be WM_PAINT: a
+            // self-reposting POSTED message outranks the modal loop's queued input and locks the drag up, and
+            // peek-and-yield is no alternative because that loop's input is invisible to PeekMessage from in here
+            // (both tried). Only WM_PAINT sits below input and so cannot starve the drag. needRender re-arms it by
+            // invalidating the frame.
             if (s->inSizeMoveLoop && s->liveResizeEngaged && !isPumpingEdt())
             {
-                ValidateRect(hWnd, nullptr); // validate FIRST so the re-arm InvalidateRect isn't cleared
-                // Re-assert the child size (>= client), same as the NCCALCSIZE path: during a hold Swing's async
-                // doLayout has time to shrink the child to a lagging size, leaving a frame-redirection strip past
-                // its edge. The active drag never drifts because every NCCALCSIZE re-asserts it; the hold must too.
+                ValidateRect(hWnd, nullptr); // before rendering, so the re-arm below isn't cleared
+                // A hold gives Swing's async doLayout time to shrink the child to a lagging size; every
+                // WM_NCCALCSIZE re-asserts it during an active drag, but nothing does here.
                 growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
-                // Present WITH vsync during the hold (the active drag above is unpaced). This caps idle FPS at the
-                // refresh rate and, because the 2-buffer FLIP_DISCARD swapchain can queue only one frame, the next
-                // Present(1) blocks until vblank — a shallow (1-deep) queue that also keeps top/left-edge content
-                // welded to the moving origin. Real drags are full of micro-pauses that land in this WM_PAINT path, so
-                // pacing it (not just handling a full stop) is what keeps ORIGIN-MOVE (top/left) resizes clean.
                 javaDrawFrameWhileLiveResizing(s, /*vsync*/ true);
                 return 0;
             }
             break;
         case WM_EXITSIZEMOVE:
             s->inSizeMoveLoop = false;
-            // Only when a real resize engaged. A plain move never sets isHandlingLiveResizeNow (so it never quiesced
-            // the async loop) and never renders here — there's nothing to finalize or resume.
             if (s->liveResizeEngaged)
             {
                 s->liveResizeEngaged = false;
-                // Snap the content child to the exact settled client size. growContentChildTo only ever grew it
-                // during the drag, so after a shrink it can be left larger than the client (clipped, so invisible);
-                // Swing's post-drag layout may no-op (its model already matches), leaving the native HWND oversized.
-                // Reset it explicitly here — safe now the frame is settled (child == client, no strip).
+                // The child can be left oversized (growContentChildTo only grows), and Swing's post-drag layout may
+                // no-op because its own model already matches. Snap it explicitly.
                 if (s->contentHwnd)
                 {
                     RECT rc; GetClientRect(hWnd, &rc);
                     SetWindowPos(s->contentHwnd, nullptr, 0, 0, rc.right - rc.left, rc.bottom - rc.top,
                                  SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
                 }
-                // We quiesced onPlatformComponentResized for the whole drag, so the layer's Swing size is stale.
-                // onLiveResizeEnded (on the EDT) forces a layout to the settled size and renders BEFORE the async
-                // loop resumes — else it renders at the stale size and flashes white — then resumes the loop.
                 javaOnLiveResizeEnded(s);
             }
             break;
@@ -676,11 +612,7 @@ extern "C"
         return toJavaPointer(result);
     }
 
-    // needRender during a resize routes here — invalidate the frame window so a WM_PAINT drives a
-    // synchronized present (stationary animation). WM_PAINT sits below input in GetMessage priority, so
-    // (unlike a posted message) it yields to the modal resize loop instead of starving it. InvalidateRect
-    // coalesces naturally (the update region just accumulates into one WM_PAINT), so no explicit gate is needed.
-    // `handle` is the LiveResizeState* returned by installLiveResizeHook for this window.
+    // Arms the WM_PAINT hold path. Repeated calls coalesce into one update region, so no explicit gate is needed.
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_postLiveResizeRender(
         JNIEnv *env, jobject redrawer, jlong handle)
     {
@@ -776,44 +708,34 @@ extern "C"
         return (jlong)result;
     }
 
-    // Subclass the frame's WndProc with LiveResizeWndProc and allocate the per-window LiveResizeState, attached to
-    // the frame under kLiveResizeStateProp. Returns the state as an opaque handle (0 on failure); Direct3DRedrawer
-    // threads it back through postLiveResizeRender/uninstallLiveResizeHook. Any number of windows may be hooked at
-    // once (state is per-frame, not global). See LiveResizeState for why this uses SetWindowLongPtr, not
-    // SetWindowSubclass (cross-thread install from the EDT).
+    // Returns the state as an opaque handle (0 on failure) for the two calls below.
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_installLiveResizeHook(
         JNIEnv *env, jobject redrawer, jlong windowPtr, jlong contentPtr)
     {
-        HWND top = GetAncestor(fromJavaPointer<HWND>(windowPtr), GA_ROOT); // frame that gets WM_ENTERSIZEMOVE / WM_SIZE
+        HWND top = GetAncestor(fromJavaPointer<HWND>(windowPtr), GA_ROOT);
         if (!top) return 0;
-        // Refuse a double-install on the same frame (would leak the first state and, capturing our own proc as the
-        // chain target, recurse forever). Shouldn't happen — one redrawer per frame, and dispose uninstalls first.
-        if (liveResizeStateFor(top)) return 0;
+        if (liveResizeStateFor(top)) return 0; // a second install would capture our own proc and recurse forever
 
         LiveResizeState *state = new LiveResizeState();
         state->frameHwnd = top;
         state->contentHwnd = fromJavaPointer<HWND>(contentPtr);
         state->redrawer = env->NewGlobalRef(redrawer);
-        state->originalProc = (WNDPROC)GetWindowLongPtrW(top, GWLP_WNDPROC); // capture AWT's proc (the chain target)
-        // Attach the state BEFORE swapping the proc: once LiveResizeWndProc is live, any message the toolkit thread
-        // dispatches must be able to find its state, else it would DefWindowProc that message and bypass AWT's proc.
+        state->originalProc = (WNDPROC)GetWindowLongPtrW(top, GWLP_WNDPROC);
+        // Prop first: once the proc is live, a message that can't find its state would go to DefWindowProc and bypass
+        // AWT's proc entirely.
         SetPropW(top, kLiveResizeStateProp, (HANDLE)state);
-        SetWindowLongPtrW(top, GWLP_WNDPROC, (LONG_PTR)LiveResizeWndProc); // go live
+        SetWindowLongPtrW(top, GWLP_WNDPROC, (LONG_PTR)LiveResizeWndProc);
         return toJavaPointer(state);
     }
 
-    // Restores the frame's original WndProc, detaches and frees the per-window state, so a resize after dispose
-    // can't call into freed state. `handle` is what installLiveResizeHook returned; a 0 handle is a no-op. Called
-    // from Direct3DRedrawer.dispose().
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_uninstallLiveResizeHook(
         JNIEnv *env, jobject redrawer, jlong handle)
     {
         LiveResizeState *state = fromJavaPointer<LiveResizeState *>(handle);
         if (!state) return;
         if (state->frameHwnd) {
-            // Only unhook if we're still the top proc; if something subclassed over us, leave the chain intact
-            // (restoring blindly would drop the other subclass). Detach the prop regardless so no stale/freed
-            // state is ever recovered — a later LiveResizeWndProc call with no state falls through to DefWindowProc.
+            // Restoring blindly would drop anything subclassed over us. The prop goes regardless, so no freed state
+            // is ever recovered.
             WNDPROC current = (WNDPROC)GetWindowLongPtrW(state->frameHwnd, GWLP_WNDPROC);
             if (current == LiveResizeWndProc && state->originalProc) {
                 SetWindowLongPtrW(state->frameHwnd, GWLP_WNDPROC, (LONG_PTR)state->originalProc);
@@ -823,7 +745,6 @@ extern "C"
         if (state->redrawer) env->DeleteGlobalRef(state->redrawer);
         delete state;
     }
-
 }
 
 #endif

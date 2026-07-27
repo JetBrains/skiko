@@ -4,30 +4,22 @@ import org.jetbrains.skiko.Library
 import org.jetbrains.skiko.Logger
 
 /**
- * Runs a block on the AWT event dispatch thread (EDT) from another thread — e.g. the Windows toolkit thread
- * that drives a live resize — and blocks the caller until the block completes, pumping the calling thread's
- * sent and posted messages meanwhile so the EDT's own cross-thread window ops (marshaled back to the calling thread)
- * complete instead of deadlocking against the wait.
- *
- * The Windows analog of macOS `LWCToolkit.invokeAndWait`, which has no JDK equivalent. The wait event and the
- * message pump are handled entirely natively; see `winApiEdtInvoker.cc`.
+ * Runs a block on the AWT event dispatch thread (EDT) from another thread and blocks until it completes, pumping the
+ * calling thread's messages meanwhile so the EDT's cross-thread window ops don't deadlock against the wait. The
+ * Windows analog of macOS `LWCToolkit.invokeAndWait`; which message classes get pumped is subtle, see
+ * `winApiEdtInvoker.cc`.
  */
 internal object WinApiEdtInvoker {
     init {
         Library.load()
     }
 
-    /**
-     * Posts [runnable] to the EDT (via `EventQueue.invokeLater`) and blocks the calling thread until it has run.
-     */
     external fun invokeAndWaitWhilePumping(runnable: Runnable)
 }
 
 /**
- * The one Java shim [WinApiEdtInvoker] needs: JNI cannot fabricate a [Runnable] to post onto the EDT, so the native
- * `invokeAndWaitWhilePumping` constructs this. Its [run] invokes [runnable] and then signals the native
- * completion event [doneEvent] (a Win32 `HANDLE` passed as a pointer), releasing the pump-waiting thread.
- * Only ever instantiated from native code.
+ * Instantiated only from native code, because JNI cannot fabricate a [Runnable] to post onto the EDT.
+ * [doneEvent] is a Win32 `HANDLE` passed as a pointer; signaling it releases the pump-waiting thread.
  */
 @Suppress("unused")
 internal class EdtInvocationTask(
