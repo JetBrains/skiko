@@ -51,7 +51,7 @@ fun compilerForTarget(project: Project, os: OS, arch: Arch): String =
         OS.Android -> "clang++"
         OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
-        OS.Wasm -> project.findProperty("wasi.sdk")?.toString()?.let { "$it/bin/clang++" } ?: "/opt/wasi-sdk-33.0-arm64-macos/bin/clang++"
+        OS.Wasm -> project.findProperty("wasi.sdk").toString().let { "$it/bin/clang++" }
     }
 
 fun linkerForTarget(project: Project, os: OS, arch: Arch): String =
