@@ -69,8 +69,8 @@ extern "C"
     // But it must NOT drain hardware input (mouse/keyboard). We block here nested inside Windows' modal move/size
     // loop, which owns the drag's input; removing that input stalls the drag (the window stops following the cursor).
     // Input is a distinct message class (QS_INPUT) from the round-trips we need (QS_POSTMESSAGE / QS_SENDMESSAGE), so
-    // we wait on and PeekMessage only the latter two (PM_QS_POSTMESSAGE), leaving the drag's input for the modal loop.
-    // SENT messages are dispatched by the PeekMessage call itself regardless of the class filter. While we pump,
+    // we wait on and PeekMessage only the latter two (PM_QS_POSTMESSAGE | PM_QS_SENDMESSAGE), leaving the drag's input
+    // for the modal loop. Both PM_QS_ flags are needed — see the PeekMessage call below. While we pump,
     // isPumpingEdt() makes the live-resize WndProc inert, so a re-dispatched SetWindowPos (which SENDs WM_NCCALCSIZE
     // back here) can't re-enter its synchronous render.
     //
@@ -110,9 +110,13 @@ extern "C"
             if (r == WAIT_TIMEOUT) break; // safety net expired: back out (see kPumpTimeoutMs); leave `doneEvent` for the task
             MSG msg;
             bool quitting = false;
-            // PM_QS_POSTMESSAGE restricts removal to posted (app) messages — the drag's hardware input stays in the
-            // queue for the modal loop. Any pending SENT messages are still dispatched by this PeekMessage.
-            while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE | PM_QS_POSTMESSAGE))
+            // PM_QS_POSTMESSAGE | PM_QS_SENDMESSAGE restricts processing to posted (app) and sent messages — the
+            // drag's hardware input stays in the queue for the modal loop. PM_QS_SENDMESSAGE is REQUIRED: naming any
+            // PM_QS_* value switches PeekMessage from "process every class" to "process only these", so with
+            // PM_QS_POSTMESSAGE alone a pending SENT message is never dispatched — it just keeps QS_SENDMESSAGE set,
+            // which re-wakes MsgWaitForMultipleObjectsEx immediately (MWMO_INPUTAVAILABLE) for a 100%-CPU spin that
+            // leaves the sender blocked.
+            while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE | PM_QS_POSTMESSAGE | PM_QS_SENDMESSAGE))
             {
                 if (msg.message == WM_QUIT)
                 {
