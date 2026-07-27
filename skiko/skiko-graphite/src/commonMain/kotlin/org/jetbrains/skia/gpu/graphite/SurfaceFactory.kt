@@ -3,7 +3,6 @@ package org.jetbrains.skia.gpu.graphite
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
@@ -15,20 +14,18 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skiko.ExperimentalSkikoApi
 
 @ExperimentalSkikoApi
-fun Surface.Companion.makeFromBackendTexture(
+fun Surface.Companion.wrapBackendTexture(
     recorder: Recorder,
     backendTexture: BackendTexture,
-    colorFormat: SurfaceColorFormat,
     colorSpace: ColorSpace?,
     surfaceProps: SurfaceProps? = null,
 ): Surface? {
     return try {
         Stats.onNativeCall()
         val ptr = interopScope {
-            _nMakeFromBackendTexture(
+            _nWrapBackendTexture(
                 recorder.nativePtr,
                 backendTexture.nativePtr,
-                colorFormat.ordinal,
                 getPtr(colorSpace),
                 toInterop(surfaceProps?.packToIntArray()),
             )
@@ -41,11 +38,10 @@ fun Surface.Companion.makeFromBackendTexture(
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_gpu_graphite_SurfaceFactory__1nMakeFromBackendTexture")
-private external fun _nMakeFromBackendTexture(
+@ExternalSymbolName("org_jetbrains_skia_gpu_graphite_SurfaceFactory__1nWrapBackendTexture")
+private external fun _nWrapBackendTexture(
     recorderPtr: NativePointer,
     backendTexturePtr: NativePointer,
-    colorType: Int,
     colorSpacePtr: NativePointer,
     surfaceProps: InteropPointer,
 ): NativePointer

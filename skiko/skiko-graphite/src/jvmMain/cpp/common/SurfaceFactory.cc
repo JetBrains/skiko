@@ -7,12 +7,11 @@
 #include "include/gpu/graphite/Surface.h"
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_org_jetbrains_skia_gpu_graphite_SurfaceFactoryKt__1nMakeFromBackendTexture(
+Java_org_jetbrains_skia_gpu_graphite_SurfaceFactoryKt__1nWrapBackendTexture(
         JNIEnv* env,
         jclass,
         jlong recorderPtr,
         jlong backendTexturePtr,
-        jint colorType,
         jlong colorSpacePtr,
         jintArray surfacePropsValues) {
     auto recorder = reinterpret_cast<skgpu::graphite::Recorder*>(
@@ -25,7 +24,6 @@ Java_org_jetbrains_skia_gpu_graphite_SurfaceFactoryKt__1nMakeFromBackendTexture(
     return reinterpret_cast<jlong>(SkSurfaces::WrapBackendTexture(
             recorder,
             *backendTexture,
-            static_cast<SkColorType>(colorType),
             std::move(colorSpace),
             surfaceProps.get()).release());
 }

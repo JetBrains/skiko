@@ -5,10 +5,9 @@
 #include "include/gpu/graphite/Recorder.h"
 #include "include/gpu/graphite/Surface.h"
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_SurfaceFactory__1nMakeFromBackendTexture(
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_SurfaceFactory__1nWrapBackendTexture(
         KNativePointer recorderPtr,
         KNativePointer backendTexturePtr,
-        KInt colorType,
         KNativePointer colorSpacePtr,
         KInteropPointer surfacePropsValues) {
     auto recorder = reinterpret_cast<skgpu::graphite::Recorder*>(recorderPtr);
@@ -18,7 +17,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_SurfaceFactory__1nMa
     return reinterpret_cast<KNativePointer>(SkSurfaces::WrapBackendTexture(
             recorder,
             *backendTexture,
-            static_cast<SkColorType>(colorType),
             std::move(colorSpace),
             surfaceProps.get()).release());
 }
