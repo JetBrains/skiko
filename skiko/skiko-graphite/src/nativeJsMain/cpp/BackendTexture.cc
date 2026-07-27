@@ -11,8 +11,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_BackendTexture__1nGe
     return reinterpret_cast<KNativePointer>(&deleteBackendTexture);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_BackendTexture__1nWrapMetalTexture(
-        KNativePointer texturePtr, KInt width, KInt height) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeMetal(
+        KInt width, KInt height, KNativePointer texturePtr) {
     auto texture = skgpu::graphite::BackendTextures::MakeMetal(
             SkISize::Make(width, height),
             reinterpret_cast<CFTypeRef>(texturePtr));

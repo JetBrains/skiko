@@ -15,8 +15,8 @@ Java_org_jetbrains_skia_gpu_graphite_BackendTextureKt__1nGetBackendTextureFinali
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_org_jetbrains_skia_gpu_graphite_BackendTextureKt__1nWrapMetalTexture(
-        JNIEnv*, jclass, jlong texturePtr, jint width, jint height) {
+Java_org_jetbrains_skia_gpu_graphite_BackendTextureKt__1nMakeMetal(
+        JNIEnv*, jclass, jint width, jint height, jlong texturePtr) {
 #if defined(SK_METAL)
     auto texture = skgpu::graphite::BackendTextures::MakeMetal(
             SkISize::Make(width, height),

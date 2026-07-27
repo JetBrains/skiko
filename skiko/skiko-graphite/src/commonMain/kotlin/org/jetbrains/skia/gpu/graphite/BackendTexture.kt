@@ -13,11 +13,11 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
             GraphiteLibrary.load()
         }
 
-        fun wrapMetalTexture(texturePtr: NativePointer, width: Int, height: Int): BackendTexture {
+        fun makeMetal(width: Int, height: Int, texturePtr: NativePointer): BackendTexture {
             requireMetalSupport()
             require(texturePtr != NullPointer) { "Metal texture pointer is null" }
             require(width > 0 && height > 0) { "Texture dimensions must be positive" }
-            return BackendTexture(_nWrapMetalTexture(texturePtr, width, height))
+            return BackendTexture(_nMakeMetal(width, height, texturePtr))
         }
     }
 
@@ -29,5 +29,5 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nGetFinalizer")
 private external fun _nGetBackendTextureFinalizer(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nWrapMetalTexture")
-private external fun _nWrapMetalTexture(texturePtr: NativePointer, width: Int, height: Int): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeMetal")
+private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
