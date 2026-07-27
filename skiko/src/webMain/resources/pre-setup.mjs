@@ -249,17 +249,17 @@ export const GL = new Proxy({}, {
     get(target, prop) {
         if (prop === 'createContext') {
             return (canvas, attr) => {
-                const webGLCtx = canvas.getContext('webgl2', attr) || canvas.getContext('webgl', attr);
+                const webGLCtx = canvas.getContext('webgl2', attr);
                 if (webGLCtx) {
                     // Use Emscripten's registerContext to properly wrap the context
                     // with metadata (handle, version, GLctx) and init extensions.
-                    var contextAttributes = {
-                        majorVersion: webGLCtx instanceof WebGL2RenderingContext ? 2 : 1,
+                    const contextAttributes = {
+                        majorVersion: 2,
                         enableExtensionsByDefault: true,
                     };
                     return _emscriptenGL.registerContext(webGLCtx, contextAttributes);
                 }
-                console.error("Failed to create any WebGL context.");
+                console.error("Failed to create WebGL2 context.");
                 return 0;
             };
         }
