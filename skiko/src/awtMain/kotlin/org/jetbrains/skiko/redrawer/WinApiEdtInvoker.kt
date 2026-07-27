@@ -10,9 +10,9 @@ import org.jetbrains.skiko.Logger
  * complete instead of deadlocking against the wait.
  *
  * The Windows analog of macOS `LWCToolkit.invokeAndWait`, which has no JDK equivalent. The wait event and the
- * message pump are handled entirely natively; see `edtInvoker.cc`.
+ * message pump are handled entirely natively; see `winApiEdtInvoker.cc`.
  */
-internal object EdtInvoker {
+internal object WinApiEdtInvoker {
     init {
         Library.load()
     }
@@ -24,7 +24,7 @@ internal object EdtInvoker {
 }
 
 /**
- * The one Java shim [EdtInvoker] needs: JNI cannot fabricate a [Runnable] to post onto the EDT, so the native
+ * The one Java shim [WinApiEdtInvoker] needs: JNI cannot fabricate a [Runnable] to post onto the EDT, so the native
  * `invokeAndWaitWhilePumping` constructs this. Its [run] invokes [runnable] and then signals the native
  * completion event [doneEvent] (a Win32 `HANDLE` passed as a pointer), releasing the pump-waiting thread.
  * Only ever instantiated from native code.

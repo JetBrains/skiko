@@ -187,7 +187,8 @@ internal class Direct3DRedrawer(
     /** Called (on the toolkit thread) when the live-resize session ends. */
     @Suppress("unused")
     private fun onLiveResizeEnded() {
-        EdtInvoker.invokeAndWaitWhilePumping {
+        WinApiEdtInvoker.invokeAndWaitWhilePumping {
+            if (isDisposed) return@invokeAndWaitWhilePumping
             javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
                 it.invalidate()
                 it.validate()
@@ -199,16 +200,21 @@ internal class Direct3DRedrawer(
 
     /**
      * Called (on the toolkit thread) to synchronously draw a single frame at the given size during a live-resize.
+     *
+     * [withVsync] paces the present: an active drag passes `false` (unpaced — driven at mouse-move cadence by
+     * WM_NCCALCSIZE), while a stationary hold passes `true` so `Present(1)` caps the idle frame rate at the refresh
+     * rate. With the 2-buffer swapchain that also keeps the present queue shallow, which keeps top/left-edge content
+     * welded to the moving window origin.
      */
     @Suppress("unused")
-    private fun drawFrameWhileLiveResizing(width: Int, height: Int) {
-        EdtInvoker.invokeAndWaitWhilePumping {
+    private fun drawFrameWhileLiveResizing(width: Int, height: Int, withVsync: Boolean) {
+        WinApiEdtInvoker.invokeAndWaitWhilePumping {
             if (isDisposed) return@invokeAndWaitWhilePumping
             val size = Dimension(width, height)
             update(forcedSize = size)
             inDrawScope(forcedSize = size) {
                 if (!isDisposed) {
-                    drawAndSwap(withVsync = false)  // Native code handles the vsync to avoid blocking the EDT
+                    drawAndSwap(withVsync = withVsync)
                 }
             }
         }

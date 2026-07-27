@@ -1,4 +1,4 @@
-// Native backing for org.jetbrains.skiko.redrawer.EdtInvoker: run a Runnable on the AWT event dispatch thread
+// Native backing for org.jetbrains.skiko.redrawer.WinApiEdtInvoker: run a Runnable on the AWT event dispatch thread
 // (EDT) from another thread (the Windows toolkit thread that drives a live resize) and block until it
 // completes, pumping this thread's sent + posted messages meanwhile (but not its hardware input) so the EDT's
 // cross-thread window ops don't deadlock against the wait. The Windows analog of macOS LWCToolkit.invokeAndWait,
@@ -6,7 +6,7 @@
 
 #include <Windows.h>
 #include "jni_helpers.h"
-#include "edtInvoker.h"
+#include "winApiEdtInvoker.h"
 
 // Reentrancy flag for invokeAndWaitWhilePumping: true only while THIS thread is spinning the nested loop below.
 // thread_local, so it means "this thread is pump-waiting" regardless of which thread drives the invocation — the
@@ -42,8 +42,7 @@ extern "C"
     }
 
     // Constructs a new EdtInvocationTask(runnable, doneEvent) — the small Java shim that runs `runnable` on the EDT
-    // and then signals `doneEvent`. Class + ctor cached on first use; clears any pending exception (returns null on
-    // failure, which the caller already handles).
+    // and then signals `doneEvent`.
     static jobject javaNewEdtInvocationTask(JNIEnv *env, jobject runnable, HANDLE doneEvent)
     {
         static jclass cls = nullptr;
@@ -84,14 +83,14 @@ extern "C"
     // cross-signal), wraps `runnable` to signal that event on completion, posts it (EventQueue.invokeLater),
     // pump-waits, and closes the event. The only Java involved is the EdtInvocationTask shim, because JNI
     // cannot fabricate a java.lang.Runnable to post.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_EdtInvoker_invokeAndWaitWhilePumping(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WinApiEdtInvoker_invokeAndWaitWhilePumping(
         JNIEnv *env, jobject invoker, jobject runnable)
     {
-        HANDLE done = CreateEventW(nullptr, /*manualReset*/ FALSE, /*initialState*/ FALSE, nullptr);
-        if (!done) return;
+        HANDLE doneEvent = CreateEventW(nullptr, /*manualReset*/ FALSE, /*initialState*/ FALSE, nullptr);
+        if (!doneEvent) return;
 
-        jobject task = javaNewEdtInvocationTask(env, runnable, done);
-        if (!task) { CloseHandle(done); return; }
+        jobject task = javaNewEdtInvocationTask(env, runnable, doneEvent);
+        if (!task) { CloseHandle(doneEvent); return; }
 
         // Set before posting so that even if the EDT runs the task and posts/sends a message back before we reach the
         // loop, a re-entrant WndProc dispatched from it sees us as busy. Cleared once the round-trip completes.
@@ -106,9 +105,9 @@ extern "C"
             DWORD waitMs = now >= deadline ? 0 : (DWORD)(deadline - now);
             // Wake on the task finishing, a cross-thread message to service, or the safety-net deadline. Deliberately
             // no QS_INPUT — see above.
-            DWORD r = MsgWaitForMultipleObjectsEx(1, &done, waitMs, QS_SENDMESSAGE | QS_POSTMESSAGE, MWMO_INPUTAVAILABLE);
+            DWORD r = MsgWaitForMultipleObjectsEx(1, &doneEvent, waitMs, QS_SENDMESSAGE | QS_POSTMESSAGE, MWMO_INPUTAVAILABLE);
             if (r == WAIT_OBJECT_0) { completed = true; break; } // task signaled done
-            if (r == WAIT_TIMEOUT) break; // safety net expired: back out (see kPumpTimeoutMs); leave `done` for the task
+            if (r == WAIT_TIMEOUT) break; // safety net expired: back out (see kPumpTimeoutMs); leave `doneEvent` for the task
             MSG msg;
             bool quitting = false;
             // PM_QS_POSTMESSAGE restricts removal to posted (app) messages — the drag's hardware input stays in the
@@ -130,9 +129,9 @@ extern "C"
         }
         tlsPumpingEdt = false;
         // Close the event only on a normal finish. If we bailed early — WM_QUIT, or the safety-net timeout with the
-        // EDT still blocked — the task may still be pending and will SetEvent(done) when it eventually runs; leave the
-        // handle open (a one-off leak) rather than risk signaling a freed (possibly recycled) handle.
-        if (completed) CloseHandle(done);
+        // EDT still blocked — the task may still be pending and will SetEvent(doneEvent) when it eventually runs; leave
+        // the handle open (a one-off leak) rather than risk signaling a freed (possibly recycled) handle.
+        if (completed) CloseHandle(doneEvent);
     }
 
     // Called by EdtInvocationTask.run() (on the EDT) once the wrapped runnable finished, to release the

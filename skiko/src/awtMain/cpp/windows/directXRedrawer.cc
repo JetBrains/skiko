@@ -5,7 +5,7 @@
 #include "jni_helpers.h"
 #include "exceptions_handler.h"
 #include "window_util.h"
-#include "edtInvoker.h"
+#include "winApiEdtInvoker.h"
 
 #include "SkColorSpace.h"
 #include "ganesh/GrBackendSurface.h"
@@ -143,8 +143,7 @@ private:
 //
 // Multi-window: all identity + drag state lives in a heap LiveResizeState attached to the frame HWND (SetProp), so
 // any number of windows can be hooked independently — LiveResizeWndProc recovers its own state from the hWnd it is
-// handed. (g_monitorOutput below stays process-global on purpose: a shared monitor vblank source, not per-window.
-// The reentrancy guard for the EDT pump-wait lives in edtInvoker as isPumpingEdt(), thread-scoped.)
+// handed. (The reentrancy guard for the EDT pump-wait lives in winApiEdtInvoker as isPumpingEdt(), thread-scoped.)
 //
 // Why raw SetWindowLongPtr(GWLP_WNDPROC) + SetProp and NOT the comctl32 SetWindowSubclass helpers (which would give
 // cleaner chaining): SetWindowSubclass must be called from the thread that OWNS the window, but we install from the
@@ -221,10 +220,13 @@ static void javaOnLiveResizeEnded(LiveResizeState *s)
 }
 
 // Render the REAL content at the last recorded client size (s->lastClientWidth/Height) into the on-screen swapchain
-// and present it synchronously. The Kotlin side hops to the EDT and blocks there (invokeAndWaitWhilePumping). The
-// present itself is always unpaced (Present(0)); the stationary-hold loop is paced separately, natively, by
-// waitForPrimaryVBlank() in the WM_PAINT handler (an active drag stays unpaced, driven by mouse-move WM_NCCALCSIZE).
-static void javaDrawFrameWhileLiveResizing(LiveResizeState *s)
+// and present it synchronously. The Kotlin side hops to the EDT and blocks there (invokeAndWaitWhilePumping). `vsync`
+// selects the present's sync interval: an active drag presents unpaced (Present(0)), driven at mouse-move cadence by
+// WM_NCCALCSIZE; a stationary hold presents with vsync (Present(1)), which self-paces to the refresh rate — the
+// 2-buffer FLIP_DISCARD swapchain can queue at most one frame, so the next Present(1) blocks until vblank. That
+// shallow (1-deep) queue is also what keeps top/left-edge content welded to the moving window origin (a deeper queue
+// adds latency that lets the content trail the edge).
+static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool vsync)
 {
     if (!s->redrawer) return;
     JNIEnv *env = getJniEnv();
@@ -233,32 +235,11 @@ static void javaDrawFrameWhileLiveResizing(LiveResizeState *s)
     if (!mid)
     {
         jclass cls = env->GetObjectClass(s->redrawer);
-        mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(II)V");
+        mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(IIZ)V");
         env->DeleteLocalRef(cls);
     }
-    if (mid) env->CallVoidMethod(s->redrawer, mid, (jint)s->lastClientWidth, (jint)s->lastClientHeight);
+    if (mid) env->CallVoidMethod(s->redrawer, mid, (jint)s->lastClientWidth, (jint)s->lastClientHeight, (jboolean)vsync);
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
-}
-
-// ===================== state shared by the live-resize WndProc =====================
-static gr_cp<IDXGIOutput> g_monitorOutput; // primary monitor output, for WaitForVBlank pacing
-
-// Block until the primary monitor's next vblank. Used to pace the stationary-hold render loop at the refresh
-// rate. Prefer this over Present(1) on a windowed (DWM-composited) flip swapchain: Present(1)'s sync interval
-// beats against DWM's own composition cadence and lands the loop at refresh x 2/3 (~40 on a 60 Hz screen);
-// pacing on the actual vblank with a non-blocking Present(0) holds a clean refresh rate.
-static void waitForPrimaryVBlank()
-{
-    if (!g_monitorOutput.get())
-    {
-        gr_cp<IDXGIFactory1> factory;
-        if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory))))
-        {
-            gr_cp<IDXGIAdapter1> adapter;
-            if (SUCCEEDED(factory->EnumAdapters1(0, &adapter))) adapter->EnumOutputs(0, &g_monitorOutput);
-        }
-    }
-    if (g_monitorOutput.get()) g_monitorOutput->WaitForVBlank();
 }
 
 // on-demand stationary-animation driver, driven by WM_PAINT (NOT a posted message). needRender (EDT)
@@ -299,7 +280,7 @@ static void growContentChildTo(LiveResizeState *s, int w, int h)
 static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     LiveResizeState *s = liveResizeStateFor(hWnd);
-    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam); // hooked but state already torn down; nothing to chain to
+    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam); // uninstallLiveResizeHook didn't restore the original proc
     switch (msg)
     {
         case WM_ERASEBKGND:
@@ -316,7 +297,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             LRESULT r = CallWindowProcW(s->originalProc, hWnd, msg, wParam, lParam);
             // Skip while a render is already pump-waiting on this thread: the EDT's SetWindowPos is SENT back here
             // and re-enters WM_NCCALCSIZE; starting another EDT round-trip would deadlock (the EDT is blocked in
-            // SendMessage). isPumpingEdt() is that guard, owned by the pump-wait itself (edtInvoker).
+            // SendMessage). isPumpingEdt() is that guard, owned by the pump-wait itself (winApiEdtInvoker).
             if (s->inSizeMoveLoop && wParam && !isPumpingEdt())
             {
                 if (!s->liveResizeEngaged)
@@ -333,7 +314,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                 // Grow (never shrink) the content child so it covers the soon-to-be-exposed region on a grow and
                 // never exposes a strip on a shrink; see growContentChildTo.
                 growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
-                javaDrawFrameWhileLiveResizing(s); // active drag: unpaced
+                javaDrawFrameWhileLiveResizing(s, false); // active drag: unpaced
             }
             return r;
         }
@@ -352,14 +333,12 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                 // doLayout has time to shrink the child to a lagging size, leaving a frame-redirection strip past
                 // its edge. The active drag never drifts because every NCCALCSIZE re-asserts it; the hold must too.
                 growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
-                javaDrawFrameWhileLiveResizing(s);
-                // Pace the stationary hold at the refresh rate — one present per vblank (a pure monitor wait on
-                // this toolkit thread; no render/Skia state, so it needn't run on the EDT). Beyond capping idle
-                // FPS, this is what keeps ORIGIN-MOVE (top/left) resize clean: real drags are full of micro-pauses
-                // that hit this WM_PAINT path, and an unpaced hold floods DWM's present queue, adding latency that
-                // desyncs content from the moving window origin. A shallow queue keeps top/left welded to the edge
-                // (right/bottom don't move the origin, so they tolerate the latency).
-                waitForPrimaryVBlank();
+                // Present WITH vsync during the hold (the active drag above is unpaced). This caps idle FPS at the
+                // refresh rate and, because the 2-buffer FLIP_DISCARD swapchain can queue only one frame, the next
+                // Present(1) blocks until vblank — a shallow (1-deep) queue that also keeps top/left-edge content
+                // welded to the moving origin. Real drags are full of micro-pauses that land in this WM_PAINT path, so
+                // pacing it (not just handling a full stop) is what keeps ORIGIN-MOVE (top/left) resizes clean.
+                javaDrawFrameWhileLiveResizing(s, /*vsync*/ true);
                 return 0;
             }
             break;

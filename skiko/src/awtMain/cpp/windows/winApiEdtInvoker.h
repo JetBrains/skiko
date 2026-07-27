@@ -1,6 +1,6 @@
 #pragma once
 
-// True while the CURRENT thread is blocked inside EdtInvoker.invokeAndWaitWhilePumping — i.e. it has posted a
+// True while the CURRENT thread is blocked inside WinApiEdtInvoker.invokeAndWaitWhilePumping — i.e. it has posted a
 // runnable to the EDT and is spinning a nested message loop for it, dispatching this thread's messages meanwhile.
 // A subclassed WndProc that renders on the EDT must consult this before doing ANY of its own synchronous work:
 //   * starting another EDT round-trip re-entrantly would post a runnable the blocked EDT can't reach yet; and
