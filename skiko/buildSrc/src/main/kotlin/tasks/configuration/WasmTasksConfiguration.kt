@@ -116,8 +116,6 @@ fun SkikoProjectContext.declareWasmTasks() {
                 add("-fno-rtti")
                 add("-fno-exceptions")
                 add("-fPIC")
-                add("--target=wasm32-wasip1")
-                add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
                 add("-D_WASI_EMULATED_MMAN")
                 add("-D_WASI_EMULATED_SIGNAL")
                 add("-D_WASI_EMULATED_PROCESS_CLOCKS")
@@ -179,8 +177,6 @@ fun SkikoProjectContext.declareWasmTasks() {
                 add("-Wl,--strip-all")
             }
             add("-Wl,--allow-undefined")
-            add("--target=wasm32-wasip1")
-            add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
             add("-mllvm")
             add("-wasm-enable-sjlj")
             add("-mexception-handling")
