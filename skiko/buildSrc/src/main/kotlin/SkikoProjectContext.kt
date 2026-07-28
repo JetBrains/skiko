@@ -20,7 +20,6 @@ class SkikoProjectContext(
     val artifacts: SkikoArtifacts,
     val kotlin: KotlinMultiplatformExtension,
     val windowsSdkPathProvider: () -> WindowsSdkPaths,
-    val createChecksumsTask: (OS, Arch, Provider<File>) -> TaskProvider<*>,
     val additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
     configureDependencies: (SkikoDependencyScope.() -> Unit)
 ) {

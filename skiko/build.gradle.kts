@@ -3,7 +3,6 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -187,9 +186,6 @@ val skikoProjectContext = SkikoProjectContext(
     artifacts = skikoArtifacts,
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
-    },
-    createChecksumsTask = { targetOs: OS, targetArch: Arch, fileToChecksum: Provider<File> ->
-        createChecksumsTask(targetOs, targetArch, fileToChecksum)
     },
     additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko, skikoArtifacts),
     configureDependencies = coreDependencies
@@ -424,20 +420,6 @@ if (supportAndroid) {
         }
     }
 }
-
-// TODO now it can be moved, move it if you change this
-// Can't be moved to buildSrc because of Checksum dependency
-fun createChecksumsTask(
-    targetOs: OS,
-    targetArch: Arch,
-    fileToChecksum: Provider<File>
-) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
-
-    inputFiles = project.files(fileToChecksum)
-    checksumAlgorithm = Checksum.Algorithm.SHA256
-    outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
-}
-
 
 if (supportAwt) {
     val skikoAwtJarForTests by project.tasks.registering(Jar::class) {

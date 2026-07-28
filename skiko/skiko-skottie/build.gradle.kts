@@ -2,7 +2,6 @@
 
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -67,9 +66,6 @@ val skikoSkottieProjectContext = SkikoProjectContext(
     artifacts = skikoSkottieArtifacts,
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
-    },
-    createChecksumsTask = { targetOs: OS, targetArch: Arch, fileToChecksum: Provider<File> ->
-        createChecksumsTask(targetOs, targetArch, fileToChecksum)
     },
     additionalRuntimeLibraries = emptyList(),
     configureDependencies = skottieDependencies
@@ -315,18 +311,6 @@ if (supportAndroid) {
             targetCompatibility = JavaVersion.VERSION_11.toString()
         }
     }
-}
-
-// TODO now it can be moved, move it if you change this
-// Can't be moved to buildSrc because of Checksum dependency
-fun createChecksumsTask(
-    targetOs: OS,
-    targetArch: Arch,
-    fileToChecksum: Provider<File>
-) = project.registerSkikoTask<org.gradle.crypto.checksum.Checksum>("createChecksums", targetOs, targetArch) {
-    inputFiles = project.files(fileToChecksum)
-    checksumAlgorithm = org.gradle.crypto.checksum.Checksum.Algorithm.SHA256
-    outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
 }
 
 if (supportAwt) {
