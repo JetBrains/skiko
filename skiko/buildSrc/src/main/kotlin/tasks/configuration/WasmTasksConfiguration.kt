@@ -187,6 +187,29 @@ fun SkikoProjectContext.declareWasmTasks() {
         configureCommon(prefixPath)
     }
 
+    val optimizeWasm by project.tasks.registering(OptimizeSkikoWasmTask::class) {
+        dependsOn(linkWasm)
+        buildSuffix.set("es6")
+        buildTargetOS.set(OS.Wasm)
+        buildTargetArch.set(Arch.Wasm)
+        buildVariant.set(buildType)
+
+        optimizer.set(project.findProperty("wasm.opt.path")?.toString() ?: "wasm-opt")
+        val wasmFileProvider = linkWasm.flatMap { it.outDir.file(it.libOutputFileName) }
+        inputFile.set(wasmFileProvider.get().asFile.absolutePath)
+        libOutputFileName.set("$libBaseName.wasm")
+
+        flags.addAll(
+            listOf(
+                "-Oz",
+                "--strip-debug",
+                "--converge",
+                "--strip-producers",
+                "--all-features",
+            )
+        )
+    }
+
     // skikoWasmJar is used by task name
     val skikoWasmJar by project.tasks.registering(Jar::class) {
         // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
@@ -198,8 +221,10 @@ fun SkikoProjectContext.declareWasmTasks() {
             }
         }
 
-        from(linkWasm) {
+        from(optimizeWasm) {
             include("*.wasm")
+        }
+        from(linkWasm) {
             include("*.mjs")
         }
 
