@@ -119,12 +119,17 @@ internal class Direct3DRedrawer(
         }
     }
 
-    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
-        if (isDisposed) {
-            return
+    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean, waitForComposition: Boolean = false) {
+        synchronized(drawLock) {
+            if (isDisposed) {
+                return
+            }
+            contextHandler.draw()
+            if (waitForComposition) {
+                waitForComposition()
+            }
+            swap(withVsync)
         }
-        contextHandler.draw()
-        swap(withVsync)
     }
 
     fun makeContext() = DirectContext(
@@ -193,16 +198,23 @@ internal class Direct3DRedrawer(
         }
     }
 
-    /** [withVsync] paces the present; see `javaDrawFrameWhileLiveResizing` in `directXRedrawer.cc`. */
+    /**
+     * Draws a frame during live resize.
+     *
+     * [isResizeFrame] specifies whether this frame actually resizes the window.
+     */
     @Suppress("unused")
-    private fun drawFrameWhileLiveResizing(width: Int, height: Int, withVsync: Boolean) {
+    private fun drawFrameWhileLiveResizing(width: Int, height: Int, isResizeFrame: Boolean) {
         WinApiEdtInvoker.invokeAndWaitWhilePumping {
             if (isDisposed) return@invokeAndWaitWhilePumping
             val size = Dimension(width, height)
             update(forcedSize = size)
             inDrawScope(forcedSize = size) {
                 if (!isDisposed) {
-                    drawAndSwap(withVsync = withVsync)
+                    drawAndSwap(
+                        withVsync = !isResizeFrame,
+                        waitForComposition = isResizeFrame
+                    )
                 }
             }
         }
@@ -221,10 +233,8 @@ internal class Direct3DRedrawer(
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long
 
-    // See the "Direct3D synchronous live-resize" section of directXRedrawer.cc. Returns 0 on failure.
     private external fun installLiveResizeHook(window: Long, content: Long): Long
-
     private external fun uninstallLiveResizeHook(handle: Long)
-
     private external fun postLiveResizeRender(handle: Long)
+    private external fun waitForComposition()
 }

@@ -200,14 +200,7 @@ static void javaOnLiveResizeEnded(LiveResizeState *s)
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-// Uses the size we recorded, not GetClientRect's, which lags a step behind mid-drag.
-//
-// `vsync` is what makes origin-move (top/left) resizes work. An unpaced hold spins ~1000 FPS and floods DWM's present
-// queue; the added latency lets content trail a moving origin. (Right/bottom is anchored top-left, so it only shows a
-// slightly stale size, cleanly clipped — hence only top/left ever broke.) Present(1) keeps the queue 1-deep on its
-// own via back-pressure, since a 2-buffer FLIP_DISCARD swapchain can hold at most one queued frame. An active drag
-// needs none of this, being throttled by the mouse-move cadence that drives WM_NCCALCSIZE.
-static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool vsync)
+static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool isResizeFrame)
 {
     if (!s->redrawer) return;
     JNIEnv *env = getJniEnv();
@@ -219,7 +212,7 @@ static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool vsync)
         mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(IIZ)V");
         env->DeleteLocalRef(cls);
     }
-    if (mid) env->CallVoidMethod(s->redrawer, mid, (jint)s->lastClientWidth, (jint)s->lastClientHeight, (jboolean)vsync);
+    if (mid) env->CallVoidMethod(s->redrawer, mid, (jint)s->lastClientWidth, (jint)s->lastClientHeight, (jboolean)isResizeFrame);
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
@@ -265,7 +258,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                 s->lastClientWidth = c.right - c.left;
                 s->lastClientHeight = c.bottom - c.top;
                 growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
-                javaDrawFrameWhileLiveResizing(s, /*vsync*/ false);
+                javaDrawFrameWhileLiveResizing(s, /*isResizeFrame*/ true);
             }
             return r;
         }
@@ -281,7 +274,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                 // A hold gives Swing's async doLayout time to shrink the child to a lagging size; every
                 // WM_NCCALCSIZE re-asserts it during an active drag, but nothing does here.
                 growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
-                javaDrawFrameWhileLiveResizing(s, /*vsync*/ true);
+                javaDrawFrameWhileLiveResizing(s, /*isResizeFrame*/ false);
                 return 0;
             }
             break;
@@ -610,6 +603,15 @@ extern "C"
                                  kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), surfaceProps.get())
                                  .release();
         return toJavaPointer(result);
+    }
+
+    // From the present until the geometry commits, the buffer is the new size and the window still the old one, and
+    // DWM must not sample in there. Waiting opens that window at the start of a composition interval, and caps a
+    // high-rate mouse at one step per composition.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_waitForComposition(
+        JNIEnv *env, jobject redrawer)
+    {
+        DwmFlush();
     }
 
     // Arms the WM_PAINT hold path. Repeated calls coalesce into one update region, so no explicit gate is needed.
