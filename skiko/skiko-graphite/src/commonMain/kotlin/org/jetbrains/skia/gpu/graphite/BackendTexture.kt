@@ -7,6 +7,9 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.ExperimentalSkikoApi
 
+/**
+ * Represents a backend-specific texture that can be used by Graphite.
+ */
 @ExperimentalSkikoApi
 class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -14,6 +17,14 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
             GraphiteLibrary.load()
         }
 
+        /**
+         * Creates a Graphite backend texture that wraps a Metal texture.
+         *
+         * @param width width of the texture in pixels.
+         * @param height height of the texture in pixels.
+         * @param texturePtr native pointer to the Metal texture to wrap.
+         * @return a backend texture wrapping the supplied Metal texture.
+         */
         fun makeMetal(width: Int, height: Int, texturePtr: NativePointer): BackendTexture {
             requireMetalSupport()
             require(texturePtr != NullPointer) { "Metal texture pointer is null" }

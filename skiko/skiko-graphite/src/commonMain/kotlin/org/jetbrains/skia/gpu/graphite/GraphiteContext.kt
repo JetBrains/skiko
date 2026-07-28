@@ -7,6 +7,9 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skiko.ExperimentalSkikoApi
 
+/**
+ * The main entry point for Graphite, responsible for managing and coordinating GPU resources.
+ */
 @ExperimentalSkikoApi
 class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -14,6 +17,13 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
             GraphiteLibrary.load()
         }
 
+        /**
+         * Creates a Graphite context that submits work to a Metal command queue.
+         *
+         * @param devicePtr native pointer to the Metal device.
+         * @param queuePtr native pointer to the Metal command queue.
+         * @return a Graphite context backed by Metal.
+         */
         fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): GraphiteContext {
             requireMetalSupport()
             require(devicePtr != NullPointer) { "Metal device pointer is null" }
@@ -25,6 +35,11 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
         }
     }
 
+    /**
+     * Creates a [Recorder] that records drawing commands for this context.
+     *
+     * @return a new recorder.
+     */
     fun makeRecorder(): Recorder {
         Stats.onNativeCall()
         val ptr = _nMakeRecorder(nativePtr)
@@ -32,6 +47,13 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
         return Recorder(ptr)
     }
 
+    /**
+     * Adds a [recording] to this context's pending GPU work.
+     *
+     * The work is sent to the GPU by a subsequent call to [submit].
+     *
+     * @param recording recording to insert.
+     */
     fun insertRecording(recording: Recording) {
         try {
             Stats.onNativeCall()
@@ -42,6 +64,11 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
         }
     }
 
+    /**
+     * Submits pending work to the GPU.
+     *
+     * @param syncCpu if `true`, waits for the submitted GPU work to finish before returning.
+     */
     fun submit(syncCpu: Boolean = false) {
         try {
             Stats.onNativeCall()

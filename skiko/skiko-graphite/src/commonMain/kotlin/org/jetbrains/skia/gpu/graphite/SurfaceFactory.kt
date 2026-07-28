@@ -13,6 +13,15 @@ import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skiko.ExperimentalSkikoApi
 
+/**
+ * Creates a Graphite surface that renders into a [backendTexture] using [recorder].
+ *
+ * @param recorder recorder used by the surface to record drawing commands.
+ * @param backendTexture backend texture that receives the rendered content.
+ * @param colorSpace color space describing how colors are interpreted, or `null` for no color space.
+ * @param surfaceProps optional surface properties controlling pixel geometry and rendering behavior.
+ * @return a surface wrapping the backend texture, or `null` if the surface could not be created.
+ */
 @ExperimentalSkikoApi
 fun Surface.Companion.wrapBackendTexture(
     recorder: Recorder,
