@@ -430,20 +430,6 @@ if (supportAwt) {
 }
 
 afterEvaluate {
-    tasks.configureEach {
-        if (group == "publishing") {
-            // There are many intermediate tasks in 'publishing' group.
-            // There are a lot of them and they have verbose names.
-            // To decrease noise in './gradlew tasks' output and Intellij Gradle tool window,
-            // group verbose tasks in a separate group 'other publishing'.
-            val allRepositories = publishing.repositories.map { it.name } + "MavenLocal"
-            val publishToTasks = allRepositories.map { "publishTo$it" }
-            if (name != "publish" && name !in publishToTasks) {
-                group = "other publishing"
-            }
-        }
-    }
-
     tasks.named("clean").configure {
         doLast {
             delete(skiko.dependenciesDir)
