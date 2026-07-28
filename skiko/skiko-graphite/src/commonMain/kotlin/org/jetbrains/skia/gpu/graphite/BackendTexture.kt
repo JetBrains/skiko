@@ -4,6 +4,7 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.ExperimentalSkikoApi
 
 @ExperimentalSkikoApi
@@ -17,6 +18,7 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
             requireMetalSupport()
             require(texturePtr != NullPointer) { "Metal texture pointer is null" }
             require(width > 0 && height > 0) { "Texture dimensions must be positive" }
+            Stats.onNativeCall()
             return BackendTexture(_nMakeMetal(width, height, texturePtr))
         }
     }
