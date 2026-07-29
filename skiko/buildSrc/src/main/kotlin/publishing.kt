@@ -98,6 +98,7 @@ fun SkikoProjectContext.declarePublications() {
     ctx.configureAndroidPublication()
 
     ctx.configurePomNames()
+    ctx.configurePublishingTaskGroups()
 }
 
 private val SkikoPublishingContext.emptySourcesJar
@@ -131,6 +132,18 @@ private fun SkikoPublishingContext.configurePublishingRepositories() {
                     username = skiko.composeRepoUserName
                     password = skiko.composeRepoKey
                 }
+            }
+        }
+    }
+}
+
+private fun SkikoPublishingContext.configurePublishingTaskGroups() {
+    project.afterEvaluate {
+        val publishToTasks = projectContext.publishing.repositories.map { "publishTo${it.name}" } + "publishToMavenLocal"
+
+        tasks.configureEach {
+            if (group == "publishing" && name != "publish" && name !in publishToTasks) {
+                group = "other publishing"
             }
         }
     }

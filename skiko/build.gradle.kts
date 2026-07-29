@@ -3,7 +3,6 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -187,9 +186,6 @@ val skikoProjectContext = SkikoProjectContext(
     artifacts = skikoArtifacts,
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
-    },
-    createChecksumsTask = { targetOs: OS, targetArch: Arch, fileToChecksum: Provider<File> ->
-        createChecksumsTask(targetOs, targetArch, fileToChecksum)
     },
     additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko, skikoArtifacts),
     configureDependencies = coreDependencies
@@ -425,20 +421,6 @@ if (supportAndroid) {
     }
 }
 
-// TODO now it can be moved, move it if you change this
-// Can't be moved to buildSrc because of Checksum dependency
-fun createChecksumsTask(
-    targetOs: OS,
-    targetArch: Arch,
-    fileToChecksum: Provider<File>
-) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
-
-    inputFiles = project.files(fileToChecksum)
-    checksumAlgorithm = Checksum.Algorithm.SHA256
-    outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
-}
-
-
 if (supportAwt) {
     val skikoAwtJarForTests by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-awt-test")
@@ -448,20 +430,6 @@ if (supportAwt) {
 }
 
 afterEvaluate {
-    tasks.configureEach {
-        if (group == "publishing") {
-            // There are many intermediate tasks in 'publishing' group.
-            // There are a lot of them and they have verbose names.
-            // To decrease noise in './gradlew tasks' output and Intellij Gradle tool window,
-            // group verbose tasks in a separate group 'other publishing'.
-            val allRepositories = publishing.repositories.map { it.name } + "MavenLocal"
-            val publishToTasks = allRepositories.map { "publishTo$it" }
-            if (name != "publish" && name !in publishToTasks) {
-                group = "other publishing"
-            }
-        }
-    }
-
     tasks.named("clean").configure {
         doLast {
             delete(skiko.dependenciesDir)

@@ -30,6 +30,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.Test
+import org.gradle.crypto.checksum.Checksum
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.gradle.kotlin.dsl.register
@@ -51,6 +52,16 @@ private val jvmTargetArchAttribute =
 private const val REQUIRED_SYMBOLS_USAGE = "skiko-required-symbols"
 private const val JVM_LINKED_LIBRARY_USAGE = "skiko-jvm-linked-library"
 private const val JVM_RUNTIME_JAR_USAGE = "skiko-jvm-runtime-jar"
+
+fun SkikoProjectContext.createChecksumsTask(
+    targetOs: OS,
+    targetArch: Arch,
+    fileToChecksum: Provider<File>,
+) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
+    inputFiles.setFrom(project.files(fileToChecksum))
+    checksumAlgorithm.set(Checksum.Algorithm.SHA256)
+    outputDirectory.set(project.layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}"))
+}
 
 private fun Project.configureTargetJvmAttributes(
     configuration: Configuration,
