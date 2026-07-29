@@ -3,7 +3,16 @@ package org.jetbrains.skiko.rendercontext
 import kotlinx.coroutines.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
+import java.util.concurrent.CopyOnWriteArrayList
 
+/**
+ * Every GLX call runs inside [org.jetbrains.skiko.lockLinuxDrawingSurface]. The per-frame body runs off the
+ * EDT on [dispatcherToBlockOn], with [withCurrentContext] binding and releasing the context around it, which
+ * is what makes running on shared pooled threads safe.
+ *
+ * On X11 the JAWT drawing-surface lock is the process-wide AWT lock, so a swap waiting for vblank holds it
+ * whichever thread runs it. Only one window per process waits per frame; see [swapIntervalForFrame].
+ */
 internal class LinuxOpenGLRenderContext(
     host: AwtSurfaceHost,
     analytics: SkiaLayerAnalytics,
@@ -75,24 +84,51 @@ internal class LinuxOpenGLRenderContext(
         liveContexts.remove(this)
         frameJob.cancel()
         synchronized(drawLock) {
-            host.backedLayer.lockLinuxDrawingSurface {
-                // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
-                // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
-                it.makeCurrent(context)
-                disposeGlResources()
-                it.destroyContext(context)
+            // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
+            // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
+            withCurrentContext { disposeGlResources() }
+            host.backedLayer.lockLinuxDrawingSurface { it.destroyContext(context) }
+        }
+    }
+
+    /**
+     * Locks the window's drawing surface, binds the GLX context to the calling thread for [body], and
+     * releases it again before returning.
+     *
+     * The release is what lets frames run on pooled threads: a context left bound stays current on whichever
+     * thread last used it, and binding it from a second thread while the first still holds it is an error.
+     * Releasing here means no thread can inherit another's binding, so which pooled thread runs which
+     * window's frame stops mattering.
+     */
+    private inline fun <T> withCurrentContext(body: (LinuxDrawingSurface) -> T): T =
+        host.backedLayer.lockLinuxDrawingSurface {
+            it.makeCurrent(context)
+            try {
+                body(it)
+            } finally {
+                it.releaseCurrent()
+            }
+        }
+
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        if (immediate) {
+            drawAndSwap(scope, immediate = true)
+        } else {
+            // GLX fuses the vblank wait into glXSwapBuffers, so the wait cannot be hoisted out on its own
+            // the way Windows does it with dwmFlush; the whole frame body moves off the EDT instead.
+            withContext(dispatcherToBlockOn) {
+                drawAndSwap(scope, immediate = false)
             }
         }
     }
 
-    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) = synchronized(drawLock) {
+    private fun drawAndSwap(scope: LayerDrawScope, immediate: Boolean) = synchronized(drawLock) {
         // Re-check inside the lock (not just at the call site): this is what makes `dispose` and an
         // in-flight frame mutually exclusive rather than merely racing on `isDisposed`.
         if (isDisposed) {
             return
         }
-        host.backedLayer.lockLinuxDrawingSurface {
-            it.makeCurrent(context)
+        withCurrentContext {
             with(scope) { drawFrame() }
             it.setSwapInterval(swapIntervalForFrame(immediate))
             it.swapBuffers()
@@ -102,20 +138,20 @@ internal class LinuxOpenGLRenderContext(
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
         check(!isDisposed) { "LinuxOpenGLRenderContext is disposed" }
-        host.backedLayer.lockLinuxDrawingSurface { it.makeCurrent(context) }
-        if (!ensureContext()) {
-            throw RenderException("Cannot init graphic context")
+        withCurrentContext {
+            if (!ensureContext()) {
+                throw RenderException("Cannot init graphic context")
+            }
+            createSurface(width, height, host.pixelGeometry)
+            glSurface ?: throw RenderException("Cannot create surface for ${width}x$height")
         }
-        createSurface(width, height, host.pixelGeometry)
-        glSurface ?: throw RenderException("Cannot create surface for ${width}x$height")
     }
 
     override fun present() {
         if (isDisposed) return
         synchronized(drawLock) {
             if (isDisposed) return
-            host.backedLayer.lockLinuxDrawingSurface {
-                it.makeCurrent(context)
+            withCurrentContext {
                 flushGl()
                 it.swapBuffers()
                 OpenGLApi.instance.glFlush()
@@ -127,10 +163,11 @@ internal class LinuxOpenGLRenderContext(
      * The GLX swap interval for the frame about to be presented: 1 blocks [swapBuffers] until the next
      * vblank, 0 returns immediately.
      *
-     * At most one window in the process may block. The wait is fused into the swap and the swap runs on the
-     * EDT, so N blocking windows would spend N vblanks per frame there and cap the whole toolkit at
-     * `refreshRate / N`. The window with the highest frame limit is the one that waits, so a window on a
-     * slower monitor cannot pace down the rest; the others swap unblocked and are paced by [frameLimiter].
+     * At most one window in the process may block. Every GLX call holds its JAWT drawing-surface lock, which
+     * on X11 is the process-wide AWT lock, so a swap that waits for vblank holds the whole toolkit for that
+     * vblank regardless of which thread runs it; N blocking windows would cost N vblanks per frame. The
+     * window with the highest frame limit is the one that waits, so a window on a slower monitor cannot pace
+     * down the rest; the others swap unblocked and are paced by [frameLimiter].
      */
     private fun swapIntervalForFrame(immediate: Boolean): Int = when {
         !properties.isVsyncEnabled -> 0
@@ -144,9 +181,10 @@ internal class LinuxOpenGLRenderContext(
          * independently, so electing the one that waits for vblank ([swapIntervalForFrame]) needs a view of
          * all of them rather than of one window's frame.
          *
-         * Mutated from the EDT alongside context creation and destruction, and read there per frame.
+         * Mutated from the EDT alongside context creation and destruction, but read per frame from
+         * [dispatcherToBlockOn], so it has to tolerate iteration concurrent with those mutations.
          */
-        val liveContexts = mutableListOf<LinuxOpenGLRenderContext>()
+        val liveContexts = CopyOnWriteArrayList<LinuxOpenGLRenderContext>()
 
         fun vsyncPacedContext(): LinuxOpenGLRenderContext? = liveContexts
             .filter { !it.isDisposed && it.host.isShowing && it.properties.isVsyncEnabled }
@@ -157,10 +195,12 @@ internal class LinuxOpenGLRenderContext(
 private fun LinuxDrawingSurface.createContext(transparency: Boolean) = createContext(display, transparency)
 private fun LinuxDrawingSurface.destroyContext(context: Long) = destroyContext(display, context)
 private fun LinuxDrawingSurface.makeCurrent(context: Long) = makeCurrent(display, window, context)
+private fun LinuxDrawingSurface.releaseCurrent() = releaseCurrent(display)
 private fun LinuxDrawingSurface.swapBuffers() = swapBuffers(display, window)
 private fun LinuxDrawingSurface.setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
 
 private external fun makeCurrent(display: Long, window: Long, context: Long)
+private external fun releaseCurrent(display: Long)
 private external fun createContext(display: Long, transparency: Boolean): Long
 private external fun destroyContext(display: Long, context: Long)
 private external fun setSwapInterval(display: Long, window: Long, interval: Int)

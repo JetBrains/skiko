@@ -63,6 +63,16 @@ extern "C"
         glXMakeCurrent(display, window, *context);
     }
 
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_releaseCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr)
+    {
+        Display *display = fromJavaPointer<Display *>(displayPtr);
+
+        // Unbind the calling thread's context. A GLX context stays current on the thread that bound it, and
+        // binding it from a second thread while the first still holds it is a BadAccess error, so a context
+        // that outlives the call that used it must be released before another thread can take it.
+        glXMakeCurrent(display, None, nullptr);
+    }
+
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_rendercontext_LinuxOpenGLRenderContextKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jboolean transparency)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
