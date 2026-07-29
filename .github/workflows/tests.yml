@@ -89,8 +89,8 @@ jobs:
       - uses: nick-fields/retry@v2
         name: 'Run iOS (x64) tests'
         with:
-          max_attempts: 10
-          timeout_minutes: 60
+          max_attempts: 3
+          timeout_minutes: 30
           shell: bash
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
@@ -100,17 +100,19 @@ jobs:
               -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" \
               iosX64TestWithMetal
 
-      # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
-      - shell: bash
-        name: 'Compile iOS (arm64) tests'
-        run: |
-          ./gradlew -p skiko --no-daemon --stacktrace \
-            -Pskiko.native.enabled=true \
-            -Dskiko.test.onci=true \
-            -Dskiko.test.performance.enabled=false \
-            iosSimulatorArm64Test
-
-      # TODO run iOS specific tests on iPhone simulator
+      - uses: nick-fields/retry@v2
+        name: 'Run iOS (arm64) tests'
+        with:
+          max_attempts: 3
+          timeout_minutes: 30
+          shell: bash
+          command: |
+            ./gradlew -p skiko --no-daemon --stacktrace \
+              -Pskiko.native.enabled=true \
+              -Dskiko.test.onci=true \
+              -Dskiko.test.performance.enabled=false \
+              -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" \
+              iosSimulatorArm64TestWithMetal
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
