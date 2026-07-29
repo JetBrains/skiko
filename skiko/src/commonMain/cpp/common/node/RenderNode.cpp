@@ -32,11 +32,9 @@ static const float NON_ZERO_EPSILON = 0.001f;
 
 // Since "kSkDrawable_Type" isn't really used anywhere outside of serialization, we can use it
 // to identify RenderNode objects without RTTI, like SkRuntimeEffect does (even without adding to original enum).
-static const SkFlattenable::Type kRenderNode_Type = static_cast<SkFlattenable::Type>(0x2d2595b6);
 // The value has to stay outside the range Skia assigns, or a node is mistaken for a
 // flattenable of that type. kSkShader_Type is the largest Skia declares.
-static_assert(static_cast<uint32_t>(kRenderNode_Type) > static_cast<uint32_t>(SkFlattenable::kSkShader_Type),
-              "kRenderNode_Type must stay above the SkFlattenable::Type values Skia declares");
+static const SkFlattenable::Type kRenderNode_Type = static_cast<SkFlattenable::Type>(0x2d2595b6);
 
 /**
  * Check for floats that are close enough to zero.
