@@ -10,6 +10,11 @@ val skikoSkottieArtifacts = SkikoArtifacts(
     displayName = "Skiko Skottie",
     pomDescription = "Kotlin Skia Skottie bindings",
 )
+val skikoGraphiteArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-graphite",
+    displayName = "Skiko Graphite",
+    pomDescription = "Kotlin Skia Graphite bindings",
+)
 
 val skikoArtifactIds: List<String> =
     listOf(
@@ -58,6 +63,16 @@ val skikoArtifactIds: List<String> =
         skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
         "${skikoSkottieArtifacts.jvmRuntimeArtifactId}-all",
+
+        skikoGraphiteArtifacts.commonArtifactId,
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {

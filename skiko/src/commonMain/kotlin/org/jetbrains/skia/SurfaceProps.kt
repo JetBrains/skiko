@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skiko.InternalSkikoApi
+
 class SurfaceProps constructor(
     internal val isDeviceIndependentFonts: Boolean = false,
     internal val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN
@@ -44,7 +46,8 @@ class SurfaceProps constructor(
         return if (pixelGeometry == _pixelGeometry) this else SurfaceProps(isDeviceIndependentFonts, _pixelGeometry)
     }
 
-    internal fun packToIntArray(): IntArray {
+    @InternalSkikoApi
+    fun packToIntArray(): IntArray {
         return intArrayOf(_getFlags(), _getPixelGeometryOrdinal())
     }
 }
