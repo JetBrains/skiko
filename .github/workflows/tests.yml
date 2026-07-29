@@ -89,8 +89,8 @@ jobs:
       - uses: nick-fields/retry@v2
         name: 'Run iOS (x64) tests'
         with:
-          max_attempts: 10
-          timeout_minutes: 60
+          max_attempts: 3
+          timeout_minutes: 30
           shell: bash
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
@@ -103,8 +103,8 @@ jobs:
       - uses: nick-fields/retry@v2
         name: 'Run iOS (arm64) tests'
         with:
-          max_attempts: 10
-          timeout_minutes: 60
+          max_attempts: 3
+          timeout_minutes: 30
           shell: bash
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
