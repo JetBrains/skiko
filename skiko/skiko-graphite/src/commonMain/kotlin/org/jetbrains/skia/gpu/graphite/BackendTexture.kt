@@ -30,7 +30,9 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
             require(texturePtr != NullPointer) { "Metal texture pointer is null" }
             require(width > 0 && height > 0) { "Texture dimensions must be positive" }
             Stats.onNativeCall()
-            return BackendTexture(_nMakeMetal(width, height, texturePtr))
+            val ptr = _nMakeMetal(width, height, texturePtr)
+            check(ptr != NullPointer) { "Failed to create a Graphite Metal backend texture" }
+            return BackendTexture(ptr)
         }
     }
 

@@ -20,5 +20,5 @@ class GraphiteTest {
     }
 }
 
-@ExperimentalSkikoApi
+@OptIn(ExperimentalSkikoApi::class)
 internal expect fun makeTestGraphiteContext(): GraphiteContext?

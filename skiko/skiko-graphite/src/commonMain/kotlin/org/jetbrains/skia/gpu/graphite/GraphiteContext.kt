@@ -41,10 +41,14 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @return a new recorder.
      */
     fun makeRecorder(): Recorder {
-        Stats.onNativeCall()
-        val ptr = _nMakeRecorder(nativePtr)
-        check(ptr != NullPointer) { "Failed to create a Graphite recorder" }
-        return Recorder(ptr)
+        return try {
+            Stats.onNativeCall()
+            val ptr = _nMakeRecorder(nativePtr)
+            check(ptr != NullPointer) { "Failed to create a Graphite recorder" }
+            Recorder(ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
     }
 
     /**
