@@ -56,7 +56,7 @@ jobs:
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.wasm.enabled=true \
-              -Pwasm.opt.path="$EMSDK_DIR/upstream/bin/wasm-opt" \
+              -Pwasm.opt.path="\$EMSDK_DIR/upstream/bin/wasm-opt" \
               publishToMavenLocal
 
       - uses: actions/setup-node@v4
