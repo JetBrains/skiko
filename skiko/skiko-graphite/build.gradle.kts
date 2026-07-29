@@ -61,9 +61,6 @@ val graphiteProjectContext = SkikoProjectContext(
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
     },
-    createChecksumsTask = { os: OS, arch: Arch, fileToChecksum: Provider<File> ->
-        createChecksumsTask(os, arch, fileToChecksum)
-    },
     additionalRuntimeLibraries = emptyList(),
     configureDependencies = graphiteDependencies,
 )
@@ -167,18 +164,6 @@ kotlin {
 }
 
 
-// TODO now it can be moved, move it if you change this
-// Can't be moved to buildSrc because of Checksum dependency
-fun createChecksumsTask(
-    targetOs: OS,
-    targetArch: Arch,
-    fileToChecksum: Provider<File>,
-) = project.registerSkikoTask<org.gradle.crypto.checksum.Checksum>("createChecksums", targetOs, targetArch) {
-    inputFiles = project.files(fileToChecksum)
-    checksumAlgorithm = org.gradle.crypto.checksum.Checksum.Algorithm.SHA256
-    outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
-}
-
 if (supportAwt && supportGraphiteJvm) {
     val graphiteAwtJarForTests by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-graphite-awt-test")
@@ -209,22 +194,6 @@ if (supportAwt && supportGraphiteJvm) {
     graphiteProjectContext.provideJvmRequiredSymbols(targetOs, targetArch)
     if (targetOs == OS.MacOS && targetArch == Arch.Arm64) {
         graphiteProjectContext.provideJvmRequiredSymbols(OS.MacOS, Arch.X64)
-    }
-}
-
-afterEvaluate {
-    tasks.configureEach {
-        if (group == "publishing") {
-            // There are many intermediate tasks in 'publishing' group.
-            // There are a lot of them and they have verbose names.
-            // To decrease noise in './gradlew tasks' output and Intellij Gradle tool window,
-            // group verbose tasks in a separate group 'other publishing'.
-            val allRepositories = publishing.repositories.map { it.name } + "MavenLocal"
-            val publishToTasks = allRepositories.map { "publishTo$it" }
-            if (name != "publish" && name !in publishToTasks) {
-                group = "other publishing"
-            }
-        }
     }
 }
 
