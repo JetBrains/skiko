@@ -143,6 +143,7 @@ private:
 struct LiveResizeState
 {
     WNDPROC originalProc = nullptr;
+    WNDPROC originalContentProc = nullptr;
     HWND frameHwnd = nullptr;
     HWND contentHwnd = nullptr;
     jobject redrawer = nullptr;     // global ref
@@ -226,6 +227,24 @@ static void growContentChildTo(LiveResizeState *s, int w, int h)
     int childH = (cr.bottom - cr.top) > h ? (cr.bottom - cr.top) : h;
     SetWindowPos(s->contentHwnd, nullptr, 0, 0, childW, childH,
                  SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+}
+
+// DXGI clips the presented buffer to the child, so the child's size AT THE PRESENT bounds what reaches the screen.
+// This prevents the wrong size from being applied to the child during live resize.
+static LRESULT CALLBACK LiveResizeContentWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    LiveResizeState *s = liveResizeStateFor(hWnd);
+    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam);
+    if (msg == WM_WINDOWPOSCHANGING && s->liveResizeEngaged)
+    {
+        WINDOWPOS *p = (WINDOWPOS *)lParam;
+        if (!(p->flags & SWP_NOSIZE))
+        {
+            if (p->cx < s->lastClientWidth) p->cx = s->lastClientWidth;
+            if (p->cy < s->lastClientHeight) p->cy = s->lastClientHeight;
+        }
+    }
+    return CallWindowProcW(s->originalContentProc, hWnd, msg, wParam, lParam);
 }
 
 static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -727,6 +746,12 @@ extern "C"
         // AWT's proc entirely.
         SetPropW(top, kLiveResizeStateProp, (HANDLE)state);
         SetWindowLongPtrW(top, GWLP_WNDPROC, (LONG_PTR)LiveResizeWndProc);
+        if (state->contentHwnd)
+        {
+            SetPropW(state->contentHwnd, kLiveResizeStateProp, (HANDLE)state);
+            state->originalContentProc = (WNDPROC)GetWindowLongPtrW(state->contentHwnd, GWLP_WNDPROC);
+            SetWindowLongPtrW(state->contentHwnd, GWLP_WNDPROC, (LONG_PTR)LiveResizeContentWndProc);
+        }
         return toJavaPointer(state);
     }
 
@@ -743,6 +768,13 @@ extern "C"
                 SetWindowLongPtrW(state->frameHwnd, GWLP_WNDPROC, (LONG_PTR)state->originalProc);
             }
             RemovePropW(state->frameHwnd, kLiveResizeStateProp);
+        }
+        if (state->contentHwnd) {
+            WNDPROC current = (WNDPROC)GetWindowLongPtrW(state->contentHwnd, GWLP_WNDPROC);
+            if (current == LiveResizeContentWndProc && state->originalContentProc) {
+                SetWindowLongPtrW(state->contentHwnd, GWLP_WNDPROC, (LONG_PTR)state->originalContentProc);
+            }
+            RemovePropW(state->contentHwnd, kLiveResizeStateProp);
         }
         if (state->redrawer) env->DeleteGlobalRef(state->redrawer);
         delete state;
