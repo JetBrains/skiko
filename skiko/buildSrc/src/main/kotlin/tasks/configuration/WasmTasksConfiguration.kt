@@ -30,6 +30,7 @@ import registerOrGetSkiaDirProvider
 import supportWeb
 import wasmImports
 import wasmImport
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 private val Project.setupMjs
@@ -189,23 +190,49 @@ fun SkikoProjectContext.declareWasmTasks() {
 
     val optimizeWasm by project.tasks.registering(OptimizeSkikoWasmTask::class) {
         dependsOn(linkWasm)
-        buildSuffix.set("es6")
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
 
-        optimizer.set(project.findProperty("wasm.opt.path")?.toString() ?: "wasm-opt")
+        // find a path to wasm-opt
+        var wasmOptPath: String
+        if (System.getenv("EMSDK_DIR") != null) {
+            // used by build pipeline
+            wasmOptPath = "${System.getenv("EMSDK_DIR")}/upstream/bin/wasm-opt"
+        } else {
+            // try to use wasm-opt that comes bundled with emcc
+            val emccInstallationPath = ByteArrayOutputStream().use {
+                execOperations.exec {
+                    commandLine("sh", "-c", "which emcc")
+                    standardOutput = it
+                }
+                it.toString().trim()
+            }
+            // emcc is under emsdk/upstream/emscripten/emcc. wasm-opt is under emsdk/upstream/bin/wasm-opt
+            val wasmOptRelativeToEmcc = File(emccInstallationPath)
+                .parentFile // emscripten/
+                .parentFile // upstream/
+                .resolve("bin/wasm-opt")
+            if (wasmOptRelativeToEmcc.exists()) {
+                wasmOptPath = wasmOptRelativeToEmcc.absolutePath
+            } else {
+                // fallback to a path accessible wasm-opt
+                wasmOptPath = "wasm-opt"
+            }
+        }
+
+        optimizer.set(wasmOptPath)
         val wasmFileProvider = linkWasm.flatMap { it.outDir.file(it.libOutputFileName) }
         inputFile.set(wasmFileProvider.get().asFile.absolutePath)
         libOutputFileName.set("$libBaseName.wasm")
 
         flags.addAll(
             listOf(
-                "-Oz",
-                "--strip-debug",
-                "--converge",
-                "--strip-producers",
-                "--all-features",
+                "-Oz", // set optimization level to compress (highest size reduction)
+                "--strip-debug", // strip debug info (including the names section)
+                "--converge", // Run passes to convergence, continuing while binary size decreases
+                "--strip-producers", // strip the wasm producers section
+                "--all-features", // enable all features (most of them are required because of compilation with emcc)
             )
         )
     }
@@ -363,7 +390,7 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
         return project.provider {
             buildList {
                 add(SubpluginOption("import-generator-path", outputFile.normalize().absolutePath))
-                add(SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath),)
+                add(SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath))
                 if (reexportFile != null) {
                     add(SubpluginOption("import-generator-reexport-path", reexportFile.normalize().absolutePath))
                 }
