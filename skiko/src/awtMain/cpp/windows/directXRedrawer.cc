@@ -1,5 +1,6 @@
 #ifdef SK_DIRECT3D
 #include <locale>
+#include <algorithm>
 #include <Windows.h>
 #include <jawt_md.h>
 #include "jni_helpers.h"
@@ -147,8 +148,8 @@ struct LiveResizeState
     HWND frameHwnd = nullptr;
     HWND contentHwnd = nullptr;
     jobject redrawer = nullptr;     // global ref
-    int lastClientWidth = 0;
-    int lastClientHeight = 0;
+    SIZE lastFrameClientSize = {};
+    SIZE enforcedChildSize = {};    // what the child is held at during a drag; see enforcedChildSizeForResizeStep
     bool inSizeMoveLoop = false;    // WM_ENTERSIZEMOVE..WM_EXITSIZEMOVE, which covers plain moves too
     bool liveResizeEngaged = false; // ...whereas this means an actual resize
 };
@@ -213,19 +214,21 @@ static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool isResizeFram
         mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(IIZ)V");
         env->DeleteLocalRef(cls);
     }
-    if (mid) env->CallVoidMethod(s->redrawer, mid, (jint)s->lastClientWidth, (jint)s->lastClientHeight, (jboolean)isResizeFrame);
+    if (mid) env->CallVoidMethod(s->redrawer, mid, (jint)s->lastFrameClientSize.cx, (jint)s->lastFrameClientSize.cy, (jboolean)isResizeFrame);
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-// Grows only. Shrinking the child ahead of the still-old frame would expose a strip on the origin-moving edge for one
-// composite; oversized, it is just clipped, and WM_EXITSIZEMOVE snaps it back.
-static void growContentChildTo(LiveResizeState *s, int w, int h)
+// Keep the child at the maximum size at each resize step to avoid a lagging (when growing)
+// or an early (when shrinking) part of the pipeline from drawing or clipping at a too-small size.
+static SIZE enforcedChildSizeForResizeStep(SIZE pending, SIZE committed)
+{
+    return { std::max(pending.cx, committed.cx), std::max(pending.cy, committed.cy) };
+}
+
+static void applyEnforcedChildSize(LiveResizeState *s)
 {
     if (!s->contentHwnd) return;
-    RECT cr; GetClientRect(s->contentHwnd, &cr);
-    int childW = (cr.right - cr.left) > w ? (cr.right - cr.left) : w;
-    int childH = (cr.bottom - cr.top) > h ? (cr.bottom - cr.top) : h;
-    SetWindowPos(s->contentHwnd, nullptr, 0, 0, childW, childH,
+    SetWindowPos(s->contentHwnd, nullptr, 0, 0, s->enforcedChildSize.cx, s->enforcedChildSize.cy,
                  SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
 }
 
@@ -240,8 +243,8 @@ static LRESULT CALLBACK LiveResizeContentWndProc(HWND hWnd, UINT msg, WPARAM wPa
         WINDOWPOS *p = (WINDOWPOS *)lParam;
         if (!(p->flags & SWP_NOSIZE))
         {
-            if (p->cx < s->lastClientWidth) p->cx = s->lastClientWidth;
-            if (p->cy < s->lastClientHeight) p->cy = s->lastClientHeight;
+            p->cx = static_cast<int>(s->enforcedChildSize.cx);
+            p->cy = static_cast<int>(s->enforcedChildSize.cy);
         }
     }
     return CallWindowProcW(s->originalContentProc, hWnd, msg, wParam, lParam);
@@ -257,9 +260,15 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             if (s->inSizeMoveLoop) return 1;
             break;
         case WM_ENTERSIZEMOVE:
+        {
             s->inSizeMoveLoop = true;
             s->liveResizeEngaged = false;
+            RECT rc; GetClientRect(hWnd, &rc);
+            const SIZE clientSize = { rc.right - rc.left, rc.bottom - rc.top };
+            s->enforcedChildSize = enforcedChildSizeForResizeStep(clientSize, clientSize);
+            s->lastFrameClientSize = clientSize;
             break;
+        }
         case WM_NCCALCSIZE:
         {
             LRESULT r = CallWindowProcW(s->originalProc, hWnd, msg, wParam, lParam);
@@ -274,9 +283,14 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
                 }
                 NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *)lParam;
                 RECT c = p->rgrc[0];
-                s->lastClientWidth = c.right - c.left;
-                s->lastClientHeight = c.bottom - c.top;
-                growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
+                RECT committed; GetClientRect(hWnd, &committed);
+                const SIZE pendingSize = { c.right - c.left, c.bottom - c.top };
+                s->enforcedChildSize = enforcedChildSizeForResizeStep(
+                    pendingSize, 
+                    { committed.right - committed.left, committed.bottom - committed.top }
+                );
+                s->lastFrameClientSize = pendingSize;
+                applyEnforcedChildSize(s);
                 javaDrawFrameWhileLiveResizing(s, /*isResizeFrame*/ true);
             }
             return r;
@@ -290,9 +304,8 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             if (s->inSizeMoveLoop && s->liveResizeEngaged && !isPumpingEdt())
             {
                 ValidateRect(hWnd, nullptr); // before rendering, so the re-arm below isn't cleared
-                // A hold gives Swing's async doLayout time to shrink the child to a lagging size; every
-                // WM_NCCALCSIZE re-asserts it during an active drag, but nothing does here.
-                growContentChildTo(s, s->lastClientWidth, s->lastClientHeight);
+                // A hold is where Swing's async doLayout lands, so the size has to be re-asserted here too.
+                applyEnforcedChildSize(s);
                 javaDrawFrameWhileLiveResizing(s, /*isResizeFrame*/ false);
                 return 0;
             }
@@ -302,8 +315,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             if (s->liveResizeEngaged)
             {
                 s->liveResizeEngaged = false;
-                // The child can be left oversized (growContentChildTo only grows), and Swing's post-drag layout may
-                // no-op because its own model already matches. Snap it explicitly.
+                // Ensure the client size is correct when exiting live resize mode
                 if (s->contentHwnd)
                 {
                     RECT rc; GetClientRect(hWnd, &rc);
