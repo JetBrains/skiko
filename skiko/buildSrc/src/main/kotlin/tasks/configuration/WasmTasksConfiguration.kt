@@ -2,6 +2,7 @@ package tasks.configuration
 
 import Arch
 import CompileSkikoCppTask
+import EnsureEmscriptenTask
 import IMPORT_GENERATOR
 import LinkSkikoWasmTask
 import OS
@@ -50,14 +51,22 @@ private val wasmSideModuleLinkTaskAttribute =
 private const val WASM_SIDE_MODULE_USAGE = "skiko-wasm-side-module"
 private const val WASM_TEST_RESOURCES_USAGE = "skiko-wasm-test-resources"
 
+private const val DEFAULT_EMSDK_VERSION = "4.0.7"
+
 fun SkikoProjectContext.declareWasmTasks() {
     if (!project.supportWeb) {
         return
     }
     val isSideModule = kind == SkikoModuleKind.EXTENSION
 
+    val emsdkVersion = project.findProperty("skiko.emsdk.version")?.toString() ?: DEFAULT_EMSDK_VERSION
+    val ensureEmscripten by project.tasks.registering(EnsureEmscriptenTask::class) {
+        this.emsdkVersion.set(emsdkVersion)
+    }
+
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
+        dependsOn(ensureEmscripten)
         dependsOn(skiaWasmDir)
         compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
@@ -91,6 +100,7 @@ fun SkikoProjectContext.declareWasmTasks() {
     }
 
     fun LinkSkikoWasmTask.configureCommon(prefixPath: String) {
+        dependsOn(ensureEmscripten)
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
         val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
