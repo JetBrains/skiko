@@ -21,6 +21,4 @@ include("docs")
 include("import-generator")
 include("test-utils")
 include("skiko-skottie")
-if (System.getProperty("os.name") == "Mac OS X") {
-    include("skiko-graphite")
-}
+include("skiko-graphite")
