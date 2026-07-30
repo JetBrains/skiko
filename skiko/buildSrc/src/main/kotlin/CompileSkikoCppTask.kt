@@ -213,6 +213,10 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
             if (file.isFile) return file
         }
 
+        // Check locally installed emsdk (installed by EnsureEmscriptenTask)
+        val localEmsdkEmcc = project.layout.buildDirectory.dir("emsdk/upstream/emscripten").get().asFile.resolve(compilerName)
+        if (localEmsdkEmcc.isFile) return localEmsdkEmcc
+
         error("Could not find compiler '$compilerName' in PATH: $paths")
     }
 

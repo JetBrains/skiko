@@ -51,7 +51,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Maven Local'
         with:
-          image_name: linux-emscripten-amd64
+          image_name: linux-amd64
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.wasm.enabled=true \
