@@ -3,18 +3,25 @@
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import tasks.configuration.*
 import dsl.SkikoDependencyScope
 
 plugins {
-    kotlin("multiplatform")
+    kotlin("multiplatform") apply false
     org.jetbrains.dokka
     `maven-publish`
     signing
     org.gradle.crypto.checksum
 }
+
+// skiko-graphite is included on Linux so CI can publish its common KMP module metadata.
+// With the default properties below, Graphite has no enabled targets on Linux because its JVM target is macOS-only.
+extra["kotlin.internal.suppressGradlePluginErrors"] = "NoKotlinTargetsDeclared"
+apply(plugin = "org.jetbrains.kotlin.multiplatform")
+val kotlin = extensions.getByType<KotlinMultiplatformExtension>()
 
 val skiko = SkikoProperties(rootProject)
 val targetOs = hostOs
@@ -72,7 +79,7 @@ repositories {
     google()
 }
 
-kotlin {
+kotlin.run {
     compilerOptions {
         languageVersion.set(skikoKotlinLanguageVersion)
         apiVersion.set(skikoKotlinApiVersion)
