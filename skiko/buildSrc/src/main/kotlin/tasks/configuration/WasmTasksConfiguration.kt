@@ -30,7 +30,6 @@ import registerOrGetSkiaDirProvider
 import supportWeb
 import wasmImports
 import wasmImport
-import java.io.ByteArrayOutputStream
 import java.io.File
 
 private val Project.setupMjs
@@ -195,29 +194,29 @@ fun SkikoProjectContext.declareWasmTasks() {
         buildVariant.set(buildType)
 
         // find a path to wasm-opt
+        val wasmOptName = if (System.getProperty("os.name").startsWith("Win")) "wasm-opt.exe" else "wasm-opt"
         var wasmOptPath: String
         if (System.getenv("EMSDK_DIR") != null) {
             // used by build pipeline
-            wasmOptPath = "${System.getenv("EMSDK_DIR")}/upstream/bin/wasm-opt"
+            wasmOptPath = "${System.getenv("EMSDK_DIR")}/upstream/bin/$wasmOptName"
         } else {
             // try to use wasm-opt that comes bundled with emcc
-            val emccInstallationPath = ByteArrayOutputStream().use {
-                execOperations.exec {
-                    commandLine("sh", "-c", "which emcc")
-                    standardOutput = it
-                }
-                it.toString().trim()
-            }
+            val emccName = compilerForTarget(OS.Wasm, Arch.Wasm)
+            val emccPath = (System.getenv("PATH") ?: "")
+                .split(File.pathSeparator)
+                .asSequence()
+                .map { File(it).resolve(emccName) }
+                .firstOrNull { it.isFile }
+
             // emcc is under emsdk/upstream/emscripten/emcc. wasm-opt is under emsdk/upstream/bin/wasm-opt
-            val wasmOptRelativeToEmcc = File(emccInstallationPath)
-                .parentFile // emscripten/
-                .parentFile // upstream/
-                .resolve("bin/wasm-opt")
-            if (wasmOptRelativeToEmcc.exists()) {
-                wasmOptPath = wasmOptRelativeToEmcc.absolutePath
-            } else {
-                // fallback to a path accessible wasm-opt
-                wasmOptPath = "wasm-opt"
+            val wasmOptRelativeToEmcc = emccPath
+                ?.parentFile // emscripten/
+                ?.parentFile // upstream/
+                ?.resolve("bin/$wasmOptName")
+
+            wasmOptPath = when {
+                wasmOptRelativeToEmcc?.exists() == true -> wasmOptRelativeToEmcc.absolutePath
+                else -> wasmOptName
             }
         }
 
