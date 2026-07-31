@@ -1,13 +1,12 @@
 import internal.utils.ArgBuilder
-import internal.utils.resolveToIoFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputFile
 
 abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
-
-    @get:Input
-    abstract val libOutputFileName: Property<String>
 
     @get:Input
     abstract val flags: ListProperty<String>
@@ -15,8 +14,11 @@ abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
     @get:Input
     abstract val optimizer: Property<String>
 
-    @get:Input
-    abstract val inputFile: Property<String>
+    @get:InputFile
+    abstract val inputFile: RegularFileProperty
+
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
 
     override val outDirNameForTool: String
         get() = "optimize"
@@ -27,6 +29,7 @@ abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
         }
 
         logArgs("Optimize args", args)
+        outputFile.get().asFile.parentFile.mkdirs()
 
         execOperations.exec {
             executable = optimizer.get()
@@ -37,8 +40,8 @@ abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
 
     override fun configureArgs() =
         super.configureArgs().apply {
-            arg(inputFile.get())
+            arg(value = inputFile)
             rawArgs(flags.get())
-            arg("-o", outDir.resolveToIoFile(libOutputFileName))
+            arg("-o", outputFile)
         }
 }
