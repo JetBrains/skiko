@@ -25,6 +25,8 @@ org.jetbrains.skiko.node
 org.jetbrains.skiko.swing
 org.jetbrains.skiko.wasm
 org.jetbrains.skiko.windows
+module:skiko-graphite
+org.jetbrains.skia.gpu.graphite
 module:skiko-skottie
 org.jetbrains.skia.skottie
 org.jetbrains.skia.sksg
