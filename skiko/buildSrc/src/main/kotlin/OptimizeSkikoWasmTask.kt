@@ -1,10 +1,10 @@
 import internal.utils.ArgBuilder
-import internal.utils.resolveToIoFile
-import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputDirectory
+import java.nio.file.Files
 
 abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
 
@@ -14,8 +14,8 @@ abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
     @get:Input
     abstract val optimizer: Property<String>
 
-    @get:InputFile
-    abstract val inputFile: RegularFileProperty
+    @get:InputDirectory
+    abstract val inputDir: DirectoryProperty
 
     @get:Input
     abstract val libOutputFileName: Property<String>
@@ -28,19 +28,42 @@ abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
             "Optimization is not incremental, but $mode is received"
         }
 
-        logArgs("Optimize args", args)
+        val inputDirectory = inputDir.get().asFile
+        val outputDirectory = outDir.get().asFile
+        outputDirectory.mkdirs()
 
-        execOperations.exec {
-            executable = optimizer.get()
-            workingDir = outDir.get().asFile
-            this.args = args.toArray().toList()
-        }
+        inputDirectory.walkTopDown()
+            .filter { it.isFile }
+            .forEach { inputFile ->
+                val outputFile = outputDirectory.resolve("${libOutputFileName.get()}.${inputFile.extension}")
+
+                when (inputFile.extension) {
+                    "wasm" -> {
+                        val optimizeArgs = createArgBuilder().apply {
+                            arg(value = inputFile)
+                            rawArgs(flags.get())
+                            arg("-o", outputFile)
+                        }
+
+                        logArgs("Optimize args for ${inputFile.name}", optimizeArgs)
+
+                        execOperations.exec {
+                            executable = optimizer.get()
+                            workingDir = outputDirectory
+                            this.args = optimizeArgs.toArray().toList()
+                        }
+                    }
+                    "mjs" -> {
+                        // *.mjs files are not really optimized, so we just copy them
+                        // they are called unoptimized in the path, because emcc
+                        // names the *.mjs and *.wasm files the same
+                        Files.copy(
+                            inputFile.toPath(),
+                            outputFile.toPath(),
+                        )
+                    }
+                }
+            }
     }
 
-    override fun configureArgs() =
-        super.configureArgs().apply {
-            arg(value = inputFile)
-            rawArgs(flags.get())
-            arg("-o", outDir.resolveToIoFile(libOutputFileName))
-        }
 }
