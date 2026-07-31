@@ -223,7 +223,7 @@ fun SkikoProjectContext.declareWasmTasks() {
 
         optimizer.set(wasmOptPath)
         inputFile.set(linkWasm.flatMap { it.outDir.file(it.libOutputFileName) })
-        outputFile.set(outDir.file("$libBaseName.wasm"))
+        libOutputFileName.set("$libBaseName.wasm")
 
         flags.addAll(
             listOf(
