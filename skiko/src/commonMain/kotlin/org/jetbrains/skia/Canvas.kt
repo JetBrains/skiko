@@ -1019,6 +1019,54 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 
     /**
+     * Draws [mesh] using its own [MeshSpecification]'s programs.
+     *
+     * The fragment program returns a local coordinate at which the [paint]'s [Shader] is sampled; in
+     * the absence of a shader the [paint]'s color is used. If the fragment program also produces a
+     * color, [blender] combines the two, and the [paint]'s [BlendMode] then combines the result with
+     * the destination. [blender] is ignored when the fragment program produces no color.
+     *
+     * The [paint]'s [MaskFilter] and [PathEffect], and its antialiasing flag, are ignored.
+     *
+     * Meshes are rasterized by GPU-backed canvases. A canvas backed by a raster [Surface] accepts
+     * the draw and produces no pixels for it.
+     *
+     * @return this
+     */
+    fun drawMesh(mesh: Mesh, blender: Blender, paint: Paint): Canvas {
+        Stats.onNativeCall()
+        try {
+            _nDrawMesh(_ptr, getPtr(mesh), getPtr(blender), getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(mesh)
+            reachabilityBarrier(blender)
+            reachabilityBarrier(paint)
+        }
+        return this
+    }
+
+    /**
+     * Draws [mesh], combining the color its fragment program produces with the [paint]'s shader or
+     * color using [blendMode].
+     *
+     * @see drawMesh
+     *
+     * @return this
+     */
+    fun drawMesh(mesh: Mesh, blendMode: BlendMode, paint: Paint): Canvas {
+        Stats.onNativeCall()
+        try {
+            _nDrawMeshBlendMode(_ptr, getPtr(mesh), blendMode.ordinal, getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(mesh)
+            reachabilityBarrier(paint)
+        }
+        return this
+    }
+
+    /**
      *
      * Draws Drawable drawable using clip and matrix.
      *
@@ -1748,6 +1796,12 @@ private external fun _nDrawPatch(
     blendMode: Int,
     paintPtr: NativePointer
 )
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawMesh")
+private external fun _nDrawMesh(ptr: NativePointer, meshPtr: NativePointer, blenderPtr: NativePointer, paintPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawMeshBlendMode")
+private external fun _nDrawMeshBlendMode(ptr: NativePointer, meshPtr: NativePointer, blendMode: Int, paintPtr: NativePointer)
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDrawable")
