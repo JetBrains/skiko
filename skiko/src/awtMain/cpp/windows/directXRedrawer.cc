@@ -161,6 +161,29 @@ static LiveResizeState *liveResizeStateFor(HWND hWnd)
     return reinterpret_cast<LiveResizeState *>(GetPropW(hWnd, kLiveResizeStateProp));
 }
 
+// Points hWnd at [ours], storing the proc it replaces in [*originalOut]. The prop goes first: once the proc is live, a
+// message that couldn't find its state would go to DefWindowProc and bypass the original proc entirely.
+static void installWndProcHook(HWND hWnd, LiveResizeState *state, WNDPROC ours, WNDPROC *originalOut)
+{
+    if (!hWnd) return;
+    SetPropW(hWnd, kLiveResizeStateProp, (HANDLE)state);
+    *originalOut = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
+    SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)ours);
+}
+
+// Undoes installWndProcHook
+static void uninstallWndProcHook(HWND hWnd, WNDPROC ours, WNDPROC original)
+{
+    if (!hWnd) return;
+    // Only if [ours] is still the installed proc: restoring blindly would drop anything subclassed over us.
+    if ((WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC) == ours && original)
+    {
+        SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)original);
+    }
+    // Remove the prop regardless
+    RemovePropW(hWnd, kLiveResizeStateProp);
+}
+
 static JNIEnv *getJniEnv()
 {
     if (!jvm) return nullptr;
@@ -237,7 +260,7 @@ static void applyEnforcedChildSize(LiveResizeState *s)
 static LRESULT CALLBACK LiveResizeContentWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     LiveResizeState *s = liveResizeStateFor(hWnd);
-    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam);
+    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam);  // See uninstallWndProcHook
     if (msg == WM_WINDOWPOSCHANGING && s->liveResizeEngaged)
     {
         WINDOWPOS *p = (WINDOWPOS *)lParam;
@@ -253,7 +276,7 @@ static LRESULT CALLBACK LiveResizeContentWndProc(HWND hWnd, UINT msg, WPARAM wPa
 static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     LiveResizeState *s = liveResizeStateFor(hWnd);
-    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam);
+    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam);  // See uninstallWndProcHook
     switch (msg)
     {
         case WM_ERASEBKGND:
@@ -753,17 +776,8 @@ extern "C"
         state->frameHwnd = top;
         state->contentHwnd = fromJavaPointer<HWND>(contentPtr);
         state->redrawer = env->NewGlobalRef(redrawer);
-        state->originalProc = (WNDPROC)GetWindowLongPtrW(top, GWLP_WNDPROC);
-        // Prop first: once the proc is live, a message that can't find its state would go to DefWindowProc and bypass
-        // AWT's proc entirely.
-        SetPropW(top, kLiveResizeStateProp, (HANDLE)state);
-        SetWindowLongPtrW(top, GWLP_WNDPROC, (LONG_PTR)LiveResizeWndProc);
-        if (state->contentHwnd)
-        {
-            SetPropW(state->contentHwnd, kLiveResizeStateProp, (HANDLE)state);
-            state->originalContentProc = (WNDPROC)GetWindowLongPtrW(state->contentHwnd, GWLP_WNDPROC);
-            SetWindowLongPtrW(state->contentHwnd, GWLP_WNDPROC, (LONG_PTR)LiveResizeContentWndProc);
-        }
+        installWndProcHook(top, state, LiveResizeWndProc, &state->originalProc);
+        installWndProcHook(state->contentHwnd, state, LiveResizeContentWndProc, &state->originalContentProc);
         return toJavaPointer(state);
     }
 
@@ -772,22 +786,8 @@ extern "C"
     {
         LiveResizeState *state = fromJavaPointer<LiveResizeState *>(handle);
         if (!state) return;
-        if (state->frameHwnd) {
-            // Restoring blindly would drop anything subclassed over us. The prop goes regardless, so no freed state
-            // is ever recovered.
-            WNDPROC current = (WNDPROC)GetWindowLongPtrW(state->frameHwnd, GWLP_WNDPROC);
-            if (current == LiveResizeWndProc && state->originalProc) {
-                SetWindowLongPtrW(state->frameHwnd, GWLP_WNDPROC, (LONG_PTR)state->originalProc);
-            }
-            RemovePropW(state->frameHwnd, kLiveResizeStateProp);
-        }
-        if (state->contentHwnd) {
-            WNDPROC current = (WNDPROC)GetWindowLongPtrW(state->contentHwnd, GWLP_WNDPROC);
-            if (current == LiveResizeContentWndProc && state->originalContentProc) {
-                SetWindowLongPtrW(state->contentHwnd, GWLP_WNDPROC, (LONG_PTR)state->originalContentProc);
-            }
-            RemovePropW(state->contentHwnd, kLiveResizeStateProp);
-        }
+        uninstallWndProcHook(state->frameHwnd, LiveResizeWndProc, state->originalProc);
+        uninstallWndProcHook(state->contentHwnd, LiveResizeContentWndProc, state->originalContentProc);
         if (state->redrawer) env->DeleteGlobalRef(state->redrawer);
         delete state;
     }
