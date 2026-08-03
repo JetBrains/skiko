@@ -173,17 +173,16 @@ internal class Direct3DRedrawer(
     @Suppress("unused")
     private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
 
-    // ---- Live-resize lifecycle, called from directXRedrawer.cc on the toolkit thread: onLiveResizeStarted →
-    // drawFrameWhileLiveResizing (per resize step) → onLiveResizeEnded. ----
-
+    /**
+     * Called from native code when a live-resize session starts.
+     */
     @Suppress("unused")
     private fun onLiveResizeStarted() {
         isHandlingLiveResizeNow = true
     }
 
     /**
-     * The drag quiesced [onPlatformComponentResized], so the layer's size is stale. It has to be laid out and
-     * rendered before the async loop resumes, or that loop renders at the stale size and flashes white.
+     * Called from native code when the live-resize session ends.
      */
     @Suppress("unused")
     private fun onLiveResizeEnded() {
@@ -199,9 +198,10 @@ internal class Direct3DRedrawer(
     }
 
     /**
-     * Draws a frame during live resize.
+     * Called from native code to draw a frame during live resize.
      *
-     * [isResizeFrame] specifies whether this frame actually resizes the window.
+     * [isResizeFrame] specifies whether this frame actually resizes the window (there could be non-resizing
+     * frames during a live resize).
      */
     @Suppress("unused")
     private fun drawFrameWhileLiveResizing(width: Int, height: Int, isResizeFrame: Boolean) {
