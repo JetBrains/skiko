@@ -44,28 +44,10 @@ abstract class LinkSkikoTask : AbstractSkikoNativeToolTask() {
         logArgs("Linker args", args, argFile)
 
         execOperations.exec {
-            executable = findLinkerExecutable()
+            executable = linker.get()
             workingDir = outDir.get().asFile
             this.args = listOf(argFileArg)
         }
-    }
-
-    private fun findLinkerExecutable(): String {
-        val linkerName = linker.get()
-        val linkerFile = File(linkerName)
-        if (linkerFile.isFile) return linkerFile.absolutePath
-
-        val paths = System.getenv("PATH")?.split(File.pathSeparator) ?: emptyList()
-        for (path in paths) {
-            val file = File(path).resolve(linkerName)
-            if (file.isFile) return file.absolutePath
-        }
-
-        // Check locally installed emsdk (installed by EnsureEmscriptenTask)
-        val localEmsdkLinker = project.layout.buildDirectory.dir("emsdk/upstream/emscripten").get().asFile.resolve(linkerName)
-        if (localEmsdkLinker.isFile) return localEmsdkLinker.absolutePath
-
-        return linkerName
     }
 
     override fun configureArgs() =
