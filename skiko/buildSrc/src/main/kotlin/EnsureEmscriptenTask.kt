@@ -1,5 +1,6 @@
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
@@ -26,39 +27,41 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
     abstract val emsdkVersion: Property<String>
 
     @get:OutputDirectory
-    val emsdkDir: File
-        get() = project.layout.buildDirectory.dir("emsdk").get().asFile
+    abstract val emsdkDir: DirectoryProperty
+
+    init {
+        emsdkDir.convention(
+            project.layout.dir(
+                emsdkVersion.map { version ->
+                    project.rootProject.gradle.gradleUserHomeDir.resolve("emsdk/emsdk-$version")
+                }
+            )
+        )
+    }
 
     @TaskAction
     fun run() {
         if (isEmccAvailable()) {
-            logger.lifecycle("emcc is already available on PATH.")
+            logger.lifecycle("emcc is already available available.")
             return
         }
 
-        logger.lifecycle("emcc not found on PATH. Installing Emscripten SDK ${emsdkVersion.get()}...")
+        logger.lifecycle("emcc not found. Installing Emscripten SDK ${emsdkVersion.get()}...")
         installEmsdk()
-        logger.lifecycle("Emscripten SDK ${emsdkVersion.get()} installed successfully at: ${emsdkDir.absolutePath}")
+        logger.lifecycle("Emscripten SDK ${emsdkVersion.get()} installed successfully at: ${emsdkDir.get().asFile.absolutePath}")
     }
 
     private fun isEmccAvailable(): Boolean {
         val emccName = if (isWindows()) "emcc.bat" else "emcc"
 
-        // Check system PATH
-        val paths = System.getenv("PATH")?.split(File.pathSeparator) ?: emptyList()
-        for (path in paths) {
-            val file = File(path).resolve(emccName)
-            if (file.isFile) return true
-        }
-
         // Check if emsdk was previously installed by this task
-        val localEmcc = emsdkDir.resolve("upstream/emscripten/$emccName")
+        val localEmcc = emsdkDir.get().asFile.resolve("upstream/emscripten/$emccName")
         return localEmcc.isFile
     }
 
     private fun installEmsdk() {
         val version = emsdkVersion.get()
-        val sdkDir = emsdkDir
+        val sdkDir = emsdkDir.get().asFile
 
         // Clone or update emsdk
         if (sdkDir.resolve(".git").isDirectory) {
