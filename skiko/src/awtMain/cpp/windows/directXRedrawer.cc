@@ -141,8 +141,7 @@ private:
 // Not SetWindowSubclass, which would chain more cleanly: it must be called from the thread that OWNS the window, and
 // we install from the EDT while the AWT frame HWND belongs to the toolkit thread. Cross-thread it just returns FALSE.
 
-struct LiveResizeState
-{
+struct LiveResizeState {
     WNDPROC originalProc = nullptr;
     WNDPROC originalContentProc = nullptr;
     HWND frameHwnd = nullptr;
@@ -152,6 +151,7 @@ struct LiveResizeState
     SIZE enforcedChildSize = {};    // what the child is held at during a drag; see enforcedChildSizeForResizeStep
     bool inSizeMoveLoop = false;    // WM_ENTERSIZEMOVE..WM_EXITSIZEMOVE, which covers plain moves too
     bool liveResizeEngaged = false; // ...whereas this means an actual resize
+    bool detached = false;          // uninstalled, but a proc we couldn't remove still needs us to forward; see below
 };
 
 static const wchar_t *kLiveResizeStateProp = L"SkikoLiveResizeState";
@@ -163,29 +163,32 @@ static LiveResizeState *liveResizeStateFor(HWND hWnd)
 
 // Points hWnd at [ours], storing the proc it replaces in [*originalOut]. The prop goes first: once the proc is live, a
 // message that couldn't find its state would go to DefWindowProc and bypass the original proc entirely.
-static void installWndProcHook(HWND hWnd, LiveResizeState *state, WNDPROC ours, WNDPROC *originalOut)
-{
+static void installWndProcHook(HWND hWnd, LiveResizeState *state, WNDPROC ours, WNDPROC *originalOut) {
     if (!hWnd) return;
     SetPropW(hWnd, kLiveResizeStateProp, (HANDLE)state);
     *originalOut = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
     SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)ours);
 }
 
-// Undoes installWndProcHook
-static void uninstallWndProcHook(HWND hWnd, WNDPROC ours, WNDPROC original)
-{
-    if (!hWnd) return;
-    // Only if [ours] is still the installed proc: restoring blindly would drop anything subclassed over us.
-    if ((WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC) == ours && original)
-    {
-        SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)original);
+// Undoes installWndProcHook. Returns whether successful.
+static bool uninstallWndProcHook(HWND hWnd, WNDPROC ours, WNDPROC original) {
+    if (!hWnd || !IsWindow(hWnd)) return true;
+    if ((WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC) != ours) {
+        return false;
     }
-    // Remove the prop regardless
+    SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)original);
     RemovePropW(hWnd, kLiveResizeStateProp);
+    return true;
 }
 
-static JNIEnv *getJniEnv()
-{
+// Hands a message on to the proc we replaced. A null [original] means we couldn't find our state at all, so there's
+// nothing left to hand it to and DefWindowProc is the best available - see the procs below.
+static LRESULT forwardToOriginal(WNDPROC original, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    return original ? CallWindowProcW(original, hWnd, msg, wParam, lParam)
+                    : DefWindowProcW(hWnd, msg, wParam, lParam);
+}
+
+static JNIEnv *getJniEnv() {
     if (!jvm) return nullptr;
     JNIEnv *env = nullptr;
     if (jvm->GetEnv((void **)&env, JNI_VERSION_1_6) == JNI_EDETACHED)
@@ -193,14 +196,12 @@ static JNIEnv *getJniEnv()
     return env;
 }
 
-static void javaOnLiveResizeStarted(LiveResizeState *s)
-{
+static void javaOnLiveResizeStarted(LiveResizeState *s) {
     if (!s->redrawer) return;
     JNIEnv *env = getJniEnv();
     if (!env) return;
     static jmethodID mid = nullptr;
-    if (!mid)
-    {
+    if (!mid) {
         jclass cls = env->GetObjectClass(s->redrawer);
         mid = env->GetMethodID(cls, "onLiveResizeStarted", "()V");
         env->DeleteLocalRef(cls);
@@ -209,14 +210,12 @@ static void javaOnLiveResizeStarted(LiveResizeState *s)
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-static void javaOnLiveResizeEnded(LiveResizeState *s)
-{
+static void javaOnLiveResizeEnded(LiveResizeState *s) {
     if (!s->redrawer) return;
     JNIEnv *env = getJniEnv();
     if (!env) return;
     static jmethodID mid = nullptr;
-    if (!mid)
-    {
+    if (!mid) {
         jclass cls = env->GetObjectClass(s->redrawer);
         mid = env->GetMethodID(cls, "onLiveResizeEnded", "()V");
         env->DeleteLocalRef(cls);
@@ -225,14 +224,12 @@ static void javaOnLiveResizeEnded(LiveResizeState *s)
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool isResizeFrame)
-{
+static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool isResizeFrame) {
     if (!s->redrawer) return;
     JNIEnv *env = getJniEnv();
     if (!env) return;
     static jmethodID mid = nullptr;
-    if (!mid)
-    {
+    if (!mid) {
         jclass cls = env->GetObjectClass(s->redrawer);
         mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(IIZ)V");
         env->DeleteLocalRef(cls);
@@ -243,13 +240,11 @@ static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool isResizeFram
 
 // Keep the child at the maximum size at each resize step to avoid a lagging (when growing)
 // or an early (when shrinking) part of the pipeline from drawing or clipping at a too-small size.
-static SIZE enforcedChildSizeForResizeStep(SIZE pending, SIZE committed)
-{
+static SIZE enforcedChildSizeForResizeStep(SIZE pending, SIZE committed) {
     return { std::max(pending.cx, committed.cx), std::max(pending.cy, committed.cy) };
 }
 
-static void applyEnforcedChildSize(LiveResizeState *s)
-{
+static void applyEnforcedChildSize(LiveResizeState *s) {
     if (!s->contentHwnd) return;
     SetWindowPos(s->contentHwnd, nullptr, 0, 0, s->enforcedChildSize.cx, s->enforcedChildSize.cy,
                  SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
@@ -257,12 +252,10 @@ static void applyEnforcedChildSize(LiveResizeState *s)
 
 // DXGI clips the presented buffer to the child, so the child's size AT THE PRESENT bounds what reaches the screen.
 // This prevents the wrong size from being applied to the child during live resize.
-static LRESULT CALLBACK LiveResizeContentWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
+static LRESULT CALLBACK LiveResizeContentWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     LiveResizeState *s = liveResizeStateFor(hWnd);
-    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam);  // See uninstallWndProcHook
-    if (msg == WM_WINDOWPOSCHANGING && s->liveResizeEngaged)
-    {
+    if (!s || s->detached) return forwardToOriginal(s ? s->originalContentProc : nullptr, hWnd, msg, wParam, lParam);
+    if (msg == WM_WINDOWPOSCHANGING && s->liveResizeEngaged) {
         WINDOWPOS *p = (WINDOWPOS *)lParam;
         if (!(p->flags & SWP_NOSIZE))
         {
@@ -270,20 +263,18 @@ static LRESULT CALLBACK LiveResizeContentWndProc(HWND hWnd, UINT msg, WPARAM wPa
             p->cy = static_cast<int>(s->enforcedChildSize.cy);
         }
     }
-    return CallWindowProcW(s->originalContentProc, hWnd, msg, wParam, lParam);
+    return forwardToOriginal(s->originalContentProc, hWnd, msg, wParam, lParam);
 }
 
-static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
+static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     LiveResizeState *s = liveResizeStateFor(hWnd);
-    if (!s) return DefWindowProcW(hWnd, msg, wParam, lParam);  // See uninstallWndProcHook
+    if (!s || s->detached) return forwardToOriginal(s ? s->originalProc : nullptr, hWnd, msg, wParam, lParam);
     switch (msg)
     {
         case WM_ERASEBKGND:
             if (s->inSizeMoveLoop) return 1;
             break;
-        case WM_ENTERSIZEMOVE:
-        {
+        case WM_ENTERSIZEMOVE: {
             s->inSizeMoveLoop = true;
             s->liveResizeEngaged = false;
             RECT rc; GetClientRect(hWnd, &rc);
@@ -292,9 +283,8 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             s->lastFrameClientSize = clientSize;
             break;
         }
-        case WM_NCCALCSIZE:
-        {
-            LRESULT r = CallWindowProcW(s->originalProc, hWnd, msg, wParam, lParam);
+        case WM_NCCALCSIZE: {
+            LRESULT r = forwardToOriginal(s->originalProc, hWnd, msg, wParam, lParam);
             // isPumpingEdt(): our own render re-enters here, because the EDT's SetWindowPos is SENT back to this
             // thread. Starting a second round-trip would deadlock against the EDT already blocked in SendMessage.
             if (s->inSizeMoveLoop && wParam && !isPumpingEdt())
@@ -324,8 +314,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             // peek-and-yield is no alternative because that loop's input is invisible to PeekMessage from in here
             // (both tried). Only WM_PAINT sits below input and so cannot starve the drag. needRender re-arms it by
             // invalidating the frame.
-            if (s->inSizeMoveLoop && s->liveResizeEngaged && !isPumpingEdt())
-            {
+            if (s->inSizeMoveLoop && s->liveResizeEngaged && !isPumpingEdt()) {
                 ValidateRect(hWnd, nullptr); // before rendering, so the re-arm below isn't cleared
                 // A hold is where Swing's async doLayout lands, so the size has to be re-asserted here too.
                 applyEnforcedChildSize(s);
@@ -335,12 +324,10 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             break;
         case WM_EXITSIZEMOVE:
             s->inSizeMoveLoop = false;
-            if (s->liveResizeEngaged)
-            {
+            if (s->liveResizeEngaged) {
                 s->liveResizeEngaged = false;
                 // Ensure the client size is correct when exiting live resize mode
-                if (s->contentHwnd)
-                {
+                if (s->contentHwnd) {
                     RECT rc; GetClientRect(hWnd, &rc);
                     SetWindowPos(s->contentHwnd, nullptr, 0, 0, rc.right - rc.left, rc.bottom - rc.top,
                                  SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
@@ -349,7 +336,7 @@ static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
             }
             break;
     }
-    return CallWindowProcW(s->originalProc, hWnd, msg, wParam, lParam);
+    return forwardToOriginal(s->originalProc, hWnd, msg, wParam, lParam);
 }
 // ===================== end Direct3D synchronous live-resize =====================
 
@@ -786,10 +773,19 @@ extern "C"
     {
         LiveResizeState *state = fromJavaPointer<LiveResizeState *>(handle);
         if (!state) return;
-        uninstallWndProcHook(state->frameHwnd, LiveResizeWndProc, state->originalProc);
-        uninstallWndProcHook(state->contentHwnd, LiveResizeContentWndProc, state->originalContentProc);
+        const bool frameUnhooked = uninstallWndProcHook(state->frameHwnd, LiveResizeWndProc, state->originalProc);
+        const bool contentUnhooked =
+            uninstallWndProcHook(state->contentHwnd, LiveResizeContentWndProc, state->originalContentProc);
+        // A proc we couldn't unlink is still in the window's chain, so the state has to outlive us for it to forward
+        // through. So instead of deleting the state, we mark it as detached. It leaks the state object, but it's
+        // better than the alternative
+        state->detached = !frameUnhooked || !contentUnhooked;
         if (state->redrawer) env->DeleteGlobalRef(state->redrawer);
-        delete state;
+        state->redrawer = nullptr;
+        if (!state->detached)
+        {
+            delete state;
+        }
     }
 }
 
