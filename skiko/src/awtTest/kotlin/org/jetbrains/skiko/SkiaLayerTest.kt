@@ -22,6 +22,7 @@ import org.jetbrains.skiko.util.UiTestScope
 import org.jetbrains.skiko.util.UiTestWindow
 import org.jetbrains.skiko.util.uiTest
 import org.junit.Assert.assertEquals
+import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
 import org.junit.Ignore
 import org.junit.Rule
@@ -367,6 +368,7 @@ class SkiaLayerTest {
 
     @Test
     fun `drag resize window`() = uiTest {
+        assumeFalse(hostOs.isLinux)  // Robot mouse moving doesn't seem to work on Linux
         System.setProperty("skiko.rendering.macos.metalSynchronousLiveResize", "true")
         System.setProperty("skiko.rendering.windows.direct3DSynchronousLiveResize", "true")
 
