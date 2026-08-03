@@ -1,20 +1,20 @@
 #include <cstdint>
 #include <jni.h>
-#ifdef SK_BUILD_FOR_ANDROID
+#if defined(SK_BUILD_FOR_ANDROID) || defined(SK_BUILD_FOR_IOS)
 #include <stdlib.h>
 #else
 #include <jawt_md.h>
 #include "jni_helpers.h"
 #endif
 
-#ifndef SK_BUILD_FOR_ANDROID
+#if !defined(SK_BUILD_FOR_ANDROID) && !defined(SK_BUILD_FOR_IOS)
 extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 #endif
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_AWTKt_getAWT(JNIEnv *env, jobject obj)
     {
-    #ifdef SK_BUILD_FOR_ANDROID
+    #if defined(SK_BUILD_FOR_ANDROID) || defined(SK_BUILD_FOR_IOS)
         abort();
         return 0;
     #else
@@ -35,7 +35,7 @@ extern "C"
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_AWTKt_getDrawingSurface(JNIEnv *env, jobject obj, jlong awtPtr, jobject layer)
     {
-    #ifdef SK_BUILD_FOR_ANDROID
+    #if defined(SK_BUILD_FOR_ANDROID) || defined(SK_BUILD_FOR_IOS)
         abort();
         return 0;
     #else
@@ -47,7 +47,7 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AWTKt_freeDrawingSurface(JNIEnv *env, jobject obj, jlong awtPtr, jlong drawingSurfacePtr)
     {
-    #ifdef SK_BUILD_FOR_ANDROID
+    #if defined(SK_BUILD_FOR_ANDROID) || defined(SK_BUILD_FOR_IOS)
         abort();
         return;
     #else
@@ -59,7 +59,7 @@ extern "C"
 
     JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_AWTKt_lockDrawingSurface(JNIEnv *env, jobject obj, jlong drawingSurfacePtr)
     {
-    #ifdef SK_BUILD_FOR_ANDROID
+    #if defined(SK_BUILD_FOR_ANDROID) || defined(SK_BUILD_FOR_IOS)
          abort();
          return 0;
     #else
@@ -70,7 +70,7 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AWTKt_unlockDrawingSurface(JNIEnv *env, jobject obj, jlong drawingSurfacePtr)
     {
-    #ifdef SK_BUILD_FOR_ANDROID
+    #if defined(SK_BUILD_FOR_ANDROID) || defined(SK_BUILD_FOR_IOS)
         abort();
         return;
     #else
@@ -81,7 +81,7 @@ extern "C"
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_AWTKt_getDrawingSurfaceInfo(JNIEnv *env, jobject obj, jlong drawingSurfacePtr)
     {
-     #ifdef SK_BUILD_FOR_ANDROID
+     #if defined(SK_BUILD_FOR_ANDROID) || defined(SK_BUILD_FOR_IOS)
          abort();
          return 0;
      #else
@@ -93,7 +93,7 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AWTKt_freeDrawingSurfaceInfo(JNIEnv *env, jobject obj, jlong drawingSurfacePtr, jlong drawingSurfaceInfoPtr)
     {
-    #ifdef SK_BUILD_FOR_ANDROID
+    #if defined(SK_BUILD_FOR_ANDROID) || defined(SK_BUILD_FOR_IOS)
          abort();
          return;
     #else
@@ -105,7 +105,7 @@ extern "C"
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_AWTKt_getPlatformInfo(JNIEnv *env, jobject obj, jlong drawingSurfaceInfoPtr)
     {
-    #ifdef SK_BUILD_FOR_ANDROID
+    #if defined(SK_BUILD_FOR_ANDROID) || defined(SK_BUILD_FOR_IOS)
         abort();
         return 0;
     #else

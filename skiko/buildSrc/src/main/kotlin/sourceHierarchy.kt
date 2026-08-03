@@ -2,8 +2,12 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinHierarchyTemplate
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import tasks.configuration.robovmIosTargetNames
 
-val SkikoProjectContext.jvmMainSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("jvmMain") else null
+// jvmMain (the AWT-free JNI implementation of the Skia API) is also consumed by the
+// RoboVM targets, so it exists even when the AWT flavor is disabled.
+val SkikoProjectContext.jvmMainSourceSet get() = if (project.supportAwt || project.supportAnyRoboVMIos) kotlin.sourceSets.getByName("jvmMain") else null
 
 val SkikoProjectContext.jvmTestSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("jvmTest") else null
 
@@ -19,11 +23,26 @@ val SkikoProjectContext.webTestSourceSet get() = if (project.supportWeb) kotlin.
 
 val SkikoProjectContext.wasmJsTest get() = if (project.supportWeb) kotlin.sourceSets.getByName("wasmJsTest") else null
 
+val SkikoProjectContext.robovmMainSourceSet get() = if (project.supportAnyRoboVMIos) kotlin.sourceSets.getByName("robovmMain") else null
+
+val SkikoProjectContext.robovmTestSourceSet get() = if (project.supportAnyRoboVMIos) kotlin.sourceSets.getByName("robovmTest") else null
+
 val skikoSourceSetHierarchyTemplate = KotlinHierarchyTemplate {
     common {
         group("jvm") {
             withAndroidTarget()
-            withJvm()
+            // All Kotlin/JVM targets except the RoboVM as it has has no AWT/JAWT/Canvas, so it must not see the shared jvm sources.
+            withCompilations { compilation ->
+                compilation.target.platformType == KotlinPlatformType.jvm &&
+                        compilation.target.name !in robovmIosTargetNames
+            }
+        }
+
+        // RoboVM (JVM on iOS): deliberately outside both the "jvm" group (no AWT)
+        // and the "native" group (no Kotlin/Native runtime). Rendering follows the
+        // native iOS approach (Metal) via RoboVM CocoaTouch classes.
+        group("robovm") {
+            withCompilations { it.target.name in robovmIosTargetNames }
         }
 
         group("web") {

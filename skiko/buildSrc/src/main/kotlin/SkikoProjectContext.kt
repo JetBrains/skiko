@@ -29,6 +29,7 @@ class SkikoProjectContext(
 }
 
 fun SkikoProjectContext.declareSkiaTasks() {
+    // Note: the RoboVM target reuse the "ios"/"iosSim" Skia binaries
     mapOf(
         "android" to listOf("arm64", "x64"),
         "ios" to listOf("arm64", "x64"),
@@ -156,6 +157,24 @@ val Project.supportNativeLinux: Boolean
 
 val Project.supportAnyNative: Boolean
     get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
+
+val Project.supportAllRoboVM: Boolean
+    get() = findProperty(SkikoGradleProperties.ROBOVM_ENABLED) == "true" || isInIdea
+
+val Project.supportAllRoboVMIos: Boolean
+    get() = supportAllRoboVM || findProperty("${SkikoGradleProperties.ROBOVM_IOS}.enabled") == "true" || isInIdea
+
+val Project.supportRoboVMIosArm64: Boolean
+    get() = supportAllRoboVMIos || findProperty(SkikoGradleProperties.ROBOVM_IOS_ARM64) == "true" || isInIdea
+
+val Project.supportRoboVMIosSimulatorArm64: Boolean
+    get() = supportAllRoboVMIos || findProperty(SkikoGradleProperties.ROBOVM_IOS_SIMULATOR_ARM64) == "true" || isInIdea
+
+val Project.supportAnyRoboVMIos: Boolean
+    get() = supportAllRoboVMIos || supportRoboVMIosArm64 || supportRoboVMIosSimulatorArm64
+
+val Project.supportAnyRoboVM: Boolean
+    get() = supportAllRoboVM || supportAnyRoboVMIos
 
 val Project.supportWeb: Boolean
     get() = findProperty(SkikoGradleProperties.WASM_ENABLED) == "true" || isInIdea

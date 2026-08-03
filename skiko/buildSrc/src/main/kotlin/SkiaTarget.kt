@@ -4,6 +4,8 @@ enum class SkiaTarget(
 ) {
     IOS("ios", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=false")),
     IOS_SIM("iosSim", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=false")),
+    // using same id=ios for RoboVM, as id is used only for prepareLocalSkiaBuild (but we are not interested in it)
+    IOS_ROBOVM("ios", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=false")),
     MACOS("macos", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
     WINDOWS("windows", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
     LINUX("linux", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
@@ -24,7 +26,7 @@ enum class SkiaTarget(
         }
 
     fun machines(hostArch: Arch): List<Arch> = when (this) {
-        IOS -> listOf(if (hostArch == Arch.Arm64) Arch.Arm64 else Arch.X64)
+        IOS, IOS_ROBOVM -> listOf(if (hostArch == Arch.Arm64) Arch.Arm64 else Arch.X64)
         IOS_SIM -> listOf(if (hostArch == Arch.Arm64) Arch.Arm64 else Arch.X64)
         MACOS -> if (hostArch == Arch.Arm64) listOf(Arch.Arm64, Arch.X64) else listOf(Arch.X64)
         WINDOWS -> listOf(hostArch)
@@ -36,6 +38,7 @@ enum class SkiaTarget(
         val archProperties = when (this) {
             IOS -> listOf("-P${SkikoGradleProperties.NATIVE_IOS}.${hostArch.gradleProperty}.enabled=true")
             IOS_SIM -> listOf("-P${SkikoGradleProperties.NATIVE_IOS}.simulator${hostArch.titleCase}.enabled=true")
+            IOS_ROBOVM -> listOf("-P${SkikoGradleProperties.ROBOVM_IOS}.${hostArch.gradleProperty}.enabled=true")
             else -> emptyList()
         }
         return gradleProperties + archProperties
@@ -45,12 +48,13 @@ enum class SkiaTarget(
         fun fromString(target: String): SkiaTarget = when (target) {
             "ios" -> IOS
             "iosSim" -> IOS_SIM
+            "iosRobovm" -> IOS_ROBOVM
             "macos" -> MACOS
             "windows" -> WINDOWS
             "linux" -> LINUX
             "wasm" -> WASM
             else -> throw IllegalArgumentException(
-                "Unknown SKIA_TARGET: $target. Valid targets: ios, iosSim, macos, windows, linux, wasm"
+                "Unknown SKIA_TARGET: $target. Valid targets: ios, iosSim, iosRobovm, macos, windows, linux, wasm"
             )
         }
     }

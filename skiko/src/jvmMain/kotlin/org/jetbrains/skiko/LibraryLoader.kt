@@ -117,7 +117,12 @@ internal class LibraryLoader(
     private fun findAndLoadLibrary(name: String, additionalFile: String? = null) {
         val platformName = System.mapLibraryName(name)
 
-        if (hostOs == OS.Android) {
+        if (hostOs == OS.Ios) {
+            // statically linked on RoboVM. Doesn't break line bellow for hostOd == Ios
+            // as this class is not being used for kotlin native (as its pure JVM)
+            return
+        }
+        if (hostOs == OS.Android || hostOs == OS.Ios || hostOs == OS.Tvos) {
             System.loadLibrary(name)
             return
         }

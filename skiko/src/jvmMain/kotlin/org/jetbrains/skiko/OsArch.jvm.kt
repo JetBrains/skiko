@@ -5,6 +5,8 @@ actual val hostOs: OS by lazy {
     when {
         osName == "Mac OS X" -> OS.MacOS
         osName.startsWith("Win") -> OS.Windows
+        // RoboVM (JVM on iOS) reports "iOS" on devices and "iOS Simulator" on the simulator
+        osName.startsWith("iOS") -> OS.Ios
         "The Android Project" == System.getProperty("java.specification.vendor") -> OS.Android
         osName == "Linux" -> OS.Linux
         else -> throw Error("Unknown OS $osName")

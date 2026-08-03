@@ -50,7 +50,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeMetalRender
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative(JNIEnv* env, jclass jclass) {
-#ifdef SK_METAL
+#if defined(SK_METAL) && !defined(SK_BUILD_FOR_IOS)
     void* device = nullptr;
     void* queue = nullptr;
     getMetalDeviceAndQueue(&device, &queue);
