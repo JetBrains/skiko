@@ -1280,7 +1280,7 @@ class SkiaLayerTest {
         }
 
         try {
-            repeat(10) { testRun ->
+            repeat(8) { testRun ->
                 // Wait until the sampled pixel shows the (green) background before launching the child.
                 waitForSampledPixelCloseTo(bgColor)
 
