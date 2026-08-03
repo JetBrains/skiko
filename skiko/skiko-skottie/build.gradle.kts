@@ -270,7 +270,7 @@ kotlin {
             dependencies.add(it.name, coreProject)
         }
         resources.srcDirs(
-            tasks.named("linkWasm"),
+            tasks.named("optimizeWasm"),
             wasmImports,
             coreWasmTestResources,
         )

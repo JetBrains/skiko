@@ -373,7 +373,7 @@ kotlin {
 
     skikoProjectContext.webTestSourceSet?.apply {
         resources.srcDirs(
-            tasks.named("linkWasm"), wasmImports
+            tasks.named("optimizeWasm"), wasmImports
         )
     }
 

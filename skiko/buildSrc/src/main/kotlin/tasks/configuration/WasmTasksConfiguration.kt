@@ -5,6 +5,7 @@ import CompileSkikoCppTask
 import IMPORT_GENERATOR
 import LinkSkikoWasmTask
 import OS
+import OptimizeSkikoWasmTask
 import SkikoModuleKind
 import SkikoProjectContext
 import compilerForTarget
@@ -16,6 +17,7 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
@@ -187,8 +189,10 @@ fun SkikoProjectContext.declareWasmTasks() {
         configureCommon(prefixPath)
     }
 
-    val optimizeWasm by project.tasks.registering(OptimizeSkikoWasmTask::class) {
-        dependsOn(linkWasm)
+    fun OptimizeSkikoWasmTask.configureCommonOptimize(
+        linkTask: TaskProvider<LinkSkikoWasmTask>,
+        nameSuffix: String = ""
+    ) {
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -221,8 +225,8 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
 
         optimizer.set(wasmOptPath)
-        inputDir.set(linkWasm.flatMap { it.outDir })
-        libOutputFileName.set(libBaseName)
+        inputDir.set(linkTask.flatMap { it.outDir })
+        libOutputFileName.set("$libBaseName$nameSuffix")
 
         flags.addAll(
             listOf(
@@ -233,6 +237,18 @@ fun SkikoProjectContext.declareWasmTasks() {
                 "--all-features", // enable all features (most of them are required because of compilation with emcc)
             )
         )
+    }
+
+    val optimizeWasm by project.tasks.registering(OptimizeSkikoWasmTask::class) {
+        dependsOn(linkWasm)
+        buildSuffix.set("es6")
+        configureCommonOptimize(linkWasm)
+    }
+
+    val optimizeWasmD8 by project.tasks.registering(OptimizeSkikoWasmTask::class) {
+        dependsOn(linkWasmD8WithES6)
+        buildSuffix.set("d8")
+        configureCommonOptimize(linkWasmD8WithES6, "d8")
     }
 
     // skikoWasmJar is used by task name
@@ -248,12 +264,10 @@ fun SkikoProjectContext.declareWasmTasks() {
 
         from(optimizeWasm) {
             include("*.wasm")
-        }
-        from(linkWasm) {
             include("*.mjs")
         }
 
-        from(linkWasmD8WithES6) {
+        from(optimizeWasmD8) {
             include("*.mjs")
             filesMatching("*.mjs") {
                 filter { it.replace("${libBaseName}d8.wasm", "$libBaseName.wasm") }
@@ -273,7 +287,7 @@ fun SkikoProjectContext.provideWasmSideModules() {
 }
 
 fun SkikoProjectContext.provideWasmTestResources() = with(project) {
-    val linkWasm = tasks.named<LinkSkikoWasmTask>("linkWasm")
+    val optimizeWasm = tasks.named<OptimizeSkikoWasmTask>("optimizeWasm")
     configurations.create("wasmTestResourcesElements") {
         isCanBeConsumed = true
         isCanBeResolved = false
@@ -285,10 +299,10 @@ fun SkikoProjectContext.provideWasmTestResources() = with(project) {
             )
         }
 
-        outgoing.artifact(linkWasm.flatMap { it.outDir })
+        outgoing.artifact(optimizeWasm.flatMap { it.outDir })
         outgoing.artifact(wasmImports) {
             builtBy(
-                linkWasm,
+                optimizeWasm,
                 tasks.named("compileTestKotlinJs"),
                 tasks.named("compileTestKotlinWasmJs"),
             )
@@ -366,6 +380,7 @@ private fun SkikoProjectContext.configureSideModuleInput(
     sideModuleFiles: ConfigurableFileCollection
 ) {
     project.tasks.named<LinkSkikoWasmTask>(mainLinkTaskName).configure {
+        dependsOn(sideModuleFiles)
         libFiles += sideModuleFiles
     }
 }
