@@ -16,7 +16,6 @@ import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
-import org.jetbrains.skiko.redrawer.renderTime
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -54,7 +53,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("SameParameterValue")
@@ -1756,11 +1754,19 @@ class SkiaLayerTest {
 
 internal fun JFrame.close() = dispatchEvent(WindowEvent(this, WindowEvent.WINDOW_CLOSING))
 
-private suspend fun Window.waitUntilOpened() = suspendCancellableCoroutine { continuation ->
-    addWindowListener(object : WindowAdapter() {
-        override fun windowOpened(e: WindowEvent?) {
-            removeWindowListener(this)
-            continuation.resume(Unit)
+private suspend fun Window.waitUntilOpened() {
+    if (isShowing) return
+    lateinit var listener: WindowListener
+    try {
+        suspendCancellableCoroutine { continuation ->
+            listener = object : WindowAdapter() {
+                override fun windowOpened(e: WindowEvent?) {
+                    continuation.resume(Unit)
+                }
+            }
+            addWindowListener(listener)
         }
-    })
+    } finally {
+        removeWindowListener(listener)
+    }
 }

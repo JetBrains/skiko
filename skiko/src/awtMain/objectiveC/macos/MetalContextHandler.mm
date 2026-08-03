@@ -152,5 +152,3 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
 
 } // extern C
 #endif
-
-       

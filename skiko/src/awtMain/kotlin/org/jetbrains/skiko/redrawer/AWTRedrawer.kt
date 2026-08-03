@@ -86,8 +86,7 @@ internal abstract class AWTRedrawer(
     override fun onPlatformComponentResized() {
         syncBoundsFromPlatformComponent()
         if (supportsRenderingBeforeShown && !layer.isShowing && layer.isDisplayable && layer.width > 0 && layer.height > 0) {
-            // Render eagerly so the window already has content when it first appears on screen; see
-            // supportsRenderingWhileHidden. A scheduled frame would be skipped (rendering is gated on isShowing).
+            // Render eagerly so the window already has content when it first appears on screen
             renderBeforeShown()
         } else {
             needRender(throttledToVsync = false)
