@@ -161,13 +161,13 @@ static LiveResizeState *liveResizeStateFor(HWND hWnd)
     return reinterpret_cast<LiveResizeState *>(GetPropW(hWnd, kLiveResizeStateProp));
 }
 
-// Points hWnd at [ours], storing the proc it replaces in [*originalOut]. The prop goes first: once the proc is live, a
-// message that couldn't find its state would go to DefWindowProc and bypass the original proc entirely.
-static void installWndProcHook(HWND hWnd, LiveResizeState *state, WNDPROC ours, WNDPROC *originalOut) {
-    if (!hWnd) return;
+// Points hWnd at [ours] and returns the proc it replaced.
+static WNDPROC installWndProcHook(HWND hWnd, LiveResizeState *state, WNDPROC ours) {
+    if (!hWnd) return nullptr;
     SetPropW(hWnd, kLiveResizeStateProp, (HANDLE)state);
-    *originalOut = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
+    const WNDPROC original = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
     SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)ours);
+    return original;
 }
 
 // Undoes installWndProcHook. Returns whether successful.
@@ -763,8 +763,8 @@ extern "C"
         state->frameHwnd = top;
         state->contentHwnd = fromJavaPointer<HWND>(contentPtr);
         state->redrawer = env->NewGlobalRef(redrawer);
-        installWndProcHook(top, state, LiveResizeWndProc, &state->originalProc);
-        installWndProcHook(state->contentHwnd, state, LiveResizeContentWndProc, &state->originalContentProc);
+        state->originalProc = installWndProcHook(top, state, LiveResizeWndProc);
+        state->originalContentProc = installWndProcHook(state->contentHwnd, state, LiveResizeContentWndProc);
         return toJavaPointer(state);
     }
 
