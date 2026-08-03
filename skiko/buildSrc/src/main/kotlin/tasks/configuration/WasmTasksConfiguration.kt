@@ -64,7 +64,12 @@ fun SkikoProjectContext.declareWasmTasks() {
     val emsdkVersion = project.findProperty("skiko.emsdk.version")?.toString() ?: DEFAULT_EMSDK_VERSION
     val ensureEmscripten by project.tasks.registering(EnsureEmscriptenTask::class) {
         this.emsdkVersion.set(emsdkVersion)
+        project.findProperty("skiko.emsdk.dir")?.toString()?.let {
+            emsdkDir.set(project.layout.dir(project.provider { project.resolveEmsdkDir(it) }))
+            requireExistingEmsdk.set(true)
+        }
     }
+
     fun emscriptenToolPath(toolName: String) =
         ensureEmscripten.flatMap { it.emsdkDir.dir("upstream/emscripten") }.map {
             it.file(toolName).asFile.absolutePath
@@ -298,6 +303,11 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
     }
 }
+
+private fun Project.resolveEmsdkDir(path: String): File =
+    File(path).let {
+        if (it.isAbsolute) it else rootProject.file(path)
+    }
 
 fun SkikoProjectContext.provideWasmSideModules() {
     provideWasmSideModule(mainLinkTaskName = "linkWasm")

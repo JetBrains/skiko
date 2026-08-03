@@ -26,10 +26,14 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
     @get:Input
     abstract val emsdkVersion: Property<String>
 
+    @get:Input
+    abstract val requireExistingEmsdk: Property<Boolean>
+
     @get:OutputDirectory
     abstract val emsdkDir: DirectoryProperty
 
     init {
+        requireExistingEmsdk.convention(false)
         emsdkDir.convention(
             project.layout.dir(
                 emsdkVersion.map { version ->
@@ -42,8 +46,12 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
     @TaskAction
     fun run() {
         if (isEmccAvailable()) {
-            logger.lifecycle("emcc is already available available.")
+            logger.lifecycle("emcc is available at: ${emccFile().absolutePath}")
             return
+        }
+
+        if (requireExistingEmsdk.get()) {
+            throw GradleException("emcc was not found at: ${emccFile().absolutePath}")
         }
 
         logger.lifecycle("emcc not found. Installing Emscripten SDK ${emsdkVersion.get()}...")
@@ -52,12 +60,12 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
     }
 
     private fun isEmccAvailable(): Boolean {
-        val emccName = if (isWindows()) "emcc.bat" else "emcc"
-
         // Check if emsdk was previously installed by this task
-        val localEmcc = emsdkDir.get().asFile.resolve("upstream/emscripten/$emccName")
-        return localEmcc.isFile
+        return emccFile().isFile
     }
+
+    private fun emccFile(): File =
+        emsdkDir.get().asFile.resolve("upstream/emscripten/${if (isWindows()) "emcc.bat" else "emcc"}")
 
     private fun installEmsdk() {
         val version = emsdkVersion.get()
