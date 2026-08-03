@@ -366,6 +366,79 @@ class SkiaLayerTest {
     }
 
     @Test
+    fun `drag resize window`() = uiTest {
+        System.setProperty("skiko.rendering.macos.metalSynchronousLiveResize", "true")
+        System.setProperty("skiko.rendering.windows.direct3DSynchronousLiveResize", "true")
+
+        val robot = Robot().apply { autoDelay = 16 }
+        suspend fun dragBottomRightCorner(window: Window, by: Dimension, steps: Int = 20) {
+            val startX = window.x + window.width - 1
+            val startY = window.y + window.height - 1
+            withContext(Dispatchers.Default) {
+                robot.mouseMove(startX, startY)
+                robot.waitForIdle()
+                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK)
+                try {
+                    for (step in 1..steps) {
+                        robot.mouseMove(startX + by.width * step / steps, startY + by.height * step / steps)
+                    }
+                } finally {
+                    robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK)
+                }
+                robot.waitForIdle()
+            }
+        }
+
+        // Everything is divisible by 24, to avoid rounding due to screen scaling
+        val initialContentSize = Dimension(480, 240)
+        val growBy = Dimension(120, 96)
+        val finalContentSize = Dimension(
+            initialContentSize.width + growBy.width,
+            initialContentSize.height + growBy.height
+        )
+
+        val window = UiTestWindow()
+        val renderer = BorderRenderer(window.layer, borderThickness = 40, borderColor = Color.RED)
+        try {
+            window.setLocation(200, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.renderDelegate = renderer
+
+            window.layer.preferredSize = initialContentSize
+            window.pack()
+            window.isVisible = true
+            delay(200)
+            assertEquals("The window didn't pack to the requested content size", initialContentSize, window.layer.size)
+
+            dragBottomRightCorner(window, by = growBy)
+            delay(200)
+
+            assertEquals("The drag didn't resize the content as requested", finalContentSize, window.layer.size)
+            assertEquals("The final layer's size is incorrect", finalContentSize, window.layer.size)
+
+            // Screenshot the window content
+            val screenshotRect = Rectangle(window.locationOnScreen, window.size).apply {
+                fun shrink(left: Int, top: Int, right: Int, bottom: Int) {
+                    x += left
+                    y += top
+                    width -= right + left
+                    height -= bottom + top
+                }
+                // Exclude insets
+                val insets = window.insets
+                shrink(insets.left, insets.top, insets.right, insets.bottom)
+                // Exclude corners, which can be round and show through pixels that don't belong to us
+                shrink(0, 20, 0, 20)
+            }
+            screenshots.assert(screenshotRect)
+
+            assertRenderApiFor(window.layer)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
     fun `render three windows`() = uiTest {
         fun window(color: Color) = UiTestWindow().apply {
             setLocation(200, 200)
@@ -1459,6 +1532,36 @@ class SkiaLayerTest {
             canvas.drawRect(Rect(0f, 0f, rectWidth * contentScale, rectHeight * contentScale), Paint().apply {
                 color = rectColor.rgb
             })
+        }
+    }
+
+    /**
+     * Fills the content with white and outlines it with a [borderThickness]-wide border, so that content lagging the
+     * window's size shows up as the border sitting away from the window's edges.
+     */
+    private class BorderRenderer(
+        private val layer: SkiaLayer,
+        private val borderThickness: Int,
+        private val borderColor: Color
+    ) : SkikoRenderDelegate {
+        /** The size, in pixels, that the last frame was laid out for. */
+        var lastRenderedSize: Dimension? = null
+            private set
+
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            lastRenderedSize = Dimension(width, height)
+
+            val w = width.toFloat()
+            val h = height.toFloat()
+            canvas.drawRect(Rect(0f, 0f, w, h), Paint().apply { color = Color.WHITE.rgb })
+
+            // Scaled, so the border keeps the same on-screen thickness whatever the content scale is.
+            val t = borderThickness * layer.contentScale
+            val border = Paint().apply { color = borderColor.rgb }
+            canvas.drawRect(Rect(0f, 0f, w, t), border)
+            canvas.drawRect(Rect(0f, h - t, w, h), border)
+            canvas.drawRect(Rect(0f, 0f, t, h), border)
+            canvas.drawRect(Rect(w - t, 0f, w, h), border)
         }
     }
 
