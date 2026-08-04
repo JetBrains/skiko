@@ -200,9 +200,9 @@ fun SkikoProjectContext.declareWasmTasks() {
         // find a path to wasm-opt
         val wasmOptName = if (System.getProperty("os.name").startsWith("Win")) "wasm-opt.exe" else "wasm-opt"
         var wasmOptPath: String
-        if (System.getenv("EMSDK_DIR") != null) {
+        if (System.getenv("EMSDK") != null) {
             // used by build pipeline
-            wasmOptPath = "${System.getenv("EMSDK_DIR")}/upstream/bin/$wasmOptName"
+            wasmOptPath = "${System.getenv("EMSDK")}/upstream/bin/$wasmOptName"
         } else {
             // try to use wasm-opt that comes bundled with emcc
             val emccName = compilerForTarget(OS.Wasm, Arch.Wasm)
