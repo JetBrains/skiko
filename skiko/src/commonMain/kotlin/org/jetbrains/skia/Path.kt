@@ -20,8 +20,6 @@ import kotlin.math.min
  * outside the geometry. Path also describes the winding rule used to fill
  * overlapping contours.
  *
- * Internally, Path lazily computes metrics likes bounds and convexity. Call
- * [updateBoundsCache] to make Path thread safe.
  */
 class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
     companion object {
@@ -936,23 +934,6 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
 
     /**
-     * Updates internal bounds so that subsequent calls to [bounds] are instantaneous.
-     * Unaltered copies of Path may also access cached bounds through [bounds].
-     *
-     * For now, identical to calling [bounds] and ignoring the returned value.
-     *
-     * Call to prepare Path subsequently drawn from multiple threads,
-     * to avoid a race condition where each draw separately computes the bounds.
-     *
-     * @return  this
-     */
-    fun updateBoundsCache(): Path {
-        Stats.onNativeCall()
-        _nUpdateBoundsCache(_ptr)
-        return this
-    }
-
-    /**
      * Returns minimum and maximum axes values of the lines and curves in Path.
      * Returns (0, 0, 0, 0) if Path contains no points.
      * Returned bounds width and height may be larger or smaller than area affected
@@ -1334,9 +1315,6 @@ private external fun _nApproximateBytesUsed(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetBounds")
 private external fun _nGetBounds(ptr: NativePointer, rect: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nUpdateBoundsCache")
-private external fun _nUpdateBoundsCache(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nComputeTightBounds")
 private external fun _nComputeTightBounds(ptr: NativePointer, rect: InteropPointer)
