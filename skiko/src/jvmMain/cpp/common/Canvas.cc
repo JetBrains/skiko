@@ -213,6 +213,13 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawDrawab
     canvas->drawDrawable(drawable, matrix.get());
 }
 
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawAnnotation
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jstring key, jlong valuePtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    SkData* value = reinterpret_cast<SkData*>(static_cast<uintptr_t>(valuePtr));
+    canvas->drawAnnotation(SkRect::MakeLTRB(left, top, right, bottom), skString(env, key).c_str(), value);
+}
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nClear(JNIEnv* env, jclass jclass, jlong ptr, jint color) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
     canvas->clear(color);

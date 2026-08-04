@@ -199,6 +199,13 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawDrawable
     canvas->drawDrawable(drawable, matrix.get());
 }
 
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawAnnotation
+  (KNativePointer ptr, KFloat left, KFloat top, KFloat right, KFloat bottom, KInteropPointer key, KNativePointer valuePtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((ptr));
+    SkData* value = reinterpret_cast<SkData*>((valuePtr));
+    canvas->drawAnnotation(SkRect::MakeLTRB(left, top, right, bottom), skString(key).c_str(), value);
+}
+
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nClear(KNativePointer ptr, KInt color) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((ptr));
     canvas->clear(color);

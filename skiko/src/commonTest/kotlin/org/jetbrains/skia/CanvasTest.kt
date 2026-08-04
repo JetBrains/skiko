@@ -16,6 +16,7 @@ import org.jetbrains.skiko.tests.TestGlContext
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -345,6 +346,44 @@ class CanvasTest {
             )
         )
     }
+
+
+    @Test
+    fun drawAnnotationIsRecordedIntoAPicture() {
+        val key = "skiko.test.annotation"
+        val value = "payload".encodeToByteArray()
+
+        val recorder = PictureRecorder()
+        recorder.beginRecording(Rect(0f, 0f, 8f, 8f))
+            .drawAnnotation(Rect(1f, 2f, 3f, 4f), key, Data.makeFromBytes(value))
+        val picture = recorder.finishRecordingAsPicture()
+
+        assertEquals(1, picture.approximateOpCount)
+
+        val serialized = picture.serializeToData().bytes
+        assertTrue(serialized.containsSequence(key.encodeToByteArray()), "the key did not reach the picture")
+        assertTrue(serialized.containsSequence(value), "the value did not reach the picture")
+    }
+
+    @Test
+    fun drawAnnotationDrawsNothing() {
+        val key = "skiko.test.annotation"
+        val white = IntArray(16) { Color.WHITE }
+
+        val surface = whiteSurface(4, 4)
+        surface.canvas.drawAnnotation(Rect(0f, 0f, 4f, 4f), key)
+        surface.assertPixelsMatch(white)
+
+        // An annotation recorded without a value is equally inert when the picture is played back.
+        val recorder = PictureRecorder()
+        recorder.beginRecording(Rect(0f, 0f, 4f, 4f)).drawAnnotation(Rect(0f, 0f, 4f, 4f), key)
+        surface.canvas.drawPicture(recorder.finishRecordingAsPicture())
+        surface.assertPixelsMatch(white)
+    }
+
+
+    private fun ByteArray.containsSequence(other: ByteArray): Boolean =
+        (0..size - other.size).any { start -> other.indices.all { this[start + it] == other[it] } }
 
 
     private fun whiteSurface(width: Int, height: Int): Surface {
