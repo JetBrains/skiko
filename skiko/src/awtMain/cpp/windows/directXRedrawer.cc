@@ -263,7 +263,12 @@ static LRESULT CALLBACK LiveResizeContentWndProc(HWND hWnd, UINT msg, WPARAM wPa
             p->cy = static_cast<int>(s->enforcedChildSize.cy);
         }
     }
-    return forwardToOriginal(s->originalContentProc, hWnd, msg, wParam, lParam);
+    const LRESULT result = forwardToOriginal(s->originalContentProc, hWnd, msg, wParam, lParam);
+    if (msg == WM_WINDOWPOSCHANGED && s->liveResizeEngaged) {
+        // AWT can leave a stale child region during live resize, causing visual artifacts.
+        SetWindowRgn(hWnd, nullptr, FALSE);
+    }
+    return result;
 }
 
 static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
