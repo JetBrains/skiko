@@ -19,7 +19,6 @@ import kotlin.math.min
  * When used to draw a filled area, Path describes whether the fill is inside or
  * outside the geometry. Path also describes the winding rule used to fill
  * overlapping contours.
- *
  */
 class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
     companion object {
@@ -909,6 +908,15 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             reachabilityBarrier(this)
             reachabilityBarrier(other)
         }
+    }
+
+    // TODO: Remove in CMP 1.14.
+    @Deprecated(
+        message = "updateBoundsCache() is obsolete and is now a no-op stub.",
+        level = DeprecationLevel.HIDDEN,
+    )
+    fun updateBoundsCache(): Path {
+        return this
     }
 
     /**
