@@ -15,59 +15,23 @@ static const DWORD kPumpTimeoutMs = 1000;
 
 extern "C"
 {
-    static void javaEventQueueInvokeLater(JNIEnv *env, jobject runnable)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WinApiEdtInvoker_preparePumping(
+        JNIEnv *env, jobject invoker)
     {
-        static jclass cls = nullptr;
-        static jmethodID mid = nullptr;
-        if (!mid)
-        {
-            jclass local = env->FindClass("java/awt/EventQueue");
-            cls = (jclass)env->NewGlobalRef(local);
-            env->DeleteLocalRef(local);
-            mid = env->GetStaticMethodID(cls, "invokeLater", "(Ljava/lang/Runnable;)V");
-        }
-        if (mid) env->CallStaticVoidMethod(cls, mid, runnable);
-        if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
+        return toJavaPointer(CreateEventW(nullptr, /*manualReset*/ FALSE, /*initialState*/ FALSE, nullptr));
     }
 
-    // A Java shim is unavoidable here: JNI cannot fabricate a java.lang.Runnable to post.
-    static jobject javaNewEdtInvocationTask(JNIEnv *env, jobject runnable, HANDLE doneEvent)
-    {
-        static jclass cls = nullptr;
-        static jmethodID ctor = nullptr;
-        if (!ctor)
-        {
-            jclass local = env->FindClass("org/jetbrains/skiko/redrawer/EdtInvocationTask");
-            cls = (jclass)env->NewGlobalRef(local);
-            env->DeleteLocalRef(local);
-            ctor = env->GetMethodID(cls, "<init>", "(Ljava/lang/Runnable;J)V");
-        }
-        jobject task = env->NewObject(cls, ctor, runnable, toJavaPointer(doneEvent));
-        if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
-        return task;
-    }
-
-    // The Win32 counterpart of the nested CFRunLoop macOS LWCToolkit.invokeAndWait spins. Which message classes it
-    // pumps is the whole design:
+    // The Win32 analog of the nested CFRunLoop in the macOS LWCToolkit.invokeAndWait.
     //
-    // POSTED as well as SENT, because EDT work makes synchronous cross-thread calls back to this thread that travel
-    // as posted messages — showing a window from a Compose recomposition posts focus/IME setup here and blocks the
-    // EDT on the reply. A sent-only pump starves those and the EDT deadlocks against us.
-    //
-    // But never input: we are nested inside the modal move/size loop, which owns the drag's input, and draining it
-    // stops the window following the cursor.
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WinApiEdtInvoker_invokeAndWaitWhilePumping(
-        JNIEnv *env, jobject invoker, jobject runnable)
+    // Handle SENT and POSTED messages until `doneEventPtr` is signalled to stop.
+    // The EDT can send POSTED messages (focus/IME) back here and wait for them.
+    // Do not handle input messages as they are handled by the parent event loop. Handling them here would, for example,
+    // stop the window following the cursor in a live-resize session.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WinApiEdtInvoker_pumpUntilDone(
+        JNIEnv *env, jobject invoker, jlong doneEventPtr)
     {
-        HANDLE doneEvent = CreateEventW(nullptr, /*manualReset*/ FALSE, /*initialState*/ FALSE, nullptr);
-        if (!doneEvent) return;
-
-        jobject task = javaNewEdtInvocationTask(env, runnable, doneEvent);
-        if (!task) { CloseHandle(doneEvent); return; }
-
-        tlsPumpingEdt = true; // before posting: the EDT may send a message back before we reach the loop
-        javaEventQueueInvokeLater(env, task);
-        env->DeleteLocalRef(task);
+        HANDLE doneEvent = fromJavaPointer<HANDLE>(doneEventPtr);
+        tlsPumpingEdt = true;
         bool completed = false;
         ULONGLONG deadline = GetTickCount64() + kPumpTimeoutMs;
         for (;;)
@@ -104,8 +68,8 @@ extern "C"
         if (completed) CloseHandle(doneEvent);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_EdtInvocationTask_signalDone(
-        JNIEnv *env, jobject task, jlong doneEvent)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WinApiEdtInvoker_signalDone(
+        JNIEnv *env, jobject invoker, jlong doneEvent)
     {
         HANDLE ev = fromJavaPointer<HANDLE>(doneEvent);
         if (ev) SetEvent(ev);

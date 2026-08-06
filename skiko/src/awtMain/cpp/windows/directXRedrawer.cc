@@ -136,17 +136,14 @@ private:
 
 // ===================== Direct3D synchronous live-resize =====================
 // Renders and presents the content synchronously inside WM_NCCALCSIZE, before the new geometry commits, so DWM never
-// composites a frame whose edges we haven't painted yet.
-//
-// Not SetWindowSubclass, which would chain more cleanly: it must be called from the thread that OWNS the window, and
-// we install from the EDT while the AWT frame HWND belongs to the toolkit thread. Cross-thread it just returns FALSE.
+// composites a frame we haven't painted yet.
 
 struct LiveResizeState {
     WNDPROC originalProc = nullptr;
     WNDPROC originalContentProc = nullptr;
     HWND frameHwnd = nullptr;
     HWND contentHwnd = nullptr;
-    jobject redrawer = nullptr;     // global ref
+    jobject redrawer = nullptr;
     SIZE lastFrameClientSize = {};
     SIZE enforcedChildSize = {};    // what the child is held at during a drag; see enforcedChildSizeForResizeStep
     bool inSizeMoveLoop = false;    // WM_ENTERSIZEMOVE..WM_EXITSIZEMOVE, which covers plain moves too
@@ -162,6 +159,8 @@ static LiveResizeState *liveResizeStateFor(HWND hWnd)
 }
 
 // Points hWnd at [ours] and returns the proc it replaced.
+// Not SetWindowSubclass, which would chain more cleanly: it must be called from the thread that OWNS the window,
+// and we install from the EDT while the AWT frame HWND belongs to the toolkit thread.
 static WNDPROC installWndProcHook(HWND hWnd, LiveResizeState *state, WNDPROC ours) {
     if (!hWnd) return nullptr;
     SetPropW(hWnd, kLiveResizeStateProp, (HANDLE)state);
