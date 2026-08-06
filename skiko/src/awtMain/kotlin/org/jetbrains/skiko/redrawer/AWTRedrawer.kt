@@ -83,31 +83,28 @@ internal abstract class AWTRedrawer(
         check(!isDisposed) { "${this.javaClass.simpleName} is disposed" }
     }
 
-    override fun onPlatformComponentResized() {
+    /**
+     * Invoked by [SkiaLayer] when the underlying Swing component is resized.
+     */
+    open fun onLayerComponentResized() {
         syncBoundsFromPlatformComponent()
-        if (supportsRenderingBeforeShown && !layer.isShowing && layer.isDisplayable && layer.width > 0 && layer.height > 0) {
-            // Render eagerly so the window already has content when it first appears on screen
+
+        if (!layer.isShowing && layer.isDisplayable && (layer.width > 0) && (layer.height > 0)) {
             renderBeforeShown()
-        } else {
-            needRender(throttledToVsync = false)
+            return
         }
+
+        needRender(throttledToVsync = false)
     }
 
     /**
-     * Whether this redrawer can render and present a frame while the layer is displayable but not yet
-     * showing (see [renderBeforeShown]). When `true`, [onPlatformComponentResized] renders eagerly so the
-     * window already has content on its first on-screen frame, avoiding a flash of the window background.
+     * Renders and presents a frame when the layer is already displayable but not yet showing.
+     * This is needed so we have a frame ready when the window is first shown, to prevent the window background
+     * flashing.
      */
-    protected open val supportsRenderingBeforeShown: Boolean get() = false
-
-    /**
-     * Renders and presents a frame while the layer is displayable but not showing.
-     *
-     * Only called when [supportsRenderingBeforeShown] is `true`. Implementations must present the frame in a
-     * way that the window's first on-screen composite reflects it rather than the background.
-     */
-    protected open fun renderBeforeShown() {
-        error("renderBeforeShown must be implemented if `supportsRenderingBeforeShown` is `true`")
+    protected open fun renderBeforeShown(): Boolean {
+        renderImmediately()
+        return true
     }
 
     override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)

@@ -9,7 +9,7 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Point
-import javax.swing.JFrame
+import javax.swing.JWindow
 import javax.swing.SwingUtilities
 
 /**
@@ -54,11 +54,13 @@ object FirstWindowShowFlashHelper {
                 }
             }
 
-            JFrame().apply {
+            // Use JWindow, not JFrame because the latter is shown with a fade-in animation on Windows,
+            // which breaks the color comparison in the test
+            JWindow().apply {
                 contentPane.add(layer, BorderLayout.CENTER)
                 location = WINDOW_LOCATION
                 size = WINDOW_SIZE
-                // Ensure our window lands above the parent's background window at these coordinates.
+                // Ensure our window is above the parent's background window
                 isAlwaysOnTop = true
                 isVisible = true
             }

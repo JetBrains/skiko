@@ -146,10 +146,7 @@ internal class MetalRedrawer(
         }
     }
 
-    override val supportsRenderingBeforeShown: Boolean
-        get() = true
-
-    override fun renderBeforeShown() {
+    override fun renderBeforeShown(): Boolean {
         checkDisposed()
         update()
         inDrawScope {
@@ -160,6 +157,7 @@ internal class MetalRedrawer(
         performNativeDrawAction {
             contextHandler.finishFrameSync()
         }
+        return true
     }
 
     private suspend fun draw() {
@@ -220,10 +218,10 @@ internal class MetalRedrawer(
         }
     }
 
-    override fun onPlatformComponentResized() {
+    override fun onLayerComponentResized() {
         // During live resize, the layer tells us its size directly; the AWT size is not in sync
         if (!isHandlingLiveResizeNow) {
-            super.onPlatformComponentResized()
+            super.onLayerComponentResized()
         }
     }
 

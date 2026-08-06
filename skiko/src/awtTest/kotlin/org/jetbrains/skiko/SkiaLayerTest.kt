@@ -1202,13 +1202,13 @@ class SkiaLayerTest {
     }
 
     @OptIn(ExperimentalAtomicApi::class)
-    @Test(timeout = 120000)
+    @Test(timeout = 240000)
     fun `no window flash on first show`() = uiTest {
-        // Until the issue is fixed in other redrawers
+        // Exclude known-bad pairs of OSes and graphics APIs.
         // Don't use assumeTrue, as uiTest iterates over multiple renderers,
         // and if one of them is skipped, the whole test is skipped
-        val fixedRenderApis = setOf(GraphicsApi.METAL/*, GraphicsApi.DIRECT3D*/)
-        if (renderApi !in fixedRenderApis) return@uiTest
+        val badRenderApis = setOf<Pair<OS, GraphicsApi>>()
+        if (Pair(hostOs, renderApi) in badRenderApis) return@uiTest
 
         val bgColor = Color.GREEN
         val fgColor = Color.BLACK
@@ -1220,7 +1220,7 @@ class SkiaLayerTest {
         // then screenshot the center pixel while the child shows, making sure it is always either black (the
         // child's content) or green (this background) - never a flash of some other color.
 
-        val backgroundWindow = JFrame().also {
+        val backgroundWindow = JFrame(renderApi.name).also {
             it.location = Point(200, 200)
             it.size = Dimension(1000, 1000)
             it.contentPane.background = bgColor
@@ -1228,6 +1228,7 @@ class SkiaLayerTest {
         backgroundWindow.isVisible = true
         backgroundWindow.waitUntilOpened()
         delay(200)
+        backgroundWindow.toFront()
 
         val pixelLocation = backgroundWindow.bounds.let {
             Point(it.x + it.width / 2, it.y + it.height / 2)

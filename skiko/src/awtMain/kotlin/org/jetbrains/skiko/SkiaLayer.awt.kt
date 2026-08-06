@@ -7,8 +7,8 @@ import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.fastForEach
+import org.jetbrains.skiko.redrawer.AWTRedrawer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
-import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.*
 import java.awt.Color
@@ -32,14 +32,16 @@ import kotlin.math.floor
 actual open class SkiaLayer internal constructor(
     accessibleContextProvider: ((Component) -> AccessibleContext)? = null,
     val properties: SkiaLayerProperties,
+    /** Must produce [AWTRedrawer]s */
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
     /**
-     * Whether this layer fills its entire host window. When true, platform-specific window-level
-     * optimizations may be used (e.g., on macOS, driving the interactive live-resize redraw from the
-     * window). Set to false when the layer is embedded as a Swing component somewhere in the window's
-     * hierarchy rather than covering the whole window, so those window-level paths are disabled.
+     * Whether this layer fills its entire host window.
+     *
+     * When true, platform-specific window-level optimizations may be used (e.g., on macOS, driving the interactive
+     * live-resize redraw from the window). Set to false when the layer is embedded as a Swing component somewhere in
+     * the window's hierarchy rather than covering the whole window, so those window-level paths are disabled.
      */
     internal val fillsWindow: Boolean = false,
 ) : JComponent(), Accessible {
@@ -124,7 +126,7 @@ actual open class SkiaLayer internal constructor(
                 @Suppress("DEPRECATION")
                 super.reshape(x, y, width, height)
 
-                redrawer?.onPlatformComponentResized()
+                redrawer?.onLayerComponentResized()
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -352,20 +354,20 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    private val redrawerManager = RedrawerManager<Redrawer>(
+    private val redrawerManager = RedrawerManager<AWTRedrawer>(
         defaultRenderApi = properties.renderApi,
         redrawerFactory = { renderApi, oldRedrawer ->
             oldRedrawer?.dispose()
             renderFactory.createRedrawer(this, renderApi, analytics, properties).also {
                 it.syncBoundsFromPlatformComponent()
-            }
+            } as AWTRedrawer
         },
         onRenderApiChanged = {
             notifyChange(PropertyKind.Renderer)
         }
     )
 
-    internal val redrawer: Redrawer? by redrawerManager::redrawer
+    internal val redrawer: AWTRedrawer? by redrawerManager::redrawer
 
     actual var renderApi: GraphicsApi by redrawerManager::renderApi
 
