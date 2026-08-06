@@ -8,6 +8,7 @@ import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.Direct3DContextHandler
+import java.awt.Dimension
 
 internal class Direct3DRedrawer(
     private val layer: SkiaLayer,
@@ -20,6 +21,18 @@ internal class Direct3DRedrawer(
 
     private var drawLock = Any()
     private var isSwapChainInitialized = false
+
+    /**
+     * Set for the duration of a resize gesture, to quiesce the async EDT renders so the synchronous native render is
+     * the only thing painting.
+     */
+    @Volatile
+    internal var isHandlingLiveResizeNow: Boolean = false
+
+    // Native LiveResizeState, 0 if the hook isn't installed.
+    private var liveResizeHandle: Long = 0L
+    private val liveResizeInstalled: Boolean
+        get() = liveResizeHandle != 0L
 
     private var device: Long = 0L
         get() {
@@ -42,10 +55,14 @@ internal class Direct3DRedrawer(
         onDeviceChosen(adapterName)
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
             .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
+
+        if (layer.fillsWindow && SkikoProperties.direct3DSynchronousLiveResize) {
+            liveResizeHandle = installLiveResizeHook(layer.windowHandle, layer.contentHandle)
+        }
     }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing) {
+        if (layer.isShowing && !isHandlingLiveResizeNow) {
             update()
             draw()
         }
@@ -56,6 +73,10 @@ internal class Direct3DRedrawer(
     }
 
     override fun dispose() = synchronized(drawLock) {
+        if (liveResizeInstalled) {
+            uninstallLiveResizeHook(liveResizeHandle)
+            liveResizeHandle = 0L
+        }
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device)
@@ -63,9 +84,21 @@ internal class Direct3DRedrawer(
         super.dispose()
     }
 
+    override fun onPlatformComponentResized() {
+        // During live resize, the layer tells us its size directly; the AWT size is not in sync
+        if (!isHandlingLiveResizeNow) {
+            super.onPlatformComponentResized()
+        }
+    }
+
     override fun needRender(throttledToVsync: Boolean) {
         checkDisposed()
-        frameDispatcher.scheduleFrame()
+        if (isHandlingLiveResizeNow) {
+            // An async EDT present would race the synchronous render on the toolkit thread.
+            postLiveResizeRender(liveResizeHandle)
+        } else {
+            frameDispatcher.scheduleFrame()
+        }
     }
 
     override fun renderImmediately() {
@@ -86,12 +119,17 @@ internal class Direct3DRedrawer(
         }
     }
 
-    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
-        if (isDisposed) {
-            return
+    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean, waitForComposition: Boolean = false) {
+        synchronized(drawLock) {
+            if (isDisposed) {
+                return
+            }
+            contextHandler.draw()
+            if (waitForComposition) {
+                waitForComposition()
+            }
+            swap(withVsync)
         }
-        contextHandler.draw()
-        swap(withVsync)
     }
 
     fun makeContext() = DirectContext(
@@ -106,7 +144,13 @@ internal class Direct3DRedrawer(
 
     fun changeSize(width: Int, height: Int): Boolean {
         return if (!isSwapChainInitialized) {
-            initSwapChain(device, width, height, layer.transparency)
+            initSwapChain(
+                device = device,
+                width = width,
+                height = height,
+                transparency = layer.transparency,
+                preferNoneScaling = liveResizeInstalled
+            )
             isSwapChainInitialized = true
             true
         } else {
@@ -126,7 +170,55 @@ internal class Direct3DRedrawer(
     fun initFence() = initFence(device)
 
     // Called from native code
+    @Suppress("unused")
     private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
+
+    /**
+     * Called from native code when a live-resize session starts.
+     */
+    @Suppress("unused")
+    private fun onLiveResizeStarted() {
+        isHandlingLiveResizeNow = true
+    }
+
+    /**
+     * Called from native code when the live-resize session ends.
+     */
+    @Suppress("unused")
+    private fun onLiveResizeEnded() {
+        WinApiEdtInvoker.invokeAndWaitWhilePumping {
+            if (isDisposed) return@invokeAndWaitWhilePumping
+            javax.swing.SwingUtilities.getWindowAncestor(layer)?.let {
+                it.invalidate()
+                it.validate()
+            }
+            isHandlingLiveResizeNow = false
+            renderImmediately()
+        }
+    }
+
+    /**
+     * Called from native code to draw a frame during live resize.
+     *
+     * [isResizeFrame] specifies whether this frame actually resizes the window (there could be non-resizing
+     * frames during a live resize).
+     */
+    @Suppress("unused")
+    private fun drawFrameWhileLiveResizing(width: Int, height: Int, isResizeFrame: Boolean) {
+        WinApiEdtInvoker.invokeAndWaitWhilePumping {
+            if (isDisposed) return@invokeAndWaitWhilePumping
+            val size = Dimension(width, height)
+            update(forcedSize = size)
+            inDrawScope(forcedSize = size) {
+                if (!isDisposed) {
+                    drawAndSwap(
+                        withVsync = !isResizeFrame,
+                        waitForComposition = isResizeFrame
+                    )
+                }
+            }
+        }
+    }
 
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXDevice(adapter: Long, contentHandle: Long, transparency: Boolean): Long
@@ -136,8 +228,13 @@ internal class Direct3DRedrawer(
     private external fun swap(device: Long, isVsyncEnabled: Boolean)
     private external fun disposeDevice(device: Long)
     private external fun getBufferIndex(device: Long): Int
-    private external fun initSwapChain(device: Long, width: Int, height: Int, transparency: Boolean)
+    private external fun initSwapChain(device: Long, width: Int, height: Int, transparency: Boolean, preferNoneScaling: Boolean)
     private external fun initFence(device: Long)
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long
+
+    private external fun installLiveResizeHook(window: Long, content: Long): Long
+    private external fun uninstallLiveResizeHook(handle: Long)
+    private external fun postLiveResizeRender(handle: Long)
+    private external fun waitForComposition()
 }

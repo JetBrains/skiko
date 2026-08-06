@@ -1,10 +1,12 @@
 #ifdef SK_DIRECT3D
 #include <locale>
+#include <algorithm>
 #include <Windows.h>
 #include <jawt_md.h>
 #include "jni_helpers.h"
 #include "exceptions_handler.h"
 #include "window_util.h"
+#include "winApiEdtInvoker.h"
 
 #include "SkColorSpace.h"
 #include "ganesh/GrBackendSurface.h"
@@ -22,6 +24,9 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>
+
+// Set in JNI_OnLoad (jvmMain/cpp/common/impl/Library.cc).
+extern "C" JavaVM *jvm;
 
 const int BuffersCount = 2;
 
@@ -58,13 +63,16 @@ public:
         device.reset(nullptr);
     }
 
-    void initSwapChain(UINT width, UINT height, jboolean transparency) {
+    void initSwapChain(UINT width, UINT height, jboolean transparency, jboolean preferNoneScaling) {
         gr_cp<IDXGIFactory4> swapChainFactory4;
         gr_cp<IDXGISwapChain1> swapChain1;
         CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
         HRESULT result = S_OK;
+        // NONE is safe only behind the live-resize pre-render, which fills the content at every new size. Otherwise
+        // it would expose a hard uncovered edge on any size change (maximize/snap/DPI/async).
+        DXGI_SCALING scaling = preferNoneScaling ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
         if (transparency) {
-            result = CreateSwapChainForComposition(swapChainFactory4.get(), width, height, &swapChain1);
+            result = CreateSwapChainForComposition(swapChainFactory4.get(), width, height, scaling, &swapChain1);
         }
         if (!transparency || FAILED(result)) {
             /*
@@ -72,7 +80,7 @@ public:
              * In this case transparency won't be supported.
              */
             swapChain1.reset(nullptr);
-            CreateSwapChainForHwnd(swapChainFactory4.get(), width, height, &swapChain1);
+            CreateSwapChainForHwnd(swapChainFactory4.get(), width, height, scaling, &swapChain1);
         }
         swapChainFactory4->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
         swapChain1->QueryInterface(IID_PPV_ARGS(&swapChain));
@@ -80,7 +88,7 @@ public:
     }
 
 private:
-    HRESULT CreateSwapChainForComposition(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, IDXGISwapChain1 **swapChain1) {
+    HRESULT CreateSwapChainForComposition(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, DXGI_SCALING scaling, IDXGISwapChain1 **swapChain1) {
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = width;
         swapChainDesc.Height = height;
@@ -89,7 +97,7 @@ private:
         swapChainDesc.SampleDesc.Quality = 0;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.BufferCount = BuffersCount;
-        swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+        swapChainDesc.Scaling = scaling;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_PREMULTIPLIED;
         HRESULT result = swapChainFactory4->CreateSwapChainForComposition(queue.get(), &swapChainDesc, nullptr, swapChain1);
@@ -111,7 +119,7 @@ private:
         return S_OK;
     }
 
-    HRESULT CreateSwapChainForHwnd(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, IDXGISwapChain1 **swapChain1) {
+    HRESULT CreateSwapChainForHwnd(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, DXGI_SCALING scaling, IDXGISwapChain1 **swapChain1) {
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = width;
         swapChainDesc.Height = height;
@@ -120,11 +128,221 @@ private:
         swapChainDesc.SampleDesc.Quality = 0;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.BufferCount = BuffersCount;
-        swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+        swapChainDesc.Scaling = scaling;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         return swapChainFactory4->CreateSwapChainForHwnd(queue.get(), hWnd, &swapChainDesc, nullptr, nullptr, swapChain1);
     }
 };
+
+// ===================== Direct3D synchronous live-resize =====================
+// Renders and presents the content synchronously inside WM_NCCALCSIZE, before the new geometry commits, so DWM never
+// composites a frame we haven't painted yet.
+
+struct LiveResizeState {
+    WNDPROC originalProc = nullptr;
+    WNDPROC originalContentProc = nullptr;
+    HWND frameHwnd = nullptr;
+    HWND contentHwnd = nullptr;
+    jobject redrawer = nullptr;
+    SIZE lastFrameClientSize = {};
+    SIZE enforcedChildSize = {};    // what the child is held at during a drag; see enforcedChildSizeForResizeStep
+    bool inSizeMoveLoop = false;    // WM_ENTERSIZEMOVE..WM_EXITSIZEMOVE, which covers plain moves too
+    bool liveResizeEngaged = false; // ...whereas this means an actual resize
+    bool detached = false;          // uninstalled, but a proc we couldn't remove still needs us to forward; see below
+};
+
+static const wchar_t *kLiveResizeStateProp = L"SkikoLiveResizeState";
+
+static LiveResizeState *liveResizeStateFor(HWND hWnd)
+{
+    return reinterpret_cast<LiveResizeState *>(GetPropW(hWnd, kLiveResizeStateProp));
+}
+
+// Points hWnd at [ours] and returns the proc it replaced.
+// Not SetWindowSubclass, which would chain more cleanly: it must be called from the thread that OWNS the window,
+// and we install from the EDT while the AWT frame HWND belongs to the toolkit thread.
+static WNDPROC installWndProcHook(HWND hWnd, LiveResizeState *state, WNDPROC ours) {
+    if (!hWnd) return nullptr;
+    SetPropW(hWnd, kLiveResizeStateProp, (HANDLE)state);
+    const WNDPROC original = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
+    SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)ours);
+    return original;
+}
+
+// Undoes installWndProcHook. Returns whether successful.
+static bool uninstallWndProcHook(HWND hWnd, WNDPROC ours, WNDPROC original) {
+    if (!hWnd || !IsWindow(hWnd)) return true;
+    if ((WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC) != ours) {
+        return false;
+    }
+    SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)original);
+    RemovePropW(hWnd, kLiveResizeStateProp);
+    return true;
+}
+
+// Hands a message on to the proc we replaced. A null [original] means we couldn't find our state at all, so there's
+// nothing left to hand it to and DefWindowProc is the best available - see the procs below.
+static LRESULT forwardToOriginal(WNDPROC original, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    return original ? CallWindowProcW(original, hWnd, msg, wParam, lParam)
+                    : DefWindowProcW(hWnd, msg, wParam, lParam);
+}
+
+static JNIEnv *getJniEnv() {
+    if (!jvm) return nullptr;
+    JNIEnv *env = nullptr;
+    if (jvm->GetEnv((void **)&env, JNI_VERSION_1_6) == JNI_EDETACHED)
+        jvm->AttachCurrentThread((void **)&env, nullptr);
+    return env;
+}
+
+static void javaOnLiveResizeStarted(LiveResizeState *s) {
+    if (!s->redrawer) return;
+    JNIEnv *env = getJniEnv();
+    if (!env) return;
+    static jmethodID mid = nullptr;
+    if (!mid) {
+        jclass cls = env->GetObjectClass(s->redrawer);
+        mid = env->GetMethodID(cls, "onLiveResizeStarted", "()V");
+        env->DeleteLocalRef(cls);
+    }
+    if (mid) env->CallVoidMethod(s->redrawer, mid);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
+}
+
+static void javaOnLiveResizeEnded(LiveResizeState *s) {
+    if (!s->redrawer) return;
+    JNIEnv *env = getJniEnv();
+    if (!env) return;
+    static jmethodID mid = nullptr;
+    if (!mid) {
+        jclass cls = env->GetObjectClass(s->redrawer);
+        mid = env->GetMethodID(cls, "onLiveResizeEnded", "()V");
+        env->DeleteLocalRef(cls);
+    }
+    if (mid) env->CallVoidMethod(s->redrawer, mid);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
+}
+
+static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool isResizeFrame) {
+    if (!s->redrawer) return;
+    JNIEnv *env = getJniEnv();
+    if (!env) return;
+    static jmethodID mid = nullptr;
+    if (!mid) {
+        jclass cls = env->GetObjectClass(s->redrawer);
+        mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(IIZ)V");
+        env->DeleteLocalRef(cls);
+    }
+    if (mid) env->CallVoidMethod(s->redrawer, mid, (jint)s->lastFrameClientSize.cx, (jint)s->lastFrameClientSize.cy, (jboolean)isResizeFrame);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
+}
+
+// Keep the child at the maximum size at each resize step to avoid a lagging (when growing)
+// or an early (when shrinking) part of the pipeline from drawing or clipping at a too-small size.
+static SIZE enforcedChildSizeForResizeStep(SIZE pending, SIZE committed) {
+    return { std::max(pending.cx, committed.cx), std::max(pending.cy, committed.cy) };
+}
+
+static void applyEnforcedChildSize(LiveResizeState *s) {
+    if (!s->contentHwnd) return;
+    SetWindowPos(s->contentHwnd, nullptr, 0, 0, s->enforcedChildSize.cx, s->enforcedChildSize.cy,
+                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+}
+
+// DXGI clips the presented buffer to the child, so the child's size AT THE PRESENT bounds what reaches the screen.
+// This prevents the wrong size from being applied to the child during live resize.
+static LRESULT CALLBACK LiveResizeContentWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    LiveResizeState *s = liveResizeStateFor(hWnd);
+    if (!s || s->detached) return forwardToOriginal(s ? s->originalContentProc : nullptr, hWnd, msg, wParam, lParam);
+    if (msg == WM_WINDOWPOSCHANGING && s->liveResizeEngaged) {
+        WINDOWPOS *p = (WINDOWPOS *)lParam;
+        if (!(p->flags & SWP_NOSIZE))
+        {
+            p->cx = static_cast<int>(s->enforcedChildSize.cx);
+            p->cy = static_cast<int>(s->enforcedChildSize.cy);
+        }
+    }
+    const LRESULT result = forwardToOriginal(s->originalContentProc, hWnd, msg, wParam, lParam);
+    if (msg == WM_WINDOWPOSCHANGED && s->liveResizeEngaged) {
+        // AWT can leave a stale child region during live resize, causing visual artifacts.
+        SetWindowRgn(hWnd, nullptr, FALSE);
+    }
+    return result;
+}
+
+static LRESULT CALLBACK LiveResizeWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    LiveResizeState *s = liveResizeStateFor(hWnd);
+    if (!s || s->detached) return forwardToOriginal(s ? s->originalProc : nullptr, hWnd, msg, wParam, lParam);
+    switch (msg)
+    {
+        case WM_ERASEBKGND:
+            if (s->inSizeMoveLoop) return 1;
+            break;
+        case WM_ENTERSIZEMOVE: {
+            s->inSizeMoveLoop = true;
+            s->liveResizeEngaged = false;
+            RECT rc; GetClientRect(hWnd, &rc);
+            const SIZE clientSize = { rc.right - rc.left, rc.bottom - rc.top };
+            s->enforcedChildSize = enforcedChildSizeForResizeStep(clientSize, clientSize);
+            s->lastFrameClientSize = clientSize;
+            break;
+        }
+        case WM_NCCALCSIZE: {
+            LRESULT r = forwardToOriginal(s->originalProc, hWnd, msg, wParam, lParam);
+            // isPumpingEdt(): our own render re-enters here, because the EDT's SetWindowPos is SENT back to this
+            // thread. Starting a second round-trip would deadlock against the EDT already blocked in SendMessage.
+            if (s->inSizeMoveLoop && wParam && !isPumpingEdt())
+            {
+                if (!s->liveResizeEngaged)
+                {
+                    s->liveResizeEngaged = true;
+                    javaOnLiveResizeStarted(s); // must quiesce the async EDT renders before the first render here
+                }
+                NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *)lParam;
+                RECT c = p->rgrc[0];
+                RECT committed; GetClientRect(hWnd, &committed);
+                const SIZE pendingSize = { c.right - c.left, c.bottom - c.top };
+                s->enforcedChildSize = enforcedChildSizeForResizeStep(
+                    pendingSize, 
+                    { committed.right - committed.left, committed.bottom - committed.top }
+                );
+                s->lastFrameClientSize = pendingSize;
+                applyEnforcedChildSize(s);
+                javaDrawFrameWhileLiveResizing(s, /*isResizeFrame*/ true);
+            }
+            return r;
+        }
+        case WM_PAINT:
+            // Drives frames while the drag is paused and no WM_NCCALCSIZE fires. It has to be WM_PAINT: a
+            // self-reposting POSTED message outranks the modal loop's queued input and locks the drag up, and
+            // peek-and-yield is no alternative because that loop's input is invisible to PeekMessage from in here
+            // (both tried). Only WM_PAINT sits below input and so cannot starve the drag. needRender re-arms it by
+            // invalidating the frame.
+            if (s->inSizeMoveLoop && s->liveResizeEngaged && !isPumpingEdt()) {
+                ValidateRect(hWnd, nullptr); // before rendering, so the re-arm below isn't cleared
+                // A hold is where Swing's async doLayout lands, so the size has to be re-asserted here too.
+                applyEnforcedChildSize(s);
+                javaDrawFrameWhileLiveResizing(s, /*isResizeFrame*/ false);
+                return 0;
+            }
+            break;
+        case WM_EXITSIZEMOVE:
+            s->inSizeMoveLoop = false;
+            if (s->liveResizeEngaged) {
+                s->liveResizeEngaged = false;
+                // Ensure the client size is correct when exiting live resize mode
+                if (s->contentHwnd) {
+                    RECT rc; GetClientRect(hWnd, &rc);
+                    SetWindowPos(s->contentHwnd, nullptr, 0, 0, rc.right - rc.left, rc.bottom - rc.top,
+                                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+                }
+                javaOnLiveResizeEnded(s);
+            }
+            break;
+    }
+    return forwardToOriginal(s->originalProc, hWnd, msg, wParam, lParam);
+}
+// ===================== end Direct3D synchronous live-resize =====================
 
 extern "C"
 {
@@ -363,12 +581,12 @@ extern "C"
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initSwapChain(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height, jboolean transparency)
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height, jboolean transparency, jboolean preferNoneScaling)
     {
         __try
         {
             DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-            d3dDevice->initSwapChain((UINT) width, (UINT) height, transparency);
+            d3dDevice->initSwapChain((UINT) width, (UINT) height, transparency, preferNoneScaling);
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {
             auto code = GetExceptionCode();
@@ -430,6 +648,23 @@ extern "C"
                                  kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), surfaceProps.get())
                                  .release();
         return toJavaPointer(result);
+    }
+
+    // From the present until the geometry commits, the buffer is the new size and the window still the old one, and
+    // DWM must not sample in there. Waiting opens that window at the start of a composition interval, and caps a
+    // high-rate mouse at one step per composition.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_waitForComposition(
+        JNIEnv *env, jobject redrawer)
+    {
+        DwmFlush();
+    }
+
+    // Arms the WM_PAINT hold path. Repeated calls coalesce into one update region, so no explicit gate is needed.
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_postLiveResizeRender(
+        JNIEnv *env, jobject redrawer, jlong handle)
+    {
+        LiveResizeState *s = fromJavaPointer<LiveResizeState *>(handle);
+        if (s && s->frameHwnd) InvalidateRect(s->frameHwnd, nullptr, FALSE);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeBuffers(
@@ -518,6 +753,43 @@ extern "C"
         adapter->GetDesc1(&desc);
         __int64 result = desc.DedicatedVideoMemory;
         return (jlong)result;
+    }
+
+    // Returns the state as an opaque handle (0 on failure) for the two calls below.
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_installLiveResizeHook(
+        JNIEnv *env, jobject redrawer, jlong windowPtr, jlong contentPtr)
+    {
+        HWND top = GetAncestor(fromJavaPointer<HWND>(windowPtr), GA_ROOT);
+        if (!top) return 0;
+        if (liveResizeStateFor(top)) return 0; // a second install would capture our own proc and recurse forever
+
+        LiveResizeState *state = new LiveResizeState();
+        state->frameHwnd = top;
+        state->contentHwnd = fromJavaPointer<HWND>(contentPtr);
+        state->redrawer = env->NewGlobalRef(redrawer);
+        state->originalProc = installWndProcHook(top, state, LiveResizeWndProc);
+        state->originalContentProc = installWndProcHook(state->contentHwnd, state, LiveResizeContentWndProc);
+        return toJavaPointer(state);
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_uninstallLiveResizeHook(
+        JNIEnv *env, jobject redrawer, jlong handle)
+    {
+        LiveResizeState *state = fromJavaPointer<LiveResizeState *>(handle);
+        if (!state) return;
+        const bool frameUnhooked = uninstallWndProcHook(state->frameHwnd, LiveResizeWndProc, state->originalProc);
+        const bool contentUnhooked =
+            uninstallWndProcHook(state->contentHwnd, LiveResizeContentWndProc, state->originalContentProc);
+        // A proc we couldn't unlink is still in the window's chain, so the state has to outlive us for it to forward
+        // through. So instead of deleting the state, we mark it as detached. It leaks the state object, but it's
+        // better than the alternative
+        state->detached = !frameUnhooked || !contentUnhooked;
+        if (state->redrawer) env->DeleteGlobalRef(state->redrawer);
+        state->redrawer = nullptr;
+        if (!state->detached)
+        {
+            delete state;
+        }
     }
 }
 

@@ -20,9 +20,8 @@
 
 #include "common/interop.hh"
 
-// Defined later in this file; forward-declared so AWTMetalLayer (below) can use them.
-static JNIEnv *resolveJNIEnvForCurrentThread();
-static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject redrawer);
+// Defined later in this file; forward-declared so AWTMetalLayer (below) can use it.
+static void javaDrawFrameWhileLiveResizing(jobject redrawer, jint width, jint height);
 
 @implementation AWTMetalLayer
 
@@ -64,9 +63,7 @@ static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject redr
 
     self.drawableSize = pixelSize;
 
-    JNIEnv *env = resolveJNIEnvForCurrentThread();
-    jmethodID drawFrameWhileLiveResizing = getDrawFrameWhileLiveResizingMethodID(env, self.javaRef);
-    env->CallVoidMethod(self.javaRef, drawFrameWhileLiveResizing, (jint)pixelSize.width, (jint)pixelSize.height);
+    javaDrawFrameWhileLiveResizing(self.javaRef, (jint)pixelSize.width, (jint)pixelSize.height);
 }
 
 @end
@@ -140,40 +137,60 @@ static JNIEnv *resolveJNIEnvForCurrentThread() {
     return env;
 }
 
-static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawer) {
-    static jmethodID onOcclusionStateChanged = NULL;
-    if (onOcclusionStateChanged == NULL) {
-        jclass redrawerClass = env->GetObjectClass(redrawer);
-        onOcclusionStateChanged = env->GetMethodID(redrawerClass, "onOcclusionStateChanged", "(Z)V");
+// One native calling function per MetalRedrawer method invoked from native. Each resolves the current thread's
+// JNIEnv itself, no-ops if the redrawer ref is missing, caches its jmethodID in a local static on first use, calls
+// the method, and clears any pending exception. Mirrors the javaXxx invokers in directXRedrawer.cc. All are called
+// on the AppKit main thread (observer / setBounds / main-queue callbacks).
+static void javaOnOcclusionStateChanged(jobject redrawer, jboolean isOccluded) {
+    if (redrawer == NULL) return;
+    JNIEnv *env = resolveJNIEnvForCurrentThread();
+    static jmethodID mid = NULL;
+    if (mid == NULL) {
+        jclass cls = env->GetObjectClass(redrawer);
+        mid = env->GetMethodID(cls, "onOcclusionStateChanged", "(Z)V");
+        env->DeleteLocalRef(cls);
     }
-    return onOcclusionStateChanged;
+    if (mid) env->CallVoidMethod(redrawer, mid, isOccluded);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-static jmethodID getOnLiveResizeStartedMethodID(JNIEnv *env, jobject redrawer) {
-    static jmethodID onLiveResizeStarted = NULL;
-    if (onLiveResizeStarted == NULL) {
-        jclass redrawerClass = env->GetObjectClass(redrawer);
-        onLiveResizeStarted = env->GetMethodID(redrawerClass, "onLiveResizeStarted", "()V");
+static void javaOnLiveResizeStarted(jobject redrawer) {
+    if (redrawer == NULL) return;
+    JNIEnv *env = resolveJNIEnvForCurrentThread();
+    static jmethodID mid = NULL;
+    if (mid == NULL) {
+        jclass cls = env->GetObjectClass(redrawer);
+        mid = env->GetMethodID(cls, "onLiveResizeStarted", "()V");
+        env->DeleteLocalRef(cls);
     }
-    return onLiveResizeStarted;
+    if (mid) env->CallVoidMethod(redrawer, mid);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-static jmethodID getOnLiveResizeEndedMethodID(JNIEnv *env, jobject redrawer) {
-    static jmethodID onLiveResizeEnded = NULL;
-    if (onLiveResizeEnded == NULL) {
-        jclass redrawerClass = env->GetObjectClass(redrawer);
-        onLiveResizeEnded = env->GetMethodID(redrawerClass, "onLiveResizeEnded", "()V");
+static void javaOnLiveResizeEnded(jobject redrawer) {
+    if (redrawer == NULL) return;
+    JNIEnv *env = resolveJNIEnvForCurrentThread();
+    static jmethodID mid = NULL;
+    if (mid == NULL) {
+        jclass cls = env->GetObjectClass(redrawer);
+        mid = env->GetMethodID(cls, "onLiveResizeEnded", "()V");
+        env->DeleteLocalRef(cls);
     }
-    return onLiveResizeEnded;
+    if (mid) env->CallVoidMethod(redrawer, mid);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-static jmethodID getDrawFrameWhileLiveResizingMethodID(JNIEnv *env, jobject redrawer) {
-    static jmethodID drawFrameWhileLiveResizing = NULL;
-    if (drawFrameWhileLiveResizing == NULL) {
-        jclass redrawerClass = env->GetObjectClass(redrawer);
-        drawFrameWhileLiveResizing = env->GetMethodID(redrawerClass, "drawFrameWhileLiveResizing", "(II)V");
+static void javaDrawFrameWhileLiveResizing(jobject redrawer, jint width, jint height) {
+    if (redrawer == NULL) return;
+    JNIEnv *env = resolveJNIEnvForCurrentThread();
+    static jmethodID mid = NULL;
+    if (mid == NULL) {
+        jclass cls = env->GetObjectClass(redrawer);
+        mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(II)V");
+        env->DeleteLocalRef(cls);
     }
-    return drawFrameWhileLiveResizing;
+    if (mid) env->CallVoidMethod(redrawer, mid, width, height);
+    if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
 extern "C"
@@ -222,15 +239,13 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         device.inflightSemaphore = dispatch_semaphore_create(device.layer.maximumDrawableCount);
 
         NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
-        jmethodID onOcclusionStateChanged = getOnOcclusionStateChangedMethodID(env, redrawer);
         device.occlusionObserver =
             [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidChangeOcclusionStateNotification
                                                               object:window
                                                                queue:[NSOperationQueue mainQueue]
                                                           usingBlock:^(NSNotification * _Nonnull note) {
                 BOOL isOccluded = ([window occlusionState] & NSWindowOcclusionStateVisible) == 0;
-                JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-                jniEnv->CallObjectMethod(layer.javaRef, onOcclusionStateChanged, isOccluded);
+                javaOnOcclusionStateChanged(layer.javaRef, isOccluded);
             }];
 
         /// Track interactive live-resize state. These fire on the AppKit main thread. weakDevice avoids
@@ -258,9 +273,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     strongDevice.inLiveResize = YES;
                     strongDevice.layer.presentsWithTransaction = YES;
                     strongDevice.layer.liveResizing = YES;
-                    JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-                    jmethodID onLiveResizeStarted = getOnLiveResizeStartedMethodID(jniEnv, strongDevice.layer.javaRef);
-                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, onLiveResizeStarted);
+                    javaOnLiveResizeStarted(strongDevice.layer.javaRef);
                 }];
             device.liveResizeEndObserver =
                 [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidEndLiveResizeNotification
@@ -276,9 +289,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     strongDevice.layer.liveResizing = NO;
                     strongDevice.layer.presentsWithTransaction = NO;
                     strongDevice.inLiveResize = NO;
-                    JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-                    jmethodID onLiveResizeEnded = getOnLiveResizeEndedMethodID(jniEnv, strongDevice.layer.javaRef);
-                    jniEnv->CallVoidMethod(strongDevice.layer.javaRef, onLiveResizeEnded);
+                    javaOnLiveResizeEnded(strongDevice.layer.javaRef);
                 }];
         }
 
@@ -317,9 +328,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_scheduleF
         if (pixelWidth <= 0 || pixelHeight <= 0) {
             return;
         }
-        JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-        jmethodID drawFrameWhileLiveResizing = getDrawFrameWhileLiveResizingMethodID(jniEnv, javaRef);
-        jniEnv->CallVoidMethod(javaRef, drawFrameWhileLiveResizing, (jint)pixelWidth, (jint)pixelHeight);
+        javaDrawFrameWhileLiveResizing(javaRef, (jint)pixelWidth, (jint)pixelHeight);
     });
 }
 
