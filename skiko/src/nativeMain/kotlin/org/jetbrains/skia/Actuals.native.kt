@@ -5,6 +5,7 @@ import kotlinx.cinterop.CPointer
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.withResult
+import org.jetbrains.skiko.ExperimentalSkikoApi
 
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
@@ -45,6 +46,7 @@ internal actual fun compilePattern(regex: String): Pattern = Pattern(regex)
 
 actual typealias ExternalSymbolName = kotlin.native.SymbolName
 
+@OptIn(ExperimentalSkikoApi::class)
 internal actual fun nMakeVulkanImpl(
     instancePtr: NativePointer,
     physicalDevicePtr: NativePointer,

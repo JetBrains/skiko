@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skiko.ExperimentalSkikoApi
 
 internal expect fun <R> commonSynchronized(lock: Any, block: () -> R)
 
@@ -23,6 +24,7 @@ internal expect fun compilePattern(regex: String): Pattern
 @OptionalExpectation
 expect annotation class ExternalSymbolName(val name: String)
 
+@OptIn(ExperimentalSkikoApi::class)
 internal expect fun nMakeVulkanImpl(
     instancePtr: NativePointer,
     physicalDevicePtr: NativePointer,

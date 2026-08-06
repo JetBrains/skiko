@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
+import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.loadOpenGLLibrary
 
@@ -51,8 +52,9 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          * @param deviceProcAddr pointer to vkGetDeviceProcAddr; must not be null
          * @param apiVersion Vulkan API version
          * @param memoryAllocator custom allocator for Vulkan device memory, or null to use
-         *                        the built-in per-allocation allocator
+         *                        Skia's built-in allocator
          */
+        @ExperimentalSkikoApi
         fun makeVulkan(
             instancePtr: NativePointer,
             physicalDevicePtr: NativePointer,

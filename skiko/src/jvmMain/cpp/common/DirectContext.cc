@@ -56,143 +56,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 #include "include/gpu/vk/VulkanBackendContext.h"
 #include "include/gpu/vk/VulkanExtensions.h"
 #include "include/gpu/vk/VulkanMemoryAllocator.h"
-
-// simple built-in per-allocation allocator
-// this is always expected to be functional
-class SimpleVkAllocator : public skgpu::VulkanMemoryAllocator {
-public:
-    struct Alloc {
-        VkDeviceMemory memory;
-        VkDeviceSize   size;
-        uint32_t       flags; // skgpu::VulkanAlloc flag bits
-    };
-
-    SimpleVkAllocator(VkPhysicalDevice physDev, VkDevice device, VkInstance instance,
-                       const skgpu::VulkanGetProc& getProc)
-        : fPhysDev(physDev), fDevice(device) {
-        fGetMemProps = (PFN_vkGetPhysicalDeviceMemoryProperties)
-            getProc("vkGetPhysicalDeviceMemoryProperties", instance, VK_NULL_HANDLE);
-        fAllocMem   = (PFN_vkAllocateMemory)               getProc("vkAllocateMemory",               VK_NULL_HANDLE, device);
-        fFreeMem    = (PFN_vkFreeMemory)                   getProc("vkFreeMemory",                   VK_NULL_HANDLE, device);
-        fMapMem     = (PFN_vkMapMemory)                    getProc("vkMapMemory",                    VK_NULL_HANDLE, device);
-        fUnmapMem   = (PFN_vkUnmapMemory)                  getProc("vkUnmapMemory",                  VK_NULL_HANDLE, device);
-        fFlush      = (PFN_vkFlushMappedMemoryRanges)      getProc("vkFlushMappedMemoryRanges",      VK_NULL_HANDLE, device);
-        fInvalidate = (PFN_vkInvalidateMappedMemoryRanges) getProc("vkInvalidateMappedMemoryRanges", VK_NULL_HANDLE, device);
-        fGetImgReqs = (PFN_vkGetImageMemoryRequirements)   getProc("vkGetImageMemoryRequirements",   VK_NULL_HANDLE, device);
-        fGetBufReqs = (PFN_vkGetBufferMemoryRequirements)  getProc("vkGetBufferMemoryRequirements",  VK_NULL_HANDLE, device);
-    }
-
-    VkResult allocateImageMemory(VkImage image, uint32_t /*propFlags*/,
-                                   skgpu::VulkanBackendMemory* out) override {
-        VkMemoryRequirements reqs;
-        fGetImgReqs(fDevice, image, &reqs);
-        return doAlloc(reqs, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, out);
-    }
-
-    VkResult allocateBufferMemory(VkBuffer buffer, BufferUsage usage, uint32_t /*propFlags*/,
-                                    skgpu::VulkanBackendMemory* out) override {
-        VkMemoryRequirements reqs;
-        fGetBufReqs(fDevice, buffer, &reqs);
-        return doAlloc(reqs, bufferProps(usage), out);
-    }
-
-    void getAllocInfo(const skgpu::VulkanBackendMemory& mem, skgpu::VulkanAlloc* out) const override {
-        const Alloc* a = reinterpret_cast<const Alloc*>(mem);
-        out->fMemory        = a->memory;
-        out->fOffset        = 0;
-        out->fSize          = a->size;
-        out->fFlags         = a->flags;
-        out->fBackendMemory = mem;
-    }
-
-    VkResult mapMemory(const skgpu::VulkanBackendMemory& mem, void** data) override {
-        return fMapMem(fDevice, reinterpret_cast<const Alloc*>(mem)->memory, 0, VK_WHOLE_SIZE, 0, data);
-    }
-    void unmapMemory(const skgpu::VulkanBackendMemory& mem) override {
-        fUnmapMem(fDevice, reinterpret_cast<const Alloc*>(mem)->memory);
-    }
-    VkResult flushMemory(const skgpu::VulkanBackendMemory& mem, VkDeviceSize off, VkDeviceSize sz) override {
-        VkMappedMemoryRange r = {};
-        r.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-        r.memory = reinterpret_cast<const Alloc*>(mem)->memory;
-        r.offset = off; r.size = sz;
-        return fFlush(fDevice, 1, &r);
-    }
-    VkResult invalidateMemory(const skgpu::VulkanBackendMemory& mem, VkDeviceSize off, VkDeviceSize sz) override {
-        VkMappedMemoryRange r = {};
-        r.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-        r.memory = reinterpret_cast<const Alloc*>(mem)->memory;
-        r.offset = off; r.size = sz;
-        return fInvalidate(fDevice, 1, &r);
-    }
-    void freeMemory(const skgpu::VulkanBackendMemory& mem) override {
-        const Alloc* a = reinterpret_cast<const Alloc*>(mem);
-        fFreeMem(fDevice, a->memory, nullptr);
-        delete a;
-    }
-    std::pair<uint64_t, uint64_t> totalAllocatedAndUsedMemory() const override { return {0, 0}; }
-
-private:
-    VkPhysicalDevice fPhysDev;
-    VkDevice         fDevice;
-    PFN_vkGetPhysicalDeviceMemoryProperties  fGetMemProps = nullptr;
-    PFN_vkAllocateMemory                     fAllocMem    = nullptr;
-    PFN_vkFreeMemory                         fFreeMem     = nullptr;
-    PFN_vkMapMemory                          fMapMem      = nullptr;
-    PFN_vkUnmapMemory                        fUnmapMem    = nullptr;
-    PFN_vkFlushMappedMemoryRanges            fFlush       = nullptr;
-    PFN_vkInvalidateMappedMemoryRanges       fInvalidate  = nullptr;
-    PFN_vkGetImageMemoryRequirements         fGetImgReqs  = nullptr;
-    PFN_vkGetBufferMemoryRequirements        fGetBufReqs  = nullptr;
-
-    uint32_t findMemType(uint32_t bits, VkMemoryPropertyFlags required) const {
-        VkPhysicalDeviceMemoryProperties mp = {};
-        fGetMemProps(fPhysDev, &mp);
-        for (uint32_t i = 0; i < mp.memoryTypeCount; i++) {
-            if ((bits & (1u << i)) && (mp.memoryTypes[i].propertyFlags & required) == required)
-                return i;
-        }
-        return ~0u;
-    }
-
-    static VkMemoryPropertyFlags bufferProps(BufferUsage u) {
-        switch (u) {
-            case BufferUsage::kGpuOnly:               return VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-            case BufferUsage::kCpuWritesGpuReads:
-            case BufferUsage::kTransfersFromCpuToGpu: return VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-            case BufferUsage::kTransfersFromGpuToCpu: return VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
-            default:                                  return VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-        }
-    }
-
-    VkResult doAlloc(const VkMemoryRequirements& reqs, VkMemoryPropertyFlags preferred,
-                      skgpu::VulkanBackendMemory* out) {
-        uint32_t idx = findMemType(reqs.memoryTypeBits, preferred);
-        if (idx == ~0u) idx = findMemType(reqs.memoryTypeBits, 0);
-        if (idx == ~0u) return VK_ERROR_OUT_OF_DEVICE_MEMORY;
-
-        VkMemoryAllocateInfo ai = {};
-        ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        ai.allocationSize  = reqs.size;
-        ai.memoryTypeIndex = idx;
-
-        VkDeviceMemory mem;
-        VkResult r = fAllocMem(fDevice, &ai, nullptr, &mem);
-        if (r != VK_SUCCESS) return r;
-
-        VkPhysicalDeviceMemoryProperties mp = {};
-        fGetMemProps(fPhysDev, &mp);
-        VkMemoryPropertyFlags props = mp.memoryTypes[idx].propertyFlags;
-
-        uint32_t flags = 0;
-        if (!(props & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))   flags |= skgpu::VulkanAlloc::kNoncoherent_Flag;
-        if (  props & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)     flags |= skgpu::VulkanAlloc::kMappable_Flag;
-        if (  props & VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT) flags |= skgpu::VulkanAlloc::kLazilyAllocated_Flag;
-
-        *out = reinterpret_cast<skgpu::VulkanBackendMemory>(new Alloc{mem, reqs.size, flags});
-        return VK_SUCCESS;
-    }
-};
+#include "src/gpu/GpuTypesPriv.h"
+#include "src/gpu/vk/vulkanmemoryallocator/VulkanMemoryAllocatorPriv.h"
 
 // calls back to the jvm
 class JvmVkAllocator : public skgpu::VulkanMemoryAllocator {
@@ -424,12 +289,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
             backendContext.fGetProc
         );
     } else {
-        backendContext.fMemoryAllocator = sk_make_sp<SimpleVkAllocator>(
-            backendContext.fPhysicalDevice,
-            backendContext.fDevice,
-            backendContext.fInstance,
-            backendContext.fGetProc
-        );
+        backendContext.fMemoryAllocator =
+            skgpu::VulkanMemoryAllocators::Make(backendContext, skgpu::ThreadSafe::kYes);
     }
 
     sk_sp<GrDirectContext> directContext = GrDirectContexts::MakeVulkan(backendContext);
@@ -468,12 +329,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContext_1jvmKt_
             backendContext.fGetProc
         );
     } else {
-        backendContext.fMemoryAllocator = sk_make_sp<SimpleVkAllocator>(
-            backendContext.fPhysicalDevice,
-            backendContext.fDevice,
-            backendContext.fInstance,
-            backendContext.fGetProc
-        );
+        backendContext.fMemoryAllocator =
+            skgpu::VulkanMemoryAllocators::Make(backendContext, skgpu::ThreadSafe::kYes);
     }
 
     sk_sp<GrDirectContext> directContext = GrDirectContexts::MakeVulkan(backendContext);

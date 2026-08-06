@@ -1,10 +1,20 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skiko.ExperimentalSkikoApi
+
 /**
  * Interface for Vulkan device memory allocation used by Skia.
  *
+ * Intended for integrations that already manage Vulkan memory themselves. Skiko does not
+ * expose Vulkan APIs, so implementations are expected to call Vulkan through an external
+ * binding library (e.g. LWJGL) using the raw handles passed to the methods below.
+ *
+ * If no allocator is provided, Skia's own allocator is used instead, which is the right
+ * choice for most applications.
+ *
  * @see [DirectContext.makeVulkan]
  */
+@ExperimentalSkikoApi
 abstract class VulkanMemoryAllocator {
 
     /**

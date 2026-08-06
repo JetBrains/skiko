@@ -3,8 +3,10 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.RenderException
 
+@OptIn(ExperimentalSkikoApi::class)
 internal actual fun nMakeVulkanImpl(
     instancePtr: NativePointer,
     physicalDevicePtr: NativePointer,
@@ -21,6 +23,7 @@ internal actual fun nMakeVulkanImpl(
     memoryAllocator
 )
 
+@OptIn(ExperimentalSkikoApi::class)
 private external fun _nMakeVulkanJvmAllocator(
     instancePtr: NativePointer,
     physicalDevicePtr: NativePointer,

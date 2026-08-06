@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import kotlinx.browser.window
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skiko.ExperimentalSkikoApi
 
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
@@ -36,6 +37,7 @@ actual fun defaultLanguageTag(): String = LANG
 
 actual fun compilePattern(regex: String): Pattern = Pattern(regex)
 
+@OptIn(ExperimentalSkikoApi::class)
 internal actual fun nMakeVulkanImpl(
     instancePtr: NativePointer,
     physicalDevicePtr: NativePointer,

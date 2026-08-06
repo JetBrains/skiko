@@ -1,10 +1,12 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
+import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.Library
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
+@OptIn(ExperimentalSkikoApi::class)
 class VulkanInteropTest {
     private companion object {
         init {
