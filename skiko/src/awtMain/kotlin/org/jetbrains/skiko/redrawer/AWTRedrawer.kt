@@ -83,10 +83,7 @@ internal abstract class AWTRedrawer(
         check(!isDisposed) { "${this.javaClass.simpleName} is disposed" }
     }
 
-    /**
-     * Invoked by [SkiaLayer] when the underlying Swing component is resized.
-     */
-    open fun onLayerComponentResized() {
+    override fun onLayerComponentResized() {
         syncBoundsFromPlatformComponent()
 
         if (!layer.isShowing && layer.isDisplayable && (layer.width > 0) && (layer.height > 0)) {

@@ -7,8 +7,8 @@ import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.fastForEach
-import org.jetbrains.skiko.redrawer.AWTRedrawer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
+import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.*
 import java.awt.Color
@@ -32,7 +32,6 @@ import kotlin.math.floor
 actual open class SkiaLayer internal constructor(
     accessibleContextProvider: ((Component) -> AccessibleContext)? = null,
     val properties: SkiaLayerProperties,
-    /** Must produce [AWTRedrawer]s */
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
@@ -354,20 +353,20 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    private val redrawerManager = RedrawerManager<AWTRedrawer>(
+    private val redrawerManager = RedrawerManager<Redrawer>(
         defaultRenderApi = properties.renderApi,
         redrawerFactory = { renderApi, oldRedrawer ->
             oldRedrawer?.dispose()
             renderFactory.createRedrawer(this, renderApi, analytics, properties).also {
                 it.syncBoundsFromPlatformComponent()
-            } as AWTRedrawer
+            }
         },
         onRenderApiChanged = {
             notifyChange(PropertyKind.Renderer)
         }
     )
 
-    internal val redrawer: AWTRedrawer? by redrawerManager::redrawer
+    internal val redrawer: Redrawer? by redrawerManager::redrawer
 
     actual var renderApi: GraphicsApi by redrawerManager::renderApi
 

@@ -17,6 +17,10 @@ internal interface Redrawer {
     fun setVisible(isVisible: Boolean) = Unit
     val renderInfo: String
     fun isTransparentBackgroundSupported(): Boolean
+    /**
+     * Invoked by AWT [SkiaLayer] when the underlying Swing component is resized. Unused in other source-sets.
+     */
+    fun onLayerComponentResized() = Unit
 }
 
 internal fun defaultIsTransparentBackgroundSupported(layer: SkiaLayer): Boolean {
