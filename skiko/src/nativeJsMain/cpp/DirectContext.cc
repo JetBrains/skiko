@@ -19,8 +19,7 @@
 #include "include/gpu/vk/VulkanBackendContext.h"
 #include "include/gpu/vk/VulkanExtensions.h"
 #include "include/gpu/vk/VulkanMemoryAllocator.h"
-#include "src/gpu/GpuTypesPriv.h"
-#include "src/gpu/vk/vulkanmemoryallocator/VulkanMemoryAllocatorPriv.h"
+#include "VulkanMemoryAllocators.hh"
 #endif // SK_VULKAN
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL

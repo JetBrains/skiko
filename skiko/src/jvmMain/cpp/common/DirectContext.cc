@@ -56,8 +56,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 #include "include/gpu/vk/VulkanBackendContext.h"
 #include "include/gpu/vk/VulkanExtensions.h"
 #include "include/gpu/vk/VulkanMemoryAllocator.h"
-#include "src/gpu/GpuTypesPriv.h"
-#include "src/gpu/vk/vulkanmemoryallocator/VulkanMemoryAllocatorPriv.h"
+#include "VulkanMemoryAllocators.hh"
 
 // calls back to the jvm
 class JvmVkAllocator : public skgpu::VulkanMemoryAllocator {
