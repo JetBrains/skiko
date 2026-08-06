@@ -64,7 +64,17 @@ actual open class SkiaLayer {
     }
 
     actual fun detach() {
-        // TODO: when switch to the frame dispatcher - stop it here.
+        state?.dispose()
+        state = null
+        htmlCanvas = null
+    }
+
+    /**
+     * Recreates the drawing surface to match the current size of the attached canvas
+     * element. Call this after changing the canvas element's `width`/`height` attributes.
+     */
+    fun resize(width: Int, height: Int) {
+        checkNotNull(state) { "SkiaLayer is not attached to a canvas" }.resize(width, height)
     }
 
     actual val component: Any?
@@ -77,9 +87,17 @@ actual open class SkiaLayer {
      * Delegates rendering and events processing to [renderDelegate].
      */
     private fun attachTo(htmlCanvas: HTMLCanvasElement) {
+        if (this.htmlCanvas === htmlCanvas && state != null) {
+            // Re-attaching to the same canvas: reuse the WebGL context and DirectContext.
+            // Creating a second DirectContext over the same WebGLRenderingContext corrupts
+            // both contexts' GL state caches once either of them is destroyed (CMP-8615).
+            state!!.resize(htmlCanvas.width, htmlCanvas.height)
+            return
+        }
+        detach()
         this.htmlCanvas = htmlCanvas
 
-        state = object: CanvasRenderer(createWebGLContext(htmlCanvas), htmlCanvas.width, htmlCanvas.height) {
+        state = object : CanvasRenderer(createWebGLContext(htmlCanvas), htmlCanvas.width, htmlCanvas.height) {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
                 val currentNanos = currentTimestamp * 1_000_000
