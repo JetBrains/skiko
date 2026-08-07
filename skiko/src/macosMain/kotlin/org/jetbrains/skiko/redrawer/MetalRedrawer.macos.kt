@@ -16,6 +16,7 @@ import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.context.ContextHandler
+import org.jetbrains.skiko.context.draw
 import org.jetbrains.skiko.context.MacOsMetalContextHandler
 import org.jetbrains.skiko.currentNanoTime
 import platform.AppKit.NSWindowDidChangeOcclusionStateNotification
@@ -158,7 +159,7 @@ internal class MacOsMetalRedrawer(
             }
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 skiaLayer.inDrawScope {
-                    contextHandler.draw()
+                    draw(contextHandler)
                 }
             }
         }
@@ -169,7 +170,7 @@ internal class MacOsMetalRedrawer(
             if (!isDisposed) {
                 update()
                 skiaLayer.inDrawScope {
-                    contextHandler.draw()
+                    draw(contextHandler)
                 }
             }
         }
@@ -238,7 +239,7 @@ internal class MetalLayer : CAMetalLayer {
     override fun drawInContext(ctx: CGContextRef?) {
         skiaLayer.update(currentNanoTime())
         skiaLayer.inDrawScope {
-            contextHandler.draw()
+            draw(contextHandler)
         }
     }
 }
