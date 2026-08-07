@@ -32,24 +32,15 @@ object FirstWindowShowFlashHelper {
     @JvmStatic
     fun main(args: Array<String>) {
         val renderApi = GraphicsApi.valueOf(args[0])
-        val color = Color(args[1].toInt())
+        val color = Color(args[1].toInt(), true)
 
         SwingUtilities.invokeLater {
             val layer = SkiaLayer(properties = SkiaLayerProperties(renderApi = renderApi))
             layer.renderDelegate = object : SkikoRenderDelegate {
                 private val paint = Paint().also { it.color = color.rgb }
-                private val loadFill = Paint().also { it.color = Color.GRAY.rgb }
-                private val layerPaint = Paint().also {
-                    it.imageFilter = ImageFilter.makeBlur(30f, 30f, FilterTileMode.CLAMP)
-                }
 
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     val rect = Rect(0f, 0f, width.toFloat(), height.toFloat())
-                    repeat(1000) {
-                        canvas.saveLayer(rect, layerPaint)
-                        canvas.drawRect(rect, loadFill)
-                        canvas.restore()
-                    }
                     canvas.drawRect(rect, paint)
                 }
             }

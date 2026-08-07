@@ -46,6 +46,12 @@ internal class SoftwareRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
+    override fun renderBeforeShown(): Boolean {
+        // renderImmediately() doesn't help with software renderer and actually makes it look worse
+        // TODO: Implement a special solution for the software renderer
+        return false
+    }
+
     override fun renderImmediately() {
         checkDisposed()
         update()
