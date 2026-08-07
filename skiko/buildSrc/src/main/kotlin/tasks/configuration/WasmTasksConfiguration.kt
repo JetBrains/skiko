@@ -2,6 +2,7 @@ package tasks.configuration
 
 import Arch
 import CompileSkikoCppTask
+import EnsureEmscriptenTask
 import IMPORT_GENERATOR
 import LinkSkikoWasmTask
 import OS
@@ -50,16 +51,33 @@ private val wasmSideModuleLinkTaskAttribute =
 private const val WASM_SIDE_MODULE_USAGE = "skiko-wasm-side-module"
 private const val WASM_TEST_RESOURCES_USAGE = "skiko-wasm-test-resources"
 
+private const val DEFAULT_EMSDK_VERSION = "4.0.7"
+
 fun SkikoProjectContext.declareWasmTasks() {
     if (!project.supportWeb) {
         return
     }
     val isSideModule = kind == SkikoModuleKind.EXTENSION
 
+    val emsdkVersion = project.findProperty("skiko.emsdk.version")?.toString() ?: DEFAULT_EMSDK_VERSION
+    val ensureEmscripten by project.tasks.registering(EnsureEmscriptenTask::class) {
+        this.emsdkVersion.set(emsdkVersion)
+        project.findProperty("skiko.emsdk.dir")?.toString()?.let {
+            emsdkDir.set(project.layout.dir(project.provider { project.resolveEmsdkDir(it) }))
+            requireExistingEmsdk.set(true)
+        }
+    }
+
+    fun emscriptenToolPath(toolName: String) =
+        ensureEmscripten.flatMap { it.emsdkDir.dir("upstream/emscripten") }.map {
+            it.file(toolName).asFile.absolutePath
+        }
+
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
+        dependsOn(ensureEmscripten)
         dependsOn(skiaWasmDir)
-        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
+        compiler.set(emscriptenToolPath(compilerForTarget(OS.Wasm, Arch.Wasm)))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -91,12 +109,13 @@ fun SkikoProjectContext.declareWasmTasks() {
     }
 
     fun LinkSkikoWasmTask.configureCommon(prefixPath: String) {
+        dependsOn(ensureEmscripten)
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
         val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
         val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
-        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
+        linker.set(emscriptenToolPath(linkerForTarget(OS.Wasm, Arch.Wasm)))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -216,6 +235,11 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
     }
 }
+
+private fun Project.resolveEmsdkDir(path: String): File =
+    File(path).let {
+        if (it.isAbsolute) it else rootProject.file(path)
+    }
 
 fun SkikoProjectContext.provideWasmSideModules() {
     provideWasmSideModule(mainLinkTaskName = "linkWasm")
