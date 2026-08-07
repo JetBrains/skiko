@@ -51,9 +51,14 @@ internal class OnScreenRedrawer(
     override fun needRender(throttledToVsync: Boolean) {
         check(!isDisposed) { "OnScreenRedrawer is disposed" }
 
-        updateRequested.set(true)
+        val platformDrivesFrame = renderer.isHandlingLiveResizeNow
+        if (!platformDrivesFrame) {
+            updateRequested.set(true)
+        }
         renderer.onFrameRequested(throttledToVsync)
-        frameDispatcher?.scheduleFrame()
+        if (!platformDrivesFrame) {
+            frameDispatcher?.scheduleFrame()
+        }
     }
 
     override fun renderImmediately() {
