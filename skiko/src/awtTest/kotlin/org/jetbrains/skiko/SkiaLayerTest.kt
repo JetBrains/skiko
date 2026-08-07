@@ -1204,11 +1204,19 @@ class SkiaLayerTest {
     @OptIn(ExperimentalAtomicApi::class)
     @Test(timeout = 240000)
     fun `no window flash on first show`() = uiTest {
-        // Exclude known-bad pairs of OSes and graphics APIs.
+        // Exclude known-bad pairs of OSes and graphics APIs. null values indicate all values
         // Don't use assumeTrue, as uiTest iterates over multiple renderers,
         // and if one of them is skipped, the whole test is skipped
-        val badRenderApis = setOf<Pair<OS, GraphicsApi>>()
-        if (Pair(hostOs, renderApi) in badRenderApis) return@uiTest
+        val badRenderApis = setOf(
+            Pair(OS.Linux, null),
+            Pair(null, GraphicsApi.SOFTWARE_FAST),
+            Pair(null, GraphicsApi.SOFTWARE_COMPAT)
+        )
+        if (
+            (Pair(hostOs, renderApi) in badRenderApis) ||
+            (Pair(hostOs, null) in badRenderApis) ||
+            (Pair(null, renderApi) in badRenderApis))
+            return@uiTest
 
         val bgColor = Color.GREEN
         val fgColor = Color.BLACK
@@ -1281,7 +1289,7 @@ class SkiaLayerTest {
         }
 
         try {
-            repeat(8) { testRun ->
+            repeat(20) { testRun ->
                 // Wait until the sampled pixel shows the (green) background before launching the child.
                 waitForSampledPixelCloseTo(bgColor)
 
