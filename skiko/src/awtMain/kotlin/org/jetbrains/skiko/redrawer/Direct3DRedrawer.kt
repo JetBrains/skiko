@@ -84,10 +84,10 @@ internal class Direct3DRedrawer(
         super.dispose()
     }
 
-    override fun onPlatformComponentResized() {
+    override fun onLayerComponentResized() {
         // During live resize, the layer tells us its size directly; the AWT size is not in sync
         if (!isHandlingLiveResizeNow) {
-            super.onPlatformComponentResized()
+            super.onLayerComponentResized()
         }
     }
 

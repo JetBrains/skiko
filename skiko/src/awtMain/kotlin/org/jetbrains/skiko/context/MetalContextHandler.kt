@@ -68,17 +68,23 @@ internal class MetalContextHandler(
         makeMetalContext(device.ptr)
     )
 
-    /** Presents the frame asynchronously (off the main thread). Used for every frame outside a live resize. */
-    fun finishFrame() = finishFrame(device.ptr)
+    /**
+     * Presents the frame asynchronously (off the AppKit main thread).
+     */
+    fun finishFrameAsync() = finishFrameAsync(device.ptr)
 
     /**
-     * Presents the frame synchronously, joining the ambient window-resize transaction.
-     * Must be called on the AppKit main thread during a live resize.
+     * Presents the frame synchronously, in the calling thread.
+     *
+     * Used in two scenarios:
+     * - During live-resize it is called on the AppKit main thread, to join the ambient window-resize transaction.
+     * - Before showing the window, it is called while the layer is already displayable (but not yet showing), so the
+     *   window's first on-screen frame draws content instead of flashing its background.
      */
-    fun finishFrameInLiveResize() = finishFrameInLiveResize(device.ptr)
+    fun finishFrameSync() = finishFrameSync(device.ptr)
 
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
-    private external fun finishFrame(device: Long)
-    private external fun finishFrameInLiveResize(device: Long)
+    private external fun finishFrameAsync(device: Long)
+    private external fun finishFrameSync(device: Long)
 }

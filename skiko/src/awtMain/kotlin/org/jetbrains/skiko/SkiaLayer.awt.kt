@@ -5,13 +5,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.fastForEach
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
+import java.awt.*
 import java.awt.Color
-import java.awt.Component
-import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Point
 import java.awt.event.*
@@ -36,10 +36,11 @@ actual open class SkiaLayer internal constructor(
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
     /**
-     * Whether this layer fills its entire host window. When true, platform-specific window-level
-     * optimizations may be used (e.g., on macOS, driving the interactive live-resize redraw from the
-     * window). Set to false when the layer is embedded as a Swing component somewhere in the window's
-     * hierarchy rather than covering the whole window, so those window-level paths are disabled.
+     * Whether this layer fills its entire host window.
+     *
+     * When true, platform-specific window-level optimizations may be used (e.g., on macOS, driving the interactive
+     * live-resize redraw from the window). Set to false when the layer is embedded as a Swing component somewhere in
+     * the window's hierarchy rather than covering the whole window, so those window-level paths are disabled.
      */
     internal val fillsWindow: Boolean = false,
 ) : JComponent(), Accessible {
@@ -124,7 +125,7 @@ actual open class SkiaLayer internal constructor(
                 @Suppress("DEPRECATION")
                 super.reshape(x, y, width, height)
 
-                redrawer?.onPlatformComponentResized()
+                redrawer?.onLayerComponentResized()
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -144,8 +145,8 @@ actual open class SkiaLayer internal constructor(
                 return canReceiveFocus(cause) && super.requestFocusInWindow(cause)
             }
 
-            private fun canReceiveFocus(cause: FocusEvent.Cause?) = cause != FocusEvent.Cause.MOUSE_EVENT ||
-                    isRequestFocusEnabled
+            private fun canReceiveFocus(cause: FocusEvent.Cause?) =
+                cause != FocusEvent.Cause.MOUSE_EVENT || isRequestFocusEnabled
         }
         @Suppress("LeakingThis")
         add(backedLayer)

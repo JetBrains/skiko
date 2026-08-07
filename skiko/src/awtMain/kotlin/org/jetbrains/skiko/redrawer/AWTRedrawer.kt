@@ -83,5 +83,26 @@ internal abstract class AWTRedrawer(
         check(!isDisposed) { "${this.javaClass.simpleName} is disposed" }
     }
 
+    override fun onLayerComponentResized() {
+        syncBoundsFromPlatformComponent()
+
+        if (!layer.isShowing && layer.isDisplayable && (layer.width > 0) && (layer.height > 0)) {
+            renderBeforeShown()
+            return
+        }
+
+        needRender(throttledToVsync = false)
+    }
+
+    /**
+     * Renders and presents a frame when the layer is already displayable but not yet showing.
+     * This is needed so we have a frame ready when the window is first shown, to prevent the window background
+     * flashing.
+     */
+    protected open fun renderBeforeShown(): Boolean {
+        renderImmediately()
+        return true
+    }
+
     override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 }
