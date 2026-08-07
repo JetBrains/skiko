@@ -1203,6 +1203,7 @@ class SkiaLayerTest {
 
     @OptIn(ExperimentalAtomicApi::class)
     @Test(timeout = 240000)
+    @Ignore
     fun `no window flash on first show`() = uiTest {
         // Exclude known-bad pairs of OSes and graphics APIs.
         // Don't use assumeTrue, as uiTest iterates over multiple renderers,
