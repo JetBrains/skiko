@@ -14,9 +14,17 @@ import org.w3c.dom.HTMLCanvasElement
  */
 internal abstract class CanvasRenderer(
     private val contextPointer: NativePointer,
-    val width: Int,
-    val height: Int,
+    width: Int,
+    height: Int,
 ) {
+    var width: Int = width
+        private set
+    var height: Int = height
+        private set
+
+    var isDisposed: Boolean = false
+        private set
+
     private val context: DirectContext
     private var surface: Surface? = null
     private var renderTarget: BackendRenderTarget? = null
@@ -36,13 +44,15 @@ internal abstract class CanvasRenderer(
 
     private val requestAnimationFrameCallback: (timestamp: Double) -> Unit = { timestamp ->
         redrawScheduled = false
-        GL.makeContextCurrent(contextPointer)
-        // `clear` and `resetMatrix` make canvas not accumulate previous effects
-        canvas?.clear(Color.WHITE)
-        canvas?.resetMatrix()
-        drawFrame(timestamp)
-        surface?.flushAndSubmit()
-        context.flush()
+        if (!isDisposed) {
+            GL.makeContextCurrent(contextPointer)
+            // `clear` and `resetMatrix` make canvas not accumulate previous effects
+            canvas?.clear(Color.WHITE)
+            canvas?.resetMatrix()
+            drawFrame(timestamp)
+            surface?.flushAndSubmit()
+            context.flush()
+        }
     }
 
     fun initCanvas() {
@@ -68,6 +78,36 @@ internal abstract class CanvasRenderer(
     }
 
     /**
+     * Recreates the render target and surface at the new size, reusing the existing
+     * WebGL context and [DirectContext].
+     *
+     * Must be called after the canvas element's `width`/`height` attributes change:
+     * that resets the WebGL drawing buffer, while the Skia surface keeps targeting
+     * the default framebuffer with the old dimensions.
+     */
+    fun resize(width: Int, height: Int) {
+        check(!isDisposed) { "CanvasRenderer is disposed" }
+        if (width == this.width && height == this.height) return
+        this.width = width
+        this.height = height
+        GL.makeContextCurrent(contextPointer)
+        initCanvas()
+    }
+
+    /**
+     * Releases the GPU resources. The renderer can't be used afterwards;
+     * a frame already scheduled via [needRedraw] becomes a no-op.
+     */
+    fun dispose() {
+        if (isDisposed) return
+        isDisposed = true
+        GL.makeContextCurrent(contextPointer)
+        disposeCanvas()
+        canvas = null
+        context.close()
+    }
+
+    /**
      * This function should implement the actual drawing on the canvas.
      *
      * @param currentTimestamp - in milliseconds
@@ -81,7 +121,7 @@ internal abstract class CanvasRenderer(
      */
     @OptIn(ExperimentalWasmJsInterop::class)
     fun needRedraw() {
-        if (redrawScheduled) {
+        if (isDisposed || redrawScheduled) {
             return
         }
         redrawScheduled = true
