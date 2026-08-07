@@ -189,7 +189,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Path__1nGetBounds(KNativePointer ptr, KInte
 
 SKIKO_EXPORT void org_jetbrains_skia_Path__1nUpdateBoundsCache(KNativePointer ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
-    instance->updateBoundsCache();
+    (void) instance->getBounds();
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Path__1nComputeTightBounds(KNativePointer ptr, KInteropPointer resultArray) {
