@@ -30,6 +30,8 @@ dependencyResolutionManagement {
         }
 
         mavenCentral()
+        // for RoboVM snapshot builds
+        maven("https://central.sonatype.com/repository/maven-snapshots")
     }
 
     versionCatalogs {

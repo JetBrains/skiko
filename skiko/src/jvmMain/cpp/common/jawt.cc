@@ -1,4 +1,4 @@
-#ifndef SK_BUILD_FOR_ANDROID
+#if !defined(SK_BUILD_FOR_ANDROID) && !defined(SK_BUILD_FOR_IOS)
 #include <jawt.h>
 #include <jawt_md.h>
 

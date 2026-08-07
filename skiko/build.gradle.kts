@@ -56,6 +56,8 @@ allprojects {
 repositories {
     mavenCentral()
     google()
+    // for RoboVM snapshots
+    maven("https://central.sonatype.com/repository/maven-snapshots")
 }
 
 kotlin {
@@ -174,6 +176,21 @@ kotlin {
         skikoProjectContext.configureNativeTarget(OS.TVOS, Arch.X64, tvosX64())
     }
 
+    if (supportAnyRoboVMIos) {
+        skikoProjectContext.configureRoboVmTarget(
+            OS.IOS, target = jvm(ROBOVM_IOS_TARGET_NAME)
+        )
+    }
+    if (supportAnyRoboVMIos) {
+        // RoboVM reuses the AWT-free JVM (JNI) implementation of the Skia API, like the
+        // Android target does, but stays outside of the "jvm" source set group.
+        val jvmMainSourceSet = sourceSets.findByName("jvmMain")
+            ?: sourceSets.create("jvmMain").apply { dependsOn(sourceSets.getByName("commonMain")) }
+        sourceSets.named("robovmMain") {
+            dependsOn(jvmMainSourceSet)
+        }
+    }
+
     sourceSets.commonMain.dependencies {
         implementation(kotlin("stdlib"))
         implementation(libs.coroutines.core)
@@ -203,6 +220,11 @@ kotlin {
 
     skikoProjectContext.androidMainSourceSet?.dependencies {
         implementation(libs.coroutines.android)
+    }
+
+    skikoProjectContext.robovmMainSourceSet?.dependencies {
+        compileOnly(project.robovmDependency("robovm-rt"))
+        compileOnly(project.robovmDependency("robovm-cocoatouch"))
     }
 
     skikoProjectContext.jvmTestSourceSet?.dependencies {

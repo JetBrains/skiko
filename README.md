@@ -13,6 +13,7 @@ Supported platforms:
    * Kotlin/JS + WebAssembly in browsers
    * Kotlin/Native on iOS(arm64 and x64)
    * Kotlin/Native on macOS (arm64 and x64)
+   * Kotlin/RoboVM/JVM on iOS(arm64)
 
 ## API documentation
 

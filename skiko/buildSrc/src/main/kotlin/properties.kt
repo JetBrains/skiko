@@ -268,6 +268,10 @@ object SkikoGradleProperties {
     const val NATIVE_TVOS_X64 = "skiko.native.tvos.x64.enabled"
     const val NATIVE_MAC = "skiko.native.mac.enabled"
     const val NATIVE_LINUX = "skiko.native.linux.enabled"
+    const val ROBOVM_ENABLED = "skiko.robovm.enabled"
+    const val ROBOVM_IOS = "skiko.robovm.ios"
+    const val ROBOVM_IOS_ARM64 = "skiko.robovm.ios.arm64.enabled"
+    const val ROBOVM_IOS_SIMULATOR_ARM64 = "skiko.robovm.ios.simulatorArm64.enabled"
 }
 
 object SkikoArtifacts {
