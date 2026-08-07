@@ -1,20 +1,17 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.OpenGLContextHandler
 
 internal class WindowsOpenGLRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
+) : AbstractOpenGLRedrawer(layer, analytics) {
     init {
         loadOpenGLLibrary()
     }
-
-    private val contextHandler = OpenGLContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val device: Long = layer.backedLayer.useDrawingSurfacePlatformInfo {
         getDevice(it).also { devicePtr ->
@@ -35,8 +32,6 @@ internal class WindowsOpenGLRedrawer(
         onDeviceChosen(adapterName)
     }
 
-    private val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
-
     init {
         makeCurrent()
         // For vsync we will use dwmFlush instead of swapInterval,
@@ -47,38 +42,38 @@ internal class WindowsOpenGLRedrawer(
         onContextInit()
     }
 
-    override fun dispose() {
-        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
+    override fun releaseResources() {
         makeCurrent()
-        contextHandler.dispose()
+        disposeGlResources()
         deleteContext(context)
-        super.dispose()
     }
 
-    override fun needRender(throttledToVsync: Boolean) {
-        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
+    override val schedulesOwnFrames: Boolean get() = true
+
+    private lateinit var frameHost: FrameHost
+
+    override fun attachFrameHost(host: FrameHost) {
+        frameHost = host
+    }
+
+    override fun onFrameRequested(throttledToVsync: Boolean) {
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
     }
 
-    override fun renderImmediately() {
-        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
-        update()
-        inDrawScope {
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                makeCurrent()
-                contextHandler.draw()
-                swapBuffers()
-                OpenGLApi.instance.glFinish()
-                if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
-                    dwmFlush()
-                }
-            }
+    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+        makeCurrent()
+        with(scope) { drawFrame() }
+        swapBuffers()
+        OpenGLApi.instance.glFinish()
+        if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
+            dwmFlush()
         }
     }
 
-    private fun draw() {
-        inDrawScope { contextHandler.draw() }
+    private fun drawInBatch() {
+        makeCurrent()
+        frameHost.inFrame { scope -> with(scope) { drawFrame() } }
     }
 
     private fun makeCurrent() = makeCurrent(device, context)
@@ -99,15 +94,14 @@ internal class WindowsOpenGLRedrawer(
             val nanoTime = System.nanoTime()
             for (redrawer in toRedrawVisible) {
                 try {
-                    redrawer.update(nanoTime)
+                    redrawer.frameHost.updateIfRequested(nanoTime)
                 } catch (e: CancellationException) {
                     // continue
                 }
             }
 
             for (redrawer in toRedrawVisible) {
-                redrawer.makeCurrent()
-                redrawer.draw()
+                redrawer.drawInBatch()
             }
 
             for (redrawer in toRedrawVisible) {

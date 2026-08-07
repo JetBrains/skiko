@@ -19,8 +19,8 @@
 
 extern "C"
 {
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_makeMetalContext(
-    JNIEnv* env, jobject contextHandler, jlong devicePtr)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalContext(
+    JNIEnv* env, jobject redrawer, jlong devicePtr)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void*) devicePtr;
@@ -31,8 +31,8 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_makeMetalRenderTarget(
-    JNIEnv* env, jobject contextHandler, jlong devicePtr, jint width, jint height)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalRenderTarget(
+    JNIEnv* env, jobject redrawer, jlong devicePtr, jint width, jint height)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
@@ -86,8 +86,8 @@ static void finishFrame(jlong devicePtr, void (^present)(MetalDevice *device, id
 /// Presents the current drawable asynchronously — the default, used under normal circumstances.
 /// Called off the AppKit main thread (from the background frame loop) so present work doesn't
 /// destabilize FPS on the main thread.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrameAsync(
-    JNIEnv *env, jobject contextHandler, jlong devicePtr)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFrameAsync(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     finishFrame(devicePtr, ^(MetalDevice *device, id<CAMetalDrawable> currentDrawable, id<MTLCommandBuffer> commandBuffer) {
         [commandBuffer addScheduledHandler:^(id<MTLCommandBuffer> buffer) {
@@ -95,7 +95,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
             /// this is an immediate, non-deferred present.
             ///
             /// During a live resize the main thread is the sole presenter (setBounds +
-            /// drawFrameWhileLiveResizing, via finishFrameInLiveResize below). A frame reaching this
+            /// drawFrameWhileLiveResizing, via finishFrameSync below). A frame reaching this
             /// async path while a resize is in progress is a stale straggler that passed the frame-loop
             /// gate just before the resize began; drop it rather than let its deferred present race the
             /// main-thread transactional present under the layer-wide presentsWithTransaction flag.
@@ -125,8 +125,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
 /// - During live-resize, on the AppKit main thread, to join the ambient resize transaction
 /// - When the window is displayable but not yet shown, to make sure the first visible frame already has the content,
 ///   avoiding flashing the layer background.
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_finishFrameSync(
-    JNIEnv *env, jobject contextHandler, jlong devicePtr)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFrameSync(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     finishFrame(devicePtr, ^(MetalDevice *device, id<CAMetalDrawable> currentDrawable, id<MTLCommandBuffer> commandBuffer) {
         /// During live-resize:
