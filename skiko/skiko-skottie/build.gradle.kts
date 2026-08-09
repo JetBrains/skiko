@@ -178,6 +178,10 @@ kotlin {
         skikoSkottieProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64(), ::coreNativeSymbolSources)
     }
 
+    if (supportNativeWindows) {
+        skikoSkottieProjectContext.configureNativeTarget(OS.Windows, Arch.X64, mingwX64(), ::coreNativeSymbolSources)
+    }
+
     if (supportNativeIosArm64) {
         skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64(), ::coreNativeSymbolSources)
     }

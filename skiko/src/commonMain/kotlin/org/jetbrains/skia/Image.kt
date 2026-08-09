@@ -177,6 +177,34 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         }
 
         /**
+         * Wraps a GPU texture without transferring ownership to Skia.
+         * The caller must keep the texture alive until the returned image is closed.
+         */
+        fun borrowTextureFrom(
+            context: DirectContext,
+            backendTexture: BackendTexture,
+            origin: SurfaceOrigin,
+            colorType: ColorType,
+            alphaType: ColorAlphaType,
+        ): Image {
+            return try {
+                Stats.onNativeCall()
+                val ptr = _nBorrowTextureFrom(
+                    getPtr(context),
+                    getPtr(backendTexture),
+                    origin.ordinal,
+                    colorType.ordinal,
+                    alphaType.ordinal,
+                )
+                if (ptr == NullPointer) throw RuntimeException("Failed to borrow backend texture")
+                Image(ptr)
+            } finally {
+                reachabilityBarrier(context)
+                reachabilityBarrier(backendTexture)
+            }
+        }
+
+        /**
          * Creates GPU-backed SkImage from backendTexture associated with context.
          *
          * Skia will assume ownership of the resource and will release it when no longer needed.
@@ -541,4 +569,13 @@ private external fun _nAdoptTextureFromAlphaType(
     surfaceOrigin: Int,
     colorType: Int,
     alphaType: Int
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nBorrowTextureFrom")
+private external fun _nBorrowTextureFrom(
+    contextPtr: NativePointer,
+    backendTexture: NativePointer,
+    surfaceOrigin: Int,
+    colorType: Int,
+    alphaType: Int,
 ): NativePointer

@@ -21,8 +21,8 @@ annotation class SkikoBinaryDsl
 
 val OS.validEnvs: List<TargetEnv>
     get() = when (this) {
-        OS.MacOS, OS.Linux -> listOf(TargetEnv.JVM, TargetEnv.NATIVE)
-        OS.Windows, OS.Android -> listOf(TargetEnv.JVM)
+        OS.MacOS, OS.Linux, OS.Windows -> listOf(TargetEnv.JVM, TargetEnv.NATIVE)
+        OS.Android -> listOf(TargetEnv.JVM)
         OS.IOS, OS.TVOS -> listOf(TargetEnv.NATIVE)
         OS.Wasm -> listOf(TargetEnv.WASM)
     }

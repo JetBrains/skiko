@@ -125,6 +125,27 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 arm64 { dynamicSystemLibs("EGL") }
             }
 
+            windows {
+                staticSkiaLibs(
+                    "d3d12allocator",
+                    "raw_ptr",
+                    "allocator_core",
+                    "allocator_base",
+                )
+                dynamicSystemLibs(
+                    "advapi32",
+                    "gdi32",
+                    "dwmapi",
+                    "ole32",
+                    "propsys",
+                    "shcore",
+                    "shlwapi",
+                    "user32",
+                    "winmm",
+                    "dxgi",
+                )
+            }
+
             macos {
                 frameworks(
                     "Metal",
@@ -303,6 +324,9 @@ kotlin {
     if (supportNativeLinux) {
         skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
         skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
+    }
+    if (supportNativeWindows) {
+        skikoProjectContext.configureNativeTarget(OS.Windows, Arch.X64, mingwX64())
     }
     if (supportNativeIosArm64) {
         skikoProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())

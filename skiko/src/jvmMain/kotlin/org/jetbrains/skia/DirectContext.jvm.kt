@@ -13,7 +13,7 @@ import org.jetbrains.skiko.RenderException
  * this function will fail.
  * For more information refer to skia `GrGLMakeAssembledInterface` function.
  */
-fun DirectContext.Companion.makeGLWithInterface(assembledInterface: GLAssembledInterface): DirectContext {
+actual fun DirectContext.Companion.makeGLWithInterface(assembledInterface: GLAssembledInterface): DirectContext {
     if (assembledInterface._ptr == NullPointer) throw RenderException("Interface pointer must not be null")
     Stats.onNativeCall()
     val ptr = _nMakeGLWithInterface(assembledInterface._ptr)

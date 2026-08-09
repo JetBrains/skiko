@@ -6,8 +6,8 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.RenderException
 
-class GLAssembledInterface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
-    companion object {
+actual class GLAssembledInterface actual internal constructor(ptr: NativePointer) : RefCnt(ptr) {
+    actual companion object {
         /**
          * Creates an OpenGL interface object.
          *
@@ -25,7 +25,7 @@ class GLAssembledInterface internal constructor(ptr: NativePointer) : RefCnt(ptr
          * @param fPtr    native pointer to the function that takes [ctxPtr] and the OpenGL function name,
          *                and returns a function pointer of that OpenGL function (see skia `GrGLGetProc`).
          */
-        fun createFromNativePointers(ctxPtr: NativePointer, fPtr: NativePointer): GLAssembledInterface {
+        actual fun createFromNativePointers(ctxPtr: NativePointer, fPtr: NativePointer): GLAssembledInterface {
             if (fPtr == NullPointer) throw RenderException("Function pointer must not be null")
             Stats.onNativeCall()
             val ptr = _nCreateFromNativePointers(ctxPtr, fPtr)

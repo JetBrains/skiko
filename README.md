@@ -13,6 +13,19 @@ Supported platforms:
    * Kotlin/JS + WebAssembly in browsers
    * Kotlin/Native on iOS(arm64 and x64)
    * Kotlin/Native on macOS (arm64 and x64)
+   * Kotlin/Native on Windows (x86_64; Win32 software presentation)
+
+## Windows Kotlin/Native smoke test on Linux
+
+On an x86_64 Linux host with Wine installed, compile the `mingwX64` KLIB and run a pure-Kotlin Skiko smoke executable with:
+
+```shell
+./skiko/tools/run-windows-native-smoke-on-wine.sh
+```
+
+This verifies Windows Kotlin/Native compilation, target detection, dependency resolution, system-theme lookup, native layer initialization, Win32 window creation, and APIs that do not call the C++ bridge. `SkiaLayer` accepts a `WindowsNativeWindow` or an HWND encoded as a non-zero `Long`; its current native backend is DPI-aware BGRA software presentation through Win32 GDI, with owned-window paint/resize dispatch, DWM frame throttling, message pumping, and borderless fullscreen transitions. OpenGL and ANGLE DLL discovery is implemented, while Direct3D and ANGLE rendering still require porting their JNI C++ bridge code to the Kotlin/Native C ABI.
+
+The published Windows Skia archives use the MSVC C++ ABI, so building and testing the native Skia bridge still requires an MSVC-compatible Windows build environment.
 
 ## API documentation
 

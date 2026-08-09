@@ -284,6 +284,7 @@ object SkikoGradleProperties {
     const val NATIVE_TVOS_X64 = "skiko.native.tvos.x64.enabled"
     const val NATIVE_MAC = "skiko.native.mac.enabled"
     const val NATIVE_LINUX = "skiko.native.linux.enabled"
+    const val NATIVE_WINDOWS = "skiko.native.windows.enabled"
 }
 
 class SkikoArtifacts(

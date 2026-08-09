@@ -5,7 +5,10 @@ enum class SkiaTarget(
     IOS("ios", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=false")),
     IOS_SIM("iosSim", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=false")),
     MACOS("macos", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
-    WINDOWS("windows", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
+    WINDOWS("windows", listOf(
+        "-P${SkikoGradleProperties.AWT_ENABLED}=true",
+        "-P${SkikoGradleProperties.NATIVE_WINDOWS}=true",
+    )),
     LINUX("linux", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
     WASM("wasm", listOf("-P${SkikoGradleProperties.WASM_ENABLED}=true", "-P${SkikoGradleProperties.AWT_ENABLED}=false"));
 

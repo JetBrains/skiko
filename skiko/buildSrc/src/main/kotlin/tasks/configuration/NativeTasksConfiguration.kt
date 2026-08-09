@@ -217,6 +217,18 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 }
                 flags.set(linuxFlags)
             }
+            OS.Windows -> {
+                compiler.set(windowsSdkPaths.compiler.absolutePath)
+                includeHeadersNonRecursive(windowsSdkPaths.includeDirs)
+                flags.set(listOf(
+                    "/nologo",
+                    *buildType.winCompilerFlags,
+                    "/utf-8",
+                    "/GR-",
+                    "/FS",
+                    *skiaPreprocessorFlags(OS.Windows, buildType),
+                ))
+            }
             else -> throw GradleException("$os not yet supported")
         }
 
@@ -268,11 +280,14 @@ fun SkikoProjectContext.configureNativeTarget(
     target: KotlinNativeTarget,
     coreNativeSymbolSourcesFor: ((OS, Arch, Boolean) -> Configuration)? = null
 ) = with(this.project) {
-    if (!os.isCompatibleWithHost) return
-
     if (kind != SkikoModuleKind.EXTENSION) {
         target.generateVersion(os, arch, skiko)
     }
+
+    // Kotlin sources can be cross-compiled on another host, but the native C++
+    // bridge and final linkage require the target platform toolchain.
+    if (!os.isCompatibleWithHost) return
+
     val isUikitSim = target.isUikitSimulator()
 
     val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"
@@ -281,7 +296,10 @@ fun SkikoProjectContext.configureNativeTarget(
     val unpackedSkia = unzipper.get()
     val skiaDir = unpackedSkia.absolutePath
 
-    val bridgesLibrary = layout.buildDirectory.file("nativeBridges/static/$targetString/$nativeBridgesLibPrefix-$targetString.a")
+    val bridgesLibraryExtension = if (os == OS.Windows) ".lib" else ".a"
+    val bridgesLibrary = layout.buildDirectory.file(
+        "nativeBridges/static/$targetString/$nativeBridgesLibPrefix-$targetString$bridgesLibraryExtension"
+    )
     val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
 
     // For iOS/tvOS we patch every library so that public Skia symbols are
@@ -313,15 +331,19 @@ fun SkikoProjectContext.configureNativeTarget(
     } else {
         nativeArchives
     }
-    val hideSkiaSymbols = project.registerSkikoTask<HideSkiaSymbolsTask>(
-        "hideSkiaSymbols".withSuffix(isUikitSim = isUikitSim),
-        os,
-        arch
-    ) {
-        targetOs.set(os)
-        symbolExtractorCommand.set(if (os == OS.IOS || os == OS.TVOS) listOf("xcrun", "nm") else listOf("nm"))
-        symbolSourceLibraries.from(hiddenSymbolSources.map { File(it) })
-        outputFile.set(hiddenSymbolsFile)
+    val hideSkiaSymbols = if (os == OS.Windows) {
+        null
+    } else {
+        project.registerSkikoTask<HideSkiaSymbolsTask>(
+            "hideSkiaSymbols".withSuffix(isUikitSim = isUikitSim),
+            os,
+            arch
+        ) {
+            targetOs.set(os)
+            symbolExtractorCommand.set(if (os == OS.IOS || os == OS.TVOS) listOf("xcrun", "nm") else listOf("nm"))
+            symbolSourceLibraries.from(hiddenSymbolSources.map { File(it) })
+            outputFile.set(hiddenSymbolsFile)
+        }
     }
 
     val linkerFlags = when (os) {
@@ -367,6 +389,14 @@ fun SkikoProjectContext.configureNativeTarget(
             options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
             mutableListOfLinkerOptions(options)
         }
+        OS.Windows -> {
+            val options = mutableListOf<String>()
+            options.addAll(windowsSdkPaths.libDirs.map { "-L${it.absolutePath}" })
+            options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
+            options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
+            options.addAll(resolvedBinaryInputs.linkFlags)
+            mutableListOfLinkerOptions(options)
+        }
         else -> mutableListOf()
     }
     if (skiko.includeTestHelpers) {
@@ -405,12 +435,16 @@ fun SkikoProjectContext.configureNativeTarget(
         }
         inputs.files(objectFiles)
         val outDir = layout.buildDirectory.dir("nativeBridges/static/$targetString").get().asFile
-        val staticLib = "$nativeBridgesLibPrefix-$targetString.a"
+        val staticLib = "$nativeBridgesLibPrefix-$targetString$bridgesLibraryExtension"
         workingDir = outDir
         when (os) {
             OS.Linux -> {
                 executable = if (arch == Arch.Arm64 && hostArch != Arch.Arm64) "aarch64-linux-gnu-ar" else "ar"
                 argumentProviders.add { listOf("-crs", staticLib) }
+            }
+            OS.Windows -> {
+                executable = windowsSdkPaths.linker.parentFile.resolve("lib.exe").absolutePath
+                argumentProviders.add { listOf("/NOLOGO", "/OUT:$staticLib") }
             }
             OS.MacOS, OS.IOS, OS.TVOS -> {
                 executable = "libtool"
@@ -452,14 +486,18 @@ fun SkikoProjectContext.configureNativeTarget(
         linkTask
     }
 
-    hideSkiaSymbols.configure {
+    hideSkiaSymbols?.configure {
         dependsOn(unzipper)
         dependsOn(compilationDependency)
     }
 
     target.compilations.all {
         compileTaskProvider.configure {
-            dependsOn(hideSkiaSymbols)
+            if (hideSkiaSymbols != null) {
+                dependsOn(hideSkiaSymbols)
+            } else {
+                dependsOn(compilationDependency)
+            }
         }
     }
 }

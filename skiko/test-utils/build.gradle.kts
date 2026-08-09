@@ -68,6 +68,9 @@ kotlin {
         linuxX64()
         linuxArm64()
     }
+    if (supportNativeWindows) {
+        mingwX64()
+    }
     if (supportNativeIosArm64) {
         iosArm64()
     }
