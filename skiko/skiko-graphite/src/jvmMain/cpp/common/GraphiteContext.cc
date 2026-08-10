@@ -38,6 +38,35 @@ Java_org_jetbrains_skia_gpu_graphite_GraphiteContextKt__1nMakeMetal(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
+Java_org_jetbrains_skia_gpu_graphite_GraphiteContextKt__1nMakeVulkan(
+        JNIEnv*, jclass, jlong instancePtr, jlong physicalDevicePtr, jlong devicePtr,
+        jlong queuePtr, jint graphicsQueueIndex, jint maxApiVersion) {
+#if defined(SK_VULKAN)
+    skgpu::VulkanBackendContext backendContext{};
+    backendContext.fInstance = reinterpret_cast<VkInstance>(static_cast<uintptr_t>(instancePtr));
+    backendContext.fPhysicalDevice =
+            reinterpret_cast<VkPhysicalDevice>(static_cast<uintptr_t>(physicalDevicePtr));
+    backendContext.fDevice = reinterpret_cast<VkDevice>(static_cast<uintptr_t>(devicePtr));
+    backendContext.fQueue = reinterpret_cast<VkQueue>(static_cast<uintptr_t>(queuePtr));
+    backendContext.fGraphicsQueueIndex = graphicsQueueIndex;
+    backendContext.fMaxAPIVersion = maxApiVersion;
+    backendContext.fGetProc = skikoVulkanGetProc();
+    backendContext.fMemoryAllocator =
+            skgpu::VulkanMemoryAllocators::Make(backendContext, static_cast<skgpu::ThreadSafe>(true));
+    if (!backendContext.fMemoryAllocator) {
+        return 0;
+    }
+
+    skgpu::graphite::ContextOptions options{};
+    options.fRequireOrderedRecordings = true;
+    auto context = skgpu::graphite::ContextFactory::MakeVulkan(backendContext, options);
+    return reinterpret_cast<jlong>(context.release());
+#else
+    return 0;
+#endif
+}
+
+extern "C" JNIEXPORT jlong JNICALL
 Java_org_jetbrains_skia_gpu_graphite_GraphiteContextKt__1nMakeRecorder(
         JNIEnv*, jclass, jlong contextPtr) {
     auto context = reinterpret_cast<skgpu::graphite::Context*>(

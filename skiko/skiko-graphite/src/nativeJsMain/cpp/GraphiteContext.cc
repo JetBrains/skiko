@@ -27,6 +27,16 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_GraphiteContext__1nM
             skgpu::graphite::ContextFactory::MakeMetal(backendContext, options).release());
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeVulkan(
+        KNativePointer,
+        KNativePointer,
+        KNativePointer,
+        KNativePointer,
+        int,
+        int) {
+    return 0;
+}
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeRecorder(
         KNativePointer contextPtr) {
     auto context = reinterpret_cast<skgpu::graphite::Context*>(contextPtr);
