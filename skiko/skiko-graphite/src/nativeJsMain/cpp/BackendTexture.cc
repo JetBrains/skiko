@@ -18,3 +18,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_BackendTexture__1nMa
             reinterpret_cast<CFTypeRef>(texturePtr));
     return reinterpret_cast<KNativePointer>(new skgpu::graphite::BackendTexture(texture));
 }
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeVulkan(
+        KInt,
+        KInt,
+        KInt,
+        KInt,
+        KNativePointer,
+        KInteropPointer) {
+    return 0;
+}
