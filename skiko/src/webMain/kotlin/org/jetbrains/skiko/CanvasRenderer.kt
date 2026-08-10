@@ -55,7 +55,11 @@ internal abstract class CanvasRenderer(
         }
     }
 
+    /**
+     * (Re)creates the render target, surface and [canvas] at the current [width]/[height].
+     */
     fun initCanvas() {
+        GL.makeContextCurrent(contextPointer)
         disposeCanvas()
 
         renderTarget = BackendRenderTarget.makeGL(width, height, 1, 8, 0, 0x8058)
@@ -70,7 +74,11 @@ internal abstract class CanvasRenderer(
         canvas = surface!!.canvas
     }
 
+    /**
+     * Frees the surface and render target.
+     */
     private fun disposeCanvas() {
+        GL.makeContextCurrent(contextPointer)
         surface?.close()
         surface = null
         renderTarget?.close()
@@ -90,7 +98,6 @@ internal abstract class CanvasRenderer(
         if (width == this.width && height == this.height) return
         this.width = width
         this.height = height
-        GL.makeContextCurrent(contextPointer)
         initCanvas()
     }
 
