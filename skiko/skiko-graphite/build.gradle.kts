@@ -44,10 +44,13 @@ val graphiteDependencies: SkikoDependencyScope.() -> Unit = {
             }
             linux {
                 staticSkiaLibs("skia_graphite_ext")
+                dynamicSystemLibs("vulkan")
+                compilerFlags("-DSK_VULKAN", "-DSK_USE_INTERNAL_VULKAN_HEADERS")
             }
             windows {
-                staticSkiaLibs("skia_graphite_dawn_ext", "dawn_combined")
-                dynamicSystemLibs("onecore_apiset", "dxguid")
+                staticSkiaLibs("skia_graphite_ext")
+                dynamicSystemLibs("vulkan-1", "onecore_apiset", "dxguid")
+                compilerFlags("-DSK_VULKAN", "-DSK_USE_INTERNAL_VULKAN_HEADERS")
             }
         }
         native {

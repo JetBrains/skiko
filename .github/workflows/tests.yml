@@ -196,6 +196,7 @@ jobs:
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
+              -Pskiko.graphite.jvm.enabled=true \
               -Dskiko.test.onci=true \
               -Dskiko.test.performance.enabled=false \
               awtTest
@@ -333,6 +334,7 @@ jobs:
         name: 'Run AWT tests'
         run: |
           ./gradlew -p skiko --no-daemon --stacktrace \
+            -Pskiko.graphite.jvm.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
             -Dskiko.test.ui.renderApi.ignoreAssertsFor=OPENGL \

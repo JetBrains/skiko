@@ -19,6 +19,18 @@ runs:
       shell: bash
       run: brew install llvm
 
+    - name: Install Vulkan SDK
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $version = '1.4.357.0'
+        $sdk = "C:\VulkanSDK\$version"
+        $installer = "$env:RUNNER_TEMP\VulkanSDK-$version.exe"
+        Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/$version/windows/vulkan_sdk.exe?Human=true" -OutFile $installer
+        Start-Process -Wait -FilePath $installer -ArgumentList '--accept-licenses', '--default-answer', '--confirm-command', 'install', 'com.lunarg.vulkan.arm64'
+        "VULKAN_SDK=$sdk" >> $env:GITHUB_ENV
+        "$sdk\Bin" >> $env:GITHUB_PATH
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
       with:
