@@ -8,8 +8,7 @@ import kotlin.test.Test
 class GraphiteTest {
     @Test
     fun contextCanRecordAndSubmit() {
-        val context = makeTestGraphiteContext() ?: return
-        context.use { context ->
+        withTestGraphiteContext { context ->
             context.makeRecorder().use { recorder ->
                 recorder.snap().use { recording ->
                     context.insertRecording(recording)
@@ -21,4 +20,4 @@ class GraphiteTest {
 }
 
 @OptIn(ExperimentalSkikoApi::class)
-internal expect fun makeTestGraphiteContext(): GraphiteContext?
+internal expect fun withTestGraphiteContext(block: (GraphiteContext) -> Unit)
