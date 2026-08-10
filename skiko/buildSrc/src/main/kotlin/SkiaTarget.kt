@@ -29,7 +29,7 @@ enum class SkiaTarget(
         MACOS -> if (hostArch == Arch.Arm64) listOf(Arch.Arm64, Arch.X64) else listOf(Arch.X64)
         WINDOWS -> listOf(hostArch)
         LINUX -> listOf(hostArch)
-        WASM -> listOf(hostArch)
+        WASM -> listOf(Arch.Wasm)
     }
 
     fun getGradleFlags(hostArch: Arch): List<String> {

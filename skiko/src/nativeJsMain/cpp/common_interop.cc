@@ -338,44 +338,38 @@ namespace skija {
 
 // Callback support
 
-#ifdef __EMSCRIPTEN__
+#ifdef SKIKO_WASM
+
+extern "C" {
+    void _releaseCallback(KInteropPointer cb);
+    KBoolean _callBooleanCallback(KInteropPointer cb);
+    KInt _callIntCallback(KInteropPointer cb);
+    KNativePointer _callNativePointerCallback(KInteropPointer cb);
+    void _callVoidCallback(KInteropPointer cb);
+}
 
 void disposeCallback(KInteropPointer cb) {
-    EM_ASM({ _releaseCallback($0) }, cb);
+    _releaseCallback(cb);
 }
 
 KBoolean callBooleanCallback(KInteropPointer cb) {
-    int value = EM_ASM_INT({
-        return _callCallback($0).value ? 1 : 0;
-    }, cb);
-    return static_cast<KBoolean>(value);
+    return _callBooleanCallback(cb);
 }
 
 KInt callIntCallback(KInteropPointer cb) {
-    int value = EM_ASM_INT({
-        return _callCallback($0).value;
-    }, cb);
-    return static_cast<KInt>(value);
+    return _callIntCallback(cb);
 }
 
 KNativePointer callNativePointerCallback(KInteropPointer cb) {
-    int value = EM_ASM_INT({
-        return _callCallback($0).value;
-    }, cb);
-    return reinterpret_cast<KNativePointer>(value);
+    return _callNativePointerCallback(cb);
 }
 
 KInteropPointer callInteropPointerCallback(KInteropPointer cb) {
-    int value = EM_ASM_INT({
-        return _callCallback($0).value;
-    }, cb);
-    return reinterpret_cast<KInteropPointer>(value);
+    return reinterpret_cast<KInteropPointer>(_callNativePointerCallback(cb));
 }
 
 void callVoidCallback(KInteropPointer cb) {
-    EM_ASM({
-        _callCallback($0);
-    }, cb);
+    _callVoidCallback(cb);
 }
 
 
@@ -397,7 +391,7 @@ SKIKO_EXPORT void skia_memSetFloat(KFloat* address, KFloat value) { address[0] =
 SKIKO_EXPORT KDouble skia_memGetDouble(KDouble* address) { return *address; }
 SKIKO_EXPORT void skia_memSetDouble(KDouble* address, KDouble value) { address[0] = value; }
 
-#else // __EMSCRIPTEN__
+#else // SKIKO_WASM
 
 static SkikoDisposeCallback disposeCallbackImpl = nullptr;
 static SkikoCallBooleanCallback callBooleanCallbackImpl = nullptr;
