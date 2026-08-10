@@ -42,17 +42,17 @@ internal abstract class CanvasRenderer(
         initCanvas()
     }
 
-    private val requestAnimationFrameCallback: (timestamp: Double) -> Unit = { timestamp ->
+    private val requestAnimationFrameCallback: (timestamp: Double) -> Unit = callback@{ timestamp ->
         redrawScheduled = false
-        if (!isDisposed) {
-            GL.makeContextCurrent(contextPointer)
-            // `clear` and `resetMatrix` make canvas not accumulate previous effects
-            canvas?.clear(Color.WHITE)
-            canvas?.resetMatrix()
-            drawFrame(timestamp)
-            surface?.flushAndSubmit()
-            context.flush()
-        }
+        if (isDisposed) return@callback
+
+        GL.makeContextCurrent(contextPointer)
+        // `clear` and `resetMatrix` make canvas not accumulate previous effects
+        canvas?.clear(Color.WHITE)
+        canvas?.resetMatrix()
+        drawFrame(timestamp)
+        surface?.flushAndSubmit()
+        context.flush()
     }
 
     /**
