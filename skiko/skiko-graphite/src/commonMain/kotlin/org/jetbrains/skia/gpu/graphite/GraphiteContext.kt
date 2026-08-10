@@ -103,12 +103,45 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param recording recording to insert.
      */
     fun insertRecording(recording: Recording) {
+        insertRecording(InsertRecordingInfo(recording))
+    }
+
+    /**
+     * Adds a recording and associated submission metadata (such as wait/signal semaphores)
+     * to this context's pending GPU work.
+     *
+     * @param info recording insertion parameters.
+     */
+    fun insertRecording(info: InsertRecordingInfo) {
         try {
             Stats.onNativeCall()
-            _nInsertRecording(nativePtr, recording.nativePtr)
+            val waitSemPtrs = NativePointerArray(info.waitSemaphores.size)
+            val signalSemPtrs = NativePointerArray(info.signalSemaphores.size)
+            for (index in info.waitSemaphores.indices) {
+                waitSemPtrs[index] = info.waitSemaphores[index].nativePtr
+            }
+            for (index in info.signalSemaphores.indices) {
+                signalSemPtrs[index] = info.signalSemaphores[index].nativePtr
+            }
+            interopScope {
+                _nInsertRecording(
+                    nativePtr,
+                    info.recording.nativePtr,
+                    toInterop(waitSemPtrs),
+                    info.waitSemaphores.size,
+                    toInterop(signalSemPtrs),
+                    info.signalSemaphores.size,
+                )
+            }
         } finally {
             reachabilityBarrier(this)
-            reachabilityBarrier(recording)
+            reachabilityBarrier(info.recording)
+            for (sem in info.waitSemaphores) {
+                reachabilityBarrier(sem)
+            }
+            for (sem in info.signalSemaphores) {
+                reachabilityBarrier(sem)
+            }
         }
     }
 
@@ -151,7 +184,14 @@ private external fun _nMakeVulkan(
 private external fun _nMakeRecorder(contextPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nInsertRecording")
-private external fun _nInsertRecording(contextPtr: NativePointer, recordingPtr: NativePointer)
+private external fun _nInsertRecording(
+    contextPtr: NativePointer,
+    recordingPtr: NativePointer,
+    waitSemaphoresPtrs: InteropPointer,
+    waitSemaphoresCount: Int,
+    signalSemaphoresPtrs: InteropPointer,
+    signalSemaphoresCount: Int,
+)
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nSubmit")
 private external fun _nSubmit(contextPtr: NativePointer, syncCpu: Boolean)

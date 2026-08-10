@@ -1,6 +1,9 @@
+#include <vector>
+
 #include "common.h"
 #include "GraphiteImageProvider.hh"
 
+#include "include/gpu/graphite/BackendSemaphore.h"
 #include "include/gpu/graphite/Context.h"
 #include "include/gpu/graphite/ContextOptions.h"
 #include "include/gpu/graphite/GraphiteTypes.h"
@@ -46,10 +49,46 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_graphite_GraphiteContext__1nM
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_gpu_graphite_GraphiteContext__1nInsertRecording(
-        KNativePointer contextPtr, KNativePointer recordingPtr) {
+        KNativePointer contextPtr,
+        KNativePointer recordingPtr,
+        KInteropPointer waitSemaphoresPtrs,
+        KInt waitSemaphoresCount,
+        KInteropPointer signalSemaphoresPtrs,
+        KInt signalSemaphoresCount) {
     auto context = reinterpret_cast<skgpu::graphite::Context*>(contextPtr);
+    if (!context) return;
+
     skgpu::graphite::InsertRecordingInfo info{};
     info.fRecording = reinterpret_cast<skgpu::graphite::Recording*>(recordingPtr);
+
+    std::vector<skgpu::graphite::BackendSemaphore> waitSemaphores;
+    if (waitSemaphoresPtrs && waitSemaphoresCount > 0) {
+        waitSemaphores.reserve(waitSemaphoresCount);
+        auto ptrs = reinterpret_cast<KNativePointer*>(waitSemaphoresPtrs);
+        for (KInt i = 0; i < waitSemaphoresCount; ++i) {
+            auto sem = reinterpret_cast<skgpu::graphite::BackendSemaphore*>(ptrs[i]);
+            if (sem) {
+                waitSemaphores.push_back(*sem);
+            }
+        }
+    }
+    info.fNumWaitSemaphores = waitSemaphores.size();
+    info.fWaitSemaphores = waitSemaphores.data();
+
+    std::vector<skgpu::graphite::BackendSemaphore> signalSemaphores;
+    if (signalSemaphoresPtrs && signalSemaphoresCount > 0) {
+        signalSemaphores.reserve(signalSemaphoresCount);
+        auto ptrs = reinterpret_cast<KNativePointer*>(signalSemaphoresPtrs);
+        for (KInt i = 0; i < signalSemaphoresCount; ++i) {
+            auto sem = reinterpret_cast<skgpu::graphite::BackendSemaphore*>(ptrs[i]);
+            if (sem) {
+                signalSemaphores.push_back(*sem);
+            }
+        }
+    }
+    info.fNumSignalSemaphores = signalSemaphores.size();
+    info.fSignalSemaphores = signalSemaphores.data();
+
     context->insertRecording(info);
 }
 
