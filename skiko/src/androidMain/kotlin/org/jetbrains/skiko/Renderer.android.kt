@@ -118,7 +118,7 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manag
         val intBuf1 = IntBuffer.allocate(1)
         gl.glGetIntegerv(GLES30.GL_DRAW_FRAMEBUFFER_BINDING, intBuf1)
         val fbId = intBuf1[0]
-        renderTarget = makeGLRenderTarget(
+        renderTarget = BackendRenderTarget.makeGL(
             width,
             height,
             0,
@@ -126,7 +126,7 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manag
             fbId,
             FramebufferFormat.GR_GL_RGBA8
         )
-        context = makeGLContext()
+        context = DirectContext.makeGL()
         surface = Surface.makeFromBackendRenderTarget(
             context!!,
             renderTarget!!,
