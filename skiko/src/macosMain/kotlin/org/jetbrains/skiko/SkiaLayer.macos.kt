@@ -4,7 +4,7 @@ import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.renderer.Renderer
 import platform.AppKit.*
 import platform.Foundation.NSNotification
 import platform.Foundation.NSNotificationCenter
@@ -63,7 +63,7 @@ actual open class SkiaLayer {
      */
     actual var renderDelegate: SkikoRenderDelegate? = null
 
-    internal var redrawer: Redrawer? = null
+    internal var renderer: Renderer? = null
 
     /**
      * Created/updated by recording in [update].
@@ -75,14 +75,14 @@ actual open class SkiaLayer {
     private val nsViewObserver = object : NSObject() {
         @ObjCAction
         fun frameDidChange(notification: NSNotification) {
-            redrawer?.syncBoundsFromPlatformComponent()
-            redrawer?.renderImmediately()
+            renderer?.syncBoundsFromPlatformComponent()
+            renderer?.renderImmediately()
         }
 
         @ObjCAction
         fun windowDidChangeBackingProperties(notification: NSNotification) {
-            redrawer?.syncBoundsFromPlatformComponent()
-            redrawer?.renderImmediately()
+            renderer?.syncBoundsFromPlatformComponent()
+            renderer?.renderImmediately()
         }
 
         fun addObserver() {
@@ -116,7 +116,7 @@ actual open class SkiaLayer {
         nsView = container
         nsView.postsFrameChangedNotifications = true
         nsViewObserver.addObserver()
-        redrawer = createNativeRedrawer(this, renderApi).apply {
+        renderer = createNativeRenderer(this, renderApi).apply {
             syncBoundsFromPlatformComponent()
             needRender()
         }
@@ -124,15 +124,15 @@ actual open class SkiaLayer {
 
     actual fun detach() {
         nsViewObserver.removeObserver()
-        redrawer?.dispose()
-        redrawer = null
+        renderer?.dispose()
+        renderer = null
     }
 
     /**
      * Schedules a frame to an appropriate moment.
      */
     actual fun needRender(throttledToVsync: Boolean) {
-        redrawer?.needRender(throttledToVsync)
+        renderer?.needRender(throttledToVsync)
     }
 
     @Deprecated(

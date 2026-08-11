@@ -11,10 +11,10 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skiko.redrawer.AwtRedrawer
-import org.jetbrains.skiko.redrawer.MetalRedrawer
-import org.jetbrains.skiko.redrawer.MetalVSyncer
-import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.renderer.AwtRenderer
+import org.jetbrains.skiko.renderer.MetalRenderer
+import org.jetbrains.skiko.renderer.MetalVSyncer
+import org.jetbrains.skiko.renderer.Renderer
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -112,12 +112,12 @@ class SkiaLayerTest {
             window.addKeyListener(object : KeyAdapter() {
                 override fun keyTyped(e: KeyEvent?) {
                     launch {
-                        val redrawer = window.layer.redrawer as MetalRedrawer
-                        redrawer.renderImmediately()
+                        val renderer = window.layer.renderer as MetalRenderer
+                        renderer.renderImmediately()
                         counter1 += 1
-                        redrawer.renderImmediately()
+                        renderer.renderImmediately()
                         counter2 += 1
-                        redrawer.renderImmediately()
+                        renderer.renderImmediately()
                     }
                 }
             })
@@ -638,11 +638,11 @@ class SkiaLayerTest {
         }
     }
 
-    private abstract class BaseTestRedrawer(
+    private abstract class BaseTestRenderer(
         layer: SkiaLayer,
         analytics: SkiaLayerAnalytics,
         renderApi: GraphicsApi,
-    ): AwtRedrawer(layer, analytics, renderApi) {
+    ): AwtRenderer(layer, analytics, renderApi) {
         private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
             renderImmediately()
         }
@@ -660,21 +660,21 @@ class SkiaLayerTest {
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on init context`() = uiTest {
         testFallbackToSoftware { layer, renderApi, analytics, _ ->
-            object : BaseTestRedrawer(layer, analytics, renderApi) {
+            object : BaseTestRenderer(layer, analytics, renderApi) {
                 override fun renderImmediately() = layer.inDrawScope { draw() }
             }
         }
     }
 
     @Test(timeout = 60000)
-    fun `fallback to software renderer, fail on create redrawer`() = uiTest {
+    fun `fallback to software renderer, fail on create renderer`() = uiTest {
         testFallbackToSoftware { _, _, _, _ -> throw RenderException() }
     }
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on draw`() = uiTest {
         testFallbackToSoftware { layer, renderApi, analytics, _ ->
-            object : BaseTestRedrawer(layer, analytics, renderApi) {
+            object : BaseTestRenderer(layer, analytics, renderApi) {
                 override fun renderImmediately() = layer.inDrawScope {
                     throw RenderException()
                 }
@@ -712,16 +712,16 @@ class SkiaLayerTest {
     private class OverrideNonSoftwareRenderFactory(
         private val nonSoftwareRenderFactory: RenderFactory
     ) : RenderFactory {
-        override fun createRedrawer(
+        override fun createRenderer(
             layer: SkiaLayer,
             renderApi: GraphicsApi,
             analytics: SkiaLayerAnalytics,
             properties: SkiaLayerProperties
-        ): Redrawer {
+        ): Renderer {
             return if (renderApi == GraphicsApi.SOFTWARE_COMPAT) {
-                RenderFactory.Default.createRedrawer(layer, renderApi, analytics, properties)
+                RenderFactory.Default.createRenderer(layer, renderApi, analytics, properties)
             } else {
-                nonSoftwareRenderFactory.createRedrawer(layer, renderApi, analytics, properties)
+                nonSoftwareRenderFactory.createRenderer(layer, renderApi, analytics, properties)
             }
         }
     }
@@ -730,7 +730,7 @@ class SkiaLayerTest {
     fun `renderApi change callback is invoked on fallback`() = uiTest {
         val window = UiTestWindow(
             renderFactory = OverrideNonSoftwareRenderFactory { layer, renderApi, analytics, _ ->
-                object : BaseTestRedrawer(layer, analytics, renderApi) {
+                object : BaseTestRenderer(layer, analytics, renderApi) {
                     override fun renderImmediately() = layer.inDrawScope {
                         throw RenderException()
                     }
@@ -1111,7 +1111,7 @@ class SkiaLayerTest {
     @Test
     fun `no window flash on hide or dispose while animation is running`() = uiTest {
         assumeTrue(hostOs.isMacOS)
-        // Until the issue is fixed in other redrawers
+        // Until the issue is fixed in other renderers
         // Don't use assumeTrue, as uiTest iterates over multiple renderers,
         // and if one of them skipped, the whole test is skipped
         if (renderApi != GraphicsApi.METAL) return@uiTest
@@ -1323,7 +1323,7 @@ class SkiaLayerTest {
     @Test
     fun `temporary change is not visible with needRender(throttledToVsync = false)`() = uiTest {
         assumeTrue(hostOs.isMacOS)
-        // The separation between update and draw is only implemented in MetalRedrawer at the moment
+        // The separation between update and draw is only implemented in MetalRenderer at the moment
         // Don't use assumeTrue, as uiTest iterates over multiple renderers,
         // and if one of them skipped, the whole test is skipped
         if (renderApi != GraphicsApi.METAL) return@uiTest
