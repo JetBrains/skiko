@@ -310,7 +310,7 @@ internal class Direct3DRenderer(
     /**
      * Flushes the given Skia surface into the Direct3D swap-chain buffer.
      *
-     * @see "src/awtMain/cpp/windows/direct3DContext.cc" -- native implementation
+     * @see "src/awtMain/cpp/windows/directXRenderer.cc" -- native implementation
      */
     private external fun flush(context: Long, surface: Long)
 }

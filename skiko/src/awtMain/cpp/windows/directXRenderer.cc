@@ -791,6 +791,22 @@ extern "C"
             delete state;
         }
     }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_renderer_Direct3DRenderer_flush(
+        JNIEnv *env, jobject renderer, jlong contextPtr, jlong surfacePtr)
+    {
+        __try
+        {
+            SkSurface *surface = fromJavaPointer<SkSurface *>(surfacePtr);
+            GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
+            context->flush(surface, SkSurfaces::BackendSurfaceAccess::kPresent, GrFlushInfo());
+            context->submit(GrSyncCpu::kYes);
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            throwJavaRenderExceptionByExceptionCode(env, __FUNCTION__, code);
+        }
+    }
 }
 
 #endif

@@ -32,7 +32,6 @@ internal value class MetalDevice(val ptr: Long)
  * Content to draw is provided by [SkiaLayer.draw].
  *
  * @see "src/awtMain/objectiveC/macos/MetalRenderer.mm" -- native implementation
- * @see "src/awtMain/objectiveC/macos/MetalRendererSurface.mm" -- native surface/present implementation
  * @see FrameDispatcher
  */
 internal class MetalRenderer(
