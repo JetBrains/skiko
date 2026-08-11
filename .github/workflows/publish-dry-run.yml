@@ -95,7 +95,6 @@ jobs:
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
               -Pskiko.awt.enabled=true \
-              -Pskiko.graphite.jvm.enabled=true \
               -Pskiko.arch=x64 \
               publishToMavenLocal
 
@@ -170,7 +169,6 @@ jobs:
           ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Pskiko.awt.enabled=true \
-            -Pskiko.graphite.jvm.enabled=true \
             -Pskiko.arch=arm64 \
             publishToMavenLocal
 
@@ -233,7 +231,6 @@ jobs:
           ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
             -Pskiko.awt.enabled=true \
-            -Pskiko.graphite.jvm.enabled=true \
             -Pskiko.arch=x64 \
             publishToMavenLocal
 

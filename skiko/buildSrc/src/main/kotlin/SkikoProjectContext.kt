@@ -185,10 +185,6 @@ val Project.supportAndroid: Boolean
 val Project.supportAwt: Boolean
     get() = findProperty(SkikoGradleProperties.AWT_ENABLED) == "true" || isInIdea
 
-val Project.supportGraphiteJvm: Boolean
-    get() = (hostOs == OS.MacOS || hostOs == OS.Linux || hostOs == OS.Windows) &&
-        findProperty(SkikoGradleProperties.GRAPHITE_JVM_ENABLED) == "true"
-
 val Project.supportAllNative: Boolean
     get() = findProperty(SkikoGradleProperties.NATIVE_ENABLED) == "true" || isInIdea
 
