@@ -4,15 +4,8 @@
 #include <jawt_md.h>
 #include "jni_helpers.h"
 #include "exceptions_handler.h"
-#include "ganesh/GrBackendSurface.h"
-#include "ganesh/GrDirectContext.h"
-#include "ganesh/gl/GrGLBackendSurface.h"
-#include "ganesh/gl/GrGLDirectContext.h"
-#include "SkSurface.h"
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
-#include "ganesh/gl/GrGLAssembleInterface.h"
-#include "ganesh/gl/GrGLDefines.h"
 #include <GL/gl.h>
 #include "window_util.h"
 
@@ -25,10 +18,8 @@ public:
     EGLContext context = EGL_NO_CONTEXT;
     EGLSurface surface = EGL_NO_SURFACE;
     EGLConfig surfaceConfig;
-    sk_sp<const GrGLInterface> backendContext;
     ~AngleDevice()
     {
-        backendContext.reset(nullptr);
         if (EGL_NO_CONTEXT != context)
         {
             eglDestroyContext(display, context);
@@ -60,6 +51,13 @@ EGLDisplay getAngleEGLDisplay(HDC hdc)
     };
     return eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE, hdc, attribs);
 }
+
+static void (*getAngleGLProc(void *, const char name[]))()
+{
+    return eglGetProcAddress(name);
+}
+
+constexpr GLenum ANGLE_GL_FRAMEBUFFER_BINDING = 0x8CA6;
 
 bool initAngleSurface(JNIEnv *env, AngleDevice *angleDevice, EGLint width, EGLint height)
 {
@@ -163,12 +161,6 @@ extern "C"
                 return (jlong) 0;
             }
 
-            sk_sp<const GrGLInterface> glInterface(GrGLMakeAssembledInterface(
-                nullptr,
-                [](void *ctx, const char name[]) -> GrGLFuncPtr { return eglGetProcAddress(name); }));
-
-            angleDevice->backendContext = glInterface;
-
             return toJavaPointer(angleDevice);
         }
         __except(EXCEPTION_EXECUTE_HANDLER)
@@ -189,15 +181,13 @@ extern "C"
         }
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_AngleRendererKt_makeAngleContext(
-        JNIEnv *env, jobject renderer, jlong devicePtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_AngleRendererKt_getAngleGLProc(
+        JNIEnv *env, jobject renderer)
     {
-        AngleDevice *angleDevice = fromJavaPointer<AngleDevice *>(devicePtr);
-        sk_sp<const GrGLInterface> backendContext = angleDevice->backendContext;
-        return toJavaPointer(GrDirectContexts::MakeGL(backendContext).release());
+        return toJavaPointer(&getAngleGLProc);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_AngleRendererKt_makeAngleRenderTarget(
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_renderer_AngleRendererKt_getAngleFramebufferId(
         JNIEnv *env, jobject renderer, jlong devicePtr, jint width, jint height)
     {
         __try
@@ -207,30 +197,28 @@ extern "C"
             if (!initAngleSurface(env, angleDevice, width, height))
             {
                 throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not create surface!");
-                return (jlong) 0;
+                return 0;
             }
 
-            angleDevice->backendContext->fFunctions.fViewport(0, 0, width, height);
+            auto glViewport = reinterpret_cast<void (APIENTRY *)(GLint, GLint, GLsizei, GLsizei)>(eglGetProcAddress("glViewport"));
+            auto glGetIntegerv = reinterpret_cast<void (APIENTRY *)(GLenum, GLint *)>(eglGetProcAddress("glGetIntegerv"));
+            if (glViewport == nullptr || glGetIntegerv == nullptr)
+            {
+                throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not get OpenGL functions.");
+                return 0;
+            }
+            glViewport(0, 0, width, height);
 
-            GrGLint buffer;
-            angleDevice->backendContext->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer);
-
-            GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(buffer), GR_GL_RGBA8 };
-            GrBackendRenderTarget renderTarget = GrBackendRenderTargets::MakeGL(width,
-                                                                                height,
-                                                                                0,
-                                                                                8,
-                                                                                glInfo);
-            GrBackendRenderTarget *pRenderTarget = new GrBackendRenderTarget(renderTarget);
-
-            return toJavaPointer(pRenderTarget);
+            GLint framebuffer;
+            glGetIntegerv(ANGLE_GL_FRAMEBUFFER_BINDING, &framebuffer);
+            return framebuffer;
         }
         __except(EXCEPTION_EXECUTE_HANDLER)
         {
             auto code = GetExceptionCode();
             throwJavaRenderExceptionByExceptionCode(env, __FUNCTION__, code);
         }
-        return (jlong) 0;
+        return 0;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_renderer_AngleRendererKt_swapBuffers(
