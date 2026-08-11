@@ -6,6 +6,7 @@ import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class FontMgrTest {
@@ -93,6 +94,16 @@ class FontMgrTest {
         }
     }
 
+
+    @Test
+    @SkipJsTarget
+    @SkipWasmTarget
+    @SkipNativeTarget
+    fun matchFamilyStyleWithNullFamilyNameReturnsDefaultSystemFont() {
+        val typeface = FontMgr.default.matchFamilyStyle(null, FontStyle.NORMAL)
+        assertNotNull(typeface, "Expected default system font when passing null as familyName")
+        typeface.close()
+    }
 
     @Test
     @SkipJsTarget

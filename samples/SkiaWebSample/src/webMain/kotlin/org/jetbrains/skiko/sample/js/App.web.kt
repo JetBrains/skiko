@@ -23,7 +23,7 @@ private class DemoApp: SkikoRenderDelegate {
         setStroke(false)
     }
 
-    private val typeface: Typeface? = FontMgr.default.matchFamilyStyle(null, FontStyle.NORMAL)
+    private val typeface: Typeface? = FontMgr.default.matchFamilyStyle( "Roboto", FontStyle.NORMAL)
 
     private val font: Font? = typeface?.let { Font(it, 36f) }
 
