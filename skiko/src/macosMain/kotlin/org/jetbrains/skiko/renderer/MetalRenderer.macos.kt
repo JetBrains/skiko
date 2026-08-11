@@ -54,8 +54,6 @@ internal class MacOsMetalRenderer(
     @Volatile private var isWindowOccluded = false
 
     init {
-        metalLayer.init(layer, this, device)
-
         val window = layer.nsView.window!!
         occlusionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
             name = NSWindowDidChangeOcclusionStateNotification,
@@ -75,13 +73,19 @@ internal class MacOsMetalRenderer(
         }
     }
 
+    // Should be the last call in the constructor, after all other initialization is complete, to avoid
+    // passing a half-constructed `this` to the layer.
+    init {
+        metalLayer.init(layer, this, device)
+    }
+
     /**
-     * Creates and returns an instances of [DirectContext]
+     * Creates and returns instances of [DirectContext]
      */
     private fun makeContext(): DirectContext = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
 
     /**
-     * Creates and returns an instances of [BackendRenderTarget] ready for rendering.
+     * Creates and returns instances of [BackendRenderTarget] ready for rendering.
      *
      * https://developer.apple.com/documentation/quartzcore/cametallayer/1478172-nextdrawable
      */

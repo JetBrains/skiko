@@ -34,12 +34,14 @@ internal class MacOsOpenGLRenderer(
 ) : Renderer(layer) {
     private val glLayer = MacosGLLayer()
 
-    init {
-        glLayer.init(layer, this)
-    }
-
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         renderImmediately()
+    }
+
+    // Should be the last call in the constructor, after all other initialization is complete, to avoid
+    // passing a half-constructed `this` to the layer.
+    init {
+        glLayer.init(layer, this)
     }
 
     override fun dispose() {
