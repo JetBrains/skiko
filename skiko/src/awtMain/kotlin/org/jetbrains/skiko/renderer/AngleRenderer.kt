@@ -94,10 +94,8 @@ internal class AngleRenderer(
     private fun ensureContext(): Boolean {
         if (context == null) {
             try {
-                val newContext = DirectContext(
-                    makeAngleContext(device).takeIf { it != 0L }
-                        ?: throw RenderException("Failed to make GL context.")
-                )
+                val newContext = GLAssembledInterface.createFromNativePointers(0, getAngleGLProc())
+                    .use { DirectContext.makeGLWithInterface(it) }
                 context = newContext
                 onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
             } catch (e: Exception) {
@@ -118,9 +116,13 @@ internal class AngleRenderer(
             disposeSurface()
             context.flush()
 
-            renderTarget = BackendRenderTarget(
-                makeAngleRenderTarget(device, w, h).takeIf { it != 0L }
-                    ?: throw RenderException("Failed to make ANGLE render target.")
+            renderTarget = BackendRenderTarget.makeGL(
+                w,
+                h,
+                0,
+                8,
+                getAngleFramebufferId(device, w, h),
+                FramebufferFormat.GR_GL_RGBA8
             )
             surface = Surface.makeFromBackendRenderTarget(
                 context,
@@ -155,7 +157,7 @@ internal class AngleRenderer(
 
 private external fun createAngleDevice(platformInfo: Long, transparency: Boolean): Long
 private external fun makeCurrent(device: Long)
-private external fun makeAngleContext(device: Long): Long
-private external fun makeAngleRenderTarget(device: Long, width: Int, height: Int): Long
+private external fun getAngleGLProc(): Long
+private external fun getAngleFramebufferId(device: Long, width: Int, height: Int): Int
 private external fun swapBuffers(device: Long, waitForVsync: Boolean)
 private external fun disposeDevice(device: Long)
