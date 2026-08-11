@@ -52,11 +52,6 @@ EGLDisplay getAngleEGLDisplay(HDC hdc)
     return eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE, hdc, attribs);
 }
 
-static void (*getAngleGLProc(void *, const char name[]))()
-{
-    return eglGetProcAddress(name);
-}
-
 constexpr GLenum ANGLE_GL_FRAMEBUFFER_BINDING = 0x8CA6;
 
 bool initAngleSurface(JNIEnv *env, AngleDevice *angleDevice, EGLint width, EGLint height)
@@ -184,7 +179,9 @@ extern "C"
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_getAngleGLProc(
         JNIEnv *env, jobject redrawer)
     {
-        return toJavaPointer(&getAngleGLProc);
+        return toJavaPointer(+[](void *, const char name[]) {
+            return eglGetProcAddress(name);
+        });
     }
 
     JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawerKt_getAngleFramebufferId(
