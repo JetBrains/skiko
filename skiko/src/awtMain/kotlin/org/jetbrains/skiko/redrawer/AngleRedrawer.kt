@@ -2,13 +2,12 @@ package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.ContextBasedContextHandler
 
 internal class AngleRedrawer(
     layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : ContextBasedContextHandler(layer, analytics, GraphicsApi.ANGLE, "ANGLE") {
+) : ContextBasedRedrawer(layer, analytics, GraphicsApi.ANGLE, "ANGLE") {
     init {
         try {
             loadAngleLibrary()

@@ -3,7 +3,6 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.ContextFreeContextHandler
 import org.jetbrains.skiko.layerFrameLimiter
 import java.awt.Color
 import java.awt.Transparency
@@ -14,7 +13,7 @@ internal class SoftwareRedrawer(
     layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-) : ContextFreeContextHandler(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
+) : ContextFreeRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
     init {
         onDeviceChosen("Software")
     }

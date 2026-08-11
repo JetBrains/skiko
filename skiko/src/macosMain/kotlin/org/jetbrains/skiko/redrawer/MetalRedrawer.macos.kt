@@ -16,7 +16,6 @@ import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.currentNanoTime
 import platform.AppKit.NSWindowDidChangeOcclusionStateNotification
 import platform.AppKit.NSWindowOcclusionStateVisible
@@ -44,7 +43,7 @@ import kotlin.concurrent.Volatile
  */
 internal class MacOsMetalRedrawer(
     layer: SkiaLayer
-) : ContextHandler(layer) {
+) : Redrawer(layer) {
     private var isDisposed = false
     internal val device = MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
@@ -191,7 +190,6 @@ internal class MacOsMetalRedrawer(
         }
     }
 
-    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 
     override fun initContext(): Boolean {
         try {
@@ -244,7 +242,7 @@ internal class MacOsMetalRedrawer(
 
 internal class MetalLayer : CAMetalLayer {
     private lateinit var skiaLayer: SkiaLayer
-    private lateinit var contextHandler: ContextHandler
+    private lateinit var redrawer: Redrawer
 
     @OverrideInit
     constructor(): super()
@@ -253,11 +251,11 @@ internal class MetalLayer : CAMetalLayer {
 
     fun init(
         layer: SkiaLayer,
-        contextHandler: ContextHandler,
+        redrawer: Redrawer,
         theDevice: MTLDeviceProtocol
     ) {
         this.skiaLayer = layer
-        this.contextHandler = contextHandler
+        this.redrawer = redrawer
         this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
@@ -281,7 +279,7 @@ internal class MetalLayer : CAMetalLayer {
     override fun drawInContext(ctx: CGContextRef?) {
         skiaLayer.update(currentNanoTime())
         skiaLayer.inDrawScope {
-            contextHandler.draw()
+            redrawer.draw()
         }
     }
 }

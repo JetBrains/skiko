@@ -4,7 +4,6 @@ import kotlinx.coroutines.*
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.ContextFreeContextHandler
 import org.jetbrains.skiko.layerFrameLimiter
 import java.lang.ref.Reference
 
@@ -12,7 +11,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-) : ContextFreeContextHandler(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
+) : ContextFreeRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
     private val frameJob = Job()
     private val frameLimiter = layerFrameLimiter(CoroutineScope(frameJob), layer.backedLayer)
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {

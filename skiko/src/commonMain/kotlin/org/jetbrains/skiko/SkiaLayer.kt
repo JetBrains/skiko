@@ -3,7 +3,7 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.PixelGeometry
-import org.jetbrains.skiko.context.ContextHandler
+import org.jetbrains.skiko.redrawer.Redrawer
 
 /**
  * Generic layer for Skiko rendering.
@@ -99,7 +99,7 @@ internal class LayerDrawScope(
         scaledLayerHeight = (layerHeight * scale).toInt().coerceAtLeast(0)
     )
 
-    internal fun ContextHandler.draw(flush: Boolean = true) {
+    internal fun Redrawer.draw(flush: Boolean = true) {
         this@LayerDrawScope.draw(flush)
     }
 }

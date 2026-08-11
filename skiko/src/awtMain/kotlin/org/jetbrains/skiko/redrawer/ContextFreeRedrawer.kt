@@ -1,14 +1,14 @@
-package org.jetbrains.skiko.context
+package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerAnalytics
 
-internal abstract class ContextFreeContextHandler(
+internal abstract class ContextFreeRedrawer(
     layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     graphicsApi: GraphicsApi
-) : AwtContextHandler(layer, analytics, graphicsApi) {
+) : AwtRedrawer(layer, analytics, graphicsApi) {
     private var isInitialized = false
 
     override fun initContext(): Boolean {

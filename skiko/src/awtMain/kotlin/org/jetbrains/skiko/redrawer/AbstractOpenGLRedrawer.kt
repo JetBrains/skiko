@@ -2,7 +2,6 @@ package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.ContextBasedContextHandler
 
 /**
  * Common base of the platform-specific OpenGL redrawers.
@@ -10,7 +9,7 @@ import org.jetbrains.skiko.context.ContextBasedContextHandler
 internal abstract class AbstractOpenGLRedrawer(
     layer: SkiaLayer,
     analytics: SkiaLayerAnalytics
-) : ContextBasedContextHandler(layer, analytics, GraphicsApi.OPENGL, "OpenGL") {
+) : ContextBasedRedrawer(layer, analytics, GraphicsApi.OPENGL, "OpenGL") {
 
     override fun makeContext() = makeGLContext()
 

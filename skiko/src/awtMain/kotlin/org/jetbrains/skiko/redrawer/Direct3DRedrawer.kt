@@ -8,7 +8,6 @@ import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.ContextBasedContextHandler
 import java.awt.Dimension
 import java.lang.ref.Reference
 
@@ -16,7 +15,7 @@ internal class Direct3DRedrawer(
     layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : ContextBasedContextHandler(layer, analytics, GraphicsApi.DIRECT3D, "Direct3D") {
+) : ContextBasedRedrawer(layer, analytics, GraphicsApi.DIRECT3D, "Direct3D") {
 
     private var drawLock = Any()
     private var isSwapChainInitialized = false

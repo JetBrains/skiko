@@ -1,10 +1,8 @@
-package org.jetbrains.skiko.context
+package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.LockFile.Companion.skiko
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
-import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
-import org.jetbrains.skiko.redrawer.renderTime
 import java.awt.Dimension
 
 /**
@@ -12,11 +10,11 @@ import java.awt.Dimension
  * Don't forget to call [onDeviceChosen] and [onContextInit] to send necessary analytics.
  */
 @OptIn(ExperimentalSkikoApi::class)
-internal abstract class AwtContextHandler(
+internal abstract class AwtRedrawer(
     layer: SkiaLayer,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi,
-) : ContextHandler(layer) {
+) : Redrawer(layer) {
     private var isFirstFrameRendered = false
 
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
@@ -121,6 +119,4 @@ internal abstract class AwtContextHandler(
         renderImmediately()
         return true
     }
-
-    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 }

@@ -11,11 +11,10 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skiko.context.AwtContextHandler
+import org.jetbrains.skiko.redrawer.AwtRedrawer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -643,7 +642,7 @@ class SkiaLayerTest {
         layer: SkiaLayer,
         analytics: SkiaLayerAnalytics,
         renderApi: GraphicsApi,
-    ): AwtContextHandler(layer, analytics, renderApi) {
+    ): AwtRedrawer(layer, analytics, renderApi) {
         private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
             renderImmediately()
         }
@@ -651,7 +650,6 @@ class SkiaLayerTest {
         override fun needRender(throttledToVsync: Boolean) = frameDispatcher.scheduleFrame()
         override fun renderImmediately() = Unit
         override fun update(nanoTime: Long) = layer.update(nanoTime)
-        override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
         override fun LayerDrawScope.initCanvas() = Unit
         override fun initContext() = false
 

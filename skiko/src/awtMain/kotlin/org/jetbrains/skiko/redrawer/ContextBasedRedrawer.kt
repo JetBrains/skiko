@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.context
+package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.GraphicsApi
@@ -6,12 +6,12 @@ import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerAnalytics
 
-internal abstract class ContextBasedContextHandler(
+internal abstract class ContextBasedRedrawer(
     layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     graphicsApi: GraphicsApi,
     val name: String
-) : AwtContextHandler(layer, analytics, graphicsApi) {
+) : AwtRedrawer(layer, analytics, graphicsApi) {
 
     protected abstract fun makeContext(): DirectContext
 

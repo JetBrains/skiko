@@ -10,7 +10,6 @@ import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoDispatchers
-import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.currentNanoTime
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
@@ -32,7 +31,7 @@ import platform.QuartzCore.*
  */
 internal class MacOsOpenGLRedrawer(
     layer: SkiaLayer
-) : ContextHandler(layer) {
+) : Redrawer(layer) {
     private val glLayer = MacosGLLayer()
 
     init {
@@ -81,7 +80,6 @@ internal class MacOsOpenGLRedrawer(
         layer.nsView.setNeedsDisplay(true)
     }
 
-    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 
     override fun initContext(): Boolean {
         try {
@@ -147,16 +145,16 @@ internal class MacOsOpenGLRedrawer(
 
 internal class MacosGLLayer : CAOpenGLLayer {
     private lateinit var skiaLayer: SkiaLayer
-    private lateinit var contextHandler: ContextHandler
+    private lateinit var redrawer: Redrawer
 
     @OverrideInit
     constructor(): super()
     @OverrideInit
     constructor(layer: Any): super(layer)
 
-    fun init(layer: SkiaLayer, contextHandler: ContextHandler) {
+    fun init(layer: SkiaLayer, redrawer: Redrawer) {
         skiaLayer = layer
-        this.contextHandler = contextHandler
+        this.redrawer = redrawer
         this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
@@ -197,7 +195,7 @@ internal class MacosGLLayer : CAOpenGLLayer {
         try {
             skiaLayer.update(currentNanoTime())
             skiaLayer.inDrawScope {
-                contextHandler.draw()
+                redrawer.draw()
             }
         } catch (e: Throwable) {
             e.printStackTrace()
