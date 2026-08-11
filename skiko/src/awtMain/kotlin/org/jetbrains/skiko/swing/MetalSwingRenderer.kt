@@ -61,7 +61,8 @@ internal class MetalSwingRenderer(
     private val adapter: MetalAdapter = chooseMetalAdapter(swingLayerProperties.adapterPriority).also {
         onDeviceChosen(it.name)
     }
-    private val context: DirectContext = makeMetalContext()
+    private val commandQueuePtr = getCommandQueue(adapter.ptr)
+    private val context = DirectContext.makeMetal(adapter.ptr, commandQueuePtr)
 
     private var texturePtr: Long = 0
 
@@ -74,6 +75,7 @@ internal class MetalSwingRenderer(
     override fun dispose() {
         disposeMetalTexture(texturePtr)
         context.close()
+        disposeCommandQueue(commandQueuePtr)
         adapter.dispose()
         painter.dispose()
         super.dispose()
@@ -91,7 +93,7 @@ internal class MetalSwingRenderer(
         autoreleasepool {
             autoCloseScope {
                 texturePtr = makeMetalTexture(adapter.ptr, texturePtr, width, height)
-                val renderTarget = makeRenderTarget().autoClose()
+                val renderTarget = makeRenderTarget(width, height).autoClose()
                 val surface = Surface.makeFromBackendRenderTarget(
                     context,
                     renderTarget,
@@ -120,17 +122,14 @@ internal class MetalSwingRenderer(
             "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
     }
 
-    private fun makeRenderTarget() = BackendRenderTarget(
-        makeMetalRenderTargetOffScreen(texturePtr)
+    private fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget.makeMetal(
+        width = width,
+        height = height,
+        texturePtr = texturePtr
     )
 
-    private fun makeMetalContext(): DirectContext = DirectContext(
-        makeMetalContext(adapter.ptr)
-    )
-
-    private external fun makeMetalContext(adapter: Long): Long
-
-    private external fun makeMetalRenderTargetOffScreen(texture: Long): Long
+    private external fun getCommandQueue(devicePtr: Long): Long
+    private external fun disposeCommandQueue(queuePtr: Long)
 
     /**
      * Provides Metal texture taking given [oldTexture] into account since it
