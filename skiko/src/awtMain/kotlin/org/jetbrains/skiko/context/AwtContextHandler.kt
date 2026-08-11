@@ -1,8 +1,10 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.context
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.LockFile.Companion.skiko
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
+import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
+import org.jetbrains.skiko.redrawer.renderTime
 import java.awt.Dimension
 
 /**
@@ -10,11 +12,11 @@ import java.awt.Dimension
  * Don't forget to call [onDeviceChosen] and [onContextInit] to send necessary analytics.
  */
 @OptIn(ExperimentalSkikoApi::class)
-internal abstract class AWTRedrawer(
-    private val layer: SkiaLayer,
+internal abstract class AwtContextHandler(
+    layer: SkiaLayer,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi,
-) : Redrawer {
+) : ContextHandler(layer) {
     private var isFirstFrameRendered = false
 
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
@@ -27,8 +29,9 @@ internal abstract class AWTRedrawer(
     }
 
     override fun dispose() {
-        require(!isDisposed) { "$javaClass is disposed" }
+        checkDisposed()
         isDisposed = true
+        super.dispose()
     }
 
     /**
@@ -49,6 +52,21 @@ internal abstract class AWTRedrawer(
         checkDisposed()
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         deviceAnalytics?.contextInit()
+    }
+
+    /**
+     * Should be called when the Skia context has been created.
+     */
+    protected fun onContextInitialized() {
+        if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
+            Logger.info { "Renderer info:\n $renderInfo" }
+        }
+        context?.run {
+            val gpuResourceCacheLimit = layer.properties.gpuResourceCacheLimit
+            if (gpuResourceCacheLimit >= 0) {
+                resourceCacheLimit = gpuResourceCacheLimit
+            }
+        }
     }
 
     override fun update(nanoTime: Long) {

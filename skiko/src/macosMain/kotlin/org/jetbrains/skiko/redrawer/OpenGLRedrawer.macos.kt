@@ -2,39 +2,41 @@
 
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.useContents
+import kotlinx.cinterop.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.LayerDrawScope
+import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.context.ContextHandler
-import org.jetbrains.skiko.context.MacOSOpenGLContextHandler
 import org.jetbrains.skiko.currentNanoTime
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp
+import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
+import platform.OpenGL.glGetIntegerv
 import platform.OpenGLCommon.CGLContextObj
 import platform.OpenGLCommon.CGLPixelFormatObj
 import platform.OpenGLCommon.CGLSetCurrentContext
+import platform.OpenGLCommon.GLenum
 import platform.QuartzCore.CAOpenGLLayer
 import platform.QuartzCore.*
 
 /**
  * OpenGL [Redrawer] implementation for MacOs.
  *
- * Not actually used. See [SkiaLayer.renderApi]
+ * Not actually used, unless the corresponding [GraphicsApi] is hardcoded in [SkiaLayer].
+ * See [SkiaLayer.renderApi] and [MacOsMetalRedrawer] instead.
  */
 internal class MacOsOpenGLRedrawer(
-    private val skiaLayer: SkiaLayer
-) : Redrawer {
-    private val contextHandler = MacOSOpenGLContextHandler(skiaLayer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
-
+    layer: SkiaLayer
+) : ContextHandler(layer) {
     private val glLayer = MacosGLLayer()
 
     init {
-        glLayer.init(skiaLayer, contextHandler)
+        glLayer.init(layer, this)
     }
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
@@ -42,13 +44,13 @@ internal class MacOsOpenGLRedrawer(
     }
 
     override fun dispose() {
-        contextHandler.dispose()
+        super.dispose()
         glLayer.dispose()
     }
 
     override fun syncBoundsFromPlatformComponent() {
         syncContentScale()
-        skiaLayer.nsView.frame.useContents {
+        layer.nsView.frame.useContents {
             glLayer.setFrame(
                 origin.x.toInt(),
                 origin.y.toInt(),
@@ -61,13 +63,13 @@ internal class MacOsOpenGLRedrawer(
     private fun syncContentScale() {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        glLayer.contentsScale = skiaLayer.nsView.window!!.backingScaleFactor
+        glLayer.contentsScale = layer.nsView.window!!.backingScaleFactor
         CATransaction.commit()
         CATransaction.flush()
     }
 
     override fun update(nanoTime: Long) {
-        skiaLayer.update(nanoTime)
+        layer.update(nanoTime)
     }
 
     override fun needRender(throttledToVsync: Boolean) {
@@ -76,10 +78,71 @@ internal class MacOsOpenGLRedrawer(
 
     override fun renderImmediately() {
         glLayer.setNeedsDisplay()
-        skiaLayer.nsView.setNeedsDisplay(true)
+        layer.nsView.setNeedsDisplay(true)
     }
 
-    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(skiaLayer)
+    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
+
+    override fun initContext(): Boolean {
+        try {
+            if (context == null) {
+                context = DirectContext.makeGL()
+            }
+        } catch (_: Exception) {
+            println("Failed to create Skia OpenGL context!")
+            return false
+        }
+        return true
+    }
+
+    @ExperimentalUnsignedTypes
+    private fun openglGetIntegerv(pname: GLenum): UInt {
+        var result = 0U
+        memScoped {
+            val data = alloc<IntVar>()
+            glGetIntegerv(pname, data.ptr)
+            result = data.value.toUInt()
+        }
+        return result
+    }
+
+    private var currentWidth = 0
+    private var currentHeight = 0
+    private fun isSizeChanged(width: Int, height: Int): Boolean {
+        if (width != currentWidth || height != currentHeight) {
+            currentWidth = width
+            currentHeight = height
+            return true
+        }
+        return false
+    }
+
+    override fun LayerDrawScope.initCanvas() {
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
+        if (isSizeChanged(w, h)) {
+            val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
+            renderTarget = BackendRenderTarget.makeGL(
+                    w,
+                    h,
+                    0,
+                    8,
+                    fbId.toInt(),
+                    FramebufferFormat.GR_GL_RGBA8
+                )
+            surface = Surface.makeFromBackendRenderTarget(
+                    context!!,
+                    renderTarget!!,
+                    SurfaceOrigin.BOTTOM_LEFT,
+                    SurfaceColorFormat.RGBA_8888,
+                    ColorSpace.sRGB,
+                    SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                ) ?: throw RenderException("Cannot create surface")
+
+            canvas = surface?.canvas
+                ?: error("Could not obtain Canvas from Surface")
+        }
+    }
 }
 
 internal class MacosGLLayer : CAOpenGLLayer {
@@ -144,4 +207,3 @@ internal class MacosGLLayer : CAOpenGLLayer {
         super.drawInCGLContext(ctx, pixelFormat,forLayerTime, displayTime)
     }
 }
-

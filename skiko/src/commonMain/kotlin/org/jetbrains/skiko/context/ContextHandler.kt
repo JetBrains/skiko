@@ -2,10 +2,15 @@ package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.redrawer.Redrawer
 
+/**
+ * Base class of all the [Redrawer] implementations; Holds the Skia context, surface and canvas the layer content is
+ * drawn into.
+ */
 internal abstract class ContextHandler(
     protected val layer: SkiaLayer
-) {
+) : Redrawer {
     protected var context: DirectContext? = null
     protected var renderTarget: BackendRenderTarget? = null
     protected var surface: Surface? = null
@@ -22,7 +27,7 @@ internal abstract class ContextHandler(
         context?.flush()
     }
 
-    open fun dispose() {
+    override fun dispose() {
         disposeCanvas()
         context?.close()
     }
@@ -32,10 +37,9 @@ internal abstract class ContextHandler(
         renderTarget?.close()
     }
 
-    open fun rendererInfo(): String {
-        return "GraphicsApi: ${layer.renderApi}\n" +
+    override val renderInfo: String
+        get() = "GraphicsApi: ${layer.renderApi}\n" +
                 "OS: ${hostOs.id} ${hostArch.id}\n"
-    }
 
     // throws RenderException if initialization of graphic context was not successful
     fun LayerDrawScope.draw(flush: Boolean = true) {
@@ -52,4 +56,3 @@ internal abstract class ContextHandler(
         }
     }
 }
-

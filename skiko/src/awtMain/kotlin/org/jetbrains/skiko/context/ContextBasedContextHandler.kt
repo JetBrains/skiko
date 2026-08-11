@@ -1,10 +1,17 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.DirectContext
+import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkiaLayerAnalytics
 
-internal abstract class ContextBasedContextHandler(layer: SkiaLayer, val name: String) : JvmContextHandler(layer) {
+internal abstract class ContextBasedContextHandler(
+    layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics,
+    graphicsApi: GraphicsApi,
+    val name: String
+) : AwtContextHandler(layer, analytics, graphicsApi) {
 
     protected abstract fun makeContext(): DirectContext
 

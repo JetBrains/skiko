@@ -1,15 +1,14 @@
 package org.jetbrains.skiko.redrawer
 
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.AngleContextHandler
+import org.jetbrains.skiko.context.ContextBasedContextHandler
 
 internal class AngleRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.ANGLE) {
+) : ContextBasedContextHandler(layer, analytics, GraphicsApi.ANGLE, "ANGLE") {
     init {
         try {
             loadAngleLibrary()
@@ -17,9 +16,6 @@ internal class AngleRedrawer(
             throw RenderException("Failed to load ANGLE library", cause = e)
         }
     }
-
-    private val contextHandler = AngleContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var drawLock = Any()
 
@@ -34,7 +30,7 @@ internal class AngleRedrawer(
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
             update(System.nanoTime())
-            draw()
+            drawFrame()
         }
     }
 
@@ -57,10 +53,9 @@ internal class AngleRedrawer(
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         makeCurrent(device)
-        contextHandler.dispose()
+        super.dispose()
         disposeDevice(device)
         device = 0L
-        super.dispose()
     }
 
     override fun needRender(throttledToVsync: Boolean) {
@@ -78,7 +73,7 @@ internal class AngleRedrawer(
         }
     }
 
-    private fun draw() {
+    private fun drawFrame() {
         inDrawScope {
             drawAndSwap(withVsync = properties.isVsyncEnabled)
         }
@@ -89,19 +84,61 @@ internal class AngleRedrawer(
             return
         }
         makeCurrent(device)
-        contextHandler.draw()
+        draw()
         swapBuffers(device, withVsync)
     }
 
-    fun makeContext() = DirectContext(
+    override fun makeContext() = DirectContext(
         makeAngleContext(device).takeIf { it != 0L }
             ?: throw RenderException("Failed to make GL context.")
     )
 
-    fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
+    private fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
         makeAngleRenderTarget(device, width, height).takeIf { it != 0L }
             ?: throw RenderException("Failed to make ANGLE render target.")
     )
+
+    private var currentWidth = 0
+    private var currentHeight = 0
+    private fun isSizeChanged(width: Int, height: Int): Boolean {
+        if (width != currentWidth || height != currentHeight) {
+            currentWidth = width
+            currentHeight = height
+            return true
+        }
+        return false
+    }
+
+    override fun LayerDrawScope.initCanvas() {
+        val context = context ?: return
+
+        val w = scaledLayerWidth
+        val h = scaledLayerHeight
+
+        if (isSizeChanged(w, h) || surface == null) {
+            disposeCanvas()
+            context.flush()
+
+            renderTarget = makeRenderTarget(w, h)
+            surface = Surface.makeFromBackendRenderTarget(
+                context,
+                renderTarget!!,
+                SurfaceOrigin.BOTTOM_LEFT,
+                SurfaceColorFormat.RGBA_8888,
+                ColorSpace.sRGB,
+                SurfaceProps(pixelGeometry = pixelGeometry)
+            ) ?: throw RenderException("Cannot create surface")
+        }
+
+        canvas = surface!!.canvas
+    }
+
+    override val renderInfo: String
+        get() = super.renderInfo +
+                "Vendor: ${AngleApi.glGetString(AngleApi.GL_VENDOR)}\n" +
+                "Model: ${AngleApi.glGetString(AngleApi.GL_RENDERER)}\n" +
+                "Version: ${AngleApi.glGetString(AngleApi.GL_VERSION)}\n"
+                // "Total VRAM: ${AngleApi.glGetIntegerv(AngleApi.GL_TOTAL_MEMORY) / 1024} MB\n"
 }
 
 private external fun createAngleDevice(platformInfo: Long, transparency: Boolean): Long

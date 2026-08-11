@@ -5,19 +5,18 @@ import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.Direct3DContextHandler
+import org.jetbrains.skiko.context.ContextBasedContextHandler
 import java.awt.Dimension
+import java.lang.ref.Reference
 
 internal class Direct3DRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.DIRECT3D) {
-
-    private val contextHandler = Direct3DContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
+) : ContextBasedContextHandler(layer, analytics, GraphicsApi.DIRECT3D, "Direct3D") {
 
     private var drawLock = Any()
     private var isSwapChainInitialized = false
@@ -42,8 +41,8 @@ internal class Direct3DRedrawer(
             return field
         }
 
-    val adapterName: String
-    val adapterMemorySize: Long
+    private val adapterName: String
+    private val adapterMemorySize: Long
 
     init {
         val adapter = chooseAdapter(properties.adapterPriority.ordinal)
@@ -64,7 +63,7 @@ internal class Direct3DRedrawer(
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing && !isHandlingLiveResizeNow) {
             update()
-            draw()
+            drawFrame()
         }
     }
 
@@ -78,10 +77,9 @@ internal class Direct3DRedrawer(
             liveResizeHandle = 0L
         }
         frameDispatcher.cancel()
-        contextHandler.dispose()
+        super.dispose()
         disposeDevice(device)
         device = 0L
-        super.dispose()
     }
 
     override fun onLayerComponentResized() {
@@ -111,7 +109,7 @@ internal class Direct3DRedrawer(
         }
     }
 
-    private suspend fun draw() {
+    private suspend fun drawFrame() {
         inDrawScope {
             withContext(dispatcherToBlockOn) {
                 drawAndSwap(withVsync = properties.isVsyncEnabled)
@@ -124,7 +122,7 @@ internal class Direct3DRedrawer(
             if (isDisposed) {
                 return
             }
-            contextHandler.draw()
+            draw()
             if (waitForComposition) {
                 waitForComposition()
             }
@@ -132,17 +130,17 @@ internal class Direct3DRedrawer(
         }
     }
 
-    fun makeContext() = DirectContext(
+    override fun makeContext() = DirectContext(
         makeDirectXContext(device)
     )
 
-    fun makeSurface(context: Long, width: Int, height: Int, surfaceProps: SurfaceProps, index: Int): Surface {
+    private fun makeSurface(context: Long, width: Int, height: Int, surfaceProps: SurfaceProps, index: Int): Surface {
         return interopScope {
             Surface(makeDirectXSurface(device, context, width, height, toInterop(surfaceProps.packToIntArray()), index))
         }
     }
 
-    fun changeSize(width: Int, height: Int): Boolean {
+    private fun changeSize(width: Int, height: Int): Boolean {
         return if (!isSwapChainInitialized) {
             initSwapChain(
                 device = device,
@@ -166,8 +164,8 @@ internal class Direct3DRedrawer(
         swap(device, withVsync)
     }
 
-    fun getBufferIndex() = getBufferIndex(device)
-    fun initFence() = initFence(device)
+    private fun getBufferIndex() = getBufferIndex(device)
+    private fun initFence() = initFence(device)
 
     // Called from native code
     @Suppress("unused")
@@ -220,6 +218,78 @@ internal class Direct3DRedrawer(
         }
     }
 
+    private val bufferCount = 2
+    private var surfaces: Array<Surface?> = arrayOfNulls(bufferCount)
+    private fun isSurfacesNull() = surfaces.all { it == null }
+
+    private var currentWidth = 0
+    private var currentHeight = 0
+
+    override fun LayerDrawScope.initCanvas() {
+        val context = context ?: return
+
+        // Direct3D can't work with zero size.
+        // Don't rewrite code to skipping, as we need the whole pipeline in zero case too
+        // (drawing -> flushing -> swapping -> waiting for vsync)
+        val width = scaledLayerWidth.coerceAtLeast(1)
+        val height = scaledLayerHeight.coerceAtLeast(1)
+
+        val sizeChanged = (width != currentWidth || height != currentHeight)
+        if (sizeChanged) {
+            currentWidth = width
+            currentHeight = height
+        }
+
+        if (sizeChanged || isSurfacesNull()) {
+            disposeCanvas()
+            context.flush()
+
+            val justInitialized = changeSize(width, height)
+            try {
+                val surfaceProps = SurfaceProps(pixelGeometry = pixelGeometry)
+                for (bufferIndex in 0 until bufferCount) {
+                    surfaces[bufferIndex] = makeSurface(
+                        context = getPtr(context),
+                        width = width,
+                        height = height,
+                        surfaceProps = surfaceProps,
+                        index = bufferIndex
+                    )
+                }
+            } finally {
+                Reference.reachabilityFence(context)
+            }
+
+            if (justInitialized) {
+                initFence()
+            }
+        }
+        surface = surfaces[getBufferIndex()]
+        canvas = surface!!.canvas
+    }
+
+    override fun flush() {
+        val context = context ?: return
+        val surface = surface ?: return
+        try {
+            flush(getPtr(context), getPtr(surface))
+        } finally {
+            Reference.reachabilityFence(context)
+            Reference.reachabilityFence(surface)
+        }
+    }
+
+    override fun disposeCanvas() {
+        for (bufferIndex in 0 until bufferCount) {
+            surfaces[bufferIndex]?.close()
+        }
+    }
+
+    override val renderInfo: String
+        get() = super.renderInfo +
+                "Video card: $adapterName\n" +
+                "Total VRAM: ${adapterMemorySize / 1024 / 1024} MB\n"
+
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXDevice(adapter: Long, contentHandle: Long, transparency: Boolean): Long
     private external fun makeDirectXContext(device: Long): Long
@@ -237,4 +307,11 @@ internal class Direct3DRedrawer(
     private external fun uninstallLiveResizeHook(handle: Long)
     private external fun postLiveResizeRender(handle: Long)
     private external fun waitForComposition()
+
+    /**
+     * Flushes the given Skia surface into the Direct3D swap-chain buffer.
+     *
+     * @see "src/awtMain/cpp/windows/direct3DContext.cc" -- native implementation
+     */
+    private external fun flush(context: Long, surface: Long)
 }

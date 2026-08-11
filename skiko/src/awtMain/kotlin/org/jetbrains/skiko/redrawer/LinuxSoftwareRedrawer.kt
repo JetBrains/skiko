@@ -3,7 +3,7 @@ package org.jetbrains.skiko.redrawer
 import org.jetbrains.skiko.*
 
 internal class LinuxSoftwareRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
 ) : AbstractDirectSoftwareRedrawer(layer, analytics, properties) {
@@ -14,8 +14,8 @@ internal class LinuxSoftwareRedrawer(
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
         layer.backedLayer.lockLinuxDrawingSurface {
-            device = createDevice(it.display, it.window, w, h).also {
-                if (it == 0L) {
+            device = createDevice(it.display, it.window, w, h).also { device ->
+                if (device == 0L) {
                     throw RenderException("Failed to create Software device")
                 }
             }
@@ -27,8 +27,8 @@ internal class LinuxSoftwareRedrawer(
         super.dispose()
     }
 
-    override fun draw() = layer.backedLayer.lockLinuxDrawingSurface {
-        super.draw()
+    override fun drawFrame() = layer.backedLayer.lockLinuxDrawingSurface {
+        super.drawFrame()
     }
 
     override fun renderImmediately() = layer.backedLayer.lockLinuxDrawingSurface {

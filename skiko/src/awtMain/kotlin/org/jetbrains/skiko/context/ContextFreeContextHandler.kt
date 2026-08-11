@@ -1,8 +1,14 @@
 package org.jetbrains.skiko.context
 
+import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkiaLayerAnalytics
 
-internal abstract class ContextFreeContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
+internal abstract class ContextFreeContextHandler(
+    layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics,
+    graphicsApi: GraphicsApi
+) : AwtContextHandler(layer, analytics, graphicsApi) {
     private var isInitialized = false
 
     override fun initContext(): Boolean {

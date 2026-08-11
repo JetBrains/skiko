@@ -1,9 +1,16 @@
-package org.jetbrains.skiko.context
+package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.ContextBasedContextHandler
 
-internal class OpenGLContextHandler(layer: SkiaLayer) : ContextBasedContextHandler(layer, "OpenGL") {
+/**
+ * Common base of the platform-specific OpenGL redrawers.
+ */
+internal abstract class AbstractOpenGLRedrawer(
+    layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics
+) : ContextBasedContextHandler(layer, analytics, GraphicsApi.OPENGL, "OpenGL") {
 
     override fun makeContext() = makeGLContext()
 
@@ -47,11 +54,12 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextBasedContextHandl
         canvas = surface!!.canvas
     }
 
-    override fun rendererInfo(): String {
-        val gl = OpenGLApi.instance
-       return super.rendererInfo() +
-            "Vendor: ${gl.glGetString(gl.GL_VENDOR)}\n" +
-            "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
-            "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
-    }
+    override val renderInfo: String
+        get() {
+            val gl = OpenGLApi.instance
+            return super.renderInfo +
+                    "Vendor: ${gl.glGetString(gl.GL_VENDOR)}\n" +
+                    "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
+                    "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
+        }
 }

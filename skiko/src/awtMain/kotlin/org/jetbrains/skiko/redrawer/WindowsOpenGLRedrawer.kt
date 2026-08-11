@@ -2,19 +2,15 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.OpenGLContextHandler
 
 internal class WindowsOpenGLRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
+) : AbstractOpenGLRedrawer(layer, analytics) {
     init {
         loadOpenGLLibrary()
     }
-
-    private val contextHandler = OpenGLContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val device: Long = layer.backedLayer.useDrawingSurfacePlatformInfo {
         getDevice(it).also { devicePtr ->
@@ -22,7 +18,7 @@ internal class WindowsOpenGLRedrawer(
         }
     }
 
-    private val context = createContext(device, layer.contentHandle, layer.transparency).also {
+    private val glContext = createContext(device, layer.contentHandle, layer.transparency).also {
         if (it == 0L) {
             throw RenderException("Cannot create Windows GL context")
         }
@@ -50,9 +46,8 @@ internal class WindowsOpenGLRedrawer(
     override fun dispose() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         makeCurrent()
-        contextHandler.dispose()
-        deleteContext(context)
         super.dispose()
+        deleteContext(glContext)
     }
 
     override fun needRender(throttledToVsync: Boolean) {
@@ -67,7 +62,7 @@ internal class WindowsOpenGLRedrawer(
         inDrawScope {
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 makeCurrent()
-                contextHandler.draw()
+                draw()
                 swapBuffers()
                 OpenGLApi.instance.glFinish()
                 if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {
@@ -77,11 +72,11 @@ internal class WindowsOpenGLRedrawer(
         }
     }
 
-    private fun draw() {
-        inDrawScope { contextHandler.draw() }
+    private fun drawFrame() {
+        inDrawScope { draw() }
     }
 
-    private fun makeCurrent() = makeCurrent(device, context)
+    private fun makeCurrent() = makeCurrent(device, glContext)
     private fun swapBuffers() = swapBuffers(device)
 
     companion object {
@@ -107,7 +102,7 @@ internal class WindowsOpenGLRedrawer(
 
             for (redrawer in toRedrawVisible) {
                 redrawer.makeCurrent()
-                redrawer.draw()
+                redrawer.drawFrame()
             }
 
             for (redrawer in toRedrawVisible) {

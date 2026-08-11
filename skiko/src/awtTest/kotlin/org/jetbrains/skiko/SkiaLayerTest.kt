@@ -11,7 +11,7 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skiko.context.JvmContextHandler
+import org.jetbrains.skiko.context.AwtContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.MetalVSyncer
 import org.jetbrains.skiko.redrawer.Redrawer
@@ -639,7 +639,11 @@ class SkiaLayerTest {
         }
     }
 
-    private abstract class BaseTestRedrawer(val layer: SkiaLayer): Redrawer {
+    private abstract class BaseTestRedrawer(
+        layer: SkiaLayer,
+        analytics: SkiaLayerAnalytics,
+        renderApi: GraphicsApi,
+    ): AwtContextHandler(layer, analytics, renderApi) {
         private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
             renderImmediately()
         }
@@ -648,6 +652,8 @@ class SkiaLayerTest {
         override fun renderImmediately() = Unit
         override fun update(nanoTime: Long) = layer.update(nanoTime)
         override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
+        override fun LayerDrawScope.initCanvas() = Unit
+        override fun initContext() = false
 
         override val renderInfo: String
             get() = ""
@@ -655,13 +661,9 @@ class SkiaLayerTest {
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on init context`() = uiTest {
-        testFallbackToSoftware { layer, _, _, _ ->
-            object : BaseTestRedrawer(layer) {
-                private val contextHandler = object : JvmContextHandler(layer) {
-                    override fun initContext() = false
-                    override fun LayerDrawScope.initCanvas() = Unit
-                }
-                override fun renderImmediately() = layer.inDrawScope { contextHandler.draw() }
+        testFallbackToSoftware { layer, renderApi, analytics, _ ->
+            object : BaseTestRedrawer(layer, analytics, renderApi) {
+                override fun renderImmediately() = layer.inDrawScope { draw() }
             }
         }
     }
@@ -673,8 +675,8 @@ class SkiaLayerTest {
 
     @Test(timeout = 60000)
     fun `fallback to software renderer, fail on draw`() = uiTest {
-        testFallbackToSoftware { layer, _, _, _ ->
-            object : BaseTestRedrawer(layer) {
+        testFallbackToSoftware { layer, renderApi, analytics, _ ->
+            object : BaseTestRedrawer(layer, analytics, renderApi) {
                 override fun renderImmediately() = layer.inDrawScope {
                     throw RenderException()
                 }
@@ -729,8 +731,8 @@ class SkiaLayerTest {
     @Test(timeout = 60000)
     fun `renderApi change callback is invoked on fallback`() = uiTest {
         val window = UiTestWindow(
-            renderFactory = OverrideNonSoftwareRenderFactory { layer, _, _, _ ->
-                object : BaseTestRedrawer(layer) {
+            renderFactory = OverrideNonSoftwareRenderFactory { layer, renderApi, analytics, _ ->
+                object : BaseTestRedrawer(layer, analytics, renderApi) {
                     override fun renderImmediately() = layer.inDrawScope {
                         throw RenderException()
                     }

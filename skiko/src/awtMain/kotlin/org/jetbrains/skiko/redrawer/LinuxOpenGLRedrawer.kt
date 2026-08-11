@@ -2,30 +2,26 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.OpenGLContextHandler
 
 internal class LinuxOpenGLRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
+) : AbstractOpenGLRedrawer(layer, analytics) {
     init {
         loadOpenGLLibrary()
     }
 
-    private val contextHandler = OpenGLContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
-
-    private var context = 0L
+    private var glContext = 0L
     private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
 
     init {
     	layer.backedLayer.lockLinuxDrawingSurface {
-            context = it.createContext(layer.transparency)
-            if (context == 0L) {
+            glContext = it.createContext(layer.transparency)
+            if (glContext == 0L) {
                 throw RenderException("Cannot create Linux GL context")
             }
-            it.makeCurrent(context)
+            it.makeCurrent(glContext)
             adapterName.also { adapterName ->
                 if (adapterName != null && !isVideoCardSupported(GraphicsApi.OPENGL, hostOs, adapterName)) {
                     throw RenderException("Cannot create Linux GL context")
@@ -65,11 +61,10 @@ internal class LinuxOpenGLRedrawer(
         layer.backedLayer.lockLinuxDrawingSurface {
             // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
             // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
-            it.makeCurrent(context)
-            contextHandler.dispose()
-            it.destroyContext(context)
+            it.makeCurrent(glContext)
+            super.dispose()
+            it.destroyContext(glContext)
         }
-        super.dispose()
     }
 
     override fun needRender(throttledToVsync: Boolean) {
@@ -82,8 +77,8 @@ internal class LinuxOpenGLRedrawer(
         checkDisposed()
         update()
         inDrawScope {
-            it.makeCurrent(context)
-            contextHandler.draw()
+            it.makeCurrent(glContext)
+            draw()
             val turnOfVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately
             if (turnOfVsync) {
                 it.setSwapInterval(0)
@@ -96,8 +91,8 @@ internal class LinuxOpenGLRedrawer(
         }
     }
 
-    private fun draw() {
-        inDrawScope { contextHandler.draw() }
+    private fun drawFrame() {
+        inDrawScope { draw() }
     }
 
     companion object {
@@ -127,8 +122,8 @@ internal class LinuxOpenGLRedrawer(
             val drawingSurfaces = toRedrawVisible.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
             try {
                 for (redrawer in toRedrawVisible) {
-                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
-                    redrawer.draw()
+                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.glContext)
+                    redrawer.drawFrame()
                 }
 
                 // TODO(demin): How can we properly synchronize multiple windows with multiple displays?
@@ -143,14 +138,14 @@ internal class LinuxOpenGLRedrawer(
                     .maxByOrNull { it.frameLimit }
 
                 for (redrawer in toRedrawVisible.filter { it != vsyncRedrawer }) {
-                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
+                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.glContext)
                     drawingSurfaces[redrawer]!!.setSwapInterval(0)
                     drawingSurfaces[redrawer]!!.swapBuffers()
                     OpenGLApi.instance.glFlush()
                 }
 
                 if (vsyncRedrawer != null) {
-                    drawingSurfaces[vsyncRedrawer]!!.makeCurrent(vsyncRedrawer.context)
+                    drawingSurfaces[vsyncRedrawer]!!.makeCurrent(vsyncRedrawer.glContext)
                     drawingSurfaces[vsyncRedrawer]!!.setSwapInterval(1)
                     drawingSurfaces[vsyncRedrawer]!!.swapBuffers()
                     OpenGLApi.instance.glFlush()
