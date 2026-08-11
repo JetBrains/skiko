@@ -6,12 +6,6 @@
 #import <QuartzCore/CAMetalLayer.h>
 #import <QuartzCore/CATransaction.h>
 #import <Metal/Metal.h>
-#import "ganesh/GrDirectContext.h"
-#import "gpu/ganesh/GrBackendSurface.h"
-#import "ganesh/mtl/GrMtlBackendContext.h"
-#import "ganesh/mtl/GrMtlDirectContext.h"
-#import "ganesh/mtl/GrMtlBackendSurface.h"
-#import "ganesh/mtl/GrMtlTypes.h"
 
 #import "MetalDevice.h"
 
@@ -19,24 +13,29 @@
 
 extern "C"
 {
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_makeMetalContext(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_getMtlDevice(
     JNIEnv* env, jobject renderer, jlong devicePtr)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void*) devicePtr;
-        GrMtlBackendContext backendContext = {};
-        backendContext.fDevice.retain((__bridge GrMTLHandle) device.adapter);
-        backendContext.fQueue.retain((__bridge GrMTLHandle) device.queue);
-        return (jlong) GrDirectContexts::MakeMetal(backendContext).release();
+        return (jlong) device.adapter;
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_makeMetalRenderTarget(
-    JNIEnv* env, jobject renderer, jlong devicePtr, jint width, jint height)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_getCommandQueue(
+    JNIEnv* env, jobject renderer, jlong devicePtr)
+{
+    @autoreleasepool {
+        MetalDevice *device = (__bridge MetalDevice *) (void*) devicePtr;
+        return (jlong) device.queue;
+    }
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_acquireDrawableTexture(
+    JNIEnv* env, jobject renderer, jlong devicePtr)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
-        GrBackendRenderTarget* renderTarget = NULL;
 
         /// If we have more than `maximumDrawableCount` command buffers inflight, wait until one of them finishes work.
         dispatch_semaphore_wait(device.inflightSemaphore, DISPATCH_TIME_FOREVER);
@@ -49,16 +48,12 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_makeMeta
             return NULL;
         }
         device.drawableHandle = currentDrawable;
-        GrMtlTextureInfo info;
-        info.fTexture.retain((__bridge GrMTLHandle) currentDrawable.texture);
-        GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, info);
-        renderTarget = new GrBackendRenderTarget(obj);
-        return (jlong) renderTarget;
+        return (jlong) currentDrawable.texture;
     }
 }
 
 /// Shared scaffolding for the two present paths. Retrieves the drawable acquired in
-/// makeMetalRenderTarget, builds its "Present" command buffer wired to release one inflight slot on
+/// acquireDrawableTexture, builds its "Present" command buffer wired to release one inflight slot on
 /// completion — every acquired drawable (which waited on inflightSemaphore) must be balanced by exactly
 /// one such committed command buffer, or the semaphore wedges and the drawable pool starves — then hands
 /// the drawable and command buffer to `present`, which commits and presents per its own policy.
