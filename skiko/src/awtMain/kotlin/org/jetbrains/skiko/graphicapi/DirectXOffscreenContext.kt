@@ -10,11 +10,12 @@ import org.jetbrains.skiko.graphicapi.InternalDirectXApi.chooseAdapter
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.createDirectXOffscreenDevice
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.disposeDevice
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.disposeDirectXTexture
-import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXContext
-import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXRenderTargetOffScreen
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXTexture
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.readPixels
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.waitForCompletion
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.getDirectXCommandQueue
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.getDirectXDevice
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.getDirectXTextureResource
 
 /**
  * Class that allows drawing into offscreen DirectX texture.
@@ -32,7 +33,11 @@ class DirectXOffscreenContext : AutoCloseable {
         }
     }
 
-    val directContext = DirectContext(makeDirectXContext(device))
+    val directContext = DirectContext.makeDirect3D(
+        adapter,
+        getDirectXDevice(device),
+        getDirectXCommandQueue(device)
+    )
 
     override fun close() {
         directContext.close()
@@ -54,7 +59,14 @@ class DirectXOffscreenContext : AutoCloseable {
             }
         }
 
-        val backendRenderTarget = BackendRenderTarget(makeDirectXRenderTargetOffScreen(texture))
+        val backendRenderTarget = BackendRenderTarget.makeDirect3D(
+            width = actualWidth,
+            height = actualHeight,
+            texturePtr = getDirectXTextureResource(texture),
+            format = DxgiFormat.B8G8R8A8_UNORM.value,
+            sampleCnt = 1,
+            levelCnt = 1
+        )
 
         override fun close() {
             backendRenderTarget.close()

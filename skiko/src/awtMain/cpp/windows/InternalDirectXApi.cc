@@ -7,24 +7,17 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>
+#include <wrl/client.h>
 #include "jni_helpers.h"
 #include "exceptions_handler.h"
 #include "window_util.h"
 
-#include "SkColorSpace.h"
-#include "ganesh/d3d/GrD3DBackendSurface.h"
-#include "ganesh/GrDirectContext.h"
-#include "ganesh/GrBackendSurface.h"
-#include "SkSurface.h"
-
-#include "ganesh/d3d/GrD3DTypes.h"
-#include "ganesh/d3d/GrD3DBackendContext.h"
-#include "ganesh/d3d/GrD3DDirectContext.h"
-
 class DirectXOffscreenDevice
 {
 public:
-    GrD3DBackendContext backendContext;
+    Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
+    Microsoft::WRL::ComPtr<ID3D12Device> device;
+    Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue;
 
     ID3D12CommandAllocator* commandAllocator;
     ID3D12GraphicsCommandList* commandList;
@@ -51,9 +44,9 @@ public:
             commandAllocator->Release();
         }
 
-        backendContext.fQueue.reset(nullptr);
-        backendContext.fDevice.reset(nullptr);
-        backendContext.fAdapter.reset(nullptr);
+        queue.Reset();
+        device.Reset();
+        adapter.Reset();
     }
 };
 
@@ -113,8 +106,8 @@ public:
         readbackHeapProperties.CreationNodeMask = 1;
         readbackHeapProperties.VisibleNodeMask = 1;
 
-        device->backendContext.fDevice->CreateCommittedResource(&textureHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&resource));
-        device->backendContext.fDevice->CreateCommittedResource(&readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&readbackBufferResource));
+        device->device->CreateCommittedResource(&textureHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&resource));
+        device->device->CreateCommittedResource(&readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&readbackBufferResource));
     }
 
     ~DirectXOffScreenTexture() {
@@ -160,12 +153,12 @@ extern "C"
     // TODO: extract common code with directXRedrawer
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_chooseAdapter(
             JNIEnv *env, jobject redrawer, jint adapterPriority) {
-        gr_cp<IDXGIFactory4> deviceFactory;
+        Microsoft::WRL::ComPtr<IDXGIFactory4> deviceFactory;
         if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory)))) {
             return 0;
         }
 
-        gr_cp<IDXGIFactory6> factory6;
+        Microsoft::WRL::ComPtr<IDXGIFactory6> factory6;
         if (!SUCCEEDED(deviceFactory->QueryInterface(IID_PPV_ARGS(&factory6)))) {
             return 0;
         }
@@ -191,14 +184,15 @@ extern "C"
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_createDirectXOffscreenDevice(
         JNIEnv *env, jobject redrawer, jlong adapterPtr) {
 
-        gr_cp<IDXGIFactory4> deviceFactory;
+        Microsoft::WRL::ComPtr<IDXGIFactory4> deviceFactory;
         if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory)))) {
             return 0;
         }
         if (adapterPtr == 0) {
             return 0;
         }
-        gr_cp<IDXGIAdapter1> adapter((IDXGIAdapter1 *) adapterPtr);
+        Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
+        adapter.Attach((IDXGIAdapter1 *) adapterPtr);
 
         D3D_FEATURE_LEVEL maxSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
         D3D_FEATURE_LEVEL featureLevels[] = {
@@ -207,19 +201,19 @@ extern "C"
         };
 
         for (int i = 0; i < _countof(featureLevels); i++) {
-            if (SUCCEEDED(D3D12CreateDevice(adapter.get(), featureLevels[i], _uuidof(ID3D12Device), nullptr))) {
+            if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), featureLevels[i], _uuidof(ID3D12Device), nullptr))) {
                 maxSupportedFeatureLevel = featureLevels[i];
                 break;
             }
         }
 
-        gr_cp<ID3D12Device> device;
-        if (!SUCCEEDED(D3D12CreateDevice(adapter.get(), maxSupportedFeatureLevel, IID_PPV_ARGS(&device)))) {
+        Microsoft::WRL::ComPtr<ID3D12Device> device;
+        if (!SUCCEEDED(D3D12CreateDevice(adapter.Get(), maxSupportedFeatureLevel, IID_PPV_ARGS(&device)))) {
             return 0;
         }
 
         // Create the command queue
-        gr_cp<ID3D12CommandQueue> queue;
+        Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue;
         D3D12_COMMAND_QUEUE_DESC queueDesc = {};
         queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
         queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -253,37 +247,32 @@ extern "C"
         d3dDevice->commandList = commandList;
         d3dDevice->fence = fence;
         d3dDevice->fenceEvent = fenceEvent;
-        d3dDevice->backendContext.fAdapter = adapter;
-        d3dDevice->backendContext.fDevice = device;
-        d3dDevice->backendContext.fQueue = queue;
-        d3dDevice->backendContext.fProtectedContext = GrProtected::kNo;
+        d3dDevice->adapter = adapter;
+        d3dDevice->device = device;
+        d3dDevice->queue = queue;
 
         return toJavaPointer(d3dDevice);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_makeDirectXRenderTargetOffScreen(
-            JNIEnv *env, jobject redrawer, jlong texturePtr) {
-        DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
-        ID3D12Resource* resource = texture->resource;
-
-        GrD3DTextureResourceInfo texResInfo = {};
-        texResInfo.fResource.retain(resource);
-        texResInfo.fResourceState = D3D12_RESOURCE_STATE_COMMON;
-        texResInfo.fFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
-        texResInfo.fSampleCount = 1;
-        texResInfo.fLevelCount = 1;
-        GrBackendRenderTarget* renderTarget = new GrBackendRenderTarget(
-            GrBackendRenderTargets::MakeD3D(texture->width, texture->height, texResInfo)
-        );
-        return reinterpret_cast<jlong>(renderTarget);
-    }
-
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_makeDirectXContext(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getDirectXDevice(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         DirectXOffscreenDevice *d3dDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
-        GrD3DBackendContext backendContext = d3dDevice->backendContext;
-        return toJavaPointer(GrDirectContexts::MakeD3D(backendContext).release());
+        return toJavaPointer(d3dDevice->device.Get());
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getDirectXCommandQueue(
+        JNIEnv *env, jobject redrawer, jlong devicePtr)
+    {
+        DirectXOffscreenDevice *d3dDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        return toJavaPointer(d3dDevice->queue.Get());
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getDirectXTextureResource(
+        JNIEnv *env, jobject redrawer, jlong texturePtr)
+    {
+        DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
+        return toJavaPointer(texture->resource);
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_makeDirectXTexture(
@@ -361,7 +350,7 @@ extern "C"
         commandList->Close();
 
         ID3D12CommandList* commandLists[] = { commandList };
-        device->backendContext.fQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+        device->queue->ExecuteCommandLists(_countof(commandLists), commandLists);
 
         // Wait for the command list to finish executing; the readback buffer will be ready to read
         auto fence = device->fence;
@@ -369,7 +358,7 @@ extern "C"
         auto& fenceValue = device->fenceValue;
 
         fenceValue += 1;
-        device->backendContext.fQueue->Signal(fence, fenceValue);
+        device->queue->Signal(fence, fenceValue);
 
         if (fence->GetCompletedValue() < fenceValue) {
             fence->SetEventOnCompletion(fenceValue, fenceEvent);

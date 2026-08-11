@@ -2,12 +2,9 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.InteropPointer
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.graphicapi.DxgiFormat
 import java.awt.Dimension
-import java.lang.ref.Reference
 
 internal class Direct3DRedrawer(
     layer: SkiaLayer,
@@ -41,11 +38,12 @@ internal class Direct3DRedrawer(
             return field
         }
 
+    private var adapter = 0L
     val adapterName: String
     val adapterMemorySize: Long
 
     init {
-        val adapter = chooseAdapter(properties.adapterPriority.ordinal)
+        adapter = chooseAdapter(properties.adapterPriority.ordinal)
         if (adapter == 0L) {
             throw RenderException("Failed to choose DirectX12 adapter.")
         }
@@ -70,6 +68,7 @@ internal class Direct3DRedrawer(
 
     private var context: DirectContext? = null
     private val bufferCount = 2
+    private val renderTargets: Array<BackendRenderTarget?> = arrayOfNulls(bufferCount)
     private val surfaces: Array<Surface?> = arrayOfNulls(bufferCount)
     private var surface: Surface? = null
     private var canvas: Canvas? = null
@@ -147,7 +146,11 @@ internal class Direct3DRedrawer(
     private fun ensureContext(): Boolean {
         if (context == null) {
             try {
-                val newContext = DirectContext(makeDirectXContext(device))
+                val newContext = DirectContext.makeDirect3D(
+                    adapter,
+                    getDirectXDevice(device),
+                    getDirectXCommandQueue(device)
+                )
                 context = newContext
                 onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
             } catch (e: Exception) {
@@ -172,26 +175,33 @@ internal class Direct3DRedrawer(
             context.flush()
 
             val justInitialized = changeSize(width, height)
-            try {
-                val surfaceProps = SurfaceProps(pixelGeometry = pixelGeometry)
-                for (bufferIndex in 0 until bufferCount) {
-                    surfaces[bufferIndex] = makeSurface(
-                        context = getPtr(context),
-                        width = width,
-                        height = height,
-                        surfaceProps = surfaceProps,
-                        index = bufferIndex
-                    )
-                }
-            } finally {
-                Reference.reachabilityFence(context)
+            val surfaceProps = SurfaceProps(pixelGeometry = pixelGeometry)
+            for (backBufferIndex in 0 until bufferCount) {
+                val renderTarget = BackendRenderTarget.makeDirect3D(
+                    width = width,
+                    height = height,
+                    texturePtr = getDirectXBackBuffer(device, backBufferIndex),
+                    format = DxgiFormat.R8G8B8A8_UNORM.value,
+                    sampleCnt = 1,
+                    levelCnt = 1
+                )
+                renderTargets[backBufferIndex] = renderTarget
+                surfaces[backBufferIndex] = Surface.makeFromBackendRenderTarget(
+                    context,
+                    renderTarget,
+                    SurfaceOrigin.TOP_LEFT,
+                    SurfaceColorFormat.RGBA_8888,
+                    ColorSpace.sRGB,
+                    surfaceProps
+                ) ?: throw RenderException("Cannot create surface")
             }
 
             if (justInitialized) {
                 initFence(device)
             }
         }
-        surface = surfaces[getBufferIndex(device)]
+        val backBufferIndex = getBufferIndex(device)
+        surface = surfaces[backBufferIndex]
         canvas = surface!!.canvas
     }
 
@@ -205,29 +215,19 @@ internal class Direct3DRedrawer(
     }
 
     private fun flushFrame() {
-        val context = context ?: return
         val surface = surface ?: return
-        try {
-            flush(getPtr(context), getPtr(surface))
-        } finally {
-            Reference.reachabilityFence(context)
-            Reference.reachabilityFence(surface)
-        }
+        surface.flushAndSubmit(syncCpu = true)
     }
 
     private fun disposeSurfaces() {
         for (bufferIndex in 0 until bufferCount) {
             surfaces[bufferIndex]?.close()
             surfaces[bufferIndex] = null
+            renderTargets[bufferIndex]?.close()
+            renderTargets[bufferIndex] = null
         }
         surface = null
         canvas = null
-    }
-
-    private fun makeSurface(context: Long, width: Int, height: Int, surfaceProps: SurfaceProps, index: Int): Surface {
-        return interopScope {
-            Surface(makeDirectXSurface(device, context, width, height, toInterop(surfaceProps.packToIntArray()), index))
-        }
     }
 
     private fun changeSize(width: Int, height: Int): Boolean {
@@ -306,8 +306,9 @@ internal class Direct3DRedrawer(
 
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXDevice(adapter: Long, contentHandle: Long, transparency: Boolean): Long
-    private external fun makeDirectXContext(device: Long): Long
-    private external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, surfacePropsIntArray: InteropPointer, index: Int): Long
+    private external fun getDirectXDevice(device: Long): Long
+    private external fun getDirectXCommandQueue(device: Long): Long
+    private external fun getDirectXBackBuffer(device: Long, backBufferIndex: Int): Long
     private external fun resizeBuffers(device: Long, width: Int, height: Int)
     private external fun swap(device: Long, isVsyncEnabled: Boolean)
     private external fun disposeDevice(device: Long)
@@ -322,5 +323,4 @@ internal class Direct3DRedrawer(
     private external fun postLiveResizeRender(handle: Long)
     private external fun waitForComposition()
 
-    private external fun flush(context: Long, surface: Long)
 }
