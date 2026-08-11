@@ -8,17 +8,11 @@
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
 
-#import "ganesh/GrBackendSurface.h"
-#import "ganesh/GrDirectContext.h"
-#import "ganesh/mtl/GrMtlBackendContext.h"
-#import "ganesh/mtl/GrMtlDirectContext.h"
-#import "ganesh/mtl/GrMtlTypes.h"
+#include "common/interop.hh"
 
 #import "MetalDevice.h"
 
 #include <assert.h>
-
-#include "common/interop.hh"
 
 // Defined later in this file; forward-declared so AWTMetalLayer (below) can use it.
 static void javaDrawFrameWhileLiveResizing(jobject redrawer, jint width, jint height);

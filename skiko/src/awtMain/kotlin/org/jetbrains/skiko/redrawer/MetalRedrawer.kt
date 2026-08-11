@@ -281,7 +281,10 @@ internal class MetalRedrawer(
     private fun ensureContext(): Boolean {
         if (context == null) {
             try {
-                val newContext = DirectContext(makeMetalContext(device.ptr))
+                val newContext = DirectContext.makeMetal(
+                    getMtlDevice(device.ptr),
+                    getCommandQueue(device.ptr)
+                )
                 context = newContext
                 onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
             } catch (e: Exception) {
@@ -299,7 +302,11 @@ internal class MetalRedrawer(
         val height = scaledLayerHeight
 
         if (width > 0 && height > 0) {
-            renderTarget = BackendRenderTarget(makeMetalRenderTarget(device.ptr, width, height))
+            renderTarget = BackendRenderTarget.makeMetal(
+                width,
+                height,
+                acquireDrawableTexture(device.ptr)
+            )
 
             surface = Surface.makeFromBackendRenderTarget(
                 context!!,
@@ -397,8 +404,9 @@ internal class MetalRedrawer(
      */
     private external fun setDisplaySyncEnabled(device: Long, enabled: Boolean)
 
-    private external fun makeMetalContext(device: Long): Long
-    private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
+    private external fun getMtlDevice(devicePtr: Long): Long
+    private external fun getCommandQueue(devicePtr: Long): Long
+    private external fun acquireDrawableTexture(devicePtr: Long): Long
     /**
      * Presents the frame asynchronously (off the AppKit main thread).
      */

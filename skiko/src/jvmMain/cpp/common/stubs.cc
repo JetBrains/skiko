@@ -132,15 +132,21 @@ JNIEXPORT void Java_org_jetbrains_skiko_PlatformOperationsKt_osxOrderEmojiAndSym
     skikoUnimplemented("Java_org_jetbrains_skiko_PlatformOperationsKt_osxOrderEmojiAndSymbolsPopup");
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalContext(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getMtlDevice(
     JNIEnv* env, jobject redrawer, jlong devicePtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalContext");
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getMtlDevice");
     return 0;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalRenderTarget(
-    JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalRenderTarget");
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getCommandQueue(
+    JNIEnv* env, jobject redrawer, jlong devicePtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getCommandQueue");
+    return 0;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_acquireDrawableTexture(
+    JNIEnv* env, jobject redrawer, jlong devicePtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_acquireDrawableTexture");
     return 0;
 }
 

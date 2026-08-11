@@ -5,27 +5,23 @@
 
 #import <QuartzCore/CAMetalLayer.h>
 #import <Metal/Metal.h>
-#import "ganesh/GrDirectContext.h"
-#import "gpu/ganesh/GrBackendSurface.h"
-#import "ganesh/mtl/GrMtlBackendContext.h"
-#import "ganesh/mtl/GrMtlDirectContext.h"
-#import "ganesh/mtl/GrMtlBackendSurface.h"
-#import "ganesh/mtl/GrMtlTypes.h"
-
-#import "MetalDevice.h"
 
 extern "C"
 {
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMetalContext(
-        JNIEnv *env, jobject contextHandler, jlong adapterPtr) {
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_getCommandQueue(
+        JNIEnv *env, jobject contextHandler, jlong devicePtr) {
     @autoreleasepool {
-        id <MTLDevice> adapter = (__bridge id <MTLDevice>) (void *) adapterPtr;
-        GrMtlBackendContext backendContext = {};
-        backendContext.fDevice.retain((__bridge GrMTLHandle) adapter);
-        id <MTLCommandQueue> fQueue = [adapter newCommandQueue];
-        backendContext.fQueue.retain((__bridge GrMTLHandle) fQueue);
-        return (jlong) GrDirectContexts::MakeMetal(backendContext).release();
+        id <MTLDevice> device = (__bridge id <MTLDevice>) (void *) devicePtr;
+        id <MTLCommandQueue> queue = [device newCommandQueue];
+        return (jlong) (__bridge_retained void *) queue;
+    }
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_disposeCommandQueue(
+        JNIEnv *env, jobject contextHandler, jlong queuePtr) {
+    @autoreleasepool {
+        id <MTLCommandQueue> queue = (__bridge_transfer id <MTLCommandQueue>) (void *) queuePtr;
     }
 }
 
@@ -56,19 +52,6 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMe
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_disposeMetalTexture(JNIEnv *env, jobject contextHandler, jlong texturePtr) {
     @autoreleasepool {
         id <MTLTexture> oldTexture = (__bridge_transfer id <MTLTexture>) (void *) texturePtr;
-    }
-}
-
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMetalRenderTargetOffScreen(
-        JNIEnv *env, jobject contextHandler, jlong texturePtr) {
-    @autoreleasepool {
-        id <MTLTexture> texture = (__bridge id <MTLTexture>) (void *) texturePtr;
-        GrMtlTextureInfo info;
-        info.fTexture.retain((__bridge GrMTLHandle) texture);
-        GrBackendRenderTarget *renderTarget = NULL;
-        GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(texture.width, texture.height, info);
-        renderTarget = new GrBackendRenderTarget(obj);
-        return (jlong) renderTarget;
     }
 }
 
