@@ -3,9 +3,6 @@ package org.jetbrains.skiko.context
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
-/**
- * TODO: remove once the native macOS backends converge on the render-context shape the AWT ones use.
- */
 internal abstract class ContextHandler(
     protected val layer: SkiaLayer,
     private val drawContent: Canvas.() -> Unit
@@ -53,8 +50,3 @@ internal abstract class ContextHandler(
     }
 }
 
-internal fun LayerDrawScope.draw(contextHandler: ContextHandler, flush: Boolean = true) {
-    with(contextHandler) {
-        this@draw.draw(flush)
-    }
-}

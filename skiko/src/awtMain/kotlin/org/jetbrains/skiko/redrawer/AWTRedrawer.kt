@@ -11,21 +11,24 @@ import java.awt.Dimension
  */
 @OptIn(ExperimentalSkikoApi::class)
 internal abstract class AWTRedrawer(
-    protected val layer: SkiaLayer,
+    private val layer: SkiaLayer,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi,
-) : AutoCloseable {
+) : Redrawer {
+    private var isFirstFrameRendered = false
+
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
-
-    var deviceAnalytics: DeviceAnalytics? = null
-        private set
-
-    @Volatile
+    private var deviceAnalytics: DeviceAnalytics? = null
     protected var isDisposed = false
         private set
 
     init {
         rendererAnalytics.init()
+    }
+
+    override fun dispose() {
+        require(!isDisposed) { "$javaClass is disposed" }
+        isDisposed = true
     }
 
     /**
@@ -48,100 +51,58 @@ internal abstract class AWTRedrawer(
         deviceAnalytics?.contextInit()
     }
 
+    override fun update(nanoTime: Long) {
+        update(nanoTime, forcedSize = null)
+    }
+
+    fun update(nanoTime: Long = renderTime(), forcedSize: Dimension?) {
+        checkDisposed()
+        layer.update(nanoTime, forcedSize = forcedSize)
+    }
+
+    protected inline fun inDrawScope(forcedSize: Dimension? = null, body: LayerDrawScope.() -> Unit) {
+        requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
+        if (!isDisposed) {
+            val isFirstFrame = !isFirstFrameRendered
+            isFirstFrameRendered = true
+            if (isFirstFrame) {
+                deviceAnalytics?.beforeFirstFrameRender()
+            }
+            deviceAnalytics?.beforeFrameRender()
+            layer.inDrawScope(forcedSize) {
+                body()
+            }
+            if (isFirstFrame && !isDisposed) {
+                deviceAnalytics?.afterFirstFrameRender()
+            }
+            deviceAnalytics?.afterFrameRender()
+        }
+    }
+
     protected fun checkDisposed() {
         check(!isDisposed) { "${this.javaClass.simpleName} is disposed" }
     }
 
-    abstract val renderInfo: String
+    override fun onLayerComponentResized() {
+        syncBoundsFromPlatformComponent()
 
-    /**
-     * Renders and presents exactly one frame at [scope]'s size. [immediate] selects the synchronous-redraw
-     * variant.
-     *
-     * Throwing [org.jetbrains.skiko.RenderException] means the frame failed, and makes
-     * [SkiaLayer.inDrawScope] fall back to the next render API.
-     */
-    abstract suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean)
+        if (!layer.isShowing && layer.isDisplayable && (layer.width > 0) && (layer.height > 0)) {
+            renderBeforeShown()
+            return
+        }
 
-    /**
-     * Whether [renderBeforeShown] runs at all. `false` leaves the layer without a frame until it is shown.
-     */
-    open val presentsBeforeShown: Boolean get() = true
+        needRender(throttledToVsync = false)
+    }
 
     /**
      * Renders and presents a frame when the layer is already displayable but not yet showing.
      * This is needed so we have a frame ready when the window is first shown, to prevent the window background
      * flashing.
-     *
-     * Returns `true` if this backend presented that frame itself; `false` presents it the ordinary way.
      */
-    open fun renderBeforeShown(scope: LayerDrawScope): Boolean = false
-
-    /**
-     * Hands over the [FrameHost] this backend records its own frames through. Called once, before the first
-     * frame.
-     */
-    open fun attachFrameHost(host: FrameHost) {}
-
-    /**
-     * Called on every frame request, including the ones the frame loop schedules no frame for.
-     */
-    open fun onFrameRequested(throttledToVsync: Boolean) {}
-
-    /**
-     * Wraps one frame of the loop. Place pacing before or after [frame], or skip it entirely to hold the loop
-     * off while this backend presents on its own.
-     */
-    open suspend fun runFrame(frame: suspend () -> Unit) = frame()
-
-    /**
-     * `true` suppresses the loop's per-window frame dispatcher; the backend then drives every frame itself
-     * through its [FrameHost].
-     */
-    // TODO: remove along with the cross-window batch, once one frame clock serves every window on a display.
-    open val schedulesOwnFrames: Boolean get() = false
-
-    open fun setVisible(isVisible: Boolean) {}
-
-    open fun syncBounds() {}
-
-    /**
-     * Whether [SkiaLayer] presents a frame synchronously while it lays out, instead of scheduling one.
-     */
-    open val presentsOnLayout: Boolean get() = false
-
-    /**
-     * Whether the platform is driving the current resize. While `true` the loop leaves AWT resize events alone,
-     * since the platform reports the size and presents the frames itself.
-     */
-    open val isHandlingLiveResizeNow: Boolean get() = false
-
-    /**
-     * Releases every native and Skia resource this backend owns. [isDisposed] is already `true` when it runs.
-     * Called once, on the EDT.
-     */
-    protected abstract fun releaseResources()
-
-    final override fun close() {
-        if (isDisposed) return
-        isDisposed = true
-        releaseResources()
+    protected open fun renderBeforeShown(): Boolean {
+        renderImmediately()
+        return true
     }
 
-    open fun isTransparentBackgroundSupported(): Boolean = defaultIsTransparentBackgroundSupported(layer)
-}
-
-/**
- * The frame loop, as seen by a backend that records frames on its own schedule.
- */
-internal interface FrameHost {
-    fun requestFrame(throttledToVsync: Boolean)
-
-    fun updateIfRequested(nanoTime: Long = renderTime())
-
-    fun renderImmediately()
-
-    fun inFrame(body: (LayerDrawScope) -> Unit)
-
-    fun inForcedSizeFrame(size: Dimension, body: (LayerDrawScope) -> Unit)
+    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
 }

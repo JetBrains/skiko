@@ -3,7 +3,7 @@ package org.jetbrains.skiko.redrawer
 import org.jetbrains.skiko.*
 
 internal class LinuxSoftwareRedrawer(
-    layer: SkiaLayer,
+    private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
 ) : AbstractDirectSoftwareRedrawer(layer, analytics, properties) {
@@ -23,12 +23,16 @@ internal class LinuxSoftwareRedrawer(
         onContextInit()
     }
 
-    override fun releaseResources() = layer.backedLayer.lockLinuxDrawingSurface {
-        super.releaseResources()
+    override fun dispose() = layer.backedLayer.lockLinuxDrawingSurface {
+        super.dispose()
     }
 
-    override fun draw(scope: LayerDrawScope) = layer.backedLayer.lockLinuxDrawingSurface {
-        super.draw(scope)
+    override fun draw() = layer.backedLayer.lockLinuxDrawingSurface {
+        super.draw()
+    }
+
+    override fun renderImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
+        super.renderImmediately()
     }
 
     override fun resize(width: Int, height: Int) = layer.backedLayer.lockLinuxDrawingSurface {
