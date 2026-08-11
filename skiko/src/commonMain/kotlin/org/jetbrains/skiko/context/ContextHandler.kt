@@ -4,8 +4,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 internal abstract class ContextHandler(
-    protected val layer: SkiaLayer,
-    private val drawContent: Canvas.() -> Unit
+    protected val layer: SkiaLayer
 ) {
     protected var context: DirectContext? = null
     protected var renderTarget: BackendRenderTarget? = null
@@ -14,6 +13,10 @@ internal abstract class ContextHandler(
 
     protected abstract fun initContext(): Boolean
     protected abstract fun LayerDrawScope.initCanvas()
+
+    protected fun drawContent(canvas: Canvas) {
+        layer.draw(canvas)
+    }
 
     protected open fun flush() {
         context?.flush()
@@ -42,7 +45,7 @@ internal abstract class ContextHandler(
         initCanvas()
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
-            drawContent()
+            drawContent(this)
         }
         if (flush) {
             flush()
