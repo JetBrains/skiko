@@ -1,6 +1,4 @@
 #include "FontMgrDefaultFactory.hh"
-#include <iostream>
-
 
 #if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
 #include "ports/SkFontMgr_mac_ct.h"

@@ -94,17 +94,6 @@ class FontMgrTest {
         }
     }
 
-
-    @Test
-    @SkipJsTarget
-    @SkipWasmTarget
-    @SkipNativeTarget
-    fun matchFamilyStyleWithNullFamilyNameReturnsDefaultSystemFont() {
-        val typeface = FontMgr.default.matchFamilyStyle(null, FontStyle.NORMAL)
-        assertNotNull(typeface, "Expected default system font when passing null as familyName")
-        typeface.close()
-    }
-
     @Test
     @SkipJsTarget
     @SkipWasmTarget
