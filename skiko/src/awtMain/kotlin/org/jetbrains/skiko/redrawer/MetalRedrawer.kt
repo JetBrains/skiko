@@ -78,9 +78,6 @@ internal class MetalRedrawer(
     private var frameHost: FrameHost? = null
 
     private var context: DirectContext? = null
-    private var renderTarget: BackendRenderTarget? = null
-    private var surface: Surface? = null
-    private var canvas: Canvas? = null
 
     init {
         onDeviceChosen(adapter.name)
@@ -132,7 +129,6 @@ internal class MetalRedrawer(
     }
 
     private fun releaseGpuResources() = synchronized(drawLock) {
-        disposeSurface()
         context?.close()
         context = null
         disposeDevice(device.ptr)
@@ -267,13 +263,12 @@ internal class MetalRedrawer(
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic Metal context")
         }
-        initSurface()
-        canvas?.runRestoringState {
-            clear(Color.TRANSPARENT)
-            layer.draw(this)
+        drawViaSurface(scaledLayerWidth, scaledLayerHeight) { surface ->
+            surface.canvas.runRestoringState {
+                clear(Color.TRANSPARENT)
+                layer.draw(this)
+            }
         }
-        context?.flush()
-        surface?.flushAndSubmit()
         // Records only; the caller presents.
         Logger.debug { "MetalRedrawer finished drawing frame" }
     }
@@ -292,38 +287,35 @@ internal class MetalRedrawer(
         return true
     }
 
-    private fun LayerDrawScope.initSurface() {
-        disposeSurface()
+    private inline fun LayerDrawScope.drawViaSurface(
+        width: Int,
+        height: Int,
+        block: (surface: Surface) -> Unit
+    ) {
+        if (width <= 0 || height <= 0) return
 
-        val width = scaledLayerWidth
-        val height = scaledLayerHeight
+        var renderTarget: BackendRenderTarget? = null
+        var surface: Surface? = null
 
-        if (width > 0 && height > 0) {
+        try {
             renderTarget = BackendRenderTarget(makeMetalRenderTarget(device.ptr, width, height))
-
             surface = Surface.makeFromBackendRenderTarget(
                 context!!,
-                renderTarget!!,
+                renderTarget,
                 SurfaceOrigin.TOP_LEFT,
                 SurfaceColorFormat.BGRA_8888,
                 ColorSpace.sRGB,
                 SurfaceProps(pixelGeometry = pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
 
-            canvas = surface!!.canvas
-        } else {
-            renderTarget = null
-            surface = null
-            canvas = null
-        }
-    }
+            block(surface)
 
-    private fun disposeSurface() {
-        surface?.close()
-        renderTarget?.close()
-        surface = null
-        renderTarget = null
-        canvas = null
+            context?.flush()
+            surface.flushAndSubmit()
+        } finally {
+            surface?.close()
+            renderTarget?.close()
+        }
     }
 
     override fun syncBounds() = synchronized(drawLock) {
