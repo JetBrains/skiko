@@ -26,6 +26,24 @@ public:
     HANDLE fenceEvent;
     UINT64 fenceValue = 0;
 
+    DirectXOffscreenDevice(
+        const Microsoft::WRL::ComPtr<IDXGIAdapter1>& adapter,
+        const Microsoft::WRL::ComPtr<ID3D12Device>& device,
+        const Microsoft::WRL::ComPtr<ID3D12CommandQueue>& queue,
+        ID3D12CommandAllocator* commandAllocator,
+        ID3D12GraphicsCommandList* commandList,
+        ID3D12Fence* fence,
+        HANDLE fenceEvent
+    ) :
+        adapter(adapter),
+        device(device),
+        queue(queue),
+        commandAllocator(commandAllocator),
+        commandList(commandList),
+        fence(fence),
+        fenceEvent(fenceEvent)
+    {}
+
     ~DirectXOffscreenDevice()
     {
         if (fenceEvent) {
@@ -63,7 +81,7 @@ public:
     ID3D12Resource* resource;
     ID3D12Resource* readbackBufferResource;
     
-    DirectXOffScreenTexture(DirectXOffscreenDevice* device, int _width, int _height) {
+    DirectXOffScreenTexture(DirectXOffscreenDevice* offscreenDevice, int _width, int _height) {
         width = _width;
         height = _height;
         D3D12_RESOURCE_DESC textureDesc;
@@ -106,8 +124,8 @@ public:
         readbackHeapProperties.CreationNodeMask = 1;
         readbackHeapProperties.VisibleNodeMask = 1;
 
-        device->device->CreateCommittedResource(&textureHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&resource));
-        device->device->CreateCommittedResource(&readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&readbackBufferResource));
+        offscreenDevice->device->CreateCommittedResource(&textureHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&resource));
+        offscreenDevice->device->CreateCommittedResource(&readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&readbackBufferResource));
     }
 
     ~DirectXOffScreenTexture() {
@@ -242,30 +260,24 @@ extern "C"
             return 0;
         }
 
-        DirectXOffscreenDevice *d3dDevice = new DirectXOffscreenDevice();
-        d3dDevice->commandAllocator = commandAllocator;
-        d3dDevice->commandList = commandList;
-        d3dDevice->fence = fence;
-        d3dDevice->fenceEvent = fenceEvent;
-        d3dDevice->adapter = adapter;
-        d3dDevice->device = device;
-        d3dDevice->queue = queue;
+        DirectXOffscreenDevice *offscreenDevice = new DirectXOffscreenDevice(
+            adapter, device, queue, commandAllocator, commandList, fence, fenceEvent);
 
-        return toJavaPointer(d3dDevice);
+        return toJavaPointer(offscreenDevice);
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getDirectXDevice(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        DirectXOffscreenDevice *d3dDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
-        return toJavaPointer(d3dDevice->device.Get());
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        return toJavaPointer(offscreenDevice->device.Get());
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getDirectXCommandQueue(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        DirectXOffscreenDevice *d3dDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
-        return toJavaPointer(d3dDevice->queue.Get());
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        return toJavaPointer(offscreenDevice->queue.Get());
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getDirectXTextureResource(
@@ -277,7 +289,7 @@ extern "C"
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_makeDirectXTexture(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jlong oldTexturePtr, jint width, jint height) {
-        DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
         DirectXOffScreenTexture *oldTexture = fromJavaPointer<DirectXOffScreenTexture *>(oldTexturePtr);
 
         DirectXOffScreenTexture *texture;
@@ -286,7 +298,7 @@ extern "C"
             if (oldTexture != nullptr) {
                 delete oldTexture;
             }
-            texture = new DirectXOffScreenTexture(device, width, height);
+            texture = new DirectXOffScreenTexture(offscreenDevice, width, height);
 
             if (texture->resource == nullptr || texture->readbackBufferResource == nullptr) {
                 delete texture;
@@ -308,12 +320,12 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_waitForCompletion(
             JNIEnv *env, jobject redrawer, jlong devicePtr, jlong texturePtr) {
 
-        DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
 
         DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
 
-        auto commandAllocator = device->commandAllocator;
-        auto commandList = device->commandList;
+        auto commandAllocator = offscreenDevice->commandAllocator;
+        auto commandList = offscreenDevice->commandList;
 
         commandAllocator->Reset();
         commandList->Reset(commandAllocator, nullptr);
@@ -350,15 +362,15 @@ extern "C"
         commandList->Close();
 
         ID3D12CommandList* commandLists[] = { commandList };
-        device->queue->ExecuteCommandLists(_countof(commandLists), commandLists);
+        offscreenDevice->queue->ExecuteCommandLists(_countof(commandLists), commandLists);
 
         // Wait for the command list to finish executing; the readback buffer will be ready to read
-        auto fence = device->fence;
-        auto fenceEvent = device->fenceEvent;
-        auto& fenceValue = device->fenceValue;
+        auto fence = offscreenDevice->fence;
+        auto fenceEvent = offscreenDevice->fenceEvent;
+        auto& fenceValue = offscreenDevice->fenceValue;
 
         fenceValue += 1;
-        device->queue->Signal(fence, fenceValue);
+        offscreenDevice->queue->Signal(fence, fenceValue);
 
         if (fence->GetCompletedValue() < fenceValue) {
             fence->SetEventOnCompletion(fenceValue, fenceEvent);
@@ -408,8 +420,8 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_disposeDevice(
         JNIEnv *env, jobject redrawer, jlong devicePtr) {
-        DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
-        delete device;
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        delete offscreenDevice;
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getTextureAlignment(
