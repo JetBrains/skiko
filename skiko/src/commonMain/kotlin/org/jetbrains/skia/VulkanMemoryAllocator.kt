@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skiko.ExperimentalSkikoApi
+import kotlin.jvm.JvmInline
 
 /**
  * Interface for Vulkan device memory allocation used by Skia.
@@ -16,32 +17,31 @@ import org.jetbrains.skiko.ExperimentalSkikoApi
  */
 @ExperimentalSkikoApi
 abstract class VulkanMemoryAllocator {
-
     /**
      * Describes how Skia intends to use a buffer allocation.
      *
      * This may or may not be acknowledged by the underlying allocator implementation.
      */
-    enum class BufferUsage(internal val ordinalValue: Int) {
-        /**
-         * GPU-only memory.
-         */
-        GPU_ONLY(0),
-
-        /**
-         * CPU-written, GPU-read memory.
-         */
-        CPU_WRITES_GPU_READS(1),
-
-        /**
-         * CPU-to-GPU transfer staging memory.
-         */
-        TRANSFERS_FROM_CPU_TO_GPU(2),
-
-        /**
-         * GPU-to-CPU transfer memory.
-         */
-        TRANSFERS_FROM_GPU_TO_CPU(3);
+    @JvmInline
+    value class BufferUsage(val value: Int) {
+        companion object {
+            /**
+             * GPU-only memory.
+             */
+            val GPU_ONLY = BufferUsage(0)
+            /**
+             * CPU-written, GPU-read memory.
+             */
+            val CPU_WRITES_GPU_READS = BufferUsage(1)
+            /**
+             * CPU-to-GPU transfer staging memory.
+             */
+            val TRANSFERS_FROM_CPU_TO_GPU = BufferUsage(2)
+            /**
+             * GPU-to-CPU transfer memory.
+             */
+            val TRANSFERS_FROM_GPU_TO_CPU = BufferUsage(3)
+        }
     }
 
     /**
@@ -95,7 +95,7 @@ abstract class VulkanMemoryAllocator {
      *
      * @return Allocation information, or `null` if allocation failed.
      */
-    abstract fun allocateImageMemory(image: Long, allocationPropertyFlags: Int): Allocation?
+    abstract fun allocateImageMemory(image: Long, allocationPropertyFlags: AllocationFlags): Allocation?
 
     /**
      * Allocate device memory for [buffer].
@@ -106,7 +106,7 @@ abstract class VulkanMemoryAllocator {
      *
      * @return Allocation information, or `null` if allocation failed.
      */
-    abstract fun allocateBufferMemory(buffer: Long, usage: BufferUsage, allocationPropertyFlags: Int): Allocation?
+    abstract fun allocateBufferMemory(buffer: Long, usage: BufferUsage, allocationPropertyFlags: AllocationFlags): Allocation?
 
     /**
      * Maps a Vulkan memory allocation for CPU access.
@@ -178,30 +178,6 @@ abstract class VulkanMemoryAllocator {
         usageOrdinal: Int,
         allocationPropertyFlags: Int
     ): Allocation? {
-        val usage = BufferUsage.entries.getOrNull(usageOrdinal) ?: return null
-        return allocateBufferMemory(buffer, usage, allocationPropertyFlags)
-    }
-
-    companion object {
-
-        /**
-         * Requests a dedicated `VkDeviceMemory` allocation.
-         */
-        const val ALLOCATION_FLAG_DEDICATED: Int = 0b0001
-
-        /**
-         * Requests lazily allocated device-local memory.
-         */
-        const val ALLOCATION_FLAG_LAZY: Int = 0b0010
-
-        /**
-         * Requests persistent mapping for host-visible memory.
-         */
-        const val ALLOCATION_FLAG_PERSISTENTLY_MAPPED: Int = 0b0100
-
-        /**
-         * Requests protected memory allocation.
-         */
-        const val ALLOCATION_FLAG_PROTECTED: Int = 0b1000
+        return allocateBufferMemory(buffer, BufferUsage(usageOrdinal), AllocationFlags(allocationPropertyFlags))
     }
 }
