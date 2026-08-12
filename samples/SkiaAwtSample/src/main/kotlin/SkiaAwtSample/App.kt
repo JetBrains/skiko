@@ -123,7 +123,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         window.isUndecorated = true
 
         /**
-         * There is a hack inside skiko OpenGL and Software redrawers for Windows that makes current
+         * There is a hack inside skiko OpenGL and Software renderers for Windows that makes current
          * window transparent without setting `background` to JDK's window. It's done by getting native
          * component parent and calling `DwmEnableBlurBehindWindow`.
          *

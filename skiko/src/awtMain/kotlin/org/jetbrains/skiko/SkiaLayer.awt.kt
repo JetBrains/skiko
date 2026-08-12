@@ -7,9 +7,9 @@ import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.fastForEach
-import org.jetbrains.skiko.redrawer.OnScreenRedrawer
-import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.RedrawerManager
+import org.jetbrains.skiko.renderer.Direct3DRenderer
+import org.jetbrains.skiko.renderer.Renderer
+import org.jetbrains.skiko.renderer.RendererManager
 import java.awt.*
 import java.awt.Color
 import java.awt.Graphics
@@ -116,7 +116,7 @@ actual open class SkiaLayer internal constructor(
                 //    For example, on macOs when we resize window or change DPI
                 //
                 // 3. to avoid double paint in one single frame, use needRender instead of renderImmediately
-                redrawer?.needRender(throttledToVsync = false)
+                renderer?.needRender(throttledToVsync = false)
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
@@ -125,7 +125,7 @@ actual open class SkiaLayer internal constructor(
                 @Suppress("DEPRECATION")
                 super.reshape(x, y, width, height)
 
-                redrawer?.onLayerComponentResized()
+                renderer?.onLayerComponentResized()
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -284,15 +284,15 @@ actual open class SkiaLayer internal constructor(
             isShowingCached = it
         }
         if (wasShowing != isShowingNow) {
-            // We don't want to call redrawer.setVisible(false) when the window becomes hidden, because that hides the
+            // We don't want to call renderer.setVisible(false) when the window becomes hidden, because that hides the
             // layer immediately and stops it from being painted (at the system level). But the window itself is still
             // actually visible for a few frames, and it draws its own background, causing a "flash".
             if (SwingUtilities.getWindowAncestor(this).isShowing) {
-                redrawer?.setVisible(isShowingNow)
+                renderer?.setVisible(isShowingNow)
             }
         }
         if (isShowingNow) {
-            redrawer?.syncBoundsFromPlatformComponent()
+            renderer?.syncBoundsFromPlatformComponent()
             repaint()
         }
     }
@@ -353,11 +353,11 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    private val redrawerManager = RedrawerManager<Redrawer>(
+    private val rendererManager = RendererManager<Renderer>(
         defaultRenderApi = properties.renderApi,
-        redrawerFactory = { renderApi, oldRedrawer ->
-            oldRedrawer?.dispose()
-            renderFactory.createRedrawer(this, renderApi, analytics, properties).also {
+        rendererFactory = { renderApi, oldRenderer ->
+            oldRenderer?.dispose()
+            renderFactory.createRenderer(this, renderApi, analytics, properties).also {
                 it.syncBoundsFromPlatformComponent()
             }
         },
@@ -366,15 +366,15 @@ actual open class SkiaLayer internal constructor(
         }
     )
 
-    internal val redrawer: Redrawer? by redrawerManager::redrawer
+    internal val renderer: Renderer? by rendererManager::renderer
 
-    actual var renderApi: GraphicsApi by redrawerManager::renderApi
+    actual var renderApi: GraphicsApi by rendererManager::renderApi
 
     val renderInfo: String
-        get() = if (redrawer == null)
+        get() = if (renderer == null)
             "SkiaLayer isn't initialized yet"
         else
-            redrawer!!.renderInfo
+            renderer!!.renderInfo
 
     @Volatile
     private var picture: PictureHolder? = null
@@ -385,7 +385,7 @@ actual open class SkiaLayer internal constructor(
         isDisposed = false
         backedLayer.init()
         pictureRecorder = PictureRecorder()
-        redrawerManager.findNextWorkingRenderApi(recreation)
+        rendererManager.findNextWorkingRenderApi(recreation)
         isInited = true
     }
 
@@ -407,9 +407,9 @@ actual open class SkiaLayer internal constructor(
     open fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         if (isInited && !isDisposed) {
-            // we should dispose redrawer first (to cancel `draw` in rendering thread)
-            redrawer?.dispose()
-            redrawerManager.dispose()
+            // we should dispose renderer first (to cancel `draw` in rendering thread)
+            renderer?.dispose()
+            rendererManager.dispose()
             picture?.instance?.close()
             picture = null
             pictureRecorder?.close()
@@ -431,11 +431,11 @@ actual open class SkiaLayer internal constructor(
         // scaled in the other direction from the window size), but this seems to
         // happen less often.
         //
-        // Calling redraw during layout might break software renderers, so only backends that ask for it
-        // present here.
-        if (isShowing && (redrawer as? OnScreenRedrawer)?.presentsOnLayout == true) {
-            redrawer?.syncBoundsFromPlatformComponent()
-            redrawer?.renderImmediately()
+        // Calling redraw during layout might break software renderers,
+        // so apply this fix only for the Direct3D case.
+        if (isShowing && (renderer as? Direct3DRenderer)?.isHandlingLiveResizeNow == false) {
+            renderer?.syncBoundsFromPlatformComponent()
+            renderer?.renderImmediately()
         }
 
         // Setting the bounds of children should be done only in the layout pass,
@@ -458,7 +458,7 @@ actual open class SkiaLayer internal constructor(
     override fun paint(g: Graphics) {
         Logger.debug { "paint called on SkiaLayer $this" }
         checkContentScale()
-        redrawer?.needRender(throttledToVsync = false)
+        renderer?.needRender(throttledToVsync = false)
     }
 
     // Workaround for JBR-5274 and JBR-5305
@@ -588,7 +588,7 @@ actual open class SkiaLayer internal constructor(
     actual fun needRender(throttledToVsync: Boolean) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
-        redrawer?.needRender(throttledToVsync)
+        renderer?.needRender(throttledToVsync)
     }
 
     @Deprecated(
@@ -601,7 +601,7 @@ actual open class SkiaLayer internal constructor(
      * Updates the layer and redraws synchronously.
      */
     fun renderImmediately() {
-        redrawer?.renderImmediately()
+        renderer?.renderImmediately()
     }
 
     internal fun update(nanoTime: Long, forcedSize: Dimension? = null) {
@@ -640,7 +640,7 @@ actual open class SkiaLayer internal constructor(
 
             val layerBg = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
             clear(
-                if (transparency && (redrawer?.isTransparentBackgroundSupported() == true)) {
+                if (transparency && (renderer?.isTransparentBackgroundSupported() == true)) {
                     layerBg
                 } else {
                     layerBg or 0xFF000000.toInt()
@@ -699,8 +699,8 @@ actual open class SkiaLayer internal constructor(
         } catch (e: RenderException) {
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
-                redrawerManager.findNextWorkingRenderApi()
-                redrawer?.renderImmediately()
+                rendererManager.findNextWorkingRenderApi()
+                renderer?.renderImmediately()
             }
         }
     }

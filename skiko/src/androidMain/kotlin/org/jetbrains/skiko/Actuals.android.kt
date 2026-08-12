@@ -3,33 +3,33 @@ package org.jetbrains.skiko
 import android.content.*
 import android.content.res.Configuration
 import android.view.View
-import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.defaultIsTransparentBackgroundSupported
+import org.jetbrains.skiko.renderer.Renderer
 
 actual fun setSystemLookAndFeel(): Unit = TODO()
 
-internal class AndroidOpenGLRedrawer(
-    private val layer: SkiaLayer,
+internal class AndroidOpenGLRenderer(
+    layer: SkiaLayer,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : Renderer(layer) {
     override fun dispose() = TODO()
     override fun needRender(canUpdateImmediately: Boolean) = TODO()
     override fun renderImmediately() = TODO()
     override fun update(nanoTime: Long) = TODO()
-    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(layer)
+    override fun initContext(): Boolean = TODO()
+    override fun LayerDrawScope.initCanvas() = TODO()
 
     override val renderInfo: String get() = "Android renderer"
 }
 
 internal actual fun makeDefaultRenderFactory(): RenderFactory {
     return object : RenderFactory {
-        override fun createRedrawer(
+        override fun createRenderer(
             layer: SkiaLayer,
             renderApi: GraphicsApi,
             analytics: SkiaLayerAnalytics,
             properties: SkiaLayerProperties
-        ): Redrawer = when (hostOs) {
-            OS.Android -> AndroidOpenGLRedrawer(layer, properties)
+        ): Renderer = when (hostOs) {
+            OS.Android -> AndroidOpenGLRenderer(layer, properties)
             else -> throw IllegalArgumentException("Must not happen")
         }
     }

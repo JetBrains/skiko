@@ -1,19 +1,19 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.redrawer.MacOsMetalRedrawer
-import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
-import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.renderer.MacOsMetalRenderer
+import org.jetbrains.skiko.renderer.MacOsOpenGLRenderer
+import org.jetbrains.skiko.renderer.Renderer
 
 /**
- * Creates an instance of [Redrawer] using [renderApi].
+ * Creates an instance of [Renderer] using [renderApi].
  * Valid values for [renderApi] are: [GraphicsApi.OPENGL], [GraphicsApi.METAL].
  * If [renderApi] is not one of the valid, then throws IllegalArgumentException.
  */
-internal fun createNativeRedrawer(
+internal fun createNativeRenderer(
     layer: SkiaLayer,
     renderApi: GraphicsApi
-): Redrawer = when (renderApi) {
-    GraphicsApi.OPENGL -> MacOsOpenGLRedrawer(layer)
-    GraphicsApi.METAL -> MacOsMetalRedrawer(layer)
+): Renderer = when (renderApi) {
+    GraphicsApi.OPENGL -> MacOsOpenGLRenderer(layer)
+    GraphicsApi.METAL -> MacOsMetalRenderer(layer)
     else -> throw IllegalArgumentException("Unsupported API $renderApi")
 }

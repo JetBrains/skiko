@@ -3,7 +3,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
-import org.jetbrains.skiko.redrawer.*
+import org.jetbrains.skiko.renderer.*
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.Metal.*
@@ -29,7 +29,7 @@ class SkikoUIView : UIView {
         MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
     private val _metalLayer: CAMetalLayer get() = layer as CAMetalLayer
     private var _skiaLayer: SkiaLayer? = null
-    private lateinit var _redrawer: MetalRedrawer
+    private lateinit var _renderer: MetalRenderer
 
     init {
         skikoInitializeUIView()
@@ -58,19 +58,19 @@ class SkikoUIView : UIView {
 
         val weakSkiaLayer = WeakReference(skiaLayer)
 
-        _redrawer = MetalRedrawer(
+        _renderer = MetalRenderer(
             _metalLayer,
             drawCallback = { surface ->
                 weakSkiaLayer.get()?.draw(surface)
             }
         )
 
-        skiaLayer.needRedrawCallback = _redrawer::needRender
+        skiaLayer.needRedrawCallback = _renderer::needRender
         skiaLayer.view = this
     }
 
     internal fun detach() {
-        _redrawer.dispose()
+        _renderer.dispose()
     }
 
     fun load(): SkikoUIView {
@@ -83,7 +83,7 @@ class SkikoUIView : UIView {
 
         window?.screen?.let {
             contentScaleFactor = it.scale
-            _redrawer.maximumFramesPerSecond = it.maximumFramesPerSecond
+            _renderer.maximumFramesPerSecond = it.maximumFramesPerSecond
         }
     }
 

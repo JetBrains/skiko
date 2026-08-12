@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.redrawer.RedrawerManager
+import org.jetbrains.skiko.renderer.RendererManager
 import java.awt.Component
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -63,19 +63,19 @@ open class SkiaSwingLayer(
             get() = this@SkiaSwingLayer.properties.gpuResourceCacheLimit
     }
 
-    private val redrawerManager = RedrawerManager<SwingRedrawer>(
+    private val rendererManager = RendererManager<SwingRenderer>(
         properties.renderApi,
-        redrawerFactory = { renderApi, oldRedrawer ->
-            oldRedrawer?.dispose()
-            createSwingRedrawer(swingLayerProperties, renderDelegateWithClipping, renderApi, analytics)
+        rendererFactory = { renderApi, oldRenderer ->
+            oldRenderer?.dispose()
+            createSwingRenderer(swingLayerProperties, renderDelegateWithClipping, renderApi, analytics)
         }
     )
 
-    private val redrawer: SwingRedrawer?
-        get() = redrawerManager.redrawer
+    private val renderer: SwingRenderer?
+        get() = rendererManager.renderer
 
     val renderApi: GraphicsApi
-        get() = redrawerManager.renderApi
+        get() = rendererManager.renderApi
 
     init {
         isOpaque = false
@@ -96,27 +96,27 @@ open class SkiaSwingLayer(
 
     private fun init(recreation: Boolean = false) {
         isDisposed = false
-        redrawerManager.findNextWorkingRenderApi(recreation)
+        rendererManager.findNextWorkingRenderApi(recreation)
         isInitialized = true
     }
 
     fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         if (isInitialized && !isDisposed) {
-            // we should dispose redrawer first (to cancel `draw` in rendering thread)
-            redrawer?.dispose()
-            redrawerManager.dispose()
+            // we should dispose renderer first (to cancel `draw` in rendering thread)
+            renderer?.dispose()
+            rendererManager.dispose()
             isDisposed = true
         }
     }
 
     override fun paint(g: Graphics) {
         try {
-            redrawer?.redraw(g as Graphics2D)
+            renderer?.redraw(g as Graphics2D)
         } catch (e: RenderException) {
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
-                redrawerManager.findNextWorkingRenderApi()
+                rendererManager.findNextWorkingRenderApi()
                 repaint()
             }
         }

@@ -1,14 +1,14 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.redrawer.*
+import org.jetbrains.skiko.renderer.*
 
 internal fun interface RenderFactory {
-    fun createRedrawer(
+    fun createRenderer(
         layer: SkiaLayer,
         renderApi: GraphicsApi,
         analytics: SkiaLayerAnalytics,
         properties: SkiaLayerProperties
-    ): Redrawer
+    ): Renderer
 
     companion object {
         val Default = makeDefaultRenderFactory()
