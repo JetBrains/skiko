@@ -8,12 +8,6 @@ import kotlin.test.assertFailsWith
 
 @OptIn(ExperimentalSkikoApi::class)
 class VulkanInteropTest {
-    private companion object {
-        init {
-            Library.load()
-        }
-    }
-
     @Test
     fun `makeVulkan validates required handles`() {
         assertFailsWith<IllegalArgumentException> {
