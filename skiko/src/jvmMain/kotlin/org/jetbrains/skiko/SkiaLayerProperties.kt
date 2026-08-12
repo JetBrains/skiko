@@ -30,8 +30,10 @@ class SkiaLayerProperties(
 
         if (isVsyncEnabled != rhs.isVsyncEnabled) return false
         if (isVsyncFramelimitFallbackEnabled != rhs.isVsyncFramelimitFallbackEnabled) return false
+        if (frameBuffering != rhs.frameBuffering) return false
         if (renderApi != rhs.renderApi) return false
         if (adapterPriority != rhs.adapterPriority) return false
+        if (gpuResourceCacheLimit != rhs.gpuResourceCacheLimit) return false
 
         return true
     }
@@ -39,22 +41,28 @@ class SkiaLayerProperties(
     fun copy(
         isVsyncEnabled: Boolean = this.isVsyncEnabled,
         isVsyncFramelimitFallbackEnabled: Boolean = this.isVsyncFramelimitFallbackEnabled,
+        frameBuffering: FrameBuffering = this.frameBuffering,
         renderApi: GraphicsApi = this.renderApi,
         adapterPriority: GpuPriority = this.adapterPriority,
+        gpuResourceCacheLimit: Long = this.gpuResourceCacheLimit,
     ): SkiaLayerProperties {
         return SkiaLayerProperties(
             isVsyncEnabled = isVsyncEnabled,
             isVsyncFramelimitFallbackEnabled = isVsyncFramelimitFallbackEnabled,
+            frameBuffering = frameBuffering,
             renderApi = renderApi,
             adapterPriority = adapterPriority,
+            gpuResourceCacheLimit = gpuResourceCacheLimit,
         )
     }
 
     override fun hashCode(): Int {
         var result = isVsyncEnabled.hashCode()
         result = 31 * result + isVsyncFramelimitFallbackEnabled.hashCode()
+        result = 31 * result + frameBuffering.hashCode()
         result = 31 * result + renderApi.hashCode()
         result = 31 * result + adapterPriority.hashCode()
+        result = 31 * result + gpuResourceCacheLimit.hashCode()
         return result
     }
 }
