@@ -54,12 +54,38 @@ abstract class VulkanMemoryAllocator {
      * @property memoryTypeIndex Index into
      * `VkPhysicalDeviceMemoryProperties.memoryTypes`.
      */
-    data class Allocation(
+    class Allocation(
         val deviceMemory: Long,
         val offset: Long,
         val size: Long,
         val memoryTypeIndex: Int
-    )
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
+
+            other as Allocation
+
+            if (deviceMemory != other.deviceMemory) return false
+            if (offset != other.offset) return false
+            if (size != other.size) return false
+            if (memoryTypeIndex != other.memoryTypeIndex) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = deviceMemory.hashCode()
+            result = 31 * result + offset.hashCode()
+            result = 31 * result + size.hashCode()
+            result = 31 * result + memoryTypeIndex
+            return result
+        }
+
+        override fun toString(): String {
+            return "Allocation(deviceMemory=$deviceMemory, offset=$offset, size=$size, memoryTypeIndex=$memoryTypeIndex)"
+        }
+    }
 
     /**
      * Allocate device memory for [image].
