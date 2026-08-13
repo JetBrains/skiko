@@ -39,6 +39,16 @@ object SkikoProperties {
 
     val vsyncEnabled: Boolean get() = getProperty("skiko.vsync.enabled")?.toBoolean() ?: true
 
+    /**
+     * Whether `SkiaSwingLayer` paces invalidation-driven repaints (`needRender`) to the display
+     * refresh using the JetBrains Runtime `FramePacing` service.
+     *
+     * Has no effect when the runtime does not provide the service; repaint requests then pass
+     * through unchanged. Read when the layer is initialized (added to a component hierarchy).
+     */
+    val swingFramePacingEnabled: Boolean get() =
+        getProperty("skiko.swing.frame.pacing")?.toBoolean() ?: false
+
     val frameBuffering: FrameBuffering get() {
         return when (getProperty("skiko.buffering")) {
             "DOUBLE" -> FrameBuffering.DOUBLE
