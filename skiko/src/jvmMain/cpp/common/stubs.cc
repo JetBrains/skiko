@@ -54,11 +54,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt
     skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_swapBuffers");
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_flush(
-        JNIEnv *env, jobject redrawer, jlong contextPtr, jlong surfacePtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_flush");
-}
-
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_chooseAdapter(JNIEnv *env, jobject redrawer, jint adapterPriority) {
     skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_chooseAdapter");
     return 0;
@@ -78,6 +73,24 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initSw
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initFence(
         JNIEnv *env, jobject redrawer, jlong devicePtr) {
     skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initFence");
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getDirectXDevice(
+        JNIEnv *env, jobject redrawer, jlong devicePtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getDirectXDevice");
+    return 0;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getDirectXCommandQueue(
+        JNIEnv *env, jobject redrawer, jlong devicePtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getDirectXCommandQueue");
+    return 0;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getDirectXBackBuffer(
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jint backBufferIndex) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getDirectXBackBuffer");
+    return 0;
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_windows_JumpListBuilder_jumpList_1init(JNIEnv *env, jobject obj) {
@@ -132,15 +145,21 @@ JNIEXPORT void Java_org_jetbrains_skiko_PlatformOperationsKt_osxOrderEmojiAndSym
     skikoUnimplemented("Java_org_jetbrains_skiko_PlatformOperationsKt_osxOrderEmojiAndSymbolsPopup");
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalContext(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getMtlDevice(
     JNIEnv* env, jobject redrawer, jlong devicePtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalContext");
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getMtlDevice");
     return 0;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalRenderTarget(
-    JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalRenderTarget");
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getCommandQueue(
+    JNIEnv* env, jobject redrawer, jlong devicePtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getCommandQueue");
+    return 0;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_acquireDrawableTexture(
+    JNIEnv* env, jobject redrawer, jlong devicePtr) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_acquireDrawableTexture");
     return 0;
 }
 

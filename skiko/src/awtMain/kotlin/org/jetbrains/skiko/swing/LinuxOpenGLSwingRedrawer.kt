@@ -55,7 +55,7 @@ internal class LinuxOpenGLSwingRedrawer(
                     throw RenderException("Cannot create offScreen OpenGL texture")
                 }
                 val fbId = getFboId(texturePtr)
-                val renderTarget = makeGLRenderTarget(
+                val renderTarget = BackendRenderTarget.makeGL(
                     width,
                     height,
                     0,
@@ -64,8 +64,7 @@ internal class LinuxOpenGLSwingRedrawer(
                     FramebufferFormat.GR_GL_RGBA8
                 ).autoClose()
 
-                // TODO: may be it is possible to reuse [makeGLContext]
-                val directContext = makeGLContext().configureContext().autoClose()
+                val directContext = DirectContext.makeGL().configureContext().autoClose()
                 val surface = Surface.makeFromBackendRenderTarget(
                     directContext,
                     renderTarget,
