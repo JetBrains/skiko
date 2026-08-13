@@ -4,6 +4,7 @@
 #include "SkRRect.h"
 #include "SkTextBlob.h"
 #include "SkVertices.h"
+#include "MeshInterop.hh"
 #include "hb.h"
 #include "interop.hh"
 
@@ -187,6 +188,17 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawVertic
         env->ReleaseShortArrayElements(indexArr, const_cast<jshort*>(indices), 0);
     }
     env->ReleaseFloatArrayElements(positionsArr, positions, 0);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawMesh
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong meshPtr, jint blendMode, jlong paintPtr) {
+    SkCanvas* canvas = jlongToPtr<SkCanvas*>(ptr);
+    auto* mesh = jlongToPtr<skiko::mesh::MeshWrapper*>(meshPtr);
+    SkPaint* paint = jlongToPtr<SkPaint*>(paintPtr);
+    sk_sp<SkBlender> blender = blendMode < 0
+        ? nullptr
+        : SkBlender::Mode(static_cast<SkBlendMode>(blendMode));
+    canvas->drawMesh(mesh->mesh, std::move(blender), *paint);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPatch

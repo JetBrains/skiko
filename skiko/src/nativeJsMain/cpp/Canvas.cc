@@ -3,6 +3,7 @@
 #include "SkRRect.h"
 #include "SkTextBlob.h"
 #include "SkVertices.h"
+#include "MeshInterop.hh"
 #include "hb.h"
 #include "common.h"
 
@@ -176,6 +177,17 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawVertices
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
 
     canvas->drawVertices(vertices, static_cast<SkBlendMode>(blendMode), *paint);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawMesh
+  (KNativePointer ptr, KNativePointer meshPtr, KInt blendMode, KNativePointer paintPtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(ptr);
+    auto* mesh = reinterpret_cast<skiko::mesh::MeshWrapper*>(meshPtr);
+    SkPaint* paint = reinterpret_cast<SkPaint*>(paintPtr);
+    sk_sp<SkBlender> blender = blendMode < 0
+        ? nullptr
+        : SkBlender::Mode(static_cast<SkBlendMode>(blendMode));
+    canvas->drawMesh(mesh->mesh, std::move(blender), *paint);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPatch

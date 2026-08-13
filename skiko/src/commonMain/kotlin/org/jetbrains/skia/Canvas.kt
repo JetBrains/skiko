@@ -719,6 +719,33 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 
     /**
+     * Experimental, under active development, and subject to change without notice.
+     *
+     * Draws a [Mesh] using its user-defined [MeshSpecification]
+     *
+     * [blendMode] is ignored if the mesh specification does not output a fragment color.
+     * Otherwise, it combines the paint shader or opaque paint color as the source with the
+     * mesh's fragment color as the destination.
+     *
+     * Mask filters, path effects, and antialiasing on [paint] are ignored.
+     *
+     * @param mesh the mesh vertices and compatible specification
+     * @param blendMode combines the paint source with the mesh fragment color
+     * @param paint supplies the color and optional shader
+     */
+    fun drawMesh(mesh: Mesh, blendMode: BlendMode = BlendMode.MODULATE, paint: Paint): Canvas {
+        Stats.onNativeCall()
+        try {
+            _nDrawMesh(_ptr, getPtr(mesh), blendMode.ordinal, getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(mesh)
+            reachabilityBarrier(paint)
+        }
+        return this
+    }
+
+    /**
      *
      * Draws a triangle mesh, using clip and Matrix.
      *
@@ -1762,6 +1789,13 @@ private external fun _nDrawVertices(
     paintPtr: NativePointer
 )
 
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawMesh")
+private external fun _nDrawMesh(
+    ptr: NativePointer,
+    meshPtr: NativePointer,
+    blendMode: Int,
+    paintPtr: NativePointer
+)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPatch")
 private external fun _nDrawPatch(
