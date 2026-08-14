@@ -17,7 +17,7 @@ import org.jetbrains.skia.impl.withStringResult
  */
 class Mesh private constructor(
     ptr: NativePointer,
-    private val colorSpace: ColorSpace
+    private val colorSpace: ColorSpace?
 ) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         init {
@@ -30,7 +30,7 @@ class Mesh private constructor(
             vertexData: InteropPointer,
             vertexDataSize: Int,
             vertexCount: Int,
-            indexData: InteropPointer?,
+            indexData: InteropPointer,
             indexCount: Int,
             bounds: Rect
         ): NativePointer {
@@ -225,7 +225,7 @@ private fun makeFromBytes(
                 toInterop(vertexBuffer),
                 vertexBuffer.size,
                 vertexCount,
-                toInterop(indexBuffer),
+                toInterop(indexBuffer ?: EMPTY_INDICES),
                 indexBuffer?.size ?: 0,
                 bounds
             )
@@ -252,7 +252,7 @@ private fun makeFromFloats(
                 toInterop(vertexBuffer),
                 vertexBuffer.size * 4,
                 vertexCount,
-                toInterop(indexBuffer),
+                toInterop(indexBuffer ?: EMPTY_INDICES),
                 indexBuffer?.size ?: 0,
                 bounds
             )
@@ -276,7 +276,7 @@ private external fun _nMake(
     vertexData: InteropPointer,
     vertexDataSize: Int,
     vertexCount: Int,
-    indexData: InteropPointer?,
+    indexData: InteropPointer,
     indexCount: Int,
     left: Float,
     top: Float,
@@ -326,3 +326,5 @@ private external fun _nSetChild(
     childPtr: NativePointer,
     type: Int
 ): NativePointer
+
+private val EMPTY_INDICES = ShortArray(0)

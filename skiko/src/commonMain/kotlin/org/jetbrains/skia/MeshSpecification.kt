@@ -16,7 +16,9 @@ import kotlin.jvm.JvmInline
  * Describes the vertex layout and SkSL programs used by a [Mesh].
  */
 class MeshSpecification internal constructor(ptr: NativePointer) : RefCnt(ptr) {
-    internal val colorSpace = ColorSpace(_nGetColorSpace(ptr))
+    internal val colorSpace: ColorSpace? = _nGetColorSpace(ptr).let {
+        if (it == Native.NullPointer) null else ColorSpace(it)
+    }
 
     @JvmInline
     value class AttributeType private constructor(internal val value: Int) {

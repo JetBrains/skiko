@@ -5,6 +5,7 @@ import org.jetbrains.skiko.tests.TestGlContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 class MeshTest {
     private val vertexShader = """
@@ -351,6 +352,8 @@ class MeshTest {
             ),
             varyingVertexShader,
             varyingFragmentShader
-        ).use {}
+        ).use { specification ->
+            assertNull(specification.colorSpace)
+        }
     }
 }
