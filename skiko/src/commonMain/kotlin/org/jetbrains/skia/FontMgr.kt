@@ -65,7 +65,8 @@ open class FontMgr : RefCnt {
      * object. Will return `null` if no 'good' match is found.
      *
      * Passing `null` as the value for [familyName] will return the
-     * default system font.
+     * default system font on certain targets but it's not guaranteed
+     * to be available.
      *
      * It is possible that this will return a style set not accessible from
      * [makeStyleSet] or [matchFamily] due to hidden or
