@@ -4,6 +4,19 @@ const path = require("path");
 
 config.browserConsoleLogOptions.level = "debug";
 
+config.customLaunchers = Object.assign(config.customLaunchers || {}, {
+    ChromeHeadlessWithWebGL: {
+        base: 'ChromeHeadless',
+        flags: [
+            '--no-sandbox',
+            '--use-gl=angle',
+            '--use-angle=swiftshader',
+            '--ignore-gpu-blocklist',
+        ]
+    }
+});
+config.browsers = ['ChromeHeadlessWithWebGL'];
+
 const basePath = config.basePath;
 const projectPath = path.resolve(basePath, "..", "..", "..", "..");
 const wasmPath = path.resolve(basePath, "kotlin")
