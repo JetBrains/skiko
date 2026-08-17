@@ -46,10 +46,10 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
         fun makeVulkan(
             width: Int,
             height: Int,
-            imagePtr: NativePointer,
             textureInfo: VulkanTextureInfo,
             imageLayout: Int,
             queueFamilyIndex: Int,
+            imagePtr: NativePointer,
         ): BackendTexture {
             requireVulkanSupport()
             require(imagePtr != NullPointer) { "Vulkan image pointer is null" }
@@ -59,10 +59,10 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
                 _nMakeVulkan(
                     width,
                     height,
+                    toInterop(textureInfo.packToIntArray()),
                     imageLayout,
                     queueFamilyIndex,
                     imagePtr,
-                    toInterop(textureInfo.packToIntArray()),
                 )
             }
             check(ptr != NullPointer) { "Failed to create a Graphite Vulkan backend texture" }
@@ -85,8 +85,8 @@ private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePoin
 private external fun _nMakeVulkan(
     width: Int,
     height: Int,
+    textureInfo: InteropPointer,
     imageLayout: Int,
     queueFamilyIndex: Int,
     imagePtr: NativePointer,
-    textureInfo: InteropPointer,
 ): NativePointer

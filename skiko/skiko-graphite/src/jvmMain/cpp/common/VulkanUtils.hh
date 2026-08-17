@@ -38,12 +38,12 @@ inline skgpu::graphite::VulkanTextureInfo skikoVulkanTextureInfoFromIntArray(
     }
 
     return skgpu::graphite::VulkanTextureInfo(
-            static_cast<VkSampleCountFlagBits>(values[2]),
-            values[3] != 0 ? skgpu::Mipmapped::kYes : skgpu::Mipmapped::kNo,
-            static_cast<VkImageCreateFlags>(values[4]),
-            static_cast<VkFormat>(values[0]),
-            static_cast<VkImageTiling>(values[5]),
-            static_cast<VkImageUsageFlags>(values[1]),
+            static_cast<VkSampleCountFlagBits>(values[0]),
+            values[1] != 0 ? skgpu::Mipmapped::kYes : skgpu::Mipmapped::kNo,
+            static_cast<VkImageCreateFlags>(values[2]),
+            static_cast<VkFormat>(values[3]),
+            static_cast<VkImageTiling>(values[4]),
+            static_cast<VkImageUsageFlags>(values[5]),
             static_cast<VkSharingMode>(values[6]),
             static_cast<VkImageAspectFlags>(values[7]),
             {});

@@ -111,33 +111,33 @@ value class VulkanImageCreateFlags(val value: Int) {
 /**
  * Descriptor containing Vulkan-specific image information for Graphite backend textures.
  *
- * @param format Vulkan image pixel format (`VkFormat`).
- * @param imageUsageFlags Vulkan image usage flags (`VkImageUsageFlags`).
  * @param sampleCount Number of samples per pixel (1 for non-MSAA).
  * @param mipmapped `true` if mipmaps are present/allocated for this texture.
  * @param flags Vulkan image creation flags (`VkImageCreateFlags`).
+ * @param format Vulkan image pixel format (`VkFormat`).
  * @param imageTiling Vulkan image tiling layout (`VkImageTiling`).
+ * @param imageUsageFlags Vulkan image usage flags (`VkImageUsageFlags`).
  * @param sharingMode Vulkan queue sharing mode (`VkSharingMode`).
  * @param aspectMask Vulkan image aspect mask (`VkImageAspectFlags`).
  */
 @ExperimentalSkikoApi
 class VulkanTextureInfo(
-    val format: VulkanFormat,
-    val imageUsageFlags: VulkanImageUsageFlags,
     val sampleCount: Int = 1,
     val mipmapped: Boolean = false,
     val flags: VulkanImageCreateFlags = VulkanImageCreateFlags.NONE,
+    val format: VulkanFormat,
     val imageTiling: VulkanImageTiling = VulkanImageTiling.OPTIMAL,
+    val imageUsageFlags: VulkanImageUsageFlags,
     val sharingMode: VulkanSharingMode = VulkanSharingMode.EXCLUSIVE,
     val aspectMask: VulkanImageAspectFlags = VulkanImageAspectFlags.COLOR,
 ) {
     internal fun packToIntArray(): IntArray = intArrayOf(
-        format.value,
-        imageUsageFlags.value,
         sampleCount,
         if (mipmapped) 1 else 0,
         flags.value,
+        format.value,
         imageTiling.value,
+        imageUsageFlags.value,
         sharingMode.value,
         aspectMask.value,
     )

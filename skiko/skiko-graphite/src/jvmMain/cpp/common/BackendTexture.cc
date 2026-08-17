@@ -37,10 +37,10 @@ Java_org_jetbrains_skia_gpu_graphite_BackendTextureKt__1nMakeVulkan(
         jclass,
         jint width,
         jint height,
+        jintArray textureInfoValues,
         jint imageLayout,
         jint queueFamilyIndex,
-        jlong imagePtr,
-        jintArray textureInfoValues) {
+        jlong imagePtr) {
 #if defined(SK_VULKAN)
     auto textureInfo = skikoVulkanTextureInfoFromIntArray(env, textureInfoValues);
     auto texture = skgpu::graphite::BackendTextures::MakeVulkan(
