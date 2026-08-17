@@ -20,6 +20,9 @@ class BackendSemaphore internal constructor(ptr: NativePointer) : Managed(ptr, _
         /**
          * Creates a Graphite backend semaphore wrapping a Vulkan `VkSemaphore`.
          *
+         * The returned [BackendSemaphore] does not take ownership of [semaphorePtr] and will not
+         * delete the Vulkan semaphore when it is closed.
+         *
          * @param semaphorePtr native pointer (`VkSemaphore`) to wrap.
          * @return a backend semaphore wrapping the Vulkan semaphore.
          */

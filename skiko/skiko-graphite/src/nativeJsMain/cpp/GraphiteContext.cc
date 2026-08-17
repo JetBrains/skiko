@@ -67,9 +67,7 @@ SKIKO_EXPORT void org_jetbrains_skia_gpu_graphite_GraphiteContext__1nInsertRecor
         auto ptrs = reinterpret_cast<KNativePointer*>(waitSemaphoresPtrs);
         for (KInt i = 0; i < waitSemaphoresCount; ++i) {
             auto sem = reinterpret_cast<skgpu::graphite::BackendSemaphore*>(ptrs[i]);
-            if (sem) {
-                waitSemaphores.push_back(*sem);
-            }
+            waitSemaphores.push_back(*sem);
         }
     }
     info.fNumWaitSemaphores = waitSemaphores.size();
@@ -81,9 +79,7 @@ SKIKO_EXPORT void org_jetbrains_skia_gpu_graphite_GraphiteContext__1nInsertRecor
         auto ptrs = reinterpret_cast<KNativePointer*>(signalSemaphoresPtrs);
         for (KInt i = 0; i < signalSemaphoresCount; ++i) {
             auto sem = reinterpret_cast<skgpu::graphite::BackendSemaphore*>(ptrs[i]);
-            if (sem) {
-                signalSemaphores.push_back(*sem);
-            }
+            signalSemaphores.push_back(*sem);
         }
     }
     info.fNumSignalSemaphores = signalSemaphores.size();

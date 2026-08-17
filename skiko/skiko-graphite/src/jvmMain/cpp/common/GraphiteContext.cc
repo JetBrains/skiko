@@ -108,9 +108,7 @@ Java_org_jetbrains_skia_gpu_graphite_GraphiteContextKt__1nInsertRecording(
         for (jint i = 0; i < waitSemaphoresCount; ++i) {
             auto sem = reinterpret_cast<skgpu::graphite::BackendSemaphore*>(
                     static_cast<uintptr_t>(ptrs[i]));
-            if (sem) {
-                waitSemaphores.push_back(*sem);
-            }
+            waitSemaphores.push_back(*sem);
         }
         env->ReleaseLongArrayElements(waitSemaphoresPtrs, ptrs, JNI_ABORT);
     }
@@ -124,9 +122,7 @@ Java_org_jetbrains_skia_gpu_graphite_GraphiteContextKt__1nInsertRecording(
         for (jint i = 0; i < signalSemaphoresCount; ++i) {
             auto sem = reinterpret_cast<skgpu::graphite::BackendSemaphore*>(
                     static_cast<uintptr_t>(ptrs[i]));
-            if (sem) {
-                signalSemaphores.push_back(*sem);
-            }
+            signalSemaphores.push_back(*sem);
         }
         env->ReleaseLongArrayElements(signalSemaphoresPtrs, ptrs, JNI_ABORT);
     }

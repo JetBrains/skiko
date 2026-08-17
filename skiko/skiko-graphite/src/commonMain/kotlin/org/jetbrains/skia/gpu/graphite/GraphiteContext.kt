@@ -118,10 +118,14 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
             val waitSemPtrs = NativePointerArray(info.waitSemaphores.size)
             val signalSemPtrs = NativePointerArray(info.signalSemaphores.size)
             for (index in info.waitSemaphores.indices) {
-                waitSemPtrs[index] = info.waitSemaphores[index].nativePtr
+                val semaphore = info.waitSemaphores[index]
+                require(!semaphore.isClosed) { "Wait semaphore is closed" }
+                waitSemPtrs[index] = semaphore.nativePtr
             }
             for (index in info.signalSemaphores.indices) {
-                signalSemPtrs[index] = info.signalSemaphores[index].nativePtr
+                val semaphore = info.signalSemaphores[index]
+                require(!semaphore.isClosed) { "Signal semaphore is closed" }
+                signalSemPtrs[index] = semaphore.nativePtr
             }
             interopScope {
                 _nInsertRecording(
