@@ -86,7 +86,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeShader
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
     SkShader* shader;
     if (hasTile) {
-        SkRect tileRect = SkRect::MakeLTRB(tileLeft, tileRight, tileBottom, tileTop);
+        SkRect tileRect = SkRect::MakeLTRB(tileLeft, tileTop, tileRight, tileBottom);
         shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), &tileRect).release();
     } else {
         shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), nullptr).release();
