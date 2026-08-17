@@ -37,6 +37,7 @@ inline skgpu::graphite::VulkanTextureInfo skikoVulkanTextureInfoFromIntArray(
         env->GetIntArrayRegion(textureInfoValues, 0, 8, values);
     }
 
+    // Keep these indices in sync with VulkanTextureInfo.packToIntArray() in VulkanTypes.kt.
     return skgpu::graphite::VulkanTextureInfo(
             static_cast<VkSampleCountFlagBits>(values[0]),
             values[1] != 0 ? skgpu::Mipmapped::kYes : skgpu::Mipmapped::kNo,
