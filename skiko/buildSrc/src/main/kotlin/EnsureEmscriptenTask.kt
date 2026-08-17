@@ -13,7 +13,7 @@ import javax.inject.Inject
 /**
  * Verifies that emcc (Emscripten compiler) is available on the system.
  * If emcc is not found from previous installations, the task automatically installs the Emscripten SDK
- * into gradles user home directory using the specified version.
+ * into gradles user home directory using the specified version and commit hash.
  *
  * The installed emsdk location is exposed via [emsdkDir] so that downstream
  * tasks can use the emscripten binaries if needed.
@@ -27,6 +27,9 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
     abstract val emsdkVersion: Property<String>
 
     @get:Input
+    abstract val emsdkCommit: Property<String>
+
+    @get:Input
     abstract val requireExistingEmsdk: Property<Boolean>
 
     @get:OutputDirectory
@@ -36,8 +39,8 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
         requireExistingEmsdk.convention(false)
         emsdkDir.convention(
             project.layout.dir(
-                emsdkVersion.map { version ->
-                    project.rootProject.gradle.gradleUserHomeDir.resolve("emsdk/emsdk-$version")
+                emsdkVersion.zip(emsdkCommit) { version, commit ->
+                    project.rootProject.gradle.gradleUserHomeDir.resolve("emsdk/emsdk-$version-$commit")
                 }
             )
         )
@@ -45,8 +48,9 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
 
     @TaskAction
     fun run() {
-        if (isEmccAvailable()) {
-            logger.lifecycle("emcc is available at: ${emccFile().absolutePath}")
+        // Check if emsdk was previously installed by this task
+        if (emccFile().isFile) {
+            logger.lifecycle("emcc is already available at: ${emccFile().absolutePath}")
             return
         }
 
@@ -59,31 +63,29 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
         logger.lifecycle("Emscripten SDK ${emsdkVersion.get()} installed successfully at: ${emsdkDir.get().asFile.absolutePath}")
     }
 
-    private fun isEmccAvailable(): Boolean {
-        // Check if emsdk was previously installed by this task
-        return emccFile().isFile
-    }
-
     private fun emccFile(): File =
         emsdkDir.get().asFile.resolve("upstream/emscripten/${if (hostOs.isWindows) "emcc.bat" else "emcc"}")
 
     private fun installEmsdk() {
         val version = emsdkVersion.get()
+        val commit = emsdkCommit.get()
         val sdkDir = emsdkDir.get().asFile
 
-        // Clone or update emsdk
+        // Clone emsdk if needed, then checkout the pinned commit.
         if (sdkDir.resolve(".git").isDirectory) {
-            logger.lifecycle("Updating existing emsdk clone...")
-            exec("git", "pull", workingDir = sdkDir)
+            logger.lifecycle("Using existing emsdk clone...")
         } else {
             sdkDir.mkdirs()
             logger.lifecycle("Cloning emsdk repository...")
-            exec("git", "clone", "https://github.com/emscripten-core/emsdk.git", sdkDir.absolutePath)
+            exec("git", "clone", "--no-checkout", "https://github.com/emscripten-core/emsdk.git", sdkDir.absolutePath)
         }
 
+        logger.lifecycle("Checking out emsdk commit $commit...")
+        exec("git", "fetch", "--depth", "1", "origin", commit, workingDir = sdkDir)
+        exec("git", "checkout", "--detach", "FETCH_HEAD", workingDir = sdkDir)
+
         // Install and activate the specified version
-        val emsdkScript = if (hostOs.isWindows) sdkDir.resolve("emsdk.bat").absolutePath
-                          else sdkDir.resolve("emsdk").absolutePath
+        val emsdkScript = sdkDir.resolve(if (hostOs.isWindows) "emsdk.bat" else "emsdk").absolutePath
 
         logger.lifecycle("Installing emsdk version $version...")
         exec(emsdkScript, "install", version, workingDir = sdkDir)
@@ -117,5 +119,4 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
             )
         }
     }
-
 }
