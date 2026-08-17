@@ -75,6 +75,11 @@ fun SkikoProjectContext.declareWasmTasks() {
             it.file(toolName).asFile.absolutePath
         }
 
+    fun emscriptenBinaryToolPath(toolName: String) =
+        ensureEmscripten.flatMap { it.emsdkDir.dir("upstream/bin") }.map {
+            it.file(toolName).asFile.absolutePath
+        }
+
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
         dependsOn(ensureEmscripten)
@@ -212,38 +217,13 @@ fun SkikoProjectContext.declareWasmTasks() {
         linkTask: TaskProvider<LinkSkikoWasmTask>,
         nameSuffix: String = ""
     ) {
+        dependsOn(ensureEmscripten)
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
 
-        // find a path to wasm-opt
         val wasmOptName = if (System.getProperty("os.name").startsWith("Win")) "wasm-opt.exe" else "wasm-opt"
-        var wasmOptPath: String
-        if (System.getenv("EMSDK") != null) {
-            // used by build pipeline
-            wasmOptPath = "${System.getenv("EMSDK")}/upstream/bin/$wasmOptName"
-        } else {
-            // try to use wasm-opt that comes bundled with emcc
-            val emccName = compilerForTarget(OS.Wasm, Arch.Wasm)
-            val emccPath = (System.getenv("PATH") ?: "")
-                .split(File.pathSeparator)
-                .asSequence()
-                .map { File(it).resolve(emccName) }
-                .firstOrNull { it.isFile }
-
-            // emcc is under emsdk/upstream/emscripten/emcc. wasm-opt is under emsdk/upstream/bin/wasm-opt
-            val wasmOptRelativeToEmcc = emccPath
-                ?.parentFile // emscripten/
-                ?.parentFile // upstream/
-                ?.resolve("bin/$wasmOptName")
-
-            wasmOptPath = when {
-                wasmOptRelativeToEmcc?.exists() == true -> wasmOptRelativeToEmcc.absolutePath
-                else -> wasmOptName
-            }
-        }
-
-        optimizer.set(wasmOptPath)
+        optimizer.set(emscriptenBinaryToolPath(wasmOptName))
         inputDir.set(linkTask.flatMap { it.outDir })
         libOutputFileName.set("$libBaseName$nameSuffix")
 
