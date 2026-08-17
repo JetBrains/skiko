@@ -11,12 +11,12 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * Verifies that emcc (Emscripten compiler) is available on the system PATH.
- * If emcc is not found, the task automatically installs the Emscripten SDK
- * into the project build directory using the specified version.
+ * Verifies that emcc (Emscripten compiler) is available on the system.
+ * If emcc is not found from previous installations, the task automatically installs the Emscripten SDK
+ * into gradles user home directory using the specified version.
  *
  * The installed emsdk location is exposed via [emsdkDir] so that downstream
- * tasks can add the emscripten binaries to their PATH if needed.
+ * tasks can use the emscripten binaries if needed.
  */
 abstract class EnsureEmscriptenTask : DefaultTask() {
 
