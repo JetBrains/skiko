@@ -65,7 +65,7 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
     }
 
     private fun emccFile(): File =
-        emsdkDir.get().asFile.resolve("upstream/emscripten/${if (isWindows()) "emcc.bat" else "emcc"}")
+        emsdkDir.get().asFile.resolve("upstream/emscripten/${if (hostOs.isWindows) "emcc.bat" else "emcc"}")
 
     private fun installEmsdk() {
         val version = emsdkVersion.get()
@@ -82,7 +82,7 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
         }
 
         // Install and activate the specified version
-        val emsdkScript = if (isWindows()) sdkDir.resolve("emsdk.bat").absolutePath
+        val emsdkScript = if (hostOs.isWindows) sdkDir.resolve("emsdk.bat").absolutePath
                           else sdkDir.resolve("emsdk").absolutePath
 
         logger.lifecycle("Installing emsdk version $version...")
@@ -118,6 +118,4 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
         }
     }
 
-    private fun isWindows(): Boolean =
-        System.getProperty("os.name").startsWith("Win", ignoreCase = true)
 }
