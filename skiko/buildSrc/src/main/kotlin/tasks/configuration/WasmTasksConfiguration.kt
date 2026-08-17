@@ -12,6 +12,7 @@ import SkikoProjectContext
 import compilerForTarget
 import dsl.TargetEnv
 import linkerForTarget
+import org.gradle.api.GradleException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
@@ -53,17 +54,16 @@ private val wasmSideModuleLinkTaskAttribute =
 private const val WASM_SIDE_MODULE_USAGE = "skiko-wasm-side-module"
 private const val WASM_TEST_RESOURCES_USAGE = "skiko-wasm-test-resources"
 
-private const val DEFAULT_EMSDK_VERSION = "4.0.7"
-
 fun SkikoProjectContext.declareWasmTasks() {
     if (!project.supportWeb) {
         return
     }
     val isSideModule = kind == SkikoModuleKind.EXTENSION
 
-    val emsdkVersion = project.findProperty("skiko.emsdk.version")?.toString() ?: DEFAULT_EMSDK_VERSION
+    val emsdkVersion = project.findProperty("skiko.emsdk.version") ?:
+        throw GradleException("skiko.emsdk.version property is not set")
     val ensureEmscripten by project.tasks.registering(EnsureEmscriptenTask::class) {
-        this.emsdkVersion.set(emsdkVersion)
+        this.emsdkVersion.set(emsdkVersion.toString())
         project.findProperty("skiko.emsdk.dir")?.toString()?.let {
             emsdkDir.set(project.layout.dir(project.provider { project.resolveEmsdkDir(it) }))
             requireExistingEmsdk.set(true)
