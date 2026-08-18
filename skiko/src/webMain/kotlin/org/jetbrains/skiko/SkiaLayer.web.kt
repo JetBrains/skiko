@@ -1,11 +1,11 @@
 package org.jetbrains.skiko
 
-import kotlinx.browser.window
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.wasm.createWebGLContext
 import org.w3c.dom.HTMLCanvasElement
+import kotlin.js.js
 
 /**
  * Provides a way to render the content and to receive the input events.
@@ -26,7 +26,7 @@ actual open class SkiaLayer {
      * See https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
      */
     actual val contentScale: Float
-        get() = window.devicePixelRatio.toFloat()
+        get() = devicePixelRatio().toFloat()
 
     /**
      * Fullscreen is not supported
@@ -114,3 +114,7 @@ actual open class SkiaLayer {
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
 }
+
+private fun devicePixelRatio(): Double =
+    //language=JavaScript
+    js("globalThis.devicePixelRatio || 1")

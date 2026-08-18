@@ -13,3 +13,4 @@ skiko/src/jvmMain/java
 .cache
 .clangd
 **/kotlin-js-store/
+/samples/SkiaWebSample/node_modules/
