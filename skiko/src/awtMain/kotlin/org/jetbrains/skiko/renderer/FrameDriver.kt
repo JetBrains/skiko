@@ -10,34 +10,44 @@ import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 import org.jetbrains.skiko.LayerDrawScope
 import java.awt.Dimension
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.swing.SwingUtilities
 
 /**
- * Schedules the frames of one [SkiaLayer] on the EDT and drives the [renderer] that renders and
- * presents them.
+ * Decides when the frames of one [SkiaLayer] happen: it collects frame requests, schedules them on
+ * the EDT, pauses its own scheduling while the platform drives frames through a live resize, and
+ * produces the frame that must be ready before the window is first shown. The [renderer] renders
+ * and presents what the driver asks for.
  */
 @OptIn(ExperimentalSkikoApi::class)
 internal class FrameDriver(
     private val layer: SkiaLayer,
     private val renderer: AwtRenderer,
     private val scheduler: FrameScheduler? = null,
-) : FrameHost {
+) : LiveResizeListener {
     private val deviceAnalytics: DeviceAnalytics? get() = renderer.deviceAnalytics
     private var isFirstFrameRendered = false
 
     var isDisposed = false
         private set
 
+    /**
+     * `true` while the platform drives the frames itself (an interactive live resize). The driver
+     * then leaves AWT resize events alone and routes frame requests to the platform's scheduler.
+     */
+    @Volatile
+    private var isPlatformDrivingFrames = false
+
     init {
-        renderer.attachFrameHost(this)
+        renderer.attachFrameEvents(this)
     }
 
     val renderInfo: String get() = renderer.renderInfo
     fun isTransparentBackgroundSupported(): Boolean = renderer.isTransparentBackgroundSupported()
 
-    val presentsOnLayout: Boolean get() = renderer.presentsOnLayout
+    val presentsOnLayout: Boolean get() = renderer.presentsOnResize && !isPlatformDrivingFrames
 
     private val updateRequested = AtomicBoolean(false)
-    override fun updateIfRequested(nanoTime: Long) {
+    internal fun updateIfRequested(nanoTime: Long = renderTime()) {
         if (updateRequested.getAndSet(false)) {
             layer.update(nanoTime)
         }
@@ -45,29 +55,39 @@ internal class FrameDriver(
 
     private val frameDispatcher = if (scheduler != null) null else {
         FrameDispatcher(MainUIDispatcher) {
-            renderer.runFrame {
-                if (layer.isShowing) {
-                    updateIfRequested()
-                    drawFrame(immediate = false)
+            if (!isPlatformDrivingFrames) {
+                renderer.runFrame {
+                    if (layer.isShowing) {
+                        updateIfRequested()
+                        drawFrame(immediate = false)
+                    }
                 }
             }
+        }
+    }
+
+    // Records the next frame's content on the EDT while the previous frame still waits for vsync.
+    private val earlyRecordDispatcher = if (!renderer.pacesAfterFrame) null else {
+        FrameDispatcher(MainUIDispatcher) {
+            if (layer.isShowing && !isPlatformDrivingFrames) updateIfRequested()
         }
     }
 
     fun needRender(throttledToVsync: Boolean) {
         check(!isDisposed) { "FrameDriver is disposed" }
 
-        val platformDrivesFrame = renderer.isHandlingLiveResizeNow
-        if (!platformDrivesFrame) {
+        if (isPlatformDrivingFrames) {
+            renderer.requestPlatformDrivenFrame()
+        } else {
             updateRequested.set(true)
-        }
-        renderer.onFrameRequested(throttledToVsync)
-        if (!platformDrivesFrame) {
+            if (!throttledToVsync) {
+                earlyRecordDispatcher?.scheduleFrame()
+            }
             if (scheduler != null) scheduler.scheduleFrame(this) else frameDispatcher?.scheduleFrame()
         }
     }
 
-    override fun renderImmediately() {
+    fun renderImmediately() {
         check(!isDisposed) { "FrameDriver is disposed" }
         layer.update(renderTime())
         if (!isDisposed) { // layer may be disposed in user code during `update`
@@ -94,21 +114,37 @@ internal class FrameDriver(
         deviceAnalytics?.afterFrameRender()
     }
 
-    override fun requestFrame(throttledToVsync: Boolean) = needRender(throttledToVsync)
-
-    override fun inFrame(body: (LayerDrawScope) -> Unit) {
+    internal fun inFrame(body: (LayerDrawScope) -> Unit) {
         if (isDisposed) return
         withFrameAnalytics {
             layer.inDrawScope { body(this) }
         }
     }
 
-    override fun inForcedSizeFrame(size: Dimension, body: (LayerDrawScope) -> Unit) {
+    override fun onLiveResizeStarted() {
+        isPlatformDrivingFrames = true
+    }
+
+    override fun onLiveResizeFrame(width: Int, height: Int, isResizeFrame: Boolean) {
         if (isDisposed) return
+        val size = Dimension(width, height)
         layer.update(renderTime(), forcedSize = size)
         if (isDisposed) return // layer may be disposed in user code during `update`
         withFrameAnalytics {
-            layer.inDrawScope(forcedSize = size) { body(this) }
+            layer.inDrawScope(forcedSize = size) {
+                renderer.renderPlatformDrivenFrame(this, isResizeFrame)
+            }
+        }
+    }
+
+    override fun onLiveResizeEnded() {
+        isPlatformDrivingFrames = false
+        if (renderer.presentsOnResize) {
+            renderImmediately()
+        } else {
+            SwingUtilities.invokeLater {
+                if (!isDisposed) needRender(throttledToVsync = false)
+            }
         }
     }
 
@@ -116,20 +152,18 @@ internal class FrameDriver(
 
     fun onLayerComponentResized() {
         // During live resize, the layer tells us its size directly; the AWT size is not in sync
-        if (renderer.isHandlingLiveResizeNow) return
+        if (isPlatformDrivingFrames) return
 
         syncBoundsFromPlatformComponent()
 
         if (!layer.isShowing && layer.isDisplayable && layer.width > 0 && layer.height > 0) {
-            if (!renderer.presentsBeforeShown) return
-            layer.update(renderTime())
-            if (isDisposed) return // layer may be disposed in user code during `update`
-            withFrameAnalytics {
-                layer.inDrawScope {
-                    val scope = this
-                    if (!renderer.renderBeforeShown(scope)) {
-                        runBlocking { renderer.renderFrame(scope, immediate = true) }
-                    }
+            when (renderer.beforeShownFrame) {
+                AwtRenderer.BeforeShownFrame.NONE -> {}
+                AwtRenderer.BeforeShownFrame.RENDER -> renderBeforeShownFrame { scope ->
+                    runBlocking { renderer.renderFrame(scope, immediate = true) }
+                }
+                AwtRenderer.BeforeShownFrame.BACKEND -> renderBeforeShownFrame { scope ->
+                    renderer.renderBeforeShown(scope)
                 }
             }
             return
@@ -138,12 +172,21 @@ internal class FrameDriver(
         needRender(throttledToVsync = false)
     }
 
+    private fun renderBeforeShownFrame(render: (LayerDrawScope) -> Unit) {
+        layer.update(renderTime())
+        if (isDisposed) return // layer may be disposed in user code during `update`
+        withFrameAnalytics {
+            layer.inDrawScope { render(this) }
+        }
+    }
+
     fun setVisible(isVisible: Boolean) = renderer.setVisible(isVisible)
 
     fun dispose() {
         if (isDisposed) return
         isDisposed = true
         frameDispatcher?.cancel()
+        earlyRecordDispatcher?.cancel()
         renderer.close()
     }
 }

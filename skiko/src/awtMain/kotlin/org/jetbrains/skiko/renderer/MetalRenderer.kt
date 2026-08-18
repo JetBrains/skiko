@@ -5,7 +5,6 @@ import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import java.awt.Component
-import java.awt.Dimension
 import javax.swing.SwingUtilities.*
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -68,13 +67,12 @@ internal class MetalRenderer(
     /**
      * Whether this renderer is currently driving an interactive live-resize itself (only ever true when
      * [SkikoProperties.metalSynchronousLiveResize] is enabled and this layer fills the window). Set for the
-     * duration of a drag; it pauses the loop's frames ([runFrame]) and the bounds sync ([syncBoundsFromPlatformComponent]) so
-     * the synchronous AppKit-main-thread render is the only thing painting during a drag.
+     * duration of a drag; it pauses the bounds sync ([syncBoundsFromPlatformComponent]) so the synchronous
+     * AppKit-main-thread render is the only thing painting during a drag. The driver holds the same state
+     * through [LiveResizeListener] and pauses its frames with it.
      */
     @Volatile
-    override var isHandlingLiveResizeNow: Boolean = false
-        private set
-
+    private var isLiveResizing: Boolean = false
 
     private var context: DirectContext? = null
 
@@ -104,26 +102,18 @@ internal class MetalRenderer(
                 "Video card: ${adapter.name}\n" +
                 "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
 
-    private val earlyRecordDispatcher = FrameDispatcher(MainUIDispatcher) {
-        if (layer.isShowing && !isHandlingLiveResizeNow) frameHost?.updateIfRequested()
-    }
-
     init {
         onContextInit()
     }
 
-    override fun onFrameRequested(throttledToVsync: Boolean) {
-        when {
-            // The background frame loop is gated off during a resize (two presenters deadlock / starve
-            // the drawable pool), so drive animation frames from the AppKit main thread instead — the
-            // same single serialized presenter that setBounds uses.
-            isHandlingLiveResizeNow -> scheduleFrameOnAppKitThread()
-            !throttledToVsync -> earlyRecordDispatcher.scheduleFrame()
-        }
-    }
+    override val pacesAfterFrame: Boolean get() = true
+
+    // The background frame loop is gated off during a resize (two presenters deadlock / starve
+    // the drawable pool), so drive animation frames from the AppKit main thread instead — the
+    // same single serialized presenter that setBounds uses.
+    override fun requestPlatformDrivenFrame() = scheduleFrameOnAppKitThread()
 
     override fun releaseResources() {
-        earlyRecordDispatcher.cancel()
         releaseGpuResources()
     }
 
@@ -162,16 +152,16 @@ internal class MetalRenderer(
         }
     }
 
-    override fun renderBeforeShown(scope: LayerDrawScope): Boolean {
+    override val beforeShownFrame: BeforeShownFrame get() = BeforeShownFrame.BACKEND
+
+    override fun renderBeforeShown(scope: LayerDrawScope) {
         performFrame(scope, finishFrame = false)
         performNativeDrawAction {
             finishFrameSync(device.ptr)
         }
-        return true
     }
 
     override suspend fun runFrame(frame: suspend () -> Unit) {
-        if (isHandlingLiveResizeNow) return
         frame()
         vSyncer?.waitForVSync()
     }
@@ -195,7 +185,8 @@ internal class MetalRenderer(
      */
     @Suppress("unused")
     fun onLiveResizeStarted() {
-        isHandlingLiveResizeNow = true
+        isLiveResizing = true
+        frameEvents?.onLiveResizeStarted()
     }
 
     /**
@@ -203,12 +194,8 @@ internal class MetalRenderer(
      */
     @Suppress("unused")
     fun onLiveResizeEnded() {
-        isHandlingLiveResizeNow = false
-        invokeLater {
-            if (!isDisposed) {
-                frameHost?.requestFrame(throttledToVsync = false)
-            }
-        }
+        isLiveResizing = false
+        frameEvents?.onLiveResizeEnded()
     }
 
     /**
@@ -222,13 +209,7 @@ internal class MetalRenderer(
         try {
             invokeOnEventThreadAndWait {
                 if (isDisposed) return@invokeOnEventThreadAndWait
-                frameHost?.inForcedSizeFrame(Dimension(width, height)) { scope ->
-                    if (!isDisposed) {  // may be disposed in user code, during `update`
-                        // The present must run on the AppKit main thread to join the resize transaction, so
-                        // only record here; `finishFrameSync` presents below on the AppKit main thread
-                        performFrame(scope, finishFrame = false)
-                    }
-                }
+                frameEvents?.onLiveResizeFrame(width, height, isResizeFrame = true)
             }
         } catch (e: Exception) {
             Logger.warn(e) { "Failed to record live-resize frame" }
@@ -241,6 +222,14 @@ internal class MetalRenderer(
                 finishFrameSync(device.ptr)
             }
         }
+    }
+
+    override fun renderPlatformDrivenFrame(scope: LayerDrawScope, isResizeFrame: Boolean) {
+        if (isDisposed) return // may be disposed in user code, during `update`
+        // The present must run on the AppKit main thread to join the resize transaction, so
+        // only record here; `finishFrameSync` presents on the AppKit main thread once the
+        // recording hop returns
+        performFrame(scope, finishFrame = false)
     }
 
     /**
@@ -315,7 +304,7 @@ internal class MetalRenderer(
 
     override fun syncBoundsFromPlatformComponent() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-        if (isHandlingLiveResizeNow) return
+        if (isLiveResizing) return
 
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)

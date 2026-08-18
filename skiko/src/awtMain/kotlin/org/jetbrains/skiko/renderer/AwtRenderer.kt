@@ -2,7 +2,6 @@ package org.jetbrains.skiko.renderer
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
-import java.awt.Dimension
 
 /**
  * Implementations must call [onDeviceChosen] and then [onContextInit] during initialization;
@@ -63,37 +62,51 @@ internal abstract class AwtRenderer(
     abstract suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean)
 
     /**
-     * Whether [renderBeforeShown] runs at all. `false` leaves the layer without a frame until it is shown.
+     * How this backend produces the frame that must be ready before the window is first shown, so
+     * the window background does not flash. The driver asks before recording anything: [NONE] skips
+     * that frame and its analytics entirely, [RENDER] presents it through [renderFrame], [BACKEND]
+     * calls [renderBeforeShown] so the backend presents it its own way.
      */
-    open val presentsBeforeShown: Boolean get() = true
+    enum class BeforeShownFrame { NONE, RENDER, BACKEND }
+
+    open val beforeShownFrame: BeforeShownFrame get() = BeforeShownFrame.RENDER
 
     /**
-     * Renders and presents a frame when the layer is already displayable but not yet showing.
-     * This is needed so we have a frame ready when the window is first shown, to prevent the window background
-     * flashing.
-     *
-     * Returns `true` if this backend presented that frame itself; `false` presents it the ordinary way.
+     * Renders and presents the before-shown frame. Only called when [beforeShownFrame] is
+     * [BeforeShownFrame.BACKEND].
      */
-    open fun renderBeforeShown(scope: LayerDrawScope): Boolean = false
-
-    /**
-     * The frame loop this backend records its own frames through; `null` until [attachFrameHost] runs.
-     */
-    var frameHost: FrameHost? = null
-        private set
-
-    /**
-     * Hands over the [FrameHost] this backend records its own frames through. Called once, before the first
-     * frame. An override must call `super` to keep [frameHost] set.
-     */
-    open fun attachFrameHost(host: FrameHost) {
-        frameHost = host
+    open fun renderBeforeShown(scope: LayerDrawScope) {
+        error("$this does not present the before-shown frame itself")
     }
 
     /**
-     * Called on every frame request, including the ones the frame loop schedules no frame for.
+     * The driver's listener for platform live-resize events; `null` until [attachFrameEvents] runs.
+     * Native resize callbacks are JNI-bound to this class, so the backend receives them and forwards
+     * each one.
+     * Written on the EDT, read from platform threads.
      */
-    open fun onFrameRequested(throttledToVsync: Boolean) {}
+    @Volatile
+    protected var frameEvents: LiveResizeListener? = null
+        private set
+
+    internal fun attachFrameEvents(events: LiveResizeListener) {
+        frameEvents = events
+    }
+
+    /**
+     * Requests one frame from the platform's own scheduler while it is driving a live resize;
+     * the platform coalesces.
+     */
+    open fun requestPlatformDrivenFrame() {}
+
+    /**
+     * Renders one frame the platform asked for during a live resize, at the size the driver has
+     * already recorded into [scope]. [isResizeFrame] is `false` for frames of the drag that do not
+     * change the size.
+     */
+    open fun renderPlatformDrivenFrame(scope: LayerDrawScope, isResizeFrame: Boolean) {
+        error("$this does not render platform-driven frames")
+    }
 
     /**
      * Wraps one frame of the loop. Place pacing before or after [frame], or skip it entirely to hold the loop
@@ -101,20 +114,23 @@ internal abstract class AwtRenderer(
      */
     open suspend fun runFrame(frame: suspend () -> Unit) = frame()
 
+    /**
+     * Whether [runFrame] blocks on vsync after the frame body. The driver then records the next
+     * frame's content early, while the previous frame is still waiting.
+     */
+    open val pacesAfterFrame: Boolean get() = false
+
     open fun setVisible(isVisible: Boolean) {}
 
     open fun syncBoundsFromPlatformComponent() {}
 
     /**
-     * Whether [SkiaLayer] presents a frame synchronously while it lays out, instead of scheduling one.
+     * Whether this backend presents synchronously at resize moments -- when [SkiaLayer] lays out,
+     * and when a live resize ends, before the platform's resize loop returns -- instead of
+     * scheduling a frame. The driver suppresses the layout present while the platform is driving
+     * a live resize.
      */
-    open val presentsOnLayout: Boolean get() = false
-
-    /**
-     * Whether the platform is driving the current resize. While `true` the loop leaves AWT resize events alone,
-     * since the platform reports the size and presents the frames itself.
-     */
-    open val isHandlingLiveResizeNow: Boolean get() = false
+    open val presentsOnResize: Boolean get() = false
 
     /**
      * Releases every native and Skia resource this backend owns. [isDisposed] is already `true` when it runs.
@@ -132,17 +148,15 @@ internal abstract class AwtRenderer(
 }
 
 /**
- * The frame loop, as seen by a backend that records frames on its own schedule.
+ * Live-resize notifications a backend forwards to its driver. The backend owns the platform thread
+ * choreography around each call; the driver owns what the event means for frame scheduling.
  */
-internal interface FrameHost {
-    fun requestFrame(throttledToVsync: Boolean)
+internal interface LiveResizeListener {
+    fun onLiveResizeStarted()
 
-    fun updateIfRequested(nanoTime: Long = renderTime())
+    /** Records and renders one frame at the given size, synchronously on the calling thread. */
+    fun onLiveResizeFrame(width: Int, height: Int, isResizeFrame: Boolean)
 
-    fun renderImmediately()
-
-    fun inFrame(body: (LayerDrawScope) -> Unit)
-
-    fun inForcedSizeFrame(size: Dimension, body: (LayerDrawScope) -> Unit)
+    fun onLiveResizeEnded()
 }
 

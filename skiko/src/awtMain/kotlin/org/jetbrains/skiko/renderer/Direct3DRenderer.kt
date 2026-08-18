@@ -6,7 +6,6 @@ import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.*
-import java.awt.Dimension
 import java.lang.ref.Reference
 
 internal class Direct3DRenderer(
@@ -17,14 +16,6 @@ internal class Direct3DRenderer(
 
     private var drawLock = Any()
     private var isSwapChainInitialized = false
-
-    /**
-     * Set for the duration of a resize gesture, to quiesce the async EDT renders so the synchronous native render is
-     * the only thing painting.
-     */
-    @Volatile
-    override var isHandlingLiveResizeNow: Boolean = false
-        private set
 
     // Native LiveResizeState, 0 if the hook isn't installed.
     private var liveResizeHandle: Long = 0L
@@ -63,8 +54,7 @@ internal class Direct3DRenderer(
                 "Video card: $adapterName\n" +
                 "Total VRAM: ${adapterMemorySize / 1024 / 1024} MB\n"
 
-    override val presentsOnLayout: Boolean
-        get() = !isHandlingLiveResizeNow
+    override val presentsOnResize: Boolean get() = true
 
     private var context: DirectContext? = null
     private val bufferCount = 2
@@ -91,17 +81,8 @@ internal class Direct3DRenderer(
         device = 0L
     }
 
-    override suspend fun runFrame(frame: suspend () -> Unit) {
-        if (isHandlingLiveResizeNow) return
-        frame()
-    }
-
-    override fun onFrameRequested(throttledToVsync: Boolean) {
-        if (isHandlingLiveResizeNow) {
-            // An async EDT present would race the synchronous render on the toolkit thread.
-            postLiveResizeRender(liveResizeHandle)
-        }
-    }
+    // An async EDT present would race the synchronous render on the toolkit thread.
+    override fun requestPlatformDrivenFrame() = postLiveResizeRender(liveResizeHandle)
 
     override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
         if (immediate) {
@@ -257,7 +238,7 @@ internal class Direct3DRenderer(
      */
     @Suppress("unused")
     private fun onLiveResizeStarted() {
-        isHandlingLiveResizeNow = true
+        frameEvents?.onLiveResizeStarted()
     }
 
     /**
@@ -271,8 +252,7 @@ internal class Direct3DRenderer(
                 it.invalidate()
                 it.validate()
             }
-            isHandlingLiveResizeNow = false
-            frameHost?.renderImmediately()
+            frameEvents?.onLiveResizeEnded()
         }
     }
 
@@ -286,16 +266,17 @@ internal class Direct3DRenderer(
     private fun drawFrameWhileLiveResizing(width: Int, height: Int, isResizeFrame: Boolean) {
         WinApiEdtInvoker.invokeAndWaitWhilePumping {
             if (isDisposed) return@invokeAndWaitWhilePumping
-            frameHost?.inForcedSizeFrame(Dimension(width, height)) { scope ->
-                if (!isDisposed) { // may be disposed in user code, during `update`
-                    drawAndSwap(
-                        scope,
-                        withVsync = !isResizeFrame,
-                        waitForComposition = isResizeFrame
-                    )
-                }
-            }
+            frameEvents?.onLiveResizeFrame(width, height, isResizeFrame)
         }
+    }
+
+    override fun renderPlatformDrivenFrame(scope: LayerDrawScope, isResizeFrame: Boolean) {
+        if (isDisposed) return // may be disposed in user code, during `update`
+        drawAndSwap(
+            scope,
+            withVsync = !isResizeFrame,
+            waitForComposition = isResizeFrame
+        )
     }
 
     private external fun chooseAdapter(adapterPriority: Int): Long

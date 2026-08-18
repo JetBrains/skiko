@@ -59,7 +59,7 @@ internal class SoftwareRenderer(
 
     // renderImmediately() doesn't help with software renderer and actually makes it look worse
     // TODO: Implement a special solution for the software renderer
-    override val presentsBeforeShown: Boolean get() = false
+    override val beforeShownFrame: BeforeShownFrame get() = BeforeShownFrame.NONE
 
     override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
         performDraw(scope)
