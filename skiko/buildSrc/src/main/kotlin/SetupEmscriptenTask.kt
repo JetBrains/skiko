@@ -21,7 +21,7 @@ import javax.inject.Inject
  * The installed emsdk location is exposed via [emsdkDir] so that downstream
  * tasks can use the emscripten binaries if needed.
  */
-abstract class EnsureEmscriptenTask : DefaultTask() {
+abstract class SetupEmscriptenTask : DefaultTask() {
 
     @get:Inject
     abstract val execOperations: ExecOperations
