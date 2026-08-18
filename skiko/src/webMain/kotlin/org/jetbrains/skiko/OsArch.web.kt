@@ -1,6 +1,5 @@
 package org.jetbrains.skiko
 
-import kotlinx.browser.window
 import kotlin.js.js
 
 actual val hostOs: OS = detectHostOs()
@@ -24,7 +23,10 @@ actual val kotlinBackend: KotlinBackend
  * but not supported in all browsers
  */
 internal fun getNavigatorInfo(): String =
-    js("navigator.userAgentData ? navigator.userAgentData.platform : navigator.platform")
+    js("(globalThis.navigator && (globalThis.navigator.userAgentData ? globalThis.navigator.userAgentData.platform : globalThis.navigator.platform)) || ''")
+
+internal fun getNavigatorUserAgent(): String =
+    js("(globalThis.navigator && globalThis.navigator.userAgent) || ''")
 
 
 /**
@@ -38,7 +40,7 @@ internal fun getNavigatorInfo(): String =
 internal fun detectHostOs(): OS {
     val platformInfo = getNavigatorInfo().takeIf {
         it.isNotEmpty()
-    } ?: window.navigator.userAgent
+    } ?: getNavigatorUserAgent()
 
     return when {
         platformInfo.contains("Android", true) -> OS.Android

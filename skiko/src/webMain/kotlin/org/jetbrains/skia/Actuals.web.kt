@@ -1,6 +1,6 @@
 package org.jetbrains.skia
 
-import kotlinx.browser.window
+import kotlin.js.js
 
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
@@ -27,10 +27,14 @@ actual class Matcher constructor(private val regex: Regex, private val input: Ch
 
 @Suppress("RedundantNullableReturnType")
 val LANG: String by lazy {
-    val lang: String? = window.navigator.language
+    val lang: String? = navigatorLanguage()
     if (lang.isNullOrEmpty()) "en-US" else lang
 }
 
 actual fun defaultLanguageTag(): String = LANG
 
 actual fun compilePattern(regex: String): Pattern = Pattern(regex)
+
+private fun navigatorLanguage(): String? =
+    //language=JavaScript
+    js("globalThis.navigator && globalThis.navigator.language")

@@ -48,6 +48,23 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
     dependsOn(unpackWasmRuntime)
 }
 
+val installNodeWindowedDeps = tasks.register<Exec>("installNodeWindowedDeps") {
+    group = "NodeJs"
+    description = "Installs the sample-only Node dependencies for the Skiko Node windowed runner."
+    inputs.file(layout.projectDirectory.file("package.json"))
+    outputs.dir(layout.projectDirectory.dir("node_modules/node-gles-webgl2"))
+    outputs.dir(layout.projectDirectory.dir("node_modules/@kmamal/sdl"))
+    environment("CXXFLAGS", "-std=c++20")
+    commandLine(providers.gradleProperty("skiko.npm.executable").orElse("npm").get(), "install")
+}
+
+tasks.register<Exec>("skikoNodeWindowedRun") {
+    group = "application"
+    description = "Builds and runs the Skiko WASM sample under Node.js in a native SDL window."
+    dependsOn("wasmJsProductionExecutableCompileSync", installNodeWindowedDeps)
+    commandLine(providers.gradleProperty("skiko.node.executable").orElse("node").get(), "node-runner.mjs")
+}
+
 kotlin {
 
     js(IR) {
