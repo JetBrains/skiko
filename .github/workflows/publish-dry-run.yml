@@ -55,6 +55,7 @@ jobs:
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.wasm.enabled=true \
+              -Pskiko.emsdk.dir="\$EMSDK_DIR" \
               publishToMavenLocal
 
       - uses: actions/setup-node@v4

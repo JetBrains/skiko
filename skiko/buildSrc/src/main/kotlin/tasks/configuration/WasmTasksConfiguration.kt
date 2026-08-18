@@ -2,6 +2,7 @@ package tasks.configuration
 
 import Arch
 import CompileSkikoCppTask
+import SetupEmscriptenTask
 import IMPORT_GENERATOR
 import LinkSkikoWasmTask
 import OS
@@ -11,6 +12,7 @@ import SkikoProjectContext
 import compilerForTarget
 import dsl.TargetEnv
 import linkerForTarget
+import org.gradle.api.GradleException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
@@ -58,10 +60,31 @@ fun SkikoProjectContext.declareWasmTasks() {
     }
     val isSideModule = kind == SkikoModuleKind.EXTENSION
 
+    val emsdkVersion = project.findProperty("skiko.emsdk.version") ?:
+        throw GradleException("skiko.emsdk.version property is not set")
+    val setupEmscripten by project.tasks.registering(SetupEmscriptenTask::class) {
+        this.emsdkVersion.set(emsdkVersion.toString())
+        project.findProperty("skiko.emsdk.dir")?.toString()?.let {
+            emsdkDir.set(project.layout.dir(project.provider { project.resolveEmsdkDir(it) }))
+            requireExistingEmsdk.set(true)
+        }
+    }
+
+    fun emscriptenToolPath(toolName: String) =
+        setupEmscripten.flatMap { it.emsdkDir.dir("upstream/emscripten") }.map {
+            it.file(toolName).asFile.absolutePath
+        }
+
+    fun emscriptenBinaryToolPath(toolName: String) =
+        setupEmscripten.flatMap { it.emsdkDir.dir("upstream/bin") }.map {
+            it.file(toolName).asFile.absolutePath
+        }
+
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
+        dependsOn(setupEmscripten)
         dependsOn(skiaWasmDir)
-        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
+        compiler.set(emscriptenToolPath(compilerForTarget(OS.Wasm, Arch.Wasm)))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -93,12 +116,13 @@ fun SkikoProjectContext.declareWasmTasks() {
     }
 
     fun LinkSkikoWasmTask.configureCommon(prefixPath: String) {
+        dependsOn(setupEmscripten)
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
         val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
         val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
-        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
+        linker.set(emscriptenToolPath(linkerForTarget(OS.Wasm, Arch.Wasm)))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -193,38 +217,13 @@ fun SkikoProjectContext.declareWasmTasks() {
         linkTask: TaskProvider<LinkSkikoWasmTask>,
         nameSuffix: String = ""
     ) {
+        dependsOn(setupEmscripten)
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
 
-        // find a path to wasm-opt
         val wasmOptName = if (System.getProperty("os.name").startsWith("Win")) "wasm-opt.exe" else "wasm-opt"
-        var wasmOptPath: String
-        if (System.getenv("EMSDK") != null) {
-            // used by build pipeline
-            wasmOptPath = "${System.getenv("EMSDK")}/upstream/bin/$wasmOptName"
-        } else {
-            // try to use wasm-opt that comes bundled with emcc
-            val emccName = compilerForTarget(OS.Wasm, Arch.Wasm)
-            val emccPath = (System.getenv("PATH") ?: "")
-                .split(File.pathSeparator)
-                .asSequence()
-                .map { File(it).resolve(emccName) }
-                .firstOrNull { it.isFile }
-
-            // emcc is under emsdk/upstream/emscripten/emcc. wasm-opt is under emsdk/upstream/bin/wasm-opt
-            val wasmOptRelativeToEmcc = emccPath
-                ?.parentFile // emscripten/
-                ?.parentFile // upstream/
-                ?.resolve("bin/$wasmOptName")
-
-            wasmOptPath = when {
-                wasmOptRelativeToEmcc?.exists() == true -> wasmOptRelativeToEmcc.absolutePath
-                else -> wasmOptName
-            }
-        }
-
-        optimizer.set(wasmOptPath)
+        optimizer.set(emscriptenBinaryToolPath(wasmOptName))
         inputDir.set(linkTask.flatMap { it.outDir })
         libOutputFileName.set("$libBaseName$nameSuffix")
 
@@ -284,6 +283,11 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
     }
 }
+
+private fun Project.resolveEmsdkDir(path: String): File =
+    File(path).let {
+        if (it.isAbsolute) it else rootProject.file(path)
+    }
 
 fun SkikoProjectContext.provideWasmSideModules() {
     provideWasmSideModule(mainLinkTaskName = "linkWasm")
