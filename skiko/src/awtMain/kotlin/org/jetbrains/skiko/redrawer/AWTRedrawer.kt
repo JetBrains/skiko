@@ -78,10 +78,18 @@ internal abstract class AWTRedrawer(
     open fun renderBeforeShown(scope: LayerDrawScope): Boolean = false
 
     /**
-     * Hands over the [FrameHost] this backend records its own frames through. Called once, before the first
-     * frame.
+     * The frame loop this backend records its own frames through; `null` until [attachFrameHost] runs.
      */
-    open fun attachFrameHost(host: FrameHost) {}
+    var frameHost: FrameHost? = null
+        private set
+
+    /**
+     * Hands over the [FrameHost] this backend records its own frames through. Called once, before the first
+     * frame. An override must call `super` to keep [frameHost] set.
+     */
+    open fun attachFrameHost(host: FrameHost) {
+        frameHost = host
+    }
 
     /**
      * Called on every frame request, including the ones the frame loop schedules no frame for.
@@ -103,7 +111,7 @@ internal abstract class AWTRedrawer(
 
     open fun setVisible(isVisible: Boolean) {}
 
-    open fun syncBounds() {}
+    open fun syncBoundsFromPlatformComponent() {}
 
     /**
      * Whether [SkiaLayer] presents a frame synchronously while it lays out, instead of scheduling one.

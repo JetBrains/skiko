@@ -108,7 +108,7 @@ internal class OnScreenRedrawer(
 
     override fun update(nanoTime: Long) = layer.update(nanoTime)
 
-    override fun syncBoundsFromPlatformComponent() = renderer.syncBounds()
+    override fun syncBoundsFromPlatformComponent() = renderer.syncBoundsFromPlatformComponent()
 
     override fun onLayerComponentResized() {
         // During live resize, the layer tells us its size directly; the AWT size is not in sync
@@ -133,6 +133,7 @@ internal class OnScreenRedrawer(
 
         needRender(throttledToVsync = false)
     }
+
     override fun setVisible(isVisible: Boolean) = renderer.setVisible(isVisible)
 
     override fun dispose() {

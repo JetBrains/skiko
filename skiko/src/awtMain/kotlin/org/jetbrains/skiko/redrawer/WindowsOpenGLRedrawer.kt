@@ -50,11 +50,6 @@ internal class WindowsOpenGLRedrawer(
 
     override val schedulesOwnFrames: Boolean get() = true
 
-    private lateinit var frameHost: FrameHost
-
-    override fun attachFrameHost(host: FrameHost) {
-        frameHost = host
-    }
 
     override fun onFrameRequested(throttledToVsync: Boolean) {
         toRedraw.add(this)
@@ -73,7 +68,7 @@ internal class WindowsOpenGLRedrawer(
 
     private fun drawInBatch() {
         makeCurrent()
-        frameHost.inFrame { scope -> with(scope) { drawFrame() } }
+        frameHost?.inFrame { scope -> with(scope) { drawFrame() } }
     }
 
     private fun makeCurrent() = makeCurrent(device, context)
@@ -94,7 +89,7 @@ internal class WindowsOpenGLRedrawer(
             val nanoTime = System.nanoTime()
             for (redrawer in toRedrawVisible) {
                 try {
-                    redrawer.frameHost.updateIfRequested(nanoTime)
+                    redrawer.frameHost?.updateIfRequested(nanoTime)
                 } catch (e: CancellationException) {
                     // continue
                 }

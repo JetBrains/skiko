@@ -68,14 +68,13 @@ internal class MetalRedrawer(
     /**
      * Whether this redrawer is currently driving an interactive live-resize itself (only ever true when
      * [SkikoProperties.metalSynchronousLiveResize] is enabled and this layer fills the window). Set for the
-     * duration of a drag; it pauses the loop's frames ([runFrame]) and the bounds sync ([syncBounds]) so
+     * duration of a drag; it pauses the loop's frames ([runFrame]) and the bounds sync ([syncBoundsFromPlatformComponent]) so
      * the synchronous AppKit-main-thread render is the only thing painting during a drag.
      */
     @Volatile
-    final override var isHandlingLiveResizeNow: Boolean = false
+    override var isHandlingLiveResizeNow: Boolean = false
         private set
 
-    private var frameHost: FrameHost? = null
 
     private var context: DirectContext? = null
 
@@ -212,10 +211,6 @@ internal class MetalRedrawer(
         }
     }
 
-    override fun attachFrameHost(host: FrameHost) {
-        frameHost = host
-    }
-
     /**
      * Called from native code, on the AppKit main thread, to draw a frame during live resize.
      */
@@ -318,7 +313,7 @@ internal class MetalRedrawer(
         }
     }
 
-    override fun syncBounds() = synchronized(drawLock) {
+    override fun syncBoundsFromPlatformComponent() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         if (isHandlingLiveResizeNow) return
 

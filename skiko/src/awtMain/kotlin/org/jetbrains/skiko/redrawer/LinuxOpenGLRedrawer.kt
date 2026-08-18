@@ -56,11 +56,6 @@ internal class LinuxOpenGLRedrawer(
 
     override val schedulesOwnFrames: Boolean get() = true
 
-    private lateinit var frameHost: FrameHost
-
-    override fun attachFrameHost(host: FrameHost) {
-        frameHost = host
-    }
 
     override fun onFrameRequested(throttledToVsync: Boolean) {
         toRedraw.add(this)
@@ -95,7 +90,7 @@ internal class LinuxOpenGLRedrawer(
     }
 
     private fun drawInBatch() {
-        frameHost.inFrame { scope -> with(scope) { drawFrame() } }
+        frameHost?.inFrame { scope -> with(scope) { drawFrame() } }
     }
 
     companion object {
@@ -116,7 +111,7 @@ internal class LinuxOpenGLRedrawer(
             val nanoTime = System.nanoTime()
             for (redrawer in toRedrawVisible) {
                 try {
-                    redrawer.frameHost.updateIfRequested(nanoTime)
+                    redrawer.frameHost?.updateIfRequested(nanoTime)
                 } catch (e: CancellationException) {
                     // continue
                 }

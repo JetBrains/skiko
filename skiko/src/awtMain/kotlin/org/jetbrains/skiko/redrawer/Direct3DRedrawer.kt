@@ -23,15 +23,13 @@ internal class Direct3DRedrawer(
      * the only thing painting.
      */
     @Volatile
-    final override var isHandlingLiveResizeNow: Boolean = false
+    override var isHandlingLiveResizeNow: Boolean = false
         private set
 
     // Native LiveResizeState, 0 if the hook isn't installed.
     private var liveResizeHandle: Long = 0L
     private val liveResizeInstalled: Boolean
         get() = liveResizeHandle != 0L
-
-    private var frameHost: FrameHost? = null
 
     private var device: Long = 0L
         get() {
@@ -79,10 +77,6 @@ internal class Direct3DRedrawer(
 
     init {
         onContextInit()
-    }
-
-    override fun attachFrameHost(host: FrameHost) {
-        frameHost = host
     }
 
     override fun releaseResources() = synchronized(drawLock) {

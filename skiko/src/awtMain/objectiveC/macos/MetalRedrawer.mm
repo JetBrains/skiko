@@ -251,7 +251,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         /// Track interactive live-resize state. These fire on the AppKit main thread. weakDevice avoids
         /// a device -> observer -> block -> device retain cycle. Gated by liveResizeEnabled: when
         /// disabled the observers aren't installed, so inLiveResize/liveResizing stay NO and every path
-        /// (setBounds, finishFrame, syncBounds, the frame loop) uses the legacy behavior.
+        /// (setBounds, finishFrame, syncBoundsFromPlatformComponent, the frame loop) uses the legacy behavior.
         ///
         /// presentsWithTransaction is scoped to the whole resize session here (not per-frame): the start
         /// observer sets it YES, the end observer clears it. This is safe because during a resize the
