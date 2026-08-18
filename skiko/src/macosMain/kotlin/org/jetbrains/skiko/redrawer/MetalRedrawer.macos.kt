@@ -15,6 +15,7 @@ import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.defaultIsTransparentBackgroundSupported
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.draw
 import org.jetbrains.skiko.context.MacOsMetalContextHandler
