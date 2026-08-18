@@ -6,9 +6,6 @@ import "./libwebgl2.preprocessed.js";
 let wasmExports = null;
 
 async function loadSkikoWASM() {
-    const url = new URL('./skiko.wasm', import.meta.url).href;
-    const response = await fetch(url);
-
     const importObject = {
         env: new Proxy({}, {
             get(target, prop) {
@@ -164,7 +161,7 @@ async function loadSkikoWASM() {
         }
     };
 
-    const {instance} = await WebAssembly.instantiateStreaming(response, importObject);
+    const instance = await instantiateSkikoWASM(importObject);
     wasmExports = instance.exports;
 
     // Initialize Emscripten runtime: HEAP views, $-prefixed globals, and wasmTable
@@ -189,6 +186,22 @@ async function loadSkikoWASM() {
         wasmExports: wasmExports,
         GL: GL
     };
+}
+
+async function instantiateSkikoWASM(importObject) {
+    const url = new URL('./skiko.wasm', import.meta.url);
+
+    if (typeof process !== 'undefined' && process.release?.name === 'node') {
+        const nodeImport = new Function('specifier', 'return import(specifier)');
+        const fs = await nodeImport('node:fs/promises');
+        const wasmBuffer = await fs.readFile(url);
+        const {instance} = await WebAssembly.instantiate(wasmBuffer, importObject);
+        return instance;
+    }
+
+    const response = await fetch(url.href);
+    const {instance} = await WebAssembly.instantiateStreaming(response, importObject);
+    return instance;
 }
 
 export const loadedWasm = {
@@ -285,5 +298,3 @@ export const GL = new Proxy({}, {
         return true;
     }
 })
-
-

@@ -85,14 +85,14 @@ internal abstract class CanvasRenderer(
             return
         }
         redrawScheduled = true
-        windowRequestAnimationFrame(requestAnimationFrameCallback)
+        skikoRequestAnimationFrame(requestAnimationFrameCallback)
     }
 }
 
 @OptIn(ExperimentalWasmJsInterop::class)
-private fun windowRequestAnimationFrame(callback: (Double) -> Unit) : Int =
+private fun skikoRequestAnimationFrame(callback: (Double) -> Unit) : Int =
     //language=JavaScript
-    js("window.requestAnimationFrame(callback)")
+    js("(globalThis.__skikoRequestAnimationFrame || globalThis.requestAnimationFrame)(callback)")
 
 
 internal external interface GLInterface {

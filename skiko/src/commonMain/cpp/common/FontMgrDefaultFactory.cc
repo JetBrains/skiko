@@ -1,7 +1,7 @@
 #include "FontMgrDefaultFactory.hh"
 
 
-#if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
+#if (defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)) && !defined(SKIKO_WASM)
 #include "ports/SkFontMgr_mac_ct.h"
 #endif
 
@@ -29,7 +29,7 @@ extern "C" const SkEmbeddedResourceHeader SK_EMBEDDED_FONTS;
 #endif
 
 sk_sp<SkFontMgr> SkFontMgrSkikoDefault() {
-#if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
+#if (defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)) && !defined(SKIKO_WASM)
     return SkFontMgr_New_CoreText(nullptr);
 #endif
 
