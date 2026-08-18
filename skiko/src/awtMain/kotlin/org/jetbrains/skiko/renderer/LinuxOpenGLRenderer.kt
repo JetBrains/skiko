@@ -7,13 +7,14 @@ import org.jetbrains.skiko.*
 internal class LinuxOpenGLRenderer(
     layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
-    private val properties: SkiaLayerProperties
+    internal val properties: SkiaLayerProperties
 ) : AbstractOpenGLRenderer(layer, analytics) {
     init {
         loadOpenGLLibrary()
     }
 
-    private var context = 0L
+    internal var context = 0L
+        private set
     private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
 
     init {
@@ -36,14 +37,15 @@ internal class LinuxOpenGLRenderer(
 
     private val frameJob = Job()
     @Volatile
-    private var frameLimit = 0.0
+    internal var frameLimit = 0.0
+        private set
     private val frameLimiter = layerFrameLimiter(
         CoroutineScope(frameJob),
         layer.backedLayer,
         onNewFrameLimit = { frameLimit = it }
     )
 
-    private suspend fun limitFramesIfNeeded() {
+    internal suspend fun limitFramesIfNeeded() {
         // Some Linuxes don't turn vsync on, so we apply additional frame limit (which should be no longer than enabled vsync)
         if (properties.isVsyncEnabled) {
             try {
@@ -52,14 +54,6 @@ internal class LinuxOpenGLRenderer(
                 // ignore
             }
         }
-    }
-
-    override val schedulesOwnFrames: Boolean get() = true
-
-
-    override fun onFrameRequested(throttledToVsync: Boolean) {
-        toRedraw.add(this)
-        frameDispatcher.scheduleFrame()
     }
 
     override fun releaseResources() {
@@ -88,81 +82,13 @@ internal class LinuxOpenGLRenderer(
             }
         }
     }
-
-    private fun drawInBatch() {
-        frameHost?.inFrame { scope -> with(scope) { drawFrame() } }
-    }
-
-    companion object {
-        private val toRedraw = mutableSetOf<LinuxOpenGLRenderer>()
-        private val toRedrawCopy = mutableSetOf<LinuxOpenGLRenderer>()
-        private val toRedrawVisible = toRedrawCopy
-            .asSequence()
-            .filterNot(LinuxOpenGLRenderer::isDisposed)
-            .filter { it.layer.isShowing }
-
-        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            toRedrawCopy.addAll(toRedraw)
-            toRedraw.clear()
-
-            // we should wait for the window with the maximum frame limit to avoid bottleneck when there is a window on a slower monitor
-            toRedrawVisible.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
-
-            val nanoTime = System.nanoTime()
-            for (renderer in toRedrawVisible) {
-                try {
-                    renderer.frameHost?.updateIfRequested(nanoTime)
-                } catch (e: CancellationException) {
-                    // continue
-                }
-            }
-
-            val drawingSurfaces = toRedrawVisible.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
-            try {
-                for (renderer in toRedrawVisible) {
-                    drawingSurfaces[renderer]!!.makeCurrent(renderer.context)
-                    renderer.drawInBatch()
-                }
-
-                // TODO(demin): How can we properly synchronize multiple windows with multiple displays?
-                //  I checked, and without vsync there is no tearing. Is it only my case (Ubuntu, Nvidia, X11),
-                //  or Ubuntu write all the screen content into an intermediate buffer? If so, then we probably only
-                //  need a frame limiter.
-
-                // Synchronize with vsync only for the fastest monitor, for the single window.
-                // Otherwise, 5 windows will wait for vsync 5 times.
-                val vsyncContext = toRedrawVisible
-                    .filter { it.properties.isVsyncEnabled }
-                    .maxByOrNull { it.frameLimit }
-
-                for (renderer in toRedrawVisible.filter { it != vsyncContext }) {
-                    drawingSurfaces[renderer]!!.makeCurrent(renderer.context)
-                    drawingSurfaces[renderer]!!.setSwapInterval(0)
-                    drawingSurfaces[renderer]!!.swapBuffers()
-                    OpenGLApi.instance.glFlush()
-                }
-
-                if (vsyncContext != null) {
-                    drawingSurfaces[vsyncContext]!!.makeCurrent(vsyncContext.context)
-                    drawingSurfaces[vsyncContext]!!.setSwapInterval(1)
-                    drawingSurfaces[vsyncContext]!!.swapBuffers()
-                    OpenGLApi.instance.glFlush()
-                }
-            } finally {
-                drawingSurfaces.values.forEach(::unlockLinuxDrawingSurface)
-            }
-
-            // Without clearing we will have a memory leak
-            toRedrawCopy.clear()
-        }
-    }
 }
 
 private fun LinuxDrawingSurface.createContext(transparency: Boolean) = createContext(display, transparency)
 private fun LinuxDrawingSurface.destroyContext(context: Long) = destroyContext(display, context)
-private fun LinuxDrawingSurface.makeCurrent(context: Long) = makeCurrent(display, window, context)
-private fun LinuxDrawingSurface.swapBuffers() = swapBuffers(display, window)
-private fun LinuxDrawingSurface.setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
+internal fun LinuxDrawingSurface.makeCurrent(context: Long) = makeCurrent(display, window, context)
+internal fun LinuxDrawingSurface.swapBuffers() = swapBuffers(display, window)
+internal fun LinuxDrawingSurface.setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
 
 private external fun makeCurrent(display: Long, window: Long, context: Long)
 private external fun createContext(display: Long, transparency: Boolean): Long

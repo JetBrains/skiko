@@ -7,7 +7,7 @@ import org.jetbrains.skiko.*
 internal class WindowsOpenGLRenderer(
     layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
-    private val properties: SkiaLayerProperties
+    internal val properties: SkiaLayerProperties
 ) : AbstractOpenGLRenderer(layer, analytics) {
     init {
         loadOpenGLLibrary()
@@ -48,14 +48,6 @@ internal class WindowsOpenGLRenderer(
         deleteContext(context)
     }
 
-    override val schedulesOwnFrames: Boolean get() = true
-
-
-    override fun onFrameRequested(throttledToVsync: Boolean) {
-        toRedraw.add(this)
-        frameDispatcher.scheduleFrame()
-    }
-
     override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
         makeCurrent()
         with(scope) { drawFrame() }
@@ -66,59 +58,8 @@ internal class WindowsOpenGLRenderer(
         }
     }
 
-    private fun drawInBatch() {
-        makeCurrent()
-        frameHost?.inFrame { scope -> with(scope) { drawFrame() } }
-    }
-
-    private fun makeCurrent() = makeCurrent(device, context)
-    private fun swapBuffers() = swapBuffers(device)
-
-    companion object {
-        private val toRedraw = mutableSetOf<WindowsOpenGLRenderer>()
-        private val toRedrawCopy = mutableSetOf<WindowsOpenGLRenderer>()
-        private val toRedrawVisible = toRedrawCopy
-            .asSequence()
-            .filterNot(WindowsOpenGLRenderer::isDisposed)
-            .filter { it.layer.isShowing }
-
-        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
-            toRedrawCopy.addAll(toRedraw)
-            toRedraw.clear()
-
-            val nanoTime = System.nanoTime()
-            for (renderer in toRedrawVisible) {
-                try {
-                    renderer.frameHost?.updateIfRequested(nanoTime)
-                } catch (e: CancellationException) {
-                    // continue
-                }
-            }
-
-            for (renderer in toRedrawVisible) {
-                renderer.drawInBatch()
-            }
-
-            for (renderer in toRedrawVisible) {
-                renderer.swapBuffers()
-            }
-
-            for (renderer in toRedrawVisible) {
-                renderer.makeCurrent()
-                OpenGLApi.instance.glFinish()
-            }
-
-            val isVsyncEnabled = toRedrawVisible.all { it.properties.isVsyncEnabled }
-            if (isVsyncEnabled) {
-                withContext(dispatcherToBlockOn) {
-                    dwmFlush() // wait for vsync
-                }
-            }
-
-            // Without clearing we will have a memory leak
-            toRedrawCopy.clear()
-        }
-    }
+    internal fun makeCurrent() = makeCurrent(device, context)
+    internal fun swapBuffers() = swapBuffers(device)
 }
 
 private external fun makeCurrent(device: Long, context: Long)
@@ -132,4 +73,4 @@ private external fun swapBuffers(device: Long)
 //  Maybe we should use D3DKMTWaitForVerticalBlankEvent? See also https://www.vsynctester.com/chromeisbroken.html
 // TODO should we support Windows 7? DWM can be disabled on Windows 7.
 //  it that case there will be a crash or just no frame limit (I don't know exactly).
-private external fun dwmFlush()
+internal external fun dwmFlush()

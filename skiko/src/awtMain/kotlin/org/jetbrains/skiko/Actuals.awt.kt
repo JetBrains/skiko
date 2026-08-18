@@ -9,12 +9,20 @@ internal fun makeDefaultRenderFactory(): RenderFactory =
     RenderFactory { layer, renderApi, analytics, properties ->
         val renderer = createRenderer(layer, renderApi, analytics, properties)
         try {
-            FrameDriver(layer, renderer)
+            FrameDriver(layer, renderer, scheduleInBatchFor(renderer))
         } catch (e: Throwable) {
             renderer.close()
             throw e
         }
     }
+
+// The OpenGL backends draw every window from a cross-window batch, so their drivers schedule into
+// the family batch instead of running a per-window dispatcher.
+private fun scheduleInBatchFor(renderer: AwtRenderer): FrameScheduler? = when (renderer) {
+    is LinuxOpenGLRenderer -> FrameScheduler { driver -> LinuxGLFrameBatch.scheduleFrame(driver, renderer) }
+    is WindowsOpenGLRenderer -> FrameScheduler { driver -> WindowsGLFrameBatch.scheduleFrame(driver, renderer) }
+    else -> null
+}
 
 private fun createRenderer(
     layer: SkiaLayer,

@@ -10,7 +10,7 @@ import java.awt.Dimension
  */
 @OptIn(ExperimentalSkikoApi::class)
 internal abstract class AwtRenderer(
-    protected val layer: SkiaLayer,
+    internal val layer: SkiaLayer,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi,
 ) : AutoCloseable {
@@ -20,7 +20,7 @@ internal abstract class AwtRenderer(
         private set
 
     @Volatile
-    protected var isDisposed = false
+    internal var isDisposed = false
         private set
 
     init {
@@ -100,13 +100,6 @@ internal abstract class AwtRenderer(
      * off while this backend presents on its own.
      */
     open suspend fun runFrame(frame: suspend () -> Unit) = frame()
-
-    /**
-     * `true` suppresses the loop's per-window frame dispatcher; the backend then drives every frame itself
-     * through its [FrameHost].
-     */
-    // TODO: remove along with the cross-window batch, once one frame clock serves every window on a display.
-    open val schedulesOwnFrames: Boolean get() = false
 
     open fun setVisible(isVisible: Boolean) {}
 

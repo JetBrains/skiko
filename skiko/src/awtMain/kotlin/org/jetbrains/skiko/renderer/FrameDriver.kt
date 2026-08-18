@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal class FrameDriver(
     private val layer: SkiaLayer,
     private val renderer: AwtRenderer,
+    private val scheduler: FrameScheduler? = null,
 ) : FrameHost {
     private val deviceAnalytics: DeviceAnalytics? get() = renderer.deviceAnalytics
     private var isFirstFrameRendered = false
@@ -42,7 +43,7 @@ internal class FrameDriver(
         }
     }
 
-    private val frameDispatcher = if (renderer.schedulesOwnFrames) null else {
+    private val frameDispatcher = if (scheduler != null) null else {
         FrameDispatcher(MainUIDispatcher) {
             renderer.runFrame {
                 if (layer.isShowing) {
@@ -62,7 +63,7 @@ internal class FrameDriver(
         }
         renderer.onFrameRequested(throttledToVsync)
         if (!platformDrivesFrame) {
-            frameDispatcher?.scheduleFrame()
+            if (scheduler != null) scheduler.scheduleFrame(this) else frameDispatcher?.scheduleFrame()
         }
     }
 
@@ -145,4 +146,12 @@ internal class FrameDriver(
         frameDispatcher?.cancel()
         renderer.close()
     }
+}
+
+/**
+ * Schedules the driver's next frame. A [FrameDriver] constructed with one delegates scheduling to
+ * it instead of running its own dispatcher.
+ */
+internal fun interface FrameScheduler {
+    fun scheduleFrame(driver: FrameDriver)
 }

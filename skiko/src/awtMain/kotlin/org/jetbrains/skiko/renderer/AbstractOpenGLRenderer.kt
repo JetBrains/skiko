@@ -38,6 +38,10 @@ internal abstract class AbstractOpenGLRenderer(
         glContext?.flush()
     }
 
+    internal fun drawBatchFrame(scope: LayerDrawScope) {
+        with(scope) { drawFrame() }
+    }
+
     protected fun disposeGlResources() {
         disposeSurface()
         glContext?.close()
