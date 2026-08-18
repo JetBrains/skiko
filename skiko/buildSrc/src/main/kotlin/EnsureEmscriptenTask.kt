@@ -8,12 +8,15 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.net.URI
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import javax.inject.Inject
 
 /**
  * Verifies that emcc (Emscripten compiler) is available on the system.
  * If emcc is not found from previous installations, the task automatically installs the Emscripten SDK
- * into gradles user home directory using the specified version and commit hash.
+ * into gradles user home directory using the specified version.
  *
  * The installed emsdk location is exposed via [emsdkDir] so that downstream
  * tasks can use the emscripten binaries if needed.
@@ -27,9 +30,6 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
     abstract val emsdkVersion: Property<String>
 
     @get:Input
-    abstract val emsdkCommit: Property<String>
-
-    @get:Input
     abstract val requireExistingEmsdk: Property<Boolean>
 
     @get:OutputDirectory
@@ -39,8 +39,8 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
         requireExistingEmsdk.convention(false)
         emsdkDir.convention(
             project.layout.dir(
-                emsdkVersion.zip(emsdkCommit) { version, commit ->
-                    project.rootProject.gradle.gradleUserHomeDir.resolve("emsdk/emsdk-$version-$commit")
+                emsdkVersion.map { version ->
+                    project.rootProject.gradle.gradleUserHomeDir.resolve("emsdk/emsdk-$version")
                 }
             )
         )
@@ -68,23 +68,10 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
 
     private fun installEmsdk() {
         val version = emsdkVersion.get()
-        val commit = emsdkCommit.get()
         val sdkDir = emsdkDir.get().asFile
 
-        // Clone emsdk if needed, then checkout the pinned commit.
-        if (sdkDir.resolve(".git").isDirectory) {
-            logger.lifecycle("Using existing emsdk clone...")
-        } else {
-            sdkDir.mkdirs()
-            logger.lifecycle("Cloning emsdk repository...")
-            exec("git", "clone", "--no-checkout", "https://github.com/emscripten-core/emsdk.git", sdkDir.absolutePath)
-        }
+        downloadAndExtractEmsdk(version, sdkDir)
 
-        logger.lifecycle("Checking out emsdk commit $commit...")
-        exec("git", "fetch", "--depth", "1", "origin", commit, workingDir = sdkDir)
-        exec("git", "checkout", "--detach", "FETCH_HEAD", workingDir = sdkDir)
-
-        // Install and activate the specified version
         val emsdkScript = sdkDir.resolve(if (hostOs.isWindows) "emsdk.bat" else "emsdk").absolutePath
 
         logger.lifecycle("Installing emsdk version $version...")
@@ -92,6 +79,36 @@ abstract class EnsureEmscriptenTask : DefaultTask() {
 
         logger.lifecycle("Activating emsdk version $version...")
         exec(emsdkScript, "activate", version, workingDir = sdkDir)
+    }
+
+    private fun downloadAndExtractEmsdk(version: String, sdkDir: File) {
+        val parentDir = sdkDir.parentFile
+        parentDir.mkdirs()
+
+        if (sdkDir.exists() && !sdkDir.deleteRecursively()) {
+            throw GradleException("Failed to delete incomplete emsdk directory: ${sdkDir.absolutePath}")
+        }
+
+        val archiveFile = Files.createTempFile(parentDir.toPath(), "emsdk-$version-", ".zip").toFile()
+        val archiveUrl = "https://github.com/emscripten-core/emsdk/archive/refs/tags/$version.zip"
+        try {
+            logger.lifecycle("Downloading emsdk source archive from $archiveUrl...")
+            URI(archiveUrl).toURL().openStream().use { input ->
+                Files.copy(input, archiveFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            }
+
+            logger.lifecycle("Extracting emsdk source archive to ${sdkDir.absolutePath}...")
+            extractArchive(archiveFile, sdkDir)
+        } finally {
+            archiveFile.delete()
+        }
+    }
+
+    private fun extractArchive(archiveFile: File, sdkDir: File) {
+        project.copy {
+            from(project.zipTree(archiveFile))
+            into(sdkDir.parentFile)
+        }
     }
 
     private fun exec(vararg args: String, workingDir: File? = null) {

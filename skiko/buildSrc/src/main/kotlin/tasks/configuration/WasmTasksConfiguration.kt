@@ -62,11 +62,8 @@ fun SkikoProjectContext.declareWasmTasks() {
 
     val emsdkVersion = project.findProperty("skiko.emsdk.version") ?:
         throw GradleException("skiko.emsdk.version property is not set")
-    val emsdkCommit = project.findProperty("skiko.emsdk.commit") ?:
-        throw GradleException("skiko.emsdk.commit property is not set")
     val ensureEmscripten by project.tasks.registering(EnsureEmscriptenTask::class) {
         this.emsdkVersion.set(emsdkVersion.toString())
-        this.emsdkCommit.set(emsdkCommit.toString())
         project.findProperty("skiko.emsdk.dir")?.toString()?.let {
             emsdkDir.set(project.layout.dir(project.provider { project.resolveEmsdkDir(it) }))
             requireExistingEmsdk.set(true)
