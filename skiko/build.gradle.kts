@@ -96,8 +96,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                     "skunicode_icu",
                     "skshaper",
                 )
-                dynamicSystemLibs("GL", "X11", "fontconfig")
-                arm64 { dynamicSystemLibs("EGL") }
+                dynamicSystemLibs("GL", "EGL", "fontconfig")
             }
 
             android {
@@ -121,8 +120,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                     "skia",
                     "skia_ganesh_ext"
                 )
-                dynamicSystemLibs("fontconfig", "GL")
-                arm64 { dynamicSystemLibs("EGL") }
+                dynamicSystemLibs("fontconfig", "GL", "EGL")
             }
 
             macos {
