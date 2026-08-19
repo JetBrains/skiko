@@ -19,15 +19,29 @@ runs:
       shell: bash
       run: brew install llvm
 
+    - name: Cache Vulkan SDK
+      if: runner.os == 'Windows'
+      id: vulkan-sdk-cache
+      uses: actions/cache@v4
+      with:
+        path: C:\VulkanSDK\1.4.357.0
+        key: vulkan-sdk-${{ runner.os }}-${{ runner.arch }}-1.4.357.0
+
     - name: Install Vulkan SDK
+      if: runner.os == 'Windows' && steps.vulkan-sdk-cache.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        $version = '1.4.357.0'
+        $installer = "$env:RUNNER_TEMP\VulkanSDK-$version.exe"
+        Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/$version/windows/vulkan_sdk.exe?Human=true" -OutFile $installer
+        Start-Process -Wait -FilePath $installer -ArgumentList '--accept-licenses', '--default-answer', '--confirm-command', 'install', 'com.lunarg.vulkan.arm64'
+
+    - name: Configure Vulkan SDK
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
         $version = '1.4.357.0'
         $sdk = "C:\VulkanSDK\$version"
-        $installer = "$env:RUNNER_TEMP\VulkanSDK-$version.exe"
-        Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/$version/windows/vulkan_sdk.exe?Human=true" -OutFile $installer
-        Start-Process -Wait -FilePath $installer -ArgumentList '--accept-licenses', '--default-answer', '--confirm-command', 'install', 'com.lunarg.vulkan.arm64'
         "VULKAN_SDK=$sdk" >> $env:GITHUB_ENV
         "$sdk\Bin" >> $env:GITHUB_PATH
 
