@@ -576,15 +576,6 @@ fun SkikoProjectContext.createLinkJvmBindings(
                         "winmm.lib",
                     )
                 )
-                if ("vulkan-1" in resolvedBinaryInputs.dynamicLibNames) {
-                    val vulkanSdk = System.getenv("VULKAN_SDK")
-                        ?: error("VULKAN_SDK must point to a Vulkan SDK when linking Vulkan on Windows")
-                    val vulkanLibDir = when (targetArch) {
-                        Arch.Arm64 -> "Lib-ARM64"
-                        else -> "Lib"
-                    }
-                    add("/LIBPATH:$vulkanSdk\\$vulkanLibDir")
-                }
                 if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
                 addAll(resolvedBinaryInputs.dynamicLibNames.map { "$it.lib" })
                 addAll(resolvedBinaryInputs.linkFlags)

@@ -1,10 +1,13 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
+import org.gradle.api.tasks.testing.AbstractTestTask
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.gradle.kotlin.dsl.withType
 import tasks.configuration.*
 import dsl.SkikoDependencyScope
 
@@ -37,13 +40,13 @@ val graphiteDependencies: SkikoDependencyScope.() -> Unit = {
             }
             linux {
                 staticSkiaLibs("skia_graphite_ext")
-                dynamicSystemLibs("vulkan")
-                compilerFlags("-DSK_VULKAN", "-DSK_USE_INTERNAL_VULKAN_HEADERS")
+                dynamicSystemLibs("dl")
+                compilerFlags("-DSK_VULKAN", "-DSK_USE_INTERNAL_VULKAN_HEADERS", "-DVK_NO_PROTOTYPES")
             }
             windows {
                 staticSkiaLibs("skia_graphite_ext")
-                dynamicSystemLibs("vulkan-1", "onecore_apiset", "dxguid")
-                compilerFlags("-DSK_VULKAN", "-DSK_USE_INTERNAL_VULKAN_HEADERS")
+                dynamicSystemLibs("onecore_apiset", "dxguid")
+                compilerFlags("-DSK_VULKAN", "-DSK_USE_INTERNAL_VULKAN_HEADERS", "-DVK_NO_PROTOTYPES")
             }
         }
         native {
@@ -217,4 +220,13 @@ tasks.withType<KotlinNativeCompile>().configureEach {
 
 tasks.withType<KotlinCompilationTask<*>>().configureEach {
     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+}
+
+tasks.withType<AbstractTestTask> {
+    testLogging {
+        events("FAILED", "SKIPPED")
+        exceptionFormat = TestExceptionFormat.FULL
+        showStandardStreams = true
+        showStackTraces = true
+    }
 }

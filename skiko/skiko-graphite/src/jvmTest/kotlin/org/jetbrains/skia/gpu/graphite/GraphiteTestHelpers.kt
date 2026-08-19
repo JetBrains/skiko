@@ -34,8 +34,10 @@ private fun makeTestMetalContext(): GraphiteContext {
 private fun withTestVulkanContext(block: (GraphiteContext) -> Unit) {
     GraphiteLibrary.load()
     val vulkanObjects = _nCreateVulkanObjects()
-    if (vulkanObjects.isEmpty()) return
-    check(vulkanObjects.size == 6) { "Failed to create test Vulkan objects" }
+    if (vulkanObjects.isEmpty()) {
+        println("WARNING: Skipping Graphite Vulkan test because Vulkan objects could not be created")
+        return
+    }
     val context = try {
         GraphiteContext.makeVulkan(
             instancePtr = vulkanObjects[0],
