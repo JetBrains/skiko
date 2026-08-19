@@ -1,6 +1,5 @@
 #include "FontMgrDefaultFactory.hh"
 
-
 #if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
 #include "ports/SkFontMgr_mac_ct.h"
 #endif
@@ -29,29 +28,31 @@ extern "C" const SkEmbeddedResourceHeader SK_EMBEDDED_FONTS;
 #endif
 
 sk_sp<SkFontMgr> SkFontMgrSkikoDefault() {
-#if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
+#if defined(SKIKO_WASM)
+    if (SK_EMBEDDED_FONTS.count == 0) {
+        return nullptr;
+    }
+
+    std::vector<sk_sp<SkData>> fontDataVector;
+    fontDataVector.reserve(SK_EMBEDDED_FONTS.count);
+
+    for (size_t i = 0; i < SK_EMBEDDED_FONTS.count; ++i) {
+        fontDataVector.push_back(
+            SkData::MakeWithoutCopy(SK_EMBEDDED_FONTS.entries[i].data,
+                                    SK_EMBEDDED_FONTS.entries[i].size)
+        );
+    }
+
+    return SkFontMgr_New_Custom_Data(SkSpan<sk_sp<SkData>>(fontDataVector));
+#elif defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
     return SkFontMgr_New_CoreText(nullptr);
-#endif
-
-#ifdef SK_BUILD_FOR_WIN
+#elif defined(SK_BUILD_FOR_WIN)
     return SkFontMgr_New_DirectWrite();
-#endif
-
-#if (defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)) && !defined(SKIKO_WASM)
+#elif defined(SK_BUILD_FOR_UNIX) || defined(SK_BUILD_FOR_LINUX)
     return SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_FreeType());
-#endif
-
-#ifdef SK_BUILD_FOR_ANDROID
+#elif defined(SK_BUILD_FOR_ANDROID)
     return SkFontMgr_New_Android(nullptr, SkFontScanner_Make_FreeType());
-#endif
-
-#ifdef SKIKO_WASM
-    sk_sp<SkData> embeddedFontData =
-        SkData::MakeWithoutCopy(SK_EMBEDDED_FONTS.entries[0].data, SK_EMBEDDED_FONTS.entries[0].size);
-    std::vector<sk_sp<SkData>> fontDataVector = { embeddedFontData };
-    SkSpan<sk_sp<SkData>> dataSpan(fontDataVector);
-    return SkFontMgr_New_Custom_Data(dataSpan);
-#endif
-
+#else
     return nullptr;
+#endif
 }

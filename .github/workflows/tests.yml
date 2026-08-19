@@ -379,27 +379,10 @@ jobs:
         with:
           chrome-version: stable
 
-      - name: 'Install Emscripten'
-        shell: bash
-        working-directory: skiko
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install libdbus-1-dev
-          if [ -d ./emsdk ]; then
-            cd ./emsdk
-            git pull
-          else
-            git clone https://github.com/emscripten-core/emsdk.git
-            cd ./emsdk
-          fi
-          ./emsdk install 4.0.7
-          ./emsdk activate 4.0.7
-
       - shell: bash
         name: 'Run WASM Tests'
         working-directory: skiko
         run: |
-          source ./emsdk/emsdk_env.sh
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.wasm.enabled=true \
             -Pskiko.js.enabled=true \
@@ -410,7 +393,6 @@ jobs:
         name: 'Run JS Tests'
         working-directory: skiko
         run: |
-          source ./emsdk/emsdk_env.sh
           ./gradlew --no-daemon --stacktrace \
             -Pskiko.wasm.enabled=true \
             -Pskiko.js.enabled=true \
