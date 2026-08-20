@@ -22,6 +22,7 @@ enum class Platform(val platformName: String) {
 }
 
 val BENCHMARK_SERVER_PORT = 8090
+val WEB_BENCHMARK_TIMEOUT_MS = 5 * 60 * 1000L
 val projectDir = findBenchmarkProjectDir()
 val repoRoot = projectDir.parentFile.parentFile
 val gradlew = repoRoot.resolve("gradlew")
@@ -182,12 +183,11 @@ fun executeGradleBenchmark(
 
         println("Waiting for benchmarks to complete (timeout 5m)...")
         val startTime = System.currentTimeMillis()
-        val timeout = 5 * 60 * 1000L
         var completed = false
         var gradleExitCode: Int? = null
         var reportedGradleExit = false
 
-        while (System.currentTimeMillis() - startTime < timeout) {
+        while (System.currentTimeMillis() - startTime < WEB_BENCHMARK_TIMEOUT_MS) {
             if (serverStopped.get()) {
                 println("Server stopped signal received. Benchmarks should be finished.")
                 completed = true
@@ -238,7 +238,7 @@ fun openWithPlaywrightIfAvailable(url: String) {
         return
     }
 
-    if (!waitForHttp(url, timeoutMs = 60_000)) {
+    if (!waitForHttp(url, timeoutMs = WEB_BENCHMARK_TIMEOUT_MS)) {
         println("Warning: webpack dev server did not become reachable at $url")
         return
     }
