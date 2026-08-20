@@ -238,7 +238,7 @@ internal class Direct3DRenderer(
      */
     @Suppress("unused")
     private fun onLiveResizeStarted() {
-        frameEvents?.onLiveResizeStarted()
+        liveResizeListener?.onLiveResizeStarted()
     }
 
     /**
@@ -252,7 +252,7 @@ internal class Direct3DRenderer(
                 it.invalidate()
                 it.validate()
             }
-            frameEvents?.onLiveResizeEnded()
+            liveResizeListener?.onLiveResizeEnded()
         }
     }
 
@@ -266,7 +266,7 @@ internal class Direct3DRenderer(
     private fun drawFrameWhileLiveResizing(width: Int, height: Int, isResizeFrame: Boolean) {
         WinApiEdtInvoker.invokeAndWaitWhilePumping {
             if (isDisposed) return@invokeAndWaitWhilePumping
-            frameEvents?.onLiveResizeFrame(width, height, isResizeFrame)
+            liveResizeListener?.onLiveResizeFrame(width, height, isResizeFrame)
         }
     }
 

@@ -109,7 +109,7 @@ internal class MetalRenderer(
     override val pacesAfterFrame: Boolean get() = true
 
     // The background frame loop is gated off during a resize (two presenters deadlock / starve
-    // the drawable pool), so drive animation frames from the AppKit main thread instead — the
+    // the drawable pool), so drive animation frames from the AppKit main thread instead, the
     // same single serialized presenter that setBounds uses.
     override fun requestPlatformDrivenFrame() = scheduleFrameOnAppKitThread()
 
@@ -152,8 +152,6 @@ internal class MetalRenderer(
         }
     }
 
-    override val beforeShownFrame: BeforeShownFrame get() = BeforeShownFrame.BACKEND
-
     override fun renderBeforeShown(scope: LayerDrawScope) {
         performFrame(scope, finishFrame = false)
         performNativeDrawAction {
@@ -186,7 +184,7 @@ internal class MetalRenderer(
     @Suppress("unused")
     fun onLiveResizeStarted() {
         isLiveResizing = true
-        frameEvents?.onLiveResizeStarted()
+        liveResizeListener?.onLiveResizeStarted()
     }
 
     /**
@@ -195,7 +193,7 @@ internal class MetalRenderer(
     @Suppress("unused")
     fun onLiveResizeEnded() {
         isLiveResizing = false
-        frameEvents?.onLiveResizeEnded()
+        liveResizeListener?.onLiveResizeEnded()
     }
 
     /**
@@ -209,7 +207,7 @@ internal class MetalRenderer(
         try {
             invokeOnEventThreadAndWait {
                 if (isDisposed) return@invokeOnEventThreadAndWait
-                frameEvents?.onLiveResizeFrame(width, height, isResizeFrame = true)
+                liveResizeListener?.onLiveResizeFrame(width, height, isResizeFrame = true)
             }
         } catch (e: Exception) {
             Logger.warn(e) { "Failed to record live-resize frame" }

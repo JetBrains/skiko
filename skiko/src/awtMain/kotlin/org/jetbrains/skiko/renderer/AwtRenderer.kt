@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.renderer
 
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 
@@ -62,36 +63,28 @@ internal abstract class AwtRenderer(
     abstract suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean)
 
     /**
-     * How this backend produces the frame that must be ready before the window is first shown, so
-     * the window background does not flash. The driver asks before recording anything: [NONE] skips
-     * that frame and its analytics entirely, [RENDER] presents it through [renderFrame], [BACKEND]
-     * calls [renderBeforeShown] so the backend presents it its own way.
+     * Whether this backend presents a frame before the window is first shown, so the window
+     * background does not flash. The driver asks before recording anything: `false` skips the
+     * frame and its analytics entirely.
      */
-    enum class BeforeShownFrame { NONE, RENDER, BACKEND }
-
-    open val beforeShownFrame: BeforeShownFrame get() = BeforeShownFrame.RENDER
+    open val needsBeforeShownFrame: Boolean get() = true
 
     /**
-     * Renders and presents the before-shown frame. Only called when [beforeShownFrame] is
-     * [BeforeShownFrame.BACKEND].
+     * Renders and presents the before-shown frame, synchronously on the EDT. The default presents
+     * it through [renderFrame].
      */
     open fun renderBeforeShown(scope: LayerDrawScope) {
-        error("$this does not present the before-shown frame itself")
+        runBlocking { renderFrame(scope, immediate = true) }
     }
 
     /**
-     * The driver's listener for platform live-resize events; `null` until [attachFrameEvents] runs.
-     * Native resize callbacks are JNI-bound to this class, so the backend receives them and forwards
-     * each one.
+     * The driver's listener for platform live-resize events; `null` until the [FrameDriver]
+     * installs itself. Native resize callbacks are JNI-bound to this class, so the backend
+     * receives them and forwards each one.
      * Written on the EDT, read from platform threads.
      */
     @Volatile
-    protected var frameEvents: LiveResizeListener? = null
-        private set
-
-    internal fun attachFrameEvents(events: LiveResizeListener) {
-        frameEvents = events
-    }
+    internal var liveResizeListener: LiveResizeListener? = null
 
     /**
      * Requests one frame from the platform's own scheduler while it is driving a live resize;
@@ -125,10 +118,10 @@ internal abstract class AwtRenderer(
     open fun syncBoundsFromPlatformComponent() {}
 
     /**
-     * Whether this backend presents synchronously at resize moments -- when [SkiaLayer] lays out,
-     * and when a live resize ends, before the platform's resize loop returns -- instead of
-     * scheduling a frame. The driver suppresses the layout present while the platform is driving
-     * a live resize.
+     * Whether this backend presents synchronously at resize moments instead of scheduling a frame.
+     * The resize moments are the [SkiaLayer] layout, and the end of a live resize, before the
+     * platform's resize loop returns. The driver suppresses the layout present while the platform
+     * is driving a live resize.
      */
     open val presentsOnResize: Boolean get() = false
 
@@ -144,7 +137,14 @@ internal abstract class AwtRenderer(
         releaseResources()
     }
 
-    open fun isTransparentBackgroundSupported(): Boolean = defaultIsTransparentBackgroundSupported(layer)
+    open fun isTransparentBackgroundSupported(): Boolean {
+        if (hostOs == OS.MacOS) {
+            return true
+        }
+
+        // for non-macOS in fullscreen transparency is not supported
+        return !layer.fullscreen
+    }
 }
 
 /**

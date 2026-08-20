@@ -26,20 +26,16 @@ internal abstract class AbstractOpenGLRenderer(
                     "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
         }
 
-    protected fun LayerDrawScope.drawFrame() {
+    internal fun drawFrame(scope: LayerDrawScope) {
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")
         }
-        initSurface()
+        with(scope) { initSurface() }
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
             layer.draw(this)
         }
         glContext?.flush()
-    }
-
-    internal fun drawBatchFrame(scope: LayerDrawScope) {
-        with(scope) { drawFrame() }
     }
 
     protected fun disposeGlResources() {

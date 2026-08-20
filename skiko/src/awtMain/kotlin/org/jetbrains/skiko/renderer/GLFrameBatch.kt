@@ -10,7 +10,7 @@ import org.jetbrains.skiko.unlockLinuxDrawingSurface
 
 /**
  * The OpenGL backends draw every on-screen window from one cross-window batch per family, waiting
- * for vsync once per tick instead of once per window — per-window vsync waits would serialize, so
+ * for vsync once per tick instead of once per window: per-window vsync waits would serialize, so
  * N windows would run at 1/N of the refresh rate. A window enters the batch each time its
  * [FrameDriver] schedules a frame and leaves it when the tick completes; disposed and hidden
  * windows are skipped at draw time.
@@ -74,7 +74,7 @@ internal object LinuxGLFrameBatch : GLFrameBatch<LinuxOpenGLRenderer>() {
             for (window in toRedrawVisible) {
                 val (driver, renderer) = window
                 drawingSurfaces[window]!!.makeCurrent(renderer.context)
-                driver.inFrame { scope -> renderer.drawBatchFrame(scope) }
+                driver.inFrame { scope -> renderer.drawFrame(scope) }
             }
 
             // TODO(demin): How can we properly synchronize multiple windows with multiple displays?
@@ -116,7 +116,7 @@ internal object WindowsGLFrameBatch : GLFrameBatch<WindowsOpenGLRenderer>() {
     override suspend fun drawAndPresent() {
         for ((driver, renderer) in toRedrawVisible) {
             renderer.makeCurrent()
-            driver.inFrame { scope -> renderer.drawBatchFrame(scope) }
+            driver.inFrame { scope -> renderer.drawFrame(scope) }
         }
 
         for ((_, renderer) in toRedrawVisible) {

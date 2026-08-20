@@ -70,7 +70,7 @@ internal class LinuxOpenGLRenderer(
     override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
         layer.backedLayer.lockLinuxDrawingSurface {
             it.makeCurrent(context)
-            with(scope) { drawFrame() }
+            drawFrame(scope)
             val turnOfVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately
             if (turnOfVsync) {
                 it.setSwapInterval(0)

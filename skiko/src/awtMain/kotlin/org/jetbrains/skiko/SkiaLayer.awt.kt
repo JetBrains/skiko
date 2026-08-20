@@ -354,8 +354,8 @@ actual open class SkiaLayer internal constructor(
 
     private val frameDriverManager = RenderApiFallbackManager<FrameDriver>(
         defaultRenderApi = properties.renderApi,
-        factory = { renderApi, oldContext ->
-            oldContext?.dispose()
+        factory = { renderApi, oldFrameDriver ->
+            oldFrameDriver?.dispose()
             renderFactory.createFrameDriver(this, renderApi, analytics, properties).also {
                 it.syncBoundsFromPlatformComponent()
             }

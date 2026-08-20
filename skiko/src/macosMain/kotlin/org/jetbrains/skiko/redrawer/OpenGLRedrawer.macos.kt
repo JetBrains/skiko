@@ -7,7 +7,6 @@ import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.defaultIsTransparentBackgroundSupported
 import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.draw
@@ -80,8 +79,6 @@ internal class MacOsOpenGLRedrawer(
         glLayer.setNeedsDisplay()
         skiaLayer.nsView.setNeedsDisplay(true)
     }
-
-    override fun isTransparentBackgroundSupported() = defaultIsTransparentBackgroundSupported(skiaLayer)
 }
 
 internal class MacosGLLayer : CAOpenGLLayer {

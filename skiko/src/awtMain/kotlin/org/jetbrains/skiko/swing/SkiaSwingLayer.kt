@@ -65,8 +65,8 @@ open class SkiaSwingLayer(
 
     private val rendererManager = RenderApiFallbackManager<SwingRenderer>(
         properties.renderApi,
-        factory = { renderApi, oldContext ->
-            oldContext?.dispose()
+        factory = { renderApi, oldRenderer ->
+            oldRenderer?.dispose()
             createSwingRenderer(swingLayerProperties, renderDelegateWithClipping, renderApi, analytics)
         }
     )

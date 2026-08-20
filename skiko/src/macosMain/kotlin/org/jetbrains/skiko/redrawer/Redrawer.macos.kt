@@ -12,5 +12,4 @@ internal interface Redrawer {
     fun syncBoundsFromPlatformComponent()
     fun update(nanoTime: Long = renderTime())
     val renderInfo: String
-    fun isTransparentBackgroundSupported(): Boolean
 }

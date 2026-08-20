@@ -38,7 +38,7 @@ internal class FrameDriver(
     private var isPlatformDrivingFrames = false
 
     init {
-        renderer.attachFrameEvents(this)
+        renderer.liveResizeListener = this
     }
 
     val renderInfo: String get() = renderer.renderInfo
@@ -157,27 +157,17 @@ internal class FrameDriver(
         syncBoundsFromPlatformComponent()
 
         if (!layer.isShowing && layer.isDisplayable && layer.width > 0 && layer.height > 0) {
-            when (renderer.beforeShownFrame) {
-                AwtRenderer.BeforeShownFrame.NONE -> {}
-                AwtRenderer.BeforeShownFrame.RENDER -> renderBeforeShownFrame { scope ->
-                    runBlocking { renderer.renderFrame(scope, immediate = true) }
-                }
-                AwtRenderer.BeforeShownFrame.BACKEND -> renderBeforeShownFrame { scope ->
-                    renderer.renderBeforeShown(scope)
+            if (renderer.needsBeforeShownFrame) {
+                layer.update(renderTime())
+                if (isDisposed) return // layer may be disposed in user code during `update`
+                withFrameAnalytics {
+                    layer.inDrawScope { renderer.renderBeforeShown(this) }
                 }
             }
             return
         }
 
         needRender(throttledToVsync = false)
-    }
-
-    private fun renderBeforeShownFrame(render: (LayerDrawScope) -> Unit) {
-        layer.update(renderTime())
-        if (isDisposed) return // layer may be disposed in user code during `update`
-        withFrameAnalytics {
-            layer.inDrawScope { render(this) }
-        }
     }
 
     fun setVisible(isVisible: Boolean) = renderer.setVisible(isVisible)
