@@ -88,11 +88,21 @@ val skikoWasmRuntimeLegacy by configurations.creating {
     isCanBeResolved = true
 }
 
+val benchmarkServerRuntimeClasspath by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+
 dependencies {
     if (!isCompositeBuild) {
         skikoWasmRuntimeVariant(libs.skiko.wasm.js)
         skikoWasmRuntimeLegacy(libs.skiko.js.wasm.runtime)
     }
+
+    benchmarkServerRuntimeClasspath("io.ktor:ktor-server-core-jvm:3.3.3")
+    benchmarkServerRuntimeClasspath("io.ktor:ktor-server-netty-jvm:3.3.3")
+    benchmarkServerRuntimeClasspath("io.ktor:ktor-server-cors-jvm:3.3.3")
+    benchmarkServerRuntimeClasspath("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.9.0")
 }
 
 val unpackedWasmRuntime = layout.buildDirectory.dir("resources")
@@ -275,6 +285,24 @@ tasks.register<JavaExec>("awtBenchmark") {
     classpath = files(mainCompilation.output.allOutputs, mainCompilation.runtimeDependencyFiles)
     mainClass.set("org.jetbrains.skiko.benchmarks.JvmMainKt")
     args(runArguments?.split(" ")?.filter { it.isNotBlank() }.orEmpty())
+}
+
+tasks.register<Exec>("runBenchmarkServer") {
+    group = "benchmark"
+    description = "Runs the local Ktor server that receives browser benchmark reports."
+
+    val serverArguments = providers.gradleProperty("benchmarkServer.arguments").orElse("")
+
+    doFirst {
+        commandLine(
+            listOf(
+                "kotlin",
+                "-classpath",
+                benchmarkServerRuntimeClasspath.asPath,
+                projectDir.resolve("benchmark_server.main.kts").absolutePath,
+            ) + serverArguments.get().split(" ").filter { it.isNotBlank() }
+        )
+    }
 }
 
 tasks.register("runBrowserAndSaveStats") {

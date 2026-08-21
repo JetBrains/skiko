@@ -303,12 +303,12 @@ class LocalBenchmarkServer(
             return
         }
 
-        val serverScript = projectDir.resolve("benchmark_server.main.kts")
         process = ProcessBuilder(
-            serverScript.absolutePath,
-            "saveStatsToJSON=$saveStatsToJSON",
-            "serverToken=$serverToken",
-            "port=$port"
+            gradlew.absolutePath,
+            "-p", projectDir.absolutePath,
+            "--no-daemon",
+            "runBenchmarkServer",
+            "-PbenchmarkServer.arguments=saveStatsToJSON=$saveStatsToJSON serverToken=$serverToken port=$port"
         )
             .directory(projectDir)
             .redirectErrorStream(true)

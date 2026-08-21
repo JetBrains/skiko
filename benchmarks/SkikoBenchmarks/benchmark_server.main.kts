@@ -1,10 +1,5 @@
 #!/usr/bin/env kotlin
 
-@file:DependsOn("io.ktor:ktor-server-core-jvm:3.3.3")
-@file:DependsOn("io.ktor:ktor-server-netty-jvm:3.3.3")
-@file:DependsOn("io.ktor:ktor-server-cors-jvm:3.3.3")
-@file:DependsOn("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.9.0")
-
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
