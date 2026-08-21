@@ -24,7 +24,6 @@ public:
     static EGLContextWrapper *create(Display *display, Window window, bool transparency) {
         const auto egl = dlopen("libEGL.so", RTLD_LAZY);
         if (!egl) {
-            // TODO: Fallback to GLX?
             std::cerr << "Could not load EGL: " << dlerror() << std::endl;
             return nullptr;
         }
@@ -38,7 +37,7 @@ public:
 
         EGLDisplay eglDisplay = eglGetDisplay(display);
         if (eglDisplay == EGL_NO_DISPLAY) {
-            std::cerr << "Could not get egl eglDisplay" << std::endl;
+            std::cerr << "Could not get egl display" << std::endl;
             return nullptr;
         }
 
