@@ -1,4 +1,4 @@
-#!/usr/bin/env kotlin
+package org.jetbrains.skiko.benchmarks
 
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -20,21 +20,21 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-val BENCHMARK_SERVER_PORT = 8090
+private const val BenchmarkServerPort = 8090
 
-data class BenchmarkResultFromClient(
+private data class BenchmarkResultFromClient(
     val name: String,
     val stats: String,
     val token: String?
 )
 
-class BenchmarksSaveServer {
+private class BenchmarksSaveServer {
     private var server: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>? = null
 
     fun start(
         saveStatsToJSON: Boolean,
         serverToken: String,
-        port: Int = BENCHMARK_SERVER_PORT
+        port: Int = BenchmarkServerPort
     ) {
         if (server != null) {
             println("Benchmark server is already running")
@@ -96,7 +96,7 @@ class BenchmarksSaveServer {
     }
 }
 
-fun parseBenchmarkResult(json: String): BenchmarkResultFromClient? =
+private fun parseBenchmarkResult(json: String): BenchmarkResultFromClient? =
     runCatching {
         val obj = Json.parseToJsonElement(json).jsonObject
         BenchmarkResultFromClient(
@@ -106,35 +106,34 @@ fun parseBenchmarkResult(json: String): BenchmarkResultFromClient? =
         )
     }.getOrNull()
 
-fun saveJson(name: String, stats: String) {
+private fun saveJson(name: String, stats: String) {
     val file = File("build/benchmarks/json-reports/$name.json")
     file.parentFile.mkdirs()
     file.writeText(stats)
     println("JSON results saved to ${file.absolutePath}")
 }
 
-fun printBenchmarkSummary(name: String, stats: String) {
+private fun printBenchmarkSummary(name: String, stats: String) {
     val average = parseJsonNumberValue(stats, "averageMillis")?.let { String.format("%.3f ms", it) } ?: "N/A"
     val min = parseJsonNumberValue(stats, "minMillis")?.let { String.format("%.3f ms", it) } ?: "N/A"
     val max = parseJsonNumberValue(stats, "maxMillis")?.let { String.format("%.3f ms", it) } ?: "N/A"
     println("${name.padEnd(25)} | avg $average | min $min | max $max")
 }
 
-fun parseJsonNumberValue(json: String, key: String): Double? {
+private fun parseJsonNumberValue(json: String, key: String): Double? {
     val match = Regex(""""$key"\s*:\s*(-?\d+(?:\.\d+)?)""").find(json) ?: return null
     return match.groupValues[1].toDoubleOrNull()
 }
 
-fun List<String>.valueFor(key: String): String? =
-    firstOrNull { it.startsWith("$key=") }?.substringAfter("=")
+fun main(args: Array<String>) {
+    val argMap = args.associate {
+        val split = it.split("=", limit = 2)
+        if (split.size == 2) split[0] to split[1] else it to ""
+    }
 
-val argMap = args.associate {
-    val split = it.split("=", limit = 2)
-    if (split.size == 2) split[0] to split[1] else it to ""
+    BenchmarksSaveServer().start(
+        saveStatsToJSON = argMap["saveStatsToJSON"]?.toBooleanStrictOrNull() ?: true,
+        serverToken = argMap["serverToken"] ?: error("Missing required argument: serverToken=<token>"),
+        port = argMap["port"]?.toIntOrNull() ?: BenchmarkServerPort
+    )
 }
-
-BenchmarksSaveServer().start(
-    saveStatsToJSON = argMap["saveStatsToJSON"]?.toBooleanStrictOrNull() ?: true,
-    serverToken = argMap["serverToken"] ?: error("Missing required argument: serverToken=<token>"),
-    port = argMap["port"]?.toIntOrNull() ?: BENCHMARK_SERVER_PORT
-)
