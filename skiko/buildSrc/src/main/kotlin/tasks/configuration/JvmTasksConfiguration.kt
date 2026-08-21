@@ -225,8 +225,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         "src/jvmMain/cpp/common",
         "src/awtMain/cpp/common",
         "src/awtMain/cpp/${targetOs.id}",
-        "src/jvmTest/cpp"
-    )
+    ) + if (skiko.includeTestHelpers) projectDirs("src/jvmTest/cpp") else emptyList()
     sourceRoots.set(srcDirs)
     if (targetOs != OS.Android) includeHeadersNonRecursive(jdkHome.resolve("include"))
     val skiaDir = skiaJvmBindingsDir.get()
@@ -316,6 +315,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         listOf(
             *skiaPreprocessorFlags(targetOs, buildType),
             *osFlags,
+            *dependencyRegistry.getCompilerFlags(targetOs, targetArch, TargetEnv.JVM).toTypedArray(),
         )
     )
 }

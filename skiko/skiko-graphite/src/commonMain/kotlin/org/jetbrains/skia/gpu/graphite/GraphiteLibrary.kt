@@ -13,3 +13,10 @@ internal fun requireMetalSupport() {
         else -> throw UnsupportedOperationException("Graphite Metal is not supported on ${hostOs.id}")
     }
 }
+
+internal fun requireVulkanSupport() {
+    when (hostOs) {
+        OS.Linux, OS.Windows -> Unit
+        else -> throw UnsupportedOperationException("Graphite Vulkan is not supported on ${hostOs.id}")
+    }
+}
