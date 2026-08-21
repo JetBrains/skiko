@@ -270,7 +270,6 @@ object SkikoGradleProperties {
     const val KOTLIN_LANGUAGE_VERSION = "skiko.kotlin.language.version"
     const val KOTLIN_API_VERSION = "skiko.kotlin.api.version"
     const val AWT_ENABLED = "skiko.awt.enabled"
-    const val GRAPHITE_JVM_ENABLED = "skiko.graphite.jvm.enabled"
     const val WASM_ENABLED = "skiko.wasm.enabled"
     const val ANDROID_ENABLED = "skiko.android.enabled"
     const val NATIVE_ENABLED = "skiko.native.enabled"

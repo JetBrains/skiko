@@ -14,6 +14,7 @@ data class ResolvedBinaryConfiguration(
     val dynamicLibNames: List<String> = emptyList(),
     val frameworks: List<String> = emptyList(),
     val linkFlags: List<String> = emptyList(),
+    val compilerFlags: List<String> = emptyList(),
 )
 
 @DslMarker
@@ -35,6 +36,7 @@ class BinaryRegistry {
         DYNAMIC_LIBS,
         LINK_FLAGS,
         FRAMEWORKS,
+        COMPILER_FLAGS,
     }
 
     private data class Rule(
@@ -68,6 +70,10 @@ class BinaryRegistry {
         rules.add(Rule(os, arch, env, RuleKind.FRAMEWORKS, frameworks.toList()))
     }
 
+    fun compilerFlags(os: OS, env: TargetEnv, vararg flags: String, arch: Arch? = null) {
+        rules.add(Rule(os, arch, env, RuleKind.COMPILER_FLAGS, flags.toList()))
+    }
+
     fun getLibs(os: OS, arch: Arch, env: TargetEnv, linkage: Linkage): List<String> =
         valuesFor(os, arch, env, linkage.ruleKind)
 
@@ -76,6 +82,9 @@ class BinaryRegistry {
 
     fun getFrameworks(os: OS, arch: Arch, env: TargetEnv): List<String> =
         valuesFor(os, arch, env, RuleKind.FRAMEWORKS).flatMap { listOf("-framework", it) }
+
+    fun getCompilerFlags(os: OS, arch: Arch, env: TargetEnv): List<String> =
+        valuesFor(os, arch, env, RuleKind.COMPILER_FLAGS)
 
     private fun valuesFor(os: OS, arch: Arch, env: TargetEnv, kind: RuleKind): List<String> =
         rules
@@ -97,6 +106,7 @@ interface ActionScope {
     fun dynamicSystemLibs(vararg libs: String)
     fun linkFlags(vararg flags: String)
     fun frameworks(vararg frameworks: String)
+    fun compilerFlags(vararg flags: String)
 }
 
 @SkikoBinaryDsl
@@ -121,6 +131,9 @@ class ArchScope internal constructor(
 
     override fun frameworks(vararg frameworks: String) =
         registry.frameworks(os, env, *frameworks, arch = arch)
+
+    override fun compilerFlags(vararg flags: String) =
+        registry.compilerFlags(os, env, *flags, arch = arch)
 }
 
 @SkikoBinaryDsl
@@ -148,6 +161,9 @@ class OSScope internal constructor(
 
     override fun frameworks(vararg frameworks: String) =
         registry.frameworks(os, env, *frameworks, arch = null)
+
+    override fun compilerFlags(vararg flags: String) =
+        registry.compilerFlags(os, env, *flags, arch = null)
 }
 
 @SkikoBinaryDsl
@@ -194,6 +210,10 @@ class EnvScope internal constructor(
 
     override fun frameworks(vararg frameworks: String) = forEachValidOs { os ->
         registry.frameworks(os, env, *frameworks, arch = null)
+    }
+
+    override fun compilerFlags(vararg flags: String) = forEachValidOs { os ->
+        registry.compilerFlags(os, env, *flags, arch = null)
     }
 }
 

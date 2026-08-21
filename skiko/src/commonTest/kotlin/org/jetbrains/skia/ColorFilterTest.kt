@@ -2,6 +2,8 @@ package org.jetbrains.skia
 
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class ColorFilterTest {
     @Test
@@ -24,6 +26,38 @@ class ColorFilterTest {
 
         ColorFilter.makeComposed(src, dst)
         ColorFilter.makeLerp(dst, src, 0.4f)
+    }
+
+    @Test
+    fun makeBlendReturnsNullForNoOpCombinations() {
+        // Skia collapses these away: the filtered color would come out unchanged.
+        assertNull(ColorFilter.makeBlend(Color.RED, BlendMode.DST), "DST is a no-op")
+        assertNull(ColorFilter.makeBlend(Color.TRANSPARENT, BlendMode.DST), "DST is a no-op")
+        for (mode in listOf(
+            BlendMode.SRC_OVER,
+            BlendMode.DST_OVER,
+            BlendMode.DST_OUT,
+            BlendMode.SRC_ATOP,
+            BlendMode.XOR,
+            BlendMode.DARKEN,
+        )) {
+            assertNull(
+                ColorFilter.makeBlend(Color.TRANSPARENT, mode),
+                "a transparent color with $mode is a no-op"
+            )
+        }
+        assertNull(
+            ColorFilter.makeBlend(Color.RED, BlendMode.DST_IN),
+            "an opaque color with DST_IN is a no-op"
+        )
+    }
+
+    @Test
+    fun makeBlendReturnsFilterForBlendsThatChangeTheColor() {
+        assertNotNull(ColorFilter.makeBlend(Color.RED, BlendMode.SRC_ATOP))
+        assertNotNull(ColorFilter.makeBlend(Color.RED, BlendMode.SRC_OVER))
+        assertNotNull(ColorFilter.makeBlend(Color.TRANSPARENT, BlendMode.SRC))
+        assertNotNull(ColorFilter.makeBlend(Color.TRANSPARENT, BlendMode.DST_IN))
     }
 
     @Test
