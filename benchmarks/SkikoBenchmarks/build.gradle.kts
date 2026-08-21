@@ -88,21 +88,11 @@ val skikoWasmRuntimeLegacy by configurations.creating {
     isCanBeResolved = true
 }
 
-val benchmarkServerRuntimeClasspath by configurations.creating {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-}
-
 dependencies {
     if (!isCompositeBuild) {
         skikoWasmRuntimeVariant(libs.skiko.wasm.js)
         skikoWasmRuntimeLegacy(libs.skiko.js.wasm.runtime)
     }
-
-    benchmarkServerRuntimeClasspath("io.ktor:ktor-server-core-jvm:3.3.3")
-    benchmarkServerRuntimeClasspath("io.ktor:ktor-server-netty-jvm:3.3.3")
-    benchmarkServerRuntimeClasspath("io.ktor:ktor-server-cors-jvm:3.3.3")
-    benchmarkServerRuntimeClasspath("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.9.0")
 }
 
 val unpackedWasmRuntime = layout.buildDirectory.dir("resources")
@@ -273,6 +263,18 @@ kotlin {
     }
 }
 
+val benchmarkServerCompilation = kotlin.targets.getByName("awt").compilations.create("benchmarkServer") {
+    defaultSourceSet {
+        kotlin.srcDir("src/benchmarkServerMain/kotlin")
+        dependencies {
+            implementation("io.ktor:ktor-server-core-jvm:3.3.3")
+            implementation("io.ktor:ktor-server-netty-jvm:3.3.3")
+            implementation("io.ktor:ktor-server-cors-jvm:3.3.3")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.9.0")
+        }
+    }
+}
+
 tasks.register<JavaExec>("awtBenchmark") {
     group = "benchmark"
     description = "Runs Skiko API benchmarks on the JVM/AWT target."
@@ -287,21 +289,17 @@ tasks.register<JavaExec>("awtBenchmark") {
     args(runArguments?.split(" ")?.filter { it.isNotBlank() }.orEmpty())
 }
 
-tasks.register<Exec>("runBenchmarkServer") {
+tasks.register<JavaExec>("runBenchmarkServer") {
     group = "benchmark"
     description = "Runs the local Ktor server that receives browser benchmark reports."
 
     val serverArguments = providers.gradleProperty("benchmarkServer.arguments").orElse("")
+    dependsOn(benchmarkServerCompilation.compileTaskProvider)
+    classpath = files(benchmarkServerCompilation.output.allOutputs, benchmarkServerCompilation.runtimeDependencyFiles)
+    mainClass.set("org.jetbrains.skiko.benchmarks.BenchmarkServerMainKt")
 
     doFirst {
-        commandLine(
-            listOf(
-                "kotlin",
-                "-classpath",
-                benchmarkServerRuntimeClasspath.asPath,
-                projectDir.resolve("benchmark_server.main.kts").absolutePath,
-            ) + serverArguments.get().split(" ").filter { it.isNotBlank() }
-        )
+        args(serverArguments.get().split(" ").filter { it.isNotBlank() })
     }
 }
 

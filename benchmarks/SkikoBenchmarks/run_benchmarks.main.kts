@@ -102,7 +102,8 @@ fun executeBenchmarks(
             println("Starting benchmark server in background...")
             val benchmarkServer = LocalBenchmarkServer(
                 saveStatsToJSON = true,
-                serverToken = runArgs.valueFor("serverToken") ?: error("Missing server token")
+                serverToken = runArgs.valueFor("serverToken") ?: error("Missing server token"),
+                extraGradleArgs = gradleArgs
             )
             benchmarkServer.start()
             try {
@@ -289,6 +290,7 @@ fun waitForHttp(url: String, timeoutMs: Long): Boolean {
 class LocalBenchmarkServer(
     private val saveStatsToJSON: Boolean,
     private val serverToken: String,
+    private val extraGradleArgs: List<String>,
     private val port: Int = BENCHMARK_SERVER_PORT
 ) {
     val stopped = AtomicBoolean(false)
@@ -307,6 +309,7 @@ class LocalBenchmarkServer(
             gradlew.absolutePath,
             "-p", projectDir.absolutePath,
             "--no-daemon",
+            *extraGradleArgs.toTypedArray(),
             "runBenchmarkServer",
             "-PbenchmarkServer.arguments=saveStatsToJSON=$saveStatsToJSON serverToken=$serverToken port=$port"
         )
@@ -332,7 +335,12 @@ class LocalBenchmarkServer(
         }
 
         if (!waitForBenchmarkServerStart()) {
-            throw RuntimeException("Benchmark server did not become reachable at http://localhost:$port/")
+            val exitCode = process
+                ?.takeIf { !it.isAlive }
+                ?.exitValue()
+                ?.let { " Server process exited with code $it." }
+                .orEmpty()
+            throw RuntimeException("Benchmark server did not become reachable at http://localhost:$port/.$exitCode")
         }
     }
 
