@@ -1,11 +1,7 @@
 #!/usr/bin/env kotlin
 
-import com.sun.net.httpserver.HttpExchange
-import com.sun.net.httpserver.HttpServer
 import java.io.File
-import java.net.InetSocketAddress
 import java.net.URI
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.UUID
@@ -185,7 +181,6 @@ fun executeGradleBenchmark(
         val startTime = System.currentTimeMillis()
         var completed = false
         var gradleExitCode: Int? = null
-        var reportedGradleExit = false
 
         while (System.currentTimeMillis() - startTime < WEB_BENCHMARK_TIMEOUT_MS) {
             if (serverStopped.get()) {
@@ -196,10 +191,7 @@ fun executeGradleBenchmark(
 
             if (gradleExitCode == null && process.waitFor(1, TimeUnit.SECONDS)) {
                 gradleExitCode = process.exitValue()
-                if (!reportedGradleExit) {
-                    println("Gradle task $task exited with code $gradleExitCode; waiting for benchmark results from the browser...")
-                    reportedGradleExit = true
-                }
+                println("Gradle task $task exited with code $gradleExitCode; waiting for benchmark results from the browser...")
             } else {
                 Thread.sleep(1_000)
             }
@@ -300,84 +292,70 @@ class LocalBenchmarkServer(
     private val port: Int = BENCHMARK_SERVER_PORT
 ) {
     val stopped = AtomicBoolean(false)
+    private val started = AtomicBoolean(false)
 
-    private val server = HttpServer.create(InetSocketAddress(port), 0)
-    private val executor = Executors.newSingleThreadExecutor()
+    private var process: Process? = null
+    private var outputThread: Thread? = null
 
     fun start() {
-        server.executor = executor
-        server.createContext("/") { exchange ->
-            when {
-                exchange.requestMethod.equals("GET", ignoreCase = true) -> {
-                    exchange.respond(200, "Benchmark server is running")
-                }
-                exchange.requestMethod.equals("OPTIONS", ignoreCase = true) -> {
-                    exchange.respond(200, "")
-                }
-                else -> {
-                    exchange.respond(404, "Not found")
+        if (process != null) {
+            println("Benchmark server is already running")
+            return
+        }
+
+        val serverScript = projectDir.resolve("benchmark_server.main.kts")
+        process = ProcessBuilder(
+            serverScript.absolutePath,
+            "saveStatsToJSON=$saveStatsToJSON",
+            "serverToken=$serverToken",
+            "port=$port"
+        )
+            .directory(projectDir)
+            .redirectErrorStream(true)
+            .start()
+
+        outputThread = Thread {
+            process?.inputStream?.bufferedReader()?.useLines { lines ->
+                lines.forEach { line ->
+                    println("[SERVER] $line")
+                    if (line.contains("Benchmark server is available at")) {
+                        started.set(true)
+                    }
+                    if (line.contains("Benchmark server stopped")) {
+                        stopped.set(true)
+                    }
                 }
             }
+        }.also {
+            it.isDaemon = true
+            it.start()
         }
-        server.createContext("/benchmark") { exchange ->
-            handleBenchmark(exchange)
+
+        if (!waitForBenchmarkServerStart()) {
+            throw RuntimeException("Benchmark server did not become reachable at http://localhost:$port/")
         }
-        server.start()
-        println("Benchmark server is available at http://localhost:$port/")
     }
 
     fun stop() {
+        val serverProcess = process ?: return
         if (stopped.compareAndSet(false, true)) {
-            server.stop(0)
+            serverProcess.destroy()
+            serverProcess.destroyForcibly()
             println("Benchmark server stopped")
         }
-        executor.shutdownNow()
+        outputThread?.interrupt()
+        process = null
+        outputThread = null
     }
 
-    private fun handleBenchmark(exchange: HttpExchange) {
-        if (exchange.requestMethod.equals("OPTIONS", ignoreCase = true)) {
-            exchange.respond(200, "")
-            return
+    private fun waitForBenchmarkServerStart(): Boolean {
+        val startTime = System.currentTimeMillis()
+        while (System.currentTimeMillis() - startTime < WEB_BENCHMARK_TIMEOUT_MS) {
+            if (started.get()) return true
+            if (process?.isAlive == false) return false
+            Thread.sleep(500)
         }
-
-        if (!exchange.requestMethod.equals("POST", ignoreCase = true)) {
-            exchange.respond(405, "Method not allowed")
-            return
-        }
-
-        val body = exchange.requestBody.bufferedReader().use { it.readText() }
-        val name = parseJsonStringValue(body, "name")
-        val stats = parseJsonStringValue(body, "stats")
-        val token = parseJsonStringValue(body, "token")
-
-        if (name == null || stats == null) {
-            exchange.respond(400, "Invalid benchmark result")
-            return
-        }
-
-        if (token != serverToken) {
-            println("Ignoring stale benchmark request for: ${name.ifEmpty { "<stop>" }}")
-            exchange.respond(409, "Stale benchmark client")
-            return
-        }
-
-        if (name.isEmpty()) {
-            println("Stopping server! Received empty name from client")
-            exchange.respond(200, "Server stopped.")
-            Thread { stop() }.start()
-            return
-        }
-
-        println("Received benchmark result for: $name")
-        printBenchmarkSummary(name, stats)
-        if (saveStatsToJSON) {
-            val file = projectDir.resolve("build/benchmarks/json-reports/$name.json")
-            file.parentFile.mkdirs()
-            file.writeText(stats)
-            println("JSON results saved to ${file.absolutePath}")
-        }
-
-        exchange.respond(200, "Benchmark result saved")
+        return false
     }
 }
 
@@ -422,70 +400,6 @@ fun findBenchmarkProjectDir(): File {
     }
 
     throw IllegalStateException("Cannot locate benchmarks/SkikoBenchmarks project")
-}
-
-fun HttpExchange.respond(statusCode: Int, text: String) {
-    responseHeaders.add("Access-Control-Allow-Origin", "*")
-    responseHeaders.add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-    responseHeaders.add("Access-Control-Allow-Headers", "Content-Type")
-    val bytes = text.encodeToByteArray()
-    sendResponseHeaders(statusCode, bytes.size.toLong())
-    responseBody.use { it.write(bytes) }
-}
-
-fun parseJsonStringValue(json: String, key: String): String? {
-    val keyToken = "\"$key\""
-    var index = json.indexOf(keyToken)
-    if (index == -1) return null
-
-    index += keyToken.length
-    while (index < json.length && json[index].isWhitespace()) index++
-    if (index >= json.length || json[index] != ':') return null
-    index++
-    while (index < json.length && json[index].isWhitespace()) index++
-    if (index >= json.length || json[index] != '"') return null
-    index++
-
-    val result = StringBuilder()
-    while (index < json.length) {
-        val c = json[index++]
-        if (c == '"') return result.toString()
-        if (c != '\\') {
-            result.append(c)
-            continue
-        }
-
-        if (index >= json.length) return null
-        when (val escaped = json[index++]) {
-            '"', '\\', '/' -> result.append(escaped)
-            'b' -> result.append('\b')
-            'f' -> result.append('\u000C')
-            'n' -> result.append('\n')
-            'r' -> result.append('\r')
-            't' -> result.append('\t')
-            'u' -> {
-                if (index + 4 > json.length) return null
-                val code = json.substring(index, index + 4).toIntOrNull(16) ?: return null
-                result.append(code.toChar())
-                index += 4
-            }
-            else -> return null
-        }
-    }
-
-    return null
-}
-
-fun printBenchmarkSummary(name: String, stats: String) {
-    val average = parseJsonNumberValue(stats, "averageMillis")?.let { String.format("%.3f ms", it) } ?: "N/A"
-    val min = parseJsonNumberValue(stats, "minMillis")?.let { String.format("%.3f ms", it) } ?: "N/A"
-    val max = parseJsonNumberValue(stats, "maxMillis")?.let { String.format("%.3f ms", it) } ?: "N/A"
-    println("${name.padEnd(25)} | avg $average | min $min | max $max")
-}
-
-fun parseJsonNumberValue(json: String, key: String): Double? {
-    val match = Regex(""""$key"\s*:\s*(-?\d+(?:\.\d+)?)""").find(json) ?: return null
-    return match.groupValues[1].toDoubleOrNull()
 }
 
 main(args)
