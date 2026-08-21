@@ -40,11 +40,17 @@ val graphiteDependencies: SkikoDependencyScope.() -> Unit = {
             }
             linux {
                 staticSkiaLibs("skia_graphite_ext")
+                if (skiko.buildType == SkiaBuildType.DEBUG) {
+                    staticSkiaLibs("spvtools", "spvtools_val")
+                }
                 dynamicSystemLibs("dl")
                 compilerFlags("-DSK_VULKAN", "-DSK_USE_INTERNAL_VULKAN_HEADERS", "-DVK_NO_PROTOTYPES")
             }
             windows {
                 staticSkiaLibs("skia_graphite_ext")
+                if (skiko.buildType == SkiaBuildType.DEBUG) {
+                    staticSkiaLibs("spvtools", "spvtools_val")
+                }
                 dynamicSystemLibs("onecore_apiset", "dxguid")
                 compilerFlags("-DSK_VULKAN", "-DSK_USE_INTERNAL_VULKAN_HEADERS", "-DVK_NO_PROTOTYPES")
             }
