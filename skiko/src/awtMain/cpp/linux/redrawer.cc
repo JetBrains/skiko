@@ -1,106 +1,179 @@
 #include <jawt_md.h>
 #include <GL/gl.h>
-#include <GL/glx.h>
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <X11/Xresource.h>
-#include <cstdlib>
-#include <unistd.h>
-#include <stdio.h>
+
+#define EGL_EGL_PROTOTYPES 0
+
+#include <EGL/egl.h>
+#include <dlfcn.h>
+#include <iostream>
 #include "jni_helpers.h"
 
-typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLXContext, Bool, const int *);
+class EGLContextWrapper {
+public:
+    EGLContextWrapper(EGLDisplay _display, EGLContext _context, EGLConfig _config, EGLSurface _surface, Window _window,
+                      bool _transparency, void *const egl) :
+            eglDisplay(_display), eglContext(_context), eglConfig(_config), eglSurface(_surface), window(_window),
+            transparency(_transparency), egl(egl) {};
+
+    ~EGLContextWrapper() {
+        const auto eglDestroyContext = getProc<PFNEGLDESTROYCONTEXTPROC>("eglDestroyContext");
+        eglDestroyContext(eglDisplay, eglContext);
+        dlclose(egl);
+    };
+
+    static EGLContextWrapper *create(Display *display, Window window, bool transparency) {
+        const auto egl = dlopen("libEGL.so", RTLD_LAZY);
+        if (!egl) {
+            std::cerr << "Could not load EGL: " << dlerror() << std::endl;
+            return nullptr;
+        }
+
+        const auto eglGetDisplay = (PFNEGLGETDISPLAYPROC) dlsym(egl, "eglGetDisplay");
+        const auto eglInitialize = (PFNEGLINITIALIZEPROC) dlsym(egl, "eglInitialize");
+        const auto eglBindAPI = (PFNEGLBINDAPIPROC) dlsym(egl, "eglBindAPI");
+        const auto eglChooseConfig = (PFNEGLCHOOSECONFIGPROC) dlsym(egl, "eglChooseConfig");
+        const auto eglCreateContext = (PFNEGLCREATECONTEXTPROC) dlsym(egl, "eglCreateContext");
+        const auto eglCreateWindowSurface = (PFNEGLCREATEWINDOWSURFACEPROC) dlsym(egl, "eglCreateWindowSurface");
+
+        EGLDisplay eglDisplay = eglGetDisplay(display);
+        if (eglDisplay == EGL_NO_DISPLAY) {
+            std::cerr << "Could not get egl display" << std::endl;
+            return nullptr;
+        }
+
+        EGLint major, minor;
+        if (!eglInitialize(eglDisplay, &major, &minor)) {
+            std::cerr << "Could not initialize egl" << std::endl;
+            return nullptr;
+        }
+
+        if (!eglBindAPI(EGL_OPENGL_ES_API)) {
+            std::cerr << "Could not bind OpenGL API" << std::endl;
+            return nullptr;
+        }
+
+        EGLint configConstraints[] = {
+                EGL_RED_SIZE, 8,
+                EGL_GREEN_SIZE, 8,
+                EGL_BLUE_SIZE, 8,
+                EGL_ALPHA_SIZE, transparency ? 8 : 0,
+                EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+                EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+                EGL_CONFIG_CAVEAT, EGL_NONE,
+                EGL_NONE,
+        };
+
+        EGLConfig eglConfig;
+        EGLint numConfigs;
+        if (!eglChooseConfig(eglDisplay, configConstraints, &eglConfig, 1, &numConfigs)) {
+            std::cerr << "Could not choose egl config" << std::endl;
+            return nullptr;
+        }
+
+        static const EGLint contextAttribs[] = {
+                EGL_CONTEXT_MAJOR_VERSION, 3,
+                EGL_NONE
+        };
+        EGLContext eglContext = eglCreateContext(eglDisplay, eglConfig, EGL_NO_CONTEXT, contextAttribs);
+        if (eglContext == EGL_NO_CONTEXT) {
+            std::cerr << "Could not create egl context" << std::endl;
+            return nullptr;
+        }
+
+        EGLSurface eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, window, nullptr);
+        if (eglSurface == EGL_NO_SURFACE) {
+            std::cerr << "Could not create egl surface" << std::endl;
+            return nullptr;
+        }
+
+        return new EGLContextWrapper(eglDisplay, eglContext, eglConfig, eglSurface, window, transparency, egl);
+    };
+
+    template<typename T>
+    T getProc(const std::string &name) {
+        const auto func = (T) dlsym(egl, name.c_str());
+        return func;
+    }
+
+    bool makeCurrent() {
+        const auto eglMakeCurrent = getProc<PFNEGLMAKECURRENTPROC>("eglMakeCurrent");
+        return eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
+    }
+
+    bool swapBuffers() {
+        const auto eglSwapBuffers = getProc<PFNEGLSWAPBUFFERSPROC>("eglSwapBuffers");
+        return eglSwapBuffers(eglDisplay, eglSurface);
+    }
+
+    bool setSwapInterval(int interval) {
+        const auto eglSwapInterval = getProc<PFNEGLSWAPINTERVALPROC>("eglSwapInterval");
+        return eglSwapInterval(eglDisplay, interval);
+    }
+
+    EGLDisplay getDisplay() const {
+        return eglDisplay;
+    }
+
+    EGLContext getContext() const {
+        return eglContext;
+    }
+
+    EGLConfig getConfig() const {
+        return eglConfig;
+    }
+
+private:
+    EGLDisplay eglDisplay{EGL_NO_DISPLAY};
+    EGLContext eglContext{EGL_NO_CONTEXT};
+    EGLConfig eglConfig{nullptr};
+    EGLSurface eglSurface{EGL_NO_SURFACE};
+    Window window;
+    bool transparency;
+    void *const egl;
+};
 
 extern "C"
 {
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval)
-    {
-        Display *display = fromJavaPointer<Display *>(displayPtr);
-        Window window = fromJavaPointer<Window>(windowPtr);
+JNIEXPORT void JNICALL
+Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong contextPtr,
+                                                                        jint interval) {
+    auto *context = fromJavaPointer<EGLContextWrapper *>(contextPtr);
 
-        // according to:
-        // https://opengl.gpuinfo.org/listreports.php?extension=GLX_EXT_swap_control
-        // https://opengl.gpuinfo.org/listreports.php?extension=GLX_MESA_swap_control
-        // https://opengl.gpuinfo.org/listreports.php?extension=GLX_SGI_swap_control
-        // there is no Linux that doesn't support at least one of these extensions
-        static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
-        if (glXSwapIntervalEXT != NULL)
-        {
-            glXSwapIntervalEXT(display, window, interval);
-        }
-        else
-        {
-            static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = (PFNGLXSWAPINTERVALMESAPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalMESA");
-            if (glXSwapIntervalMESA != NULL)
-            {
-                glXSwapIntervalMESA(interval);
-            }
-            else
-            {
-                static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalSGI");
-                if (glXSwapIntervalSGI != NULL)
-                {
-                    glXSwapIntervalSGI(interval);
-                }
-            }
-        }
+    context->setSwapInterval(interval);
+}
+
+JNIEXPORT void JNICALL
+Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong contextPtr) {
+    auto *context = fromJavaPointer<EGLContextWrapper *>(contextPtr);
+
+    context->swapBuffers();
+}
+
+JNIEXPORT void JNICALL
+Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong contextPtr) {
+    auto *context = fromJavaPointer<EGLContextWrapper *>(contextPtr);
+
+    context->makeCurrent();
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr,
+                                                                      jlong windowPtr, jboolean transparency) {
+    auto *display = fromJavaPointer<Display *>(displayPtr);
+    auto window = fromJavaPointer<Window>(windowPtr);
+    if (!display) return 0;
+
+    auto eglContext = EGLContextWrapper::create(display, window, transparency);
+    return toJavaPointer(eglContext);
+}
+
+JNIEXPORT void JNICALL
+Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_destroyContext(JNIEnv *env, jobject redrawer,
+                                                                       jlong contextPtr) {
+    auto *context = fromJavaPointer<EGLContextWrapper *>(contextPtr);
+
+    if (context) {
+        delete context;
     }
-
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
-    {
-        Display *display = fromJavaPointer<Display *>(displayPtr);
-        Window window = fromJavaPointer<Window>(windowPtr);
-
-        glXSwapBuffers(display, window);
-    }
-
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jlong contextPtr)
-    {
-        Display *display = fromJavaPointer<Display *>(displayPtr);
-        Window window = fromJavaPointer<Window>(windowPtr);
-        GLXContext *context = fromJavaPointer<GLXContext *>(contextPtr);
-
-        glXMakeCurrent(display, window, *context);
-    }
-
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jboolean transparency)
-    {
-        Display *display = fromJavaPointer<Display *>(displayPtr);
-        if (!display) return 0;
-
-        XVisualInfo *vi;
-
-        if (transparency)
-        {
-            GLint att[] = {
-                GLX_RGBA,
-                GLX_RED_SIZE, 8,
-                GLX_GREEN_SIZE, 8,
-                GLX_BLUE_SIZE, 8,
-                GLX_ALPHA_SIZE, 8,
-                GLX_DOUBLEBUFFER, True, None
-            };
-            vi = glXChooseVisual(display, 0, att);
-        }
-        else {
-            GLint att[] = {GLX_RGBA, GLX_DOUBLEBUFFER, True, None};
-            vi = glXChooseVisual(display, 0, att);
-        }
-
-        if (!vi) return 0;
-
-        GLXContext *context = new GLXContext(glXCreateContext(display, vi, NULL, GL_TRUE));
-        return toJavaPointer(context);
-    }
-
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_destroyContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong contextPtr)
-    {
-        Display *display = fromJavaPointer<Display *>(displayPtr);
-        GLXContext *context = fromJavaPointer<GLXContext *>(contextPtr);
-
-        if (display && context) {
-            glXDestroyContext(display, *context);
-            delete context;
-	    }
-    }
+}
 }
