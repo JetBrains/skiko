@@ -74,6 +74,8 @@ open class SkiaSwingLayer(
     private val redrawer: SwingRedrawer?
         get() = redrawerManager.redrawer
 
+    private var repaintPacer: SwingRepaintPacer? = null
+
     val renderApi: GraphicsApi
         get() = redrawerManager.renderApi
 
@@ -97,16 +99,43 @@ open class SkiaSwingLayer(
     private fun init(recreation: Boolean = false) {
         isDisposed = false
         redrawerManager.findNextWorkingRenderApi(recreation)
+        repaintPacer?.dispose()
+        repaintPacer = if (SkikoProperties.swingFramePacingEnabled) SwingRepaintPacer(this) else null
         isInitialized = true
     }
 
     fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         if (isInitialized && !isDisposed) {
+            repaintPacer?.dispose()
+            repaintPacer = null
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
             redrawerManager.dispose()
             isDisposed = true
+        }
+    }
+
+    /**
+     * Requests a repaint of the layer content, like [repaint].
+     *
+     * When frame pacing is enabled ([SkikoProperties.swingFramePacingEnabled]) and the JetBrains
+     * Runtime `FramePacing` service can pace the layer's display, the repaint is deferred to the
+     * next display refresh tick, and multiple requests coalesce into at most one repaint per tick.
+     * Otherwise the request falls back to a plain [repaint].
+     *
+     * Use this instead of [repaint] for invalidation-driven rendering (e.g. animations), so that a
+     * continuously invalidating scene renders at most at the display refresh rate.
+     *
+     * Must be called on the AWT event dispatch thread.
+     */
+    fun needRender() {
+        check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
+        val repaintPacer = repaintPacer
+        if (repaintPacer != null && !isDisposed) {
+            repaintPacer.requestRepaint()
+        } else {
+            repaint()
         }
     }
 
