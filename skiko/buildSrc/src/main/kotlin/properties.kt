@@ -294,6 +294,7 @@ class SkikoArtifacts(
     val commonArtifactId = artifactIdPrefix
     val jvmArtifactId = "$artifactIdPrefix-awt"
     val jvmRuntimeArtifactId = "$artifactIdPrefix-awt-runtime"
+    val jvmRuntimeAllArtifactId = "$jvmRuntimeArtifactId-all"
     // an artifact (klib) for k/js targets
     val jsArtifactId = "$artifactIdPrefix-js"
     // an artifact (klib) for k/wasm targets

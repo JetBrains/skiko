@@ -40,7 +40,7 @@ val skikoArtifactIds: List<String> =
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
-        "${skikoArtifacts.jvmRuntimeArtifactId}-all",
+        skikoArtifacts.jvmRuntimeAllArtifactId,
 
         skikoSkottieArtifacts.commonArtifactId,
         skikoSkottieArtifacts.jvmArtifactId,
@@ -62,7 +62,7 @@ val skikoArtifactIds: List<String> =
         skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
-        "${skikoSkottieArtifacts.jvmRuntimeArtifactId}-all",
+        skikoSkottieArtifacts.jvmRuntimeAllArtifactId,
 
         skikoGraphiteArtifacts.commonArtifactId,
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
