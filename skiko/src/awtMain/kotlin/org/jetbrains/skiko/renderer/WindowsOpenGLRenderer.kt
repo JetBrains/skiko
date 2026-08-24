@@ -49,7 +49,6 @@ internal class WindowsOpenGLRenderer(
     }
 
     override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
-        makeCurrent()
         drawFrame(scope)
         swapBuffers()
         OpenGLApi.instance.glFinish()
@@ -58,8 +57,33 @@ internal class WindowsOpenGLRenderer(
         }
     }
 
-    internal fun makeCurrent() = makeCurrent(device, context)
+    override fun makeCurrent() = makeCurrent(device, context)
     internal fun swapBuffers() = swapBuffers(device)
+}
+
+/**
+ * Draw all, swap all, then one dwmFlush for vsync.
+ */
+internal object WindowsGLFrameBatch : GLFrameBatch<WindowsOpenGLRenderer>() {
+    override suspend fun drawAndPresent() {
+        drawAll()
+
+        for ((_, renderer) in toRedrawVisible) {
+            renderer.swapBuffers()
+        }
+
+        for ((_, renderer) in toRedrawVisible) {
+            renderer.makeCurrent()
+            OpenGLApi.instance.glFinish()
+        }
+
+        val isVsyncEnabled = toRedrawVisible.all { (_, renderer) -> renderer.properties.isVsyncEnabled }
+        if (isVsyncEnabled) {
+            withContext(dispatcherToBlockOn) {
+                dwmFlush() // wait for vsync
+            }
+        }
+    }
 }
 
 private external fun makeCurrent(device: Long, context: Long)
@@ -73,4 +97,4 @@ private external fun swapBuffers(device: Long)
 //  Maybe we should use D3DKMTWaitForVerticalBlankEvent? See also https://www.vsynctester.com/chromeisbroken.html
 // TODO should we support Windows 7? DWM can be disabled on Windows 7.
 //  it that case there will be a crash or just no frame limit (I don't know exactly).
-internal external fun dwmFlush()
+private external fun dwmFlush()

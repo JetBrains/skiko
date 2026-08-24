@@ -26,7 +26,11 @@ internal abstract class AbstractOpenGLRenderer(
                     "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
         }
 
+    /** Binds this renderer's GL context on the calling thread. */
+    internal abstract fun makeCurrent()
+
     internal fun drawFrame(scope: LayerDrawScope) {
+        makeCurrent()
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")
         }

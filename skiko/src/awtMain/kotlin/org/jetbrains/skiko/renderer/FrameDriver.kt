@@ -148,7 +148,12 @@ internal class FrameDriver(
         }
     }
 
-    fun syncBoundsFromPlatformComponent() = renderer.syncBoundsFromPlatformComponent()
+    fun syncBoundsFromPlatformComponent() {
+        // During a live resize the platform sizes the layers itself; syncing the lagging AWT
+        // bounds would fight it.
+        if (isPlatformDrivingFrames) return
+        renderer.syncBoundsFromPlatformComponent()
+    }
 
     fun onLayerComponentResized() {
         // During live resize, the layer tells us its size directly; the AWT size is not in sync

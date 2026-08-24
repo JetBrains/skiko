@@ -64,16 +64,6 @@ internal class MetalRenderer(
     private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
     @Volatile private var isWindowOccluded = false
 
-    /**
-     * Whether this renderer is currently driving an interactive live-resize itself (only ever true when
-     * [SkikoProperties.metalSynchronousLiveResize] is enabled and this layer fills the window). Set for the
-     * duration of a drag; it pauses the bounds sync ([syncBoundsFromPlatformComponent]) so the synchronous
-     * AppKit-main-thread render is the only thing painting during a drag. The driver holds the same state
-     * through [LiveResizeListener] and pauses its frames with it.
-     */
-    @Volatile
-    private var isLiveResizing: Boolean = false
-
     private var context: DirectContext? = null
 
     init {
@@ -183,7 +173,6 @@ internal class MetalRenderer(
      */
     @Suppress("unused")
     fun onLiveResizeStarted() {
-        isLiveResizing = true
         liveResizeListener?.onLiveResizeStarted()
     }
 
@@ -192,7 +181,6 @@ internal class MetalRenderer(
      */
     @Suppress("unused")
     fun onLiveResizeEnded() {
-        isLiveResizing = false
         liveResizeListener?.onLiveResizeEnded()
     }
 
@@ -302,7 +290,6 @@ internal class MetalRenderer(
 
     override fun syncBoundsFromPlatformComponent() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-        if (isLiveResizing) return
 
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
