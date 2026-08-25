@@ -4,6 +4,14 @@ import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
+    /**
+     * A value that can be bound to a `uniform shader`, `uniform colorFilter` or `uniform blender`
+     * declaration in an SkSL program.
+     *
+     * @see Mesh.make
+     */
+    sealed interface Child
+
     companion object {
         fun makeForShader(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
