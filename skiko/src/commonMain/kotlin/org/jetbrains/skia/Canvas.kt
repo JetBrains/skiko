@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.ImageFilter.Companion.makeDropShadowOnly
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.InternalSkikoApi
 
 open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, internal val _owner: Any) :
@@ -1025,6 +1026,62 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 
     /**
+     * Draws a mesh using a user-defined specification (see [MeshSpecification]). Requires a GPU
+     * backend or SkSL to be compiled in.
+     *
+     * [blender] is ignored if [mesh]'s specification does not output fragment shader color.
+     * Otherwise, it combines
+     *  - the [Shader] if [paint] contains [Shader]
+     *  - or the opaque [paint] color if [paint] does not contain [Shader]
+     *
+     * as the src of the blend and the mesh's fragment color as the dst.
+     *
+     * [MaskFilter], [PathEffect], and antialiasing on [paint] are ignored.
+     *
+     * A canvas backed by a raster [Surface] accepts the draw and produces no pixels for it.
+     *
+     * @param mesh    the mesh vertices and compatible specification.
+     * @param blender combines vertices colors with [Shader] if present or [paint] opaque color if
+     *                not. Ignored if the custom mesh does not output color.
+     * @param paint   specifies the [Shader], used as mesh texture.
+     *
+     * @return this
+     */
+    @ExperimentalSkikoApi
+    fun drawMesh(mesh: Mesh, blender: Blender, paint: Paint): Canvas {
+        Stats.onNativeCall()
+        try {
+            _nDrawMesh(_ptr, getPtr(mesh), getPtr(blender), getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(mesh)
+            reachabilityBarrier(blender)
+            reachabilityBarrier(paint)
+        }
+        return this
+    }
+
+    /**
+     * Draws [mesh] with a [Blender] built from [blendMode].
+     *
+     * @see drawMesh
+     *
+     * @return this
+     */
+    @ExperimentalSkikoApi
+    fun drawMesh(mesh: Mesh, blendMode: BlendMode, paint: Paint): Canvas {
+        Stats.onNativeCall()
+        try {
+            _nDrawMeshBlendMode(_ptr, getPtr(mesh), blendMode.ordinal, getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(mesh)
+            reachabilityBarrier(paint)
+        }
+        return this
+    }
+
+    /**
      *
      * Draws Drawable drawable using clip and matrix.
      *
@@ -1860,6 +1917,18 @@ private external fun _nDrawPatch(
     blendMode: Int,
     paintPtr: NativePointer
 )
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawMesh")
+// Needs ForceNativeThreadState: draws a mesh on a canvas that can be GPU-backed, which can call Metal.
+// Native call path: SkCanvas::drawMesh -> SkCanvas::onDrawMesh -> SkDevice::drawMesh
+@ForceNativeThreadState
+private external fun _nDrawMesh(ptr: NativePointer, meshPtr: NativePointer, blenderPtr: NativePointer, paintPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawMeshBlendMode")
+// Needs ForceNativeThreadState: draws a mesh on a canvas that can be GPU-backed, which can call Metal.
+// Native call path: SkCanvas::drawMesh -> SkCanvas::onDrawMesh -> SkDevice::drawMesh
+@ForceNativeThreadState
+private external fun _nDrawMeshBlendMode(ptr: NativePointer, meshPtr: NativePointer, blendMode: Int, paintPtr: NativePointer)
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDrawable")

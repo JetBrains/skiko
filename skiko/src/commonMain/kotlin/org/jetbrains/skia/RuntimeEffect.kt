@@ -5,8 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     /**
-     * A value that can be bound to a `uniform shader`, `uniform colorFilter` or `uniform blender`
-     * declaration in an SkSL program.
+     * A value that allows passing a [Shader], [ColorFilter] or [Blender] as a child.
      *
      * @see Mesh.make
      */
