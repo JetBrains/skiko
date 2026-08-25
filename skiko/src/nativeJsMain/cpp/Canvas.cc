@@ -1,5 +1,7 @@
 #include <iostream>
+#include "SkBlender.h"
 #include "SkCanvas.h"
+#include "SkMesh.h"
 #include "SkRRect.h"
 #include "SkTextBlob.h"
 #include "SkVertices.h"
@@ -189,6 +191,23 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPatch
         static_cast<SkBlendMode>(blendMode),
         *paint
     );
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawMesh
+  (KNativePointer ptr, KNativePointer meshPtr, KNativePointer blenderPtr, KNativePointer paintPtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((ptr));
+    SkMesh* mesh = reinterpret_cast<SkMesh*>((meshPtr));
+    SkBlender* blender = reinterpret_cast<SkBlender*>((blenderPtr));
+    SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
+    canvas->drawMesh(*mesh, sk_ref_sp(blender), *paint);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawMeshBlendMode
+  (KNativePointer ptr, KNativePointer meshPtr, KInt blendMode, KNativePointer paintPtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((ptr));
+    SkMesh* mesh = reinterpret_cast<SkMesh*>((meshPtr));
+    SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
+    canvas->drawMesh(*mesh, SkBlender::Mode(static_cast<SkBlendMode>(blendMode)), *paint);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawDrawable
