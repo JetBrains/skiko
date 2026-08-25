@@ -73,11 +73,6 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
     }
 
-    fun emscriptenToolPath(toolName: String) =
-        setupEmscripten.flatMap { it.emsdkDir.dir("upstream/emscripten") }.map {
-            it.file(toolName).asFile.absolutePath
-        }
-
     fun emscriptenBinaryToolPath(toolName: String) =
         setupEmscripten.flatMap { it.emsdkDir.dir("upstream/bin") }.map {
             it.file(toolName).asFile.absolutePath
@@ -87,7 +82,7 @@ fun SkikoProjectContext.declareWasmTasks() {
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
         dependsOn(setupEmscripten)
         dependsOn(skiaWasmDir)
-        compiler.set(emscriptenToolPath(compilerForTarget(project, OS.Wasm, Arch.Wasm)))
+        compiler.set(compilerForTarget(project, OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -135,7 +130,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
         val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
-        linker.set(emscriptenToolPath(linkerForTarget(project, OS.Wasm, Arch.Wasm)))
+        linker.set(linkerForTarget(project, OS.Wasm, Arch.Wasm))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -162,7 +157,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
 
         flags.addAll(buildList {
-            add("-Oz")
+            add("-O2")
             add("-fuse-ld=lld")
             add("-flto")
             if (isSideModule) {
@@ -174,7 +169,6 @@ fun SkikoProjectContext.declareWasmTasks() {
             } else {
                 add("-Wl,--gc-sections")
                 add("-Wl,--no-entry")
-                add("-Wl,--strip-all")
             }
             add("-Wl,--allow-undefined")
             add("-mllvm")
