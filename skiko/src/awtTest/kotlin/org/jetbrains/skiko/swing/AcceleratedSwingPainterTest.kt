@@ -8,11 +8,9 @@ import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.MainUIDispatcher
-import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkikoRenderDelegate
 import org.jetbrains.skiko.toImage
 import org.jetbrains.skiko.util.ScreenshotTestRule
-import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import java.awt.Color
@@ -23,6 +21,7 @@ import java.awt.image.BufferedImage
 import javax.swing.JFrame
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.time.Duration.Companion.seconds
 
 class AcceleratedSwingPainterTest {
     @get:Rule
@@ -87,7 +86,7 @@ class AcceleratedSwingPainterTest {
                 val layer = SkiaSwingLayer(FakeRenderer(window, 100, 100, Color.RED))
                 window.contentPane.add(layer)
                 window.setSize(100, 100)
-                delay(1000)
+                delay(1.seconds)
 
                 val image = BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
                 val g2d = image.createGraphics()
@@ -109,7 +108,7 @@ class AcceleratedSwingPainterTest {
                 window.setSize(100, 100)
                 window.isUndecorated = true
                 window.isVisible = true
-                delay(1000)
+                delay(1.seconds)
 
                 val image = BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
                 val g2d = image.createGraphics()

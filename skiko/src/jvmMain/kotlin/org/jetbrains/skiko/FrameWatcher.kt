@@ -2,6 +2,9 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * This class is intended to mitigate issues coming from the situation that we have
@@ -12,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * making sure that we'll have memory consumption under control.
  */
 internal object FrameWatcher {
-    var gcDelayMillis = 30_000L
+    var gcDelay: Duration = 30.seconds
     var minFramesToRenderer = 1_000
 
     fun start() {
@@ -22,7 +25,7 @@ internal object FrameWatcher {
         GlobalScope.launch(Dispatchers.IO) {
             while (true) {
                 // Wait some time between collection attempts.
-                delay(gcDelayMillis)
+                delay(gcDelay)
                 // Ensure that certain number of frames were rendered, as we allocate Skia
                 // garbage when rendering.
                 if (frameCounter.get() > minFramesToRenderer) {
