@@ -5,9 +5,64 @@ import java.util.*
 // TODO maybe we can get rid of global properties, and pass SkiaLayerProperties to Window -> ComposeWindow -> SkiaLayer
 @Suppress("SameParameterValue")
 /**
- * Global Skiko properties, which are read from system JDK variables orr from environment variables
+ * Global Skiko properties, which are read from system JDK properties or environment variables.
  */
 object SkikoProperties {
+
+    private val properties = run {
+        val resourcePropertiesEnabled = System.getProperty("skiko.resource.properties.enabled")?.toBoolean() ?: false
+        val resources = if (resourcePropertiesEnabled) {
+            SkikoProperties::class.java.classLoader.getResourceAsStream("skiko.properties")
+        } else {
+            null
+        }
+        val systemProps = System.getProperties()
+        if (resources == null) systemProps else Properties(systemProps).apply { load(resources) }
+    }
+
+    private fun getProperty(key: String): String? = properties.getProperty(key)
+
+    private inline fun <T> lazyProperty(crossinline loader: () -> T): Lazy<T> {
+        // Use NONE to avoid unnecessary synchronization overhead.
+        // It is an error to change the properties after they are first accessed anyway, so synchronization
+        // is not crucial.
+        // In fact, because we are currently grabbing all the properties at object initialization, they can't be
+        // changed.
+        return lazy(LazyThreadSafetyMode.NONE) {
+            loader()
+        }
+    }
+
+    private inline fun <T> lazyProperty(name: String, crossinline parse: (String?) -> T): Lazy<T> {
+        return lazyProperty {
+            parse(getProperty(name))
+        }
+    }
+
+    private inline fun lazyStringProperty(name: String, crossinline defaultValue: () -> String): Lazy<String> {
+        return lazyProperty(name) {
+            it ?: defaultValue()
+        }
+    }
+
+    private fun lazyBooleanProperty(name: String, defaultValue: Boolean): Lazy<Boolean> {
+        return lazyProperty(name) {
+            it?.toBoolean() ?: defaultValue
+        }
+    }
+
+    private fun lazyIntProperty(name: String, defaultValue: Int): Lazy<Int> {
+        return lazyProperty(name) {
+            it?.toInt() ?: defaultValue
+        }
+    }
+
+    private fun lazyDoubleProperty(name: String, defaultValue: Double): Lazy<Double> {
+        return lazyProperty(name) {
+            it?.toDouble() ?: defaultValue
+        }
+    }
+
     /**
      * Path where the Skiko binaries (dll/so/dylib, depending on OS) are placed.
      *
@@ -30,34 +85,34 @@ object SkikoProperties {
      *
      * It is used for extracting the Skiko binaries (if `libraryPath` isn't null) and logging.
      */
-    val dataPath: String get() = getProperty("skiko.data.path") ?: "${getProperty("user.home")}/.skiko/"
+    val dataPath: String
+        by lazyStringProperty("skiko.data.path", defaultValue = { "${getProperty("user.home")}/.skiko/" })
 
     /**
      * Purge data inside the [dataPath] if it is not used/older than this 'days'
      */
-    val dataCleanupDays: Int get() = getProperty("skiko.data.cleanup.days")?.toInt() ?: 31
+    val dataCleanupDays: Int
+        by lazyIntProperty("skiko.data.cleanup.days", defaultValue = 31)
 
-    val vsyncEnabled: Boolean get() = getProperty("skiko.vsync.enabled")?.toBoolean() ?: true
+    val vsyncEnabled: Boolean
+        by lazyBooleanProperty("skiko.vsync.enabled", defaultValue = true)
 
-    val frameBuffering: FrameBuffering get() {
-        return when (getProperty("skiko.buffering")) {
+    val frameBuffering: FrameBuffering by lazyProperty("skiko.buffering") {
+        when (it) {
             "DOUBLE" -> FrameBuffering.DOUBLE
             "TRIPLE" -> FrameBuffering.TRIPLE
             else -> FrameBuffering.DEFAULT
         }
     }
 
-    val macOSWaitForPreviousFrameVsyncOnRedrawImmediately: Boolean get() {
-        return getProperty("skiko.rendering.macos.waitForPreviousFrameVsyncOnRedrawImmediately")?.toBoolean() ?: true
-    }
+    val macOSWaitForPreviousFrameVsyncOnRedrawImmediately: Boolean
+        by lazyBooleanProperty("skiko.rendering.macos.waitForPreviousFrameVsyncOnRedrawImmediately", defaultValue = true)
 
-    val windowsWaitForVsyncOnRedrawImmediately: Boolean get() {
-        return getProperty("skiko.rendering.windows.waitForFrameVsyncOnRedrawImmediately")?.toBoolean() ?: false
-    }
+    val windowsWaitForVsyncOnRedrawImmediately: Boolean
+        by lazyBooleanProperty("skiko.rendering.windows.waitForFrameVsyncOnRedrawImmediately", defaultValue = false)
 
-    val linuxWaitForVsyncOnRedrawImmediately: Boolean get() {
-        return getProperty("skiko.rendering.linux.waitForFrameVsyncOnRedrawImmediately")?.toBoolean() ?: false
-    }
+    val linuxWaitForVsyncOnRedrawImmediately: Boolean
+        by lazyBooleanProperty("skiko.rendering.linux.waitForFrameVsyncOnRedrawImmediately", defaultValue = false)
 
     /**
      * Metal on macOS: during an interactive live resize (dragging a window edge), render and present
@@ -67,9 +122,8 @@ object SkikoProperties {
      * When disabled, resize falls back to the previous behavior: geometry is updated from the EDT, and frames are
      * presented asynchronously off the resize transaction.
      */
-    val metalSynchronousLiveResize: Boolean get() {
-        return getProperty("skiko.rendering.macos.metalSynchronousLiveResize")?.toBoolean() ?: false
-    }
+    val metalSynchronousLiveResize: Boolean
+        by lazyBooleanProperty("skiko.rendering.macos.metalSynchronousLiveResize", defaultValue = false)
 
     /**
      * Direct3D on Windows: during an interactive live resize (dragging a window edge), render and present
@@ -79,9 +133,8 @@ object SkikoProperties {
      * When disabled, resize falls back to the previous behavior: geometry is updated from the EDT
      * and frames are presented asynchronously off the resize.
      */
-    val direct3DSynchronousLiveResize: Boolean get() {
-        return getProperty("skiko.rendering.windows.direct3DSynchronousLiveResize")?.toBoolean() ?: false
-    }
+    val direct3DSynchronousLiveResize: Boolean
+        by lazyBooleanProperty("skiko.rendering.windows.direct3DSynchronousLiveResize", defaultValue = false)
 
     /**
      * Is experimental ANGLE renderer API enabled (https://skia.org/docs/user/special/angle/).
@@ -95,44 +148,53 @@ object SkikoProperties {
      * - The `skiko.library.path` property is defined and the directory has libEGL, libGLESv2 from
      *   https://github.com/JetBrains/angle-pack/releases
      */
-    val renderingAngleEnabled: Boolean get() = getProperty("skiko.rendering.angle.enabled")?.toBoolean() ?: false
+    val renderingAngleEnabled: Boolean
+        by lazyBooleanProperty("skiko.rendering.angle.enabled", defaultValue = false)
 
     /**
      * If vsync is enabled, but platform can't support it (Software renderer, Linux with uninstalled drivers),
      * we enable frame limit by the display refresh rate.
      */
-    val vsyncFramelimitFallbackEnabled: Boolean get() = getProperty(
-        "skiko.vsync.framelimit.fallback.enabled"
-    )?.toBoolean() ?: true
+    val vsyncFramelimitFallbackEnabled: Boolean
+        by lazyBooleanProperty("skiko.vsync.framelimit.fallback.enabled", defaultValue = true)
 
-    val fpsEnabled: Boolean get() = getProperty("skiko.fps.enabled")?.toBoolean() ?: false
-    val fpsPeriodSeconds: Double get() = getProperty("skiko.fps.periodSeconds")?.toDouble() ?: 2.0
+    val fpsEnabled: Boolean
+        by lazyBooleanProperty("skiko.fps.enabled", defaultValue = false)
+
+    val fpsPeriodSeconds: Double
+        by lazyDoubleProperty("skiko.fps.periodSeconds", defaultValue = 2.0)
 
     /**
-     * Show long frames which is longer than [fpsLongFramesMillis].
+     * Show frames that are longer than [fpsLongFramesMillis].
      * If [fpsLongFramesMillis] isn't defined will show frames longer than 1.5 * (1000 / displayRefreshRate)
      */
-    val fpsLongFramesShow: Boolean get() = getProperty("skiko.fps.longFrames.show")?.toBoolean() ?: false
+    val fpsLongFramesShow: Boolean
+        by lazyBooleanProperty("skiko.fps.longFrames.show", defaultValue = false)
 
-    val fpsLongFramesMillis: Double? get() = getProperty("skiko.fps.longFrames.millis")?.toDouble()
+    val fpsLongFramesMillis: Double?
+        by lazyProperty("skiko.fps.longFrames.millis", parse = { it?.toDouble() })
 
-    val renderApi: GraphicsApi get() {
+    val renderApi: GraphicsApi by lazyProperty {
         val environment = System.getenv("SKIKO_RENDER_API")
         val property = getProperty("skiko.renderApi")
-        return parseRenderApi(environment ?: property)
+        parseRenderApi(environment ?: property)
     }
 
-    val gpuPriority: GpuPriority get() {
+    val gpuPriority: GpuPriority by lazyProperty {
         val value = getProperty("skiko.gpu.priority") ?:
             getProperty("skiko.metal.gpu.priority") ?: // for backward compatability
             getProperty("skiko.directx.gpu.priority")  // for backward compatability
 
-        return value?.let(GpuPriority::parseOrNull) ?: GpuPriority.Auto
+        value?.let(GpuPriority::parseOrNull) ?: GpuPriority.Auto
     }
 
-    val macOsOpenGLEnabled: Boolean get() = getProperty("skiko.macos.opengl.enabled")?.toBoolean() ?: false
+    val macOsOpenGLEnabled: Boolean
+        by lazyBooleanProperty("skiko.macos.opengl.enabled", defaultValue = false)
 
-    val gpuResourceCacheLimit: Long get() = parseSize(getProperty("skiko.gpu.resourceCacheLimit"))
+    val gpuResourceCacheLimit: Long by lazyProperty(
+        name = "skiko.gpu.resourceCacheLimit",
+        parse = ::parseSize
+    )
 
     private fun parseSize(size: String?): Long {
         if (size == null) return -1L
@@ -147,19 +209,6 @@ object SkikoProperties {
         return numericPart.toLongOrNull()?.times(multiplier)
             ?: throw IllegalArgumentException("Invalid size format: $size")
     }
-
-    private val properties = run {
-        val resourcePropertiesEnabled = System.getProperty("skiko.resource.properties.enabled")?.toBoolean() ?: false
-        val resources = if (resourcePropertiesEnabled) {
-            SkikoProperties::class.java.classLoader.getResourceAsStream("skiko.properties")
-        } else {
-            null
-        }
-        val systemProps = System.getProperties()
-        if (resources == null) systemProps else Properties(systemProps).apply { load(resources) }
-    }
-
-    private fun getProperty(key: String): String? = properties.getProperty(key)
 
     internal fun parseRenderApi(text: String?): GraphicsApi {
         when (text) {
