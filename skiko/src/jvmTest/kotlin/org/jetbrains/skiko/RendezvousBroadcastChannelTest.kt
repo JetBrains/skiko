@@ -5,6 +5,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class RendezvousBroadcastChannelTest {
     @Test(timeout = 5000)
@@ -96,10 +98,10 @@ class RendezvousBroadcastChannelTest {
         val channel = RendezvousBroadcastChannel<Int>()
         runBlocking {
             try {
-                withTimeout(1000) {
+                withTimeout(1.seconds) {
                     channel.sendAll(1)
                 }
-            } catch (e: TimeoutCancellationException) {
+            } catch (_: TimeoutCancellationException) {
                 isExceptionThrown = true
             }
         }
@@ -115,10 +117,10 @@ class RendezvousBroadcastChannelTest {
             launch {
                 channel.sendAll(1)
                 try {
-                    withTimeout(1000) {
+                    withTimeout(1.seconds) {
                         channel.sendAll(1)
                     }
-                } catch (e: TimeoutCancellationException) {
+                } catch (_: TimeoutCancellationException) {
                     isExceptionThrown = true
                 }
             }
@@ -137,10 +139,10 @@ class RendezvousBroadcastChannelTest {
         val channel = RendezvousBroadcastChannel<Int>()
         runBlocking {
             try {
-                withTimeout(1000) {
+                withTimeout(1.seconds) {
                     channel.receive()
                 }
-            } catch (e: TimeoutCancellationException) {
+            } catch (_: TimeoutCancellationException) {
                 isExceptionThrown = true
             }
         }
@@ -156,10 +158,10 @@ class RendezvousBroadcastChannelTest {
             launch {
                 channel.receive()
                 try {
-                    withTimeout(1000) {
+                    withTimeout(1.seconds) {
                         channel.receive()
                     }
-                } catch (e: TimeoutCancellationException) {
+                } catch (_: TimeoutCancellationException) {
                     isExceptionThrown = true
                 }
             }
@@ -184,7 +186,7 @@ class RendezvousBroadcastChannelTest {
         val produceJob = launch {
             for (i in 0 until 1000) {
                 channel.sendAll(i)
-                delay(10)
+                delay(10.milliseconds)
             }
         }
 
@@ -193,19 +195,19 @@ class RendezvousBroadcastChannelTest {
         launch {
             repeat(1000) {
                 frames1.add(channel.receive())
-                delay(random.nextLong(10L))
+                delay(random.nextLong(10L).milliseconds)
             }
         }
         launch {
             repeat(1000) {
                 frames2.add(channel.receive())
-                delay(random.nextLong(10L))
+                delay(random.nextLong(10L).milliseconds)
             }
         }
         launch {
             repeat(1000) {
                 frames3.add(channel.receive())
-                delay(random.nextLong(10L))
+                delay(random.nextLong(10L).milliseconds)
             }
         }
 

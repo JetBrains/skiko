@@ -13,7 +13,9 @@ import org.junit.Test
 import java.awt.Point
 import javax.swing.WindowConstants
 import kotlin.math.*
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
 class SkiaLayerPerformanceTest {
@@ -133,7 +135,7 @@ class SkiaLayerPerformanceTest {
 
     private suspend fun awaitFrameCollection(windows: List<PerformanceHelper>) {
         while (!windows.all(PerformanceHelper::isCollected)) {
-            delay(100)
+            delay(100.milliseconds)
         }
     }
 
@@ -200,7 +202,7 @@ class SkiaLayerPerformanceTest {
                 window.location = Point((index + 1) * 200, 200)
             }
         }
-        delay(1000)
+        delay(1.seconds)
         try {
             helpers.forEach { it.startCollect() }
             awaitFrameCollection(helpers)
@@ -225,7 +227,7 @@ class SkiaLayerPerformanceTest {
                 window.location = Point(index * 300, 200)
             }
         }
-        delay(1000)
+        delay(1.seconds)
         try {
             helpers.forEach { it.startCollect() }
             awaitFrameCollection(helpers)
