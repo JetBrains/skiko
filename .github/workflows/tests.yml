@@ -391,7 +391,7 @@ jobs:
             -Pskiko.wasm.enabled=true \
             -Pskiko.js.enabled=true \
             -Pskiko.test.onci=true \
-            -Pwasi.sdk= {{ steps.install_wasi-sdk.outputs.wasi-sdk-path }}\
+            -Pwasi.sdk={{ steps.install_wasi-sdk.outputs.wasi-sdk-path }}\
             wasmJsTest
 
       - shell: bash

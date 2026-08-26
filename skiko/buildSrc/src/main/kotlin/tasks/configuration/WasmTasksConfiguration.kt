@@ -2,6 +2,7 @@ package tasks.configuration
 
 import Arch
 import CompileSkikoCppTask
+import CopyEmscriptenWebGLLibsTask
 import SetupEmscriptenTask
 import IMPORT_GENERATOR
 import LinkSkikoWasmTask
@@ -11,6 +12,7 @@ import SkikoModuleKind
 import SkikoProjectContext
 import compilerForTarget
 import dsl.TargetEnv
+import hostOs
 import linkerForTarget
 import org.gradle.api.GradleException
 import org.gradle.api.artifacts.Configuration
@@ -19,17 +21,15 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
-import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import projectDirs
@@ -41,6 +41,11 @@ import java.io.File
 
 private val Project.setupMjs
     get() = wasmImport("setup.mjs")
+
+// import-generator inlines local JS imports relative to the prefix file,
+// so the prefix and generated Emscripten WebGL files must share this directory.
+private val Project.generatedPreSetupMjs
+    get() = layout.buildDirectory.file("generated/emscriptenWebGLLibs/webMain/pre-setup.mjs").get().asFile
 
 private fun Project.sideModuleSetupMjs(libBaseName: String) =
     wasmImport("$libBaseName.mjs")
@@ -77,6 +82,28 @@ fun SkikoProjectContext.declareWasmTasks() {
         setupEmscripten.flatMap { it.emsdkDir.dir("upstream/bin") }.map {
             it.file(toolName).asFile.absolutePath
         }
+
+    val copyEmscriptenWebGLLibs = if (!isSideModule) {
+        project.tasks.register<CopyEmscriptenWebGLLibsTask>("copyEmscriptenWebGLLibs") {
+            dependsOn(setupEmscripten)
+            nodeExecutable.set(project.layout.file(setupEmscripten.map { it.nodeExecutableFile() }))
+            preprocessor.set(setupEmscripten.flatMap { it.emsdkDir.file("upstream/emscripten/tools/preprocessor.mjs") })
+            emscriptenLibDir.set(setupEmscripten.flatMap { it.emsdkDir.dir("upstream/emscripten/src/lib") })
+            outputDir.set(project.layout.buildDirectory.dir("generated/emscriptenWebGLLibs/webMain"))
+            libFiles.set(listOf("libwebgl.js", "libwebgl2.js"))
+            prefixFile.set(project.layout.projectDirectory.file("src/webMain/resources/pre-setup.mjs"))
+            localImportFiles.from(project.layout.projectDirectory.file("src/webMain/resources/emscripten-compat.js"))
+        }.also { task ->
+            project.tasks.matching {
+                it.name in listOf("compileKotlinJs", "compileKotlinWasmJs")
+            }.configureEach {
+                // The compiler plugin reads generatedPreSetupMjs while producing setup.mjs.
+                dependsOn(task)
+            }
+        }
+    } else {
+        null
+    }
 
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
@@ -124,6 +151,7 @@ fun SkikoProjectContext.declareWasmTasks() {
     }
 
     fun LinkSkikoWasmTask.configureCommon(prefixPath: String) {
+        copyEmscriptenWebGLLibs?.let { dependsOn(it) }
         dependsOn(setupEmscripten)
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
@@ -314,6 +342,20 @@ private fun Project.resolveEmsdkDir(path: String): File =
         if (it.isAbsolute) it else rootProject.file(path)
     }
 
+private fun SetupEmscriptenTask.nodeExecutableFile(): File {
+    val executableName = if (hostOs.isWindows) "node.exe" else "node"
+    val nodeRoot = emsdkDir.get().asFile.resolve("node")
+    val candidates = nodeRoot
+        .takeIf { it.isDirectory }
+        ?.walkTopDown()
+        ?.filter { it.isFile && it.name == executableName }
+        ?.toList()
+        .orEmpty()
+
+    return candidates.firstOrNull { it.parentFile.name == "bin" } ?: candidates.firstOrNull()
+        ?: throw GradleException("Could not find Emscripten node executable under ${nodeRoot.absolutePath}")
+}
+
 fun SkikoProjectContext.provideWasmSideModules() {
     provideWasmSideModule(mainLinkTaskName = "linkWasm")
     provideWasmSideModule(mainLinkTaskName = "linkWasmD8WithES6")
@@ -467,7 +509,7 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
 class WasmImportsGeneratorCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
     KotlinCompilation.MAIN_COMPILATION_NAME,
     { it.setupMjs },
-    { it.projectDir.resolve("src/webMain/resources/pre-setup.mjs") },
+    { it.generatedPreSetupMjs },
     { it.setupReexportMjs(it.name) },
     { it.name }
 )

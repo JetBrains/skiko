@@ -48,6 +48,10 @@ jobs:
           java-version: '21'
           distribution: 'corretto'
 
+      - name: 'Install wasi-sdk'
+        id: install_wasi-sdk
+        uses: bytecodealliance/setup-wasi-sdk-action@v1
+
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Maven Local'
         with:
@@ -56,6 +60,7 @@ jobs:
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.wasm.enabled=true \
               -Pskiko.emsdk.dir="\$EMSDK_DIR" \
+              -Pwasi.sdk={{ steps.install_wasi-sdk.outputs.wasi-sdk-path }}\
               publishToMavenLocal
 
       - uses: actions/setup-node@v4
