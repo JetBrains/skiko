@@ -8,20 +8,23 @@ import org.jetbrains.skiko.MainUIDispatcher
  * The OpenGL backends draw every on-screen window from one cross-window batch per family, waiting
  * for vsync once per tick instead of once per window: per-window vsync waits would serialize, so
  * N windows would run at 1/N of the refresh rate. A window enters the batch each time its
- * [FrameDriver] schedules a frame and leaves it when the tick completes; disposed and hidden
- * windows are skipped at draw time.
+ * [forWindow] scheduler schedules a frame and leaves it when the tick completes; disposed and
+ * hidden windows are skipped at draw time.
  */
 internal abstract class GLFrameBatch<R : AbstractOpenGLRenderer> {
-    private val toRedraw = mutableSetOf<Pair<FrameDriver, R>>()
-    private val toRedrawCopy = mutableSetOf<Pair<FrameDriver, R>>()
-    protected val toRedrawVisible: Sequence<Pair<FrameDriver, R>> = toRedrawCopy
+    private val toRedraw = mutableSetOf<Pair<FrameProducer, R>>()
+    private val toRedrawCopy = mutableSetOf<Pair<FrameProducer, R>>()
+    protected val toRedrawVisible: Sequence<Pair<FrameProducer, R>> = toRedrawCopy
         .asSequence()
         .filterNot { (_, renderer) -> renderer.isDisposed }
         .filter { (_, renderer) -> renderer.layer.isShowing }
 
-    fun scheduleFrame(driver: FrameDriver, renderer: R) {
-        toRedraw.add(driver to renderer)
-        frameDispatcher.scheduleFrame()
+    /** One window's [FrameScheduler], scheduling into this family batch. */
+    fun forWindow(producer: FrameProducer, renderer: R): FrameScheduler = object : FrameScheduler {
+        override fun scheduleFrame(throttledToVsync: Boolean) {
+            toRedraw.add(producer to renderer)
+            frameDispatcher.scheduleFrame()
+        }
     }
 
     /** Runs before the tick records anything; the place to wait out a frame limit. */
@@ -29,8 +32,8 @@ internal abstract class GLFrameBatch<R : AbstractOpenGLRenderer> {
 
     /** Records and draws every window of [toRedrawVisible]; each frame binds its own GL context. */
     protected fun drawAll() {
-        for ((driver, renderer) in toRedrawVisible) {
-            driver.inFrame { scope -> renderer.drawFrame(scope) }
+        for ((producer, renderer) in toRedrawVisible) {
+            producer.inFrame { scope -> renderer.drawFrame(scope) }
         }
     }
 
@@ -44,9 +47,9 @@ internal abstract class GLFrameBatch<R : AbstractOpenGLRenderer> {
         awaitFrameLimit()
 
         val nanoTime = System.nanoTime()
-        for ((driver, _) in toRedrawVisible) {
+        for ((producer, _) in toRedrawVisible) {
             try {
-                driver.updateIfRequested(nanoTime)
+                producer.updateIfRequested(nanoTime)
             } catch (e: CancellationException) {
                 // continue
             }

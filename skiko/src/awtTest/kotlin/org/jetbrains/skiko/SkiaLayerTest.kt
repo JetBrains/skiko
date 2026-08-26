@@ -14,6 +14,8 @@ import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.renderer.AwtRenderer
 import org.jetbrains.skiko.renderer.MetalVSyncer
 import org.jetbrains.skiko.renderer.FrameDriver
+import org.jetbrains.skiko.renderer.FrameProducer
+import org.jetbrains.skiko.renderer.SingleFrameScheduler
 import org.jetbrains.skiko.swing.SkiaSwingLayer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -708,7 +710,8 @@ class SkiaLayerTest {
             return if (renderApi == GraphicsApi.SOFTWARE_COMPAT) {
                 RenderFactory.Default.createFrameDriver(layer, renderApi, analytics, properties)
             } else {
-                FrameDriver(layer, nonSoftware(layer, renderApi, analytics, properties))
+                val producer = FrameProducer(layer, nonSoftware(layer, renderApi, analytics, properties))
+                FrameDriver(layer, producer, SingleFrameScheduler(producer))
             }
         }
     }

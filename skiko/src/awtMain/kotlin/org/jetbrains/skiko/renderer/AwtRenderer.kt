@@ -108,7 +108,7 @@ internal abstract class AwtRenderer(
     open suspend fun runFrame(frame: suspend () -> Unit) = frame()
 
     /**
-     * Whether [runFrame] blocks on vsync after the frame body. The driver then records the next
+     * Whether [runFrame] blocks on vsync after the frame body. The scheduler then records the next
      * frame's content early, while the previous frame is still waiting.
      */
     open val pacesAfterFrame: Boolean get() = false
