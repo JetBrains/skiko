@@ -515,7 +515,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-shared",
                 "-dead_strip",
                 "-install_name", "./${libOutputFileName.get()}",
-                "-current_version", skiko.planeDeployVersion,
+                "-current_version", skiko.baseDeployVersion,
                 *resolvedBinaryInputs.linkFlags.toTypedArray(),
                 *resolvedBinaryInputs.frameworks.toTypedArray(),
                 *if (resolvedCoreLinkedLibraryDirs != null) arrayOf(
