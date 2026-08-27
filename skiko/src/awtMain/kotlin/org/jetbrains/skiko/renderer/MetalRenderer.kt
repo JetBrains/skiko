@@ -116,9 +116,9 @@ internal class MetalRenderer(
         _device = null
     }
 
-    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+    override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) {
         if (immediate) {
-            performFrame(scope)
+            performFrame()
             // Trying to draw immediately in Metal will result in lost (undrawn)
             // frames if there are more than two between consecutive vsync events.
             if (SkikoProperties.macOSWaitForPreviousFrameVsyncOnRedrawImmediately) {
@@ -129,7 +129,7 @@ internal class MetalRenderer(
             // It can be expensive to run it in the main thread, and FPS can become unstable.
             // This is visible by running [SkiaLayerPerformanceTest], standard deviation is increased significantly.
             withContext(dispatcherToBlockOn) {
-                performFrame(scope)
+                performFrame()
             }
             // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
             if (!isDisposed && isWindowOccluded) {
@@ -142,8 +142,8 @@ internal class MetalRenderer(
         }
     }
 
-    override fun renderBeforeShown(scope: LayerDrawScope) {
-        performFrame(scope, finishFrame = false)
+    override fun LayerDrawScope.renderBeforeShown() {
+        performFrame(finishFrame = false)
         performNativeDrawAction {
             finishFrameSync(device.ptr)
         }
@@ -161,8 +161,8 @@ internal class MetalRenderer(
         windowOcclusionStateChannel.trySend(isOccluded)
     }
 
-    private fun performFrame(scope: LayerDrawScope, finishFrame: Boolean = true) = performNativeDrawAction {
-        with(scope) { drawFrame() }
+    private fun LayerDrawScope.performFrame(finishFrame: Boolean = true) = performNativeDrawAction {
+        drawFrame()
         if (finishFrame) {
             finishFrameAsync(device.ptr)
         }
@@ -195,7 +195,7 @@ internal class MetalRenderer(
         try {
             invokeOnEventThreadAndWait {
                 if (isDisposed) return@invokeOnEventThreadAndWait
-                liveResizeListener?.onLiveResizeFrame(width, height, isResizeFrame = true)
+                liveResizeListener?.onLiveResizeFrame(width, height)
             }
         } catch (e: Exception) {
             Logger.warn(e) { "Failed to record live-resize frame" }
@@ -210,12 +210,12 @@ internal class MetalRenderer(
         }
     }
 
-    override fun renderPlatformDrivenFrame(scope: LayerDrawScope, isResizeFrame: Boolean) {
+    override fun LayerDrawScope.renderPlatformDrivenFrame() {
         if (isDisposed) return // may be disposed in user code, during `update`
         // The present must run on the AppKit main thread to join the resize transaction, so
         // only record here; `finishFrameSync` presents on the AppKit main thread once the
         // recording hop returns
-        performFrame(scope, finishFrame = false)
+        performFrame(finishFrame = false)
     }
 
     /**

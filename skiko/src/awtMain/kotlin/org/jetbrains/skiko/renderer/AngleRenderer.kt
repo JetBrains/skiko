@@ -65,17 +65,17 @@ internal class AngleRenderer(
         device = 0L
     }
 
-    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+    override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) {
         val withVsync = if (immediate) SkikoProperties.windowsWaitForVsyncOnRedrawImmediately else properties.isVsyncEnabled
-        drawAndSwap(scope, withVsync)
+        drawAndSwap(withVsync)
     }
 
-    private fun drawAndSwap(scope: LayerDrawScope, withVsync: Boolean) = synchronized(drawLock) {
+    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
         if (isDisposed) {
             return
         }
         makeCurrent(device)
-        with(scope) { drawFrame() }
+        drawFrame()
         swapBuffers(device, withVsync)
     }
 

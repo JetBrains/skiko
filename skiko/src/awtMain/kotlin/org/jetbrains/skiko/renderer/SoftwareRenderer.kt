@@ -61,13 +61,13 @@ internal class SoftwareRenderer(
     // TODO: Implement a special solution for the software renderer
     override val needsBeforeShownFrame: Boolean get() = false
 
-    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
-        performDraw(scope)
+    override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) {
+        performDraw()
     }
 
-    private fun performDraw(scope: LayerDrawScope) {
+    private fun LayerDrawScope.performDraw() {
         if (!isDisposed) {
-            with(scope) { drawFrame() }
+            drawFrame()
         }
     }
 

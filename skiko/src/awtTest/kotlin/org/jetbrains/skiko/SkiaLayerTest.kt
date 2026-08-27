@@ -662,7 +662,7 @@ class SkiaLayerTest {
     fun `fallback to software renderer, fail on draw`() = uiTest {
         testFallbackToSoftware { layer, renderApi, analytics, _ ->
             object : BaseTestRenderer(layer, analytics, renderApi) {
-                override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+                override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) {
                     throw RenderException()
                 }
             }
@@ -721,7 +721,7 @@ class SkiaLayerTest {
         val window = UiTestWindow(
             renderFactory = OverrideNonSoftwareRenderFactory { layer, renderApi, analytics, _ ->
                 object : BaseTestRenderer(layer, analytics, renderApi) {
-                    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+                    override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) {
                         throw RenderException()
                     }
                 }

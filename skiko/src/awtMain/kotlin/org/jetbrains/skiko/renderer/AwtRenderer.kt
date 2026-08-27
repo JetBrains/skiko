@@ -54,13 +54,13 @@ internal abstract class AwtRenderer(
     abstract val renderInfo: String
 
     /**
-     * Renders and presents exactly one frame at [scope]'s size. [immediate] selects the synchronous-redraw
-     * variant.
+     * Renders and presents exactly one frame at the receiving scope's size. [immediate] selects the
+     * synchronous variant.
      *
      * Throwing [org.jetbrains.skiko.RenderException] means the frame failed, and makes
      * [SkiaLayer.inDrawScope] fall back to the next render API.
      */
-    abstract suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean)
+    abstract suspend fun LayerDrawScope.renderFrame(immediate: Boolean)
 
     /**
      * Whether this backend presents a frame before the window is first shown, so the window
@@ -73,8 +73,8 @@ internal abstract class AwtRenderer(
      * Renders and presents the before-shown frame, synchronously on the EDT. The default presents
      * it through [renderFrame].
      */
-    open fun renderBeforeShown(scope: LayerDrawScope) {
-        runBlocking { renderFrame(scope, immediate = true) }
+    open fun LayerDrawScope.renderBeforeShown() {
+        runBlocking { renderFrame(immediate = true) }
     }
 
     /**
@@ -94,10 +94,9 @@ internal abstract class AwtRenderer(
 
     /**
      * Renders one frame the platform asked for during a live resize, at the size the driver has
-     * already recorded into [scope]. [isResizeFrame] is `false` for frames of the drag that do not
-     * change the size.
+     * already recorded into the receiving scope.
      */
-    open fun renderPlatformDrivenFrame(scope: LayerDrawScope, isResizeFrame: Boolean) {
+    open fun LayerDrawScope.renderPlatformDrivenFrame() {
         error("$this does not render platform-driven frames")
     }
 
@@ -155,7 +154,7 @@ internal interface LiveResizeListener {
     fun onLiveResizeStarted()
 
     /** Records and renders one frame at the given size, synchronously on the calling thread. */
-    fun onLiveResizeFrame(width: Int, height: Int, isResizeFrame: Boolean)
+    fun onLiveResizeFrame(width: Int, height: Int)
 
     fun onLiveResizeEnded()
 }

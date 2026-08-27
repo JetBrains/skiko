@@ -33,7 +33,7 @@ internal abstract class GLFrameBatch<R : AbstractOpenGLRenderer> {
     /** Records and draws every window of [toRedrawVisible]; each frame binds its own GL context. */
     protected fun drawAll() {
         for ((producer, renderer) in toRedrawVisible) {
-            producer.inFrame { scope -> renderer.drawFrame(scope) }
+            producer.inFrame { with(renderer) { drawFrame() } }
         }
     }
 

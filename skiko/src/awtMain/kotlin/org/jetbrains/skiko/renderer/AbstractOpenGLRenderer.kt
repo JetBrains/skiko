@@ -29,12 +29,12 @@ internal abstract class AbstractOpenGLRenderer(
     /** Binds this renderer's GL context on the calling thread. */
     internal abstract fun makeCurrent()
 
-    internal fun drawFrame(scope: LayerDrawScope) {
+    internal fun LayerDrawScope.drawFrame() {
         makeCurrent()
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")
         }
-        with(scope) { initSurface() }
+        initSurface()
         canvas?.runRestoringState {
             clear(Color.TRANSPARENT)
             layer.draw(this)

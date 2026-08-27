@@ -39,16 +39,16 @@ internal class FrameProducer(
         if (isDisposed) return
         withFrameAnalytics {
             layer.inDrawScope {
-                renderer.renderFrame(this, immediate)
+                with(renderer) { renderFrame(immediate) }
             }
         }
     }
 
     /** Runs [body] as one frame: inside the layer's draw scope, wrapped in the frame analytics. */
-    fun inFrame(forcedSize: Dimension? = null, body: (LayerDrawScope) -> Unit) {
+    fun inFrame(forcedSize: Dimension? = null, body: LayerDrawScope.() -> Unit) {
         if (isDisposed) return
         withFrameAnalytics {
-            layer.inDrawScope(forcedSize) { body(this) }
+            layer.inDrawScope(forcedSize) { body() }
         }
     }
 

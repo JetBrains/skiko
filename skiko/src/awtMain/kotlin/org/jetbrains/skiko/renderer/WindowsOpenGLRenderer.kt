@@ -48,8 +48,8 @@ internal class WindowsOpenGLRenderer(
         deleteContext(context)
     }
 
-    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
-        drawFrame(scope)
+    override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) {
+        drawFrame()
         swapBuffers()
         OpenGLApi.instance.glFinish()
         if (SkikoProperties.windowsWaitForVsyncOnRedrawImmediately) {

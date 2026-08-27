@@ -27,8 +27,8 @@ internal class LinuxSoftwareRenderer(
         super.releaseResources()
     }
 
-    override fun draw(scope: LayerDrawScope) = layer.backedLayer.lockLinuxDrawingSurface {
-        super.draw(scope)
+    override fun LayerDrawScope.draw() = layer.backedLayer.lockLinuxDrawingSurface {
+        performDraw()
     }
 
     override fun resize(width: Int, height: Int) = layer.backedLayer.lockLinuxDrawingSurface {

@@ -84,22 +84,22 @@ internal class Direct3DRenderer(
     // An async EDT present would race the synchronous render on the toolkit thread.
     override fun requestPlatformDrivenFrame() = postLiveResizeRender(liveResizeHandle)
 
-    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) {
+    override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) {
         if (immediate) {
-            drawAndSwap(scope, withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
+            drawAndSwap(withVsync = SkikoProperties.windowsWaitForVsyncOnRedrawImmediately)
         } else {
             withContext(dispatcherToBlockOn) {
-                drawAndSwap(scope, withVsync = properties.isVsyncEnabled)
+                drawAndSwap(withVsync = properties.isVsyncEnabled)
             }
         }
     }
 
-    private fun drawAndSwap(scope: LayerDrawScope, withVsync: Boolean, waitForComposition: Boolean = false) {
+    private fun LayerDrawScope.drawAndSwap(withVsync: Boolean, waitForComposition: Boolean = false) {
         synchronized(drawLock) {
             if (isDisposed) {
                 return
             }
-            with(scope) { drawFrame() }
+            drawFrame()
             if (waitForComposition) {
                 waitForComposition()
             }
@@ -266,14 +266,16 @@ internal class Direct3DRenderer(
     private fun drawFrameWhileLiveResizing(width: Int, height: Int, isResizeFrame: Boolean) {
         WinApiEdtInvoker.invokeAndWaitWhilePumping {
             if (isDisposed) return@invokeAndWaitWhilePumping
-            liveResizeListener?.onLiveResizeFrame(width, height, isResizeFrame)
+            this.isResizeFrame = isResizeFrame
+            liveResizeListener?.onLiveResizeFrame(width, height)
         }
     }
 
-    override fun renderPlatformDrivenFrame(scope: LayerDrawScope, isResizeFrame: Boolean) {
+    private var isResizeFrame = false
+
+    override fun LayerDrawScope.renderPlatformDrivenFrame() {
         if (isDisposed) return // may be disposed in user code, during `update`
         drawAndSwap(
-            scope,
             withVsync = !isResizeFrame,
             waitForComposition = isResizeFrame
         )

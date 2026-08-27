@@ -34,9 +34,9 @@ internal abstract class AbstractDirectSoftwareRenderer(
 
     protected var device = 0L
 
-    override suspend fun renderFrame(scope: LayerDrawScope, immediate: Boolean) = draw(scope)
+    override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) = draw()
 
-    protected open fun draw(scope: LayerDrawScope) = performDraw(scope)
+    protected open fun LayerDrawScope.draw() = performDraw()
 
     open fun resize(width: Int, height: Int) = resize(device, width, height)
     open fun finishFrame(surface: Long) = finishFrame(device, surface)
@@ -47,9 +47,9 @@ internal abstract class AbstractDirectSoftwareRenderer(
         disposeDevice(device)
     }
 
-    private fun performDraw(scope: LayerDrawScope) {
+    protected fun LayerDrawScope.performDraw() {
         if (!isDisposed) {
-            with(scope) { drawFrame() }
+            drawFrame()
         }
     }
 
