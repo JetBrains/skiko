@@ -11,14 +11,18 @@ static dbus_bool_t initDbusThreads(void* lib) {
     return false;
 }
 
-static void* loadLibDbus() {
-    static void* dlOpenResult = dlopen("libdbus-1.so", RTLD_LAZY | RTLD_LOCAL);
-    static bool initSuccess = dlOpenResult && initDbusThreads(dlOpenResult);
-    if (initSuccess) {
-        return dlOpenResult;
-    } else {
-        return nullptr;
+static void* initializeLibDbus() {
+    void* handle = dlopen("libdbus-1.so.3", RTLD_LAZY | RTLD_LOCAL);
+    if (!handle) {
+        handle = dlopen("libdbus-1.so", RTLD_LAZY | RTLD_LOCAL);
     }
+
+    return handle && initDbusThreads(handle) ? handle : nullptr;
+}
+
+static void* loadLibDbus() {
+    static void* const lib = initializeLibDbus();
+    return lib;
 }
 
 static DBusMessage* dbus_message_new_method_call_dynamic(const char *bus_name, const char *path, const char *iface, const char *method) {

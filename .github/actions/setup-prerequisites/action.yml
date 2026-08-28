@@ -1,6 +1,12 @@
 name: 'Setup Prerequisites'
 description: 'Shared steps to prepare build environment'
 
+inputs:
+  vulkan-sdk-version:
+    description: 'Vulkan SDK version to install on Windows'
+    required: false
+    default: '1.4.357.0'
+
 runs:
   using: "composite"
   steps:
@@ -18,6 +24,31 @@ runs:
       if: runner.os == 'macOS'
       shell: bash
       run: brew install llvm
+
+    - name: Cache Vulkan SDK installer
+      if: runner.os == 'Windows'
+      uses: actions/cache@v4
+      with:
+        path: ${{ runner.temp }}\VulkanSDK-${{ inputs.vulkan-sdk-version }}.exe
+        key: vulkan-sdk-installer-${{ runner.os }}-${{ runner.arch }}-${{ inputs.vulkan-sdk-version }}
+
+    - name: Install Vulkan SDK
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $installer = "$env:RUNNER_TEMP\VulkanSDK-${{ inputs.vulkan-sdk-version }}.exe"
+        if (-not (Test-Path $installer)) {
+          Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/${{ inputs.vulkan-sdk-version }}/windows/vulkan_sdk.exe?Human=true" -OutFile $installer
+        }
+        Start-Process -Wait -FilePath $installer -ArgumentList '--accept-licenses', '--default-answer', '--confirm-command', 'install', 'com.lunarg.vulkan.arm64'
+
+    - name: Configure Vulkan SDK
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $sdk = "C:\VulkanSDK\${{ inputs.vulkan-sdk-version }}"
+        "VULKAN_SDK=$sdk" >> $env:GITHUB_ENV
+        "$sdk\Bin" >> $env:GITHUB_PATH
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4

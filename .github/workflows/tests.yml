@@ -31,7 +31,6 @@ jobs:
         run: |
           ./gradlew -p skiko --no-daemon --stacktrace \
             -Pskiko.native.enabled=true \
-            -Pskiko.graphite.jvm.enabled=true \
             -Dskiko.test.onci=true \
             -Dskiko.test.performance.enabled=false \
             awtTest

@@ -225,8 +225,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         "src/jvmMain/cpp/common",
         "src/awtMain/cpp/common",
         "src/awtMain/cpp/${targetOs.id}",
-        "src/jvmTest/cpp"
-    )
+    ) + if (skiko.includeTestHelpers) projectDirs("src/jvmTest/cpp") else emptyList()
     sourceRoots.set(srcDirs)
     if (targetOs != OS.Android) includeHeadersNonRecursive(jdkHome.resolve("include"))
     val skiaDir = skiaJvmBindingsDir.get()
@@ -316,6 +315,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         listOf(
             *skiaPreprocessorFlags(targetOs, buildType),
             *osFlags,
+            *dependencyRegistry.getCompilerFlags(targetOs, targetArch, TargetEnv.JVM).toTypedArray(),
         )
     )
 }
@@ -515,7 +515,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-shared",
                 "-dead_strip",
                 "-install_name", "./${libOutputFileName.get()}",
-                "-current_version", skiko.planeDeployVersion,
+                "-current_version", skiko.baseDeployVersion,
                 *resolvedBinaryInputs.linkFlags.toTypedArray(),
                 *resolvedBinaryInputs.frameworks.toTypedArray(),
                 *if (resolvedCoreLinkedLibraryDirs != null) arrayOf(

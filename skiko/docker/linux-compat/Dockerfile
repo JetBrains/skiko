@@ -34,6 +34,8 @@ RUN yum install -y \
     libXfixes libXfixes-devel \
     libXdamage libXdamage-devel \
     libXtst libXtst-devel \
+    vulkan vulkan-devel \
+    mesa-vulkan-drivers \
     libglvnd libglvnd-devel \
     libglvnd-glx libglvnd-egl \
     dbus-devel dbus-libs && \
