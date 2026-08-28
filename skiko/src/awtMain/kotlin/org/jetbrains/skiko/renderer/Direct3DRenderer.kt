@@ -266,14 +266,11 @@ internal class Direct3DRenderer(
     private fun drawFrameWhileLiveResizing(width: Int, height: Int, isResizeFrame: Boolean) {
         WinApiEdtInvoker.invokeAndWaitWhilePumping {
             if (isDisposed) return@invokeAndWaitWhilePumping
-            this.isResizeFrame = isResizeFrame
-            liveResizeListener?.onLiveResizeFrame(width, height)
+            liveResizeListener?.onLiveResizeFrame(width, height, isResizeFrame)
         }
     }
 
-    private var isResizeFrame = false
-
-    override fun LayerDrawScope.renderPlatformDrivenFrame() {
+    override fun LayerDrawScope.renderPlatformDrivenFrame(isResizeFrame: Boolean) {
         if (isDisposed) return // may be disposed in user code, during `update`
         drawAndSwap(
             withVsync = !isResizeFrame,

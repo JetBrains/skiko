@@ -94,9 +94,10 @@ internal abstract class AwtRenderer(
 
     /**
      * Renders one frame the platform asked for during a live resize, at the size the driver has
-     * already recorded into the receiving scope.
+     * already recorded into the receiving scope. [isResizeFrame] is `false` for frames of the
+     * drag that do not change the size.
      */
-    open fun LayerDrawScope.renderPlatformDrivenFrame() {
+    open fun LayerDrawScope.renderPlatformDrivenFrame(isResizeFrame: Boolean) {
         error("$this does not render platform-driven frames")
     }
 
@@ -154,7 +155,7 @@ internal interface LiveResizeListener {
     fun onLiveResizeStarted()
 
     /** Records and renders one frame at the given size, synchronously on the calling thread. */
-    fun onLiveResizeFrame(width: Int, height: Int)
+    fun onLiveResizeFrame(width: Int, height: Int, isResizeFrame: Boolean)
 
     fun onLiveResizeEnded()
 }

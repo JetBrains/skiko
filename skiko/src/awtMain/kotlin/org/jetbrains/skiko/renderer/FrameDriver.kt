@@ -63,13 +63,13 @@ internal class FrameDriver(
         scheduler.pause()
     }
 
-    override fun onLiveResizeFrame(width: Int, height: Int) {
+    override fun onLiveResizeFrame(width: Int, height: Int, isResizeFrame: Boolean) {
         if (isDisposed) return
         val size = Dimension(width, height)
         layer.update(renderTime(), forcedSize = size)
         if (isDisposed) return // layer may be disposed in user code during `update`
         producer.inFrame(forcedSize = size) {
-            with(renderer) { renderPlatformDrivenFrame() }
+            with(renderer) { renderPlatformDrivenFrame(isResizeFrame) }
         }
     }
 

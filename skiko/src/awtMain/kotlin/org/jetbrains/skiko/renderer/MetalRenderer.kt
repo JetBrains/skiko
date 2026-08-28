@@ -188,14 +188,14 @@ internal class MetalRenderer(
      * Called from native code, on the AppKit main thread, to draw a frame during live resize.
      */
     @Suppress("unused")
-    fun drawFrameWhileLiveResizing(width: Int, height: Int) {
+    fun drawFrameWhileLiveResizing(width: Int, height: Int, isResizeFrame: Boolean) {
         if (isDisposed || width <= 0 || height <= 0) return
 
         // Record content at exactly the present size, on the EDT.
         try {
             invokeOnEventThreadAndWait {
                 if (isDisposed) return@invokeOnEventThreadAndWait
-                liveResizeListener?.onLiveResizeFrame(width, height)
+                liveResizeListener?.onLiveResizeFrame(width, height, isResizeFrame)
             }
         } catch (e: Exception) {
             Logger.warn(e) { "Failed to record live-resize frame" }
@@ -210,7 +210,8 @@ internal class MetalRenderer(
         }
     }
 
-    override fun LayerDrawScope.renderPlatformDrivenFrame() {
+    // isResizeFrame is unused: Metal presents resize and non-resize frames the same way.
+    override fun LayerDrawScope.renderPlatformDrivenFrame(isResizeFrame: Boolean) {
         if (isDisposed) return // may be disposed in user code, during `update`
         // The present must run on the AppKit main thread to join the resize transaction, so
         // only record here; `finishFrameSync` presents on the AppKit main thread once the

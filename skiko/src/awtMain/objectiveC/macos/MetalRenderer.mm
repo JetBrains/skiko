@@ -21,7 +21,7 @@
 #include "common/interop.hh"
 
 // Defined later in this file; forward-declared so AWTMetalLayer (below) can use it.
-static void javaDrawFrameWhileLiveResizing(jobject renderer, jint width, jint height);
+static void javaDrawFrameWhileLiveResizing(jobject renderer, jint width, jint height, jboolean isResizeFrame);
 
 @implementation AWTMetalLayer
 
@@ -61,9 +61,10 @@ static void javaDrawFrameWhileLiveResizing(jobject renderer, jint width, jint he
         return;
     }
 
+    jboolean isResizeFrame = !CGSizeEqualToSize(self.drawableSize, pixelSize);
     self.drawableSize = pixelSize;
 
-    javaDrawFrameWhileLiveResizing(self.javaRef, (jint)pixelSize.width, (jint)pixelSize.height);
+    javaDrawFrameWhileLiveResizing(self.javaRef, (jint)pixelSize.width, (jint)pixelSize.height, isResizeFrame);
 }
 
 @end
@@ -180,16 +181,16 @@ static void javaOnLiveResizeEnded(jobject renderer) {
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
-static void javaDrawFrameWhileLiveResizing(jobject renderer, jint width, jint height) {
+static void javaDrawFrameWhileLiveResizing(jobject renderer, jint width, jint height, jboolean isResizeFrame) {
     if (renderer == NULL) return;
     JNIEnv *env = resolveJNIEnvForCurrentThread();
     static jmethodID mid = NULL;
     if (mid == NULL) {
         jclass cls = env->GetObjectClass(renderer);
-        mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(II)V");
+        mid = env->GetMethodID(cls, "drawFrameWhileLiveResizing", "(IIZ)V");
         env->DeleteLocalRef(cls);
     }
-    if (mid) env->CallVoidMethod(renderer, mid, width, height);
+    if (mid) env->CallVoidMethod(renderer, mid, width, height, isResizeFrame);
     if (env->ExceptionCheck()) { env->ExceptionDescribe(); env->ExceptionClear(); }
 }
 
@@ -328,7 +329,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_scheduleF
         if (pixelWidth <= 0 || pixelHeight <= 0) {
             return;
         }
-        javaDrawFrameWhileLiveResizing(javaRef, (jint)pixelWidth, (jint)pixelHeight);
+        javaDrawFrameWhileLiveResizing(javaRef, (jint)pixelWidth, (jint)pixelHeight, /*isResizeFrame*/ false);
     });
 }
 
