@@ -29,7 +29,7 @@ internal class LinuxOpenGLRedrawer(
                 }
             }
             onDeviceChosen(adapterName)
-            it.setSwapInterval(swapInterval)
+            it.setSwapInterval(context, swapInterval)
         }
         onContextInit()
     }
@@ -84,12 +84,12 @@ internal class LinuxOpenGLRedrawer(
             with(scope) { drawFrame() }
             val turnOfVsync = properties.isVsyncEnabled && !SkikoProperties.linuxWaitForVsyncOnRedrawImmediately
             if (turnOfVsync) {
-                it.setSwapInterval(0)
+                it.setSwapInterval(context, 0)
             }
-            it.swapBuffers()
+            it.swapBuffers(context)
             OpenGLApi.instance.glFlush()
             if (turnOfVsync) {
-                it.setSwapInterval(swapInterval)
+                it.setSwapInterval(context, swapInterval)
             }
         }
     }
@@ -142,15 +142,15 @@ internal class LinuxOpenGLRedrawer(
 
                 for (redrawer in toRedrawVisible.filter { it != vsyncRedrawer }) {
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
-                    drawingSurfaces[redrawer]!!.setSwapInterval(0)
-                    drawingSurfaces[redrawer]!!.swapBuffers()
+                    drawingSurfaces[redrawer]!!.setSwapInterval(redrawer.context, 0)
+                    drawingSurfaces[redrawer]!!.swapBuffers(redrawer.context)
                     OpenGLApi.instance.glFlush()
                 }
 
                 if (vsyncRedrawer != null) {
                     drawingSurfaces[vsyncRedrawer]!!.makeCurrent(vsyncRedrawer.context)
-                    drawingSurfaces[vsyncRedrawer]!!.setSwapInterval(1)
-                    drawingSurfaces[vsyncRedrawer]!!.swapBuffers()
+                    drawingSurfaces[vsyncRedrawer]!!.setSwapInterval(vsyncRedrawer.context, 1)
+                    drawingSurfaces[vsyncRedrawer]!!.swapBuffers(vsyncRedrawer.context)
                     OpenGLApi.instance.glFlush()
                 }
             } finally {
@@ -163,14 +163,14 @@ internal class LinuxOpenGLRedrawer(
     }
 }
 
-private fun LinuxDrawingSurface.createContext(transparency: Boolean) = createContext(display, transparency)
-private fun LinuxDrawingSurface.destroyContext(context: Long) = destroyContext(display, context)
-private fun LinuxDrawingSurface.makeCurrent(context: Long) = makeCurrent(display, window, context)
-private fun LinuxDrawingSurface.swapBuffers() = swapBuffers(display, window)
-private fun LinuxDrawingSurface.setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
+private fun LinuxDrawingSurface.createContext(transparency: Boolean) = createContext(display, window, transparency)
+private fun LinuxDrawingSurface.destroyContext(context: Long) = org.jetbrains.skiko.redrawer.destroyContext(context)
+private fun LinuxDrawingSurface.makeCurrent(context: Long) = org.jetbrains.skiko.redrawer.makeCurrent(context)
+private fun LinuxDrawingSurface.swapBuffers(context: Long) = org.jetbrains.skiko.redrawer.swapBuffers(context)
+private fun LinuxDrawingSurface.setSwapInterval(context: Long, interval: Int) = org.jetbrains.skiko.redrawer.setSwapInterval(context, interval)
 
-private external fun makeCurrent(display: Long, window: Long, context: Long)
-private external fun createContext(display: Long, transparency: Boolean): Long
-private external fun destroyContext(display: Long, context: Long)
-private external fun setSwapInterval(display: Long, window: Long, interval: Int)
-private external fun swapBuffers(display: Long, window: Long)
+private external fun makeCurrent(context: Long)
+private external fun createContext(display: Long, window: Long, transparency: Boolean): Long
+private external fun destroyContext(context: Long)
+private external fun setSwapInterval(context: Long, interval: Int)
+private external fun swapBuffers(context: Long)
