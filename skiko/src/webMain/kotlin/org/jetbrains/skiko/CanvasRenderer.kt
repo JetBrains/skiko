@@ -2,8 +2,11 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skiko.wasm.ContextAttributes
+import org.jetbrains.skiko.wasm.EmscriptenWebGLContextAttributes
+import org.khronos.webgl.WebGLRenderingContextBase
 import org.w3c.dom.HTMLCanvasElement
+import kotlin.js.ExperimentalWasmJsInterop
+import kotlin.js.js
 
 /**
  * CanvasRenderer takes an [HTMLCanvasElement] instance and initializes
@@ -16,11 +19,17 @@ internal abstract class CanvasRenderer(
     private val contextPointer: NativePointer,
     width: Int,
     height: Int,
+    requestedSampleCount: Int = 1, // it must be the actual sampling from the current webgl context.
 ) {
     var width: Int = width
         private set
     var height: Int = height
         private set
+
+    // To remain compatible with the previous implementation, we coerce to 1.
+    // Although Skia does it in src/gpu/ganesh/gl/GrGLBackendSurface.cpp#L295 too:
+    // std::max(1, sampleCnt)
+    val requestedSampleCount: Int = requestedSampleCount.coerceAtLeast(1)
 
     var isDisposed: Boolean = false
         private set
@@ -62,7 +71,7 @@ internal abstract class CanvasRenderer(
         GL.makeContextCurrent(contextPointer)
         disposeCanvas()
 
-        renderTarget = BackendRenderTarget.makeGL(width, height, 1, 8, 0, 0x8058)
+        renderTarget = BackendRenderTarget.makeGL(width, height, requestedSampleCount, 8, 0, 0x8058)
         surface = Surface.makeFromBackendRenderTarget(
             context,
             renderTarget!!,
@@ -143,8 +152,12 @@ private fun windowRequestAnimationFrame(callback: (Double) -> Unit) : Int =
 
 
 internal external interface GLInterface {
-    fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer
+    fun createContext(context: HTMLCanvasElement, contextAttributes: EmscriptenWebGLContextAttributes): NativePointer
     fun makeContextCurrent(contextPointer: NativePointer): Boolean;
 }
 
 internal expect val GL: GLInterface
+
+@OptIn(ExperimentalWasmJsInterop::class)
+internal fun currentGLContext(gl: GLInterface): WebGLRenderingContextBase? =
+    js("gl.currentContext ? gl.currentContext.GLctx : null")
