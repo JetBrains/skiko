@@ -263,6 +263,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         /// transaction that never commits.
         if (liveResizeEnabled) {
             __weak MetalDevice *weakDevice = device;
+            const NSUInteger idleDrawableCount = layer.maximumDrawableCount;
             device.liveResizeStartObserver =
                 [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowWillStartLiveResizeNotification
                                                                   object:window
@@ -271,6 +272,9 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     MetalDevice *strongDevice = weakDevice;
                     if (!strongDevice) return;
                     strongDevice.inLiveResize = YES;
+                    if (idleDrawableCount < 3) {  // Live resize needs 3 drawables to work well
+                        strongDevice.layer.maximumDrawableCount = 3;
+                    }
                     strongDevice.layer.presentsWithTransaction = YES;
                     strongDevice.layer.liveResizing = YES;
                     javaOnLiveResizeStarted(strongDevice.layer.javaRef);
@@ -289,6 +293,9 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
                     strongDevice.layer.liveResizing = NO;
                     strongDevice.layer.presentsWithTransaction = NO;
                     strongDevice.inLiveResize = NO;
+                    if (idleDrawableCount < 3) {  // Reset back
+                        strongDevice.layer.maximumDrawableCount = idleDrawableCount;
+                    }
                     javaOnLiveResizeEnded(strongDevice.layer.javaRef);
                 }];
         }

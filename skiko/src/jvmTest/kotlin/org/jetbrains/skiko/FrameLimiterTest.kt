@@ -105,7 +105,7 @@ class FrameLimiterTest {
             repeat(frameCount) {
                 limiter.awaitNextFrame()
                 ticks.add(currentTime.toInt())
-                advanceTimeBy(frameRenderMillis)
+                advanceTimeBy(frameRenderMillis.milliseconds)
             }
         }
         return ticks
@@ -124,21 +124,21 @@ class FrameLimiterTest {
                 repeat(frameCount) {
                     limiter.awaitNextFrame()
                     ticks1.add(currentTime.toInt())
-                    advanceTimeBy(3)
+                    advanceTimeBy(3.milliseconds)
                 }
             }
             launch {
                 repeat(frameCount) {
                     limiter.awaitNextFrame()
                     ticks2.add(currentTime.toInt())
-                    advanceTimeBy(1)
+                    advanceTimeBy(1.milliseconds)
                 }
             }
             launch {
                 repeat(frameCount) {
                     limiter.awaitNextFrame()
                     ticks3.add(currentTime.toInt())
-                    advanceTimeBy(1)
+                    advanceTimeBy(1.milliseconds)
                 }
             }
         }
@@ -160,7 +160,7 @@ class FrameLimiterTest {
                 currentTime = { testScheduler.currentTime.milliseconds },
                 impreciseDelay = { timeMillis ->
                     val ms = ceil(timeMillis.toDouble() / delayPrecisionMillis).toInt() * delayPrecisionMillis
-                    delay(ms)
+                    delay(ms.milliseconds)
                 }
             )
             block(limiter)
