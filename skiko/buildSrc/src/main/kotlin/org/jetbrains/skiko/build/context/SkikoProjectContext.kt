@@ -1,0 +1,244 @@
+package org.jetbrains.skiko.build.context
+
+import de.undercouch.gradle.tasks.download.Download
+import java.io.File
+import org.gradle.api.DefaultTask
+import org.gradle.api.Project
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.skiko.build.cpp.WindowsSdkPaths
+import org.jetbrains.skiko.build.dependencies.*
+import org.jetbrains.skiko.build.utils.*
+
+enum class SkikoModuleKind { CORE, EXTENSION }
+
+class SkikoProjectContext(
+    val project: Project,
+    val skiko: SkikoProperties,
+    val kind: SkikoModuleKind,
+    val artifacts: SkikoArtifacts,
+    val kotlin: KotlinMultiplatformExtension,
+    val windowsSdkPathProvider: () -> WindowsSdkPaths,
+    val additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
+    configureDependencies: (SkikoDependencyScope.() -> Unit)
+) {
+    val dependencyRegistry = BinaryRegistry()
+    val dependsOnCore: Boolean
+
+    init {
+        val dependencyScope = SkikoDependencyScope(dependencyRegistry)
+        dependencyScope.configureDependencies()
+        dependsOnCore = dependencyScope.dependsOnCore
+    }
+
+    val buildType = skiko.buildType
+
+    val windowsSdkPaths: WindowsSdkPaths by lazy {
+        windowsSdkPathProvider()
+    }
+
+    val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
+
+    val projectPath: String = if (kind == SkikoModuleKind.CORE) ":" else ":${project.name}"
+    val libBaseName: String = artifacts.artifactIdPrefix
+    val nativeBridgesLibPrefix: String = "${artifacts.artifactIdPrefix}-native-bridges"
+    val cinteropName: String = libBaseName
+
+    fun staticLibBaseNames(os: OS, arch: Arch, env: TargetEnv): List<String> =
+        dependencyRegistry.getLibs(os, arch, env, Linkage.STATIC)
+
+    fun directStaticLibBaseNames(os: OS, arch: Arch, env: TargetEnv): List<String> =
+        dependencyRegistry.getLibs(os, arch, env, Linkage.DIRECT_STATIC)
+
+    private fun archivePaths(os: OS, libBaseNames: List<String>, skiaBinDir: String): List<String> {
+        val prefix = if (os == OS.Windows) "" else "lib"
+        val suffix = when (os) {
+            OS.Windows -> ".lib"
+            OS.Wasm -> ".wasm.a"
+            else -> ".a"
+        }
+
+        return libBaseNames.map { baseName ->
+            "$skiaBinDir/$prefix$baseName$suffix"
+        }
+    }
+
+    fun staticArchivePaths(os: OS, arch: Arch, env: TargetEnv, skiaBinDir: String): List<String> =
+        archivePaths(os, staticLibBaseNames(os, arch, env), skiaBinDir)
+
+    fun directStaticArchivePaths(os: OS, arch: Arch, env: TargetEnv, skiaBinDir: String): List<String> =
+        archivePaths(os, directStaticLibBaseNames(os, arch, env), skiaBinDir)
+
+    fun dynamicLibNames(os: OS, arch: Arch, env: TargetEnv): List<String> =
+        dependencyRegistry.getLibs(os, arch, env, Linkage.DYNAMIC)
+
+    fun resolveBinaryInputs(os: OS, arch: Arch, env: TargetEnv, skiaBinDir: String): ResolvedBinaryConfiguration {
+        return ResolvedBinaryConfiguration(
+            staticLibBaseNames = staticLibBaseNames(os, arch, env),
+            staticArchivePaths = staticArchivePaths(os, arch, env, skiaBinDir),
+            directStaticLibBaseNames = directStaticLibBaseNames(os, arch, env),
+            directStaticArchivePaths = directStaticArchivePaths(os, arch, env, skiaBinDir),
+            dynamicLibNames = dynamicLibNames(os, arch, env),
+            frameworks = dependencyRegistry.getFrameworks(os, arch, env),
+            linkFlags = dependencyRegistry.getLinkFlags(os, arch, env),
+            compilerFlags = dependencyRegistry.getCompilerFlags(os, arch, env)
+        )
+    }
+}
+
+fun SkikoProjectContext.declareSkiaTasks() {
+    mapOf(
+        "android" to listOf("arm64", "x64"),
+        "ios" to listOf("arm64", "x64"),
+        "iosSim" to listOf("arm64", "x64"),
+        "linux" to listOf("arm64", "x64"),
+        "macos" to listOf("arm64", "x64"),
+        "tvos" to listOf("arm64"),
+        "tvosSim" to listOf("arm64", "x64"),
+        "wasm" to listOf("wasm"),
+        "windows" to listOf("arm64", "x64"),
+    ).forEach { (config, architectures) ->
+        architectures.forEach { arch ->
+            val taskNameSuffix = joinToTitleCamelCase(config, arch)
+            val target = "$config-$arch"
+
+            val skiaReleaseTag = project.skiaVersion(target)
+
+            val skiaBaseUrl = "https://github.com/JetBrains/skia/releases/download/$skiaReleaseTag"
+
+            val artifactId = "Skia-${skiaReleaseTag}-${config}-$buildType-${arch}"
+
+            val downloadSkiaTask = project.tasks.register<Download>("downloadSkia$buildType$taskNameSuffix") {
+                group = "Skia Binaries"
+
+                val skiaUrl = "$skiaBaseUrl/$artifactId.zip"
+                description = "downloads $skiaUrl"
+
+                onlyIfModified(true)
+                src(skiaUrl)
+                dest(skiko.dependenciesDir.resolve(
+                    "skia/$skiaReleaseTag/Skia-$skiaReleaseTag-$config-$buildType-${arch}.zip")
+                )
+            }
+
+            project.tasks.register<Copy>("unzipSkia$buildType$taskNameSuffix") {
+                group = "Skia Binaries"
+
+                val outputDir = skiko.dependenciesDir.resolve("skia/$skiaReleaseTag/$artifactId")
+                description = "unzips to $outputDir"
+
+                dependsOn(downloadSkiaTask)
+                from(project.zipTree(downloadSkiaTask.get().dest)) {
+                    // On Windows, some of the skia libraries have lib prefix and some do not
+                    // Let's standardize it
+                    if (config == "windows") {
+                        rename { name ->
+                            if (name.startsWith("lib") && name.endsWith(".lib")) {
+                                name.removePrefix("lib")
+                            } else {
+                                name
+                            }
+                        }
+                    }
+                }
+                into(outputDir)
+            }
+        }
+    }
+}
+
+/**
+ * Do not call inside tasks.register or tasks.call callback
+ * (tasks' registration during other task's registration is prohibited)
+ */
+fun SkikoProjectContext.registerOrGetSkiaDirProvider(
+    os: OS, arch: Arch, isUikitSim: Boolean = false
+): Provider<File> {
+    val taskNameSuffix = joinToTitleCamelCase(buildType.id, os.idWithSuffix(isUikitSim = isUikitSim), arch.id)
+
+    val skiaDir = skiko.skiaDir
+    return if (skiaDir != null) {
+        project.tasks.registerOrGetTask<DefaultTask>("skiaDir$taskNameSuffix") {
+            // dummy task to simplify usage of the resulting provider (see `else` branch)
+            // if a file provider is not created from a task provider,
+            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
+            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
+            enabled = false
+        }.map {
+            skiaDir.absoluteFile
+        }
+    } else {
+        project.rootProject.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
+    }
+}
+
+internal val Project.isInIdea: Boolean
+    get() {
+        return System.getProperty("idea.active")?.toBoolean() == true
+    }
+
+val Project.supportAndroid: Boolean
+    get() = findProperty(SkikoGradleProperties.ANDROID_ENABLED) == "true" // || isInIdea
+
+val Project.supportAwt: Boolean
+    get() = findProperty(SkikoGradleProperties.AWT_ENABLED) == "true" || isInIdea
+
+val Project.supportAllNative: Boolean
+    get() = findProperty(SkikoGradleProperties.NATIVE_ENABLED) == "true" || isInIdea
+
+val Project.supportAllNativeIos: Boolean
+    get() = supportAllNative || findProperty("${SkikoGradleProperties.NATIVE_IOS}.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosArm64: Boolean
+    get() = supportAllNativeIos || findProperty(SkikoGradleProperties.NATIVE_IOS_ARM64) == "true" || isInIdea
+
+val Project.supportNativeIosSimulatorArm64: Boolean
+    get() = supportAllNativeIos || findProperty(SkikoGradleProperties.NATIVE_IOS_SIMULATOR_ARM64) == "true" || isInIdea
+
+val Project.supportNativeIosX64: Boolean
+    get() = supportAllNativeIos || findProperty(SkikoGradleProperties.NATIVE_IOS_X64) == "true" || isInIdea
+
+val Project.supportAnyNativeIos: Boolean
+    get() = supportAllNativeIos || supportNativeIosArm64 || supportNativeIosSimulatorArm64 || supportNativeIosX64
+
+val Project.supportAllNativeTvos: Boolean
+    get() = supportAllNative || findProperty("${SkikoGradleProperties.NATIVE_TVOS}.enabled") == "true" || isInIdea
+
+val Project.supportNativeTvosArm64: Boolean
+    get() = supportAllNativeTvos || findProperty(SkikoGradleProperties.NATIVE_TVOS_ARM64) == "true" || isInIdea
+
+val Project.supportNativeTvosSimulatorArm64: Boolean
+    get() = supportAllNativeTvos || findProperty(SkikoGradleProperties.NATIVE_TVOS_SIMULATOR_ARM64) == "true" || isInIdea
+
+val Project.supportNativeTvosX64: Boolean
+    get() = supportAllNativeTvos || findProperty(SkikoGradleProperties.NATIVE_TVOS_X64) == "true" || isInIdea
+
+val Project.supportAnyNativeTvos: Boolean
+    get() = supportAllNativeTvos || supportNativeTvosArm64 || supportNativeTvosSimulatorArm64 || supportNativeTvosX64
+
+val Project.supportNativeMac: Boolean
+    get() = supportAllNative || findProperty(SkikoGradleProperties.NATIVE_MAC) == "true" || isInIdea
+
+val Project.supportNativeLinux: Boolean
+    get() = supportAllNative || findProperty(SkikoGradleProperties.NATIVE_LINUX) == "true" || isInIdea
+
+val Project.supportAnyNative: Boolean
+    get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
+
+val Project.supportWeb: Boolean
+    get() = findProperty(SkikoGradleProperties.WASM_ENABLED) == "true" || isInIdea
+
+fun Project.skiaVersion(target: String): String {
+    val platformSpecificVersion = "dependencies.skia.$target"
+
+    return if (hasProperty(platformSpecificVersion)) {
+        property(platformSpecificVersion) as String
+    } else {
+        property("dependencies.skia") as String
+    }
+}
