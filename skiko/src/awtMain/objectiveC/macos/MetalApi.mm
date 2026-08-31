@@ -31,12 +31,12 @@ void *objc_autoreleasePoolPush(void);
 void objc_autoreleasePoolPop(void *);
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_openAutoreleasepool(
-    JNIEnv *env, jobject redrawer) {
+    JNIEnv *env, jobject renderer) {
     return (jlong)objc_autoreleasePoolPush();
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_MetalApiKt_closeAutoreleasepool(
-    JNIEnv *env, jobject redrawer, jlong handle) {
+    JNIEnv *env, jobject renderer, jlong handle) {
     objc_autoreleasePoolPop((void *)handle);
 }
 
