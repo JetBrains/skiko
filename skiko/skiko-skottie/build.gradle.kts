@@ -2,17 +2,21 @@
 
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.gradle.kotlin.dsl.withType
-import org.gradle.kotlin.dsl.named
-import tasks.configuration.*
-import dsl.SkikoDependencyScope
+import org.jetbrains.skiko.build.configuration.*
+import org.jetbrains.skiko.build.context.*
+import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
+import org.jetbrains.skiko.build.dependencies.SkikoDependencyScope
+import org.jetbrains.skiko.build.publishing.*
+import org.jetbrains.skiko.build.utils.*
 
 plugins {
     kotlin("multiplatform")

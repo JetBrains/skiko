@@ -1,15 +1,19 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
-import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import org.gradle.kotlin.dsl.withType
-import tasks.configuration.*
-import dsl.SkikoDependencyScope
+import org.jetbrains.skiko.build.configuration.*
+import org.jetbrains.skiko.build.context.*
+import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
+import org.jetbrains.skiko.build.dependencies.SkikoDependencyScope
+import org.jetbrains.skiko.build.publishing.*
+import org.jetbrains.skiko.build.utils.*
 
 plugins {
     kotlin("multiplatform")
