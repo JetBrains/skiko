@@ -37,8 +37,8 @@ class SkiaLayerTest {
             val activeContextsAfterAttach = createdGlContexts(canvas)
 
             assertTrue(activeContextsAfterAttach > 0, "the WebGL spy must observe the first attach")
-            assertEquals(100, layer.state?.width)
-            assertEquals(100, layer.state?.height)
+            assertEquals(100, layer.renderContext?.width)
+            assertEquals(100, layer.renderContext?.height)
 
             layer.requestAndAwaitRender()
             assertEquals(1, renderDelegate.renders, "exactly one frame per needRender()")
@@ -47,8 +47,8 @@ class SkiaLayerTest {
             canvas.width = 200
             canvas.height = 150
             layer.resize(200, 150)
-            assertEquals(200, layer.state?.width)
-            assertEquals(150, layer.state?.height)
+            assertEquals(200, layer.renderContext?.width)
+            assertEquals(150, layer.renderContext?.height)
 
             layer.requestAndAwaitRender()
             assertEquals(2, renderDelegate.renders, "resize must not skip or duplicate frames")
@@ -62,7 +62,7 @@ class SkiaLayerTest {
             assertEquals(3, renderDelegate.renders, "resize must not skip or duplicate frames")
             renderDelegate.assertRendered(60, 40, Color.RED, "frame after shrinking resize")
 
-            // Resizing to the same size is a no-op in CanvasRenderer.resize, but must keep
+            // Resizing to the same size is a no-op in WebGLRenderContext.resize, but must keep
             // rendering: the canvas drawing buffer is still cleared by the attribute write.
             layer.resize(60, 40)
             layer.requestAndAwaitRender()
@@ -83,7 +83,7 @@ class SkiaLayerTest {
             layer.renderDelegate = renderDelegate
 
             layer.attachTo(canvas)
-            val initialState = assertNotNull(layer.state)
+            val initialState = assertNotNull(layer.renderContext)
             val activeContextsAfterAttach = createdGlContexts(canvas)
             assertTrue(activeContextsAfterAttach > 0, "the WebGL spy must observe the first attach")
 
@@ -105,11 +105,11 @@ class SkiaLayerTest {
                     "same-canvas re-attach must not create another WebGL context / DirectContext"
                 )
                 assertSame(
-                    initialState, layer.state,
-                    "same-canvas re-attach must reuse the CanvasRenderer"
+                    initialState, layer.renderContext,
+                    "same-canvas re-attach must reuse the WebGLRenderContext"
                 )
-                assertEquals(newSize, layer.state?.width)
-                assertEquals(newSize, layer.state?.height)
+                assertEquals(newSize, layer.renderContext?.width)
+                assertEquals(newSize, layer.renderContext?.height)
 
                 layer.requestAndAwaitRender()
                 assertEquals(2 + i, renderDelegate.renders, "the rendering is expected to continue after re-attach")
@@ -128,16 +128,16 @@ class SkiaLayerTest {
                     layer.renderDelegate = renderDelegate
 
                     layer.attachTo(canvas1)
-                    val state1 = assertNotNull(layer.state)
+                    val state1 = assertNotNull(layer.renderContext)
                     layer.requestAndAwaitRender()
                     renderDelegate.assertRendered(100, 100, Color.RED, "frame on the first canvas")
 
                     layer.detach()
-                    assertNull(layer.state)
+                    assertNull(layer.renderContext)
                     assertTrue(state1.isDisposed, "previous renderer must be disposed on detach")
 
                     layer.attachTo(canvas2)
-                    val state2 = assertNotNull(layer.state)
+                    val state2 = assertNotNull(layer.renderContext)
                     assertNotSame(state1, state2, "a different canvas needs a new renderer")
                     assertFalse(state2.isDisposed)
                     assertEquals(200, state2.width)
@@ -220,7 +220,7 @@ class SkiaLayerTest {
 
                 val samples = (webgl2Context.getParameter(WebGLRenderingContext.SAMPLES) as JsNumber).toInt()
                 assertEquals(0, samples)
-                assertEquals(1, layer.state?.requestedSampleCount)
+                assertEquals(1, layer.renderContext?.requestedSampleCount)
             } finally {
                 layer.detach()
             }
@@ -239,7 +239,7 @@ class SkiaLayerTest {
 
                 val samples = (webgl2Context.getParameter(WebGLRenderingContext.SAMPLES) as JsNumber).toInt()
                 assertTrue(samples > 1, "samples expected to be > 1, but was $samples")
-                assertEquals(samples, layer.state?.requestedSampleCount)
+                assertEquals(samples, layer.renderContext?.requestedSampleCount)
             } finally {
                 layer.detach()
             }

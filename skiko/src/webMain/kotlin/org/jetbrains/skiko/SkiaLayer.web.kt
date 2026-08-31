@@ -6,12 +6,8 @@ import org.jetbrains.skia.Color
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.wasm.EmscriptenWebGLContextAttributes
 import org.jetbrains.skiko.wasm.createWebGLContext
-import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.js.ExperimentalWasmJsInterop
-import kotlin.js.JsNumber
-import kotlin.js.toInt
-import kotlin.js.unsafeCast
 
 /**
  * Provides a way to render the content and to receive the input events.
@@ -19,6 +15,10 @@ import kotlin.js.unsafeCast
  *
  * SkikoLayer needs to be initialized with [HTMLCanvasElement] instance
  * using [attachTo] method.
+ *
+ * Internally this drives an internal [WebGLRenderContext] (which owns the WebGL Skia surface) from a
+ * `requestAnimationFrame` loop: each scheduled frame re-reads the `<canvas>` size, acquires a surface of that
+ * size, hands its canvas to [renderDelegate], then presents.
  */
 actual open class SkiaLayer {
 
@@ -35,7 +35,7 @@ actual open class SkiaLayer {
         }
     }
 
-    internal var state: CanvasRenderer? = null
+    internal var renderContext: WebGLRenderContext? = null
 
     internal var requestEmscriptenWebGLContextAttributes: EmscriptenWebGLContextAttributes? = null
 
@@ -63,7 +63,7 @@ actual open class SkiaLayer {
      * Schedules a drawFrame to the appropriate moment.
      */
     actual fun needRender(throttledToVsync: Boolean) {
-        state?.needRedraw()
+        scheduleFrame()
     }
 
     @Deprecated(
@@ -86,8 +86,8 @@ actual open class SkiaLayer {
     }
 
     actual fun detach() {
-        state?.dispose()
-        state = null
+        renderContext?.close()
+        renderContext = null
         htmlCanvas = null
     }
 
@@ -96,7 +96,7 @@ actual open class SkiaLayer {
      * element. Call this after changing the canvas element's `width`/`height` attributes.
      */
     fun resize(width: Int, height: Int) {
-        checkNotNull(state) { "SkiaLayer is not attached to a canvas" }.resize(width, height)
+        checkNotNull(renderContext) { "SkiaLayer is not attached to a canvas" }.resize(width, height)
     }
 
     actual val component: Any?
@@ -104,49 +104,82 @@ actual open class SkiaLayer {
 
     private var htmlCanvas: HTMLCanvasElement? = null
 
+    private var redrawScheduled = false
+
     /**
-     * Initializes the [CanvasRenderer] and events listeners.
+     * Initializes the internal [WebGLRenderContext].
      * Delegates rendering and events processing to [renderDelegate].
      */
     @OptIn(ExperimentalWasmJsInterop::class)
     private fun attachTo(htmlCanvas: HTMLCanvasElement) {
-        if (this.htmlCanvas === htmlCanvas && state != null) {
+        if (this.htmlCanvas === htmlCanvas && renderContext != null) {
             // Re-attaching to the same canvas: reuse the WebGL context and DirectContext.
             // Creating a second DirectContext over the same WebGLRenderingContext corrupts
             // both contexts' GL state caches once either of them is destroyed (CMP-8615).
-            state!!.resize(htmlCanvas.width, htmlCanvas.height)
+            renderContext!!.resize(htmlCanvas.width, htmlCanvas.height)
             return
         }
         detach()
         this.htmlCanvas = htmlCanvas
+        renderContext = WebGLRenderContext(
+            createWebGLContext(htmlCanvas, requestEmscriptenWebGLContextAttributes),
+            htmlCanvas.width,
+            htmlCanvas.height,
+        )
+    }
 
-        val contextPointer = createWebGLContext(htmlCanvas, requestEmscriptenWebGLContextAttributes)
-        GL.makeContextCurrent(contextPointer)
-
-        // Get the actual sampling in the current webgl context and pass it to Skia.
-        // This value affects the Skia's antialiasing strategy choice.
-        val sampleCount: Int =
-            currentGLContext(GL)?.getParameter(WebGLRenderingContext.SAMPLES)?.unsafeCast<JsNumber>()?.toInt() ?: 0
-
-        state = object : CanvasRenderer(
-            contextPointer = contextPointer,
-            width = htmlCanvas.width,
-            height = htmlCanvas.height,
-            requestedSampleCount = sampleCount
-        ) {
-            override fun drawFrame(currentTimestamp: Double) {
-                // currentTimestamp is in milliseconds.
-                val currentNanos = currentTimestamp * 1_000_000
-                renderDelegate?.onRender(canvas!!, width, height, currentNanos.toLong())
-            }
+    /**
+     * Coalescing `requestAnimationFrame` scheduler: multiple [scheduleFrame] calls before the next animation
+     * frame collapse to a single [renderFrame].
+     */
+    @OptIn(ExperimentalWasmJsInterop::class)
+    private fun scheduleFrame() {
+        if (redrawScheduled || renderContext == null) {
+            return
+        }
+        redrawScheduled = true
+        windowRequestAnimationFrame { timestamp ->
+            redrawScheduled = false
+            renderFrame(timestamp)
         }
     }
 
+    /**
+     * Renders a single frame: re-reads the `<canvas>` size, acquires a surface of that size from the
+     * [renderContext], clears it, lets [renderDelegate] draw, then presents.
+     *
+     * @param timestampMillis the `requestAnimationFrame` timestamp, in milliseconds.
+     */
+    private fun renderFrame(timestampMillis: Double) {
+        val context = renderContext ?: return
+        if (context.isDisposed) return
+        val canvasElement = htmlCanvas ?: return
+        val width = canvasElement.width
+        val height = canvasElement.height
+        if (width <= 0 || height <= 0) return
+
+        val nanoTime = (timestampMillis * 1_000_000).toLong()
+        val surface = context.acquireSurface(width, height)
+        // `clear` and `resetMatrix` make the canvas not accumulate previous effects.
+        surface.canvas.clear(Color.WHITE)
+        surface.canvas.resetMatrix()
+        renderDelegate?.onRender(surface.canvas, width, height, nanoTime)
+        context.present()
+    }
+
     internal actual fun draw(canvas: Canvas) {
+        val canvasElement = htmlCanvas
+        val width = canvasElement?.width ?: 0
+        val height = canvasElement?.height ?: 0
         canvas.clear(Color.WHITE)
-        renderDelegate?.onRender(canvas, state!!.width, state!!.height, currentNanoTime())
+        renderDelegate?.onRender(canvas, width, height, currentNanoTime())
     }
 
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
 }
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private fun windowRequestAnimationFrame(callback: (Double) -> Unit): Int =
+    //language=JavaScript
+    js("window.requestAnimationFrame(callback)")

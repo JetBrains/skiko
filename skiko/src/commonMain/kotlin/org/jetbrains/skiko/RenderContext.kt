@@ -62,8 +62,9 @@ interface RenderContext : AutoCloseable {
     fun present()
 
     /**
-     * Anchor for the per-platform factories, which are declared as extensions on it, such as
-     * `RenderContext.createFromMetalLayer(layer)` on darwin.
+     * Anchor for the per-platform factories, which are declared as extensions on it:
+     * `RenderContext.createFromCanvas(canvas)` on web, `RenderContext.createFromMetalLayer(layer)` on
+     * darwin, and `RenderContext.createFromCurrentGLContext()` on Android.
      */
     companion object
 }
