@@ -8,6 +8,8 @@ internal abstract class AbstractOpenGLRenderer(
     analytics: SkiaLayerAnalytics,
 ) : AwtRenderer(layer, analytics, GraphicsApi.OPENGL) {
 
+    override val directContext: DirectContext? get() = glContext
+
     protected val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
 
     private var glContext: DirectContext? = null
@@ -42,13 +44,21 @@ internal abstract class AbstractOpenGLRenderer(
         glContext?.flush()
     }
 
+    /** The surface the last [createSurface] produced, or `null` before the first frame. */
+    protected val glSurface: Surface? get() = surface
+
+    /** Submits the recorded GPU work. The caller must have made its context current. */
+    protected fun flushGl() {
+        glContext?.flush()
+    }
+
     protected fun disposeGlResources() {
         disposeSurface()
         glContext?.close()
         glContext = null
     }
 
-    private fun ensureContext(): Boolean {
+    protected fun ensureContext(): Boolean {
         if (glContext == null) {
             try {
                 val newContext = DirectContext.makeGL()
@@ -62,11 +72,11 @@ internal abstract class AbstractOpenGLRenderer(
         return true
     }
 
-    private fun LayerDrawScope.initSurface() {
-        val glContext = glContext ?: return
+    private fun LayerDrawScope.initSurface() = createSurface(scaledLayerWidth, scaledLayerHeight, pixelGeometry)
 
-        val w = scaledLayerWidth
-        val h = scaledLayerHeight
+    /** (Re)creates the on-screen GL surface at [w] x [h] when the size changed or none exists yet. */
+    protected fun createSurface(w: Int, h: Int, pixelGeometry: PixelGeometry) {
+        val glContext = glContext ?: return
 
         if (isSizeChanged(w, h) || surface == null) {
             disposeSurface()

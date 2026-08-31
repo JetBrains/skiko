@@ -66,6 +66,12 @@ internal class MetalRenderer(
 
     private var context: DirectContext? = null
 
+    /** Surface handed out by [acquireSurface]; closed by the next [present] or [acquireSurface]. */
+    private var acquiredSurface: Surface? = null
+    private var acquiredRenderTarget: BackendRenderTarget? = null
+
+    override val directContext: DirectContext? get() = context
+
     init {
         onDeviceChosen(adapter.name)
         val numberOfBuffers = properties.frameBuffering.numberOfBuffers() ?: 0 // zero means default for system
@@ -108,6 +114,7 @@ internal class MetalRenderer(
     }
 
     private fun releaseGpuResources() = synchronized(drawLock) {
+        disposeAcquiredSurface()
         context?.close()
         context = null
         disposeDevice(device.ptr)
@@ -244,6 +251,42 @@ internal class MetalRenderer(
         Logger.debug { "MetalRenderer finished drawing frame" }
     }
 
+    // --- Public standalone RenderContext surface. The on-screen loop records and submits within one
+    // drawFrame, so it uses drawViaSurface and holds no surface between frames; a standalone caller splits
+    // the same sequence across acquireSurface and present, so the surface has to outlive the acquire call.
+    // It is closed as soon as present() has submitted it, which is the disposal point drawViaSurface uses.
+    override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
+        check(!isDisposed) { "MetalRedrawer is disposed" }
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic Metal context")
+        }
+        if (width <= 0 || height <= 0) {
+            throw RenderException("Cannot create surface for ${width}x$height")
+        }
+        disposeAcquiredSurface()
+        val newRenderTarget = BackendRenderTarget.makeMetal(width, height, acquireDrawableTexture(device.ptr))
+        acquiredRenderTarget = newRenderTarget
+        val newSurface = Surface.makeFromBackendRenderTarget(
+            context!!,
+            newRenderTarget,
+            SurfaceOrigin.TOP_LEFT,
+            SurfaceColorFormat.BGRA_8888,
+            ColorSpace.sRGB,
+            SurfaceProps(pixelGeometry = layer.pixelGeometry)
+        ) ?: throw RenderException("Cannot create surface")
+        acquiredSurface = newSurface
+        newSurface
+    }
+
+    override fun present() = synchronized(drawLock) {
+        if (!isDisposed) {
+            context?.flush()
+            acquiredSurface?.flushAndSubmit()
+            finishFrameAsync(device.ptr)
+        }
+        disposeAcquiredSurface()
+    }
+
     private fun ensureContext(): Boolean {
         if (context == null) {
             try {
@@ -294,6 +337,13 @@ internal class MetalRenderer(
             surface?.close()
             renderTarget?.close()
         }
+    }
+
+    private fun disposeAcquiredSurface() {
+        acquiredSurface?.close()
+        acquiredSurface = null
+        acquiredRenderTarget?.close()
+        acquiredRenderTarget = null
     }
 
     override fun syncBoundsFromPlatformComponent() = synchronized(drawLock) {

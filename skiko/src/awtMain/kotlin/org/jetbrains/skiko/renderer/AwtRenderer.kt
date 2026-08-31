@@ -5,6 +5,9 @@ import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 
 /**
+ * Extends the public [RenderContext], so one per-API class backs both the on-screen path and a
+ * standalone consumer.
+ *
  * Implementations must call [onDeviceChosen] and then [onContextInit] during initialization;
  * skipping them silently disables device analytics.
  */
@@ -12,8 +15,8 @@ import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 internal abstract class AwtRenderer(
     internal val layer: SkiaLayer,
     private val analytics: SkiaLayerAnalytics,
-    private val graphicsApi: GraphicsApi,
-) : AutoCloseable {
+    final override val graphicsApi: GraphicsApi,
+) : RenderContext {
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
 
     var deviceAnalytics: DeviceAnalytics? = null

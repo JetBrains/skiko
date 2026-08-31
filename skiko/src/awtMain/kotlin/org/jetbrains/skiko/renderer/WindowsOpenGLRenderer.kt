@@ -57,6 +57,24 @@ internal class WindowsOpenGLRenderer(
         }
     }
 
+    override fun acquireSurface(width: Int, height: Int): Surface {
+        check(!isDisposed) { "WindowsOpenGLRenderer is disposed" }
+        makeCurrent()
+        if (!ensureContext()) {
+            throw RenderException("Cannot init graphic context")
+        }
+        createSurface(width, height, layer.pixelGeometry)
+        return glSurface ?: throw RenderException("Cannot create surface for ${width}x$height")
+    }
+
+    override fun present() {
+        if (isDisposed) return
+        makeCurrent()
+        flushGl()
+        swapBuffers()
+        OpenGLApi.instance.glFinish()
+    }
+
     override fun makeCurrent() = makeCurrent(device, context)
     internal fun swapBuffers() = swapBuffers(device)
 }

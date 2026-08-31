@@ -13,6 +13,14 @@ internal class LinuxOpenGLRenderer(
         loadOpenGLLibrary()
     }
 
+    /**
+     * Serialises the public entry points against disposal. Frames run on the EDT, but [acquireSurface] and
+     * [present] are public entry points a caller drives from its own render thread, and [releaseResources]
+     * can arrive on the EDT while one of those is in flight. Each takes this lock and re-checks [isDisposed]
+     * inside it, so [releaseResources] cannot free the GLX context out from under a running JNI call.
+     */
+    private val drawLock = Any()
+
     private var context = 0L
     private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
 
@@ -87,12 +95,14 @@ internal class LinuxOpenGLRenderer(
 
     override fun releaseResources() {
         frameJob.cancel()
-        layer.backedLayer.lockLinuxDrawingSurface {
-            // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
-            // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
-            it.makeCurrent(context)
-            disposeGlResources()
-            it.destroyContext(context)
+        synchronized(drawLock) {
+            layer.backedLayer.lockLinuxDrawingSurface {
+                // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
+                // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
+                it.makeCurrent(context)
+                disposeGlResources()
+                it.destroyContext(context)
+            }
         }
     }
 
@@ -111,6 +121,37 @@ internal class LinuxOpenGLRenderer(
             }
         } finally {
             unlockDrawingSurface()
+        }
+    }
+
+    override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
+        checkDisposed()
+        lockDrawingSurface()
+        try {
+            makeCurrent()
+            if (!ensureContext()) {
+                throw RenderException("Cannot init graphic context")
+            }
+            createSurface(width, height, layer.pixelGeometry)
+            glSurface ?: throw RenderException("Cannot create surface for ${width}x$height")
+        } finally {
+            unlockDrawingSurface()
+        }
+    }
+
+    override fun present() {
+        if (isDisposed) return
+        synchronized(drawLock) {
+            if (isDisposed) return
+            val surface = lockDrawingSurface()
+            try {
+                makeCurrent()
+                flushGl()
+                surface.swapBuffers()
+                OpenGLApi.instance.glFlush()
+            } finally {
+                unlockDrawingSurface()
+            }
         }
     }
 }

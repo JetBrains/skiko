@@ -640,6 +640,7 @@ class SkiaLayerTest {
         }
     }
 
+    @OptIn(ExperimentalSkikoApi::class)
     private abstract class BaseTestRenderer(
         layer: SkiaLayer,
         analytics: SkiaLayerAnalytics,
@@ -651,6 +652,11 @@ class SkiaLayerTest {
         }
 
         override val renderInfo: String get() = ""
+        override val directContext: org.jetbrains.skia.DirectContext? get() = null
+        // These fakes exercise the on-screen fallback via renderFrame only; the standalone surface path is unused.
+        override fun acquireSurface(width: Int, height: Int): org.jetbrains.skia.Surface =
+            throw RenderException("Test render context has no standalone surface")
+        override fun present() = Unit
         override fun releaseResources() = Unit
     }
 
