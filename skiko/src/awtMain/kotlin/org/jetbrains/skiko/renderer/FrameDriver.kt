@@ -17,7 +17,7 @@ internal class FrameDriver(
     private val layer: SkiaLayer,
     private val producer: FrameProducer,
     private val scheduler: FrameScheduler,
-) : LiveResizeListener {
+) {
     private val renderer: AwtRenderer get() = producer.renderer
 
     var isDisposed = false
@@ -30,8 +30,37 @@ internal class FrameDriver(
     @Volatile
     private var isPlatformDrivingFrames = false
 
+    private val liveResizeListener = object : LiveResizeListener {
+        override fun onLiveResizeStarted() {
+            isPlatformDrivingFrames = true
+            scheduler.pause()
+        }
+
+        override fun onLiveResizeFrame(width: Int, height: Int, isResizeFrame: Boolean) {
+            if (isDisposed) return
+            val size = Dimension(width, height)
+            producer.update(renderTime(), forcedSize = size)
+            if (isDisposed) return // layer may be disposed in user code during `update`
+            producer.inFrame(forcedSize = size) {
+                with(renderer) { renderPlatformDrivenFrame(isResizeFrame) }
+            }
+        }
+
+        override fun onLiveResizeEnded() {
+            isPlatformDrivingFrames = false
+            scheduler.resume()
+            if (renderer.presentsOnResize) {
+                renderImmediately()
+            } else {
+                SwingUtilities.invokeLater {
+                    if (!isDisposed) needRender(throttledToVsync = false)
+                }
+            }
+        }
+    }
+
     init {
-        renderer.liveResizeListener = this
+        renderer.liveResizeListener = liveResizeListener
     }
 
     val renderInfo: String get() = renderer.renderInfo
@@ -45,43 +74,15 @@ internal class FrameDriver(
         if (isPlatformDrivingFrames) {
             renderer.requestPlatformDrivenFrame()
         } else {
-            producer.requestUpdate()
             scheduler.scheduleFrame(throttledToVsync)
         }
     }
 
     fun renderImmediately() {
         check(!isDisposed) { "FrameDriver is disposed" }
-        layer.update(renderTime())
+        producer.update(renderTime())
         if (!isDisposed) { // layer may be disposed in user code during `update`
             runBlocking { producer.drawFrame(immediate = true) }
-        }
-    }
-
-    override fun onLiveResizeStarted() {
-        isPlatformDrivingFrames = true
-        scheduler.pause()
-    }
-
-    override fun onLiveResizeFrame(width: Int, height: Int, isResizeFrame: Boolean) {
-        if (isDisposed) return
-        val size = Dimension(width, height)
-        layer.update(renderTime(), forcedSize = size)
-        if (isDisposed) return // layer may be disposed in user code during `update`
-        producer.inFrame(forcedSize = size) {
-            with(renderer) { renderPlatformDrivenFrame(isResizeFrame) }
-        }
-    }
-
-    override fun onLiveResizeEnded() {
-        isPlatformDrivingFrames = false
-        scheduler.resume()
-        if (renderer.presentsOnResize) {
-            renderImmediately()
-        } else {
-            SwingUtilities.invokeLater {
-                if (!isDisposed) needRender(throttledToVsync = false)
-            }
         }
     }
 
@@ -100,7 +101,7 @@ internal class FrameDriver(
 
         if (!layer.isShowing && layer.isDisplayable && layer.width > 0 && layer.height > 0) {
             if (renderer.needsBeforeShownFrame) {
-                layer.update(renderTime())
+                producer.update(renderTime())
                 if (isDisposed) return // layer may be disposed in user code during `update`
                 producer.inFrame { with(renderer) { renderBeforeShown() } }
             }

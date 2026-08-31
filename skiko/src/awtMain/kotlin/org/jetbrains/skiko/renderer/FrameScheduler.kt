@@ -3,6 +3,7 @@ package org.jetbrains.skiko.renderer
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.MainUIDispatcher
 import org.jetbrains.skiko.renderTime
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Decides when one window's scheduled frames run, producing each through the window's
@@ -34,11 +35,24 @@ internal class SingleFrameScheduler(private val producer: FrameProducer) : Frame
     @Volatile
     private var isPaused = false
 
+    private val updateRequested = AtomicBoolean(false)
+
+    private fun requestUpdate() {
+        updateRequested.set(true)
+    }
+
+    // Consumes the request, so the frame and early-record dispatchers record each frame's content once.
+    private fun updateIfRequested() {
+        if (updateRequested.getAndSet(false)) {
+            producer.update(renderTime())
+        }
+    }
+
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (!isPaused) {
             renderer.runFrame {
                 if (layer.isShowing) {
-                    producer.updateIfRequested(renderTime())
+                    updateIfRequested()
                     producer.drawFrame(immediate = false)
                 }
             }
@@ -48,11 +62,12 @@ internal class SingleFrameScheduler(private val producer: FrameProducer) : Frame
     // Records the next frame's content on the EDT while the previous frame still waits for vsync.
     private val earlyRecordDispatcher = if (!renderer.pacesAfterFrame) null else {
         FrameDispatcher(MainUIDispatcher) {
-            if (layer.isShowing && !isPaused) producer.updateIfRequested(renderTime())
+            if (layer.isShowing && !isPaused) updateIfRequested()
         }
     }
 
     override fun scheduleFrame(throttledToVsync: Boolean) {
+        requestUpdate()
         if (!throttledToVsync) {
             earlyRecordDispatcher?.scheduleFrame()
         }

@@ -49,7 +49,7 @@ internal abstract class GLFrameBatch<R : AbstractOpenGLRenderer> {
         val nanoTime = System.nanoTime()
         for ((producer, _) in toRedrawVisible) {
             try {
-                producer.updateIfRequested(nanoTime)
+                producer.update(nanoTime)
             } catch (e: CancellationException) {
                 // continue
             }

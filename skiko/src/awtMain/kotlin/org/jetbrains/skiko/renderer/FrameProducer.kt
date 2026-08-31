@@ -5,7 +5,6 @@ import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 import java.awt.Dimension
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Produces the frames of one [SkiaLayer]: records the layer's content, renders it through the
@@ -19,20 +18,11 @@ internal class FrameProducer(
 ) {
     private val deviceAnalytics: DeviceAnalytics? get() = renderer.deviceAnalytics
     private var isFirstFrameRendered = false
-    private val updateRequested = AtomicBoolean(false)
 
     var isDisposed = false
         private set
 
-    fun requestUpdate() {
-        updateRequested.set(true)
-    }
-
-    fun updateIfRequested(nanoTime: Long) {
-        if (updateRequested.getAndSet(false)) {
-            layer.update(nanoTime)
-        }
-    }
+    fun update(nanoTime: Long, forcedSize: Dimension? = null) = layer.update(nanoTime, forcedSize)
 
     /** Renders and presents one frame through [AwtRenderer.renderFrame]. */
     suspend fun drawFrame(immediate: Boolean) {
