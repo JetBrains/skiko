@@ -6,7 +6,9 @@ import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr
 import org.jetbrains.skia.*
+import platform.Metal.MTLCommandQueueProtocol
 import platform.Metal.MTLCreateSystemDefaultDevice
+import platform.Metal.MTLDeviceProtocol
 import platform.QuartzCore.CAMetalDrawableProtocol
 import platform.QuartzCore.CAMetalLayer
 
@@ -30,14 +32,39 @@ fun RenderContext.Companion.createFromMetalLayer(layer: CAMetalLayer): RenderCon
  * uikit redrawer (those own their own view + frame loop); this is the primitive a consumer drives itself.
  */
 internal class MetalRenderContext(private val metalLayer: CAMetalLayer) : RenderContext {
-    private val device = MTLCreateSystemDefaultDevice()
+    private val deviceHandle = MTLCreateSystemDefaultDevice()
         ?: throw RenderException("Metal is not supported on this system")
-    private val queue = device.newCommandQueue()
+    private val queueHandle = deviceHandle.newCommandQueue()
         ?: throw RenderException("Couldn't create Metal command queue")
-    private val context = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
+    private val context = DirectContext.makeMetal(deviceHandle.objcPtr(), queueHandle.objcPtr())
+    private var closed = false
 
     override val graphicsApi: GraphicsApi get() = GraphicsApi.METAL
     override val directContext: DirectContext get() = context
+
+    /**
+     * The `MTLDevice` skiko renders on. Backs the public [org.jetbrains.skiko.metalDevice] GPU-interop
+     * accessor.
+     *
+     * @throws IllegalStateException if this context has been closed.
+     */
+    internal val device: MTLDeviceProtocol
+        get() {
+            check(!closed) { "MetalRenderContext is closed" }
+            return deviceHandle
+        }
+
+    /**
+     * The `MTLCommandQueue` skiko submits its frames on. Backs the public
+     * [org.jetbrains.skiko.metalCommandQueue] GPU-interop accessor.
+     *
+     * @throws IllegalStateException if this context has been closed.
+     */
+    internal val queue: MTLCommandQueueProtocol
+        get() {
+            check(!closed) { "MetalRenderContext is closed" }
+            return queueHandle
+        }
 
     private var drawable: CAMetalDrawableProtocol? = null
     private var renderTarget: BackendRenderTarget? = null
@@ -84,6 +111,7 @@ internal class MetalRenderContext(private val metalLayer: CAMetalLayer) : Render
     override fun close() {
         disposeSurface()
         context.close()
+        closed = true
     }
 
     private fun disposeSurface() {

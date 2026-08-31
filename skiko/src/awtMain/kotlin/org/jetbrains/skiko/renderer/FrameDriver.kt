@@ -18,7 +18,7 @@ internal class FrameDriver(
     private val producer: FrameProducer,
     private val scheduler: FrameScheduler,
 ) {
-    private val renderer: AwtRenderer get() = producer.renderer
+    internal val renderer: AwtRenderer get() = producer.renderer
 
     var isDisposed = false
         private set

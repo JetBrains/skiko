@@ -33,6 +33,45 @@ internal class Direct3DRenderer(
 
     override val directContext: DirectContext? get() = context
 
+    /**
+     * The `IDXGIAdapter1` skiko renders on, as a native pointer. Backs the public
+     * [org.jetbrains.skiko.direct3DAdapterPointer] GPU-interop accessor. Read it under [drawLock] and after
+     * re-checking [isDisposed], so it can never race [releaseResources] freeing the native device.
+     *
+     * @throws IllegalStateException if this context has been disposed.
+     */
+    internal val direct3DAdapterPtr: Long
+        get() = synchronized(drawLock) {
+            check(!isDisposed) { "Direct3DRenderer is disposed" }
+            adapter
+        }
+
+    /**
+     * The `ID3D12Device` skiko renders on, as a native pointer. Backs the public
+     * [org.jetbrains.skiko.direct3DDevicePointer] GPU-interop accessor. Same locking/lifetime discipline as
+     * [direct3DAdapterPtr].
+     *
+     * @throws IllegalStateException if this context has been disposed.
+     */
+    internal val direct3DDevicePtr: Long
+        get() = synchronized(drawLock) {
+            check(!isDisposed) { "Direct3DRenderer is disposed" }
+            getDirectXDevice(device)
+        }
+
+    /**
+     * The `ID3D12CommandQueue` skiko submits its frames on, as a native pointer. Backs the public
+     * [org.jetbrains.skiko.direct3DQueuePointer] GPU-interop accessor. Same locking/lifetime discipline as
+     * [direct3DAdapterPtr].
+     *
+     * @throws IllegalStateException if this context has been disposed.
+     */
+    internal val direct3DQueuePtr: Long
+        get() = synchronized(drawLock) {
+            check(!isDisposed) { "Direct3DRenderer is disposed" }
+            getDirectXCommandQueue(device)
+        }
+
     init {
         adapter = chooseAdapter(properties.adapterPriority.ordinal)
         if (adapter == 0L) {
@@ -320,5 +359,4 @@ internal class Direct3DRenderer(
     private external fun uninstallLiveResizeHook(handle: Long)
     private external fun postLiveResizeRender(handle: Long)
     private external fun waitForComposition()
-
 }

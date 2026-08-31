@@ -72,6 +72,32 @@ internal class MetalRenderer(
 
     override val directContext: DirectContext? get() = context
 
+    /**
+     * The `id<MTLDevice>` skiko renders on, as a native pointer (a `__bridge`-castable address). Backs the
+     * public [org.jetbrains.skiko.metalDevicePointer] GPU-interop accessor. Read it under [drawLock] and after
+     * re-checking [isDisposed], so it can never race [releaseResources] freeing the native device.
+     *
+     * @throws IllegalStateException if this context has been disposed.
+     */
+    internal val metalDeviceObjcPtr: Long
+        get() = synchronized(drawLock) {
+            check(!isDisposed) { "MetalRenderer is disposed" }
+            getMtlDevice(device.ptr)
+        }
+
+    /**
+     * The `id<MTLCommandQueue>` skiko submits its frames on, as a native pointer. Backs the public
+     * [org.jetbrains.skiko.metalCommandQueuePointer] GPU-interop accessor. Same locking/lifetime discipline as
+     * [metalDeviceObjcPtr].
+     *
+     * @throws IllegalStateException if this context has been disposed.
+     */
+    internal val metalCommandQueueObjcPtr: Long
+        get() = synchronized(drawLock) {
+            check(!isDisposed) { "MetalRenderer is disposed" }
+            getCommandQueue(device.ptr)
+        }
+
     init {
         onDeviceChosen(adapter.name)
         val numberOfBuffers = properties.frameBuffering.numberOfBuffers() ?: 0 // zero means default for system
@@ -432,5 +458,4 @@ internal class MetalRenderer(
      * - Before showing the window, it is called while the layer is already displayable (but not yet showing), so the
      *   window's first on-screen frame draws content instead of flashing its background.
      */
-    private external fun finishFrameSync(device: Long)
-}
+    private external fun finishFrameSync(device: Long)}

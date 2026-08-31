@@ -21,7 +21,7 @@ namespace {
  * LinuxVsyncTicker is a *separate*, render-path-independent tick source: one dedicated background
  * thread per window that blocks on the driver's real vblank counter and reports the observed
  * vsync time back to Kotlin. It never touches the GLX context / drawing-surface-locking machinery
- * that LinuxOpenGLRenderer's swapBuffers/makeCurrent use (see redrawer.cc) and must stay that way.
+ * that LinuxOpenGLRenderer's swapBuffers/makeCurrent use (see renderer.cc) and must stay that way.
  *
  * Both glXWaitForMscOML (GLX_OML_sync_control) and glXGetVideoSyncSGI/glXWaitVideoSyncSGI
  * (GLX_SGI_video_sync) REQUIRE a GLXContext to be current on the calling thread - per their
