@@ -109,7 +109,7 @@ internal class Direct3DRenderer(
     }
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "Direct3DRedrawer is disposed" }
+        check(!isDisposed) { "Direct3DRenderer is disposed" }
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic Direct3D context")
         }

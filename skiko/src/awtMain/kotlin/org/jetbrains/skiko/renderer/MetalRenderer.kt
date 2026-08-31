@@ -256,7 +256,7 @@ internal class MetalRenderer(
     // the same sequence across acquireSurface and present, so the surface has to outlive the acquire call.
     // It is closed as soon as present() has submitted it, which is the disposal point drawViaSurface uses.
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
+        check(!isDisposed) { "MetalRenderer is disposed" }
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic Metal context")
         }

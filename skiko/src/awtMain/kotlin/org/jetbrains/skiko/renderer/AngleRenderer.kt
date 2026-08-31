@@ -82,7 +82,7 @@ internal class AngleRenderer(
     }
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "AngleRedrawer is disposed" }
+        check(!isDisposed) { "AngleRenderer is disposed" }
         makeCurrent(device)
         if (!ensureContext()) {
             throw RenderException("Cannot init graphic context")

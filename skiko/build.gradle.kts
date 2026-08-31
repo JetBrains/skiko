@@ -96,7 +96,10 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                     "skunicode_icu",
                     "skshaper",
                 )
-                dynamicSystemLibs("GL", "X11", "fontconfig")
+                // pthread is needed for LinuxVsyncTicker.cc's dedicated GLX vsync-wait thread; on
+                // this project's Amazon Linux 2 build image (glibc < 2.34) pthread_create/_join
+                // live in a separate libpthread.so that must be linked explicitly.
+                dynamicSystemLibs("GL", "X11", "fontconfig", "pthread")
                 arm64 { dynamicSystemLibs("EGL") }
             }
 

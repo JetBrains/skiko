@@ -67,7 +67,7 @@ internal class SoftwareRenderer(
     }
 
     override fun acquireSurface(width: Int, height: Int): Surface = synchronized(drawLock) {
-        check(!isDisposed) { "SoftwareRedrawer is disposed" }
+        check(!isDisposed) { "SoftwareRenderer is disposed" }
         if (standaloneSurface == null || width != standaloneWidth || height != standaloneHeight) {
             standaloneSurface?.close()
             standaloneSurface = Surface.makeRaster(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL))

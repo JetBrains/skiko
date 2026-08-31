@@ -63,7 +63,7 @@ open class SkiaSwingLayer(
             get() = this@SkiaSwingLayer.properties.gpuResourceCacheLimit
     }
 
-    private val rendererManager = RenderApiFallbackManager<SwingRenderer>(
+    private val frameDriverManager = RenderApiFallbackManager<SwingRenderer>(
         properties.renderApi,
         factory = { renderApi, oldRenderer ->
             oldRenderer?.dispose()
@@ -72,10 +72,10 @@ open class SkiaSwingLayer(
     )
 
     private val renderer: SwingRenderer?
-        get() = rendererManager.current
+        get() = frameDriverManager.current
 
     val renderApi: GraphicsApi
-        get() = rendererManager.renderApi
+        get() = frameDriverManager.renderApi
 
     init {
         isOpaque = false
@@ -96,7 +96,7 @@ open class SkiaSwingLayer(
 
     private fun init(recreation: Boolean = false) {
         isDisposed = false
-        rendererManager.findNextWorkingRenderApi(recreation)
+        frameDriverManager.findNextWorkingRenderApi(recreation)
         isInitialized = true
     }
 
@@ -105,7 +105,7 @@ open class SkiaSwingLayer(
         if (isInitialized && !isDisposed) {
             // we should dispose renderer first (to cancel `draw` in rendering thread)
             renderer?.dispose()
-            rendererManager.dispose()
+            frameDriverManager.dispose()
             isDisposed = true
         }
     }
@@ -116,7 +116,7 @@ open class SkiaSwingLayer(
         } catch (e: RenderException) {
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
-                rendererManager.findNextWorkingRenderApi()
+                frameDriverManager.findNextWorkingRenderApi()
                 repaint()
             }
         }
