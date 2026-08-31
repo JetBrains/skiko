@@ -8,6 +8,7 @@ import IMPORT_GENERATOR
 import LinkSkikoWasmTask
 import OS
 import OptimizeSkikoWasmTask
+import SetupWasiSdkTask
 import SkikoModuleKind
 import SkikoProjectContext
 import compilerForTarget
@@ -19,7 +20,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
-import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
@@ -34,9 +35,11 @@ import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import projectDirs
 import registerOrGetSkiaDirProvider
+import resolveSdkDir
 import supportWeb
 import wasmImports
 import wasmImport
+import wasiSdkExecutableName
 import java.io.File
 
 private val Project.setupMjs
@@ -71,24 +74,40 @@ fun SkikoProjectContext.declareWasmTasks() {
     val emsdkVersion = project.findProperty("skiko.emsdk.version") ?:
         throw GradleException("skiko.emsdk.version property is not set")
     val setupEmscripten by project.tasks.registering(SetupEmscriptenTask::class) {
-        this.emsdkVersion.set(emsdkVersion.toString())
+        sdkVersion.set(emsdkVersion.toString())
         project.findProperty("skiko.emsdk.dir")?.toString()?.let {
-            emsdkDir.set(project.layout.dir(project.provider { project.resolveEmsdkDir(it) }))
-            requireExistingEmsdk.set(true)
+            sdkDir.set(project.layout.dir(project.provider { project.resolveSdkDir(it) }))
+            requireExistingSdk.set(true)
+        }
+    }
+
+    val wasiSdkVersion = project.findProperty("skiko.wasi.sdk.version") ?:
+        throw GradleException("skiko.wasi.sdk.version property is not set")
+    val setupWasiSdk by project.tasks.registering(SetupWasiSdkTask::class) {
+        sdkVersion.set(wasiSdkVersion.toString())
+        (project.findProperty("wasi.sdk")?.toString()
+            ?: project.findProperty("skiko.wasi.sdk.dir")?.toString())?.let {
+            sdkDir.set(project.layout.dir(project.provider { project.resolveSdkDir(it) }))
+            requireExistingSdk.set(true)
         }
     }
 
     fun emscriptenBinaryToolPath(toolName: String) =
-        setupEmscripten.flatMap { it.emsdkDir.dir("upstream/bin") }.map {
+        setupEmscripten.flatMap { it.sdkDir.dir("upstream/bin") }.map {
             it.file(toolName).asFile.absolutePath
+        }
+
+    fun wasiSdkBinaryToolPath(toolName: String) =
+        setupWasiSdk.flatMap { it.sdkDir.dir("bin") }.map {
+            it.file(wasiSdkExecutableName(toolName)).asFile.absolutePath
         }
 
     val copyEmscriptenWebGLLibs = if (!isSideModule) {
         project.tasks.register<CopyEmscriptenWebGLLibsTask>("copyEmscriptenWebGLLibs") {
             dependsOn(setupEmscripten)
             nodeExecutable.set(project.layout.file(setupEmscripten.map { it.nodeExecutableFile() }))
-            preprocessor.set(setupEmscripten.flatMap { it.emsdkDir.file("upstream/emscripten/tools/preprocessor.mjs") })
-            emscriptenLibDir.set(setupEmscripten.flatMap { it.emsdkDir.dir("upstream/emscripten/src/lib") })
+            preprocessor.set(setupEmscripten.flatMap { it.sdkDir.file("upstream/emscripten/tools/preprocessor.mjs") })
+            emscriptenLibDir.set(setupEmscripten.flatMap { it.sdkDir.dir("upstream/emscripten/src/lib") })
             outputDir.set(project.layout.buildDirectory.dir("generated/emscriptenWebGLLibs/webMain"))
             libFiles.set(listOf("libwebgl.js", "libwebgl2.js"))
             prefixFile.set(project.layout.projectDirectory.file("src/webMain/resources/pre-setup.mjs"))
@@ -107,9 +126,9 @@ fun SkikoProjectContext.declareWasmTasks() {
 
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm, false)
     val compileWasm by project.tasks.registering(CompileSkikoCppTask::class) {
-        dependsOn(setupEmscripten)
+        dependsOn(setupWasiSdk)
         dependsOn(skiaWasmDir)
-        compiler.set(compilerForTarget(project, OS.Wasm, Arch.Wasm))
+        compiler.set(wasiSdkBinaryToolPath(compilerForTarget(OS.Wasm, Arch.Wasm)))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -152,13 +171,13 @@ fun SkikoProjectContext.declareWasmTasks() {
 
     fun LinkSkikoWasmTask.configureCommon(prefixPath: String) {
         copyEmscriptenWebGLLibs?.let { dependsOn(it) }
-        dependsOn(setupEmscripten)
+        dependsOn(setupWasiSdk)
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
         val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
         val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
-        linker.set(linkerForTarget(project, OS.Wasm, Arch.Wasm))
+        linker.set(wasiSdkBinaryToolPath(linkerForTarget(OS.Wasm, Arch.Wasm)))
         buildTargetOS.set(OS.Wasm)
         buildTargetArch.set(Arch.Wasm)
         buildVariant.set(buildType)
@@ -337,14 +356,9 @@ fun SkikoProjectContext.declareWasmTasks() {
     }
 }
 
-private fun Project.resolveEmsdkDir(path: String): File =
-    File(path).let {
-        if (it.isAbsolute) it else rootProject.file(path)
-    }
-
 private fun SetupEmscriptenTask.nodeExecutableFile(): File {
     val executableName = if (hostOs.isWindows) "node.exe" else "node"
-    val nodeRoot = emsdkDir.get().asFile.resolve("node")
+    val nodeRoot = sdkDir.get().asFile.resolve("node")
     val candidates = nodeRoot
         .takeIf { it.isDirectory }
         ?.walkTopDown()
@@ -401,7 +415,9 @@ private fun SkikoProjectContext.provideWasmSideModule(mainLinkTaskName: String) 
 
         outgoing.artifact(sideLinkTask.flatMap { task ->
             task.outDir.file(task.libOutputFileName)
-        })
+        }) {
+            builtBy(sideLinkTask)
+        }
     }
 }
 

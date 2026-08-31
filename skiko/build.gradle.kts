@@ -543,8 +543,27 @@ tasks.register<BuildLocalSkiaTask>("prepareLocalSkiaBuild") {
         skiko.skiaTarget.getGradleFlags(skiko.targetArch)
     })
 
-    findProperty("wasi.sdk")?.toString()?.let {
-        wasiSdkPath.set(it)
+    if (skiko.skiaTarget == SkiaTarget.WASM) {
+        // Web builds register setupWasiSdk in declareWasmTasks(); reuse it here to avoid
+        // registering the same task twice when local Skia WASM builds run with web support.
+        val setupWasiSdk = if (supportWeb) {
+            tasks.named<SetupWasiSdkTask>("setupWasiSdk")
+        } else {
+            // Local Skia WASM builds can be requested with -Pskia.target=wasm without
+            // enabling web tasks, so they need to register the WASI SDK setup themselves.
+            val wasiSdkVersion = project.findProperty("skiko.wasi.sdk.version")
+                ?: throw GradleException("skiko.wasi.sdk.version property is not set")
+            tasks.register<SetupWasiSdkTask>("setupWasiSdk") {
+                sdkVersion.set(wasiSdkVersion.toString())
+                (project.findProperty("wasi.sdk")?.toString()
+                    ?: project.findProperty("skiko.wasi.sdk.dir")?.toString())?.let {
+                    sdkDir.set(project.layout.dir(project.provider { project.resolveSdkDir(it) }))
+                    requireExistingSdk.set(true)
+                }
+            }
+        }
+        dependsOn(setupWasiSdk)
+        wasiSdkPath.set(setupWasiSdk.map { it.sdkDir.get().asFile.absolutePath })
     }
 }
 

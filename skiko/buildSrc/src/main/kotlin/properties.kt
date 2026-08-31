@@ -1,4 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
@@ -40,7 +39,7 @@ val OS.isCompatibleWithHost: Boolean
         OS.Android -> true
     }
 
-fun compilerForTarget(project: Project, os: OS, arch: Arch): String =
+fun compilerForTarget(os: OS, arch: Arch): String =
     when (os) {
         // TODO: Use clang++ for all Linux targets
         OS.Linux -> when (arch) {
@@ -51,11 +50,11 @@ fun compilerForTarget(project: Project, os: OS, arch: Arch): String =
         OS.Android -> "clang++"
         OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
-        OS.Wasm -> project.findProperty("wasi.sdk").toString().let { "$it/bin/clang++" }
+        OS.Wasm -> "clang++"
     }
 
-fun linkerForTarget(project: Project, os: OS, arch: Arch): String =
-    if (os.isWindows) "lld-link.exe" else compilerForTarget(project, os, arch)
+fun linkerForTarget(os: OS, arch: Arch): String =
+    if (os.isWindows) "lld-link.exe" else compilerForTarget(os, arch)
 
 val OS.dynamicLibExt: String
     get() = when (this) {
