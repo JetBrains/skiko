@@ -197,8 +197,8 @@ extern "C"
                 return 0;
             }
 
-            auto glViewport = reinterpret_cast<void (APIENTRY *)(GLint, GLint, GLsizei, GLsizei)>(eglGetProcAddress("glViewport"));
-            auto glGetIntegerv = reinterpret_cast<void (APIENTRY *)(GLenum, GLint *)>(eglGetProcAddress("glGetIntegerv"));
+            static auto glViewport = reinterpret_cast<void (APIENTRY *)(GLint, GLint, GLsizei, GLsizei)>(eglGetProcAddress("glViewport"));
+            static auto glGetIntegerv = reinterpret_cast<void (APIENTRY *)(GLenum, GLint *)>(eglGetProcAddress("glGetIntegerv"));
             if (glViewport == nullptr || glGetIntegerv == nullptr)
             {
                 throwJavaRenderExceptionWithMessage(env, __FUNCTION__, "Could not get OpenGL functions.");
