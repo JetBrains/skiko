@@ -94,9 +94,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_finishFra
             /// async path while a resize is in progress is a stale straggler that passed the frame-loop
             /// gate just before the resize began; drop it rather than let its deferred present race the
             /// main-thread transactional present under the layer-wide presentsWithTransaction flag.
-            /// inLiveResize is a plain atomic ivar (not a CoreAnimation property), so reading it on the
+            /// liveResizing is a plain atomic ivar (not a CoreAnimation property), so reading it on the
             /// scheduler thread takes no CA lock and can't block.
-            if (device.inLiveResize) {
+            if (device.layer.liveResizing) {
                 return;
             }
 
