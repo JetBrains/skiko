@@ -6,7 +6,9 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.jetbrains.skiko.build.context.ToolMode
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.ArgBuilder
+import org.jetbrains.skiko.build.utils.VisualCppLinkerArgBuilder
+import org.jetbrains.skiko.build.utils.resolveToIoFile
 
 abstract class LinkSkikoTask : AbstractSkikoNativeToolTask() {
     @get:InputFiles

@@ -18,11 +18,24 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
-import org.jetbrains.skiko.build.context.*
-import org.jetbrains.skiko.build.cpp.*
-import org.jetbrains.skiko.build.dependencies.*
-import org.jetbrains.skiko.build.utils.*
-import org.jetbrains.skiko.build.wasm.*
+import org.jetbrains.skiko.build.context.SkikoModuleKind
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.registerOrGetSkiaDirProvider
+import org.jetbrains.skiko.build.context.supportWeb
+import org.jetbrains.skiko.build.cpp.CompileSkikoCppTask
+import org.jetbrains.skiko.build.dependencies.TargetEnv
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.IMPORT_GENERATOR
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.compilerForTarget
+import org.jetbrains.skiko.build.utils.linkerForTarget
+import org.jetbrains.skiko.build.utils.projectDirs
+import org.jetbrains.skiko.build.utils.wasmImport
+import org.jetbrains.skiko.build.utils.wasmImports
+import org.jetbrains.skiko.build.wasm.LinkSkikoWasmTask
+import org.jetbrains.skiko.build.wasm.OptimizeSkikoWasmTask
+import org.jetbrains.skiko.build.wasm.SetupEmscriptenTask
 
 private val Project.setupMjs
     get() = wasmImport("setup.mjs")

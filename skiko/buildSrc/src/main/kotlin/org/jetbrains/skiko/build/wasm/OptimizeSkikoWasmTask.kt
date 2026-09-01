@@ -7,7 +7,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.jetbrains.skiko.build.context.ToolMode
 import org.jetbrains.skiko.build.cpp.AbstractSkikoNativeToolTask
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.ArgBuilder
 
 abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
 

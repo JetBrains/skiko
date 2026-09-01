@@ -9,7 +9,9 @@ import org.gradle.nativeplatform.toolchain.internal.EmptySystemLibraries
 import org.gradle.nativeplatform.toolchain.internal.SystemLibraries
 import org.gradle.nativeplatform.toolchain.internal.msvcpp.*
 import org.gradle.util.internal.VersionNumber
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.hostOs
 
 data class WindowsSdkPaths(
     val compiler: File,

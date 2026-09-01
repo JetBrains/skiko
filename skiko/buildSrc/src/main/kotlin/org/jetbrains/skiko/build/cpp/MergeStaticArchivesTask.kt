@@ -1,3 +1,6 @@
+package org.jetbrains.skiko.build.cpp
+
+import org.jetbrains.skiko.build.utils.OS
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty

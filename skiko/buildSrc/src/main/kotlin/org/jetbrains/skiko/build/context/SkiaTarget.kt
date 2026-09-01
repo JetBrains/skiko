@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.build.context
 
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.SkikoGradleProperties
 
 enum class SkiaTarget(
     val id: String,

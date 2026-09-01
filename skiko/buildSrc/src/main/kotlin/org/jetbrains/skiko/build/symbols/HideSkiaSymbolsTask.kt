@@ -11,7 +11,7 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.OS
 
 abstract class HideSkiaSymbolsTask : DefaultTask() {
     @get:Inject

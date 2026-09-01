@@ -6,7 +6,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.jetbrains.skiko.build.cpp.LinkSkikoTask
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.resolveToIoFile
 
 abstract class LinkSkikoWasmTask : LinkSkikoTask() {
     @get:InputFiles

@@ -14,11 +14,23 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
-import org.jetbrains.skiko.build.context.*
-import org.jetbrains.skiko.build.cpp.*
-import org.jetbrains.skiko.build.dependencies.*
-import org.jetbrains.skiko.build.symbols.*
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.context.SkikoModuleKind
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.registerOrGetSkiaDirProvider
+import org.jetbrains.skiko.build.cpp.CompileSkikoCppTask
+import org.jetbrains.skiko.build.cpp.PatchSkiaSymbolsTask
+import org.jetbrains.skiko.build.cpp.WriteCInteropDefFile
+import org.jetbrains.skiko.build.symbols.HideSkiaSymbolsTask
+import org.jetbrains.skiko.build.dependencies.TargetEnv
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.compilerForTarget
+import org.jetbrains.skiko.build.utils.hostArch
+import org.jetbrains.skiko.build.utils.isCompatibleWithHost
+import org.jetbrains.skiko.build.utils.joinToTitleCamelCase
+import org.jetbrains.skiko.build.utils.mutableListOfLinkerOptions
+import org.jetbrains.skiko.build.utils.projectDirs
+import org.jetbrains.skiko.build.utils.registerSkikoTask
 
 private val nativeSymbolSourcesOsAttribute =
     Attribute.of("org.jetbrains.skiko.nativeSymbolSources.os", String::class.java)

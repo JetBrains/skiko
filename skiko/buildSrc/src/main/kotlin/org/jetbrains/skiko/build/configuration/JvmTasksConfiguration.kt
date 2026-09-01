@@ -19,12 +19,30 @@ import org.gradle.crypto.checksum.Checksum
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.skiko.build.context.*
-import org.jetbrains.skiko.build.cpp.*
-import org.jetbrains.skiko.build.dependencies.*
+import org.jetbrains.skiko.build.context.SkikoModuleKind
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.registerOrGetSkiaDirProvider
+import org.jetbrains.skiko.build.cpp.CompileSkikoCppTask
+import org.jetbrains.skiko.build.cpp.CompileSkikoObjCTask
+import org.jetbrains.skiko.build.cpp.LinkSkikoTask
+import org.jetbrains.skiko.build.cpp.runPkgConfig
+import org.jetbrains.skiko.build.dependencies.AdditionalRuntimeLibrary
+import org.jetbrains.skiko.build.dependencies.TargetEnv
 import org.jetbrains.skiko.build.signing.SealAndSignSharedLibraryTask
-import org.jetbrains.skiko.build.symbols.*
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.symbols.GenerateRequiredSymbolsTask
+import org.jetbrains.skiko.build.symbols.GenerateSymbolsListTask
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkiaBuildType
+import org.jetbrains.skiko.build.utils.compilerForTarget
+import org.jetbrains.skiko.build.utils.dynamicLibExt
+import org.jetbrains.skiko.build.utils.hostArch
+import org.jetbrains.skiko.build.utils.hostOs
+import org.jetbrains.skiko.build.utils.joinToTitleCamelCase
+import org.jetbrains.skiko.build.utils.linkerForTarget
+import org.jetbrains.skiko.build.utils.projectDirs
+import org.jetbrains.skiko.build.utils.registerSkikoTask
+import org.jetbrains.skiko.build.utils.targetId
 
 private val jvmTargetOsAttribute =
     Attribute.of("org.jetbrains.skiko.jvm.target-os", String::class.java)

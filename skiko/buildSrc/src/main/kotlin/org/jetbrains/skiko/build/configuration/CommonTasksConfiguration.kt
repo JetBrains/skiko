@@ -6,11 +6,23 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
-import org.jetbrains.skiko.build.context.*
-import org.jetbrains.skiko.build.cpp.*
-import org.jetbrains.skiko.build.dependencies.*
-import org.jetbrains.skiko.build.symbols.*
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.context.skiaVersion
+import org.jetbrains.skiko.build.context.supportAndroid
+import org.jetbrains.skiko.build.context.supportNativeIosArm64
+import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeIosX64
+import org.jetbrains.skiko.build.context.supportNativeLinux
+import org.jetbrains.skiko.build.context.supportNativeMac
+import org.jetbrains.skiko.build.context.supportNativeTvosArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosX64
+import org.jetbrains.skiko.build.context.supportWeb
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkiaBuildType
+import org.jetbrains.skiko.build.utils.SkikoProperties
+import org.jetbrains.skiko.build.utils.registerSkikoTask
+import org.jetbrains.skiko.build.utils.toTitleCase
 
 private fun Project.appleToolchainOutputOrNull(vararg args: String): String? =
     runCatching {
