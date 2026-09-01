@@ -22,8 +22,15 @@ import org.gradle.nativeplatform.MachineArchitecture
 import org.gradle.nativeplatform.OperatingSystemFamily
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
-import org.jetbrains.skiko.build.context.*
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.supportAndroid
+import org.jetbrains.skiko.build.context.supportAwt
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.targetId
+import org.jetbrains.skiko.build.utils.registerOrGetTask
+import org.jetbrains.skiko.build.utils.toTitleCase
 
 private val SkikoProjectContext.publishing get() = project.extensions.getByType(PublishingExtension::class.java)
 

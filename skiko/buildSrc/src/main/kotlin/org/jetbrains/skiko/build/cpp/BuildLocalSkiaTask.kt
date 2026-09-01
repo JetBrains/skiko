@@ -11,7 +11,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
 import org.jetbrains.skiko.build.context.SkiaTarget
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.SkiaBuildType
 
 abstract class BuildLocalSkiaTask : DefaultTask() {
 

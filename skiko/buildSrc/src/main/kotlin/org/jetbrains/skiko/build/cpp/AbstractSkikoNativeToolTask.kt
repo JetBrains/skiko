@@ -12,7 +12,11 @@ import org.gradle.process.ExecOperations
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.skiko.build.context.ToolMode
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.ArgBuilder
+import org.jetbrains.skiko.build.utils.DefaultArgBuilder
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkiaBuildType
 
 abstract class AbstractSkikoNativeToolTask : DefaultTask() {
     @get:Inject
@@ -114,4 +118,3 @@ abstract class AbstractSkikoNativeToolTask : DefaultTask() {
         } else logger.warn("$prefix: '$argFile'")
     }
 }
-

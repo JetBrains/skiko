@@ -11,7 +11,12 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.crypto.checksum.Checksum
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.register
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.SkikoProperties
+import org.jetbrains.skiko.build.utils.targetId
+import org.jetbrains.skiko.build.utils.toTitleCase
 
 interface AdditionalRuntimeLibrary {
     val jarTask: TaskProvider<Jar>

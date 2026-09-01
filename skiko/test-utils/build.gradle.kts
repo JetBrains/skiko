@@ -7,8 +7,20 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import org.jetbrains.skiko.build.context.*
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.context.skikoSourceSetHierarchyTemplate
+import org.jetbrains.skiko.build.context.supportAndroid
+import org.jetbrains.skiko.build.context.supportAwt
+import org.jetbrains.skiko.build.context.supportNativeIosArm64
+import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeIosX64
+import org.jetbrains.skiko.build.context.supportNativeLinux
+import org.jetbrains.skiko.build.context.supportNativeMac
+import org.jetbrains.skiko.build.context.supportNativeTvosArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosX64
+import org.jetbrains.skiko.build.context.supportWeb
+import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
 
 plugins {
     kotlin("multiplatform")

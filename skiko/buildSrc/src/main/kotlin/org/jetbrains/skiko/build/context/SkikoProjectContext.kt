@@ -12,8 +12,19 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.skiko.build.cpp.WindowsSdkPaths
-import org.jetbrains.skiko.build.dependencies.*
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.dependencies.AdditionalRuntimeLibrary
+import org.jetbrains.skiko.build.dependencies.BinaryRegistry
+import org.jetbrains.skiko.build.dependencies.Linkage
+import org.jetbrains.skiko.build.dependencies.ResolvedBinaryConfiguration
+import org.jetbrains.skiko.build.dependencies.SkikoDependencyScope
+import org.jetbrains.skiko.build.dependencies.TargetEnv
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.SkikoGradleProperties
+import org.jetbrains.skiko.build.utils.SkikoProperties
+import org.jetbrains.skiko.build.utils.joinToTitleCamelCase
+import org.jetbrains.skiko.build.utils.registerOrGetTask
 
 enum class SkikoModuleKind { CORE, EXTENSION }
 

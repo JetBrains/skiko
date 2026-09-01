@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.build.dependencies
 
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
 
 enum class TargetEnv { JVM, NATIVE, WASM }
 enum class Linkage { STATIC, DIRECT_STATIC, DYNAMIC }

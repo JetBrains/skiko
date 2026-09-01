@@ -16,7 +16,11 @@ import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutionException
 import org.jetbrains.skiko.build.context.ToolMode
-import org.jetbrains.skiko.build.utils.*
+import org.jetbrains.skiko.build.utils.ArgBuilder
+import org.jetbrains.skiko.build.utils.RunExternalProcessWork
+import org.jetbrains.skiko.build.utils.SourceToOutputMapping
+import org.jetbrains.skiko.build.utils.VisualCppCompilerArgBuilder
+import org.jetbrains.skiko.build.utils.mapSourceFilesToOutputFiles
 
 abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
     @get:Internal
