@@ -21,15 +21,14 @@ import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
@@ -121,6 +120,8 @@ fun SkikoProjectContext.declareWasmTasks() {
             }.configureEach {
                 // The compiler plugin reads generatedPreSetupMjs while producing setup.mjs.
                 dependsOn(task)
+                inputs.file(project.layout.buildDirectory.file("generated/emscriptenWebGLLibs/webMain/pre-setup.mjs"))
+                    .withPathSensitivity(PathSensitivity.RELATIVE)
             }
         }
     } else {
@@ -358,30 +359,6 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
     }
 
-    val optimizeWasm by project.tasks.registering(Exec::class) {
-        dependsOn(linkWasm)
-        val wasmFileProvider = linkWasm.flatMap { it.outDir.file(it.libOutputFileName) }
-
-        executable = "wasm-opt"
-
-        argumentProviders.add(CommandLineArgumentProvider {
-            val wasmFile = wasmFileProvider.get().asFile
-            listOf("-Oz", "--strip-debug", "--converge", "--strip-producers", wasmFile.absolutePath, "-o", wasmFile.absolutePath + ".opt")
-        })
-
-        doLast {
-            val wasmFile = wasmFileProvider.get().asFile
-            val optimizedFile = File(wasmFile.absolutePath + ".opt")
-            if (optimizedFile.exists()) {
-                wasmFile.delete()
-                optimizedFile.renameTo(wasmFile)
-                println("WASM optimized: ${wasmFile.length() / 1024} KB")
-            }
-        }
-    }
-    project.tasks.named("skikoWasmJar") {
-        dependsOn(optimizeWasm)
-    }
 }
 
 private fun SetupEmscriptenTask.nodeExecutableFile(): File {
