@@ -283,6 +283,10 @@ tasks.register<JavaExec>("awtBenchmark") {
     dependsOn(mainCompilation.compileTaskProvider)
     if (isCompositeBuild) {
         dependsOn(gradle.includedBuild("skiko").task(":skikoJvmJarForTests"))
+        systemProperty(
+            "skiko.library.path",
+            gradle.includedBuild("skiko").projectDir.resolve("build/skiko-runtime-for-tests").absolutePath
+        )
     }
     classpath = files(mainCompilation.output.allOutputs, mainCompilation.runtimeDependencyFiles)
     mainClass.set("org.jetbrains.skiko.benchmarks.JvmMainKt")

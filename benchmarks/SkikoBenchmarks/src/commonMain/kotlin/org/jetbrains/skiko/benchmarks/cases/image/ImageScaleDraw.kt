@@ -7,12 +7,44 @@ import org.jetbrains.skia.Rect
 import org.jetbrains.skia.SamplingMode
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skiko.benchmarks.BenchmarkSurfaceProvider
 import org.jetbrains.skiko.benchmarks.BenchmarkCase
+import org.jetbrains.skiko.benchmarks.RasterBenchmarkSurfaceProvider
+import org.jetbrains.skiko.benchmarks.makeGpuBenchmarkSurfaceProvider
 import kotlin.math.roundToLong
 
 val imageScaleDrawBenchmark = BenchmarkCase("image_scale_draw") {
+    runImageScaleDraw(RasterBenchmarkSurfaceProvider)
+}
+
+val imageScaleDrawGpuBenchmark = BenchmarkCase("image_scale_draw_gpu",
+    isSupported = { gpuSurfaceProvider() != null },
+    tearDown = { closeGpuSurfaceProvider() },
+) {
+    runImageScaleDraw(gpuSurfaceProvider()!!)
+}
+
+private var gpuSurfaceProvider: BenchmarkSurfaceProvider? = null
+private var gpuSurfaceProviderInitialized = false
+
+private fun gpuSurfaceProvider(): BenchmarkSurfaceProvider? {
+    if (!gpuSurfaceProviderInitialized) {
+        gpuSurfaceProvider = makeGpuBenchmarkSurfaceProvider()
+        gpuSurfaceProviderInitialized = true
+    }
+
+    return gpuSurfaceProvider
+}
+
+private fun closeGpuSurfaceProvider() {
+    gpuSurfaceProvider?.close()
+    gpuSurfaceProvider = null
+    gpuSurfaceProviderInitialized = false
+}
+
+private fun runImageScaleDraw(surfaceProvider: BenchmarkSurfaceProvider): Long {
     makePatternImage(128, 128).use { image ->
-        Surface.makeRasterN32Premul(512, 512).use { surface ->
+        return surfaceProvider.withSurface(512, 512) { surface ->
             Paint().use { paint ->
                 val canvas = surface.canvas
                 canvas.clear(0xFFFFFFFF.toInt())
