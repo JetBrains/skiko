@@ -3,6 +3,7 @@ package org.jetbrains.skiko.benchmarks
 import org.jetbrains.skiko.benchmarks.cases.drawing.clipTransformDrawBenchmark
 import org.jetbrains.skiko.benchmarks.cases.drawing.rectGridDrawBenchmark
 import org.jetbrains.skiko.benchmarks.cases.image.imageScaleDrawBenchmark
+import org.jetbrains.skiko.benchmarks.cases.image.imageScaleDrawGpuBenchmark
 import org.jetbrains.skiko.benchmarks.cases.image.imageSnapshotEncodeBenchmark
 import org.jetbrains.skiko.benchmarks.cases.path.pathBooleanOpsBenchmark
 import org.jetbrains.skiko.benchmarks.cases.path.pathParseAndDrawBenchmark
@@ -99,6 +100,8 @@ class BenchmarkCase(
     val name: String,
     val warmups: Int = 5,
     val iterations: Int = 25,
+    val isSupported: () -> Boolean = { true },
+    val tearDown: () -> Unit = {},
     val operation: () -> Long,
 )
 
@@ -109,23 +112,33 @@ object SkikoBenchmarkSuite {
         platform: String,
         config: BenchmarkConfig = BenchmarkConfig(),
     ): BenchmarkReport {
-        val selectedCases = if (config.benchmarks.isNullOrEmpty()) {
+        val requestedCases = if (config.benchmarks.isNullOrEmpty()) {
             cases
         } else {
             val normalized = config.benchmarks.map { it.lowercase() }.toSet()
             cases.filter { it.name.lowercase() in normalized }
         }
 
-        require(selectedCases.isNotEmpty()) {
+        require(requestedCases.isNotEmpty()) {
             "No Skiko benchmarks matched ${config.benchmarks.orEmpty().joinToString(",")}"
+        }
+
+        val selectedCases = requestedCases.filter { it.isSupported() }
+        require(selectedCases.isNotEmpty()) {
+            "Requested Skiko benchmarks are not supported on this platform: " +
+                    requestedCases.joinToString(", ") { it.name }
         }
 
         return BenchmarkReport(
             platform = platform,
             versionInfo = config.versionInfo,
             results = selectedCases.flatMap { case ->
-                config.modes.sortedBy { it.executionOrder }.map { mode ->
-                    case.run(mode, config)
+                try {
+                    config.modes.sortedBy { it.executionOrder }.map { mode ->
+                        case.run(mode, config)
+                    }
+                } finally {
+                    case.tearDown()
                 }
             }
         )
@@ -137,6 +150,7 @@ object SkikoBenchmarkSuite {
         pathParseAndDrawBenchmark,
         imageSnapshotEncodeBenchmark,
         imageScaleDrawBenchmark,
+        imageScaleDrawGpuBenchmark,
         clipTransformDrawBenchmark,
         pathBooleanOpsBenchmark,
         surfaceReadPixelsBenchmark,

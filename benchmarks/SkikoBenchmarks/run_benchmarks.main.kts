@@ -53,6 +53,9 @@ fun main(args: Array<String>) {
     println("Skiko version: $version")
     println("Number of runs: $runs")
     println("Modes: $modes")
+    if (usesCompositeBuild(version, argMap)) {
+        println("Composite build: true")
+    }
     println("Run server: ${platform == Platform.WEB}")
     benchmarkName?.let { println("Filtering by benchmark: $it") }
 
@@ -133,9 +136,14 @@ fun executeBenchmarks(
 }
 
 fun gradleArgsFor(version: String, extraArgs: Map<String, String>, platform: Platform): List<String> {
-    val args = mutableListOf("-Pskiko.version=$version")
-    if (extraArgs["composite"] == "true") {
-        args += "-Pskiko.composite.build=1"
+    val useCompositeBuild = usesCompositeBuild(version, extraArgs)
+    val args = if (useCompositeBuild) {
+        mutableListOf("-Pskiko.composite.build=1")
+    } else {
+        mutableListOf("-Pskiko.version=$version")
+    }
+
+    if (useCompositeBuild) {
         when (platform) {
             Platform.WEB -> {
                 args += "-Pskiko.wasm.enabled=true"
@@ -156,6 +164,9 @@ fun gradleArgsFor(version: String, extraArgs: Map<String, String>, platform: Pla
 
     return args.distinct()
 }
+
+fun usesCompositeBuild(version: String, extraArgs: Map<String, String>): Boolean =
+    extraArgs["composite"] == "true" || version == "0.0.0-SNAPSHOT" || version == "current"
 
 fun executeGradleBenchmark(
     task: String,
