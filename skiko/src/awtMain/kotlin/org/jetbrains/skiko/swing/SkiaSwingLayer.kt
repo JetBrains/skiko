@@ -74,6 +74,8 @@ open class SkiaSwingLayer(
     private val renderer: SwingRenderer?
         get() = rendererManager.current
 
+    private var repaintPacer: SwingRepaintPacer? = null
+
     val renderApi: GraphicsApi
         get() = rendererManager.renderApi
 
@@ -97,16 +99,44 @@ open class SkiaSwingLayer(
     private fun init(recreation: Boolean = false) {
         isDisposed = false
         rendererManager.findNextWorkingRenderApi(recreation)
+        repaintPacer?.dispose()
+        repaintPacer = if (SkikoProperties.swingFramePacingEnabled) SwingRepaintPacer(this) else null
         isInitialized = true
     }
 
     fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         if (isInitialized && !isDisposed) {
+            repaintPacer?.dispose()
+            repaintPacer = null
             // we should dispose renderer first (to cancel `draw` in rendering thread)
             renderer?.dispose()
             rendererManager.dispose()
             isDisposed = true
+        }
+    }
+
+    /**
+     * Requests a repaint of the layer content, like [repaint].
+     *
+     * When frame pacing is enabled ([SkikoProperties.swingFramePacingEnabled]) and Skiko has a
+     * display clock for the layer's display, the repaint is deferred to the next display refresh
+     * tick, and multiple requests coalesce into at most one repaint per tick. Otherwise the request
+     * falls back to a plain [repaint].
+     *
+     * Use this instead of [repaint] for invalidation-driven rendering (e.g. animations), so that a
+     * continuously invalidating scene renders at most at the display refresh rate.
+     *
+     * Must be called on the AWT event dispatch thread.
+     */
+    fun needRender() {
+        check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
+        if (isDisposed) return
+        val repaintPacer = repaintPacer
+        if (repaintPacer != null) {
+            repaintPacer.requestRepaint()
+        } else {
+            repaint()
         }
     }
 
