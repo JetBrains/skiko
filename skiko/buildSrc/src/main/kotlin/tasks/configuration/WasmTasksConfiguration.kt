@@ -22,13 +22,13 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
@@ -123,6 +123,8 @@ fun SkikoProjectContext.declareWasmTasks() {
             }.configureEach {
                 // The compiler plugin reads generatedPreSetupMjs while producing setup.mjs.
                 dependsOn(task)
+                inputs.file(project.layout.buildDirectory.file("generated/emscriptenWebGLLibs/webMain/pre-setup.mjs"))
+                    .withPathSensitivity(PathSensitivity.RELATIVE)
             }
         }
     } else {
@@ -364,6 +366,7 @@ fun SkikoProjectContext.declareWasmTasks() {
             println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
         }
     }
+
 }
 
 private fun SetupEmscriptenTask.nodeExecutableFile(): File {

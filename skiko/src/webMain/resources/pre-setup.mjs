@@ -55,10 +55,10 @@ async function loadSkikoWASM() {
                 if (prop === 'munmap') return () => 0;
                 if (prop === 'getpid') return () => 1;
                 if (prop === 'fiprintf' || prop === '__small_fprintf') return () => 0;
-                if (prop === '__wasm_longjmp') return () => {
+                if (prop === 'longjmp' || prop === '__wasm_longjmp') return () => {
                     throw new Error('longjmp not supported');
                 };
-                if (prop === '__wasm_setjmp' || prop === '__wasm_setjmp_test') return () => 0;
+                if (prop === 'setjmp' || prop === '__wasm_setjmp' || prop === '__wasm_setjmp_test') return () => 0;
 
                 return (...args) => {
                     if (wasmExports && wasmExports[prop]) {

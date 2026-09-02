@@ -242,7 +242,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
     }
 
-    compiler.set(compilerForTarget(project, targetOs, targetArch))
+    compiler.set(compilerForTarget(targetOs, targetArch))
 
     val osFlags: Array<String>
     when (targetOs) {
@@ -501,7 +501,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
     buildSuffix.set("jvm")
     buildTargetArch.set(targetArch)
     buildVariant.set(buildType)
-    linker.set(linkerForTarget(project, targetOs, targetArch))
+    linker.set(linkerForTarget(targetOs, targetArch))
     val maybeSignedDir = project.layout.buildDirectory.dir("maybe-signed-$target").get().asFile
     when (targetOs) {
         OS.MacOS -> {
