@@ -97,6 +97,24 @@ object SkikoProperties {
     val vsyncEnabled: Boolean
         by lazyBooleanProperty("skiko.vsync.enabled", defaultValue = true)
 
+    /**
+     * Whether `SkiaSwingLayer` paces invalidation-driven repaints (`needRender`) to the display
+     * refresh.
+     *
+     * Ticks come from Skiko's own display clocks, so this works on any JVM. Read when the layer
+     * is initialized (added to a component hierarchy).
+     */
+    val swingFramePacingEnabled: Boolean
+        by lazyBooleanProperty("skiko.swing.frame.pacing", defaultValue = false)
+
+    /**
+     * Forces Skiko's own pacing clocks to the phase-aligned timer even where a native display
+     * clock (CADisplayLink, DXGI vblank, DRM vblank) is available. Debug and measurement escape
+     * hatch.
+     */
+    val swingFramePacingForceTimer: Boolean
+        by lazyBooleanProperty("skiko.swing.frame.pacing.forceTimer", defaultValue = false)
+
     val frameBuffering: FrameBuffering by lazyProperty("skiko.buffering") {
         when (it) {
             "DOUBLE" -> FrameBuffering.DOUBLE
