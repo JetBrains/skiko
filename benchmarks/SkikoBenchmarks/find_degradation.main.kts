@@ -1,5 +1,7 @@
 #!/usr/bin/env kotlin
 
+@file:Import("benchmark_project.main.kts")
+
 import java.io.File
 
 /**
@@ -93,20 +95,6 @@ fun checkDegradation(v1: String, v2: String, benchmarkName: String, platform: St
     return output.lines()
         .drop(reportStartIndex)
         .any { line -> line.contains(benchmarkName) && line.contains("SLOWER") }
-}
-
-fun findBenchmarkProjectDir(): File {
-    val current = File(".").canonicalFile
-    if (current.resolve("build.gradle.kts").exists() && current.name == "SkikoBenchmarks") {
-        return current
-    }
-
-    val fromRepoRoot = current.resolve("benchmarks/SkikoBenchmarks")
-    if (fromRepoRoot.resolve("build.gradle.kts").exists()) {
-        return fromRepoRoot.canonicalFile
-    }
-
-    throw IllegalStateException("Cannot locate benchmarks/SkikoBenchmarks project")
 }
 
 main(args)
