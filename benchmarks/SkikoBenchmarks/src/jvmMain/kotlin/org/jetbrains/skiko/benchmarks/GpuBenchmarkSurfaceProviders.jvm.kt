@@ -15,7 +15,7 @@ import org.jetbrains.skiko.graphicapi.OpenGLOffscreenContext
 import org.jetbrains.skiko.hostOs
 
 /**
- * Selects the native GPU backend used by Skiko on each AWT host platform.
+ * Selects the native GPU backend used by Skiko on each JVM host platform.
  */
 internal actual fun makeGpuBenchmarkSurfaceProvider(): BenchmarkSurfaceProvider? {
     return try {

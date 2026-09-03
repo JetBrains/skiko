@@ -9,7 +9,7 @@ import java.util.UUID
 
 enum class Platform(val platformName: String) {
     WEB("web"),
-    AWT("awt");
+    JVM("jvm");
 
     companion object {
         fun fromString(name: String): Platform =
@@ -130,9 +130,9 @@ fun executeBenchmarks(
                 benchmarkServer.stop()
             }
         }
-        Platform.AWT -> {
+        Platform.JVM -> {
             executeGradleBenchmark(
-                task = "awtBenchmark",
+                task = "jvmBenchmark",
                 runArgs = runArgs,
                 isServerStopped = null,
                 extraGradleArgs = gradleArgs
@@ -155,7 +155,7 @@ fun gradleArgsFor(version: String, extraArgs: Map<String, String>, platform: Pla
                 args += "-Pskiko.wasm.enabled=true"
                 args += "-Pskiko.awt.enabled=false"
             }
-            Platform.AWT -> {
+            Platform.JVM -> {
                 args += "-Pskiko.wasm.enabled=false"
                 args += "-Pskiko.awt.enabled=true"
             }

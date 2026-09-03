@@ -143,7 +143,7 @@ tasks.matching { it.name == "jsProcessResources" || it.name == "wasmJsProcessRes
     dependsOn(unpackWasmRuntime)
 }
 
-configurations.matching { it.name == "awtRuntimeClasspath" }.configureEach {
+configurations.matching { it.name == "jvmRuntimeClasspath" }.configureEach {
     attributes {
         attribute(
             OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE,
@@ -186,7 +186,7 @@ gradle.taskGraph.whenReady {
 
 val Task.requiresSkikoVersion: Boolean
     get() = name in setOf(
-        "awtBenchmark",
+        "jvmBenchmark",
         "wasmJsBrowserProductionRun",
         "wasmJsBrowserDevelopmentRun",
         "runBrowserAndSaveStats",
@@ -196,7 +196,7 @@ val String.referencesSkikoBenchmarkTask: Boolean
     get() {
         val taskName = substringAfterLast(":")
         return taskName in setOf(
-            "awtBenchmark",
+            "jvmBenchmark",
             "wasmJsBrowserProductionRun",
             "wasmJsBrowserDevelopmentRun",
             "runBrowserAndSaveStats",
@@ -204,7 +204,7 @@ val String.referencesSkikoBenchmarkTask: Boolean
     }
 
 kotlin {
-    jvm("awt") {
+    jvm {
         compilations.all {
             compileTaskProvider.configure {
                 compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
@@ -235,7 +235,7 @@ kotlin {
             implementation(libs.skiko)
         }
 
-        val awtMain by getting {
+        val jvmMain by getting {
             dependencies {
                 if (isCompositeBuild) {
                     runtimeOnly(files(localAwtRuntimeJar!!))
@@ -263,7 +263,7 @@ kotlin {
     }
 }
 
-val benchmarkServerCompilation = kotlin.targets.getByName("awt").compilations.create("benchmarkServer") {
+val benchmarkServerCompilation = kotlin.targets.getByName("jvm").compilations.create("benchmarkServer") {
     defaultSourceSet {
         kotlin.srcDir("src/benchmarkServerMain/kotlin")
         dependencies {
@@ -275,11 +275,11 @@ val benchmarkServerCompilation = kotlin.targets.getByName("awt").compilations.cr
     }
 }
 
-tasks.register<JavaExec>("awtBenchmark") {
+tasks.register<JavaExec>("jvmBenchmark") {
     group = "benchmark"
-    description = "Runs Skiko API benchmarks on the JVM/AWT target."
+    description = "Runs Skiko API benchmarks on the JVM target."
 
-    val mainCompilation = kotlin.targets.getByName("awt").compilations.getByName("main")
+    val mainCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn(mainCompilation.compileTaskProvider)
     if (isCompositeBuild) {
         dependsOn(gradle.includedBuild("skiko").task(":skikoJvmJarForTests"))

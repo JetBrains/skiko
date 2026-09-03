@@ -40,13 +40,13 @@ You can also run the Gradle convenience task:
 ./gradlew -p benchmarks/SkikoBenchmarks runBrowserAndSaveStats -Pskiko.version=<skiko-version>
 ```
 
-JVM/AWT can be run with:
+JVM can be run with:
 
 ```bash
-./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts awt version=<skiko-version>
+./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts jvm version=<skiko-version>
 ```
 
-The JVM/AWT task prints the same JSON report directly to the terminal.
+The JVM task prints the same JSON report directly to the terminal.
 
 Additional arguments:
 
@@ -138,10 +138,10 @@ The included-build path follows the web samples: `org.jetbrains.skiko:skiko` is 
 with the local `skiko` project, and the wasm runtime is copied from the included build's
 `skikoWasmJar` output.
 
-AWT can also run against the current checkout:
+JVM can also run against the current checkout:
 
 ```bash
-./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts awt \
+./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts jvm \
     version=<version-label> \
     composite=true
 ```

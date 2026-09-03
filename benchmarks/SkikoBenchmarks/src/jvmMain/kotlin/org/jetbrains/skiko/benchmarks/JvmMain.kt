@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
 
     val config = BenchmarkConfig.fromArgs(args.asIterable())
     val report = SkikoBenchmarkSuite.run(
-        platform = "jvm-awt",
+        platform = "jvm",
         config = config,
     )
 
@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
         resultsDir.mkdirs()
         report.results.forEach { result ->
             val file = resultsDir.resolve("${result.name}.json")
-            file.writeText(result.toReportJson(platform = "jvm-awt", versionInfo = config.versionInfo))
+            file.writeText(result.toReportJson(platform = "jvm", versionInfo = config.versionInfo))
             println("JSON results saved to ${file.absolutePath}")
         }
     } else {

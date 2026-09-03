@@ -6,7 +6,7 @@ import java.io.File
 
 /**
  * Usage:
- *   ./find_degradation.main.kts benchmarks=<benchmarkName> versions=<versionsFile> [platform=web|awt]
+ *   ./find_degradation.main.kts benchmarks=<benchmarkName> versions=<versionsFile> [platform=web|jvm]
  */
 
 val projectDir = findBenchmarkProjectDir()
@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
     val platform = argMap["platform"] ?: "web"
 
     if (benchmarkName == null || versionsFileName == null) {
-        println("Usage: ./find_degradation.main.kts benchmarks=<benchmarkName> versions=<versionsFile> [platform=web|awt]")
+        println("Usage: ./find_degradation.main.kts benchmarks=<benchmarkName> versions=<versionsFile> [platform=web|jvm]")
         return
     }
 
