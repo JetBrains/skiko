@@ -294,17 +294,24 @@ fun canOpenWithPlaywright(): Boolean =
 fun waitForHttp(url: String, timeoutMs: Long): Boolean {
     val start = System.currentTimeMillis()
     while (System.currentTimeMillis() - start < timeoutMs) {
-        try {
-            val connection = URI(url).toURL().openConnection()
-            connection.connectTimeout = 1_000
-            connection.readTimeout = 1_000
-            connection.getInputStream().use { return true }
-        } catch (_: Throwable) {
+        if (isHttpReachable(url)) {
+            return true
+        } else {
             Thread.sleep(500)
         }
     }
     return false
 }
+
+fun isHttpReachable(url: String): Boolean =
+    try {
+        val connection = URI(url).toURL().openConnection()
+        connection.connectTimeout = 1_000
+        connection.readTimeout = 1_000
+        connection.getInputStream().use { true }
+    } catch (_: Throwable) {
+        false
+    }
 
 class LocalBenchmarkServer(
     private val saveStatsToJSON: Boolean,
@@ -334,7 +341,9 @@ class LocalBenchmarkServer(
             "--stacktrace",
             *extraGradleArgs.toTypedArray(),
             "runBenchmarkServer",
-            "-PbenchmarkServer.arguments=saveStatsToJSON=$saveStatsToJSON serverToken=$serverToken port=$port"
+            "-PbenchmarkServer.saveStatsToJSON=$saveStatsToJSON",
+            "-PbenchmarkServer.serverToken=$serverToken",
+            "-PbenchmarkServer.port=$port"
         )
             .directory(projectDir)
             .redirectErrorStream(true)
@@ -396,6 +405,7 @@ class LocalBenchmarkServer(
     }
 
     private fun waitForBenchmarkServerStart(): Boolean {
+        val url = "http://localhost:$port/"
         val startTime = System.currentTimeMillis()
         var observedStartingProcessAlive = false
         while (System.currentTimeMillis() - startTime < WEB_BENCHMARK_TIMEOUT_MS) {
@@ -411,6 +421,11 @@ class LocalBenchmarkServer(
                 observedStartingProcessAlive = true
             }
             if (!processIsAlive && observedStartingProcessAlive) return false
+
+            if (isHttpReachable(url)) {
+                state.set(BenchmarkServerState.RUNNING)
+                return true
+            }
 
             Thread.sleep(500)
         }

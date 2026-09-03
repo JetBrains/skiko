@@ -297,13 +297,19 @@ tasks.register<JavaExec>("runBenchmarkServer") {
     group = "benchmark"
     description = "Runs the local Ktor server that receives browser benchmark reports."
 
-    val serverArguments = providers.gradleProperty("benchmarkServer.arguments").orElse("")
+    val saveStatsToJSON = providers.gradleProperty("benchmarkServer.saveStatsToJSON").orElse("true")
+    val serverToken = providers.gradleProperty("benchmarkServer.serverToken")
+    val port = providers.gradleProperty("benchmarkServer.port").orElse("8090")
     dependsOn(benchmarkServerCompilation.compileTaskProvider)
     classpath = files(benchmarkServerCompilation.output.allOutputs, benchmarkServerCompilation.runtimeDependencyFiles)
     mainClass.set("org.jetbrains.skiko.benchmarks.BenchmarkServerMainKt")
 
     doFirst {
-        args(serverArguments.get().split(" ").filter { it.isNotBlank() })
+        args(
+            "saveStatsToJSON=${saveStatsToJSON.get()}",
+            "serverToken=${serverToken.get()}",
+            "port=${port.get()}"
+        )
     }
 }
 
