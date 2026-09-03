@@ -32,13 +32,13 @@ val gradlew = repoRoot.resolve("gradlew")
 
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
-        println("Usage: ./run_benchmarks.main.kts <platform> version=<version> [runs=1] [benchmarks=<name1,name2,...>] [modes=SIMPLE|VSYNC_EMULATION|STARTUP] [any other gradle args]")
+        println("Usage: ./run_benchmarks.main.kts <platform> version=<version> [runs=1] [benchmarks=<name1,name2,...>] [modes=SIMPLE|STARTUP] [any other gradle args]")
         println("Platforms: ${Platform.entries.joinToString { it.platformName }}")
         println("Arguments:")
         println("  runs=<number> (default: 1)")
         println("  version=<skiko-version> (required)")
         println("  benchmarks=<name1,name2,...>")
-        println("  modes=SIMPLE,VSYNC_EMULATION,STARTUP (default: SIMPLE)")
+        println("  modes=SIMPLE,STARTUP (default: SIMPLE)")
         println("  any other gradle args")
         return
     }

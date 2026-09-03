@@ -65,9 +65,6 @@ data class BenchmarkResult(
     val minMillis: Double,
     val maxMillis: Double,
     val checksum: Long,
-    val p90Millis: Double? = null,
-    val p99Millis: Double? = null,
-    val missedFramePercent: Double? = null,
 ) {
     fun toJson(indent: String): String = buildString {
         append(indent).append("{\n")
@@ -79,15 +76,6 @@ data class BenchmarkResult(
         append(indent).append("  \"medianMillis\": ").append(medianMillis.formatMillis()).append(",\n")
         append(indent).append("  \"minMillis\": ").append(minMillis.formatMillis()).append(",\n")
         append(indent).append("  \"maxMillis\": ").append(maxMillis.formatMillis()).append(",\n")
-        p90Millis?.let {
-            append(indent).append("  \"p90Millis\": ").append(it.formatMillis()).append(",\n")
-        }
-        p99Millis?.let {
-            append(indent).append("  \"p99Millis\": ").append(it.formatMillis()).append(",\n")
-        }
-        missedFramePercent?.let {
-            append(indent).append("  \"missedFramePercent\": ").append(it.formatMillis()).append(",\n")
-        }
         append(indent).append("  \"checksum\": ").append(checksum).append("\n")
         append(indent).append("}")
     }
@@ -160,7 +148,6 @@ object SkikoBenchmarkSuite {
     private fun BenchmarkCase.run(mode: BenchmarkMode, config: BenchmarkConfig): BenchmarkResult =
         when (mode) {
             BenchmarkMode.SIMPLE -> runRepeated(BenchmarkMode.SIMPLE, config)
-            BenchmarkMode.VSYNC_EMULATION -> runRepeated(BenchmarkMode.VSYNC_EMULATION, config)
             BenchmarkMode.STARTUP -> runStartup()
         }
 
@@ -188,9 +175,6 @@ object SkikoBenchmarkSuite {
             minMillis = samples.minOrNull() ?: 0.0,
             maxMillis = samples.maxOrNull() ?: 0.0,
             checksum = checksum,
-            p90Millis = if (mode == BenchmarkMode.VSYNC_EMULATION) samples.percentile(90) else null,
-            p99Millis = if (mode == BenchmarkMode.VSYNC_EMULATION) samples.percentile(99) else null,
-            missedFramePercent = if (mode == BenchmarkMode.VSYNC_EMULATION) samples.missedFramePercent() else null,
         )
     }
 
@@ -220,7 +204,6 @@ private val BenchmarkMode.executionOrder: Int
     get() = when (this) {
         BenchmarkMode.STARTUP -> 0
         BenchmarkMode.SIMPLE -> 1
-        BenchmarkMode.VSYNC_EMULATION -> 2
     }
 
 private fun DoubleArray.median(): Double {
@@ -234,21 +217,6 @@ private fun DoubleArray.median(): Double {
     } else {
         sorted[middle]
     }
-}
-
-private fun DoubleArray.percentile(percentile: Int): Double {
-    require(isNotEmpty()) { "Cannot calculate percentile of an empty array" }
-
-    val sorted = sortedArray()
-    val index = (((percentile / 100.0) * (sorted.size - 1))).roundToLong().toInt()
-    return sorted[index.coerceIn(sorted.indices)]
-}
-
-private fun DoubleArray.missedFramePercent(frameBudgetMillis: Double = 16.666): Double {
-    require(isNotEmpty()) { "Cannot calculate missed frame percentage of an empty array" }
-
-    val missedFrames = count { it > frameBudgetMillis }
-    return missedFrames * 100.0 / size
 }
 
 private fun String.escapeJson(): String =

@@ -2,7 +2,6 @@ package org.jetbrains.skiko.benchmarks
 
 enum class BenchmarkMode(val argumentName: String, val resultSuffix: String?) {
     SIMPLE("SIMPLE", null),
-    VSYNC_EMULATION("VSYNC_EMULATION", "vsync_emulation"),
     STARTUP("STARTUP", "startup");
 
     companion object {
