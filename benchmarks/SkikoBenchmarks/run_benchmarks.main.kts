@@ -174,7 +174,7 @@ fun gradleArgsFor(version: String, extraArgs: Map<String, String>, platform: Pla
 }
 
 fun usesCompositeBuild(version: String, extraArgs: Map<String, String>): Boolean =
-    extraArgs["composite"] == "true" || version == "0.0.0-SNAPSHOT" || version == "current"
+    extraArgs["composite"] == "true" || version == "current"
 
 fun executeGradleBenchmark(
     task: String,
