@@ -24,6 +24,32 @@ internal object RasterBenchmarkSurfaceProvider : BenchmarkSurfaceProvider {
 }
 
 /**
+ * Lazily creates and owns the GPU-backed surface provider for benchmark cases.
+ */
+internal object GpuBenchmarkSurfaceProvider {
+    private var provider: BenchmarkSurfaceProvider? = null
+    private var initialized = false
+
+    fun get(): BenchmarkSurfaceProvider? {
+        if (!initialized) {
+            provider = makeGpuBenchmarkSurfaceProvider()
+            initialized = true
+        }
+
+        return provider
+    }
+
+    fun isSupported(): Boolean =
+        get() != null
+
+    fun close() {
+        provider?.close()
+        provider = null
+        initialized = false
+    }
+}
+
+/**
  * Creates the best available GPU-backed provider for the current benchmark target.
  *
  * Returns null when the target has no GPU implementation or when the backend context cannot be

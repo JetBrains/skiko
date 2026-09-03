@@ -9,8 +9,8 @@ import org.jetbrains.skia.Surface
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.benchmarks.BenchmarkSurfaceProvider
 import org.jetbrains.skiko.benchmarks.BenchmarkCase
+import org.jetbrains.skiko.benchmarks.GpuBenchmarkSurfaceProvider
 import org.jetbrains.skiko.benchmarks.RasterBenchmarkSurfaceProvider
-import org.jetbrains.skiko.benchmarks.makeGpuBenchmarkSurfaceProvider
 import kotlin.math.roundToLong
 
 val imageScaleDrawBenchmark = BenchmarkCase("image_scale_draw") {
@@ -18,28 +18,10 @@ val imageScaleDrawBenchmark = BenchmarkCase("image_scale_draw") {
 }
 
 val imageScaleDrawGpuBenchmark = BenchmarkCase("image_scale_draw_gpu",
-    isSupported = { gpuSurfaceProvider() != null },
-    tearDown = { closeGpuSurfaceProvider() },
+    isSupported = { GpuBenchmarkSurfaceProvider.isSupported() },
+    tearDown = { GpuBenchmarkSurfaceProvider.close() },
 ) {
-    runImageScaleDraw(gpuSurfaceProvider()!!)
-}
-
-private var gpuSurfaceProvider: BenchmarkSurfaceProvider? = null
-private var gpuSurfaceProviderInitialized = false
-
-private fun gpuSurfaceProvider(): BenchmarkSurfaceProvider? {
-    if (!gpuSurfaceProviderInitialized) {
-        gpuSurfaceProvider = makeGpuBenchmarkSurfaceProvider()
-        gpuSurfaceProviderInitialized = true
-    }
-
-    return gpuSurfaceProvider
-}
-
-private fun closeGpuSurfaceProvider() {
-    gpuSurfaceProvider?.close()
-    gpuSurfaceProvider = null
-    gpuSurfaceProviderInitialized = false
+    runImageScaleDraw(GpuBenchmarkSurfaceProvider.get()!!)
 }
 
 private fun runImageScaleDraw(surfaceProvider: BenchmarkSurfaceProvider): Long {
