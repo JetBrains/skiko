@@ -4,7 +4,7 @@
 
 /**
  * Usage:
- *   ./compare_benchmarks.main.kts v1=<version1> [v2=<version2>] [runs=3] [benchmarks=<name1,name2>] [platform=web|awt] [modes=SIMPLE|VSYNC_EMULATION|STARTUP] [metric=average|median] [skipExisting=true]
+ *   ./compare_benchmarks.main.kts v1=<version1> [v2=<version2>] [runs=3] [benchmarks=<name1,name2>] [platform=web|jvm] [modes=SIMPLE|VSYNC_EMULATION|STARTUP] [metric=average|median] [skipExisting=true]
  */
 
 val projectDir = findBenchmarkProjectDir()
@@ -76,7 +76,7 @@ fun main(args: Array<String>) {
     val v2 = argMap["v2"] ?: positionalArgs.getOrNull(1)
 
     if (v1 == null) {
-        println("Usage: ./compare_benchmarks.main.kts v1=<version1> [v2=<version2>] [runs=3] [benchmarks=<name1,name2>] [platform=web|awt] [modes=SIMPLE|VSYNC_EMULATION|STARTUP] [metric=average|median] [skipExisting=true]")
+        println("Usage: ./compare_benchmarks.main.kts v1=<version1> [v2=<version2>] [runs=3] [benchmarks=<name1,name2>] [platform=web|jvm] [modes=SIMPLE|VSYNC_EMULATION|STARTUP] [metric=average|median] [skipExisting=true]")
         return
     }
 
