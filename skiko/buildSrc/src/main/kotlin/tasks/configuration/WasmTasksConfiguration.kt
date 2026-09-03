@@ -21,7 +21,6 @@ import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
@@ -150,22 +149,22 @@ fun SkikoProjectContext.declareWasmTasks() {
 
         flags.set(
             buildList {
-                addAll(skiaPreprocessorFlags(OS.Wasm, buildType))
-                addAll(buildType.clangFlags)
-                add("-Oz")
-                add("-flto")
-                add("-fvisibility=hidden")
-                add("-fno-rtti")
-                add("-fno-exceptions")
-                add("-fPIC")
-                add("-D_WASI_EMULATED_MMAN")
-                add("-D_WASI_EMULATED_SIGNAL")
-                add("-D_WASI_EMULATED_PROCESS_CLOCKS")
-                add("-D_WASI_EMULATED_GETPID")
-                add("-mllvm")
-                add("-wasm-enable-sjlj")
-                add("-mexception-handling")
-                if (skiko.isWasmBuildWithProfiling) add("--profiling")
+                addAll(skiaPreprocessorFlags(OS.Wasm, buildType)) // Skia/ICU feature macros for this WASM build type.
+                addAll(buildType.clangFlags) // C++ standard plus Debug/Release optimization or debug-info flags.
+                add("-O2") // Optimize for speed without the most expensive optimization passes.
+                add("-flto") // Enable link-time optimization.
+                add("-fvisibility=hidden") // Hide symbols by default unless explicitly exported.
+                add("-fno-rtti") // Disable C++ runtime type information.
+                add("-fno-exceptions") // Disable C++ exception support.
+                add("-fPIC") // Generate position-independent code.
+                add("-D_WASI_EMULATED_MMAN") // Enable WASI libc's minimal mmap emulation declarations.
+                add("-D_WASI_EMULATED_SIGNAL") // Enable WASI libc's minimal signal emulation declarations.
+                add("-D_WASI_EMULATED_PROCESS_CLOCKS") // Enable WASI libc process-clock emulation declarations.
+                add("-D_WASI_EMULATED_GETPID") // Enable WASI libc getpid() emulation declarations.
+                add("-mllvm") // Forward the next option directly to LLVM.
+                add("-wasm-enable-sjlj") // Enable LLVM's WebAssembly setjmp/longjmp lowering pass.
+                add("-mexception-handling") // Enable WASM EH support used by SjLj; C++ exceptions stay disabled.
+                if (skiko.isWasmBuildWithProfiling) add("--profiling") // Keep function names for profiling output.
             }
         )
     }
@@ -205,30 +204,29 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
 
         flags.addAll(buildList {
-            add("-O2")
-            add("-fuse-ld=lld")
-            add("-flto")
+            add("-O2") // Optimize linked output for speed without the most expensive optimization passes.
+            add("-fuse-ld=lld") // Use LLVM's lld linker.
+            add("-flto") // Run link-time optimization across bitcode inputs.
+            add("-Wl,--no-entry") // Do not require a _start entry point.
             if (isSideModule) {
-                add("-shared")
-                add("-Wl,--no-entry")
-                add("-Wl,--export-all")
-                add("-Wl,--import-memory")
-                add("-Wl,--import-table")
+                add("-shared") // Produce a shared/side WebAssembly module.
+                add("-Wl,--export-all") // Export all module symbols for dynamic loading.
+                add("-Wl,--import-memory") // Import linear memory from the host/main module.
+                add("-Wl,--import-table") // Import the function table from the host/main module.
             } else {
-                add("-Wl,--gc-sections")
-                add("-Wl,--no-entry")
+                add("-Wl,--gc-sections") // Remove unused sections during linking.
             }
-            add("-Wl,--allow-undefined")
-            add("-mllvm")
-            add("-wasm-enable-sjlj")
-            add("-mexception-handling")
+            add("-Wl,--allow-undefined") // Allow unresolved symbols to become imports where possible.
+            add("-mllvm") // Forward the next option directly to LLVM.
+            add("-wasm-enable-sjlj") // Enable LLVM's WebAssembly setjmp/longjmp lowering pass.
+            add("-mexception-handling") // Enable WASM EH support used by SjLj; C++ exceptions stay disabled.
 
-            if (skiko.isWasmBuildWithProfiling) add("--profiling")
-            addAll(resolvedBinaryInputs.linkFlags)
+            if (skiko.isWasmBuildWithProfiling) add("--profiling") // Keep function names for profiling output.
+            addAll(resolvedBinaryInputs.linkFlags) // Link Skia and other resolved WASM binary inputs.
         })
         if (!isSideModule) {
             flags.addAll(exportsProvider.map { exports ->
-                exports.map { "-Wl,--export=$it" }
+                exports.map { "-Wl,--export=$it" } // Export symbols referenced by generated JS glue.
             })
         }
 
