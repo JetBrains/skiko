@@ -2,6 +2,7 @@
 
 @file:Import("benchmark_project.main.kts")
 
+import java.io.File
 import java.net.URI
 import java.util.Collections
 import java.util.concurrent.TimeUnit
@@ -325,6 +326,7 @@ class LocalBenchmarkServer(
             return
         }
 
+        val processStartTime = System.currentTimeMillis()
         process = ProcessBuilder(
             gradlew.absolutePath,
             "-p", projectDir.absolutePath,
@@ -371,7 +373,13 @@ class LocalBenchmarkServer(
             } else {
                 "\nLast benchmark server output:\n$outputTail"
             }
-            throw RuntimeException("Benchmark server did not become reachable at http://localhost:$port/.$exitCode$outputMessage")
+            val daemonOutput = recentGradleDaemonOutput(sinceMillis = processStartTime)
+            val daemonMessage = if (daemonOutput.isBlank()) {
+                ""
+            } else {
+                "\nRecent Gradle daemon output:\n$daemonOutput"
+            }
+            throw RuntimeException("Benchmark server did not become reachable at http://localhost:$port/.$exitCode$outputMessage$daemonMessage")
         }
     }
 
@@ -408,6 +416,33 @@ class LocalBenchmarkServer(
         }
         return false
     }
+}
+
+fun recentGradleDaemonOutput(sinceMillis: Long): String {
+    val gradleUserHome = System.getenv("GRADLE_USER_HOME")
+        ?.takeIf { it.isNotBlank() }
+        ?.let(::File)
+        ?: File(System.getProperty("user.home"), ".gradle")
+    val daemonDir = gradleUserHome.resolve("daemon")
+    if (!daemonDir.isDirectory) return ""
+
+    return daemonDir
+        .walkTopDown()
+        .filter { it.isFile && it.name.endsWith(".out.log") && it.lastModified() >= sinceMillis - 60_000 }
+        .sortedByDescending { it.lastModified() }
+        .take(3)
+        .mapNotNull { file ->
+            runCatching {
+                val lines = file.readLines().takeLast(80)
+                buildString {
+                    append("[GRADLE_DAEMON] ").append(file.absolutePath).append("\n")
+                    lines.forEach { line ->
+                        append("[GRADLE_DAEMON] ").append(line).append("\n")
+                    }
+                }.trimEnd()
+            }.getOrNull()
+        }
+        .joinToString("\n")
 }
 
 fun collectResults(platform: String, version: String, runIndex: Int) {
