@@ -3,6 +3,7 @@
 @file:Import("benchmark_project.main.kts")
 
 import java.net.URI
+import java.util.Collections
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import java.util.UUID
@@ -311,6 +312,7 @@ class LocalBenchmarkServer(
     private val port: Int = BENCHMARK_SERVER_PORT
 ) {
     private val state = AtomicReference(BenchmarkServerState.STARTING)
+    private val outputLines = Collections.synchronizedList(mutableListOf<String>())
 
     private var process: Process? = null
     private var outputThread: Thread? = null
@@ -327,6 +329,7 @@ class LocalBenchmarkServer(
             gradlew.absolutePath,
             "-p", projectDir.absolutePath,
             "--no-daemon",
+            "--stacktrace",
             *extraGradleArgs.toTypedArray(),
             "runBenchmarkServer",
             "-PbenchmarkServer.arguments=saveStatsToJSON=$saveStatsToJSON serverToken=$serverToken port=$port"
@@ -338,6 +341,7 @@ class LocalBenchmarkServer(
         outputThread = Thread {
             process?.inputStream?.bufferedReader()?.useLines { lines ->
                 lines.forEach { line ->
+                    outputLines.add(line)
                     println("[SERVER] $line")
                     if (line.contains("Benchmark server is available at")) {
                         state.set(BenchmarkServerState.RUNNING)
@@ -353,12 +357,21 @@ class LocalBenchmarkServer(
         }
 
         if (!waitForBenchmarkServerStart()) {
+            outputThread?.join(5_000)
             val exitCode = process
                 ?.takeIf { !it.isAlive }
                 ?.exitValue()
                 ?.let { " Server process exited with code $it." }
                 .orEmpty()
-            throw RuntimeException("Benchmark server did not become reachable at http://localhost:$port/.$exitCode")
+            val outputTail = synchronized(outputLines) {
+                outputLines.takeLast(40).joinToString(separator = "\n") { "[SERVER] $it" }
+            }
+            val outputMessage = if (outputTail.isBlank()) {
+                ""
+            } else {
+                "\nLast benchmark server output:\n$outputTail"
+            }
+            throw RuntimeException("Benchmark server did not become reachable at http://localhost:$port/.$exitCode$outputMessage")
         }
     }
 
@@ -376,13 +389,21 @@ class LocalBenchmarkServer(
 
     private fun waitForBenchmarkServerStart(): Boolean {
         val startTime = System.currentTimeMillis()
+        var observedStartingProcessAlive = false
         while (System.currentTimeMillis() - startTime < WEB_BENCHMARK_TIMEOUT_MS) {
-            when (state.get()) {
-                BenchmarkServerState.RUNNING -> return true
+            val currentState = state.get()
+            when (currentState) {
                 BenchmarkServerState.STOPPED -> return false
+                BenchmarkServerState.RUNNING -> return true
                 BenchmarkServerState.STARTING -> Unit
             }
-            if (process?.isAlive == false) return false
+
+            val processIsAlive = process?.isAlive == true
+            if (currentState == BenchmarkServerState.STARTING && processIsAlive) {
+                observedStartingProcessAlive = true
+            }
+            if (!processIsAlive && observedStartingProcessAlive) return false
+
             Thread.sleep(500)
         }
         return false
