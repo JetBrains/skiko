@@ -56,6 +56,9 @@ private fun Project.sideModuleSetupMjs(libBaseName: String) =
 private fun Project.setupReexportMjs(libBaseName: String) =
     wasmImport("js-$libBaseName-reexport-symbols.mjs")
 
+private val Project.wasmExportSymbols
+    get() = wasmImport("required-wasm-exports.txt")
+
 private fun Project.skikoTestMjs(libBaseName: String) =
     wasmImport("$libBaseName-test.mjs")
 
@@ -194,13 +197,15 @@ fun SkikoProjectContext.declareWasmTasks() {
         )
 
         val exportsProvider = project.provider {
-            val setupMjs = project.setupMjs
-            if (!setupMjs.exists()) return@provider emptyList<String>()
-            val text = setupMjs.readText()
-            val fromBrackets = Regex("""loadedWasm\._\["([a-zA-Z0-9_]+)"\]""").findAll(text).map { it.groupValues[1] }
-            val fromDot = Regex("""wasmExports\.([a-zA-Z0-9_]+)""").findAll(text).map { it.groupValues[1] }
-            val fromOrg = Regex("""org_jetbrains_[a-zA-Z0-9_]+""").findAll(text).map { it.value }
-            (fromBrackets + fromDot + fromOrg + listOf("malloc", "free", "memory", "__wasm_call_ctors", "_initialize")).distinct().toList()
+            val exportsFile = project.wasmExportSymbols
+            if (!exportsFile.exists()) {
+                throw GradleException("Required WASM exports file was not generated: ${exportsFile.absolutePath}")
+            }
+            val generatedExports = exportsFile.readLines()
+            (generatedExports + listOf("malloc", "free", "memory", "__wasm_call_ctors", "_initialize"))
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .distinct()
         }
 
         flags.addAll(buildList {
@@ -488,6 +493,7 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
     private val outputFileProvider: (Project) -> File,
     private val prefixFileProvider: (Project) -> File,
     private val reexportFileProvider: ((Project) -> File)?,
+    private val exportsFileProvider: ((Project) -> File)?,
     private val moduleNameProvider: (Project) -> String
 ) : KotlinCompilerPluginSupportPlugin {
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
@@ -496,6 +502,7 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
         val outputFile = outputFileProvider(project)
         val prefixFile = prefixFileProvider(project)
         val reexportFile = reexportFileProvider?.invoke(project)
+        val exportsFile = exportsFileProvider?.invoke(project)
         val moduleName = moduleNameProvider(project)
 
         return project.provider {
@@ -504,6 +511,9 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
                 add(SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath))
                 if (reexportFile != null) {
                     add(SubpluginOption("import-generator-reexport-path", reexportFile.normalize().absolutePath))
+                }
+                if (exportsFile != null) {
+                    add(SubpluginOption("import-generator-exports-path", exportsFile.normalize().absolutePath))
                 }
                 add(SubpluginOption("import-generator-module-name", moduleName))
             }
@@ -526,6 +536,7 @@ class WasmImportsGeneratorCompilerPluginSupportPlugin : AbstractImportGeneratorC
     { it.setupMjs },
     { it.generatedPreSetupMjs },
     { it.setupReexportMjs(it.name) },
+    { it.wasmExportSymbols },
     { it.name }
 )
 
@@ -537,6 +548,7 @@ class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGen
         it.projectDir.resolve("src/webMain/resources/$preludeFileName")
     },
     null,
+    null,
     { it.name }
 )
 
@@ -545,6 +557,7 @@ class SideWasmImportsGeneratorPlugin : AbstractImportGeneratorCompilerPluginSupp
     { it.sideModuleSetupMjs(it.name) },
     { it.projectDir.resolve("src/webMain/resources/pre-${it.name}.mjs") },
     { it.setupReexportMjs(it.name) },
+    null,
     { it.name }
 )
 
@@ -557,6 +570,9 @@ fun KotlinJsTargetDsl.setupImportsGeneratorPlugin(
 
     main.compileTaskProvider.configure {
         outputs.file(if (isSideModule) project.sideModuleSetupMjs(libBaseName) else project.setupMjs)
+        if (!isSideModule) {
+            outputs.file(project.wasmExportSymbols)
+        }
     }
 
     test.compileTaskProvider.configure {
