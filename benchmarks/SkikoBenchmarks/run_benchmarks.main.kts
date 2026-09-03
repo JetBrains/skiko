@@ -1,9 +1,10 @@
 #!/usr/bin/env kotlin
 
-import java.io.File
+@file:Import("benchmark_project.main.kts")
+
 import java.net.URI
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import java.util.UUID
 
 enum class Platform(val platformName: String) {
@@ -15,6 +16,12 @@ enum class Platform(val platformName: String) {
             entries.find { it.platformName == name }
                 ?: throw IllegalArgumentException("Unsupported platform: $name. Supported: ${entries.joinToString { it.platformName }}")
     }
+}
+
+enum class BenchmarkServerState {
+    STARTING,
+    RUNNING,
+    STOPPED
 }
 
 val BENCHMARK_SERVER_PORT = 8090
@@ -91,7 +98,6 @@ fun executeBenchmarks(
     }
 
     extraArgs.forEach { (key, value) ->
-        if (key == "saveStatsToJSON" && platform == Platform.WEB) return@forEach
         if (key == "composite" || key.startsWith("skiko.")) return@forEach
         if (value.isNotEmpty()) {
             runArgs.add("$key=$value")
@@ -104,7 +110,7 @@ fun executeBenchmarks(
         Platform.WEB -> {
             println("Starting benchmark server in background...")
             val benchmarkServer = LocalBenchmarkServer(
-                saveStatsToJSON = true,
+                saveStatsToJSON = runArgs.valueFor("saveStatsToJSON")?.toBoolean() ?: true,
                 serverToken = runArgs.valueFor("serverToken") ?: error("Missing server token"),
                 extraGradleArgs = gradleArgs
             )
@@ -115,7 +121,7 @@ fun executeBenchmarks(
                 executeGradleBenchmark(
                     task = "wasmJsBrowserProductionRun",
                     runArgs = runArgs,
-                    serverStopped = benchmarkServer.stopped,
+                    isServerStopped = benchmarkServer::isStopped,
                     extraGradleArgs = gradleArgs + "-Pskiko.benchmark.openBrowser=${!browserIsOpenedByPlaywright}",
                     browserUrl = browserUrl
                 )
@@ -128,7 +134,7 @@ fun executeBenchmarks(
             executeGradleBenchmark(
                 task = "awtBenchmark",
                 runArgs = runArgs,
-                serverStopped = null,
+                isServerStopped = null,
                 extraGradleArgs = gradleArgs
             )
         }
@@ -171,7 +177,7 @@ fun usesCompositeBuild(version: String, extraArgs: Map<String, String>): Boolean
 fun executeGradleBenchmark(
     task: String,
     runArgs: List<String>,
-    serverStopped: AtomicBoolean?,
+    isServerStopped: (() -> Boolean)?,
     extraGradleArgs: List<String> = emptyList(),
     browserUrl: String? = null
 ) {
@@ -186,7 +192,7 @@ fun executeGradleBenchmark(
 
     val process = processBuilder.start()
 
-    val exitCode = if (serverStopped != null) {
+    val exitCode = if (isServerStopped != null) {
         browserUrl?.let { openWithPlaywrightIfAvailable(it) }
 
         println("Waiting for benchmarks to complete (timeout 5m)...")
@@ -195,7 +201,7 @@ fun executeGradleBenchmark(
         var gradleExitCode: Int? = null
 
         while (System.currentTimeMillis() - startTime < WEB_BENCHMARK_TIMEOUT_MS) {
-            if (serverStopped.get()) {
+            if (isServerStopped()) {
                 println("Server stopped signal received. Benchmarks should be finished.")
                 completed = true
                 break
@@ -304,11 +310,12 @@ class LocalBenchmarkServer(
     private val extraGradleArgs: List<String>,
     private val port: Int = BENCHMARK_SERVER_PORT
 ) {
-    val stopped = AtomicBoolean(false)
-    private val started = AtomicBoolean(false)
+    private val state = AtomicReference(BenchmarkServerState.STARTING)
 
     private var process: Process? = null
     private var outputThread: Thread? = null
+
+    fun isStopped(): Boolean = state.get() == BenchmarkServerState.STOPPED
 
     fun start() {
         if (process != null) {
@@ -333,10 +340,10 @@ class LocalBenchmarkServer(
                 lines.forEach { line ->
                     println("[SERVER] $line")
                     if (line.contains("Benchmark server is available at")) {
-                        started.set(true)
+                        state.set(BenchmarkServerState.RUNNING)
                     }
                     if (line.contains("Benchmark server stopped")) {
-                        stopped.set(true)
+                        state.set(BenchmarkServerState.STOPPED)
                     }
                 }
             }
@@ -357,7 +364,7 @@ class LocalBenchmarkServer(
 
     fun stop() {
         val serverProcess = process ?: return
-        if (stopped.compareAndSet(false, true)) {
+        if (state.getAndSet(BenchmarkServerState.STOPPED) != BenchmarkServerState.STOPPED) {
             serverProcess.destroy()
             serverProcess.destroyForcibly()
             println("Benchmark server stopped")
@@ -370,7 +377,11 @@ class LocalBenchmarkServer(
     private fun waitForBenchmarkServerStart(): Boolean {
         val startTime = System.currentTimeMillis()
         while (System.currentTimeMillis() - startTime < WEB_BENCHMARK_TIMEOUT_MS) {
-            if (started.get()) return true
+            when (state.get()) {
+                BenchmarkServerState.RUNNING -> return true
+                BenchmarkServerState.STOPPED -> return false
+                BenchmarkServerState.STARTING -> Unit
+            }
             if (process?.isAlive == false) return false
             Thread.sleep(500)
         }
@@ -401,24 +412,5 @@ fun cleanJsonReports() {
 
 fun List<String>.valueFor(key: String): String? =
     firstOrNull { it.startsWith("$key=") }?.substringAfter("=")
-
-fun findBenchmarkProjectDir(): File {
-    val current = File(".").canonicalFile
-    if (current.resolve("build.gradle.kts").exists() && current.name == "SkikoBenchmarks") {
-        return current
-    }
-
-    val fromRepoRoot = current.resolve("benchmarks/SkikoBenchmarks")
-    if (fromRepoRoot.resolve("build.gradle.kts").exists()) {
-        return fromRepoRoot.canonicalFile
-    }
-
-    val fromScriptParent = File("benchmarks/SkikoBenchmarks").canonicalFile
-    if (fromScriptParent.resolve("build.gradle.kts").exists()) {
-        return fromScriptParent
-    }
-
-    throw IllegalStateException("Cannot locate benchmarks/SkikoBenchmarks project")
-}
 
 main(args)
