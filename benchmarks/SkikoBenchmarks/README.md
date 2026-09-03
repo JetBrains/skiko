@@ -64,19 +64,15 @@ that make sense for synchronous Skia operations:
 ```bash
 ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web \
     version=<skiko-version> \
-    modes=SIMPLE,VSYNC_EMULATION,STARTUP
+    modes=SIMPLE,STARTUP
 ```
 
 Supported modes:
 
 ```text
 SIMPLE            warmed repeated operation timing; default mode
-VSYNC_EMULATION   repeated timing plus 60 Hz budget-oriented percentile data
 STARTUP           first operation timing with no warmup
 ```
-
-`REAL` mode is not supported. Compose uses it to measure real display/vsync
-behavior, but these Skiko benchmarks run offscreen synchronous Skia operations.
 
 ## Compare Artifacts
 
