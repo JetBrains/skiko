@@ -7,12 +7,15 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.Surface
+import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.GpuPriority
 import org.jetbrains.skiko.MainUIDispatcher
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.SkikoRenderDelegate
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.graphicapi.DirectXOffscreenContext
 import org.jetbrains.skiko.toImage
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.junit.Rule
@@ -26,6 +29,8 @@ import java.awt.GraphicsEnvironment
 import java.awt.Image
 import java.awt.GridLayout
 import java.awt.image.BufferedImage
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
@@ -137,6 +142,7 @@ class AcceleratedSwingPainterTest {
      * from EDT because this is the production path that was observed to freeze.
      */
     @Test
+    @OptIn(ExperimentalSkikoApi::class)
     fun `stress Direct3D Swing device creation in lifecycle states`() {
         assumeTrue(hostOs == OS.Windows)
         assumeFalse(GraphicsEnvironment.isHeadless())
@@ -144,17 +150,19 @@ class AcceleratedSwingPainterTest {
 
         val iterations = System.getProperty("skiko.test.direct3d.stress.iterations", "5").toInt()
         val maxDurationMs = System.getProperty("skiko.test.direct3d.stress.maxDurationMs", "10000").toLong()
+        val textureSize = System.getProperty("skiko.test.direct3d.stress.textureSize", "1024").toInt()
 
         runBlocking(MainUIDispatcher) {
             val windows = mutableListOf<JFrame>()
             try {
-                repeat(iterations) { iteration ->
+                GpuPriority.entries.forEach { adapterPriority ->
+                    repeat(iterations) { iteration ->
                     // The layer is added before its window is displayable; addNotify occurs on show.
                     JFrame().also { window ->
                         windows += window
                         window.setSize(64, 64)
-                        window.contentPane.add(newDirect3DLayer())
-                        measureDeviceCreation("show invisible window", iteration, maxDurationMs) {
+                        window.contentPane.add(newDirect3DLayer(adapterPriority))
+                        measureDeviceCreation("$adapterPriority / show invisible window", iteration, maxDurationMs) {
                             window.isVisible = true
                         }
                     }
@@ -164,8 +172,19 @@ class AcceleratedSwingPainterTest {
                         windows += window
                         window.setSize(64, 64)
                         window.isVisible = true
-                        measureDeviceCreation("attach to visible window", iteration, maxDurationMs) {
-                            window.contentPane.add(newDirect3DLayer())
+                        measureDeviceCreation("$adapterPriority / attach to visible window", iteration, maxDurationMs) {
+                            window.contentPane.add(newDirect3DLayer(adapterPriority))
+                        }
+                    }
+
+                    // Tool-window contents can be attached before layout assigns a non-zero size.
+                    JFrame().also { window ->
+                        windows += window
+                        window.setSize(64, 64)
+                        window.isVisible = true
+                        val layer = newDirect3DLayer(adapterPriority).apply { setSize(0, 0) }
+                        measureDeviceCreation("$adapterPriority / attach zero-sized layer", iteration, maxDurationMs) {
+                            window.contentPane.add(layer)
                         }
                     }
 
@@ -176,34 +195,66 @@ class AcceleratedSwingPainterTest {
                         tabs.addTab("visible", JPanel())
                         window.setSize(64, 64)
                         window.isVisible = true
-                        measureDeviceCreation("attach in hidden tab", iteration, maxDurationMs) {
-                            tabs.addTab("hidden", newDirect3DLayer())
+                        measureDeviceCreation("$adapterPriority / attach in hidden tab", iteration, maxDurationMs) {
+                            tabs.addTab("hidden", newDirect3DLayer(adapterPriority))
                         }
                     }
 
+                    // Create and retain real GPU textures before creating another device.
+                    val residentLayers = mutableListOf<SkiaSwingLayer>()
                     // Keep earlier devices alive, then create several more in one EDT action.
                     JFrame().also { window ->
                         windows += window
                         window.setSize(256, 256)
                         window.isVisible = true
                         val panel = JPanel(GridLayout(2, 2))
-                        measureDeviceCreation("attach four layers", iteration, maxDurationMs) {
-                            repeat(4) { panel.add(newDirect3DLayer()) }
+                        measureDeviceCreation("$adapterPriority / attach four layers", iteration, maxDurationMs) {
+                            repeat(4) {
+                                newDirect3DLayer(adapterPriority).also {
+                                    residentLayers += it
+                                    panel.add(it)
+                                }
+                            }
                             window.contentPane.add(panel)
                         }
+                        residentLayers.forEach { renderIntoBitmap(it, textureSize) }
                     }
 
                     // Reattaching the same layer disposes and creates its device again.
                     JFrame().also { window ->
                         windows += window
-                        val layer = newDirect3DLayer()
+                        val layer = newDirect3DLayer(adapterPriority)
                         window.contentPane.add(layer)
                         window.setSize(64, 64)
                         window.isVisible = true
-                        measureDeviceCreation("reattach layer", iteration, maxDurationMs) {
+                        measureDeviceCreation("$adapterPriority / reattach layer", iteration, maxDurationMs) {
                             window.contentPane.remove(layer)
                             window.contentPane.add(layer)
                         }
+                    }
+
+                    // The EDT normally serializes Swing attachment, but other code can create
+                    // Direct3D offscreen contexts in parallel. Exercise that race explicitly.
+                    val creationStarted = CountDownLatch(1)
+                    val executor = Executors.newSingleThreadExecutor()
+                    val offscreenContext = executor.submit<DirectXOffscreenContext> {
+                        creationStarted.countDown()
+                        DirectXOffscreenContext()
+                    }
+                    try {
+                        creationStarted.await()
+                        JFrame().also { window ->
+                            windows += window
+                            window.setSize(64, 64)
+                            window.isVisible = true
+                            measureDeviceCreation("$adapterPriority / parallel offscreen device", iteration, maxDurationMs) {
+                                window.contentPane.add(newDirect3DLayer(adapterPriority))
+                            }
+                        }
+                    } finally {
+                        offscreenContext.get().close()
+                        executor.shutdownNow()
+                    }
                     }
                 }
             } finally {
@@ -212,10 +263,23 @@ class AcceleratedSwingPainterTest {
         }
     }
 
-    private fun newDirect3DLayer() = SkiaSwingLayer(
+    private fun newDirect3DLayer(adapterPriority: GpuPriority) = SkiaSwingLayer(
         renderDelegate = SkikoRenderDelegate { _, _, _, _ -> },
-        properties = SkiaLayerProperties(renderApi = GraphicsApi.DIRECT3D)
+        properties = SkiaLayerProperties(
+            renderApi = GraphicsApi.DIRECT3D,
+            adapterPriority = adapterPriority
+        )
     )
+
+    private fun renderIntoBitmap(layer: SkiaSwingLayer, size: Int) {
+        layer.setSize(size, size)
+        val graphics = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB_PRE).createGraphics()
+        try {
+            layer.paint(graphics)
+        } finally {
+            graphics.dispose()
+        }
+    }
 
     private inline fun measureDeviceCreation(name: String, iteration: Int, maxDurationMs: Long, block: () -> Unit) {
         val startedAt = System.nanoTime()
