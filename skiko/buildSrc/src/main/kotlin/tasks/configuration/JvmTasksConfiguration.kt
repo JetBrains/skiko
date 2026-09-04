@@ -872,6 +872,12 @@ fun SkikoProjectContext.setupJvmTestTask(
             systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", canRunUiTests.toString()))
             systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
             systemProperty("skiko.test.ui.renderApi.ignoreAssertsFor", System.getProperty("skiko.test.ui.renderApi.ignoreAssertsFor", "OPENGL"))
+            systemProperty("skiko.test.direct3d.stress.enabled", System.getProperty("skiko.test.direct3d.stress.enabled", "false"))
+            systemProperty("skiko.test.direct3d.stress.iterations", System.getProperty("skiko.test.direct3d.stress.iterations", "5"))
+            systemProperty("skiko.test.direct3d.stress.maxDurationMs", System.getProperty("skiko.test.direct3d.stress.maxDurationMs", "10000"))
+            systemProperty("skiko.test.direct3d.stress.textureSize", System.getProperty("skiko.test.direct3d.stress.textureSize", "256"))
+            systemProperty("skiko.test.direct3d.stress.maxResidentWindows", System.getProperty("skiko.test.direct3d.stress.maxResidentWindows", "12"))
+            systemProperty("skiko.test.direct3d.stress.runId", System.getProperty("skiko.test.direct3d.stress.runId", ""))
             systemProperty("skiko.test.debug", buildType == SkiaBuildType.DEBUG)
 
             // Tests should be deterministic, so disable scaling.

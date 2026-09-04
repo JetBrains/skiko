@@ -47,6 +47,16 @@ For example, if we want to include UI tests when we test JVM target, call this:
 ```
 Don't run any background tasks, click mouse, or press keys during the tests. Otherwise, they probably fail.
 
+#### Stressing first Direct3D device creation on Windows
+
+SKIKO-1116 is a rare, environment-dependent UI freeze during Direct3D device creation. Run the PowerShell stress script on a physical Windows machine to start a fresh test JVM for each attempt:
+
+```powershell
+.\skiko\scripts\stress-direct3d-device-creation.ps1 -Repetitions 100
+```
+
+While it runs, optionally trigger a display-driver reset with `Win+Ctrl+Shift+B`, or test immediately after sleep/resume, monitor reconnect, and RDP connect/disconnect. Save work first: the display may flicker. A slow `attach` measurement is the relevant signal; a quick `Failed to create DirectX12 device` message followed by fallback is not the reported freeze. Do not alter TDR registry settings or intentionally submit hanging GPU workloads.
+
 #### Run samples
 - First follow the instruction here: [Building JVM bindings](#building-jvm-bindings)
 - `./gradlew :SkiaAwtSample:run`
