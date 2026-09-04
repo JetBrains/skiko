@@ -6,6 +6,7 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.Paint
+import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.tests.runTest
 import org.w3c.dom.ErrorEvent
 import org.w3c.dom.HTMLCanvasElement
@@ -17,6 +18,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNotSame
 import kotlin.test.assertNull
@@ -147,6 +149,146 @@ class SkiaLayerTest {
                     layer.detach()
                 }
             }
+        }
+    }
+
+    /**
+     * CMP-9xxx / "null function" crash on fast window resize.
+     *
+     * [CanvasRenderer.resize] destroys the [Surface] synchronously. The `Canvas` handed to
+     * [SkikoRenderDelegate.onRender] is an unmanaged view owned by that Surface, so closing the
+     * Surface in the middle of a frame turns the canvas the delegate is drawing into a dangling
+     * `SkCanvas*`. In Wasm the next virtual call through its vtable traps with
+     * `RuntimeError: null function`, which is what the user sees as
+     * `RenderNode_nDrawInto -> SkCanvas::drawDrawable`.
+     *
+     * Compose calls `SkiaLayer.attachTo(canvas)` (-> `resize`) from its resize handling, so a
+     * resize arriving while a frame is being drawn is reachable in practice.
+     */
+    @Test
+    fun resizeDuringFrameKeepsTheFrameCanvasAlive() = runTest {
+        withLayer(100, 100) { htmlCanvas, layer ->
+            var resizeRequested = false
+            var surfaceClosedMidFrame: Boolean? = null
+            var drawAfterResizeFailure: Throwable? = null
+            var colorAfterResize: Int? = null
+
+            layer.renderDelegate = object : SkikoRenderDelegate {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    canvas.clear(Color.RED)
+                    if (resizeRequested) return
+                    resizeRequested = true
+
+                    // Exactly what Compose does on a resize event, but delivered while a frame
+                    // is in flight.
+                    htmlCanvas.width = 200
+                    htmlCanvas.height = 150
+                    layer.resize(200, 150)
+
+                    // The Surface owning `canvas` must still be alive: `canvas` was handed to us
+                    // for the duration of this frame.
+                    surfaceClosedMidFrame = (canvas._owner as Surface).isClosed
+
+                    // Keep using the canvas we were given, like Compose does after its own
+                    // measure/layout pass - this is where the crash happens in the wild
+                    // (RenderNode::drawInto -> canvas->drawDrawable through a freed vtable).
+                    // Only do it while the surface is alive: a use-after-free here traps the whole
+                    // Wasm module and would take every other test in the run down with it. The
+                    // `surfaceClosedMidFrame` assertion below is what reports the bug.
+                    if (surfaceClosedMidFrame == true) return
+                    try {
+                        val paint = Paint()
+                        paint.color = Color.BLUE
+                        canvas.drawCircle(1f, 1f, 1000f, paint)
+                        paint.close()
+
+                        val pixel = Bitmap()
+                        pixel.allocN32Pixels(1, 1)
+                        colorAfterResize = if (canvas.readPixels(pixel, 0, 0)) pixel.getColor(0, 0) else 0
+                        pixel.close()
+                    } catch (t: Throwable) {
+                        drawAfterResizeFailure = t
+                    }
+                }
+            }
+
+            layer.attachTo(htmlCanvas)
+            layer.requestAndAwaitRender()
+
+            assertTrue(resizeRequested, "the delegate must have been invoked")
+            assertEquals(
+                false, surfaceClosedMidFrame,
+                "resize() must not close the Surface that owns the Canvas of the running frame: " +
+                        "the Canvas becomes a dangling SkCanvas* for the rest of drawFrame()"
+            )
+            assertNull(drawAfterResizeFailure, "drawing on the frame canvas after a resize must not fail")
+            assertEquals(Color.BLUE, colorAfterResize, "the frame canvas must still be drawable after resize()")
+
+            // The renderer must also keep working for the following frames.
+            val next = TestRenderDelegate(fillColor = Color.GREEN)
+            layer.renderDelegate = next
+            layer.requestAndAwaitRender()
+            next.assertRendered(200, 150, Color.GREEN, "frame after a resize requested mid-frame")
+        }
+    }
+
+    /**
+     * `initCanvas()` closes the old Surface *before* creating the new one and only assigns
+     * `canvas` at the very end. If surface creation fails (a size the GPU cannot back - easy to
+     * hit while a window is being dragged, and unavoidable for a 0-sized container), the
+     * exception escapes `resize()` and the renderer is left holding a `Canvas` whose native
+     * `SkCanvas` has already been freed. The next `requestAnimationFrame` then does
+     * `canvas?.clear(Color.WHITE)` on freed memory.
+     */
+    @Test
+    fun failedResizeMustNotLeaveADanglingCanvas() = runTest {
+        withLayer(100, 100) { htmlCanvas, layer ->
+            val renderDelegate = TestRenderDelegate(fillColor = Color.RED)
+            layer.renderDelegate = renderDelegate
+
+            layer.attachTo(htmlCanvas)
+            layer.requestAndAwaitRender()
+            renderDelegate.assertRendered(100, 100, Color.RED, "initial frame")
+
+            // Far beyond GL_MAX_RENDERBUFFER_SIZE: Surface.makeFromBackendRenderTarget returns null.
+            // The HTML canvas attributes are deliberately left alone - allocating a 1M x 1M
+            // drawing buffer would lose the WebGL context and mask what is under test.
+            val tooBig = 1 shl 20
+            val failure = runCatching { layer.resize(tooBig, tooBig) }.exceptionOrNull()
+            assertNull(
+                failure,
+                "a size the GPU cannot back must be skipped, not thrown out of resize(): the throw " +
+                        "leaves CanvasRenderer.canvas pointing at the already freed SkCanvas"
+            )
+
+            // Today this frame dereferences the freed SkCanvas in `canvas?.clear(Color.WHITE)`.
+            var surfaceClosed: Boolean? = null
+            layer.renderDelegate = object : SkikoRenderDelegate {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    surfaceClosed = (canvas._owner as Surface).isClosed
+                    canvas.clear(Color.RED)
+                }
+            }
+            layer.requestAndAwaitRender()
+            assertNotEquals(
+                true, surfaceClosed,
+                "drawFrame() must never receive a Canvas owned by a closed Surface"
+            )
+
+            // Zero-sized containers happen while resizing, and must not break the renderer either.
+            htmlCanvas.width = 0
+            htmlCanvas.height = 0
+            assertNull(runCatching { layer.resize(0, 0) }.exceptionOrNull(), "resize(0, 0) must not throw")
+            layer.requestAndAwaitRender()
+
+            // ... and the layer has to recover once a usable size arrives.
+            val recovered = TestRenderDelegate(fillColor = Color.GREEN)
+            layer.renderDelegate = recovered
+            htmlCanvas.width = 120
+            htmlCanvas.height = 90
+            layer.resize(120, 90)
+            layer.requestAndAwaitRender()
+            recovered.assertRendered(120, 90, Color.GREEN, "frame after recovering from a failed resize")
         }
     }
 
