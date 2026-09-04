@@ -153,92 +153,31 @@ class SkiaLayerTest {
     }
 
     /**
-     * CMP-9xxx / "null function" crash on fast window resize.
+     * "null function" trap on fast window resize: use-after-free of the native `SkCanvas`.
      *
-     * [CanvasRenderer.resize] destroys the [Surface] synchronously. The `Canvas` handed to
-     * [SkikoRenderDelegate.onRender] is an unmanaged view owned by that Surface, so closing the
-     * Surface in the middle of a frame turns the canvas the delegate is drawing into a dangling
-     * `SkCanvas*`. In Wasm the next virtual call through its vtable traps with
-     * `RuntimeError: null function`, which is what the user sees as
-     * `RenderNode_nDrawInto -> SkCanvas::drawDrawable`.
+     * `Surface.canvas` is an unmanaged view - the native `SkCanvas` is owned by the `Surface` and
+     * dies with it. `initCanvas()` closes the old Surface *before* creating the new one and only
+     * assigns `canvas` at the very end:
      *
-     * Compose calls `SkiaLayer.attachTo(canvas)` (-> `resize`) from its resize handling, so a
-     * resize arriving while a frame is being drawn is reachable in practice.
-     */
-    @Test
-    fun resizeDuringFrameKeepsTheFrameCanvasAlive() = runTest {
-        withLayer(100, 100) { htmlCanvas, layer ->
-            var resizeRequested = false
-            var surfaceClosedMidFrame: Boolean? = null
-            var drawAfterResizeFailure: Throwable? = null
-            var colorAfterResize: Int? = null
-
-            layer.renderDelegate = object : SkikoRenderDelegate {
-                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                    canvas.clear(Color.RED)
-                    if (resizeRequested) return
-                    resizeRequested = true
-
-                    // Exactly what Compose does on a resize event, but delivered while a frame
-                    // is in flight.
-                    htmlCanvas.width = 200
-                    htmlCanvas.height = 150
-                    layer.resize(200, 150)
-
-                    // The Surface owning `canvas` must still be alive: `canvas` was handed to us
-                    // for the duration of this frame.
-                    surfaceClosedMidFrame = (canvas._owner as Surface).isClosed
-
-                    // Keep using the canvas we were given, like Compose does after its own
-                    // measure/layout pass - this is where the crash happens in the wild
-                    // (RenderNode::drawInto -> canvas->drawDrawable through a freed vtable).
-                    // Only do it while the surface is alive: a use-after-free here traps the whole
-                    // Wasm module and would take every other test in the run down with it. The
-                    // `surfaceClosedMidFrame` assertion below is what reports the bug.
-                    if (surfaceClosedMidFrame == true) return
-                    try {
-                        val paint = Paint()
-                        paint.color = Color.BLUE
-                        canvas.drawCircle(1f, 1f, 1000f, paint)
-                        paint.close()
-
-                        val pixel = Bitmap()
-                        pixel.allocN32Pixels(1, 1)
-                        colorAfterResize = if (canvas.readPixels(pixel, 0, 0)) pixel.getColor(0, 0) else 0
-                        pixel.close()
-                    } catch (t: Throwable) {
-                        drawAfterResizeFailure = t
-                    }
-                }
-            }
-
-            layer.attachTo(htmlCanvas)
-            layer.requestAndAwaitRender()
-
-            assertTrue(resizeRequested, "the delegate must have been invoked")
-            assertEquals(
-                false, surfaceClosedMidFrame,
-                "resize() must not close the Surface that owns the Canvas of the running frame: " +
-                        "the Canvas becomes a dangling SkCanvas* for the rest of drawFrame()"
-            )
-            assertNull(drawAfterResizeFailure, "drawing on the frame canvas after a resize must not fail")
-            assertEquals(Color.BLUE, colorAfterResize, "the frame canvas must still be drawable after resize()")
-
-            // The renderer must also keep working for the following frames.
-            val next = TestRenderDelegate(fillColor = Color.GREEN)
-            layer.renderDelegate = next
-            layer.requestAndAwaitRender()
-            next.assertRendered(200, 150, Color.GREEN, "frame after a resize requested mid-frame")
-        }
-    }
-
-    /**
-     * `initCanvas()` closes the old Surface *before* creating the new one and only assigns
-     * `canvas` at the very end. If surface creation fails (a size the GPU cannot back - easy to
-     * hit while a window is being dragged, and unavoidable for a 0-sized container), the
-     * exception escapes `resize()` and the renderer is left holding a `Canvas` whose native
-     * `SkCanvas` has already been freed. The next `requestAnimationFrame` then does
-     * `canvas?.clear(Color.WHITE)` on freed memory.
+     *     disposeCanvas()                       // SkCanvas freed; `canvas` still points at it
+     *     renderTarget = BackendRenderTarget.makeGL(width, height, ...)
+     *     surface = Surface.makeFromBackendRenderTarget(...) ?: throw RenderException(...)
+     *     canvas = surface!!.canvas             // skipped when the line above throws
+     *
+     * so a `resize()` whose surface creation fails leaves the renderer holding a `Canvas` over
+     * freed memory, with `surface == null` but `canvas != null`, and `width`/`height` already
+     * committed to a size nothing is backing.
+     *
+     * No reentrancy is needed for this to crash: JS is run-to-completion, so the resize event and
+     * the following `requestAnimationFrame` are separate tasks. The next frame - any later frame -
+     * does `canvas?.clear(Color.WHITE)` and then hands the dangling canvas to the delegate, where
+     * Compose's `RenderNode.drawInto` reaches `canvas->drawDrawable()` and traps on the freed
+     * vtable. Freed Skia memory is not scrubbed, which is why the earlier `clear`/`resetMatrix`
+     * can still appear to succeed and only a later virtual call reads a zeroed slot.
+     *
+     * Surface creation failing is reachable during a fast drag in two ways, neither guarded:
+     * `resize()` accepts non-positive sizes, and `GL.makeContextCurrent()`'s `Boolean` result is
+     * ignored, so a lost or non-current WebGL context is never noticed.
      */
     @Test
     fun failedResizeMustNotLeaveADanglingCanvas() = runTest {
@@ -260,6 +199,12 @@ class SkiaLayerTest {
                 "a size the GPU cannot back must be skipped, not thrown out of resize(): the throw " +
                         "leaves CanvasRenderer.canvas pointing at the already freed SkCanvas"
             )
+            assertEquals(
+                100, layer.state?.width,
+                "a resize that could not be applied must not commit its size: the reported size " +
+                        "has to keep matching the surface that actually exists"
+            )
+            assertEquals(100, layer.state?.height, "a resize that could not be applied must not commit its size")
 
             // Today this frame dereferences the freed SkCanvas in `canvas?.clear(Color.WHITE)`.
             var surfaceClosed: Boolean? = null
