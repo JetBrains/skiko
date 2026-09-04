@@ -22,6 +22,7 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
@@ -58,6 +59,9 @@ private fun Project.setupReexportMjs(libBaseName: String) =
 
 private val Project.wasmExportSymbols
     get() = wasmImport("required-wasm-exports.txt")
+
+private val Project.wasmTestExportSymbols
+    get() = wasmImport("required-wasm-test-exports.txt")
 
 private fun Project.skikoTestMjs(libBaseName: String) =
     wasmImport("$libBaseName-test.mjs")
@@ -201,7 +205,9 @@ fun SkikoProjectContext.declareWasmTasks() {
             if (!exportsFile.exists()) {
                 throw GradleException("Required WASM exports file was not generated: ${exportsFile.absolutePath}")
             }
-            val generatedExports = exportsFile.readLines()
+            val testExportsFile = project.wasmTestExportSymbols
+            val generatedExports = exportsFile.readLines() +
+                    if (testExportsFile.exists()) testExportsFile.readLines() else emptyList()
             (generatedExports + listOf("malloc", "free", "memory", "__wasm_call_ctors", "_initialize"))
                 .map { it.trim() }
                 .filter { it.isNotEmpty() }
@@ -387,6 +393,14 @@ fun SkikoProjectContext.provideWasmSideModules() {
 
 fun SkikoProjectContext.provideWasmTestResources() = with(project) {
     val optimizeWasm = tasks.named<OptimizeSkikoWasmTask>("optimizeWasm")
+    val wasmTestRuntimeResources = tasks.register<Sync>("wasmTestRuntimeResources") {
+        dependsOn(optimizeWasm)
+        from(optimizeWasm.flatMap { it.outDir }) {
+            include("$libBaseName.wasm")
+            include("*.mjs")
+        }
+        into(layout.buildDirectory.dir("wasmTestRuntimeResources"))
+    }
     configurations.create("wasmTestResourcesElements") {
         isCanBeConsumed = true
         isCanBeResolved = false
@@ -398,7 +412,7 @@ fun SkikoProjectContext.provideWasmTestResources() = with(project) {
             )
         }
 
-        outgoing.artifact(optimizeWasm.flatMap { it.outDir })
+        outgoing.artifact(wasmTestRuntimeResources.map { it.destinationDir })
         outgoing.artifact(wasmImports) {
             builtBy(
                 optimizeWasm,
@@ -554,7 +568,7 @@ class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGen
         it.projectDir.resolve("src/webMain/resources/$preludeFileName")
     },
     null,
-    null,
+    { it.wasmTestExportSymbols },
     { it.name }
 )
 
@@ -583,6 +597,7 @@ fun KotlinJsTargetDsl.setupImportsGeneratorPlugin(
 
     test.compileTaskProvider.configure {
         outputs.file(project.skikoTestMjs(libBaseName))
+        outputs.file(project.wasmTestExportSymbols)
     }
 
     listOf(main, test).forEach {
