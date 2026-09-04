@@ -7,18 +7,28 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.Surface
+import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.MainUIDispatcher
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.SkikoRenderDelegate
+import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.toImage
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.junit.Rule
 import org.junit.Test
+import org.junit.Assume.assumeFalse
+import org.junit.Assume.assumeTrue
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.GraphicsConfiguration
+import java.awt.GraphicsEnvironment
 import java.awt.Image
+import java.awt.GridLayout
 import java.awt.image.BufferedImage
 import javax.swing.JFrame
+import javax.swing.JPanel
+import javax.swing.JTabbedPane
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.seconds
@@ -119,6 +129,101 @@ class AcceleratedSwingPainterTest {
             } finally {
                 window.dispose()
             }
+        }
+    }
+
+    /**
+     * Manual stress reproducer for SKIKO-1116. Device creation is intentionally done
+     * from EDT because this is the production path that was observed to freeze.
+     */
+    @Test
+    fun `stress Direct3D Swing device creation in lifecycle states`() {
+        assumeTrue(hostOs == OS.Windows)
+        assumeFalse(GraphicsEnvironment.isHeadless())
+        assumeTrue(System.getProperty("skiko.test.direct3d.stress.enabled") == "true")
+
+        val iterations = System.getProperty("skiko.test.direct3d.stress.iterations", "5").toInt()
+        val maxDurationMs = System.getProperty("skiko.test.direct3d.stress.maxDurationMs", "10000").toLong()
+
+        runBlocking(MainUIDispatcher) {
+            val windows = mutableListOf<JFrame>()
+            try {
+                repeat(iterations) { iteration ->
+                    // The layer is added before its window is displayable; addNotify occurs on show.
+                    JFrame().also { window ->
+                        windows += window
+                        window.setSize(64, 64)
+                        window.contentPane.add(newDirect3DLayer())
+                        measureDeviceCreation("show invisible window", iteration, maxDurationMs) {
+                            window.isVisible = true
+                        }
+                    }
+
+                    // The layer is added to an already displayable hierarchy, as in tool-window opening.
+                    JFrame().also { window ->
+                        windows += window
+                        window.setSize(64, 64)
+                        window.isVisible = true
+                        measureDeviceCreation("attach to visible window", iteration, maxDurationMs) {
+                            window.contentPane.add(newDirect3DLayer())
+                        }
+                    }
+
+                    // A hidden tab is displayable but not showing, matching deferred tool-window content.
+                    JFrame().also { window ->
+                        windows += window
+                        val tabs = JTabbedPane().also { window.contentPane.add(it) }
+                        tabs.addTab("visible", JPanel())
+                        window.setSize(64, 64)
+                        window.isVisible = true
+                        measureDeviceCreation("attach in hidden tab", iteration, maxDurationMs) {
+                            tabs.addTab("hidden", newDirect3DLayer())
+                        }
+                    }
+
+                    // Keep earlier devices alive, then create several more in one EDT action.
+                    JFrame().also { window ->
+                        windows += window
+                        window.setSize(256, 256)
+                        window.isVisible = true
+                        val panel = JPanel(GridLayout(2, 2))
+                        measureDeviceCreation("attach four layers", iteration, maxDurationMs) {
+                            repeat(4) { panel.add(newDirect3DLayer()) }
+                            window.contentPane.add(panel)
+                        }
+                    }
+
+                    // Reattaching the same layer disposes and creates its device again.
+                    JFrame().also { window ->
+                        windows += window
+                        val layer = newDirect3DLayer()
+                        window.contentPane.add(layer)
+                        window.setSize(64, 64)
+                        window.isVisible = true
+                        measureDeviceCreation("reattach layer", iteration, maxDurationMs) {
+                            window.contentPane.remove(layer)
+                            window.contentPane.add(layer)
+                        }
+                    }
+                }
+            } finally {
+                windows.forEach(JFrame::dispose)
+            }
+        }
+    }
+
+    private fun newDirect3DLayer() = SkiaSwingLayer(
+        renderDelegate = SkikoRenderDelegate { _, _, _, _ -> },
+        properties = SkiaLayerProperties(renderApi = GraphicsApi.DIRECT3D)
+    )
+
+    private inline fun measureDeviceCreation(name: String, iteration: Int, maxDurationMs: Long, block: () -> Unit) {
+        val startedAt = System.nanoTime()
+        block()
+        val durationMs = (System.nanoTime() - startedAt) / 1_000_000
+        println("Direct3D Swing device creation [$name #$iteration]: ${durationMs}ms")
+        check(durationMs < maxDurationMs) {
+            "Direct3D Swing device creation [$name #$iteration] took ${durationMs}ms"
         }
     }
 
