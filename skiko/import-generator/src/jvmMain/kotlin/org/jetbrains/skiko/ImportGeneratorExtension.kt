@@ -10,6 +10,7 @@ internal class ImportGeneratorExtension(
     private val path: String,
     private val prefix: String?,
     private val reexportPath: String?,
+    private val exportsPath: String?,
     private val moduleName: String
 ) : IrGenerationExtension {
     override fun generate(
@@ -22,12 +23,27 @@ internal class ImportGeneratorExtension(
         val importGenerator = ImportGeneratorTransformer(pluginContext, moduleName)
 
         outputFile.writer().use { writer ->
-            prefixFile?.let { writer.appendLine(it.readText()) }
+            prefixFile?.let {
+                val prefixContent = it.readText()
+                val inlined = inlineLocalImports(prefixContent, it.parentFile)
+                writer.appendLine(inlined)
+            }
             moduleFragment.transformChildrenVoid(importGenerator)
 
             importGenerator.getExportSymbols().forEach { symbolName ->
                 writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
             }
+        }
+
+        exportsPath?.let {
+            val exportsFile = File(it)
+            exportsFile.parentFile.mkdirs()
+            exportsFile.writeText(
+                importGenerator.getExportSymbols()
+                    .distinct()
+                    .sorted()
+                    .joinToString(separator = "\n", postfix = "\n")
+            )
         }
 
         if (reexportPath == null) return
@@ -49,5 +65,30 @@ internal class ImportGeneratorExtension(
                 reexportWriter.appendLine("window['${symbolName}'] = wasmApi['${symbolName}'];")
             }
         }
+    }
+
+    private fun inlineLocalImports(content: String, baseDir: File): String {
+        val namedImportRegex = Regex("""import\s+\{([^}]+)}\s+from\s+"\.\/([^"]+)";""")
+        val bareImportRegex = Regex("""import\s+"\.\/([^"]+)";""")
+        var result = content
+        for (match in bareImportRegex.findAll(content)) {
+            val fileName = match.groupValues[1]
+            val importedFile = baseDir.resolve(fileName)
+            if (importedFile.exists()) {
+                val fileContent = importedFile.readText()
+                result = result.replace(match.value, fileContent)
+            }
+        }
+        for (match in namedImportRegex.findAll(content)) {
+            val fileName = match.groupValues[2]
+            val importedFile = baseDir.resolve(fileName)
+            if (importedFile.exists()) {
+                // Replace "export var" with "var" in the inlined content
+                val fileContent = importedFile.readText()
+                    .replace("export var ", "var ")
+                result = result.replace(match.value, fileContent)
+            }
+        }
+        return result
     }
 }

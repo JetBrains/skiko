@@ -4,7 +4,6 @@ import Arch
 import CompileSkikoCppTask
 import PatchSkiaSymbolsTask
 import OS
-import SkiaBuildType
 import SkikoModuleKind
 import SkikoProjectContext
 import WriteCInteropDefFile

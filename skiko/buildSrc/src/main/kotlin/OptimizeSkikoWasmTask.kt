@@ -34,7 +34,7 @@ abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
         inputDirectory.walkTopDown()
             .filter { it.isFile }
             .forEach { inputFile ->
-                val outputFile = outputDirectory.resolve("${libOutputFileName.get()}.${inputFile.extension}")
+                val outputFile = outputDirectory.resolve(outputFileNameFor(inputFile.name))
 
                 when (inputFile.extension) {
                     "wasm" -> {
@@ -60,12 +60,21 @@ abstract class OptimizeSkikoWasmTask : AbstractSkikoNativeToolTask() {
                             inputFile.readText()
                                 .replace(
                                     "${inputFile.nameWithoutExtension}.wasm",
-                                    "${libOutputFileName.get()}.wasm"
+                                    "${outputFile.nameWithoutExtension}.wasm"
                                 )
                         )
                     }
                 }
             }
+    }
+
+    private fun outputFileNameFor(inputFileName: String): String {
+        val nameWithoutExtension = inputFileName.substringBeforeLast(".")
+        val extension = inputFileName.substringAfterLast(".", missingDelimiterValue = "")
+        val optimizedBaseName = nameWithoutExtension.removeSuffix(".unoptimized")
+            .ifEmpty { libOutputFileName.get() }
+
+        return if (extension.isEmpty()) optimizedBaseName else "$optimizedBaseName.$extension"
     }
 
 }

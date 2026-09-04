@@ -10,7 +10,13 @@ repositories {
     mavenLocal()
 }
 
-val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
+val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "0") == "1" ||
+        runCatching { gradle.includedBuild("skiko") }.isSuccess ||
+        (gradle.parent?.includedBuilds?.any { it.name == "skiko" } ?: false)
+
+fun getSkikoIncludedBuild() = runCatching { gradle.includedBuild("skiko") }.getOrNull()
+    ?: gradle.parent?.includedBuild("skiko")
+    ?: error("skiko included build not found")
 
 if (project.hasProperty("skiko.version") && isCompositeBuild) {
     project.logger.warn("skiko.version property has no effect when skiko.composite.build is set")
@@ -23,7 +29,7 @@ dependencies {
         // When we build skiko locally, we have no say in setting skiko.version in the included build.
         // That said, it is always built as "0.0.0-SNAPSHOT" and setting any other version is misleading
         // and can create conflict due to incompatibility of skiko runtime and skiko libs
-        files(gradle.includedBuild("skiko").projectDir.resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"))
+        files(getSkikoIncludedBuild().projectDir.resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"))
     } else {
         libs.skiko.wasm.runtime
     })
@@ -34,7 +40,7 @@ val unpackWasmRuntime = tasks.register("unpackWasmRuntime", Copy::class) {
     from(skikoWasm.map { zipTree(it) })
 
     if (isCompositeBuild) {
-        dependsOn(gradle.includedBuild("skiko").task(":skikoWasmJar"))
+        dependsOn(getSkikoIncludedBuild().task(":skikoWasmJar"))
     }
 }
 

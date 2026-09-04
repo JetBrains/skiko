@@ -66,7 +66,7 @@ actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
 }
 
 
-// Those functions are defined by Emscripten.
+// Those functions are provided by the WASM module or JS runtime.
 @ExternalSymbolName("malloc")
 internal external fun _malloc(size: Int): NativePointer
 
