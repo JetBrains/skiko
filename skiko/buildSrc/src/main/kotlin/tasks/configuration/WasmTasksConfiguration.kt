@@ -173,8 +173,8 @@ fun SkikoProjectContext.declareWasmTasks() {
                 add("-mexception-handling") // Enable WASM EH support used by SjLj; C++ exceptions stay disabled.
 
                 // TODO: check if this is still needed
-                add("--target=wasm32-wasip1")
-                add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
+//                add("--target=wasm32-wasip1")
+//                add("--sysroot=${project.findProperty("wasi.sdk")?.toString() ?: "/opt/wasi-sdk-33.0-arm64-macos"}/share/wasi-sysroot")
                 if (skiko.isWasmBuildWithProfiling) add("--profiling") // Keep function names for profiling output.
             }
         )

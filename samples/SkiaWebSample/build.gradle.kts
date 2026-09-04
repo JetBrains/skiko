@@ -52,10 +52,11 @@ val installNodeWindowedDeps = tasks.register<Exec>("installNodeWindowedDeps") {
     group = "NodeJs"
     description = "Installs the sample-only Node dependencies for the Skiko Node windowed runner."
     inputs.file(layout.projectDirectory.file("package.json"))
+    inputs.file(layout.projectDirectory.file("scripts/patch-node-gles-webgl2-window-surface.mjs"))
     outputs.dir(layout.projectDirectory.dir("node_modules/node-gles-webgl2"))
     outputs.dir(layout.projectDirectory.dir("node_modules/@kmamal/sdl"))
     environment("CXXFLAGS", "-std=c++20")
-    commandLine(providers.gradleProperty("skiko.npm.executable").orElse("npm").get(), "install")
+    commandLine(providers.gradleProperty("skiko.npm.executable").orElse("npm").get(), "install", "--no-audit", "--no-fund")
 }
 
 tasks.register<Exec>("skikoNodeWindowedRun") {

@@ -2,6 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/patch-node-gles-webgl2-window-surface.mjs && npm rebuild node-gles-webgl2",
     "skiko-node-window": "node node-runner.mjs"
   },
   "dependencies": {
