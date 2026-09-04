@@ -172,6 +172,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "-s", "EXPORT_ES6=1",
                 "-s", "EXPORT_NAME=loadSkikoWASM",
                 "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
+                "-s", "STACK_SIZE=1048576", // 1 MB
                 "--bind",
             )
         }
