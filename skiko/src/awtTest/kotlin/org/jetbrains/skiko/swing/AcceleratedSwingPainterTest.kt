@@ -138,8 +138,21 @@ class AcceleratedSwingPainterTest {
     }
 
     /**
-     * Manual stress reproducer for SKIKO-1116. Device creation is intentionally done
+     * Manual desktop reproducer for SKIKO-1116. Device creation is intentionally done
      * from EDT because this is the production path that was observed to freeze.
+     *
+     * Run on a physical Windows machine with:
+     * ```
+     * ./gradlew :skiko:awtTest \
+     *   --tests "org.jetbrains.skiko.swing.AcceleratedSwingPainterTest.stress Direct3D Swing device creation in lifecycle states" \
+     *   -Dskiko.test.direct3d.stress.enabled=true -Dskiko.test.direct3d.stress.iterations=100
+     * ```
+     *
+     * While it runs, trigger a display-driver reset with Win+Ctrl+Shift+B, then repeat
+     * around sleep/resume, monitor reconnect, and RDP connect/disconnect. A brief display
+     * flicker is expected. The reproducer is successful only if an "attach" measurement is
+     * slow; a quick "Failed to create DirectX12 device" followed by fallback is not this bug.
+     * Do not change TDR registry settings or run a deliberately hanging GPU workload.
      */
     @Test
     @OptIn(ExperimentalSkikoApi::class)
@@ -150,7 +163,8 @@ class AcceleratedSwingPainterTest {
 
         val iterations = System.getProperty("skiko.test.direct3d.stress.iterations", "5").toInt()
         val maxDurationMs = System.getProperty("skiko.test.direct3d.stress.maxDurationMs", "10000").toLong()
-        val textureSize = System.getProperty("skiko.test.direct3d.stress.textureSize", "1024").toInt()
+        val textureSize = System.getProperty("skiko.test.direct3d.stress.textureSize", "256").toInt()
+        val maxResidentWindows = System.getProperty("skiko.test.direct3d.stress.maxResidentWindows", "12").toInt()
 
         runBlocking(MainUIDispatcher) {
             val windows = mutableListOf<JFrame>()
@@ -254,6 +268,10 @@ class AcceleratedSwingPainterTest {
                     } finally {
                         offscreenContext.get().close()
                         executor.shutdownNow()
+                    }
+
+                    while (windows.size > maxResidentWindows) {
+                        windows.removeAt(0).dispose()
                     }
                     }
                 }
