@@ -255,61 +255,63 @@ fun SkikoProjectContext.declareWasmTasks() {
         configureCommonOptimize(linkWasmD8WithES6, "d8")
     }
 
-    val wasmProposalsManifest by project.tasks.registering(WasmProposalsManifestTask::class) {
-        dependsOn(optimizeWasm)
-        wasmFile.convention(
-            optimizeWasm.flatMap { it.outDir.file("${libBaseName}.wasm") }
-        )
-        manifestFile.convention(
-            project.layout.buildDirectory.file("reports/wasm-proposals-manifest.csv")
-        )
-    }
-
-    val referenceManifestFile = project.layout.projectDirectory.file("wasm-proposals-manifest.csv")
-
-    project.tasks.register("dumpWasmProposalsManifest") {
-        dependsOn(wasmProposalsManifest)
-        val builtManifest = wasmProposalsManifest.flatMap { it.manifestFile }
-        inputs.file(builtManifest)
-        outputs.file(referenceManifestFile)
-        doLast {
-            val src = builtManifest.get().asFile
-            val dst = referenceManifestFile.asFile
-            src.copyTo(dst, overwrite = true)
-            logger.lifecycle("Updated reference manifest: ${dst.relativeTo(project.rootDir)}")
-        }
-    }
-
-    val verifyWasmProposalsManifest = project.tasks.register("verifyWasmProposalsManifest") {
-        dependsOn(wasmProposalsManifest)
-        val builtManifest = wasmProposalsManifest.flatMap { it.manifestFile }
-        inputs.file(builtManifest)
-        inputs.file(referenceManifestFile)
-        doLast {
-            val reference = referenceManifestFile.asFile
-            if (!reference.exists()) {
-                throw org.gradle.api.GradleException(
-                    "Reference manifest not found at ${reference.path}.\n" +
-                    "Run './gradlew dumpWasmProposalsManifest' to create it."
-                )
-            }
-            val built = builtManifest.get().asFile.readText()
-            val expected = reference.readText()
-            if (built != expected) {
-                throw org.gradle.api.GradleException(
-                    "Wasm proposals manifest does not match the reference!\n" +
-                    "Expected (from ${reference.path}):\n$expected\n" +
-                    "Actual (from build at ${builtManifest.get().asFile.path}):\n$built\n" +
-                    "If the change is intentional, run './gradlew dumpWasmProposalsManifest' to update the reference."
-                )
-            }
-            logger.lifecycle("Wasm proposals manifest matches the reference.")
-        }
-    }
-
     // skikoWasmJar is used by task name
     val skikoWasmJar by project.tasks.registering(Jar::class) {
-        dependsOn(verifyWasmProposalsManifest)
+        if (!isSideModule) {
+            val wasmProposalsManifest = project.tasks.register("wasmProposalsManifest", WasmProposalsManifestTask::class.java) {
+                dependsOn(optimizeWasm)
+                wasmFile.convention(
+                    optimizeWasm.flatMap { it.outDir.file("${libBaseName}.wasm") }
+                )
+                manifestFile.convention(
+                    project.layout.buildDirectory.file("reports/wasm-proposals-manifest.csv")
+                )
+            }
+
+            val referenceManifestFile = project.layout.projectDirectory.file("wasm-proposals-manifest.csv")
+
+            project.tasks.register("dumpWasmProposalsManifest") {
+                dependsOn(wasmProposalsManifest)
+                val builtManifest = wasmProposalsManifest.flatMap { it.manifestFile }
+                inputs.file(builtManifest)
+                outputs.file(referenceManifestFile)
+                doLast {
+                    val src = builtManifest.get().asFile
+                    val dst = referenceManifestFile.asFile
+                    src.copyTo(dst, overwrite = true)
+                    logger.lifecycle("Updated reference manifest: ${dst.relativeTo(project.rootDir)}")
+                }
+            }
+
+            val verifyWasmProposalsManifest = project.tasks.register("verifyWasmProposalsManifest") {
+                dependsOn(wasmProposalsManifest)
+                val builtManifest = wasmProposalsManifest.flatMap { it.manifestFile }
+                inputs.file(builtManifest)
+                inputs.file(referenceManifestFile)
+                doLast {
+                    val reference = referenceManifestFile.asFile
+                    if (!reference.exists()) {
+                        throw org.gradle.api.GradleException(
+                            "Reference manifest not found at ${reference.path}.\n" +
+                            "Run './gradlew dumpWasmProposalsManifest' to create it."
+                        )
+                    }
+                    val built = builtManifest.get().asFile.readText()
+                    val expected = reference.readText()
+                    if (built != expected) {
+                        throw org.gradle.api.GradleException(
+                            "Wasm proposals manifest does not match the reference!\n" +
+                            "Expected (from ${reference.path}):\n$expected\n" +
+                            "Actual (from build at ${builtManifest.get().asFile.path}):\n$built\n" +
+                            "If the change is intentional, run './gradlew dumpWasmProposalsManifest' to update the reference."
+                        )
+                    }
+                    logger.lifecycle("Wasm proposals manifest matches the reference.")
+                }
+            }
+
+            dependsOn(verifyWasmProposalsManifest)
+        }
         // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
         from(project.setupReexportMjs(libBaseName).parentFile) {
             include(project.setupReexportMjs(libBaseName).name)
