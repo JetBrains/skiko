@@ -12,9 +12,11 @@ internal class RenderApiFallbackManager<R>(
 ) {
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue(defaultRenderApi).toMutableList()
 
+    @Volatile
     var current: R? = null
         private set
 
+    @Volatile
     var renderApi: GraphicsApi = fallbackRenderApiQueue[0]
         set(value) {
             field = value
