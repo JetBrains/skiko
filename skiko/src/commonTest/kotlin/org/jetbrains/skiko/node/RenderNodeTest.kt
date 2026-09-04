@@ -5,6 +5,7 @@ import org.jetbrains.skia.tests.assertCloseEnough
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class RenderNodeTest {
@@ -376,6 +377,65 @@ class RenderNodeTest {
         fun close() {
             nodes.forEach(RenderNode::close)
             surface.close()
+            context.close()
+        }
+    }
+
+    /**
+     * "null function" trap reported from Wasm on fast window resize.
+     *
+     * `beginRecording()` wraps the recorder's canvas with `managed = false`:
+     *
+     *     Canvas(ptr = RenderNode_nBeginRecording(_ptr), managed = false, _owner = this)
+     *
+     * and `Managed`'s `require(ptr != 0)` only runs when `managed == true`, so a null
+     * `SkCanvas*` is silently wrapped into a `Canvas` whose `_ptr` is 0 instead of failing here.
+     * `Surface.canvas` guards this case explicitly (`if (ptr == NullPointer) throw ...`);
+     * `beginRecording()` does not.
+     *
+     * `drawInto()` then forwards it as `getPtr(canvas)` == 0 with no check, and the native export
+     * `reinterpret_cast`s 0 to `SkCanvas*`. That is exactly the reported trap: emscripten leaves
+     * the first 1024 bytes of linear memory zeroed so null dereferences read zeros, so
+     * `i32.load 0` yields 0, `i32.load offset=176` reads address 176 and also yields 0, and
+     * `call_indirect` with function index 0 raises `RuntimeError: null function`.
+     *
+     * Degenerate bounds are what a container momentarily collapsing during a fast resize produces.
+     */
+    @Test
+    fun beginRecordingNeverReturnsACanvasOverANullPointer() {
+        val context = RenderNodeContext()
+        val degenerateBounds = listOf(
+            Rect(0f, 0f, 0f, 0f),
+            Rect(0f, 0f, 100f, 0f),
+            Rect(0f, 0f, 0f, 100f),
+            Rect(10f, 10f, 5f, 5f), // inverted: width/height are negative
+        )
+        try {
+            for (bounds in degenerateBounds) {
+                val node = RenderNode(context)
+                try {
+                    node.bounds = bounds
+                    val recording = node.beginRecording()
+                    assertFalse(
+                        recording.isClosed,
+                        "beginRecording() returned a Canvas over a null SkCanvas for bounds=$bounds; " +
+                                "drawInto() would forward pointer 0 and trap with 'null function'"
+                    )
+                    recording.clear(Color.TRANSPARENT)
+                    node.endRecording()
+
+                    // The recorded node must be drawable into a real canvas afterwards.
+                    val surface = Surface.makeRasterN32Premul(16, 16)
+                    try {
+                        node.drawInto(surface.canvas)
+                    } finally {
+                        surface.close()
+                    }
+                } finally {
+                    node.close()
+                }
+            }
+        } finally {
             context.close()
         }
     }
