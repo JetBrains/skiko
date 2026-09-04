@@ -342,7 +342,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
 
         from(optimizeWasm) {
-            include("*.wasm")
+            include("$libBaseName.wasm")
             include("*.mjs")
         }
 
