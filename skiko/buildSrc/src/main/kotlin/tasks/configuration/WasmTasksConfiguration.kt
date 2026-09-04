@@ -237,7 +237,11 @@ fun SkikoProjectContext.declareWasmTasks() {
                 }
                 add("--converge") // Run passes to convergence, continuing while binary size decreases
                 add("--strip-producers") // strip the wasm producers section
-                add("--all-features") // enable all features (most of them are required because of compilation with emcc)
+                add("--enable-bulk-memory")
+                add("--enable-exception-handling")
+                add("--enable-nontrapping-float-to-int")
+                add("--enable-sign-ext")
+                add("--enable-threads")
             }
         )
     }
