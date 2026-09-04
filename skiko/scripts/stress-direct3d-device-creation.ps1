@@ -28,6 +28,7 @@ for ($attempt = 1; $attempt -le $Repetitions; $attempt++) {
     Write-Host "`n=== Fresh test JVM attempt $attempt of $Repetitions ==="
     $gradleArguments = @(
         ":awtTest",
+        "--no-daemon",
         "--tests", $testName,
         "-Dskiko.test.direct3d.stress.enabled=true",
         "-Dskiko.test.direct3d.stress.iterations=1",
