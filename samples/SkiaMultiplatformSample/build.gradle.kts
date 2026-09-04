@@ -1,6 +1,11 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.Usage
+import org.gradle.language.jvm.tasks.ProcessResources
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 buildscript {
     repositories {
@@ -47,37 +52,6 @@ var hostArch = when (osArch) {
 
 val host = "${hostOs}-${hostArch}"
 
-val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
-if (project.hasProperty("skiko.version") && isCompositeBuild) {
-    project.logger.warn("skiko.version property has no effect when skiko.composite.build is set")
-}
-
-
-val skikoWasm by configurations.creating
-
-dependencies {
-    skikoWasm(if (isCompositeBuild) {
-        // When we build skiko locally, we have no say in setting skiko.version in the included build.
-        // That said, it is always built as "0.0.0-SNAPSHOT" and setting any other version is misleading
-        // and can create conflict due to incompatibility of skiko runtime and skiko libs
-        files(gradle.includedBuild("skiko").projectDir.resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"))
-    } else {
-        libs.skiko.wasm.runtime
-    })
-}
-
-val unpackWasmRuntime = tasks.register("unpackWasmRuntime", Copy::class) {
-    destinationDir = file("$buildDir/resources/")
-    from(skikoWasm.map { zipTree(it) })
-
-    if (isCompositeBuild) {
-        dependsOn(gradle.includedBuild("skiko").task(":skikoWasmJar"))
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
-    dependsOn(unpackWasmRuntime)
-}
 
 kotlin {
     if (hostOs == "macos") {
@@ -154,8 +128,6 @@ kotlin {
 
         val webMain by creating {
             dependsOn(commonMain)
-            resources.setSrcDirs(resources.srcDirs)
-            resources.srcDirs(unpackWasmRuntime.map { it.destinationDir })
         }
 
         val jsMain by getting {
@@ -204,6 +176,8 @@ kotlin {
             }
         }
     }
+
+    targets.withType<KotlinJsIrTarget>().all { configureSkikoWebRuntime(project, this) }
 }
 
 if (hostOs == "macos") {
@@ -414,4 +388,48 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
     compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
+}
+
+private fun configureSkikoWebRuntime(
+    project: Project,
+    target: KotlinJsIrTarget,
+) {
+    val titledTargetName = target.name.replaceFirstChar { it.titlecase() }
+    val mainCompilation = target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)!!
+    val runtimeDepsConfig = project.configurations.findByName(mainCompilation.runtimeDependencyConfigurationName)!!
+    val skikoWebRuntimeJarFiles = runtimeDepsConfig.incoming.artifactView {
+        @Suppress("UnstableApiUsage")
+        withVariantReselection()
+        attributes {
+            runtimeDepsConfig.attributes.keySet().forEach {
+                @Suppress("UNCHECKED_CAST")
+                attribute(it as Attribute<Any>, runtimeDepsConfig.attributes.getAttribute(it) as Any)
+            }
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
+        }
+    }.files
+    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-${target.name}-runtime")
+
+    val unpackRuntime = project.tasks.register("unpackSkikoRuntimeFor$titledTargetName", Copy::class.java) {
+        destinationDir = unpackedRuntimeDir.get().asFile
+        from(skikoWebRuntimeJarFiles.map { artifact -> project.zipTree(artifact) })
+        exclude("META-INF/**")
+    }
+
+    target.compilations.all {
+        if (target.wasmTargetType != null) {
+            binaries.all {
+                linkSyncTask.configure {
+                    dependsOn(unpackRuntime)
+                    from.from(unpackedRuntimeDir)
+                }
+            }
+        } else {
+            project.tasks.named(processResourcesTaskName, ProcessResources::class.java) {
+                from(unpackedRuntimeDir)
+                dependsOn(unpackRuntime)
+                exclude("META-INF")
+            }
+        }
+    }
 }

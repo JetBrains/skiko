@@ -22,7 +22,6 @@ dependencyResolutionManagement {
         create("libs") {
             version("skiko", providers.gradleProperty("skiko.version").get())
             library("skiko", "org.jetbrains.skiko", "skiko").versionRef("skiko")
-            library("skiko-wasm-runtime", "org.jetbrains.skiko", "skiko-js-wasm-runtime").versionRef("skiko")
 
             val osName = System.getProperty("os.name")
             val hostOs = when {
