@@ -1,0 +1,468 @@
+package org.jetbrains.skiko.build.publishing
+
+import kotlin.jvm.java
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.Bundling
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.java.TargetJvmEnvironment
+import org.gradle.api.component.SoftwareComponentFactory
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.publish.PublicationContainer
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPom
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.tasks.Copy
+import org.gradle.jvm.tasks.Jar
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.support.serviceOf
+import org.gradle.nativeplatform.MachineArchitecture
+import org.gradle.nativeplatform.OperatingSystemFamily
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.supportAndroid
+import org.jetbrains.skiko.build.context.supportAwt
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.targetId
+import org.jetbrains.skiko.build.utils.registerOrGetTask
+import org.jetbrains.skiko.build.utils.toTitleCase
+
+private val SkikoProjectContext.publishing get() = project.extensions.getByType(PublishingExtension::class.java)
+
+/**
+ * Shared POM metadata for all Skiko publications (license, project URL, SCM, developers).
+ */
+fun MavenPom.configureSkikoPomMetadata() {
+    licenses {
+        license {
+            name.set("The Apache License, Version 2.0")
+            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+        }
+    }
+    val repoUrl = "https://www.github.com/JetBrains/skiko"
+    url.set(repoUrl)
+    scm {
+        url.set(repoUrl)
+        val repoConnection = "scm:git:$repoUrl.git"
+        connection.set(repoConnection)
+        developerConnection.set(repoConnection)
+    }
+    developers {
+        developer {
+            name.set("Compose Multiplatform Team")
+            organization.set("JetBrains")
+            organizationUrl.set("https://www.jetbrains.com")
+        }
+    }
+}
+
+private val awtRuntimeTargets = listOf(
+    OS.MacOS to Arch.X64, OS.MacOS to Arch.Arm64,
+    OS.Linux to Arch.X64, OS.Linux to Arch.Arm64,
+    OS.Windows to Arch.X64, OS.Windows to Arch.Arm64
+)
+
+private class SkikoPublishingContext(
+    val projectContext: SkikoProjectContext,
+) {
+    val project = projectContext.project
+    val kotlin = projectContext.kotlin
+    val skiko = projectContext.skiko
+    val skikoArtifacts = projectContext.artifacts
+    val additionalRuntimeLibraries = projectContext.additionalRuntimeLibraries
+
+    val pomNameForPublication: MutableMap<String, String> = HashMap()
+    val awtRuntimeAllInputsDirName = "awtRuntimeAllInputs"
+    val awtRuntimeAllModuleInputsDir =
+        project.rootProject.layout.projectDirectory.dir("dependencies/$awtRuntimeAllInputsDirName/${skikoArtifacts.artifactIdPrefix}")
+    val awtRuntimeAllInputJarPattern =
+        "${skikoArtifacts.artifactIdPrefix}-${skiko.deployVersion}-*.jar"
+
+    fun publishing(configure: PublishingExtension.() -> Unit) {
+        projectContext.publishing.apply(configure)
+    }
+
+    fun publications(configure: PublicationContainer.() -> Unit) {
+        projectContext.publishing.publications.apply(configure)
+    }
+
+    fun awtRuntimeAllInputJarName(os: OS, arch: Arch) =
+        "${skikoArtifacts.artifactIdPrefix}-${skiko.deployVersion}-${targetId(os, arch)}.jar"
+}
+
+fun SkikoProjectContext.declarePublications() {
+    val ctx = SkikoPublishingContext(this)
+    ctx.configurePublishingRepositories()
+    ctx.configurePublicationDefaults()
+    if (kotlin.targets.findByName("awt") != null) {
+        ctx.configureAllJvmRuntimeJarPublications()
+        ctx.configureAwtRuntimeAllJarPublication()
+        ctx.configureAwtRuntimeJarPublication()
+        ctx.configureAwtPublicationConstraints()
+    }
+    ctx.configureAdditionalRuntimeLibrariesPublication()
+    ctx.configureWebPublication()
+    ctx.configureAndroidPublication()
+
+    ctx.configurePomNames()
+    ctx.configurePublishingTaskGroups()
+}
+
+private val SkikoPublishingContext.emptySourcesJar
+    get() = project.tasks.registerOrGetTask<Jar>("emptySourcesJar") {
+        archiveClassifier.set("sources")
+    }
+
+private val SkikoPublishingContext.emptyJavadocJar
+    get() = project.tasks.registerOrGetTask<Jar>("emptyJavadocJar") {
+        archiveClassifier.set("javadoc")
+    }
+
+private fun SkikoPublishingContext.configurePublishingRepositories() {
+    publishing {
+        repositories {
+            configureEach {
+                val repoName = name
+                project.tasks.register("publishTo${repoName}") {
+                    group = "publishing"
+                    dependsOn(project.tasks.named("publishAllPublicationsTo${repoName}Repository"))
+                }
+            }
+            maven {
+                name = "BuildRepo"
+                url = project.rootProject.layout.buildDirectory.dir("repo").get().asFile.toURI()
+            }
+            maven {
+                name = "ComposeRepo"
+                url = project.uri(skiko.composeRepoUrl)
+                credentials {
+                    username = skiko.composeRepoUserName
+                    password = skiko.composeRepoKey
+                }
+            }
+        }
+    }
+}
+
+private fun SkikoPublishingContext.configurePublishingTaskGroups() {
+    project.afterEvaluate {
+        val publishToTasks = projectContext.publishing.repositories.map { "publishTo${it.name}" } + "publishToMavenLocal"
+
+        tasks.configureEach {
+            if (group == "publishing" && name != "publish" && name !in publishToTasks) {
+                group = "other publishing"
+            }
+        }
+    }
+}
+
+private fun SkikoPublishingContext.configurePublicationDefaults() {
+    pomNameForPublication["kotlinMultiplatform"] = "${skikoArtifacts.displayName} KMP"
+    kotlin.targets.forEach {
+        pomNameForPublication[it.name] = "${skikoArtifacts.displayName} ${toTitleCase(it.name)}"
+    }
+
+    publishing {
+        publications.configureEach {
+            this as MavenPublication
+            groupId = SkikoArtifacts.DEFAULT_GROUP_ID
+
+            // Necessary for publishing to Maven Central
+            artifact(emptyJavadocJar)
+
+            pom {
+                description.set(skikoArtifacts.pomDescription)
+                configureSkikoPomMetadata()
+            }
+        }
+    }
+}
+
+private fun SkikoPublishingContext.configureAllJvmRuntimeJarPublications() = publications {
+    projectContext.allJvmRuntimeJars.forEach { entry ->
+        val os = entry.key.first
+        val arch = entry.key.second
+        create("skikoJvmRuntime${toTitleCase(os.id)}${toTitleCase(arch.id)}", MavenPublication::class.java) {
+            pomNameForPublication[name] = "${skikoArtifacts.displayName} JVM Runtime for ${os.name} ${arch.name}"
+            artifactId = skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)
+            project.afterEvaluate {
+                artifact(entry.value.map { it.archiveFile.get() })
+                artifact(emptySourcesJar)
+            }
+            pom.withXml {
+                asNode().appendNode("dependencies")
+                    .appendNode("dependency").apply {
+                        appendNode("groupId", SkikoArtifacts.DEFAULT_GROUP_ID)
+                        appendNode("artifactId", skikoArtifacts.jvmArtifactId)
+                        appendNode("version", "[${skiko.deployVersion}]")
+                        appendNode("scope", "compile")
+                    }
+            }
+        }
+        if (skiko.isTeamcityCIBuild) {
+            val stageTask = project.tasks.registerOrGetTask<Copy>(
+                "stage${toTitleCase(os.id)}${toTitleCase(arch.id)}AwtRuntimeJarForAwtRuntimeAllJar"
+            ) {
+                from(entry.value.map { it.archiveFile })
+                into(awtRuntimeAllModuleInputsDir)
+            }
+            project.tasks
+                .named("publishSkikoJvmRuntime${toTitleCase(os.id)}${toTitleCase(arch.id)}PublicationToComposeRepoRepository")
+                .configure { dependsOn(stageTask) }
+        }
+    }
+}
+
+private fun SkikoPublishingContext.configureAwtRuntimeAllJarPublication() {
+    if (!project.supportAwt) return
+
+    val allArtifactId = skikoArtifacts.jvmRuntimeAllArtifactId
+    val allJar = project.tasks.registerOrGetTask<Jar>("awtRuntimeAllJar") {
+        isZip64 = true
+        archiveBaseName.set(allArtifactId)
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+        // CI bundle all defined targets read directly from the staging directory.
+        if (skiko.isTeamcityCIBuild) {
+            from({
+                project.fileTree(awtRuntimeAllModuleInputsDir) {
+                    include(awtRuntimeAllInputJarPattern)
+                }.files.sortedBy { it.name }.map { project.zipTree(it) }
+            }) {
+                exclude("**/META-INF/**")
+            }
+
+            doFirst {
+                val missingInputJars = awtRuntimeTargets
+                    .map { (os, arch) -> awtRuntimeAllInputJarName(os, arch) }
+                    .filterNot { awtRuntimeAllModuleInputsDir.file(it).asFile.isFile }
+                if (missingInputJars.isNotEmpty()) {
+                    error(
+                        "Missing AWT runtime input jars for ${skiko.deployVersion} in " +
+                            "${awtRuntimeAllModuleInputsDir.asFile}. Expected files matching " +
+                            "'$awtRuntimeAllInputJarPattern', missing: ${missingInputJars.joinToString()}"
+                    )
+                }
+            }
+        } else {
+            awtRuntimeTargets
+                .filter { projectContext.allJvmRuntimeJars.containsKey(it) }
+                .associateWith { projectContext.allJvmRuntimeJars.getValue(it) }
+                .values.forEach { runtimeJar ->
+                    from(project.zipTree(runtimeJar.flatMap { it.archiveFile })) {
+                        exclude("**/META-INF/**")
+                    }
+                }
+        }
+    }
+
+    publications {
+        create("awtRuntimeAll", MavenPublication::class.java) {
+            pomNameForPublication[name] = "Composition of all ${skikoArtifacts.displayName} AWT Runtimes"
+            artifactId = allArtifactId
+            artifact(allJar)
+            artifact(emptySourcesJar)
+        }
+    }
+}
+
+/**
+ * There are several artifacts, providing the native runtime, for each OS and architecture:
+ * - skiko-awt-runtime-macos-arm64
+ * - skiko-awt-runtime-macos-x64
+ * - ...
+ *
+ * Each of those artifacts gets published using its own maven coordinates.
+ * In order to support consumers who would like to express a single dependency on Skiko, this 'uber' publication is created,
+ * listing each OS and architecture-specific artifact as a dependency to a Gradle variant, distinguised by
+ * default Gradle attributes.
+ *
+ * ```
+ * org.jetbrains.skiko:skiko-awt-runtime
+ *     - variant awtRuntimeElements-macos-arm64
+ *          - depends on org.jetbrains.skiko:skiko-awt-runtime-macos-arm64
+ *
+ *     - variant awtRuntimeElements-macos-x64
+ *          - depends on org.jetbrains.skiko:skiko-awt-runtime-macos-x64
+ * ...
+ * ```
+ *
+ * This allows Gradle consumers to add a single, universal dependency
+ * ```
+ * dependencies {
+ *      implementation("org.jetbrains.skiko:skiko-awt-runtime:...")
+ * }
+ * ```
+ *
+ * which resolves the correct artifact for the current platform.
+ */
+private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
+    val allJvmRuntimeVariants = awtRuntimeTargets.map { (os, arch) ->
+        project.configurations.create("awtRuntimeElements-${targetId(os, arch)}").apply {
+
+            /* Setup default attributes */
+            attributes.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
+            attributes.attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
+            attributes.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.EXTERNAL))
+            attributes.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
+            attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
+            attributes.attribute(
+                TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
+                project.objects.named(TargetJvmEnvironment.STANDARD_JVM)
+            )
+
+            /*
+            Add OS and architecture attributes to the exposed configuration.
+             */
+            attributes.attribute(
+                OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE,
+                project.objects.named(
+                    when (os) {
+                        OS.Linux -> OperatingSystemFamily.LINUX
+                        OS.Windows -> OperatingSystemFamily.WINDOWS
+                        OS.MacOS -> OperatingSystemFamily.MACOS
+                        else -> error("Unsupported OS for awtRuntimeElements: $os")
+                    }
+                )
+            )
+
+            attributes.attribute(
+                MachineArchitecture.ARCHITECTURE_ATTRIBUTE,
+                project.objects.named(
+                    when (arch) {
+                        Arch.X64 -> MachineArchitecture.X86_64
+                        Arch.Arm64 -> MachineArchitecture.ARM64
+                        else -> error("Unsupported arch for awtRuntimeElements: $arch")
+                    }
+                )
+            )
+
+            /*
+            Add the dependency to the actual JVM runtime artifact.
+             */
+            dependencies.add(
+                project.dependencies.create(
+                    SkikoArtifacts.DEFAULT_GROUP_ID,
+                    skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch),
+                    skiko.deployVersion
+                )
+            )
+        }
+    }
+
+    /* Create a new software component and add all variants */
+    val component = project.serviceOf<SoftwareComponentFactory>().adhoc("awtRuntimeElements")
+    allJvmRuntimeVariants.forEach { variant ->
+        component.addVariantsFromConfiguration(variant) {
+            mapToMavenScope("runtime")
+        }
+    }
+
+    /* Create the actual publication for this */
+    publications {
+        create("awtRuntimeElements", MavenPublication::class.java) {
+            from(component)
+            pomNameForPublication[name] = "${skikoArtifacts.displayName} JVM Runtime"
+            groupId = SkikoArtifacts.DEFAULT_GROUP_ID
+            artifactId = skikoArtifacts.jvmRuntimeArtifactId
+            version = skiko.deployVersion
+
+            /*
+            The entire machinery only works with Gradle attributes;
+            therefore, we do not add any dependencies to the maven pom file
+             */
+            pom {
+                withXml {
+                    val dependencyNodes = asElement().getElementsByTagName("dependencies")
+                    for (i in 0 until dependencyNodes.length) {
+                        dependencyNodes.item(i).parentNode.removeChild(dependencyNodes.item(i))
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Adds dependency constraints from the skiko-awt (Kotlin) publication to all skiko-awt-runtime-* (JNI) artifacts.
+ * This ensures compatibility between the Kotlin and native runtime artifacts.
+ * 
+ * Constraints are added to the awt target's configurations, which automatically propagates them to both:
+ * - Maven POM (via dependencyManagement section)
+ * - Gradle Module Metadata (via dependencyConstraints in variants)
+ */
+private fun SkikoPublishingContext.configureAwtPublicationConstraints() {
+    // Add constraints to Gradle configurations
+    // This will automatically generate both POM dependencyManagement and Gradle Module Metadata dependencyConstraints
+    listOf("awtApiElements", "awtRuntimeElements").forEach { configName ->
+        project.configurations.findByName(configName)?.let { config ->
+            // Note: "!!" suffix is used to enforce a strict version
+            // See https://docs.gradle.org/current/userguide/dependency_versions.html#sec:rich-version-constraints
+
+            // Add constraint for the uber runtime artifact
+            config.dependencyConstraints.add(
+                project.dependencies.constraints.create(
+                    "${SkikoArtifacts.DEFAULT_GROUP_ID}:${skikoArtifacts.jvmRuntimeArtifactId}:${skiko.deployVersion}!!"
+                )
+            )
+            
+            // Add constraints for platform-specific runtime artifacts
+            awtRuntimeTargets.forEach { (os, arch) ->
+                config.dependencyConstraints.add(
+                    project.dependencies.constraints.create(
+                        "${SkikoArtifacts.DEFAULT_GROUP_ID}:${skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)}:${skiko.deployVersion}!!"
+                    )
+                )
+            }
+        }
+    }
+}
+
+private fun SkikoPublishingContext.configureAdditionalRuntimeLibrariesPublication() = publications {
+    additionalRuntimeLibraries.forEach {
+        it.registerMavenPublication(this, emptySourcesJar, pomNameForPublication)
+    }
+}
+
+private fun SkikoPublishingContext.configureWebPublication() {
+    kotlin.targets.withType(KotlinJsIrTarget::class.java).all {
+        val skikoWasmRuntimeConfig = project.configurations.create("skikoWasmRuntimeElementsFor${toTitleCase(name)}") {
+            isCanBeConsumed = true
+            isCanBeResolved = false
+            attributes {
+                val runtimeConf = this@all.project.configurations.getByName(
+                    this@all.compilations.getByName("main").runtimeDependencyConfigurationName
+                )
+                runtimeConf.attributes.keySet().forEach {
+                    attribute(it as Attribute<Any>, runtimeConf.attributes.getAttribute(it) as Any)
+                }
+                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
+            }
+            outgoing.artifact(project.tasks.named("skikoWasmJar")) {
+                classifier = "skiko-runtime"
+            }
+        }
+        addVariantToKotlinTarget(this, skikoWasmRuntimeConfig)
+    }
+}
+
+private fun SkikoPublishingContext.configureAndroidPublication() = publications {
+    if (!project.supportAndroid) return@publications
+    pomNameForPublication["android"] = "${skikoArtifacts.displayName} Android Runtime"
+}
+
+private fun SkikoPublishingContext.configurePomNames() = publications {
+    val publicationsWithoutPomNames = this.toList().filter { it.name !in pomNameForPublication }
+    if (publicationsWithoutPomNames.isNotEmpty()) {
+        error("Publications with unknown POM names: ${publicationsWithoutPomNames.joinToString { "'${it.name}'" }}")
+    }
+    configureEach {
+        this as MavenPublication
+        pom.name.set(pomNameForPublication[name]!!)
+    }
+}
