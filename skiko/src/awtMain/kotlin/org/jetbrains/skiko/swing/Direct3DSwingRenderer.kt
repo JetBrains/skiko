@@ -7,10 +7,12 @@ import org.jetbrains.skiko.graphicapi.InternalDirectXApi.createDirectXOffscreenD
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.disposeDirectXTexture
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.chooseAdapter
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.disposeDevice
-import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXContext
-import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXRenderTargetOffScreen
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.makeDirectXTexture
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.waitForCompletion
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.getDirectXCommandQueue
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.getDirectXDevice
+import org.jetbrains.skiko.graphicapi.InternalDirectXApi.getDirectXTextureResource
+import org.jetbrains.skiko.graphicapi.DxgiFormat
 import java.awt.Graphics2D
 
 // TODO reuse DirectXOffscreenContext
@@ -36,8 +38,10 @@ internal class Direct3DSwingRenderer(
     private val context = if (device == 0L) {
         throw RenderException("Failed to create DirectX12 device.")
     } else {
-        DirectContext(
-            makeDirectXContext(device)
+        DirectContext.makeDirect3D(
+            adapter,
+            getDirectXDevice(device),
+            getDirectXCommandQueue(device)
         )
     }
 
@@ -67,7 +71,7 @@ internal class Direct3DSwingRenderer(
             if (texturePtr == 0L) {
                 throw RenderException("Can't allocate DirectX resources")
             }
-            val renderTarget = makeRenderTarget().autoClose()
+            val renderTarget = makeRenderTarget(alignedWidth, height).autoClose()
 
             val surface = Surface.makeFromBackendRenderTarget(
                 context,
@@ -92,7 +96,12 @@ internal class Direct3DSwingRenderer(
         painter.paint(g, surface, texturePtr)
     }
 
-    private fun makeRenderTarget() = BackendRenderTarget(
-        makeDirectXRenderTargetOffScreen(texturePtr)
+    private fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget.makeDirect3D(
+        width = width,
+        height = height,
+        texturePtr = getDirectXTextureResource(texturePtr),
+        format = DxgiFormat.B8G8R8A8_UNORM.value,
+        sampleCnt = 1,
+        levelCnt = 1
     )
 }
