@@ -78,6 +78,22 @@ jobs:
         run: |
           bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
 
+      - shell: bash
+        name: 'Run Skiko Web Benchmarks'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skiko-benchmarks-gradle
+          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
+          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+        run: |
+          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web version=0.0.0-SNAPSHOT
+
+      - uses: actions/upload-artifact@v4
+        name: 'Upload Skiko Web Benchmark Reports'
+        if: always()
+        with:
+          name: skiko-web-benchmark-reports
+          path: benchmarks/SkikoBenchmarks/build/benchmarks/archive
+
   Linux:
     name: 'Linux x64 Publish Dry Run'
     runs-on: ubuntu-24.04
