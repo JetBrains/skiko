@@ -6,19 +6,24 @@ import org.w3c.dom.HTMLCanvasElement
 import kotlin.js.JsAny
 import kotlin.js.Promise
 
-internal external interface ContextAttributes {
+// EmscriptenWebGLContextAttributes combines:
+// https://github.com/KhronosGroup/WebGL/blob/main/specs/latest/1.0/webgl.idl#L43-L58
+// and its own properties https://github.com/emscripten-core/emscripten/blob/main/src/lib/libwebgl.js
+@InternalSkikoApi
+external interface EmscriptenWebGLContextAttributes : JsAny {
     val alpha: Int?
     val depth: Int?
     val stencil: Int?
     val antialias: Int?
     val premultipliedAlpha: Int?
     val preserveDrawingBuffer: Int?
-    val preferLowPowerToHighPerformance: Int?
+    val powerPreference: Int?
     val failIfMajorPerformanceCaveat: Int?
+    val majorVersion: Int?
     val enableExtensionsByDefault: Int?
     val explicitSwapControl: Int?
     val renderViaOffscreenBackBuffer: Int?
-    val majorVersion: Int?
+    val desynchronized: Int?
 }
 
 /**
@@ -94,7 +99,34 @@ internal fun patchWebGlContext(canvas: HTMLCanvasElement): Unit = js("""{
     }
 }""")
 
-internal expect fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): NativePointer
+@JsFun(
+    """(attr) => ({
+        alpha: attr && attr.alpha != null ? attr.alpha : 1,
+        depth: attr && attr.depth != null ? attr.depth : 1,
+        stencil: attr && attr.stencil != null ? attr.stencil : 8,
+        antialias: attr && attr.antialias != null ? attr.antialias : 0,
+        premultipliedAlpha: attr && attr.premultipliedAlpha != null ? attr.premultipliedAlpha : 1,
+        preserveDrawingBuffer: attr && attr.preserveDrawingBuffer != null ? attr.preserveDrawingBuffer : 0,
+        powerPreference: ['default', 'low-power', 'high-performance'][
+            attr && attr.powerPreference != null ? attr.powerPreference : 0
+        ],
+        failIfMajorPerformanceCaveat: attr && attr.failIfMajorPerformanceCaveat != null ? attr.failIfMajorPerformanceCaveat : 0,
+        majorVersion: attr && attr.majorVersion != null ? attr.majorVersion : 2,
+        enableExtensionsByDefault: attr && attr.enableExtensionsByDefault != null ? attr.enableExtensionsByDefault : 1,
+        explicitSwapControl: attr && attr.explicitSwapControl != null ? attr.explicitSwapControl : 0,
+        renderViaOffscreenBackBuffer: attr && attr.renderViaOffscreenBackBuffer != null ? attr.renderViaOffscreenBackBuffer : 0,
+        desynchronized: attr && attr.desynchronized != null ? attr.desynchronized : 0,
+    })"""
+)
+private external fun contextAttributesWithDefaults(attr: EmscriptenWebGLContextAttributes?): EmscriptenWebGLContextAttributes
+
+internal fun createWebGLContext(
+    canvas: HTMLCanvasElement,
+    attr: EmscriptenWebGLContextAttributes? = null
+): NativePointer {
+    patchWebGlContext(canvas)
+    return org.jetbrains.skiko.GL.createContext(canvas, contextAttributesWithDefaults(attr))
+}
 
 internal expect fun onWasmReady(onReady: () -> Unit)
 
