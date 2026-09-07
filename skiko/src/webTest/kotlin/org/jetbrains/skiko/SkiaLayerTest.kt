@@ -1,21 +1,23 @@
 package org.jetbrains.skiko
 
 import kotlinx.browser.document
-import kotlinx.browser.window
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.Paint
 import org.jetbrains.skiko.tests.runTest
-import org.w3c.dom.ErrorEvent
+import org.jetbrains.skiko.wasm.EmscriptenWebGLContextAttributes
+import org.khronos.webgl.WebGLRenderingContext
+import org.khronos.webgl.WebGLRenderingContextBase
 import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.PromiseRejectionEvent
-import org.w3c.dom.events.Event
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.js.ExperimentalWasmJsInterop
+import kotlin.js.JsNumber
+import kotlin.js.js
+import kotlin.js.toInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNotSame
@@ -201,7 +203,56 @@ class SkiaLayerTest {
             }
         }
     }
+
+    @OptIn(ExperimentalWasmJsInterop::class)
+    @Test
+    fun createSkiaLayerWithRequestedContextAttributes() = runTest {
+        withCanvas(200, 200) { canvas ->
+            val layer = SkiaLayer()
+            try {
+                layer.attachTo(canvas)
+                layer.requestAndAwaitRender()
+                assertNoGlError(canvas, "no errors after creating")
+
+                val webgl2Context = canvas.getContext("webgl2") as? WebGLRenderingContextBase
+                assertNotNull(webgl2Context, "the requested context must be provided by the canvas")
+                assertEquals(webgl2Context, currentGLContext(GL))
+
+                val samples = (webgl2Context.getParameter(WebGLRenderingContext.SAMPLES) as JsNumber).toInt()
+                assertEquals(0, samples)
+                assertEquals(1, layer.state?.requestedSampleCount)
+            } finally {
+                layer.detach()
+            }
+        }
+
+        withCanvas(200, 200) { canvas ->
+            val layer = SkiaLayer.makeWithContextAttributes(testContextAttributes(enableAntialias = true))
+            try {
+                layer.attachTo(canvas)
+                layer.requestAndAwaitRender()
+                assertNoGlError(canvas, "no errors after creating")
+
+                val webgl2Context = canvas.getContext("webgl2") as? WebGLRenderingContextBase
+                assertNotNull(webgl2Context, "the requested context must be provided by the canvas")
+                assertEquals(webgl2Context, currentGLContext(GL))
+
+                val samples = (webgl2Context.getParameter(WebGLRenderingContext.SAMPLES) as JsNumber).toInt()
+                assertTrue(samples > 1, "samples expected to be > 1, but was $samples")
+                assertEquals(samples, layer.state?.requestedSampleCount)
+            } finally {
+                layer.detach()
+            }
+        }
+    }
 }
+
+//language=js
+private fun testContextAttributes(enableAntialias: Boolean): EmscriptenWebGLContextAttributes = js(
+    """(function() {
+        return { antialias: enableAntialias ? 1 : 0 };
+    })()"""
+)
 
 @OptIn(ExperimentalWasmJsInterop::class)
 private fun windowRequestAnimationFrame(callback: (Double) -> Unit): Int =
