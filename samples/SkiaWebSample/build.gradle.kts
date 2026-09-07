@@ -76,7 +76,7 @@ private fun configureSkikoWebRuntime(
 
     val unpackRuntime = project.tasks.register("unpackSkikoRuntimeFor$titledTargetName", Copy::class.java) {
         destinationDir = unpackedRuntimeDir.get().asFile
-        from(skikoWebRuntimeJarFiles.map { artifact -> project.zipTree(artifact) })
+        from(project.provider { skikoWebRuntimeJarFiles.map { artifact -> project.zipTree(artifact) } })
         exclude("META-INF/**")
     }
 
