@@ -83,9 +83,7 @@ internal class ImportGeneratorExtension(
             val fileName = match.groupValues[2]
             val importedFile = baseDir.resolve(fileName)
             if (importedFile.exists()) {
-                // Replace "export var" with "var" in the inlined content
                 val fileContent = importedFile.readText()
-                    .replace("export var ", "var ")
                 result = result.replace(match.value, fileContent)
             }
         }

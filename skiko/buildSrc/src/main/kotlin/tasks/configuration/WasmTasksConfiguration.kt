@@ -3,6 +3,7 @@ package tasks.configuration
 import Arch
 import CompileSkikoCppTask
 import CopyEmscriptenWebGLLibsTask
+import GenerateWasmSideModuleExportsTask
 import SetupEmscriptenTask
 import IMPORT_GENERATOR
 import LinkSkikoWasmTask
@@ -22,6 +23,7 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
@@ -65,6 +67,9 @@ private val Project.wasmTestExportSymbols
 
 private fun Project.skikoTestMjs(libBaseName: String) =
     wasmImport("$libBaseName-test.mjs")
+
+private fun Project.wasmSideModuleExportSymbols(mainLinkTaskName: String) =
+    wasmImport("required-wasm-side-module-exports-$mainLinkTaskName.txt")
 
 private val wasmSideModuleLinkTaskAttribute =
     Attribute.of("org.jetbrains.skiko.wasmSideModule.linkTask", String::class.java)
@@ -125,6 +130,8 @@ fun SkikoProjectContext.declareWasmTasks() {
             }.configureEach {
                 // The compiler plugin reads generatedPreSetupMjs while producing setup.mjs.
                 dependsOn(task)
+                inputs.dir(task.flatMap { it.outputDir })
+                    .withPathSensitivity(PathSensitivity.RELATIVE)
             }
         }
     } else {
@@ -206,9 +213,30 @@ fun SkikoProjectContext.declareWasmTasks() {
                 throw GradleException("Required WASM exports file was not generated: ${exportsFile.absolutePath}")
             }
             val testExportsFile = project.wasmTestExportSymbols
+            val testExports = if (skiko.includeTestHelpers) {
+                if (!testExportsFile.exists()) {
+                    throw GradleException("Required WASM test exports file was not generated: ${testExportsFile.absolutePath}")
+                }
+                testExportsFile.readLines()
+            } else {
+                emptyList()
+            }
             val generatedExports = exportsFile.readLines() +
-                    if (testExportsFile.exists()) testExportsFile.readLines() else emptyList()
-            (generatedExports + listOf("malloc", "free", "memory", "__wasm_call_ctors", "_initialize"))
+                    testExports +
+                    // Side modules are loaded dynamically, so the main module must export
+                    // only the symbols those modules actually import. This keeps the wasm
+                    // smaller than --export-dynamic while still satisfying runtime linking.
+                    project.wasmSideModuleExportSymbols(name)
+                        .takeIf { it.exists() }
+                        ?.readLines()
+                        .orEmpty()
+            (generatedExports + listOf(
+                "malloc",
+                "free",
+                "memory",
+                "__wasm_call_ctors",
+                "_initialize"
+            ))
                 .map { it.trim() }
                 .filter { it.isNotEmpty() }
                 .distinct()
@@ -226,6 +254,7 @@ fun SkikoProjectContext.declareWasmTasks() {
                 add("-Wl,--import-table") // Import the function table from the host/main module.
             } else {
                 add("-Wl,--gc-sections") // Remove unused sections during linking.
+                add("-Wl,--growable-table") // Allow side modules to reserve function table slots.
             }
             add("-Wl,--allow-undefined") // Allow unresolved symbols to become imports where possible.
             add("-mllvm") // Forward the next option directly to LLVM.
@@ -263,6 +292,12 @@ fun SkikoProjectContext.declareWasmTasks() {
             kotlin.wasmJs().compilations["main"].compileTaskProvider,
             kotlin.js().compilations["main"].compileTaskProvider
         )
+        if (skiko.includeTestHelpers) {
+            dependsOn(
+                kotlin.wasmJs().compilations["test"].compileTaskProvider,
+                kotlin.js().compilations["test"].compileTaskProvider
+            )
+        }
 
         buildSuffix.set("es6")
         emccOutputFileName.set(if (isSideModule) "$libBaseName.unoptimized.wasm" else "skiko.unoptimized.mjs") // this determines the name .wasm file too
@@ -280,6 +315,12 @@ fun SkikoProjectContext.declareWasmTasks() {
             kotlin.wasmJs().compilations["main"].compileTaskProvider,
             kotlin.js().compilations["main"].compileTaskProvider
         )
+        if (skiko.includeTestHelpers) {
+            dependsOn(
+                kotlin.wasmJs().compilations["test"].compileTaskProvider,
+                kotlin.js().compilations["test"].compileTaskProvider
+            )
+        }
 
         buildSuffix.set("d8")
         emccOutputFileName.set(if (isSideModule) "${libBaseName}d8.unoptimized.wasm" else "skikod8.unoptimized.mjs") // this determines the name .wasm file too
@@ -494,12 +535,27 @@ private fun SkikoProjectContext.configureSideModuleInput(
     mainLinkTaskName: String,
     sideModuleFiles: ConfigurableFileCollection
 ) {
+    val setupEmscripten = project.tasks.named<SetupEmscriptenTask>("setupEmscripten")
+    // Generate a narrow export list from the side modules before linking the main
+    // module; otherwise unresolved side-module imports would fail at runtime.
+    val sideModuleExports = project.tasks.register<GenerateWasmSideModuleExportsTask>(
+        "generateWasmSideModuleExports${mainLinkTaskName.replaceFirstChar { it.titlecase() }}"
+    ) {
+        dependsOn(setupEmscripten)
+        dependsOn(sideModuleFiles)
+        nodeExecutable.set(project.layout.file(setupEmscripten.map { it.nodeExecutableFile() }))
+        sideModules.from(sideModuleFiles)
+        outputFile.set(project.wasmSideModuleExportSymbols(mainLinkTaskName))
+    }
+
     // Side modules built with -shared are dynamic wasm modules loaded at runtime.
     // They must NOT be passed to the core linker (wasm-ld cannot statically link
     // a dynamic object). Instead, copy them into the core link output directory
     // so they are bundled alongside the core .wasm for runtime loading.
     project.tasks.named<LinkSkikoWasmTask>(mainLinkTaskName).configure {
-        dependsOn(sideModuleFiles)
+        dependsOn(sideModuleExports)
+        inputs.file(sideModuleExports.flatMap { it.outputFile })
+            .withPathSensitivity(PathSensitivity.RELATIVE)
         doLast {
             sideModuleFiles.files.forEach { sideWasm ->
                 sideWasm.copyTo(outDir.get().asFile.resolve(sideWasm.name), overwrite = true)
@@ -587,9 +643,17 @@ fun KotlinJsTargetDsl.setupImportsGeneratorPlugin(
 ) {
     val main by compilations.getting
     val test by compilations.getting
+    val mainPrefixFile = if (isSideModule) {
+        project.projectDir.resolve("src/webMain/resources/pre-$libBaseName.mjs")
+    } else {
+        project.generatedPreSetupMjs
+    }
+    val testPrefixFile = project.projectDir.resolve("src/webMain/resources/pre-${project.name}-test.mjs")
 
     main.compileTaskProvider.configure {
         outputs.file(if (isSideModule) project.sideModuleSetupMjs(libBaseName) else project.setupMjs)
+        inputs.file(mainPrefixFile)
+            .withPathSensitivity(PathSensitivity.RELATIVE)
         if (!isSideModule) {
             outputs.file(project.wasmExportSymbols)
         }
@@ -598,6 +662,10 @@ fun KotlinJsTargetDsl.setupImportsGeneratorPlugin(
     test.compileTaskProvider.configure {
         outputs.file(project.skikoTestMjs(libBaseName))
         outputs.file(project.wasmTestExportSymbols)
+        if (testPrefixFile.exists()) {
+            inputs.file(testPrefixFile)
+                .withPathSensitivity(PathSensitivity.RELATIVE)
+        }
     }
 
     listOf(main, test).forEach {
