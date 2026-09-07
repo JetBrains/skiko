@@ -1,7 +1,19 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
+import org.gradle.api.DefaultTask
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
+import org.gradle.api.file.ArchiveOperations
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
@@ -410,10 +422,12 @@ private fun configureSkikoWebRuntime(
     }.files
     val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-${target.name}-runtime")
 
-    val unpackRuntime = project.tasks.register("unpackSkikoRuntimeFor$titledTargetName", Copy::class.java) {
-        destinationDir = unpackedRuntimeDir.get().asFile
-        from(skikoWebRuntimeJarFiles.map { artifact -> project.zipTree(artifact) })
-        exclude("META-INF/**")
+    val unpackRuntime = project.tasks.register(
+        "unpackSkikoRuntimeFor$titledTargetName",
+        UnpackSkikoRuntimeTask::class.java,
+    ) {
+        runtimeFiles.from(skikoWebRuntimeJarFiles)
+        outputDirectory.set(unpackedRuntimeDir)
     }
 
     target.compilations.all {
@@ -430,6 +444,32 @@ private fun configureSkikoWebRuntime(
                 dependsOn(unpackRuntime)
                 exclude("META-INF")
             }
+        }
+    }
+}
+
+@CacheableTask
+abstract class UnpackSkikoRuntimeTask : DefaultTask() {
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val runtimeFiles: ConfigurableFileCollection
+
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    @get:javax.inject.Inject
+    abstract val archiveOperations: ArchiveOperations
+
+    @get:javax.inject.Inject
+    abstract val fileSystemOperations: FileSystemOperations
+
+    @TaskAction
+    fun unpack() {
+        fileSystemOperations.copy {
+            from(runtimeFiles.files.map(archiveOperations::zipTree))
+            into(outputDirectory)
+            exclude("META-INF/**")
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         }
     }
 }

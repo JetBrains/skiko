@@ -46,6 +46,11 @@ dependencyResolutionManagement {
 rootProject.name = "SkiaMultiplatformSample"
 
 if (extra.properties.getOrDefault("skiko.composite.build", "") == "1") {
+    // Included builds don't inherit properties declared in this build's gradle.properties.
+    // Enable all Skiko targets required by this multiplatform sample.
+    System.setProperty("org.gradle.project.skiko.wasm.enabled", "true")
+    System.setProperty("org.gradle.project.skiko.native.enabled", "true")
+
     includeBuild("../../skiko") {
         dependencySubstitution {
             substitute(module("org.jetbrains.skiko:skiko")).using(project(":"))
