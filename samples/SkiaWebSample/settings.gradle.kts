@@ -32,6 +32,10 @@ dependencyResolutionManagement {
 rootProject.name = "SkiaWebSample"
 
 if (extra.properties.getOrDefault("skiko.composite.build", "") == "1") {
+    // Included builds don't inherit properties declared in this build's gradle.properties.
+    // Skiko disables web targets by default, so enable them for this web sample.
+    System.setProperty("org.gradle.project.skiko.wasm.enabled", "true")
+
     includeBuild("../../skiko") {
         dependencySubstitution {
             substitute(module("org.jetbrains.skiko:skiko")).using(project(":"))
