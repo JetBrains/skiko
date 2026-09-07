@@ -174,7 +174,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "-Wl,--gc-sections",
                 "-Wl,--no-entry",
                 "-Wl,--error-limit=0",
-                "-s", "STACK_SIZE=1048576", // 1 MB
+                "-Wl,-z,stack-size=1048576", // 1 MB
             )
         }
     }
