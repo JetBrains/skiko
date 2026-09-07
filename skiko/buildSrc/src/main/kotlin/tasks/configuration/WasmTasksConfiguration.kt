@@ -230,7 +230,9 @@ fun SkikoProjectContext.declareWasmTasks() {
         flags.addAll(
             buildList {
                 add("-Oz") // set optimization level to compress (highest size reduction)
-                if (!skiko.isWasmBuildWithProfiling) {
+                if (skiko.isWasmBuildWithProfiling) {
+                    add("--debuginfo")
+                } else {
                     // strip debug info (including the names section)
                     // only do so if we are not building with profiling, as names are required for profiling
                     add("--strip-debug")
