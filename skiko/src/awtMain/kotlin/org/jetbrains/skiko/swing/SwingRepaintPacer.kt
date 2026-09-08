@@ -18,6 +18,8 @@ internal class SwingRepaintPacer(
     private val service: FramePacingService? = FramePacingServices.default
 ) {
     private var disposed = false
+    private var subscription: AutoCloseable? = null
+    private var subscribedDisplayId = UNKNOWN_DISPLAY_ID
     private val tickChannel = Channel<Unit>(Channel.RENDEZVOUS)
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (!disposed) {
@@ -34,23 +36,42 @@ internal class SwingRepaintPacer(
     fun dispose() {
         disposed = true
         frameDispatcher.cancel()
+        closeSubscription()
     }
 
     private suspend fun awaitTick() {
         val service = service ?: return
-        val graphicsConfiguration = component.graphicsConfiguration ?: return
-        val displayId = service.displayId(graphicsConfiguration)
-        val subscription = service.subscribe(displayId) { _, _ -> tickChannel.trySend(Unit) } ?: return
+        if (!ensureSubscription(service)) return
         try {
             withTimeout(DEFAULT_TICK_TIMEOUT_MILLIS) { tickChannel.receive() }
         } catch (_: TimeoutCancellationException) {
             // A failed clock only disables pacing for this frame in the MVP.
-        } finally {
-            subscription.close()
         }
     }
 
+    /** Keeps one display clock alive across a continuous animation. */
+    private fun ensureSubscription(service: FramePacingService): Boolean {
+        if (subscription != null) return true
+        val graphicsConfiguration = component.graphicsConfiguration ?: return false
+        val displayId = service.displayId(graphicsConfiguration)
+        val newSubscription = service.subscribe(displayId) { _, _ -> onTick() } ?: return false
+        subscription = newSubscription
+        subscribedDisplayId = displayId
+        return true
+    }
+
+    private fun onTick() {
+        tickChannel.trySend(Unit)
+    }
+
+    private fun closeSubscription() {
+        subscription?.close()
+        subscription = null
+        subscribedDisplayId = UNKNOWN_DISPLAY_ID
+    }
+
     private companion object {
+        const val UNKNOWN_DISPLAY_ID = -1L
         const val DEFAULT_TICK_TIMEOUT_MILLIS = 50L
     }
 }
