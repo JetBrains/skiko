@@ -185,6 +185,107 @@ static int findBestCrtc(int64_t wantPeriodNanos, int *outFd, int *outCrtcIndex)
     return 1;
 }
 
+static void *vblankThreadProc(void *param)
+{
+    FramePacingDrmClock *clock = (FramePacingDrmClock *)param;
+    JNIEnv *env = NULL;
+    if (framePacingJvm->AttachCurrentThreadAsDaemon((void **)&env, NULL) != JNI_OK) {
+        return NULL;
+    }
+
+    int64_t fallback = clock->fallbackPeriodNanos;
+    if (fallback <= 0) {
+        fallback = 1000000000LL / 60;
+    }
+    /*
+     * A display in power save can complete vblank waits immediately instead of
+     * failing them. No real display ticks at twice its nominal rate, so
+     * anything faster is not a vblank; pace off the nominal period until real
+     * ones resume. Half the period, not the whole one: a true refresh rate
+     * legitimately runs slightly faster than its nominal figure.
+     */
+    const int64_t minInterval = fallback / 2;
+    const unsigned int highCrtc = ((unsigned int)clock->crtcIndex
+            << _DRM_VBLANK_HIGH_CRTC_SHIFT) & _DRM_VBLANK_HIGH_CRTC_MASK;
+
+    int vblankUsable = 1;
+    int64_t last = nowNanos();
+
+    while (!stopRequested(clock)) {
+        int64_t tickTime;
+
+        if (vblankUsable) {
+            union drm_wait_vblank vbl;
+            memset(&vbl, 0, sizeof(vbl));
+            vbl.request.type = (enum drm_vblank_seq_type)(_DRM_VBLANK_RELATIVE | highCrtc);
+            vbl.request.sequence = 1;
+
+            int rc;
+            do {
+                rc = ioctl(clock->fd, DRM_IOCTL_WAIT_VBLANK, &vbl);
+            } while (rc == -1 && errno == EINTR && !stopRequested(clock));
+            if (stopRequested(clock)) {
+                break;
+            }
+            if (rc == -1) {
+                /*
+                 * The CRTC is gone (display removed, adapter reconfigured).
+                 * Drop to the nominal period rather than stopping: a clock
+                 * that stops ticking would starve its subscribers until the
+                 * pacer's timeout notices; a nominal-rate clock keeps them
+                 * paced.
+                 */
+                vblankUsable = 0;
+                continue;
+            }
+
+            tickTime = clock->monotonicTimestamps
+                    ? (int64_t)vbl.reply.tval_sec * 1000000000LL
+                            + (int64_t)vbl.reply.tval_usec * 1000LL
+                    : nowNanos();
+            int64_t elapsed = tickTime - last;
+            if (elapsed < minInterval) {
+                if (!sleepOrStop(clock, fallback - (elapsed > 0 ? elapsed : 0))) {
+                    break;
+                }
+                tickTime = nowNanos();
+            }
+        } else {
+            if (!sleepOrStop(clock, fallback)) {
+                break;
+            }
+            tickTime = nowNanos();
+        }
+
+        last = tickTime;
+        env->CallVoidMethod(clock->clockRef, framePacingOnNativeTickMID, (jlong)tickTime);
+        if (env->ExceptionCheck()) {
+            env->ExceptionClear();
+        }
+    }
+
+    framePacingJvm->DetachCurrentThread();
+    return NULL;
+}
+
+static int initShared(JNIEnv *env, jobject clockObj)
+{
+    if (framePacingJvm == NULL) {
+        if (env->GetJavaVM(&framePacingJvm) != JNI_OK) {
+            return 0;
+        }
+    }
+    if (framePacingOnNativeTickMID == NULL) {
+        jclass clockClass = env->GetObjectClass(clockObj);
+        framePacingOnNativeTickMID = env->GetMethodID(clockClass, "onNativeTick", "(J)V");
+        if (framePacingOnNativeTickMID == NULL) {
+            env->ExceptionClear();
+            return 0;
+        }
+    }
+    return 1;
+}
+
 extern "C" {
 
 JNIEXPORT jboolean JNICALL
@@ -201,5 +302,104 @@ Java_org_jetbrains_skiko_swing_LinuxDrmVBlankClock_nativeProbe(JNIEnv *env, jcla
     return JNI_TRUE;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_jetbrains_skiko_swing_LinuxDrmVBlankClock_nativeCreate(JNIEnv *env, jclass cls,
+                                                                jobject clockObj,
+                                                                jlong displayPeriodNanos,
+                                                                jstring connectorName)
+{
+    (void)cls;
+    if (!initShared(env, clockObj)) {
+        return 0;
+    }
+
+    int fd = -1;
+    int crtcIndex = -1;
+    (void)connectorName; // reserved; Skiko has no connector data to pass
+    /*
+     * displayPeriodNanos is what the toolkit reported for this display, and 0
+     * when it reported nothing. Passing the 0 through matters: findBestCrtc
+     * then takes the first active CRTC rather than matching against a
+     * substituted rate, which would pick the wrong CRTC on a mixed-refresh
+     * desktop. It also serves as the thread's cadence when vblank waits fail,
+     * where 0 falls back to 60 Hz.
+     */
+    if (!findBestCrtc(displayPeriodNanos, &fd, &crtcIndex)) {
+        return 0;
+    }
+
+    FramePacingDrmClock *clock = (FramePacingDrmClock *)calloc(1, sizeof(FramePacingDrmClock));
+    if (clock == NULL) {
+        close(fd);
+        return 0;
+    }
+    clock->fd = fd;
+    clock->crtcIndex = crtcIndex;
+    clock->fallbackPeriodNanos = displayPeriodNanos;
+
+    struct drm_get_cap cap;
+    memset(&cap, 0, sizeof(cap));
+    cap.capability = DRM_CAP_TIMESTAMP_MONOTONIC;
+    clock->monotonicTimestamps =
+            ioctl(fd, DRM_IOCTL_GET_CAP, &cap) == 0 && cap.value != 0;
+
+    clock->clockRef = env->NewGlobalRef(clockObj);
+    if (clock->clockRef == NULL) {
+        close(fd);
+        free(clock);
+        return 0;
+    }
+    return (jlong)(intptr_t)clock;
+}
+
+JNIEXPORT void JNICALL
+Java_org_jetbrains_skiko_swing_LinuxDrmVBlankClock_nativeStart(JNIEnv *env, jclass cls, jlong ptr)
+{
+    (void)env;
+    (void)cls;
+    FramePacingDrmClock *clock = (FramePacingDrmClock *)(intptr_t)ptr;
+    clock->hasThread = pthread_create(&clock->thread, NULL, vblankThreadProc, clock) == 0;
+}
+
+JNIEXPORT void JNICALL
+Java_org_jetbrains_skiko_swing_LinuxDrmVBlankClock_nativeStop(JNIEnv *env, jclass cls, jlong ptr)
+{
+    (void)env;
+    (void)cls;
+    FramePacingDrmClock *clock = (FramePacingDrmClock *)(intptr_t)ptr;
+    __atomic_store_n(&clock->stop, 1, __ATOMIC_RELEASE);
+}
+
+JNIEXPORT void JNICALL
+Java_org_jetbrains_skiko_swing_LinuxDrmVBlankClock_nativeRelease(JNIEnv *env, jclass cls, jlong ptr)
+{
+    (void)cls;
+    FramePacingDrmClock *clock = (FramePacingDrmClock *)(intptr_t)ptr;
+    if (clock->hasThread) {
+        // The thread exits promptly once the stop flag is set (at most one
+        // frame wait); bound the join so release stays effectively brief.
+        struct timespec deadline;
+        clock_gettime(CLOCK_REALTIME, &deadline);
+        deadline.tv_sec += 1;
+        if (pthread_timedjoin_np(clock->thread, NULL, &deadline) != 0) {
+            /*
+             * The thread is still inside its vblank wait: a wedged CRTC can hold
+             * DRM_IOCTL_WAIT_VBLANK for far longer than one frame. Detach it and
+             * leak the clock. Closing the descriptor, dropping the global
+             * reference or freeing the struct here would pull all three out from
+             * under a live thread, and the descriptor number could then be
+             * handed to an unrelated open(). The clock is already stopped, so
+             * the leaked thread delivers nothing when its wait finally returns;
+             * the leak is one struct, one descriptor and one global reference
+             * per wedged display.
+             */
+            pthread_detach(clock->thread);
+            return;
+        }
+    }
+    close(clock->fd);
+    env->DeleteGlobalRef(clock->clockRef);
+    free(clock);
+}
 
 } // extern "C"

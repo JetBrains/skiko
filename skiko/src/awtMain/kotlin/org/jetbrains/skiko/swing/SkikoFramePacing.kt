@@ -145,6 +145,9 @@ internal class SkikoFramePacingService private constructor(
             hostOs == OS.Windows ->
                 WinNativeClock(displayId, periodNanos, useVBlank = false)
 
+            hostOs == OS.Linux && LinuxDrmVBlankClock.available() ->
+                LinuxDrmVBlankClock(displayId, periodNanos, reportedPeriodNanos)
+
             else -> TimerClock(displayId, periodNanos)
         }
 
@@ -436,16 +439,74 @@ internal class WinNativeClock(
     }
 }
 
-/** Checks whether an active DRM CRTC is accessible in this session. */
-internal class LinuxDrmVBlankClock private constructor() {
-    companion object {
-        fun available(): Boolean = try {
-            nativeProbe()
-        } catch (_: UnsatisfiedLinkError) {
-            false
+/**
+ * Linux display clock: a per-CRTC kernel DRM vblank wait delivering kernel vblank timestamps
+ * (see `FramePacing.cc` in `cpp/linux`). The CRTC is chosen by matching mode periods against
+ * the display's advertised refresh; needs a local session with DRM device access (logind seat
+ * ACL), so remote/headless environments probe unavailable and fall back to the timer.
+ *
+ * [displayPeriodNanos] is the refresh period AWT reported for this display, or 0 when it reported
+ * none. It is the CRTC match key, and it is deliberately not the substituted [periodNanos]: with
+ * an unknown rate, matching against a stand-in 60 Hz would pick the 60 Hz CRTC on a mixed-refresh
+ * desktop and pace a 144 Hz window at 60. With 0 the native side takes the first active CRTC
+ * instead, which is right on a single-display desktop and no worse anywhere else.
+ */
+internal class LinuxDrmVBlankClock(
+    displayId: Long,
+    periodNanos: Long,
+    private val displayPeriodNanos: Long
+) : DisplayClock(displayId, periodNanos) {
+
+    private var ptr = 0L
+
+    override fun onStart() {
+        ptr = nativeCreate(this, displayPeriodNanos, null)
+        if (ptr != 0L) {
+            nativeStart(ptr)
         }
+        // On failure the clock stays silent; the pacer's tick timeout drops the subscription.
+    }
+
+    override fun onStop() {
+        if (ptr != 0L) nativeStop(ptr)
+    }
+
+    override fun onRelease() {
+        if (ptr != 0L) {
+            nativeRelease(ptr)
+            ptr = 0L
+        }
+    }
+
+    /** Called from the DRM vblank wait thread. */
+    @Suppress("unused") // called from native
+    fun onNativeTick(timeNanos: Long) = deliver(timeNanos)
+
+    companion object {
+        fun available(): Boolean =
+            try {
+                nativeProbe()
+            } catch (_: UnsatisfiedLinkError) {
+                false
+            }
 
         @JvmStatic
         private external fun nativeProbe(): Boolean
+
+        @JvmStatic
+        private external fun nativeCreate(
+            clock: LinuxDrmVBlankClock,
+            displayPeriodNanos: Long,
+            connectorName: String?
+        ): Long
+
+        @JvmStatic
+        private external fun nativeStart(ptr: Long)
+
+        @JvmStatic
+        private external fun nativeStop(ptr: Long)
+
+        @JvmStatic
+        private external fun nativeRelease(ptr: Long)
     }
 }
