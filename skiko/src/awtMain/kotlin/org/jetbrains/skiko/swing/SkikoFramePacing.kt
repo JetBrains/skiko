@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.SkikoProperties
 import org.jetbrains.skiko.hostOs
 import java.awt.GraphicsConfiguration
 import java.awt.GraphicsDevice
@@ -111,8 +112,9 @@ internal class SkikoFramePacingService private constructor(
         val instance: FramePacingService? by lazy {
             if (GraphicsEnvironment.isHeadless()) return@lazy null
 
+            val forceTimer = SkikoProperties.swingFramePacingForceTimer
             SkikoFramePacingService { displayId, periodNanos, reportedPeriodNanos ->
-                TimerClock(displayId, periodNanos)
+                createClock(displayId, periodNanos, reportedPeriodNanos, forceTimer)
             }
         }
 
@@ -124,6 +126,20 @@ internal class SkikoFramePacingService private constructor(
          * Separate from [instance] so tests can assert which backend a display gets, rather than
          * only that the probe accepted it.
          */
+        internal fun createClock(
+            displayId: Long,
+            periodNanos: Long,
+            reportedPeriodNanos: Long,
+            forceTimer: Boolean
+        ): DisplayClock = when {
+            forceTimer -> TimerClock(displayId, periodNanos)
+
+            hostOs == OS.MacOS && MacDisplayLinkClock.available(displayId) ->
+                MacDisplayLinkClock(displayId, periodNanos)
+
+            else -> TimerClock(displayId, periodNanos)
+        }
+
         /**
          * The platform display id for [device], parsed out of the public
          * [GraphicsDevice.getIDstring]:
@@ -283,16 +299,61 @@ internal class TimerClock(
     }
 }
 
-/** Checks whether a macOS display has a CADisplayLink source. */
-internal class MacDisplayLinkClock private constructor() {
-    companion object {
-        fun available(displayId: Long): Boolean = try {
-            nativeProbe(displayId.toInt())
-        } catch (_: UnsatisfiedLinkError) {
-            false
+/**
+ * macOS display clock: a Skiko-owned per-display `CADisplayLink` (`NSScreen.displayLink`, macOS 14+) delivering
+ * [onNativeTick] from the display link callback thread. See `FramePacing.mm`.
+ */
+internal class MacDisplayLinkClock(
+    displayId: Long,
+    periodNanos: Long
+) : DisplayClock(displayId, periodNanos) {
+
+    private var ptr = 0L
+
+    override fun onStart() {
+        ptr = nativeCreate(displayId.toInt(), this)
+        if (ptr != 0L) {
+            nativeStart(ptr)
         }
+        // On failure the clock stays silent; the pacer's tick timeout drops the subscription.
+    }
+
+    override fun onStop() {
+        if (ptr != 0L) nativeStop(ptr)
+    }
+
+    override fun onRelease() {
+        if (ptr != 0L) {
+            nativeRelease(ptr)
+            ptr = 0L
+        }
+    }
+
+    /** Called from the CADisplayLink runloop thread. */
+    @Suppress("unused") // called from native
+    fun onNativeTick(timeNanos: Long) = deliver(timeNanos)
+
+    companion object {
+        fun available(displayId: Long): Boolean =
+            try {
+                nativeProbe(displayId.toInt())
+            } catch (_: UnsatisfiedLinkError) {
+                false
+            }
 
         @JvmStatic
         private external fun nativeProbe(displayId: Int): Boolean
+
+        @JvmStatic
+        private external fun nativeCreate(displayId: Int, clock: MacDisplayLinkClock): Long
+
+        @JvmStatic
+        private external fun nativeStart(ptr: Long)
+
+        @JvmStatic
+        private external fun nativeStop(ptr: Long)
+
+        @JvmStatic
+        private external fun nativeRelease(ptr: Long)
     }
 }
