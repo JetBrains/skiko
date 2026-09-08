@@ -282,3 +282,17 @@ internal class TimerClock(
         }
     }
 }
+
+/** Checks whether a macOS display has a CADisplayLink source. */
+internal class MacDisplayLinkClock private constructor() {
+    companion object {
+        fun available(displayId: Long): Boolean = try {
+            nativeProbe(displayId.toInt())
+        } catch (_: UnsatisfiedLinkError) {
+            false
+        }
+
+        @JvmStatic
+        private external fun nativeProbe(displayId: Int): Boolean
+    }
+}
