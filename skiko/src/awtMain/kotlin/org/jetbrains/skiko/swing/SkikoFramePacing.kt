@@ -357,3 +357,17 @@ internal class MacDisplayLinkClock(
         private external fun nativeRelease(ptr: Long)
     }
 }
+
+/** Checks whether Windows exposes a desktop-attached DXGI output. */
+internal class WinNativeClock private constructor() {
+    companion object {
+        fun vblankAvailable(): Boolean = try {
+            nativeProbeVBlank()
+        } catch (_: UnsatisfiedLinkError) {
+            false
+        }
+
+        @JvmStatic
+        private external fun nativeProbeVBlank(): Boolean
+    }
+}
