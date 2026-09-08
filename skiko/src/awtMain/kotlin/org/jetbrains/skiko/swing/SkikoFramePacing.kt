@@ -137,6 +137,14 @@ internal class SkikoFramePacingService private constructor(
             hostOs == OS.MacOS && MacDisplayLinkClock.available(displayId) ->
                 MacDisplayLinkClock(displayId, periodNanos)
 
+            hostOs == OS.Windows && WinNativeClock.vblankAvailable() ->
+                WinNativeClock(displayId, periodNanos, useVBlank = true)
+
+            // Even without DWM the native clock paces on Windows' high-resolution waitable timer,
+            // which a JVM-side wait cannot match on stock JVMs (~16 ms system-timer quantization).
+            hostOs == OS.Windows ->
+                WinNativeClock(displayId, periodNanos, useVBlank = false)
+
             else -> TimerClock(displayId, periodNanos)
         }
 
@@ -358,16 +366,72 @@ internal class MacDisplayLinkClock(
     }
 }
 
-/** Checks whether Windows exposes a desktop-attached DXGI output. */
-internal class WinNativeClock private constructor() {
-    companion object {
-        fun vblankAvailable(): Boolean = try {
-            nativeProbeVBlank()
-        } catch (_: UnsatisfiedLinkError) {
-            false
+/**
+ * Windows display clock, in one of two native flavors (see `FramePacing.cc`):
+ * - [useVBlank]: `IDXGIOutput::WaitForVBlank` on the output of the AWT screen [displayId] —
+ *   a true per-display vblank.
+ * - otherwise: DWM composition timing waited out with a high-resolution waitable timer — one
+ *   desktop-wide cadence, for DXGI-less environments.
+ */
+internal class WinNativeClock(
+    displayId: Long,
+    periodNanos: Long,
+    private val useVBlank: Boolean
+) : DisplayClock(displayId, periodNanos) {
+
+    private var ptr = 0L
+
+    override fun onStart() {
+        ptr = if (useVBlank) {
+            nativeCreateVBlank(this, displayId.toInt(), periodNanos)
+        } else {
+            nativeCreate(this, periodNanos)
         }
+        if (ptr != 0L) {
+            nativeStart(ptr)
+        }
+        // On failure the clock stays silent; the pacer's tick timeout drops the subscription.
+    }
+
+    override fun onStop() {
+        if (ptr != 0L) nativeStop(ptr)
+    }
+
+    override fun onRelease() {
+        if (ptr != 0L) {
+            nativeRelease(ptr)
+            ptr = 0L
+        }
+    }
+
+    /** Called from the native clock thread. */
+    @Suppress("unused") // called from native
+    fun onNativeTick(timeNanos: Long) = deliver(timeNanos)
+
+    companion object {
+        fun vblankAvailable(): Boolean =
+            try {
+                nativeProbeVBlank()
+            } catch (_: UnsatisfiedLinkError) {
+                false
+            }
 
         @JvmStatic
         private external fun nativeProbeVBlank(): Boolean
+
+        @JvmStatic
+        private external fun nativeCreate(clock: WinNativeClock, fallbackPeriodNanos: Long): Long
+
+        @JvmStatic
+        private external fun nativeCreateVBlank(clock: WinNativeClock, screen: Int, fallbackPeriodNanos: Long): Long
+
+        @JvmStatic
+        private external fun nativeStart(ptr: Long)
+
+        @JvmStatic
+        private external fun nativeStop(ptr: Long)
+
+        @JvmStatic
+        private external fun nativeRelease(ptr: Long)
     }
 }
