@@ -435,3 +435,17 @@ internal class WinNativeClock(
         private external fun nativeRelease(ptr: Long)
     }
 }
+
+/** Checks whether an active DRM CRTC is accessible in this session. */
+internal class LinuxDrmVBlankClock private constructor() {
+    companion object {
+        fun available(): Boolean = try {
+            nativeProbe()
+        } catch (_: UnsatisfiedLinkError) {
+            false
+        }
+
+        @JvmStatic
+        private external fun nativeProbe(): Boolean
+    }
+}
