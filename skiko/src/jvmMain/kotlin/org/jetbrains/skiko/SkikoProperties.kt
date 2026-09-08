@@ -97,6 +97,13 @@ object SkikoProperties {
     val vsyncEnabled: Boolean
         by lazyBooleanProperty("skiko.vsync.enabled", defaultValue = true)
 
+    /**
+     * Whether [org.jetbrains.skiko.swing.SkiaSwingLayer.needRender] may pace
+     * invalidation-driven repaints. Disabled by default.
+     */
+    val swingFramePacingEnabled: Boolean
+        by lazyBooleanProperty("skiko.swing.frame.pacing", defaultValue = false)
+
     val frameBuffering: FrameBuffering by lazyProperty("skiko.buffering") {
         when (it) {
             "DOUBLE" -> FrameBuffering.DOUBLE
