@@ -7,6 +7,7 @@ import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.MainUIDispatcher
 import java.awt.Component
 import java.awt.GraphicsConfiguration
+import kotlin.math.ceil
 
 /**
  * The repaint entry point used by [SkiaSwingLayer.needRender].
@@ -21,6 +22,7 @@ internal class SwingRepaintPacer(
     private var subscription: AutoCloseable? = null
     private var subscribedDisplayId = UNKNOWN_DISPLAY_ID
     private var failedDisplayId = UNKNOWN_DISPLAY_ID
+    private var tickTimeoutMillis = DEFAULT_TICK_TIMEOUT_MILLIS
 
     @Volatile
     private var receivedTick = false
@@ -47,7 +49,7 @@ internal class SwingRepaintPacer(
         val service = service ?: return
         if (!ensureSubscription(service)) return
         try {
-            withTimeout(DEFAULT_TICK_TIMEOUT_MILLIS) { tickChannel.receive() }
+            withTimeout(tickTimeoutMillis) { tickChannel.receive() }
         } catch (_: TimeoutCancellationException) {
             // A clock that never ticked is unpaceable; one that did may recover next frame.
             failedDisplayId = if (receivedTick) UNKNOWN_DISPLAY_ID else subscribedDisplayId
@@ -65,6 +67,7 @@ internal class SwingRepaintPacer(
         if (subscription != null && displayId == subscribedDisplayId) return true
 
         closeSubscription()
+        tickTimeoutMillis = tickTimeoutMillisFor(service.refreshPeriodNanos(displayId))
         receivedTick = false
         val newSubscription = try {
             service.subscribe(displayId) { _, _ -> onTick() }
@@ -98,9 +101,20 @@ internal class SwingRepaintPacer(
         subscribedDisplayId = UNKNOWN_DISPLAY_ID
     }
 
+    private fun tickTimeoutMillisFor(periodNanos: Long): Long =
+        if (periodNanos > 0) {
+            ceil(TICK_TIMEOUT_PERIODS * periodNanos / 1_000_000.0)
+                .toLong()
+                .coerceAtLeast(MIN_TICK_TIMEOUT_MILLIS)
+        } else {
+            DEFAULT_TICK_TIMEOUT_MILLIS
+        }
+
     private companion object {
         const val UNKNOWN_DISPLAY_ID = -1L
+        const val TICK_TIMEOUT_PERIODS = 3
         const val DEFAULT_TICK_TIMEOUT_MILLIS = 50L
+        const val MIN_TICK_TIMEOUT_MILLIS = 50L
     }
 }
 
