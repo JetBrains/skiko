@@ -119,8 +119,13 @@ open class SkiaSwingLayer(
     /**
      * Requests a repaint of the layer content, like [repaint].
      *
-     * When frame pacing is enabled, this is the entry point that can coalesce continuous
-     * invalidation-driven repaint requests. Otherwise it behaves exactly like [repaint].
+     * When frame pacing is enabled ([SkikoProperties.swingFramePacingEnabled]) and Skiko has a
+     * display clock for the layer's display, the repaint is deferred to the next display refresh
+     * tick, and multiple requests coalesce into at most one repaint per tick. Otherwise the request
+     * falls back to a plain [repaint].
+     *
+     * Use this instead of [repaint] for invalidation-driven rendering (e.g. animations), so that a
+     * continuously invalidating scene renders at most at the display refresh rate.
      *
      * Must be called on the AWT event dispatch thread.
      */
