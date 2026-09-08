@@ -20,6 +20,10 @@ internal class SwingRepaintPacer(
     private var disposed = false
     private var subscription: AutoCloseable? = null
     private var subscribedDisplayId = UNKNOWN_DISPLAY_ID
+    private var failedDisplayId = UNKNOWN_DISPLAY_ID
+
+    @Volatile
+    private var receivedTick = false
     private val tickChannel = Channel<Unit>(Channel.RENDEZVOUS)
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (!disposed) {
@@ -45,27 +49,40 @@ internal class SwingRepaintPacer(
         try {
             withTimeout(DEFAULT_TICK_TIMEOUT_MILLIS) { tickChannel.receive() }
         } catch (_: TimeoutCancellationException) {
-            // A failed clock only disables pacing for this frame in the MVP.
+            // A clock that never ticked is unpaceable; one that did may recover next frame.
+            failedDisplayId = if (receivedTick) UNKNOWN_DISPLAY_ID else subscribedDisplayId
+            closeSubscription()
         }
     }
 
     /** Keeps one display clock alive across a continuous animation. */
     private fun ensureSubscription(service: FramePacingService): Boolean {
         val displayId = resolveDisplayId(service)
-        if (displayId == UNKNOWN_DISPLAY_ID) {
+        if (displayId == UNKNOWN_DISPLAY_ID || displayId == failedDisplayId) {
             closeSubscription()
             return false
         }
         if (subscription != null && displayId == subscribedDisplayId) return true
 
         closeSubscription()
-        val newSubscription = service.subscribe(displayId) { _, _ -> onTick() } ?: return false
+        receivedTick = false
+        val newSubscription = try {
+            service.subscribe(displayId) { _, _ -> onTick() }
+        } catch (_: Throwable) {
+            null
+        }
+        if (newSubscription == null) {
+            failedDisplayId = displayId
+            return false
+        }
         subscription = newSubscription
         subscribedDisplayId = displayId
+        failedDisplayId = UNKNOWN_DISPLAY_ID
         return true
     }
 
     private fun onTick() {
+        receivedTick = true
         tickChannel.trySend(Unit)
     }
 
