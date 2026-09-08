@@ -51,9 +51,14 @@ internal class SwingRepaintPacer(
 
     /** Keeps one display clock alive across a continuous animation. */
     private fun ensureSubscription(service: FramePacingService): Boolean {
-        if (subscription != null) return true
-        val graphicsConfiguration = component.graphicsConfiguration ?: return false
-        val displayId = service.displayId(graphicsConfiguration)
+        val displayId = resolveDisplayId(service)
+        if (displayId == UNKNOWN_DISPLAY_ID) {
+            closeSubscription()
+            return false
+        }
+        if (subscription != null && displayId == subscribedDisplayId) return true
+
+        closeSubscription()
         val newSubscription = service.subscribe(displayId) { _, _ -> onTick() } ?: return false
         subscription = newSubscription
         subscribedDisplayId = displayId
@@ -62,6 +67,12 @@ internal class SwingRepaintPacer(
 
     private fun onTick() {
         tickChannel.trySend(Unit)
+    }
+
+    /** Re-resolve on every frame so moving a window between displays replaces its clock. */
+    private fun resolveDisplayId(service: FramePacingService): Long {
+        val graphicsConfiguration = component.graphicsConfiguration ?: return UNKNOWN_DISPLAY_ID
+        return service.displayId(graphicsConfiguration)
     }
 
     private fun closeSubscription() {
