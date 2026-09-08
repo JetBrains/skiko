@@ -11,13 +11,14 @@ import kotlin.math.sin
 
 open class ClocksAwt(
     private val scaleProvider: () -> Float,
-    private val renderProvider: () -> GraphicsApi = { GraphicsApi.UNKNOWN }
+    private val renderProvider: () -> GraphicsApi = { GraphicsApi.UNKNOWN },
 ) : SkikoRenderDelegate, MouseMotionListener {
     constructor(layer: SkiaLayer) : this(
         { layer.contentScale },
         { layer.renderApi }
     )
 
+    lateinit var f: () -> Unit
     private val typeface = FontMgr.default.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 13f).apply {
         edging = FontEdging.SUBPIXEL_ANTI_ALIAS
@@ -117,6 +118,7 @@ open class ClocksAwt(
         val picture = pictureRecorder.finishRecordingAsPicture()
         canvas.drawPicture(picture, null, Paint())
         canvas.drawLine(left, top + rectH, left + rectW, top, Paint())
+        f()
     }
 
     override fun mouseDragged(e: MouseEvent) {
