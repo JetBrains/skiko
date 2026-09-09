@@ -55,19 +55,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRenderer_dispose
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRenderer_makeMetalRenderTargetOffScreen(
-        JNIEnv *env, jobject contextHandler, jlong texturePtr) {
-    @autoreleasepool {
-        id <MTLTexture> texture = (__bridge id <MTLTexture>) (void *) texturePtr;
-        GrMtlTextureInfo info;
-        info.fTexture.retain((__bridge GrMTLHandle) texture);
-        GrBackendRenderTarget *renderTarget = NULL;
-        GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(texture.width, texture.height, info);
-        renderTarget = new GrBackendRenderTarget(obj);
-        return (jlong) renderTarget;
-    }
-}
-
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_MetalOffscreenContext_makeMetalDevice(
         JNIEnv *env, jobject contextHandler) {
     @autoreleasepool {
@@ -80,18 +67,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_MetalOffscreenContext
         JNIEnv *env, jobject contextHandler, jlong devicePtr) {
     @autoreleasepool {
         id <MTLDevice> device = (__bridge_transfer id <MTLDevice>) (void *) devicePtr;
-    }
-}
-
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_MetalOffscreenContext_makeMetalContext(
-        JNIEnv *env, jobject contextHandler, jlong devicePtr) {
-    @autoreleasepool {
-        id <MTLDevice> device = (__bridge id <MTLDevice>) (void *) devicePtr;
-        GrMtlBackendContext backendContext = {};
-        backendContext.fDevice.retain((__bridge GrMTLHandle) device);
-        id <MTLCommandQueue> fQueue = [device newCommandQueue];
-        backendContext.fQueue.retain((__bridge GrMTLHandle) fQueue);
-        return (jlong) GrDirectContexts::MakeMetal(backendContext).release();
     }
 }
 
@@ -113,16 +88,19 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_MetalOffscreenContext
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_MetalOffscreenContext_makeMetalRenderTargetOffScreen(
-        JNIEnv *env, jobject contextHandler, jlong texturePtr) {
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_MetalOffscreenContext_getCommandQueue(
+        JNIEnv *env, jobject contextHandler, jlong devicePtr) {
     @autoreleasepool {
-        id <MTLTexture> texture = (__bridge id <MTLTexture>) (void *) texturePtr;
-        GrMtlTextureInfo info;
-        info.fTexture.retain((__bridge GrMTLHandle) texture);
-        GrBackendRenderTarget *renderTarget = NULL;
-        GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(texture.width, texture.height, info);
-        renderTarget = new GrBackendRenderTarget(obj);
-        return (jlong) renderTarget;
+        id <MTLDevice> device = (__bridge id <MTLDevice>) (void *) devicePtr;
+        id <MTLCommandQueue> queue = [device newCommandQueue];
+        return (jlong) (__bridge_retained void *) queue;
+    }
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_MetalOffscreenContext_disposeCommandQueue(
+        JNIEnv *env, jobject contextHandler, jlong queuePtr) {
+    @autoreleasepool {
+        id <MTLCommandQueue> queue = (__bridge_transfer id <MTLCommandQueue>) (void *) queuePtr;
     }
 }
 

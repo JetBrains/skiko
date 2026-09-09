@@ -21,10 +21,13 @@ class MetalOffscreenContext : AutoCloseable {
         }
     }
 
-    val directContext = DirectContext(makeMetalContext(device))
+    private val commandQueue = getCommandQueue(device)
+
+    val directContext = DirectContext.makeMetal(device, commandQueue)
 
     override fun close() {
         directContext.close()
+        disposeCommandQueue(commandQueue)
         disposeMetalDevice(device)
     }
 
@@ -38,7 +41,11 @@ class MetalOffscreenContext : AutoCloseable {
             }
         }
 
-        val backendRenderTarget = BackendRenderTarget(makeMetalRenderTargetOffScreen(texture))
+        val backendRenderTarget = BackendRenderTarget.makeMetal(
+            width = width,
+            height = height,
+            texturePtr = texture
+        )
 
         override fun close() {
             backendRenderTarget.close()
@@ -48,10 +55,10 @@ class MetalOffscreenContext : AutoCloseable {
 
     private external fun makeMetalDevice(): NativePointer
     private external fun disposeMetalDevice(devicePtr: NativePointer)
-    private external fun makeMetalContext(devicePtr: NativePointer): NativePointer
     private external fun makeMetalTexture(devicePtr: NativePointer, width: Int, height: Int): NativePointer
     private external fun disposeMetalTexture(texturePtr: NativePointer)
-    private external fun makeMetalRenderTargetOffScreen(texturePtr: NativePointer): NativePointer
+    private external fun getCommandQueue(devicePtr: NativePointer): NativePointer
+    private external fun disposeCommandQueue(queuePtr: NativePointer)
 
     private companion object {
         init {

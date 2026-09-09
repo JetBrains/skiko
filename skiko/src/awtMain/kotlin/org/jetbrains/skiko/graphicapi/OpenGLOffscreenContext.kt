@@ -7,8 +7,6 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.Library
 import org.jetbrains.skiko.RenderException
-import org.jetbrains.skiko.makeGLContext
-import org.jetbrains.skiko.makeGLRenderTarget
 
 /**
  * Class that allows drawing into offscreen OpenGL textures on Linux.
@@ -42,7 +40,7 @@ class OpenGLOffscreenContext : AutoCloseable {
         startRendering(contextPtr, bufferPtr)
         try {
             if (_directContext == null) {
-                _directContext = makeGLContext()
+                _directContext = DirectContext.makeGL()
             }
 
             val texture = Texture(width, height)
@@ -74,7 +72,7 @@ class OpenGLOffscreenContext : AutoCloseable {
             }
         }
 
-        val backendRenderTarget: BackendRenderTarget = makeGLRenderTarget(
+        val backendRenderTarget: BackendRenderTarget = BackendRenderTarget.makeGL(
             width,
             height,
             0,
