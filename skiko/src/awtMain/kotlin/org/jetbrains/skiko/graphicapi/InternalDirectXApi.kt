@@ -7,6 +7,7 @@ import org.jetbrains.skiko.Library
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.isVideoCardSupported
 
+// https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format
 @JvmInline
 internal value class DxgiFormat(val value: Int) {
     companion object {
