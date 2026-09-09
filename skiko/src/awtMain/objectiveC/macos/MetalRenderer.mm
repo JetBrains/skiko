@@ -245,17 +245,19 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_createMe
 
         /// Track interactive live-resize state. These fire on the AppKit main thread. weakDevice avoids
         /// a device -> observer -> block -> device retain cycle. Gated by liveResizeEnabled: when
-        /// disabled the observers aren't installed, so inLiveResize/liveResizing stay NO and every path
+        /// disabled the observers aren't installed, so liveResizing stays NO and every path
         /// (setBounds, finishFrame, syncBoundsFromPlatformComponent, the frame loop) uses the legacy behavior.
         ///
         /// presentsWithTransaction is scoped to the whole resize session here (not per-frame): the start
         /// observer sets it YES, the end observer clears it. This is safe because during a resize the
         /// main thread is the sole presenter (setBounds + drawFrameWhileLiveResizing) and any frame that
         /// reaches the async present path in finishFrame is dropped there. The ordering below keeps
-        /// presentsWithTransaction = YES a strict subset of inLiveResize = YES (set inLiveResize first at
-        /// start, clear the flag first at end) so that whenever the flag is YES a background straggler is
+        /// presentsWithTransaction = YES a strict subset of liveResizing = YES (set liveResizing first at
+        /// start, clear it last at end) so that whenever the property is YES a background straggler is
         /// already being dropped — it can never present async under YES and defer forever on a
-        /// transaction that never commits.
+        /// transaction that never commits. liveResizing and presentsWithTransaction are both written
+        /// here on the main thread, but the readers that matter for this ordering run on other threads
+        /// and can interleave between the two writes.
         if (liveResizeEnabled) {
             __weak MetalDevice *weakDevice = device;
             const NSUInteger idleDrawableCount = layer.maximumDrawableCount;
@@ -266,12 +268,11 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_createMe
                                                               usingBlock:^(NSNotification * _Nonnull note) {
                     MetalDevice *strongDevice = weakDevice;
                     if (!strongDevice) return;
-                    strongDevice.inLiveResize = YES;
                     if (idleDrawableCount < 3) {  // Live resize needs 3 drawables to work well
                         strongDevice.layer.maximumDrawableCount = 3;
                     }
-                    strongDevice.layer.presentsWithTransaction = YES;
                     strongDevice.layer.liveResizing = YES;
+                    strongDevice.layer.presentsWithTransaction = YES;
                     javaOnLiveResizeStarted(strongDevice.layer.javaRef);
                 }];
             device.liveResizeEndObserver =
@@ -281,13 +282,11 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_createMe
                                                               usingBlock:^(NSNotification * _Nonnull note) {
                     MetalDevice *strongDevice = weakDevice;
                     if (!strongDevice) return;
-                    /// Stop the main-thread live-resize draw (liveResizing) before clearing inLiveResize,
-                    /// so setBounds stops driving frames as the resize winds down. Clear
-                    /// presentsWithTransaction before inLiveResize so background frames, which resume
-                    /// presenting async once inLiveResize goes NO, never observe the flag as YES.
-                    strongDevice.layer.liveResizing = NO;
+                    /// Clear presentsWithTransaction before liveResizing, so background frames — which
+                    /// resume presenting async once liveResizing goes NO — never observe the property
+                    /// as YES. This is the mirror of the start order above.
                     strongDevice.layer.presentsWithTransaction = NO;
-                    strongDevice.inLiveResize = NO;
+                    strongDevice.layer.liveResizing = NO;
                     if (idleDrawableCount < 3) {  // Reset back
                         strongDevice.layer.maximumDrawableCount = idleDrawableCount;
                     }
@@ -321,7 +320,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_renderer_MetalRenderer_scheduleF
         /// again; and it lets an onRender -> needRender inside drawFrameWhileLiveResizing re-arm the next frame,
         /// sustaining the animation while the pointer is held still.
         atomic_store(&device->frameOnAppKitThreadScheduled, false);
-        if (!device.inLiveResize) {
+        if (!device.layer.liveResizing) {
             return;
         }
         CGSize size = device.layer.drawableSize;
