@@ -51,7 +51,7 @@ internal abstract class AbstractOpenGLRenderer(
     private fun ensureContext(): Boolean {
         if (glContext == null) {
             try {
-                val newContext = makeGLContext()
+                val newContext = DirectContext.makeGL()
                 glContext = newContext
                 onContextInitialized(newContext, layer.properties.gpuResourceCacheLimit) { renderInfo }
             } catch (e: Exception) {
@@ -72,7 +72,7 @@ internal abstract class AbstractOpenGLRenderer(
             disposeSurface()
             val gl = OpenGLApi.instance
             val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
-            renderTarget = makeGLRenderTarget(
+            renderTarget = BackendRenderTarget.makeGL(
                 w,
                 h,
                 0,
