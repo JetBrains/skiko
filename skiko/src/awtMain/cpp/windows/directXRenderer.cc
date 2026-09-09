@@ -21,6 +21,12 @@
 extern "C" JavaVM *jvm;
 
 const int BuffersCount = 2;
+const D3D_FEATURE_LEVEL minSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
+const D3D_FEATURE_LEVEL featureLevels[] = {
+    // TODO add D3D_FEATURE_LEVEL_12_2
+    D3D_FEATURE_LEVEL_12_1,
+    D3D_FEATURE_LEVEL_12_0
+};
 
 class DirectXDevice
 {
@@ -501,7 +507,7 @@ extern "C"
                 break;
             }
             if (
-                SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)) &&
+                SUCCEEDED(D3D12CreateDevice(adapter, minSupportedFeatureLevel, _uuidof(ID3D12Device), nullptr)) &&
                 isAdapterSupported(env, renderer, adapter)
             ) {
                 return toJavaPointer(adapter);
@@ -525,12 +531,7 @@ extern "C"
         Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
         adapter.Attach((IDXGIAdapter1 *) adapterPtr);
 
-        D3D_FEATURE_LEVEL maxSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
-        D3D_FEATURE_LEVEL featureLevels[] = {
-            // TODO add D3D_FEATURE_LEVEL_12_2
-            D3D_FEATURE_LEVEL_12_1,
-            D3D_FEATURE_LEVEL_12_0
-        };
+        D3D_FEATURE_LEVEL maxSupportedFeatureLevel = minSupportedFeatureLevel;
 
         for (int i = 0; i < _countof(featureLevels); i++) {
             if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), featureLevels[i], _uuidof(ID3D12Device), nullptr))) {
