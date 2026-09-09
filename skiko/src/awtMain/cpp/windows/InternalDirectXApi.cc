@@ -14,6 +14,7 @@
 
 const D3D_FEATURE_LEVEL minSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
 const D3D_FEATURE_LEVEL featureLevels[] = {
+    // TODO add D3D_FEATURE_LEVEL_12_2
     D3D_FEATURE_LEVEL_12_1,
     D3D_FEATURE_LEVEL_12_0
 };
