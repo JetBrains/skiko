@@ -37,8 +37,6 @@ function collectRuntimeFailures(page) {
 }
 
 test("Skiko extensions sample starts in browser", async ({ page }) => {
-  test.setTimeout(120_000);
-
   const failures = collectRuntimeFailures(page);
   const response = await page.goto("/", { waitUntil: "domcontentloaded" });
 

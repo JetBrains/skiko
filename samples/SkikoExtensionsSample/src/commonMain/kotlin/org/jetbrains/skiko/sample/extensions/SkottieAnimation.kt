@@ -15,11 +15,22 @@ internal fun exitAfterMillis(args: Array<String>): Int? =
         argument.removePrefix("--exit-after-ms=").takeIf { it != argument }?.toInt()
     }
 
-fun makeSkottieAnimationPlayer(animationJson: String): SkottieAnimationPlayer =
-    SkottieAnimationPlayer(Animation.makeFromString(animationJson))
+fun makeSkottieAnimationPlayer(
+    animationJson: String,
+    mark: (String) -> Unit = {}
+): SkottieAnimationPlayer {
+    mark("animation-before-make-from-string")
+    val animation = Animation.makeFromString(animationJson)
+    mark("animation-after-make-from-string")
+    return SkottieAnimationPlayer(animation)
+}
 
-internal fun loadSkottieAnimationPlayer(): SkottieAnimationPlayer =
-    makeSkottieAnimationPlayer(ORBIT_ANIMATION_JSON)
+internal fun loadSkottieAnimationPlayer(mark: (String) -> Unit = {}): SkottieAnimationPlayer {
+    mark("animation-before-load")
+    val player = makeSkottieAnimationPlayer(ORBIT_ANIMATION_JSON, mark)
+    mark("animation-after-load")
+    return player
+}
 
 class SkottieAnimationPlayer(
     private val animation: Animation
