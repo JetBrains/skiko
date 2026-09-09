@@ -9,13 +9,20 @@ Current benchmark coverage:
 ```text
 surface_allocation      raster surface creation and teardown
 rect_grid_draw          many small filled rect draws
+rect_grid_draw_gpu      many small filled rect draws on a GPU surface
 path_parse_and_draw     SVG path parsing and stroked path rendering
+path_parse_and_draw_gpu SVG path parsing and stroked path rendering on a GPU surface
 image_snapshot_encode   image snapshot and PNG encoding
+image_snapshot_encode_gpu image snapshot and PNG encoding from a GPU surface
 image_scale_draw        scaled image draws with sampling
+image_scale_draw_gpu    scaled image draws with sampling on a GPU surface
 clip_transform_draw     save/restore, clip, transform, and rounded-rect drawing
+clip_transform_draw_gpu save/restore, clip, transform, and rounded-rect drawing on a GPU surface
 path_boolean_ops        path union/intersection operations
 surface_read_pixels     raster readback into Bitmap
+surface_read_pixels_gpu GPU surface readback into Bitmap
 text_blob_draw          positioned glyph blob drawing
+text_blob_draw_gpu      positioned glyph blob drawing on a GPU surface
 ```
 
 ## Run Against a Maven Artifact

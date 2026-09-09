@@ -2,12 +2,25 @@ package org.jetbrains.skiko.benchmarks.cases.drawing
 
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PaintMode
-import org.jetbrains.skia.Surface
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skiko.benchmarks.BenchmarkSurfaceProvider
 import org.jetbrains.skiko.benchmarks.BenchmarkCase
+import org.jetbrains.skiko.benchmarks.GpuBenchmarkSurfaceProvider
+import org.jetbrains.skiko.benchmarks.RasterBenchmarkSurfaceProvider
 
 val rectGridDrawBenchmark = BenchmarkCase("rect_grid_draw") {
-    Surface.makeRasterN32Premul(512, 512).use { surface ->
+    runRectGridDraw(RasterBenchmarkSurfaceProvider)
+}
+
+val rectGridDrawGpuBenchmark = BenchmarkCase("rect_grid_draw_gpu",
+    isSupported = { GpuBenchmarkSurfaceProvider.isSupported() },
+    tearDown = { GpuBenchmarkSurfaceProvider.close() },
+) {
+    runRectGridDraw(GpuBenchmarkSurfaceProvider.get()!!)
+}
+
+private fun runRectGridDraw(surfaceProvider: BenchmarkSurfaceProvider): Long {
+    return surfaceProvider.withSurface(512, 512) { surface ->
         Paint().use { paint ->
             paint.mode = PaintMode.FILL
             val canvas = surface.canvas

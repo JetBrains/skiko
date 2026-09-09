@@ -3,12 +3,25 @@ package org.jetbrains.skiko.benchmarks.cases.drawing
 import org.jetbrains.skia.ClipMode
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PaintMode
-import org.jetbrains.skia.Surface
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skiko.benchmarks.BenchmarkSurfaceProvider
 import org.jetbrains.skiko.benchmarks.BenchmarkCase
+import org.jetbrains.skiko.benchmarks.GpuBenchmarkSurfaceProvider
+import org.jetbrains.skiko.benchmarks.RasterBenchmarkSurfaceProvider
 
 val clipTransformDrawBenchmark = BenchmarkCase("clip_transform_draw") {
-    Surface.makeRasterN32Premul(512, 512).use { surface ->
+    runClipTransformDraw(RasterBenchmarkSurfaceProvider)
+}
+
+val clipTransformDrawGpuBenchmark = BenchmarkCase("clip_transform_draw_gpu",
+    isSupported = { GpuBenchmarkSurfaceProvider.isSupported() },
+    tearDown = { GpuBenchmarkSurfaceProvider.close() },
+) {
+    runClipTransformDraw(GpuBenchmarkSurfaceProvider.get()!!)
+}
+
+private fun runClipTransformDraw(surfaceProvider: BenchmarkSurfaceProvider): Long {
+    return surfaceProvider.withSurface(512, 512) { surface ->
         Paint().use { paint ->
             val canvas = surface.canvas
             canvas.clear(0xFFFFFFFF.toInt())

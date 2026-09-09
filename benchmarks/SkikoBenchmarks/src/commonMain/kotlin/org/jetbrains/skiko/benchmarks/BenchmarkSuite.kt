@@ -1,15 +1,21 @@
 package org.jetbrains.skiko.benchmarks
 
 import org.jetbrains.skiko.benchmarks.cases.drawing.clipTransformDrawBenchmark
+import org.jetbrains.skiko.benchmarks.cases.drawing.clipTransformDrawGpuBenchmark
 import org.jetbrains.skiko.benchmarks.cases.drawing.rectGridDrawBenchmark
+import org.jetbrains.skiko.benchmarks.cases.drawing.rectGridDrawGpuBenchmark
 import org.jetbrains.skiko.benchmarks.cases.image.imageScaleDrawBenchmark
 import org.jetbrains.skiko.benchmarks.cases.image.imageScaleDrawGpuBenchmark
 import org.jetbrains.skiko.benchmarks.cases.image.imageSnapshotEncodeBenchmark
+import org.jetbrains.skiko.benchmarks.cases.image.imageSnapshotEncodeGpuBenchmark
 import org.jetbrains.skiko.benchmarks.cases.path.pathBooleanOpsBenchmark
 import org.jetbrains.skiko.benchmarks.cases.path.pathParseAndDrawBenchmark
+import org.jetbrains.skiko.benchmarks.cases.path.pathParseAndDrawGpuBenchmark
 import org.jetbrains.skiko.benchmarks.cases.readback.surfaceReadPixelsBenchmark
+import org.jetbrains.skiko.benchmarks.cases.readback.surfaceReadPixelsGpuBenchmark
 import org.jetbrains.skiko.benchmarks.cases.surface.surfaceAllocationBenchmark
 import org.jetbrains.skiko.benchmarks.cases.text.textBlobDrawBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textBlobDrawGpuBenchmark
 import kotlin.math.roundToLong
 import kotlin.time.TimeSource
 
@@ -135,14 +141,20 @@ object SkikoBenchmarkSuite {
     private val cases = listOf(
         surfaceAllocationBenchmark,
         rectGridDrawBenchmark,
+        rectGridDrawGpuBenchmark,
         pathParseAndDrawBenchmark,
+        pathParseAndDrawGpuBenchmark,
         imageSnapshotEncodeBenchmark,
+        imageSnapshotEncodeGpuBenchmark,
         imageScaleDrawBenchmark,
         imageScaleDrawGpuBenchmark,
         clipTransformDrawBenchmark,
+        clipTransformDrawGpuBenchmark,
         pathBooleanOpsBenchmark,
         surfaceReadPixelsBenchmark,
+        surfaceReadPixelsGpuBenchmark,
         textBlobDrawBenchmark,
+        textBlobDrawGpuBenchmark,
     )
 
     private fun BenchmarkCase.run(mode: BenchmarkMode, config: BenchmarkConfig): BenchmarkResult =
