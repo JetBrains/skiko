@@ -245,22 +245,18 @@ fun SkikoProjectContext.declareWasmTasks() {
         flags.addAll(buildList {
             add("-O2") // Optimize linked output for speed without the most expensive optimization passes.
             add("-fuse-ld=lld") // Use LLVM's lld linker.
-            add("-flto") // Run link-time optimization across bitcode inputs.
+//            add("-flto") // Run link-time optimization across bitcode inputs.
             add("-Wl,--no-entry") // Do not require a _start entry point.
             if (isSideModule) {
                 add("-shared") // Produce a shared/side WebAssembly module.
                 add("-Wl,--export-all") // Export all module symbols for dynamic loading.
                 add("-Wl,--import-memory") // Import linear memory from the host/main module.
                 add("-Wl,--import-table") // Import the function table from the host/main module.
-
-                add("-Wl,--experimental-pic")
-                add("-Wl,--unresolved-symbols=import-dynamic")
-                add("-Wl,--no-shlib-sigcheck")
             } else {
                 add("-Wl,--gc-sections") // Remove unused sections during linking.
                 add("-Wl,--growable-table") // Allow side modules to reserve function table slots.
-                add("-Wl,--allow-undefined") // Allow unresolved symbols to become imports where possible.
             }
+            add("-Wl,--allow-undefined") // Allow unresolved symbols to become imports where possible.
             add("-mllvm") // Forward the next option directly to LLVM.
             add("-wasm-enable-sjlj") // Enable LLVM's WebAssembly setjmp/longjmp lowering pass.
             add("-mexception-handling") // Enable WASM EH support used by SjLj; C++ exceptions stay disabled.
@@ -356,7 +352,7 @@ fun SkikoProjectContext.declareWasmTasks() {
 
         flags.addAll(
             buildList {
-                add("-O2") // set optimization level to compress (highest size reduction)
+                add("-Oz") // set optimization level to compress (highest size reduction)
                 if (skiko.isWasmBuildWithProfiling) {
                     add("--debuginfo")
                 } else {
