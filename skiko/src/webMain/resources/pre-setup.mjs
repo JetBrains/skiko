@@ -207,8 +207,23 @@ const extensionLoadPromises = new Map();
 const loadedSideModules = new Map();
 const dynamicSymbols = {};
 const gotEntries = {};
+const resolvedGotSymbols = new Set();
 const functionTableIndexes = new WeakMap();
 let fallbackStackPointer = null;
+
+const hasOwn = (object, name) => Object.prototype.hasOwnProperty.call(object, name);
+
+const SIDE_MODULE_INTERNAL_SYMBOLS = new Set([
+    "memory",
+    "__memory_base",
+    "__table_base",
+    "__stack_pointer",
+    "__indirect_function_table",
+    "__wasm_apply_data_relocs",
+    "__wasm_call_ctors",
+    "__wasm_init_memory",
+    "_initialize",
+]);
 
 const SIDE_MODULE_RUNTIME_ENV_IMPORTS = new Set([
     "__indirect_function_table",
@@ -295,24 +310,43 @@ const toAddress = (value, memoryBase = 0) => {
 
 const getGotEntry = (name) => {
     const symbolName = String(name);
+
     if (!gotEntries[symbolName]) {
+        const isResolved = hasOwn(dynamicSymbols, symbolName);
+
         gotEntries[symbolName] = new WebAssembly.Global(
             { value: "i32", mutable: true },
-            toAddress(dynamicSymbols[symbolName])
+            isResolved ? toAddress(dynamicSymbols[symbolName]) : 0
         );
+
+        if (isResolved) {
+            resolvedGotSymbols.add(symbolName);
+        }
     }
+
     return gotEntries[symbolName];
 };
 
 const updateGot = (exports) => {
     for (const [name, value] of Object.entries(exports)) {
-        if (!gotEntries[name]) {
-            gotEntries[name] = new WebAssembly.Global({ value: "i32", mutable: true }, 0);
+        if (SIDE_MODULE_INTERNAL_SYMBOLS.has(name)) continue;
+
+        // Do not let a side module replace a core/previous definition.
+        if (resolvedGotSymbols.has(name)) {
+            continue;
         }
+
+        if (!gotEntries[name]) {
+            gotEntries[name] = new WebAssembly.Global(
+                { value: "i32", mutable: true },
+                0
+            );
+        }
+
         gotEntries[name].value = toAddress(value);
+        resolvedGotSymbols.add(name);
     }
 };
-
 const relocateExports = (exports, memoryBase) => {
     const relocated = {};
     for (const [name, value] of Object.entries(exports)) {
@@ -384,7 +418,7 @@ const loadWasmSideModule = async (extensionPath) => {
     const instance = await WebAssembly.instantiate(wasmModule, importObject);
     moduleExports = relocateExports(instance.exports, memoryBase);
     updateGot(moduleExports);
-    Object.assign(dynamicSymbols, moduleExports);
+    registerDynamicSymbols(moduleExports);
 
     const unresolvedImports = moduleImports
         .filter(({ module, name }) =>
@@ -404,7 +438,9 @@ const loadWasmSideModule = async (extensionPath) => {
     if (typeof moduleExports.__wasm_apply_data_relocs === "function") {
         moduleExports.__wasm_apply_data_relocs();
     }
-    if (typeof moduleExports.__wasm_call_ctors === "function") {
+    if (typeof moduleExports._initialize === "function") {
+        moduleExports._initialize();
+    } else if (typeof moduleExports.__wasm_call_ctors === "function") {
         moduleExports.__wasm_call_ctors();
     }
 
@@ -414,11 +450,48 @@ const loadWasmSideModule = async (extensionPath) => {
 };
 
 export const loadSkikoExtension = (extensionPath) => {
-    if (extensionLoadPromises.has(extensionPath)) return extensionLoadPromises.get(extensionPath);
-    const loadPromise = awaitSkikoCore.then(async (module) => {
-        const sideModuleExports = (await loadWasmSideModule(extensionPath)).exports;
-        Object.assign(loadedWasm._, sideModuleExports);
+    if (extensionLoadPromises.has(extensionPath)) {
+        return extensionLoadPromises.get(extensionPath);
+    }
 
+    const loadPromise = awaitSkikoCore.then(async (module) => {
+        const coreMalloc = module.wasmExports.malloc;
+        const coreFree = module.wasmExports.free;
+
+        const sideModuleExports =
+            (await loadWasmSideModule(extensionPath)).exports;
+
+        if (
+            sideModuleExports.malloc &&
+            sideModuleExports.malloc !== coreMalloc
+        ) {
+            console.warn(
+                `Skiko extension ${extensionPath} contains a second malloc`
+            );
+        }
+
+        if (
+            sideModuleExports.free &&
+            sideModuleExports.free !== coreFree
+        ) {
+            console.warn(
+                `Skiko extension ${extensionPath} contains a second free`
+            );
+        }
+
+        publishExtensionExports(sideModuleExports);
+
+        if (loadedWasm._.malloc !== coreMalloc) {
+            throw new Error(
+                `Skiko extension ${extensionPath} replaced core malloc`
+            );
+        }
+
+        if (loadedWasm._.free !== coreFree) {
+            throw new Error(
+                `Skiko extension ${extensionPath} replaced core free`
+            );
+        }
     }).catch((error) => {
         extensionLoadPromises.delete(extensionPath);
         throw error;
@@ -427,7 +500,6 @@ export const loadSkikoExtension = (extensionPath) => {
     extensionLoadPromises.set(extensionPath, loadPromise);
     return loadPromise;
 };
-
 const awaitSkikoCore = loadSkikoWASM().then((module) => {
     Object.assign(loadedWasm._, module.wasmExports);
     Object.assign(dynamicSymbols, module.wasmExports);
@@ -448,6 +520,28 @@ export const awaitSkiko = awaitSkikoCore.then(async (module) => {
 
     return module
 });
+
+const registerDynamicSymbols = (exports) => {
+    for (const [name, value] of Object.entries(exports)) {
+        if (SIDE_MODULE_INTERNAL_SYMBOLS.has(name)) continue;
+
+        // Main module or an earlier module keeps precedence.
+        if (!hasOwn(dynamicSymbols, name)) {
+            dynamicSymbols[name] = value;
+        }
+    }
+};
+
+const publishExtensionExports = (exports) => {
+    for (const [name, value] of Object.entries(exports)) {
+        if (SIDE_MODULE_INTERNAL_SYMBOLS.has(name)) continue;
+
+        // Do not replace core exports such as malloc/free.
+        if (!hasOwn(loadedWasm._, name)) {
+            loadedWasm._[name] = value;
+        }
+    }
+};
 
 export const GL = new Proxy({}, {
     get(target, prop) {
