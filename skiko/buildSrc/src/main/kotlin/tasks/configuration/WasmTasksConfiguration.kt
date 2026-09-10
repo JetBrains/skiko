@@ -245,7 +245,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         flags.addAll(buildList {
             add("-O2") // Optimize linked output for speed without the most expensive optimization passes.
             add("-fuse-ld=lld") // Use LLVM's lld linker.
-//            add("-flto") // Run link-time optimization across bitcode inputs.
+            add("-flto") // Run link-time optimization across bitcode inputs.
             add("-Wl,--no-entry") // Do not require a _start entry point.
             if (isSideModule) {
                 add("-shared") // Produce a shared/side WebAssembly module.
