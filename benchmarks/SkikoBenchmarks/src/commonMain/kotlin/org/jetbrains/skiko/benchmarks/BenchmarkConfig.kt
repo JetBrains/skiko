@@ -1,7 +1,23 @@
 package org.jetbrains.skiko.benchmarks
 
+/**
+ * Specifies how benchmark cases are timed.
+ */
 enum class BenchmarkMode(val argumentName: String, val resultSuffix: String?) {
+    /**
+     * Measures warmed repeated operations and is the default mode.
+     *
+     * Warmup calls run before the measured iterations, so one-time setup such as lazy GPU provider
+     * initialization happens outside the reported timing.
+     */
     SIMPLE("SIMPLE", null),
+
+    /**
+     * Measures the first operation only, without warmups.
+     *
+     * This mode includes first-use costs, including lazy GPU provider initialization, when they are
+     * needed by the benchmark operation.
+     */
     STARTUP("STARTUP", "startup");
 
     companion object {
