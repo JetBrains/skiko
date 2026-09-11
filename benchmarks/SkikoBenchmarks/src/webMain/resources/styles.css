@@ -1,0 +1,37 @@
+html {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f7f8fa;
+    color: #1f2328;
+}
+
+body {
+    margin: 0;
+}
+
+main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 20px;
+}
+
+h1 {
+    margin: 0 0 16px;
+    font-size: 28px;
+    font-weight: 650;
+}
+
+#status {
+    margin-bottom: 16px;
+    font-size: 15px;
+}
+
+pre {
+    min-height: 320px;
+    overflow: auto;
+    padding: 16px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 13px;
+    line-height: 1.45;
+}
