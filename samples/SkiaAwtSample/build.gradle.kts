@@ -41,9 +41,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
     implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
+    implementation("org.jetbrains.skiko:skiko-rendering-awt-runtime-$target:$version")
     implementation("org.jetbrains.runtime:jbr-api:1.5.0")
     if (System.getProperty("os.name").startsWith("Win")) {
-        implementation("org.jetbrains.skiko:skiko-awt-runtime-angle-$target:$version")
+        implementation("org.jetbrains.skiko:skiko-rendering-awt-runtime-angle-$target:$version")
     }
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
