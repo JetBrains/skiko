@@ -2,7 +2,8 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skiko.internal.fastForEachReversed
 
-internal interface CloseScope {
+@InternalSkikoApi
+interface CloseScope {
     fun <T : AutoCloseable> T.autoClose(): T
 }
 
@@ -24,7 +25,8 @@ internal interface CloseScope {
  * }
  * ```
  */
-internal fun autoCloseScope(body: CloseScope.() -> Unit) {
+@InternalSkikoApi
+fun autoCloseScope(body: CloseScope.() -> Unit) {
     val resources = mutableListOf<AutoCloseable>()
     val scope = object : CloseScope {
         override fun <T : AutoCloseable> T.autoClose(): T {
