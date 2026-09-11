@@ -71,6 +71,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.skiko)
+            implementation(libs.skiko.rendering)
         }
 
         webMain {
@@ -79,7 +80,6 @@ kotlin {
             }
         }
     }
-
     targets.withType<KotlinJsIrTarget>().all { configureSkikoWebRuntime(project, this) }
 }
 
