@@ -4,6 +4,13 @@ import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
+    /**
+     * A value that allows passing a [Shader], [ColorFilter] or [Blender] as a child.
+     *
+     * @see Mesh.make
+     */
+    sealed interface Child
+
     companion object {
         fun makeForShader(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
