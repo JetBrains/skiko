@@ -237,6 +237,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
     if (kind == SkikoModuleKind.EXTENSION) {
         val coreProjectDir = project.rootProject.projectDir
+        includeHeadersNonRecursive(coreProjectDir.resolve("src/awtMain/cpp/include"))
         includeHeadersNonRecursive(coreProjectDir.resolve("src/jvmMain/cpp/common"))
         includeHeadersNonRecursive(coreProjectDir.resolve("src/jvmMain/cpp/include"))
         includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
@@ -404,6 +405,11 @@ fun SkikoProjectContext.createObjcCompileTask(
     includeHeadersNonRecursive(projectDir.resolve("src/awtMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp"))
+    if (kind == SkikoModuleKind.EXTENSION) {
+        val coreProjectDir = project.rootProject.projectDir
+        includeHeadersNonRecursive(coreProjectDir.resolve("src/jvmMain/cpp"))
+        includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
+    }
 
     compiler.set(project.appleToolchainExecutableOrDefault("clang", "clang"))
     buildVariant.set(buildType)
