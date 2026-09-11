@@ -11,7 +11,7 @@ import kotlin.test.Test
 class AccessibilityKtTest {
     private companion object {
         init {
-            Library.load()
+            RenderingLibrary.load()
         }
     }
 
