@@ -210,7 +210,8 @@ object SkikoProperties {
             ?: throw IllegalArgumentException("Invalid size format: $size")
     }
 
-    internal fun parseRenderApi(text: String?): GraphicsApi {
+    @InternalSkikoApi
+    fun parseRenderApi(text: String?): GraphicsApi {
         when (text) {
             "SOFTWARE_COMPAT" -> return GraphicsApi.SOFTWARE_COMPAT
             "SOFTWARE_FAST", "DIRECT_SOFTWARE" -> return GraphicsApi.SOFTWARE_FAST
@@ -250,7 +251,8 @@ object SkikoProperties {
         }
     }
 
-    internal fun fallbackRenderApiQueue(initialApi: GraphicsApi?): List<GraphicsApi> {
+    @InternalSkikoApi
+    fun fallbackRenderApiQueue(initialApi: GraphicsApi?): List<GraphicsApi> {
         var fallbackApis = when (hostOs) {
             OS.Linux -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE_COMPAT)

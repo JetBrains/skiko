@@ -27,11 +27,6 @@ internal class LockFile private constructor(private val lockfile: Path, private 
          * Lock file used to synchronize modifications to the 'skiko' native library
          */
         val skiko = LockFile(Path(dataPath, ".skiko.lock"), ".skiko.lock.monitor".intern())
-
-        /**
-         * Lock file used to synchronize modifications to the 'angle' native library
-         */
-        val angle = LockFile(Path(dataPath, ".angle.lock"), ".angle.lock.monitor".intern())
     }
 }
 
