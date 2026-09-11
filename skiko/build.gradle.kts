@@ -163,17 +163,19 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "brotli",
             )
             linkFlags(
-                "-s", "MAIN_MODULE=2",
-                "-s", "AUTOLOAD_DYLIBS=0",
-                "-l", "GL",
-                "-s", "MAX_WEBGL_VERSION=2",
-                "-s", "MIN_WEBGL_VERSION=2",
-                "-s", "MODULARIZE=1",
-                "-s", "EXPORT_ES6=1",
-                "-s", "EXPORT_NAME=loadSkikoWASM",
-                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
-                "-s", "STACK_SIZE=1048576", // 1 MB
-                "--bind",
+                "-lsetjmp", // Links setjmp support for non-local jumps.
+                "-lwasi-emulated-mman", // Links WASI mmap/munmap emulation.
+                "-lwasi-emulated-signal", // Links WASI signal handling emulation.
+                "-lwasi-emulated-process-clocks", // Links WASI process clock emulation.
+                "-lwasi-emulated-getpid", // Links WASI getpid emulation.
+                "-mllvm", // Passes the next option through to LLVM.
+                "-wasm-enable-sjlj", // Enables setjmp/longjmp support for WebAssembly.
+                "-mexception-handling", // Enables WebAssembly exception handling.
+                "-fuse-ld=lld", // Uses LLVM lld as the linker.
+                "-Wl,--gc-sections", // Removes unused sections during linking.
+                "-Wl,--no-entry", // Builds a module without a start entry point.
+                "-Wl,--error-limit=0", // Reports all linker errors without a limit.
+                "-Wl,-z,stack-size=1048576", // Sets the stack size to 1 MB.
             )
         }
     }
@@ -542,6 +544,29 @@ tasks.register<BuildLocalSkiaTask>("prepareLocalSkiaBuild") {
     skikoTargetFlags.set(provider {
         skiko.skiaTarget.getGradleFlags(skiko.targetArch)
     })
+
+    if (skiko.skiaTarget == SkiaTarget.WASM) {
+        // Web builds register setupWasiSdk in declareWasmTasks(); reuse it here to avoid
+        // registering the same task twice when local Skia WASM builds run with web support.
+        val setupWasiSdk = if (supportWeb) {
+            tasks.named<SetupWasiSdkTask>("setupWasiSdk")
+        } else {
+            // Local Skia WASM builds can be requested with -Pskia.target=wasm without
+            // enabling web tasks, so they need to register the WASI SDK setup themselves.
+            val wasiSdkVersion = project.findProperty("skiko.wasi.sdk.version")
+                ?: throw GradleException("skiko.wasi.sdk.version property is not set")
+            tasks.register<SetupWasiSdkTask>("setupWasiSdk") {
+                sdkVersion.set(wasiSdkVersion.toString())
+                (project.findProperty("wasi.sdk")?.toString()
+                    ?: project.findProperty("skiko.wasi.sdk.dir")?.toString())?.let {
+                    sdkDir.set(project.layout.dir(project.provider { project.resolveSdkDir(it) }))
+                    requireExistingSdk.set(true)
+                }
+            }
+        }
+        dependsOn(setupWasiSdk)
+        wasiSdkPath.set(setupWasiSdk.map { it.sdkDir.get().asFile.absolutePath })
+    }
 }
 
 tasks.register("printSkiaVersion") {

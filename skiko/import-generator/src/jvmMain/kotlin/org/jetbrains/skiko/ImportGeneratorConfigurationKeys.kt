@@ -16,6 +16,10 @@ object ImportGeneratorConfigurationKeys {
         REEXPORT_OPTION_NAME
     )
 
+    val EXPORTS_PATH: CompilerConfigurationKey<String> = CompilerConfigurationKey.create(
+        EXPORTS_OPTION_NAME
+    )
+
     val MODULE_NAME: CompilerConfigurationKey<String> = CompilerConfigurationKey.create(
         MODULE_NAME_OPTION_NAME
     )

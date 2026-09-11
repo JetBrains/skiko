@@ -10,6 +10,7 @@ internal class ImportGeneratorExtension(
     private val path: String,
     private val prefix: String?,
     private val reexportPath: String?,
+    private val exportsPath: String?,
     private val moduleName: String
 ) : IrGenerationExtension {
     override fun generate(
@@ -28,6 +29,17 @@ internal class ImportGeneratorExtension(
             importGenerator.getExportSymbols().forEach { symbolName ->
                 writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
             }
+        }
+
+        exportsPath?.let {
+            val exportsFile = File(it)
+            exportsFile.parentFile.mkdirs()
+            exportsFile.writeText(
+                importGenerator.getExportSymbols()
+                    .distinct()
+                    .sorted()
+                    .joinToString(separator = "\n", postfix = "\n")
+            )
         }
 
         if (reexportPath == null) return
@@ -50,4 +62,5 @@ internal class ImportGeneratorExtension(
             }
         }
     }
+
 }

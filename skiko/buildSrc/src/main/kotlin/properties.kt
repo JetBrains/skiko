@@ -1,4 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
@@ -51,7 +50,7 @@ fun compilerForTarget(os: OS, arch: Arch): String =
         OS.Android -> "clang++"
         OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
-        OS.Wasm -> if (Os.isFamily(Os.FAMILY_WINDOWS)) "emcc.bat" else "emcc"
+        OS.Wasm -> "clang++"
     }
 
 fun linkerForTarget(os: OS, arch: Arch): String =
@@ -223,6 +222,25 @@ class SkikoProperties(private val myProject: Project) {
                 if (!file.isDirectory) throw (GradleException("\"skia.dir\" property was explicitly set to ${skiaDirProp} which is not resolved as a directory"))
                 file
             }
+
+    private fun findFile(path: String): File {
+        val file = File(path)
+        if (file.isAbsolute) return file
+
+        val projectFile = myProject.file(path)
+        if (projectFile.exists()) return projectFile
+
+        // Try top-level build root if we are in an included build
+        var g = myProject.gradle
+        while (g.parent != null) {
+            g = g.parent!!
+        }
+        val topLevelRoot = g.rootProject.projectDir
+        val topLevelFile = File(topLevelRoot, path)
+        if (topLevelFile.exists()) return topLevelFile
+
+        return projectFile
+    }
 
     val composeRepoUrl: String
         get() = System.getenv("COMPOSE_REPO_URL") ?: "https://packages.jetbrains.team/maven/p/cmp/dev"
