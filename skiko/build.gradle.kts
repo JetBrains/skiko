@@ -163,18 +163,19 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "brotli",
             )
             linkFlags(
-                "-lsetjmp",
-                "-lwasi-emulated-mman",
-                "-lwasi-emulated-signal",
-                "-lwasi-emulated-process-clocks",
-                "-lwasi-emulated-getpid",
-                "-mllvm", "-wasm-enable-sjlj",
-                "-mexception-handling",
-                "-fuse-ld=lld",
-                "-Wl,--gc-sections",
-                "-Wl,--no-entry",
-                "-Wl,--error-limit=0",
-                "-Wl,-z,stack-size=1048576", // 1 MB
+                "-lsetjmp", // Links setjmp support for non-local jumps.
+                "-lwasi-emulated-mman", // Links WASI mmap/munmap emulation.
+                "-lwasi-emulated-signal", // Links WASI signal handling emulation.
+                "-lwasi-emulated-process-clocks", // Links WASI process clock emulation.
+                "-lwasi-emulated-getpid", // Links WASI getpid emulation.
+                "-mllvm", // Passes the next option through to LLVM.
+                "-wasm-enable-sjlj", // Enables setjmp/longjmp support for WebAssembly.
+                "-mexception-handling", // Enables WebAssembly exception handling.
+                "-fuse-ld=lld", // Uses LLVM lld as the linker.
+                "-Wl,--gc-sections", // Removes unused sections during linking.
+                "-Wl,--no-entry", // Builds a module without a start entry point.
+                "-Wl,--error-limit=0", // Reports all linker errors without a limit.
+                "-Wl,-z,stack-size=1048576", // Sets the stack size to 1 MB.
             )
         }
     }

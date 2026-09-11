@@ -332,8 +332,6 @@ fun SkikoProjectContext.declareWasmTasks() {
             project.setupMjs.normalize().absolutePath
         }
         configureCommon(prefixPath)
-        //configureCommon(project.setupMjs.normalize().absolutePath)
-
     }
 
     fun OptimizeSkikoWasmTask.configureCommonOptimize(
