@@ -1,4 +1,5 @@
 @file:JsModule("./skiko.mjs")
 package org.jetbrains.skiko
 
-internal actual external val GL: GLInterface
+@InternalSkikoApi
+actual external val GL: GLInterface

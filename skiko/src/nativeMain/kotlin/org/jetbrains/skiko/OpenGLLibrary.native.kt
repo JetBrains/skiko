@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
-internal actual fun loadOpenGLLibrary() {
+@InternalSkikoApi
+actual fun loadOpenGLLibrary() {
     when (hostOs) {
         // It is deprecated. See https://developer.apple.com/documentation/opengles
         OS.Ios -> throw RenderException("OpenGL on iOS isn't supported")

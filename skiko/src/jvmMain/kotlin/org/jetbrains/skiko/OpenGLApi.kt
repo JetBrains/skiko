@@ -5,7 +5,8 @@ package org.jetbrains.skiko
  * PS. In further development we should find a common pattern of using OpenGL,
  * Vulkan, Metal and implement common interface to all graphics APIs.
  */
-internal class OpenGLApi private constructor() {
+@InternalSkikoApi
+class OpenGLApi private constructor() {
     // OpenGL constants
     val GL_DRAW_FRAMEBUFFER_BINDING = 0x8CA6
     val GL_VENDOR = 0x1F00

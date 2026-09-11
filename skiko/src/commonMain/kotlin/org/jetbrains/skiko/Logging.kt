@@ -110,7 +110,8 @@ class DefaultConsoleLogger(
     }
 }
 
-internal object Logger {
+@InternalSkikoApi
+object Logger {
     var loggerFactory: () -> SkikoLoggerInterface = { DefaultConsoleLogger() }
 
     val loggerImpl by lazy {
