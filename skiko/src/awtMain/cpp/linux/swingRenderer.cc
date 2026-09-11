@@ -228,4 +228,104 @@ extern "C"
             delete texture;
         }
     }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_OpenGLOffscreenContext_makeOffScreenContext(
+        JNIEnv *env, jobject contextHandler)
+    {
+        OffScreenContext* context = OffScreenContext::create();
+        return toJavaPointer(context);
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_OpenGLOffscreenContext_disposeOffScreenContext(
+        JNIEnv *env, jobject contextHandler, jlong contextPtr)
+    {
+        OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
+
+        if (context) {
+            delete context;
+        }
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_OpenGLOffscreenContext_makeOffScreenBuffer(
+        JNIEnv *env, jobject contextHandler, jlong contextPtr, jlong oldBufferPtr, jint width, jint height)
+    {
+        OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
+        OffScreenBuffer* oldBuffer = fromJavaPointer<OffScreenBuffer *>(oldBufferPtr);
+
+        OffScreenBuffer* buffer;
+        if (oldBuffer == nullptr || oldBuffer->width != width || oldBuffer->height != height) {
+            if (oldBuffer != nullptr) {
+                delete oldBuffer;
+            }
+            buffer = OffScreenBuffer::create(context, width, height);
+        } else {
+            buffer = oldBuffer;
+        }
+
+        return toJavaPointer(buffer);
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_OpenGLOffscreenContext_disposeOffScreenBuffer(
+        JNIEnv *env, jobject contextHandler, jlong bufferPtr)
+    {
+        OffScreenBuffer* buffer = fromJavaPointer<OffScreenBuffer *>(bufferPtr);
+        if (buffer) {
+            delete buffer;
+        }
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_OpenGLOffscreenContext_startRendering(
+        JNIEnv *env, jobject contextHandler, jlong contextPtr, jlong bufferPtr)
+    {
+        OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
+        OffScreenBuffer* buffer = fromJavaPointer<OffScreenBuffer *>(bufferPtr);
+
+        glXMakeCurrent(context->display, buffer->pbuffer, context->context);
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_OpenGLOffscreenContext_finishRendering(
+        JNIEnv *env, jobject contextHandler, jlong contextPtr)
+    {
+        OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
+        glXMakeCurrent(context->display, None, nullptr);
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_OpenGLOffscreenContext_createAndBindTexture(
+        JNIEnv *env, jobject contextHandler, jint width, jint height)
+    {
+        GLuint tex;
+        glGenTextures(1, &tex);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+        GLuint fbo;
+        glGenFramebuffers(1, &fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+
+        OffScreenTexture *texture = new OffScreenTexture(tex, fbo);
+
+        return toJavaPointer(texture);
+    }
+
+    JNIEXPORT GLuint JNICALL Java_org_jetbrains_skiko_graphicapi_OpenGLOffscreenContext_getFboId(
+        JNIEnv *env, jobject contextHandler, jlong texturePtr)
+    {
+        OffScreenTexture *texture = fromJavaPointer<OffScreenTexture *>(texturePtr);
+
+        return texture->fbo;
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_OpenGLOffscreenContext_unbindAndDisposeTexture(
+        JNIEnv *env, jobject contextHandler, jlong texturePtr)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        OffScreenTexture *texture = fromJavaPointer<OffScreenTexture *>(texturePtr);
+
+        if (texture) {
+            delete texture;
+        }
+    }
 } // extern "C"
