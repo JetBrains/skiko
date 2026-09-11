@@ -238,7 +238,7 @@ val skikoProjectContext = SkikoProjectContext(
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
     },
-    additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko, skikoArtifacts),
+    additionalRuntimeLibraries = emptyList(),
     configureDependencies = coreDependencies
 )
 
@@ -474,6 +474,7 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
     val coreObjcCompile = if (os.isMacOs) tasks.named<CompileSkikoObjCTask>("objcCompile$suffix") else null
     val requiredSymbols = skikoProjectContext.jvmRequiredSymbolsFor(os, arch)
     dependencies.add(requiredSymbols.name, project(":skiko-skottie"))
+    dependencies.add(requiredSymbols.name, project(":skiko-rendering"))
     if (os != OS.Android && supportAwt) {
         dependencies.add(requiredSymbols.name, project(":skiko-graphite"))
     }
