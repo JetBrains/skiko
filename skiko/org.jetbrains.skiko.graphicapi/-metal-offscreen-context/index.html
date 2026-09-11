@@ -2,8 +2,8 @@
 <html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-    <title>org.jetbrains.skiko.graphicapi</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <title>MetalOffscreenContext</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
     <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
       if (storage == null) {
@@ -18,22 +18,22 @@
         }
       }
     </script>
-<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
-<link href="../../styles/style.css" rel="Stylesheet">
-<link href="../../styles/main.css" rel="Stylesheet">
-<link href="../../styles/prism.css" rel="Stylesheet">
-<link href="../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
-<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
-<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
-<script type="text/javascript" src="../../scripts/main.js" defer></script>
-<script type="text/javascript" src="../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
 <div class="root">
     <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
-<a class="library-name--link" href="../../index.html" tabindex="1">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     skiko
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
@@ -43,7 +43,6 @@
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
                 <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":/awtMain">awt</button>
-                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":/webMain">web</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
@@ -57,13 +56,6 @@
                                 <input type="checkbox" class="checkbox--input" id=":/awtMain" data-filter=":/awtMain">
                                 <span class="checkbox--icon"></span>
                                 awt
-                            </label>
-                        </li>
-                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":/webMain" data-filter=":/webMain">
-                                <span class="checkbox--icon"></span>
-                                web
                             </label>
                         </li>
                 </ul>
@@ -97,80 +89,95 @@
         </nav>
         <div id="resizer" class="resizer" data-item-type="BAR"></div>
         <div id="main" data-item-type="SECTION" role="main">
-<div class="main-content" data-page-type="package" id="content" pageids="skiko::org.jetbrains.skiko.graphicapi////PointingToDeclaration//853577478">
-  <div class="breadcrumbs"><a href="../index.html">skiko</a><span class="delimiter">/</span><span class="current">org.jetbrains.skiko.graphicapi</span></div>
+<div class="main-content" data-page-type="classlike" id="content" pageids="skiko::org.jetbrains.skiko.graphicapi/MetalOffscreenContext///PointingToDeclaration//561814353">
+  <div class="breadcrumbs"><a href="../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skiko.graphicapi</a><span class="delimiter">/</span><span class="current">MetalOffscreenContext</span></div>
   <div class="cover ">
-    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+    <h1 class="cover"><span>Metal</span><wbr><span>Offscreen</span><wbr><span><span>Context</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain" data-active="" data-toggle=":/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/awtMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../skiko/org.jetbrains.skiko/-experimental-skiko-api/index.html"><span class="token annotation builtin">ExperimentalSkikoApi</span></a></div></div><span class="token keyword">class </span><a href="index.html">MetalOffscreenContext</a> : <a href="https://developer.android.com/reference/kotlin/java/lang/AutoCloseable.html">AutoCloseable</a></div><p class="paragraph">Class that allows drawing into offscreen Metal textures.</p><p class="paragraph">The context owns the Metal device and the Skia direct context created from it. Each <a href="-texture/index.html">Texture</a> owns one Metal texture and exposes it as a Skia <a href="../../../skiko/org.jetbrains.skia/-backend-render-target/index.html">BackendRenderTarget</a>.</p></div>    </div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="1427340952%2FConstructors%2F561814353" anchor-label="MetalOffscreenContext" id="1427340952%2FConstructors%2F561814353" data-filterable-set=":/awtMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-metal-offscreen-context.html"><span>Metal</span><wbr><span>Offscreen</span><wbr><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1427340952%2FConstructors%2F561814353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain" data-active="" data-toggle=":/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/awtMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div data-togglable="TYPE">
         <h2 class="tableheader">Types</h2>
-        <div class="table"><a data-name="-2103684208%2FClasslikes%2F561814353" anchor-label="DirectXOffscreenContext" id="-2103684208%2FClasslikes%2F561814353" data-filterable-set=":/awtMain"></a>
+        <div class="table"><a data-name="1643986475%2FClasslikes%2F561814353" anchor-label="Texture" id="1643986475%2FClasslikes%2F561814353" data-filterable-set=":/awtMain"></a>
           <div class="table-row table-row_content" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-direct-x-offscreen-context/index.html"><span>Direct</span><wbr><span>XOffscreen</span><wbr><span><span>Context</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2103684208%2FClasslikes%2F561814353"></span>
+                  <div><a href="-texture/index.html"><span><span>Texture</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1643986475%2FClasslikes%2F561814353"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain" data-active="" data-toggle=":/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":/awtMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../skiko/org.jetbrains.skiko/-experimental-skiko-api/index.html"><span class="token annotation builtin">ExperimentalSkikoApi</span></a></div></div><span class="token keyword">class </span><a href="-direct-x-offscreen-context/index.html">DirectXOffscreenContext</a> : <a href="https://developer.android.com/reference/kotlin/java/lang/AutoCloseable.html">AutoCloseable</a></div><div class="brief "><p class="paragraph">Class that allows drawing into offscreen DirectX texture.</p></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/awtMain"><div class="symbol monospace"><span class="token keyword">inner </span><span class="token keyword">class </span><a href="-texture/index.html">Texture</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">width<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span> : <a href="https://developer.android.com/reference/kotlin/java/lang/AutoCloseable.html">AutoCloseable</a></div><div class="brief "><p class="paragraph">Offscreen Metal texture that can be wrapped into a Skia Surface.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1595160984%2FClasslikes%2F561814353" anchor-label="MetalOffscreenContext" id="1595160984%2FClasslikes%2F561814353" data-filterable-set=":/awtMain"></a>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-190618355%2FProperties%2F561814353" anchor-label="directContext" id="-190618355%2FProperties%2F561814353" data-filterable-set=":/awtMain"></a>
           <div class="table-row table-row_content" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-metal-offscreen-context/index.html"><span>Metal</span><wbr><span>Offscreen</span><wbr><span><span>Context</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1595160984%2FClasslikes%2F561814353"></span>
+                  <div><a href="direct-context.html"><span>direct</span><wbr><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-190618355%2FProperties%2F561814353"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain" data-active="" data-toggle=":/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":/awtMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../skiko/org.jetbrains.skiko/-experimental-skiko-api/index.html"><span class="token annotation builtin">ExperimentalSkikoApi</span></a></div></div><span class="token keyword">class </span><a href="-metal-offscreen-context/index.html">MetalOffscreenContext</a> : <a href="https://developer.android.com/reference/kotlin/java/lang/AutoCloseable.html">AutoCloseable</a></div><div class="brief "><p class="paragraph">Class that allows drawing into offscreen Metal textures.</p></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/awtMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="direct-context.html">directContext</a><span class="token operator">: </span><a href="../../../skiko/org.jetbrains.skia/-direct-context/index.html">DirectContext</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="381200300%2FClasslikes%2F561814353" anchor-label="OpenGLOffscreenContext" id="381200300%2FClasslikes%2F561814353" data-filterable-set=":/awtMain"></a>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="661596891%2FFunctions%2F561814353" anchor-label="close" id="661596891%2FFunctions%2F561814353" data-filterable-set=":/awtMain"></a>
           <div class="table-row table-row_content" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-open-g-l-offscreen-context/index.html"><span>Open</span><wbr><span>GLOffscreen</span><wbr><span><span>Context</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="381200300%2FClasslikes%2F561814353"></span>
+                  <div><a href="close.html"><span><span>close</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="661596891%2FFunctions%2F561814353"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/awtMain" data-filterable-set=":/awtMain" data-active="" data-toggle=":/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":/awtMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../skiko/org.jetbrains.skiko/-experimental-skiko-api/index.html"><span class="token annotation builtin">ExperimentalSkikoApi</span></a></div></div><span class="token keyword">class </span><a href="-open-g-l-offscreen-context/index.html">OpenGLOffscreenContext</a> : <a href="https://developer.android.com/reference/kotlin/java/lang/AutoCloseable.html">AutoCloseable</a></div><div class="brief "><p class="paragraph">Class that allows drawing into offscreen OpenGL textures on Linux.</p></div></div>                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-1277921882%2FClasslikes%2F67585281" anchor-label="WebGLOffscreenContext" id="-1277921882%2FClasslikes%2F67585281" data-filterable-set=":/webMain"></a>
-          <div class="table-row table-row_content" data-filterable-current=":/webMain" data-filterable-set=":/webMain">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="-web-g-l-offscreen-context/index.html"><span>Web</span><wbr><span>GLOffscreen</span><wbr><span><span>Context</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1277921882%2FClasslikes%2F67585281"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/webMain" data-filterable-set=":/webMain" data-active="" data-toggle=":/webMain">web</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":/webMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../skiko/org.jetbrains.skiko/-experimental-skiko-api/index.html"><span class="token annotation builtin">ExperimentalSkikoApi</span></a></div></div><span class="token keyword">class </span><a href="-web-g-l-offscreen-context/index.html">WebGLOffscreenContext</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a></div><div class="brief "><p class="paragraph">Class that allows drawing into an offscreen WebGL render target.</p></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/awtMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="close.html"><span class="token function">close</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
