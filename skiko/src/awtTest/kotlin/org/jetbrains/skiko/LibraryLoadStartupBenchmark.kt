@@ -88,7 +88,7 @@ open class LibraryLoadStartupBenchmark {
         @JvmStatic
         fun main(args: Array<String>) {
             Library.load()
-            currentSystemTheme
+            check(LibraryTestImpl().run() != 0L)
         }
     }
 }

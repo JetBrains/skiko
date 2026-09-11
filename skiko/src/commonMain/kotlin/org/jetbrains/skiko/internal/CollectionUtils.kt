@@ -1,5 +1,7 @@
 package org.jetbrains.skiko.internal
 
+import org.jetbrains.skiko.InternalSkikoApi
+
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -17,7 +19,8 @@ internal inline fun <T, R> Array<T>.unpackTo(destinationArray: R, unpackItem: (T
 }
 
 @OptIn(ExperimentalContracts::class)
-internal inline fun <T> List<T>.fastForEach(action: (T) -> Unit) {
+@InternalSkikoApi
+inline fun <T> List<T>.fastForEach(action: (T) -> Unit) {
     contract { callsInPlace(action) }
     for (index in indices) {
         val item = get(index)
