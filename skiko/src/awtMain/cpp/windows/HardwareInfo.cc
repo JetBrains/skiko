@@ -49,7 +49,7 @@ extern "C"
         auto status = RegOpenKeyExW(HKEY_LOCAL_MACHINE, path, 0, KEY_READ, &hKey);
         if (ERROR_SUCCESS == status) {
             std::wstring strValue;
-            
+
             GetStringRegKey(hKey, key, strValue);
             std::string result = std::string(strValue.begin(), strValue.end());
             return env->NewStringUTF(result.c_str());

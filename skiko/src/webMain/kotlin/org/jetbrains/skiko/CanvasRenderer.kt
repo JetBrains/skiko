@@ -15,7 +15,8 @@ import kotlin.js.js
  * After initialization [needRedraw] can be used to schedule a call to [drawFrame].
  * [drawFrame] has to be implemented to perform the actual drawing on [canvas].
  */
-internal abstract class CanvasRenderer(
+@InternalSkikoApi
+abstract class CanvasRenderer(
     private val contextPointer: NativePointer,
     width: Int,
     height: Int,
@@ -150,14 +151,16 @@ private fun windowRequestAnimationFrame(callback: (Double) -> Unit) : Int =
     //language=JavaScript
     js("window.requestAnimationFrame(callback)")
 
-
-internal external interface GLInterface {
+@InternalSkikoApi
+external interface GLInterface {
     fun createContext(context: HTMLCanvasElement, contextAttributes: EmscriptenWebGLContextAttributes): NativePointer
-    fun makeContextCurrent(contextPointer: NativePointer): Boolean;
+    fun makeContextCurrent(contextPointer: NativePointer): Boolean
 }
 
-internal expect val GL: GLInterface
+@InternalSkikoApi
+expect val GL: GLInterface
 
+@InternalSkikoApi
 @OptIn(ExperimentalWasmJsInterop::class)
-internal fun currentGLContext(gl: GLInterface): WebGLRenderingContextBase? =
+fun currentGLContext(gl: GLInterface): WebGLRenderingContextBase? =
     js("gl.currentContext ? gl.currentContext.GLctx : null")
