@@ -23,11 +23,7 @@ internal class ImportGeneratorExtension(
         val importGenerator = ImportGeneratorTransformer(pluginContext, moduleName)
 
         outputFile.writer().use { writer ->
-            prefixFile?.let {
-                val prefixContent = it.readText()
-                val inlined = inlineLocalImports(prefixContent, it.parentFile)
-                writer.appendLine(inlined)
-            }
+            prefixFile?.let { writer.appendLine(it.readText()) }
             moduleFragment.transformChildrenVoid(importGenerator)
 
             importGenerator.getExportSymbols().forEach { symbolName ->
@@ -67,26 +63,4 @@ internal class ImportGeneratorExtension(
         }
     }
 
-    private fun inlineLocalImports(content: String, baseDir: File): String {
-        val namedImportRegex = Regex("""import\s+\{([^}]+)}\s+from\s+"\.\/([^"]+)";""")
-        val bareImportRegex = Regex("""import\s+"\.\/([^"]+)";""")
-        var result = content
-        for (match in bareImportRegex.findAll(content)) {
-            val fileName = match.groupValues[1]
-            val importedFile = baseDir.resolve(fileName)
-            if (importedFile.exists()) {
-                val fileContent = importedFile.readText()
-                result = result.replace(match.value, fileContent)
-            }
-        }
-        for (match in namedImportRegex.findAll(content)) {
-            val fileName = match.groupValues[2]
-            val importedFile = baseDir.resolve(fileName)
-            if (importedFile.exists()) {
-                val fileContent = importedFile.readText()
-                result = result.replace(match.value, fileContent)
-            }
-        }
-        return result
-    }
 }

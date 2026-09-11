@@ -1,7 +1,4 @@
 // This file is used for loading skiko.wasm and provides the environment for it
-import "./emscripten-compat.js";
-import "./libwebgl.preprocessed.js";
-import "./libwebgl2.preprocessed.js";
 
 let wasmExports = null;
 

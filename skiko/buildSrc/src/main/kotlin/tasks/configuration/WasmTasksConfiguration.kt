@@ -2,7 +2,7 @@ package tasks.configuration
 
 import Arch
 import CompileSkikoCppTask
-import CopyEmscriptenWebGLLibsTask
+import GenerateEmscriptenWebGLPrefixTask
 import GenerateWasmSideModuleExportsTask
 import SetupEmscriptenTask
 import IMPORT_GENERATOR
@@ -114,24 +114,58 @@ fun SkikoProjectContext.declareWasmTasks() {
             it.file(wasiSdkExecutableName(toolName)).asFile.absolutePath
         }
 
-    val copyEmscriptenWebGLLibs = if (!isSideModule) {
-        project.tasks.register<CopyEmscriptenWebGLLibsTask>("copyEmscriptenWebGLLibs") {
+    val generateEmscriptenWebGLPrefix = if (!isSideModule) {
+        project.tasks.register<GenerateEmscriptenWebGLPrefixTask>("generateEmscriptenWebGLPrefix") {
             dependsOn(setupEmscripten)
-            nodeExecutable.set(project.layout.file(setupEmscripten.map { it.nodeExecutableFile() }))
-            preprocessor.set(setupEmscripten.flatMap { it.sdkDir.file("upstream/emscripten/tools/preprocessor.mjs") })
-            emscriptenLibDir.set(setupEmscripten.flatMap { it.sdkDir.dir("upstream/emscripten/src/lib") })
-            outputDir.set(project.layout.buildDirectory.dir("generated/emscriptenWebGLLibs/webMain"))
-            libFiles.set(listOf("libwebgl.js", "libwebgl2.js"))
-            prefixFile.set(project.layout.projectDirectory.file("src/webMain/resources/pre-setup.mjs"))
-            localImportFiles.from(project.layout.projectDirectory.file("src/webMain/resources/emscripten-compat.js"))
+
+            nodeExecutable.set(
+                project.layout.file(
+                    setupEmscripten.map { it.nodeExecutableFile() }
+                )
+            )
+
+            preprocessor.set(
+                setupEmscripten.flatMap {
+                    it.sdkDir.file("upstream/emscripten/tools/preprocessor.mjs")
+                }
+            )
+
+            emscriptenLibDir.set(
+                setupEmscripten.flatMap {
+                    it.sdkDir.dir("upstream/emscripten/src/lib")
+                }
+            )
+
+            compatibilityFile.set(
+                project.layout.projectDirectory.file(
+                    "src/webMain/resources/emscripten-compat.js"
+                )
+            )
+
+            setupBodyFile.set(
+                project.layout.projectDirectory.file(
+                    "src/webMain/resources/pre-setup-body.mjs"
+                )
+            )
+            libFiles.set(
+                listOf("libwebgl.js", "libwebgl2.js")
+            )
+
+            outputFile.set(
+                project.layout.buildDirectory.file(
+                    "generated/emscriptenWebGLLibs/webMain/pre-setup.mjs"
+                )
+            )
         }.also { task ->
             project.tasks.matching {
                 it.name in listOf("compileKotlinJs", "compileKotlinWasmJs")
             }.configureEach {
                 // The compiler plugin reads generatedPreSetupMjs while producing setup.mjs.
                 dependsOn(task)
-                inputs.dir(task.flatMap { it.outputDir })
-                    .withPathSensitivity(PathSensitivity.RELATIVE)
+
+                inputs.file(
+                    task.flatMap { it.outputFile }
+                ).withPathSensitivity(PathSensitivity.RELATIVE)
             }
         }
     } else {
@@ -184,7 +218,7 @@ fun SkikoProjectContext.declareWasmTasks() {
     }
 
     fun LinkSkikoWasmTask.configureCommon(prefixPath: String) {
-        copyEmscriptenWebGLLibs?.let { dependsOn(it) }
+        generateEmscriptenWebGLPrefix?.let { dependsOn(it) }
         dependsOn(setupWasiSdk)
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
