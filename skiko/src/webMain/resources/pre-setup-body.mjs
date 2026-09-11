@@ -149,7 +149,7 @@ async function loadSkikoWASM() {
                 if (prop === '__wasm_longjmp') return () => {
                     throw new Error('longjmp not supported');
                 };
-                if (prop === '__wasm_setjmp' || prop === '__wasm_setjmp_test') return () => 0;
+                if (prop === "setjmp" || prop === '__wasm_setjmp' || prop === '__wasm_setjmp_test') return () => 0;
 
                 return (...args) => {
                     if (wasmExports && wasmExports[prop]) {
@@ -257,7 +257,7 @@ const parseDylinkMetadata = (module) => {
     }
 
     const bytes = new Uint8Array(sections[0]);
-    const offsetRef = { offset: 0 };
+    const offsetRef = {offset: 0};
     const metadata = {
         memorySize: 0,
         memoryAlign: 0,
@@ -312,7 +312,7 @@ const getGotEntry = (name) => {
         const isResolved = hasOwn(dynamicSymbols, symbolName);
 
         gotEntries[symbolName] = new WebAssembly.Global(
-            { value: "i32", mutable: true },
+            {value: "i32", mutable: true},
             isResolved ? toAddress(dynamicSymbols[symbolName]) : 0
         );
 
@@ -335,7 +335,7 @@ const updateGot = (exports) => {
 
         if (!gotEntries[name]) {
             gotEntries[name] = new WebAssembly.Global(
-                { value: "i32", mutable: true },
+                {value: "i32", mutable: true},
                 0
             );
         }
@@ -385,10 +385,10 @@ const loadWasmSideModule = async (extensionPath) => {
     const resolveSymbol = (prop) => dynamicSymbols[prop] ?? moduleExports[prop];
     const importProxy = new Proxy({}, {
         get(_, prop) {
-            if (prop === "__memory_base") return new WebAssembly.Global({ value: "i32", mutable: false }, memoryBase);
-            if (prop === "__table_base") return new WebAssembly.Global({ value: "i32", mutable: false }, tableBase);
+            if (prop === "__memory_base") return new WebAssembly.Global({value: "i32", mutable: false}, memoryBase);
+            if (prop === "__table_base") return new WebAssembly.Global({value: "i32", mutable: false}, tableBase);
             if (prop === "__stack_pointer") {
-                fallbackStackPointer ||= new WebAssembly.Global({ value: "i32", mutable: true }, 0);
+                fallbackStackPointer ||= new WebAssembly.Global({value: "i32", mutable: true}, 0);
                 return wasmExports.__stack_pointer ?? fallbackStackPointer;
             }
             if (prop === "memory") return wasmExports.memory;
@@ -408,8 +408,8 @@ const loadWasmSideModule = async (extensionPath) => {
     const importObject = {
         env: importProxy,
         wasi_snapshot_preview1: createWasiImports(),
-        "GOT.func": new Proxy({}, { get: (_, prop) => getGotEntry(prop) }),
-        "GOT.mem": new Proxy({}, { get: (_, prop) => getGotEntry(prop) })
+        "GOT.func": new Proxy({}, {get: (_, prop) => getGotEntry(prop)}),
+        "GOT.mem": new Proxy({}, {get: (_, prop) => getGotEntry(prop)})
     };
 
     const instance = await WebAssembly.instantiate(wasmModule, importObject);
@@ -418,7 +418,7 @@ const loadWasmSideModule = async (extensionPath) => {
     registerDynamicSymbols(moduleExports);
 
     const unresolvedImports = moduleImports
-        .filter(({ module, name }) =>
+        .filter(({module, name}) =>
             (
                 (module === "env" && !SIDE_MODULE_RUNTIME_ENV_IMPORTS.has(name)) ||
                 module === "GOT.func" ||
@@ -427,7 +427,7 @@ const loadWasmSideModule = async (extensionPath) => {
             dynamicSymbols[name] === undefined &&
             moduleExports[name] === undefined
         )
-        .map(({ module, name }) => `${module}.${name}`);
+        .map(({module, name}) => `${module}.${name}`);
     if (unresolvedImports.length > 0) {
         throw new Error(`Unresolved Skiko side-module imports: ${unresolvedImports.join(", ")}`);
     }
@@ -441,7 +441,7 @@ const loadWasmSideModule = async (extensionPath) => {
         moduleExports.__wasm_call_ctors();
     }
 
-    const loadedModule = { exports: moduleExports };
+    const loadedModule = {exports: moduleExports};
     loadedSideModules.set(extensionPath, loadedModule);
     return loadedModule;
 };

@@ -8,9 +8,15 @@ function range(n) {
 }
 
 function assert(cond, msg) {
-    if (!cond) {
-        console.warn('Assertion failed: ' + (msg || ''));
+    if (cond) return;
+
+    if (typeof msg === "string" && msg.startsWith("missing sig for ")) {
+        // ignore missing signatures as we do not include libsigs.js from emscripten.
+        // libsigs.js is not relevant for our custom runtime loader.
+        return;
     }
+
+    console.warn('Assertion failed: ' + (msg || ''));
 }
 
 var decoratorSuffixes = [
@@ -30,12 +36,15 @@ var decoratorSuffixes = [
 ];
 
 function isDecorator(ident) {
-    return decoratorSuffixes.some(function(suffix) { return ident.endsWith(suffix); });
+    return decoratorSuffixes.some(function (suffix) {
+        return ident.endsWith(suffix);
+    });
 }
 
-var LibraryManager = { library: {} };
+var LibraryManager = {library: {}};
 
-function autoAddDeps(lib, symbol) {}
+function autoAddDeps(lib, symbol) {
+}
 
 function addToLibrary(lib) {
     Object.assign(LibraryManager.library, lib);
@@ -130,47 +139,105 @@ var webglGetUniformBlockIndex;
 var webglGetLeftBracePos;
 
 function writeI53ToI64(ptr, num) {
-    HEAPU32[((ptr)>>2)] = num;
-    HEAPU32[(((ptr)+(4))>>2)] = (num - HEAPU32[((ptr)>>2)])/4294967296;
+    HEAPU32[((ptr) >> 2)] = num;
+    HEAPU32[(((ptr) + (4)) >> 2)] = (num - HEAPU32[((ptr) >> 2)]) / 4294967296;
 }
 
 function readI53FromI64(ptr) {
-    return HEAPU32[((ptr)>>2)] + HEAP32[(((ptr)+(4))>>2)] * 4294967296;
+    return HEAPU32[((ptr) >> 2)] + HEAP32[(((ptr) + (4)) >> 2)] * 4294967296;
 }
 
 // Map of module-scoped variable setters for $-prefixed symbols.
 // We cannot use globalThis because skiko.mjs is an ES module and bare
 // variable references resolve to module scope, not the global object.
 var _emscriptenGlobalSetters = {
-    'tempFixedLengthArray': function(v) { tempFixedLengthArray = v; },
-    'miniTempWebGLFloatBuffers': function(v) { miniTempWebGLFloatBuffers = v; },
-    'miniTempWebGLIntBuffers': function(v) { miniTempWebGLIntBuffers = v; },
-    'heapObjectForWebGLType': function(v) { heapObjectForWebGLType = v; },
-    'toTypedArrayIndex': function(v) { toTypedArrayIndex = v; },
-    'webgl_enable_WEBGL_multi_draw': function(v) { webgl_enable_WEBGL_multi_draw = v; },
-    'webgl_enable_EXT_polygon_offset_clamp': function(v) { webgl_enable_EXT_polygon_offset_clamp = v; },
-    'webgl_enable_EXT_clip_control': function(v) { webgl_enable_EXT_clip_control = v; },
-    'webgl_enable_WEBGL_polygon_mode': function(v) { webgl_enable_WEBGL_polygon_mode = v; },
-    'getEmscriptenSupportedExtensions': function(v) { getEmscriptenSupportedExtensions = v; },
-    'GLctx': function(v) { GLctx = v; },
-    'GL': function(v) { _emscriptenGL = v; },
-    'webglGetUniformLocation': function(v) { webglGetUniformLocation = v; },
-    'webglPrepExtensions': function(v) { webglPrepExtensions = v; },
-    'webgl_enable_WEBGL_draw_instanced_base_vertex_base_instance': function(v) { webgl_enable_WEBGL_draw_instanced_base_vertex_base_instance = v; },
-    'webgl_enable_WEBGL_multi_draw_instanced_base_vertex_base_instance': function(v) { webgl_enable_WEBGL_multi_draw_instanced_base_vertex_base_instance = v; },
-    '_glDrawElements': function(v) { _glDrawElements = v; },
-    'webglBufferSubData': function(v) { webglBufferSubData = v; },
-    'webglGetExtensions': function(v) { webglGetExtensions = v; },
-    'computeUnpackAlignedImageSize': function(v) { computeUnpackAlignedImageSize = v; },
-    'colorChannelsInGlTextureFormat': function(v) { colorChannelsInGlTextureFormat = v; },
-    'emscriptenWebGLGetTexPixelData': function(v) { emscriptenWebGLGetTexPixelData = v; },
-    'emscriptenWebGLGet': function(v) { emscriptenWebGLGet = v; },
-    'emscriptenWebGLGetUniform': function(v) { emscriptenWebGLGetUniform = v; },
-    'webglGetProgramUniformLocation': function(v) { webglGetProgramUniformLocation = v; },
-    'webglPrepareUniformLocationsBeforeFirstUse': function(v) { webglPrepareUniformLocationsBeforeFirstUse = v; },
-    'emscriptenWebGLGetVertexAttrib': function(v) { emscriptenWebGLGetVertexAttrib = v; },
-    'webglGetUniformBlockIndex': function(v) { webglGetUniformBlockIndex = v; },
-    'webglGetLeftBracePos': function(v) { webglGetLeftBracePos = v; },
+    'tempFixedLengthArray': function (v) {
+        tempFixedLengthArray = v;
+    },
+    'miniTempWebGLFloatBuffers': function (v) {
+        miniTempWebGLFloatBuffers = v;
+    },
+    'miniTempWebGLIntBuffers': function (v) {
+        miniTempWebGLIntBuffers = v;
+    },
+    'heapObjectForWebGLType': function (v) {
+        heapObjectForWebGLType = v;
+    },
+    'toTypedArrayIndex': function (v) {
+        toTypedArrayIndex = v;
+    },
+    'webgl_enable_WEBGL_multi_draw': function (v) {
+        webgl_enable_WEBGL_multi_draw = v;
+    },
+    'webgl_enable_EXT_polygon_offset_clamp': function (v) {
+        webgl_enable_EXT_polygon_offset_clamp = v;
+    },
+    'webgl_enable_EXT_clip_control': function (v) {
+        webgl_enable_EXT_clip_control = v;
+    },
+    'webgl_enable_WEBGL_polygon_mode': function (v) {
+        webgl_enable_WEBGL_polygon_mode = v;
+    },
+    'getEmscriptenSupportedExtensions': function (v) {
+        getEmscriptenSupportedExtensions = v;
+    },
+    'GLctx': function (v) {
+        GLctx = v;
+    },
+    'GL': function (v) {
+        _emscriptenGL = v;
+    },
+    'webglGetUniformLocation': function (v) {
+        webglGetUniformLocation = v;
+    },
+    'webglPrepExtensions': function (v) {
+        webglPrepExtensions = v;
+    },
+    'webgl_enable_WEBGL_draw_instanced_base_vertex_base_instance': function (v) {
+        webgl_enable_WEBGL_draw_instanced_base_vertex_base_instance = v;
+    },
+    'webgl_enable_WEBGL_multi_draw_instanced_base_vertex_base_instance': function (v) {
+        webgl_enable_WEBGL_multi_draw_instanced_base_vertex_base_instance = v;
+    },
+    '_glDrawElements': function (v) {
+        _glDrawElements = v;
+    },
+    'webglBufferSubData': function (v) {
+        webglBufferSubData = v;
+    },
+    'webglGetExtensions': function (v) {
+        webglGetExtensions = v;
+    },
+    'computeUnpackAlignedImageSize': function (v) {
+        computeUnpackAlignedImageSize = v;
+    },
+    'colorChannelsInGlTextureFormat': function (v) {
+        colorChannelsInGlTextureFormat = v;
+    },
+    'emscriptenWebGLGetTexPixelData': function (v) {
+        emscriptenWebGLGetTexPixelData = v;
+    },
+    'emscriptenWebGLGet': function (v) {
+        emscriptenWebGLGet = v;
+    },
+    'emscriptenWebGLGetUniform': function (v) {
+        emscriptenWebGLGetUniform = v;
+    },
+    'webglGetProgramUniformLocation': function (v) {
+        webglGetProgramUniformLocation = v;
+    },
+    'webglPrepareUniformLocationsBeforeFirstUse': function (v) {
+        webglPrepareUniformLocationsBeforeFirstUse = v;
+    },
+    'emscriptenWebGLGetVertexAttrib': function (v) {
+        emscriptenWebGLGetVertexAttrib = v;
+    },
+    'webglGetUniformBlockIndex': function (v) {
+        webglGetUniformBlockIndex = v;
+    },
+    'webglGetLeftBracePos': function (v) {
+        webglGetLeftBracePos = v;
+    },
 };
 
 // Extract $-prefixed symbols from LibraryManager.library into module-scoped
