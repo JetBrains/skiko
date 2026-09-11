@@ -60,7 +60,14 @@ function error(msg) {
 
 var HEAP8, HEAPU8, HEAP16, HEAPU16, HEAP32, HEAPU32, HEAPF32, HEAPF64;
 
+var currentMemoryBuffer;
 function updateMemoryViews(buffer) {
+    if (buffer === currentMemoryBuffer) {
+        return;
+    }
+
+    currentMemoryBuffer = buffer;
+
     HEAP8 = new Int8Array(buffer);
     HEAPU8 = new Uint8Array(buffer);
     HEAP16 = new Int16Array(buffer);

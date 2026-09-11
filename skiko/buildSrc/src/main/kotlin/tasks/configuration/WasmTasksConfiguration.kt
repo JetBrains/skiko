@@ -199,12 +199,13 @@ fun SkikoProjectContext.declareWasmTasks() {
             buildList {
                 addAll(skiaPreprocessorFlags(OS.Wasm, buildType)) // Skia/ICU feature macros for this WASM build type.
                 addAll(buildType.clangFlags) // C++ standard plus Debug/Release optimization or debug-info flags.
-                add("-O2") // Optimize for speed without the most expensive optimization passes.
-                add("-flto") // Enable link-time optimization.
+                add("-flto=thin") // Enable link-time optimization.
                 add("-fvisibility=hidden") // Hide symbols by default unless explicitly exported.
                 add("-fno-rtti") // Disable C++ runtime type information.
                 add("-fno-exceptions") // Disable C++ exception support.
-                add("-fPIC") // Generate position-independent code.
+                if (isSideModule) {
+                    add("-fPIC") // Generate position-independent code.
+                }
                 add("-D_WASI_EMULATED_MMAN") // Enable WASI libc's minimal mmap emulation declarations.
                 add("-D_WASI_EMULATED_SIGNAL") // Enable WASI libc's minimal signal emulation declarations.
                 add("-D_WASI_EMULATED_PROCESS_CLOCKS") // Enable WASI libc process-clock emulation declarations.
@@ -277,9 +278,8 @@ fun SkikoProjectContext.declareWasmTasks() {
         }
 
         flags.addAll(buildList {
-            add("-O2") // Optimize linked output for speed without the most expensive optimization passes.
             add("-fuse-ld=lld") // Use LLVM's lld linker.
-            add("-flto") // Run link-time optimization across bitcode inputs.
+            add("-flto=thin") // Run link-time optimization across bitcode inputs.
             add("-Wl,--no-entry") // Do not require a _start entry point.
             if (isSideModule) {
                 add("-shared") // Produce a shared/side WebAssembly module.
