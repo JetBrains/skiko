@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
-internal expect inline fun <R> maybeSynchronized(lock: Any, block: () -> R): R
+@InternalSkikoApi
+expect inline fun <R> maybeSynchronized(lock: Any, block: () -> R): R
 
 expect fun currentNanoTime(): Long
