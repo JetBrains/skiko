@@ -121,10 +121,7 @@ class LibraryLoadStressTest {
 
         private fun load() {
             Library.load()
-            /*
-            Check if we can access the 'currentSystemTheme' as this will perform an actual native call
-             */
-            currentSystemTheme
+            check(LibraryTestImpl().run() != 0L)
         }
 
         @OptIn(ExperimentalPathApi::class)

@@ -81,7 +81,6 @@ class LibraryLoadCleanupTest {
         tempDataDir.listDirectoryEntries().forEach { file ->
             when {
                 file.isReadable() && file.name == LockFile.skiko.name -> return@forEach
-                file.isReadable() && file.name == LockFile.angle.name -> return@forEach
                 file.isDirectory() -> return@forEach
                 else -> error("The cleanup implementation only expects directories and a .lock file\nfound: $file")
             }
