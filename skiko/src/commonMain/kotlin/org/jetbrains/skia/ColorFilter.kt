@@ -11,7 +11,7 @@ import org.jetbrains.skia.impl.*
  *  All subclasses are required to be reentrant-safe : it must be legal to share
  *  the same instance between several threads.
  */
-class ColorFilter : RefCnt {
+class ColorFilter : RefCnt, RuntimeEffect.Child {
     companion object {
         fun makeComposed(outer: ColorFilter?, inner: ColorFilter?): ColorFilter {
             return try {
