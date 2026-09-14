@@ -211,7 +211,7 @@ private fun SkikoPublishingContext.configureAllJvmRuntimeJarPublications() = pub
 private fun SkikoPublishingContext.configureAwtRuntimeAllJarPublication() {
     if (!project.supportAwt) return
 
-    val allArtifactId = "${skikoArtifacts.jvmRuntimeArtifactId}-all"
+    val allArtifactId = skikoArtifacts.jvmRuntimeAllArtifactId
     val allJar = project.tasks.registerOrGetTask<Jar>("awtRuntimeAllJar") {
         isZip64 = true
         archiveBaseName.set(allArtifactId)

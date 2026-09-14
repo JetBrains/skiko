@@ -132,11 +132,11 @@ class SkikoProperties(private val myProject: Project) {
     val isTeamcityCIBuild: Boolean
         get() = myProject.hasProperty("teamcity")
 
-    val planeDeployVersion: String = myProject.property("deploy.version") as String
+    val baseDeployVersion: String = myProject.property("deploy.version") as String
 
     val deployVersion: String
         get() {
-            val main = if (isRelease) planeDeployVersion else "$planeDeployVersion-SNAPSHOT"
+            val main = if (isRelease) baseDeployVersion else "$baseDeployVersion-SNAPSHOT"
             var metadata = if (buildType == SkiaBuildType.DEBUG) "+debug" else ""
             metadata += if (isWasmBuildWithProfiling) "+profiling" else ""
             return main + metadata
@@ -194,32 +194,12 @@ class SkikoProperties(private val myProject: Project) {
                 ?: myProject.findProperty("skia.repo.dir")?.toString()
                 ?: myProject.findProperty("skia.pack.dir")?.toString()
             )?.let { skiaRepoDirProp ->
-                val file = findFile(skiaRepoDirProp)
+                val file = File(skiaRepoDirProp)
                 if (!file.isDirectory) {
                     throw GradleException("\"skia.repo.dir\" property was explicitly set to $skiaRepoDirProp which is not resolved as a directory")
                 }
                 file
             }
-
-    /**
-     * Target-specific Skia repository root directory.
-     *
-     * Usage: `-Pskia.repo.dir.wasm=/path/to/skia`
-     */
-    fun skiaRepoDir(os: OS): File? {
-        val targetSpecific = myProject.findProperty("skia.repo.dir.${os.id}")?.toString()
-            ?: myProject.findProperty("skia.pack.dir.${os.id}")?.toString()
-            ?: System.getenv("SKIA_REPO_DIR_${os.id.uppercase()}")
-            ?: System.getenv("SKIA_PACK_DIR_${os.id.uppercase()}")
-            ?: System.getProperty("skia.repo.dir.${os.id}")
-            ?: System.getProperty("skia.pack.dir.${os.id}")
-
-        return targetSpecific?.let {
-            val file = findFile(it)
-            if (!file.isDirectory) throw (GradleException("\"skia.repo.dir.${os.id}\" property was explicitly set to $it which is not resolved as a directory"))
-            file
-        } ?: skiaRepoDir
-    }
 
     /**
      * Skia source directory for publishing.
@@ -238,27 +218,10 @@ class SkikoProperties(private val myProject: Project) {
     val skiaDir: File?
         get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir") ?: myProject.findProperty("skia.dir")
             ?.toString())?.let { skiaDirProp ->
-                val file = findFile(skiaDirProp)
+                val file = File(skiaDirProp)
                 if (!file.isDirectory) throw (GradleException("\"skia.dir\" property was explicitly set to ${skiaDirProp} which is not resolved as a directory"))
                 file
             }
-
-    /**
-     * Target-specific Skia source directory.
-     *
-     * Usage: `-Pskia.dir.wasm=/path/to/skia`
-     */
-    fun skiaDir(os: OS): File? {
-        val targetSpecific = myProject.findProperty("skia.dir.${os.id}")?.toString()
-            ?: System.getenv("SKIA_DIR_${os.id.uppercase()}")
-            ?: System.getProperty("skia.dir.${os.id}")
-
-        return targetSpecific?.let {
-            val file = findFile(it)
-            if (!file.isDirectory) throw (GradleException("\"skia.dir.${os.id}\" property was explicitly set to $it which is not resolved as a directory"))
-            file
-        } ?: skiaDir
-    }
 
     private fun findFile(path: String): File {
         val file = File(path)
@@ -349,6 +312,7 @@ class SkikoArtifacts(
     val commonArtifactId = artifactIdPrefix
     val jvmArtifactId = "$artifactIdPrefix-awt"
     val jvmRuntimeArtifactId = "$artifactIdPrefix-awt-runtime"
+    val jvmRuntimeAllArtifactId = "$jvmRuntimeArtifactId-all"
     // an artifact (klib) for k/js targets
     val jsArtifactId = "$artifactIdPrefix-js"
     // an artifact (klib) for k/wasm targets

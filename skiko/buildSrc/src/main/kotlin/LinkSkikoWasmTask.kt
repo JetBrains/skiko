@@ -1,4 +1,3 @@
-import internal.utils.*
 import org.gradle.api.file.ConfigurableFileCollection
 
 import org.gradle.api.provider.Property
@@ -14,6 +13,4 @@ abstract class LinkSkikoWasmTask : LinkSkikoTask() {
     @get:Input
     abstract val emccOutputFileName: Property<String>
 
-    override fun configureArgs() =
-        super.configureArgs()
 }

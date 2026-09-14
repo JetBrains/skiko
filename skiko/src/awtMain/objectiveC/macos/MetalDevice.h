@@ -6,10 +6,12 @@
 
 @property jobject javaRef;
 
-/// True while an interactive live resize is in progress. When set, the layer drives a synchronous,
-/// transactional redraw from its own bounds change (on the main thread) so content, drawableSize and
-/// the window backing all land in the same CATransaction.
-@property BOOL liveResizing;
+/// True when the user drags-to-resize the window.
+///
+/// Explicitly atomic because it can be read off the main thread.
+/// It is a plain synthesized ivar, not a CoreAnimation-backed property, so reading it on the Metal scheduler thread
+/// takes no CA lock and cannot block.
+@property (atomic) BOOL liveResizing;
 
 @end
 
@@ -32,11 +34,6 @@
 @property (strong) id<NSObject> occlusionObserver;
 @property (strong) id<NSObject> liveResizeStartObserver;
 @property (strong) id<NSObject> liveResizeEndObserver;
-
-/// True while the window is in an interactive (edge-drag) live resize. During that window we present
-/// drawables synchronously and transactionally (presentsWithTransaction) so the Metal content swap is
-/// committed together with the layer, instead of racing it on another thread.
-@property (atomic) BOOL inLiveResize;
 
 @end
 

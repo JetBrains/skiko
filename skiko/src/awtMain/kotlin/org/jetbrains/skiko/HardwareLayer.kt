@@ -2,12 +2,13 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import org.jetbrains.skiko.redrawer.dispatcherToBlockOn
+import org.jetbrains.skiko.renderer.dispatcherToBlockOn
 import java.awt.Canvas
 import java.awt.Component
 import java.awt.Graphics
 import java.awt.event.InputMethodEvent
 import javax.accessibility.AccessibleContext
+import kotlin.time.Duration.Companion.seconds
 
 internal open class HardwareLayer(
     private val accessibleContextProvider: ((Component) -> AccessibleContext)? = null
@@ -82,7 +83,7 @@ internal fun layerFrameLimiter(
             //  on my machine it takes 0.2ms on Linux, 0.01ms on macOs, 0.1ms on Windows
             state.frameLimit = component.getDisplayRefreshRate()
             onNewFrameLimit(state.frameLimit)
-            delay(1000)
+            delay(1.seconds)
         }
     }
 

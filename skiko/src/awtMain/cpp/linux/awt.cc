@@ -11,14 +11,14 @@
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_AWTLinuxDrawingSurfaceKt_getDisplay(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_AWTLinuxDrawingSurfaceKt_getDisplay(JNIEnv *env, jobject renderer, jlong platformInfoPtr)
     {
         JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
         Display *display = dsi_x11->display;
         return toJavaPointer(display);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_AWTLinuxDrawingSurfaceKt_getWindow(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_AWTLinuxDrawingSurfaceKt_getWindow(JNIEnv *env, jobject renderer, jlong platformInfoPtr)
     {
         JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
         Window window = dsi_x11->drawable;

@@ -22,7 +22,6 @@ dependencyResolutionManagement {
         create("libs") {
             version("skiko", providers.gradleProperty("skiko.version").get())
             library("skiko", "org.jetbrains.skiko", "skiko").versionRef("skiko")
-            library("skiko-wasm-runtime", "org.jetbrains.skiko", "skiko-js-wasm-runtime").versionRef("skiko")
 
             val osName = System.getProperty("os.name")
             val hostOs = when {
@@ -47,6 +46,11 @@ dependencyResolutionManagement {
 rootProject.name = "SkiaMultiplatformSample"
 
 if (extra.properties.getOrDefault("skiko.composite.build", "") == "1") {
+    // Included builds don't inherit properties declared in this build's gradle.properties.
+    // Enable all Skiko targets required by this multiplatform sample.
+    System.setProperty("org.gradle.project.skiko.wasm.enabled", "true")
+    System.setProperty("org.gradle.project.skiko.native.enabled", "true")
+
     includeBuild("../../skiko") {
         dependencySubstitution {
             substitute(module("org.jetbrains.skiko:skiko")).using(project(":"))

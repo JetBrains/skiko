@@ -145,7 +145,7 @@ private val TRANSPARENT_COLOR = java.awt.Color(0, 0, 0, 0)
  */
 @DelicateSkikoApi
 fun transparentWindowBackgroundHack(renderApi: GraphicsApi): java.awt.Color? {
-    // There is a hack inside OpenGL and Software redrawers for Windows that makes the
+    // There is a hack inside OpenGL and Software renderers for Windows that makes the
     // window transparent without setting the `background` of the AWT window. It is done
     // by getting the native component parent and calling `DwmEnableBlurBehindWindow`.
     //

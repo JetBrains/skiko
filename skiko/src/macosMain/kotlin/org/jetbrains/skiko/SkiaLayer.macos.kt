@@ -38,7 +38,7 @@ actual open class SkiaLayer {
      * https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
      */
     actual val contentScale: Float
-        get() = if (this::nsView.isInitialized) nsView.window!!.backingScaleFactor.toFloat() else 1.0f
+        get() = if (this::nsView.isInitialized) (nsView.window?.backingScaleFactor?.toFloat() ?: 1.0f) else 1.0f
 
     /**
      * Fullscreen is not supported
