@@ -2,14 +2,12 @@
 #include "SkData.h"
 #include "SkImage.h"
 #include "SkBitmap.h"
-#include "ganesh/GrDirectContext.h"
 #include "SkShader.h"
 #include "SkEncodedImageFormat.h"
 #include "encode/SkPngEncoder.h"
 #include "encode/SkJpegEncoder.h"
 #include "encode/SkWebpEncoder.h"
 #include "common.h"
-#include "include/gpu/ganesh/SkImageGanesh.h"
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRaster
@@ -135,10 +133,9 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nPeekPixelsToPixmap
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nReadPixelsBitmap
   (KNativePointer ptr, KNativePointer contextPtr, KNativePointer bitmapPtr, KInt srcX, KInt srcY, KBoolean cache) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
-    GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
     auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;
-    return instance->readPixels(context, bitmap->info(), bitmap->getPixels(), bitmap->pixmap().rowBytes(), srcX, srcY, cachingHint);
+    return instance->readPixels(bitmap->pixmap(), srcX, srcY, cachingHint);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nReadPixelsPixmap
@@ -157,33 +154,3 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nScalePixels
     return instance->scalePixels(*pixmap, skija::SamplingMode::unpackFrom2Ints(samplingOptionsVal1, samplingOptionsVal2), cachingHint);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nAdoptTextureFrom
-  (KNativePointer contextPtr, KNativePointer backendTexturePtr, KInt surfaceOrigin, KInt colorType) {
-    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(contextPtr);
-    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(backendTexturePtr);
-
-    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
-        static_cast<GrRecordingContext*>(context),
-        *backendTexture,
-        static_cast<GrSurfaceOrigin>(surfaceOrigin),
-        static_cast<SkColorType>(colorType)
-    );
-
-    return reinterpret_cast<KNativePointer>(image.release());
-}
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nAdoptTextureFromAlphaType
-  (KNativePointer contextPtr, KNativePointer backendTexturePtr, KInt surfaceOrigin, KInt colorType, KInt alphaType) {
-    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(contextPtr);
-    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(backendTexturePtr);
-
-    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
-        static_cast<GrRecordingContext*>(context),
-        *backendTexture,
-        static_cast<GrSurfaceOrigin>(surfaceOrigin),
-        static_cast<SkColorType>(colorType),
-        static_cast<SkAlphaType>(alphaType)
-    );
-
-    return reinterpret_cast<KNativePointer>(image.release());
-}
