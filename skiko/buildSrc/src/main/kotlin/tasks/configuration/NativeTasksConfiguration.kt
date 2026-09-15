@@ -219,6 +219,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
             }
             else -> throw GradleException("$os not yet supported")
         }
+        flags.addAll(compilerFlags(os, arch, TargetEnv.NATIVE))
 
         val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
