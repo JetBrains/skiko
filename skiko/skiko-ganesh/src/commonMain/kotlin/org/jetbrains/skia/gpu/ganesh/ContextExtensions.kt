@@ -102,4 +102,7 @@ fun Surface.flush() {
 private external fun _nGetCanvasRecordingContext(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_ganesh_ContextExtensions__1nGetSurfaceRecordingContext")
+// No ForceNativeThreadState: returns a stored pointer to the recording context without doing any work, so it is short
+// and cannot block.
+// Native call path: SkSurface::recordingContext -> SkSurface_Ganesh::onGetRecordingContext
 private external fun _nGetSurfaceRecordingContext(ptr: NativePointer): NativePointer
