@@ -24,6 +24,8 @@ dependencyResolutionManagement {
 
             library("skiko", "org.jetbrains.skiko", "skiko").versionRef("skiko")
             library("skiko-platform", "org.jetbrains.skiko", "skiko-platform").versionRef("skiko")
+            library("skiko-ganesh", "org.jetbrains.skiko", "skiko-ganesh").versionRef("skiko")
+            library("skiko-ganesh-wasm-js", "org.jetbrains.skiko", "skiko-ganesh-wasm-js").versionRef("skiko")
             library("skiko-js-wasm-runtime", "org.jetbrains.skiko", "skiko-js-wasm-runtime").versionRef("skiko")
             library("skiko-wasm-js", "org.jetbrains.skiko", "skiko-wasm-js").versionRef("skiko")
             library("browser", "org.jetbrains.kotlinx", "kotlinx-browser").versionRef("kotlinxBrowser")
@@ -41,6 +43,7 @@ if (useIncludedSkiko) {
         dependencySubstitution {
             substitute(module("org.jetbrains.skiko:skiko")).using(project(":"))
             substitute(module("org.jetbrains.skiko:skiko-platform")).using(project(":skiko-platform"))
+            substitute(module("org.jetbrains.skiko:skiko-ganesh")).using(project(":skiko-ganesh"))
         }
     }
 }
