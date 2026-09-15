@@ -15,15 +15,6 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             }
         }
 
-        fun makeFromImage(image: Image, context: DirectContext): Bitmap {
-            val bitmap = Bitmap()
-            bitmap.allocPixels(image.imageInfo)
-            return if (image.readPixels(context, bitmap)) bitmap else {
-                bitmap.close()
-                throw RuntimeException("Failed to readPixels from $image")
-            }
-        }
-
         init {
             staticLoad()
         }

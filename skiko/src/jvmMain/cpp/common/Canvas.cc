@@ -24,12 +24,6 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nMakeFromB
     return reinterpret_cast<jlong>(canvas);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetCanvasRecordingContext
-  (JNIEnv* env, jclass jclass, jlong canvasPtr) {
-    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
-    return reinterpret_cast<jlong>(canvas->recordingContext());
-}
-
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetCanvasSurface
   (JNIEnv* env, jclass jclass, jlong canvasPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
