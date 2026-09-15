@@ -3,7 +3,6 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.interopScope
-import org.jetbrains.skiko.Library
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -17,7 +16,7 @@ class DirectContextTest {
 
     private companion object {
         init {
-            Library.load()
+            GaneshLibrary.load()
         }
     }
 
