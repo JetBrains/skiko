@@ -113,6 +113,7 @@ val skikoWasmRuntimeLegacy by configurations.creating {
 dependencies {
     if (!isCompositeBuild) {
         skikoWasmRuntimeVariant(libs.skiko.wasm.js)
+        skikoWasmRuntimeVariant(libs.skiko.ganesh.wasm.js)
         skikoWasmRuntimeLegacy(libs.skiko.js.wasm.runtime)
     }
 }
@@ -121,10 +122,15 @@ val unpackedWasmRuntime = layout.buildDirectory.dir("resources")
 
 val unpackWasmRuntime = tasks.register("unpackWasmRuntime", Copy::class) {
     into(unpackedWasmRuntime)
+    exclude("META-INF/**")
     outputs.upToDateWhen { false }
     from(providers.provider {
         val runtimeFiles = if (isCompositeBuild) {
-            files(gradle.includedBuild("skiko").projectDir.resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"))
+            val skikoBuildDir = gradle.includedBuild("skiko").projectDir
+            files(
+                skikoBuildDir.resolve("build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"),
+                skikoBuildDir.resolve("skiko-ganesh/build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"),
+            )
         } else {
             resolvePublishedWasmRuntime()
         }
@@ -134,6 +140,7 @@ val unpackWasmRuntime = tasks.register("unpackWasmRuntime", Copy::class) {
 
     if (isCompositeBuild) {
         dependsOn(gradle.includedBuild("skiko").task(":skikoWasmJar"))
+        dependsOn(gradle.includedBuild("skiko").task(":skiko-ganesh:skikoWasmJar"))
     }
 }
 
@@ -269,6 +276,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.skiko)
+            implementation(libs.skiko.ganesh)
         }
 
         val jvmMain by getting {
