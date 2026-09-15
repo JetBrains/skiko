@@ -71,7 +71,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.skiko)
-            implementation(libs.skiko.platform)
+            implementation(libs.skiko.ganesh)
+            implementation(libs.skiko.rendering)
         }
 
         webMain {
