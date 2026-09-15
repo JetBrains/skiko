@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.renderer
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
 import org.jetbrains.skiko.*
 
 internal abstract class AbstractOpenGLRenderer(
