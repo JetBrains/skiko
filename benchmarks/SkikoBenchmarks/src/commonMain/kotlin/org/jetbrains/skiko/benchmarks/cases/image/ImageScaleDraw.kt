@@ -6,6 +6,7 @@ import org.jetbrains.skia.PaintMode
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.SamplingMode
 import org.jetbrains.skia.Surface
+import org.jetbrains.skia.gpu.ganesh.flushAndSubmit
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.benchmarks.BenchmarkSurfaceProvider
 import org.jetbrains.skiko.benchmarks.BenchmarkCase
