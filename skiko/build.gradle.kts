@@ -42,7 +42,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
         all {
             staticSkiaLibs(
                 "skia",
-                "skia_ganesh_ext",
                 "svg",
                 "skparagraph",
                 "skshaper",
@@ -71,14 +70,11 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                     "CoreText",
                     "Foundation",
                     "IOKit",
-                    "Metal",
-                    "OpenGL",
                     "QuartzCore",  // for CoreAnimation
                 )
             }
 
             windows {
-                    staticSkiaLibs("d3d12allocator")
                     // m151 SkSL adopted Chromium's raw_ptr<T> (BackupRefPtr/MiraclePtr), which is
                     // active on Windows (no-op elsewhere). skia.lib now references partition_alloc
                     // and raw_ptr symbols that live in these split-out static libs, so link them.
@@ -91,19 +87,16 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs(
                     "skia",
-                    "skia_ganesh_ext",
                     "skunicode_core",
                     "skunicode_icu",
                     "skshaper",
                 )
-                dynamicSystemLibs("GL", "X11", "fontconfig")
-                arm64 { dynamicSystemLibs("EGL") }
+                dynamicSystemLibs("X11", "fontconfig")
             }
 
             android {
                 // Hack to fix problem with linker not always finding certain declarations.
-                directStaticSkiaLibs("skia", "skia_ganesh_ext")
-                dynamicSystemLibs("GLESv3", "EGL")
+                directStaticSkiaLibs("skia")
             }
         }
         native {
@@ -118,16 +111,13 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                     "skshaper",
                     "skunicode_core",
                     "skunicode_icu",
-                    "skia",
-                    "skia_ganesh_ext"
+                    "skia"
                 )
-                dynamicSystemLibs("fontconfig", "GL")
-                arm64 { dynamicSystemLibs("EGL") }
+                dynamicSystemLibs("fontconfig")
             }
 
             macos {
                 frameworks(
-                    "Metal",
                     "CoreGraphics",
                     "CoreText",
                     "CoreServices",
@@ -136,7 +126,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
 
             ios {
                 frameworks(
-                    "Metal",
                     "CoreGraphics",
                     "CoreText",
                     "UIKit",
@@ -145,7 +134,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
 
             tvos {
                 frameworks(
-                    "Metal",
                     "CoreGraphics",
                     "CoreText",
                     "UIKit",
@@ -165,7 +153,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             linkFlags(
                 "-s", "MAIN_MODULE=2",
                 "-s", "AUTOLOAD_DYLIBS=0",
-                "-l", "GL",
                 "-s", "MAX_WEBGL_VERSION=2",
                 "-s", "MIN_WEBGL_VERSION=2",
                 "-s", "MODULARIZE=1",
@@ -446,6 +433,7 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
     val coreObjcCompile = if (os.isMacOs) tasks.named<CompileSkikoObjCTask>("objcCompile$suffix") else null
     val requiredSymbols = skikoProjectContext.jvmRequiredSymbolsFor(os, arch)
     dependencies.add(requiredSymbols.name, project(":skiko-skottie"))
+    dependencies.add(requiredSymbols.name, project(":skiko-ganesh"))
     dependencies.add(requiredSymbols.name, project(":skiko-rendering"))
     if (os != OS.Android && supportAwt) {
         dependencies.add(requiredSymbols.name, project(":skiko-graphite"))
@@ -483,9 +471,11 @@ if (supportWeb) {
     skikoProjectContext.provideWasmTestResources()
 
     val linkWasmSideModules = skikoProjectContext.wasmSideModulesFor("linkWasm").also {
+        dependencies.add(it.name, project(":skiko-ganesh"))
         dependencies.add(it.name, project(":skiko-skottie"))
     }
     val linkWasmD8SideModules = skikoProjectContext.wasmSideModulesFor("linkWasmD8WithES6").also {
+        dependencies.add(it.name, project(":skiko-ganesh"))
         dependencies.add(it.name, project(":skiko-skottie"))
     }
     skikoProjectContext.configureWasmMainModuleSideModuleInputs(
