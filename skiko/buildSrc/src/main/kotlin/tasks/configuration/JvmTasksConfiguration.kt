@@ -316,7 +316,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         listOf(
             *skiaPreprocessorFlags(targetOs, buildType),
             *osFlags,
-            *dependencyRegistry.getCompilerFlags(targetOs, targetArch, TargetEnv.JVM).toTypedArray(),
+            *compilerFlags(targetOs, targetArch, TargetEnv.JVM).toTypedArray(),
         )
     )
 }
@@ -423,6 +423,7 @@ fun SkikoProjectContext.createObjcCompileTask(
             *os.clangFlags,
             *buildType.clangFlags,
             *skiaPreprocessorFlags(os, buildType),
+            *compilerFlags(os, arch, TargetEnv.JVM).toTypedArray(),
             "-fPIC"
         )
     )
@@ -734,9 +735,7 @@ fun SkikoProjectContext.skikoJvmRuntimeJarTask(
         archiveClassifier.set(target)
         nativeFiles.forEach { provider -> from(provider) }
     }
-    if (kind == SkikoModuleKind.CORE) {
-        configureJvmRuntimeJarElements(targetOs, targetArch, runtimeJar)
-    }
+    configureJvmRuntimeJarElements(targetOs, targetArch, runtimeJar)
     return runtimeJar
 }
 

@@ -23,7 +23,7 @@ class SkikoProjectContext(
     val additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
     configureDependencies: (SkikoDependencyScope.() -> Unit)
 ) {
-    val dependencyRegistry = BinaryRegistry()
+    private val dependencyRegistry = BinaryRegistry()
     val dependsOnCore: Boolean
 
     init {
@@ -73,6 +73,9 @@ class SkikoProjectContext(
     fun dynamicLibNames(os: OS, arch: Arch, env: TargetEnv): List<String> =
         dependencyRegistry.getLibs(os, arch, env, Linkage.DYNAMIC)
 
+    fun compilerFlags(os: OS, arch: Arch, env: TargetEnv): List<String> =
+        dependencyRegistry.getCompilerFlags(os, arch, env)
+
     fun resolveBinaryInputs(os: OS, arch: Arch, env: TargetEnv, skiaBinDir: String): ResolvedBinaryConfiguration {
         return ResolvedBinaryConfiguration(
             staticLibBaseNames = staticLibBaseNames(os, arch, env),
@@ -82,7 +85,7 @@ class SkikoProjectContext(
             dynamicLibNames = dynamicLibNames(os, arch, env),
             frameworks = dependencyRegistry.getFrameworks(os, arch, env),
             linkFlags = dependencyRegistry.getLinkFlags(os, arch, env),
-            compilerFlags = dependencyRegistry.getCompilerFlags(os, arch, env)
+            compilerFlags = compilerFlags(os, arch, env)
         )
     }
 }
