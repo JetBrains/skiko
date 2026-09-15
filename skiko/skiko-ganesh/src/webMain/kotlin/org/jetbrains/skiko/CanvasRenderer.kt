@@ -1,6 +1,8 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.gpu.ganesh.flushAndSubmit
+import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.wasm.EmscriptenWebGLContextAttributes
 import org.khronos.webgl.WebGLRenderingContextBase
