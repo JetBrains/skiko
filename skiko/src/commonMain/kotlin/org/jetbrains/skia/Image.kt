@@ -2,8 +2,9 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.InternalSkikoApi
 
-class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInfo {
+class Image @InternalSkikoApi constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInfo {
     companion object {
         /**
          *
@@ -136,85 +137,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             }
             require(ptr != NullPointer) { "Failed to Image::makeFromEncoded" }
             return Image(ptr)
-        }
-
-        /**
-         * Creates GPU-backed SkImage from backendTexture associated with context.
-         *
-         * Skia will assume ownership of the resource and will release it when no longer needed.
-         * A non-null Image is returned if format of backendTexture is recognized and supported.
-         * Recognized formats vary by GPU backend.
-         *
-         * @param context         GPU context
-         * @param backendTexture  texture residing on GPU
-         * @param origin          origin of backendTexture
-         * @param colorType       color type of the resulting Image
-         * @return                created Image
-         *
-         * @throws RuntimeException - if nullPtr is returned.
-         */
-        fun adoptTextureFrom(
-            context: DirectContext,
-            backendTexture: BackendTexture,
-            origin: SurfaceOrigin,
-            colorType: ColorType,
-        ): Image {
-            return try {
-                Stats.onNativeCall()
-                val ptr = _nAdoptTextureFrom(
-                    getPtr(context),
-                    getPtr(backendTexture),
-                    origin.ordinal,
-                    colorType.ordinal
-                )
-                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromTexture")
-                Image(ptr)
-            }
-            finally {
-                reachabilityBarrier(context)
-                reachabilityBarrier(backendTexture)
-            }
-        }
-
-        /**
-         * Creates GPU-backed SkImage from backendTexture associated with context.
-         *
-         * Skia will assume ownership of the resource and will release it when no longer needed.
-         * A non-null Image is returned if format of backendTexture is recognized and supported.
-         * Recognized formats vary by GPU backend.
-         *
-         * @param context         GPU context
-         * @param backendTexture  texture residing on GPU
-         * @param origin          origin of backendTexture
-         * @param colorType       color type of the resulting Image
-         * @param alphaType       alpha type of the resulting Image
-         * @return                created Image
-         *
-         * @throws RuntimeException - if nullPtr is returned.
-         */
-        fun adoptTextureFrom(
-            context: DirectContext,
-            backendTexture: BackendTexture,
-            origin: SurfaceOrigin,
-            colorType: ColorType,
-            alphaType: ColorAlphaType,
-        ): Image {
-            return try {
-                Stats.onNativeCall()
-                val ptr = _nAdoptTextureFromAlphaType(
-                    getPtr(context),
-                    getPtr(backendTexture),
-                    origin.ordinal,
-                    colorType.ordinal,
-                    alphaType.ordinal,
-                )
-                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromTexture")
-                Image(ptr)
-            }
-            finally {
-                reachabilityBarrier(context)
-                reachabilityBarrier(backendTexture)
-            }
         }
 
         init {
@@ -352,21 +274,9 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         }
     }
 
-    fun readPixels(dst: Bitmap): Boolean {
-        return readPixels(null, dst, 0, 0, false)
-    }
+    fun readPixels(dst: Bitmap): Boolean = readPixels(dst, 0, 0, false)
 
-    fun readPixels(dst: Bitmap, srcX: Int, srcY: Int): Boolean {
-        return readPixels(null, dst, srcX, srcY, false)
-    }
-
-    fun readPixels(context: DirectContext, dst: Bitmap): Boolean {
-        return readPixels(context, dst, 0, 0, false)
-    }
-
-    fun readPixels(context: DirectContext, dst: Bitmap, srcX: Int, srcY: Int): Boolean {
-        return readPixels(context, dst, srcX, srcY, false)
-    }
+    fun readPixels(dst: Bitmap, srcX: Int, srcY: Int): Boolean = readPixels(dst, srcX, srcY, false)
 
 
     /**
@@ -401,18 +311,17 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
      *
      * If cache is true, pixels may be retained locally, otherwise pixels are not added to the local cache.
      *
-     * @param context the DirectContext in play, if it exists
      * @param dst     destination bitmap
      * @param srcX    column index whose absolute value is less than getWidth()
      * @param srcY    row index whose absolute value is less than getHeight()
      * @param cache   whether the pixels should be cached locally
      * @return        true if pixels are copied to dstPixels
      */
-    fun readPixels(context: DirectContext?, dst: Bitmap, srcX: Int, srcY: Int, cache: Boolean): Boolean {
+    fun readPixels(dst: Bitmap, srcX: Int, srcY: Int, cache: Boolean): Boolean {
         return try {
             _nReadPixelsBitmap(
                 _ptr,
-                getPtr(context),
+                NullPointer,
                 getPtr(dst),
                 srcX,
                 srcY,
@@ -420,7 +329,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             )
         } finally {
             reachabilityBarrier(this)
-            reachabilityBarrier(context)
             reachabilityBarrier(dst)
         }
     }
@@ -526,19 +434,3 @@ private external fun _nReadPixelsBitmap(
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
 private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
-private external fun _nAdoptTextureFrom(
-    contextPtr: NativePointer,
-    backendTexture: NativePointer,
-    surfaceOrigin: Int,
-    colorType: Int
-): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFromAlphaType")
-private external fun _nAdoptTextureFromAlphaType(
-    contextPtr: NativePointer,
-    backendTexture: NativePointer,
-    surfaceOrigin: Int,
-    colorType: Int,
-    alphaType: Int
-): NativePointer
