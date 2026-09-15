@@ -14,9 +14,9 @@ import org.jetbrains.skiko.RenderException
  * For more information refer to skia `GrGLMakeAssembledInterface` function.
  */
 fun DirectContext.Companion.makeGLWithInterface(assembledInterface: GLAssembledInterface): DirectContext {
-    if (assembledInterface._ptr == NullPointer) throw RenderException("Interface pointer must not be null")
+    if (assembledInterface.nativePtr == NullPointer) throw RenderException("Interface pointer must not be null")
     Stats.onNativeCall()
-    val ptr = _nMakeGLWithInterface(assembledInterface._ptr)
+    val ptr = _nMakeGLWithInterface(assembledInterface.nativePtr)
     if (ptr == NullPointer) throw RenderException("Can't create OpenGL DirectContext with provided interface")
     return DirectContext(ptr)
 }

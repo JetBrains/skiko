@@ -2,10 +2,11 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.InternalSkikoApi
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.loadOpenGLLibrary
 
-class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
+class DirectContext @InternalSkikoApi constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     companion object {
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
@@ -39,31 +40,31 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
         }
 
         init {
-            staticLoad()
+            GaneshLibrary.load()
         }
     }
 
     fun flush(): DirectContext {
         Stats.onNativeCall()
-        DirectContext_nFlushDefault(_ptr)
+        DirectContext_nFlushDefault(nativePtr)
         return this
     }
 
     fun flush(surface: Surface): DirectContext {
         Stats.onNativeCall()
-        DirectContext_nFlush(_ptr, surface._ptr)
+        DirectContext_nFlush(nativePtr, surface.nativePtr)
         return this
     }
 
     fun resetAll(): DirectContext {
         Stats.onNativeCall()
-        _nReset(_ptr, -1)
+        _nReset(nativePtr, -1)
         return this
     }
 
     fun resetGLAll(): DirectContext {
         Stats.onNativeCall()
-        _nReset(_ptr, 0xffff)
+        _nReset(nativePtr, 0xffff)
         return this
     }
 
@@ -71,7 +72,7 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
         Stats.onNativeCall()
         var flags = 0
         for (state in states) flags = flags or state._bit
-        _nReset(_ptr, flags)
+        _nReset(nativePtr, flags)
         return this
     }
 
@@ -87,13 +88,13 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
      */
     fun submit(syncCpu: Boolean) {
         Stats.onNativeCall()
-        _nSubmit(_ptr, syncCpu)
+        _nSubmit(nativePtr, syncCpu)
     }
 
     fun flushAndSubmit(surface: Surface, syncCpu: Boolean = false) {
         try {
             Stats.onNativeCall()
-            _nFlushAndSubmit(_ptr, surface._ptr, syncCpu)
+            _nFlushAndSubmit(nativePtr, surface.nativePtr, syncCpu)
         } finally {
             reachabilityBarrier(this)
         }
@@ -122,7 +123,7 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
     fun abandon() {
         try {
             Stats.onNativeCall()
-            _nAbandon(_ptr, 0)
+            _nAbandon(nativePtr, 0)
         } finally {
             reachabilityBarrier(this)
         }
@@ -136,7 +137,7 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
         get() {
             try {
                 Stats.onNativeCall()
-                return DirectContext_nGetResourceCacheLimit(_ptr)
+                return DirectContext_nGetResourceCacheLimit(nativePtr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -144,7 +145,7 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
         set(value) {
             try {
                 Stats.onNativeCall()
-                DirectContext_nSetResourceCacheLimit(_ptr, value)
+                DirectContext_nSetResourceCacheLimit(nativePtr, value)
             } finally {
                 reachabilityBarrier(this)
             }
