@@ -60,7 +60,7 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
         }
 
         init {
-            staticLoad()
+            GaneshLibrary.load()
         }
     }
 
