@@ -123,7 +123,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.skiko)
-                implementation(libs.skiko.platform)
+                implementation(libs.skiko.ganesh)
+                implementation(libs.skiko.rendering)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
             }
         }
@@ -136,7 +137,8 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 implementation(libs.skiko.awt.runtime)
-                implementation(libs.skiko.platform.awt.runtime)
+                implementation(libs.skiko.ganesh.awt.runtime)
+                implementation(libs.skiko.rendering.awt.runtime)
             }
         }
 
