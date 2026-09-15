@@ -95,7 +95,9 @@ fun Surface.flush() {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_ganesh_ContextExtensions__1nGetCanvasRecordingContext")
-// Follows nested canvas wrappers and may take time proportional to their depth.
+// Needs ForceNativeThreadState: follows a chain of nested canvas wrappers, so its time grows with how deeply they are
+// nested.
+// Native call path: SkPaintFilterCanvas::recordingContext -> SkPaintFilterCanvas::recordingContext
 @ForceNativeThreadState
 private external fun _nGetCanvasRecordingContext(ptr: NativePointer): NativePointer
 
