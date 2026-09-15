@@ -63,8 +63,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * Canvases obtained from [Surface.canvas] return that surface. Canvases that draw into
      * a [Bitmap], a [Picture] recording or a document return null.
      *
-     * The returned surface is borrowed from the Canvas and must not be closed. It carries the
-     * canvas's [recordingContext], so [Surface.flush] and [Surface.flushAndSubmit] work on it.
+     * The returned surface is borrowed from the Canvas and must not be closed.
      *
      * @return the Surface backing this Canvas, if any; null otherwise
      */
@@ -72,7 +71,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetCanvasSurface(_ptr)
-            if (ptr == NullPointer) null else Surface(ptr, recordingContext, managed = false)
+            if (ptr == NullPointer) null else Surface(ptr, lifetimeOwner = _owner, managed = false)
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(_owner)
