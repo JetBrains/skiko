@@ -38,7 +38,7 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
         }
 
         init {
-            staticLoad()
+            GaneshLibrary.load()
         }
     }
 
