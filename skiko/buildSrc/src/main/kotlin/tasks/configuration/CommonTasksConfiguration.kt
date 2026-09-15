@@ -43,7 +43,6 @@ fun skiaHeadersDirs(skiaDir: File): List<File> =
     listOf(
         skiaDir,
         skiaDir.resolve("include"),
-        skiaDir.resolve("include/third_party/vulkan"),
         skiaDir.resolve("include/core"),
         skiaDir.resolve("include/gpu"),
         skiaDir.resolve("include/effects"),
@@ -73,9 +72,6 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         "-DSK_GAMMA_APPLY_TO_A8",
         "-DSK_GAMMA_SRGB",
         "-DSK_SCALAR_TO_FLOAT_EXCLUDED",
-        "-DSK_SUPPORT_GPU=1",
-        "-DSK_GANESH",
-        "-DSK_GL",
         "-DSK_SHAPER_HARFBUZZ_AVAILABLE",
         "-DSK_UNICODE_AVAILABLE",
         "-DSK_SHAPER_UNICODE_AVAILABLE",
@@ -93,20 +89,16 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
     val perOs = when (os) {
         OS.MacOS -> listOf(
             "-DSK_SHAPER_CORETEXT_AVAILABLE",
-            "-DSK_BUILD_FOR_MAC",
-            "-DSK_METAL",
-            "-DSK_VULKAN"
+            "-DSK_BUILD_FOR_MAC"
         )
         OS.IOS -> listOf(
             "-DSK_BUILD_FOR_IOS",
-            "-DSK_SHAPER_CORETEXT_AVAILABLE",
-            "-DSK_METAL"
+            "-DSK_SHAPER_CORETEXT_AVAILABLE"
         )
         OS.TVOS -> listOf(
             "-DSK_BUILD_FOR_IOS",
             "-DSK_BUILD_FOR_TVOS",
-            "-DSK_SHAPER_CORETEXT_AVAILABLE",
-            "-DSK_METAL"
+            "-DSK_SHAPER_CORETEXT_AVAILABLE"
         )
         OS.Windows -> listOf(
             "-DSK_BUILD_FOR_WIN",
@@ -114,23 +106,18 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
             "-D_HAS_EXCEPTIONS=0",
             "-DWIN32_LEAN_AND_MEAN",
             "-DNOMINMAX",
-            "-DSK_GAMMA_APPLY_TO_A8",
-            "-DSK_DIRECT3D",
-            "-DSK_ANGLE",
-            "-DSK_VULKAN"
+            "-DSK_GAMMA_APPLY_TO_A8"
         )
         OS.Linux -> listOf(
             "-DSK_BUILD_FOR_LINUX",
-            "-D_GLIBCXX_USE_CXX11_ABI=0",
-            "-DSK_VULKAN"
+            "-D_GLIBCXX_USE_CXX11_ABI=0"
         )
         OS.Wasm -> listOf(
             "-DSKIKO_WASM",
             "-sSUPPORT_LONGJMP=wasm"
         )
         OS.Android -> listOf(
-            "-DSK_BUILD_FOR_ANDROID",
-            "-DSK_VULKAN"
+            "-DSK_BUILD_FOR_ANDROID"
         )
     }
 
