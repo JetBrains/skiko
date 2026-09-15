@@ -34,7 +34,7 @@ class GLAssembledInterface internal constructor(ptr: NativePointer) : RefCnt(ptr
         }
 
         init {
-            staticLoad()
+            GaneshLibrary.load()
         }
     }
 }

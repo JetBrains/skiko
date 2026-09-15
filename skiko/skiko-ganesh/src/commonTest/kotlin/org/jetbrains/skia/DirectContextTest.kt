@@ -1,14 +1,15 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skiko.tests.TestGlContext
+import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DirectContextNativeTest {
 
     @Test
-    fun resourceCacheLimitTest() {
-        if (!TestGlContext.isAvailable()) return
+    fun resourceCacheLimitTest() = runTest {
+        if (!TestGlContext.isAvailable()) return@runTest
 
         TestGlContext.run {
             DirectContext.makeGL().useContext { context ->
