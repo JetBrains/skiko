@@ -1,6 +1,10 @@
-package SkiaAwtSample
+package org.jetbrains.skiko.ff
 
-import kotlinx.coroutines.*
+import SkiaAwtSample.ClocksAwt
+import SkiaAwtSample.swingSkia
+import com.sun.java.swing.plaf.windows.resources.windows
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.swing.SkiaSwingLayer
@@ -10,25 +14,24 @@ import java.awt.Toolkit
 import java.awt.event.*
 import java.awt.RenderingHints
 import javax.swing.*
-import java.io.File
 import java.nio.file.Files
-import javax.imageio.ImageIO
+import kotlin.test.Test
 
-fun main(args: Array<String>) {
-    System.setProperty("skiko.swing.frame.pacing", "true")
-    //System.setProperty("skiko.swing.frame.pacing.forceTimer", "true")
-    setupSkikoLoggerFactory { DefaultConsoleLogger.fromLevel(System.getProperty("skiko.log.level", "INFO")) }
-    val windows = parseArgs(args)
-    repeat(windows) {
-        when (System.getProperty("skiko.swing.interop")) {
-            "true" -> swingSkia()
-            else -> createWindow("window $it", windows == 1)
-        }
+class VsyncTest {
+    @Test
+    fun test() {
+
+        System.setProperty("skiko.swing.frame.pacing", "true")
+        //System.setProperty("skiko.swing.frame.pacing.forceTimer", "true")
+        createWindow("window ", true)
+        Thread.sleep(1000000)
     }
 }
 
 @OptIn(ExperimentalSkikoApi::class)
-fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLater {
+fun createWindow(title: String, exitOnClose: Boolean) = runBlocking(MainUIDispatcher) {
+
+    
     val renderingHints = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints") as Map<Any, Any>
     val pixelGeometry = when (renderingHints[RenderingHints.KEY_TEXT_ANTIALIASING]) {
         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB -> PixelGeometry.RGB_H
@@ -38,13 +41,13 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         else -> PixelGeometry.UNKNOWN
     }
     val fpsCounter = FPSCounter(logOnTick = true)
-    val clocks = ClocksAwt({ 1.0F }, { GraphicsApi.DIRECT3D} )
+    val clocks = ClocksAwt({ 1.0F }, { GraphicsApi.DIRECT3D })
     val skiaLayer = SkiaSwingLayer(clocks)
     clocks.f = { fpsCounter.tick(); skiaLayer.needRender() }
 
+    
     val window = JFrame(title)
-    window.defaultCloseOperation =
-        if (exitOnClose) WindowConstants.EXIT_ON_CLOSE else WindowConstants.DISPOSE_ON_CLOSE
+    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.background = Color.GREEN
     window.contentPane.add(skiaLayer)
 
@@ -61,6 +64,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         }
     })
 
+    
     val miToggleFullscreen = JMenuItem("Toggle fullscreen")
     val ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
     miToggleFullscreen.setAccelerator(ctrlF)
@@ -79,6 +83,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         }
     })
 
+    
     val miDpiState = JMenuItem("Get current DPI")
     val ctrlD = KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
     miDpiState.setAccelerator(ctrlD)
@@ -105,6 +110,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
 
     editMenu.add(miEmojiAndSymbols)
 
+    
     window.setJMenuBar(menuBar)
 
     skiaLayer.addMouseMotionListener(clocks)
@@ -146,8 +152,10 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     window.preferredSize = Dimension(800, 600)
     window.pack()
     window.pack()
+    
     skiaLayer.paint(window.graphics)
     window.isVisible = true
+
 }
 
 private fun parseArgs(args: Array<String>): Int {
