@@ -39,7 +39,7 @@ fun Surface.Companion.wrapBackendTexture(
                 toInterop(surfaceProps?.packToIntArray()),
             )
         }
-        if (ptr == NullPointer) null else Surface(ptr)
+        if (ptr == NullPointer) null else Surface(ptr, arrayOf(recorder, backendTexture))
     } finally {
         reachabilityBarrier(recorder)
         reachabilityBarrier(backendTexture)
