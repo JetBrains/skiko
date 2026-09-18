@@ -162,6 +162,8 @@ external interface GLInterface {
 @InternalSkikoApi
 expect val GL: GLInterface
 
+internal expect fun isSideModuleLoaded(): Boolean
+
 @InternalSkikoApi
 @OptIn(ExperimentalWasmJsInterop::class)
 fun currentGLContext(gl: GLInterface): WebGLRenderingContextBase? =
