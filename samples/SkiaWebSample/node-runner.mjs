@@ -3,6 +3,7 @@ import sdlModule from "@kmamal/sdl";
 
 const sdl = sdlModule.default ?? sdlModule;
 const useCpuCopy = process.env.SKIKO_NODE_CPU_COPY === "1";
+const debugNodeRunner = process.env.SKIKO_NODE_DEBUG === "1";
 const windowWidth = 606;
 const windowHeight = 706;
 const browserCanvases = [
@@ -24,10 +25,18 @@ class NodeCanvas {
     getContext(type, attributes = {}) {
         if (type !== "webgl2") return null;
         if (!this._gl) {
+            debugLog(`creating webgl2 context for ${this.id}`);
             this._gl = this.renderer.createCanvasContext(this, attributes);
+            debugLog(`created webgl2 context for ${this.id}`);
             this._gl.canvas = this;
         }
         return this._gl;
+    }
+}
+
+function debugLog(message) {
+    if (debugNodeRunner) {
+        console.error(`[skiko-node] ${message}`);
     }
 }
 
@@ -458,6 +467,8 @@ class WebGLSync extends WebGLObjectHandle {}
 class WebGLTexture extends WebGLObjectHandle {}
 class WebGLTransformFeedback extends WebGLObjectHandle {}
 class WebGLVertexArrayObject extends WebGLObjectHandle {}
+class WebGLRenderingContext {}
+class WebGL2RenderingContext extends WebGLRenderingContext {}
 
 Object.assign(globalThis, {
     WebGLBuffer,
@@ -471,6 +482,8 @@ Object.assign(globalThis, {
     WebGLTexture,
     WebGLTransformFeedback,
     WebGLVertexArrayObject,
+    WebGLRenderingContext,
+    WebGL2RenderingContext,
 });
 
 function adaptWebGL2Context(gl) {
@@ -549,6 +562,8 @@ function adaptWebGL2Context(gl) {
     });
 }
 
+globalThis.window = globalThis;
+globalThis.self = globalThis;
 globalThis.HTMLCanvasElement = NodeCanvas;
 Object.defineProperty(globalThis, "navigator", {
     configurable: true,
@@ -660,7 +675,7 @@ async function runWindowedDemo() {
 function readCanvasPixels(canvas) {
     const gl = canvas.getContext("webgl2");
     gl.finish();
-    const pixels = new Uint8Array(canvas.width * canvas.height * 4);
+    const pixels = Buffer.allocUnsafe(canvas.width * canvas.height * 4);
     gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
     return pixels;
 }

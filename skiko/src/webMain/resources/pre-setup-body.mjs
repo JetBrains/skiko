@@ -94,8 +94,8 @@ const createWasiImports = () => ({
 });
 
 async function loadSkikoWASM() {
-    const url = new URL('./skiko.wasm', import.meta.url).href;
-    const response = await fetch(url);
+    const url = new URL('./skiko.wasm', import.meta.url);
+    const isNodeJs = typeof process !== "undefined" && process.release?.name === "node";
 
     const importObject = {
         env: new Proxy({}, {
@@ -163,7 +163,18 @@ async function loadSkikoWASM() {
         wasi_snapshot_preview1: createWasiImports()
     };
 
-    const {instance} = await WebAssembly.instantiateStreaming(response, importObject);
+    let instance;
+    if (isNodeJs) {
+        const loadFile = new Function(
+            "url",
+            "return import('node:fs/promises').then((fs) => fs.readFile(url));"
+        );
+        const wasmBytes = await loadFile(url);
+        ({ instance } = await WebAssembly.instantiate(wasmBytes, importObject));
+    } else {
+        const response = await fetch(url.href);
+        ({ instance } = await WebAssembly.instantiateStreaming(response, importObject));
+    }
     wasmExports = instance.exports;
 
     // Initialize Emscripten runtime: HEAP views, $-prefixed globals, and wasmTable
