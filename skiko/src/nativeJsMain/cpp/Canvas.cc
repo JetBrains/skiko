@@ -22,12 +22,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Canvas__1nMakeFromBitmap
     return reinterpret_cast<KNativePointer>(canvas);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Canvas__1nGetRecordingContext
-  (KNativePointer canvasPtr) {
-    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
-    return reinterpret_cast<KNativePointer>(canvas->recordingContext());
-}
-
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPoint
   (KNativePointer canvasPtr, KFloat x, KFloat y, KNativePointer paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));

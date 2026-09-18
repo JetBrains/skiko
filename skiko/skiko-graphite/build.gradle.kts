@@ -32,11 +32,15 @@ val graphiteArtifacts = SkikoArtifacts(
 val graphiteDependencies: SkikoDependencyScope.() -> Unit = {
     dependsOnCore()
     targets {
+        all {
+            compilerFlags("-DSK_SUPPORT_GPU=1", "-DSK_GANESH", "-DSK_GL")
+        }
         jvm {
             macos {
                 staticSkiaLibs("skia_graphite_ext")
                 linkFlags("-lobjc")
                 frameworks("CoreFoundation", "Foundation", "Metal")
+                compilerFlags("-DSK_METAL")
             }
             linux {
                 staticSkiaLibs("skia_graphite_ext")
@@ -52,14 +56,29 @@ val graphiteDependencies: SkikoDependencyScope.() -> Unit = {
                     staticSkiaLibs("spvtools", "spvtools_val")
                 }
                 dynamicSystemLibs("onecore_apiset", "dxguid")
-                compilerFlags("-DSK_VULKAN", "-DSK_USE_INTERNAL_VULKAN_HEADERS", "-DVK_NO_PROTOTYPES")
+                compilerFlags(
+                    "-DSK_DIRECT3D",
+                    "-DSK_ANGLE",
+                    "-DSK_VULKAN",
+                    "-DSK_USE_INTERNAL_VULKAN_HEADERS",
+                    "-DVK_NO_PROTOTYPES",
+                )
             }
         }
         native {
             staticSkiaLibs("skia_graphite_ext")
-            macos { frameworks("CoreFoundation", "Foundation", "Metal") }
-            ios { frameworks("CoreFoundation", "Foundation", "Metal") }
-            tvos { frameworks("CoreFoundation", "Foundation", "Metal") }
+            macos {
+                frameworks("CoreFoundation", "Foundation", "Metal")
+                compilerFlags("-DSK_METAL")
+            }
+            ios {
+                frameworks("CoreFoundation", "Foundation", "Metal")
+                compilerFlags("-DSK_METAL")
+            }
+            tvos {
+                frameworks("CoreFoundation", "Foundation", "Metal")
+                compilerFlags("-DSK_METAL")
+            }
         }
     }
 }

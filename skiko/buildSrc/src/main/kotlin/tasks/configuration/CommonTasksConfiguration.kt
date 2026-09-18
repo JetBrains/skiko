@@ -72,9 +72,6 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         "-DSK_GAMMA_APPLY_TO_A8",
         "-DSK_GAMMA_SRGB",
         "-DSK_SCALAR_TO_FLOAT_EXCLUDED",
-        "-DSK_SUPPORT_GPU=1",
-        "-DSK_GANESH",
-        "-DSK_GL",
         "-DSK_SHAPER_HARFBUZZ_AVAILABLE",
         "-DSK_UNICODE_AVAILABLE",
         "-DSK_SHAPER_UNICODE_AVAILABLE",
@@ -92,19 +89,16 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
     val perOs = when (os) {
         OS.MacOS -> listOf(
             "-DSK_SHAPER_CORETEXT_AVAILABLE",
-            "-DSK_BUILD_FOR_MAC",
-            "-DSK_METAL"
+            "-DSK_BUILD_FOR_MAC"
         )
         OS.IOS -> listOf(
             "-DSK_BUILD_FOR_IOS",
-            "-DSK_SHAPER_CORETEXT_AVAILABLE",
-            "-DSK_METAL"
+            "-DSK_SHAPER_CORETEXT_AVAILABLE"
         )
         OS.TVOS -> listOf(
             "-DSK_BUILD_FOR_IOS",
             "-DSK_BUILD_FOR_TVOS",
-            "-DSK_SHAPER_CORETEXT_AVAILABLE",
-            "-DSK_METAL"
+            "-DSK_SHAPER_CORETEXT_AVAILABLE"
         )
         OS.Windows -> listOf(
             "-DSK_BUILD_FOR_WIN",
@@ -112,9 +106,7 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
             "-D_HAS_EXCEPTIONS=0",
             "-DWIN32_LEAN_AND_MEAN",
             "-DNOMINMAX",
-            "-DSK_GAMMA_APPLY_TO_A8",
-            "-DSK_DIRECT3D",
-            "-DSK_ANGLE"
+            "-DSK_GAMMA_APPLY_TO_A8"
         )
         OS.Linux -> listOf(
             "-DSK_BUILD_FOR_LINUX",

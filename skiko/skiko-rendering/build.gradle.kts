@@ -37,13 +37,22 @@ val buildType = skiko.buildType
 val targetOs = hostOs
 val targetArch = skiko.targetArch
 val coreProject = project(":")
+val ganeshProject = project(":skiko-ganesh")
 
 val renderingDependencies: SkikoDependencyScope.() -> Unit = {
     dependsOnCore()
     targets {
+        all {
+            compilerFlags("-DSK_SUPPORT_GPU=1", "-DSK_GANESH", "-DSK_GL")
+        }
         jvm {
+            windows {
+                dynamicSystemLibs("OpenGL32", "d3d12", "dxgi")
+                compilerFlags("-DSK_DIRECT3D", "-DSK_ANGLE")
+            }
             macos {
                 linkFlags("-lobjc")
+                compilerFlags("-DSK_METAL")
                 frameworks(
                     "AppKit",
                     "CoreFoundation",
@@ -221,12 +230,14 @@ if (supportWeb) {
             - implementation("org.jetbrains.skiko:skiko-rendering-x")
          */
         compileOnly(project(":"))
+        compileOnly(project(":skiko-ganesh"))
     }
 
     sourceSets.commonTest.dependencies {
         implementation(kotlin("test"))
         implementation(kotlin("test-annotations-common"))
         implementation(project(":"))
+        implementation(project(":skiko-ganesh"))
         implementation(project(":test-utils"))
     }
 
@@ -269,6 +280,7 @@ if (supportWeb) {
     skikoRenderingProjectContext.webTestSourceSet?.apply {
         val coreWasmTestResources = skikoRenderingProjectContext.wasmTestResourcesFor().also {
             dependencies.add(it.name, coreProject)
+            dependencies.add(it.name, ganeshProject)
         }
         resources.srcDirs(
             coreWasmTestResources,
@@ -329,6 +341,7 @@ if (supportAwt) {
     }
     val coreJvmRuntimeJar = skikoRenderingProjectContext.jvmRuntimeJarFor(targetOs, targetArch).also {
         dependencies.add(it.name, coreProject)
+        dependencies.add(it.name, ganeshProject)
     }
     skikoRenderingProjectContext.setupJvmTestTask(
         skikoRenderingAwtJarForTests,
