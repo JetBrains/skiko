@@ -20,6 +20,11 @@ val skikoPlatformArtifacts = SkikoArtifacts(
     displayName = "Skiko Platform",
     pomDescription = "Kotlin Skia platform layer",
 )
+val skikoGaneshArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-ganesh",
+    displayName = "Skiko Ganesh",
+    pomDescription = "Kotlin Skia Ganesh bindings",
+)
 
 val skikoArtifactIds: List<String> =
     listOf(
@@ -109,7 +114,29 @@ val skikoArtifactIds: List<String> =
         skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
-        skikoPlatformArtifacts.jvmRuntimeAllArtifactId,
+        skikoPlatformArtifacts.jvmRuntimeAllArtifactId,,
+
+        skikoGaneshArtifacts.commonArtifactId,
+        skikoGaneshArtifacts.jvmArtifactId,
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGaneshArtifacts.jsArtifactId,
+        skikoGaneshArtifacts.wasmArtifactId,
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+        skikoGaneshArtifacts.jvmRuntimeAllArtifactId,
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
