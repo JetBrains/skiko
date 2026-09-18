@@ -50,7 +50,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun passesThroughDirectlyWhenServiceIsAbsent() {
+    fun `passes through directly when the service is absent`() {
         onEdt {
             pacer = SwingRepaintPacer(panel, service = null)
             attachAndPack()
@@ -63,7 +63,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun paintsUnpacedWhileComponentHasNoDisplay() {
+    fun `paints unpaced while the component has no display`() {
         val service = FakeFramePacingService()
         val before = onEdtGet {
             pacer = SwingRepaintPacer(panel, service)
@@ -78,7 +78,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun paintsFirstFrameImmediatelyAndSubscribesOnce() {
+    fun `paints the first frame immediately and subscribes once`() {
         val service = FakeFramePacingService().apply { periodNanos = HUGE_PERIOD_NANOS }
         onEdt {
             pacer = SwingRepaintPacer(panel, service)
@@ -99,7 +99,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun pacesContinuousRequestsToOneRepaintPerTick() {
+    fun `paces continuous requests to one repaint per tick`() {
         val service = FakeFramePacingService().apply { periodNanos = HUGE_PERIOD_NANOS }
         onEdt {
             pacer = SwingRepaintPacer(panel, service)
@@ -131,7 +131,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun paintsUnpacedWhenDisplayCannotBePaced() {
+    fun `paints unpaced when the display cannot be paced`() {
         val service = FakeFramePacingService().apply { refuseSubscriptions = true }
         onEdt {
             pacer = SwingRepaintPacer(panel, service)
@@ -151,7 +151,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun tickTimeoutAfterAClockStallsResubscribesOnTheNextFrame() {
+    fun `a tick timeout after a clock stalls resubscribes on the next frame`() {
         // A 100 ms period puts the tick timeout at 300 ms: long enough to deliver the first tick
         // with room to spare, short enough for the stall to time out within the test.
         val service = FakeFramePacingService().apply { periodNanos = 100_000_000L }
@@ -184,7 +184,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun doesNotResubscribeToAClockThatNeverTicked() {
+    fun `does not resubscribe to a clock that never ticked`() {
         // A backend that accepts the display and then stays silent — a native clock that failed to
         // open its display source looks exactly like this. Re-subscribing on every timeout would
         // rebuild that clock forever and hold the scene to one repaint per timeout.
@@ -212,7 +212,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun resubscribesWhenTheDisplayChanges() {
+    fun `resubscribes when the display changes`() {
         val service = FakeFramePacingService().apply { periodNanos = HUGE_PERIOD_NANOS }
         onEdt {
             pacer = SwingRepaintPacer(panel, service)
@@ -241,7 +241,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun resubscribesWhenTheRefreshRateChanges() {
+    fun `resubscribes when the refresh rate changes`() {
         // A clock is built for one refresh rate, so a mode change on the same display needs a new one.
         val service = FakeFramePacingService().apply { periodNanos = HUGE_PERIOD_NANOS }
         onEdt {
@@ -268,7 +268,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun aTickFromAClosedSubscriptionDoesNotEndTheNewWait() {
+    fun `a tick from a closed subscription does not end the new wait`() {
         // A clock delivers from a snapshot of its listeners, so a subscription can receive one tick
         // after it was closed. That tick must not release a wait on the subscription that replaced it.
         val service = FakeFramePacingService().apply { periodNanos = HUGE_PERIOD_NANOS }
@@ -301,7 +301,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun closesSubscriptionWhenTheDisplayBecomesUnresolvable() {
+    fun `closes the subscription when the display becomes unresolvable`() {
         val service = FakeFramePacingService().apply { periodNanos = HUGE_PERIOD_NANOS }
         onEdt {
             pacer = SwingRepaintPacer(panel, service)
@@ -323,7 +323,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun closesSubscriptionOnDisposeAndPassesThroughAfterwards() {
+    fun `closes the subscription on dispose and passes through afterwards`() {
         val service = FakeFramePacingService().apply { periodNanos = HUGE_PERIOD_NANOS }
         onEdt {
             pacer = SwingRepaintPacer(panel, service)
@@ -350,7 +350,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun releasesTheSubscriptionOnceTheComponentGoesIdle() {
+    fun `releases the subscription once the component goes idle`() {
         val service = FakeFramePacingService().apply { periodNanos = HUGE_PERIOD_NANOS }
         onEdt {
             pacer = SwingRepaintPacer(panel, service)
@@ -374,7 +374,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun keepsTheSubscriptionWhileTheFrameLoopIsWaiting() {
+    fun `keeps the subscription while the frame loop is waiting`() {
         val service = FakeFramePacingService().apply { periodNanos = HUGE_PERIOD_NANOS }
         onEdt {
             pacer = SwingRepaintPacer(panel, service)
@@ -397,7 +397,7 @@ class SwingRepaintPacerTest {
     }
 
     @Test
-    fun framePacingPropertyDefaultsToFalse() {
+    fun `the frame pacing property defaults to false`() {
         assertFalse(SkikoProperties.swingFramePacingEnabled)
     }
 
