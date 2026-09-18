@@ -191,11 +191,13 @@ internal abstract class DisplayClock(
     }
 
     /**
-     * @return true when the last listener was removed and the clock stopped
+     * @return true when this call stopped the clock. False if other listeners remain, or if the
+     * clock was already stopped — a listener dropped by [deliver] can make a later [remove] see an
+     * empty list that has already been torn down, and [onStop] must not run twice.
      */
     fun remove(listener: TickListener): Boolean {
         listeners.remove(listener)
-        if (listeners.isNotEmpty()) return false
+        if (listeners.isNotEmpty() || stopped) return false
 
         stopped = true
         onStop()
@@ -207,14 +209,19 @@ internal abstract class DisplayClock(
     /** Called after [stopped] is set, on the caller's thread; must not block. */
     protected abstract fun onStop()
 
-    /** Delivers one tick to every listener. A throwing listener does not stop the others. */
+    /**
+     * Delivers one tick to every listener. A listener that throws is printed and removed so it
+     * cannot spam later ticks; other listeners still run.
+     */
     protected fun deliver(timeNanos: Long) {
         for (listener in listeners) {
             // Re-checked per listener: the list is a snapshot, and the clock can stop mid-delivery.
             if (stopped) return
             try {
                 listener(displayId, timeNanos)
-            } catch (_: Throwable) {
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                listeners.remove(listener)
             }
         }
     }

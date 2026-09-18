@@ -238,6 +238,10 @@ internal interface FramePacingService {
     /**
      * Subscribes [onTick] to refresh ticks of [displayId]. [onTick] is invoked on an arbitrary non-EDT thread. Returns
      * a handle that closes the subscription, or null if the display cannot be paced.
+     *
+     * If [onTick] throws, the exception is printed and that listener is removed, so a broken listener cannot keep
+     * throwing on later ticks. Other listeners on the same display are unaffected. Closing the returned handle is still
+     * valid after a drop.
      */
     fun subscribe(
         displayId: Long,

@@ -104,13 +104,17 @@ class SkikoFramePacingServiceTest {
     }
 
     @Test
-    fun `a throwing listener does not starve its sibling`() {
+    fun `a throwing listener is dropped and does not starve its sibling`() {
         val service = headfulService()
         val displayId = paceableDisplayId(service)
         Library.load()
 
+        val throwCount = AtomicLong()
         val siblingTicks = CountDownLatch(10)
-        val throwing = service.subscribe(displayId) { _, _ -> error("deliberate test exception") }
+        val throwing = service.subscribe(displayId) { _, _ ->
+            throwCount.incrementAndGet()
+            error("deliberate test exception")
+        }
         val sibling = service.subscribe(displayId) { _, _ -> siblingTicks.countDown() }
         assertNotNull(throwing)
         assertNotNull(sibling)
@@ -120,9 +124,16 @@ class SkikoFramePacingServiceTest {
                 siblingTicks.await(5, TimeUnit.SECONDS),
                 "sibling listener starved by a throwing listener"
             )
+            assertEquals(
+                1,
+                throwCount.get(),
+                "throwing listener should have been dropped after the first exception"
+            )
         } finally {
-            throwing.close()
+            // Close the healthy sibling first: that is the order that would double-stop the clock
+            // if dropping a throwing listener from deliver() were not teardown-idempotent.
             sibling.close()
+            throwing.close()
         }
     }
 
