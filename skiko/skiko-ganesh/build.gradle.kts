@@ -282,7 +282,7 @@ if (supportWeb) {
 
 if (supportAndroid) {
     val os = OS.Android
-    val ganeshAndroidArtifact by project.tasks.registering(Jar::class) {
+    val skikoAndroidArtifact by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-ganesh-android")
         from(kotlin.targets.getByName("android").compilations.getByName("main").output.allOutputs)
     }
@@ -290,7 +290,7 @@ if (supportAndroid) {
         val coreJvmLinkedLibrary = ganeshProjectContext.jvmLinkedLibraryFor(os, arch).also {
             dependencies.add(it.name, coreProject)
         }
-        ganeshProjectContext.createSkikoJvmJarTask(os, arch, ganeshAndroidArtifact, files(coreJvmLinkedLibrary))
+        ganeshProjectContext.createSkikoJvmJarTask(os, arch, skikoAndroidArtifact, files(coreJvmLinkedLibrary))
         ganeshProjectContext.provideJvmRequiredSymbols(os, arch)
     }
 
