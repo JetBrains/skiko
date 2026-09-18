@@ -157,10 +157,16 @@ void RenderNode::setLayerPaint(const std::optional<SkPaint>& layerPaint) {
 }
 
 void RenderNode::setBounds(const SkRect& bounds) {
+    bool sizeChanged = this->bounds.width() != bounds.width() || this->bounds.height() != bounds.height();
+
     this->bounds = bounds;
-    this->matrixDirty = true;
+
+    // Skip matrix re-calculation for topLeft-only changes, since topLef is irrelevant for it
+    if (sizeChanged) {
+        this->matrixDirty = true;
+    }
     // The bounds size is the cull rect of a clipping node's recording.
-    this->invalidateSnapshot(kContent);
+    this->invalidateSnapshot(sizeChanged ? kContent : kAppearance);
 }
 
 void RenderNode::setPivot(const SkPoint& pivot) {
