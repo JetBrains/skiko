@@ -65,12 +65,19 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
         } finally {
             reachabilityBarrier(this)
         }
-        set(value) = try {
+        set(value) = setNodeBounds(value.left, value.top, value.right, value.bottom)
+
+    /**
+     * Sets the bounds for this RenderNode internally and can be used to avoid Rect object creation.
+     */
+    internal fun setNodeBounds(left: Float, top: Float, right: Float, bottom: Float) {
+        try {
             Stats.onNativeCall()
-            RenderNode_nSetBounds(_ptr, value.left, value.top, value.right, value.bottom)
+            RenderNode_nSetBounds(_ptr, left, top, right, bottom)
         } finally {
             reachabilityBarrier(this)
         }
+    }
 
     var pivot: Point
         get() = try {
@@ -79,12 +86,19 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
         } finally {
             reachabilityBarrier(this)
         }
-        set(value) = try {
+        set(value) = setNodePivot(value.x, value.y)
+
+    /**
+     * Sets the pivot point for this RenderNode internally and can be used to avoid Point object creation.
+     */
+    internal fun setNodePivot(x: Float, y: Float) {
+        try {
             Stats.onNativeCall()
-            RenderNode_nSetPivot(_ptr, value.x, value.y)
+            RenderNode_nSetPivot(_ptr, x, y)
         } finally {
             reachabilityBarrier(this)
         }
+    }
 
     /**
      * Alpha multiplier for this RenderNode.
