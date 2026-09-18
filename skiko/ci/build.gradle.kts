@@ -15,6 +15,21 @@ val skikoGraphiteArtifacts = SkikoArtifacts(
     displayName = "Skiko Graphite",
     pomDescription = "Kotlin Skia Graphite bindings",
 )
+val skikoGpuArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-gpu",
+    displayName = "Skiko GPU",
+    pomDescription = "Backend-neutral Skiko GPU API",
+)
+val skikoGaneshGpuProviderArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-ganesh-gpu-provider",
+    displayName = "Skiko Ganesh GPU Provider",
+    pomDescription = "Ganesh implementation of the Skiko GPU provider API",
+)
+val skikoGraphiteGpuProviderArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-graphite-gpu-provider",
+    displayName = "Skiko Graphite GPU Provider",
+    pomDescription = "Graphite implementation of the Skiko GPU provider API",
+)
 
 val skikoArtifactIds: List<String> =
     listOf(
@@ -81,6 +96,21 @@ val skikoArtifactIds: List<String> =
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+
+        skikoGpuArtifacts.commonArtifactId,
+        skikoGpuArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGpuArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGpuArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+
+        skikoGaneshGpuProviderArtifacts.commonArtifactId,
+        skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+
+        skikoGraphiteGpuProviderArtifacts.commonArtifactId,
+        skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
