@@ -357,6 +357,59 @@ class RenderNodeTest {
         context.close()
     }
 
+    @Test
+    fun positionOnlyBoundsChangeKeepsContentSnapshot() {
+        val context = RenderNodeContext(snapshotCache = true)
+        val node = RenderNode(context)
+        val surface = Surface.makeRasterN32Premul(32, 32)
+
+        val size = 10f
+        val initialBounds = Rect.makeXYWH(0f, 0f, size, size)
+
+        var contentDraws = 0
+        val content = object : Drawable() {
+            override fun onDraw(canvas: Canvas?) {
+                contentDraws++
+            }
+
+            override fun onGetBounds() = initialBounds
+        }
+        node.bounds = initialBounds
+        node.beginRecording().drawDrawable(content)
+        node.endRecording()
+
+        // Build the content snapshot, then verify that replaying it does not unroll the content.
+        node.drawInto(surface.canvas)
+
+        val afterInitialSnapshot = contentDraws
+        assertTrue(afterInitialSnapshot > 0)
+
+        repeat(5) {
+            node.drawInto(surface.canvas)
+            assertEquals(afterInitialSnapshot, contentDraws)
+        }
+
+        // Moving the node changes its appearance but not its local content or cull rect.
+        repeat(5) {
+            val delta = it.toFloat()
+            node.bounds = node.bounds.offset(delta, delta)
+            node.drawInto(surface.canvas)
+            assertEquals(afterInitialSnapshot, contentDraws)
+        }
+
+        // Resizing a clipped node changes the recording cull rect and rebuilds the snapshot.
+        val newSize = size + 10f
+        node.bounds = Rect.makeXYWH(node.bounds.left, node.bounds.top, newSize, newSize)
+        node.drawInto(surface.canvas)
+        assertEquals(afterInitialSnapshot + 1, contentDraws)
+        assertTrue(contentDraws > afterInitialSnapshot)
+
+        surface.close()
+        node.close()
+        content.close()
+        context.close()
+    }
+
     // The nodes a test builds, the surface they draw into and the pixels that come out.
     // Everything created here is closed even when an assertion fails partway through.
     private class RenderScope(val context: RenderNodeContext, val surface: Surface) {
