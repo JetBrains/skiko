@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.ImageFilter.Companion.makeDropShadowOnly
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.InternalSkikoApi
 
 open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, internal val _owner: Any) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
@@ -1905,7 +1906,8 @@ private external fun _nRestore(ptr: NativePointer)
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestoreToCount")
 private external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)
 
-internal inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
+@InternalSkikoApi
+inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
     val restoreCount = save()
     try {
         block()
