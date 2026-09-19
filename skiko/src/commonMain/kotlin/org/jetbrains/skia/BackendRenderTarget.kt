@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.RenderException
@@ -60,6 +61,44 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
             return BackendRenderTarget(_nMakeDirect3D(width, height, texturePtr, format, sampleCnt, levelCnt))
         }
 
+        /**
+         * Creates Vulkan backend render target from a Vulkan image.
+         *
+         * Caller must keep the underlying VkImage valid for the lifetime of the resulting backend render target.
+         */
+        fun makeVulkan(
+            width: Int,
+            height: Int,
+            imagePtr: NativePointer,
+            imageTiling: Int,
+            imageLayout: Int,
+            format: Int,
+            imageUsageFlags: Int,
+            sampleCnt: Int,
+            levelCnt: Int
+        ): BackendRenderTarget {
+            require(width > 0) { "width must be positive" }
+            require(height > 0) { "height must be positive" }
+            require(imagePtr != NullPointer) { "imagePtr must not be null" }
+            require(sampleCnt > 0) { "sampleCnt must be positive" }
+            require(levelCnt > 0) { "levelCnt must be positive" }
+
+            Stats.onNativeCall()
+            val ptr = _nMakeVulkan(
+                width,
+                height,
+                imagePtr,
+                imageTiling,
+                imageLayout,
+                format,
+                imageUsageFlags,
+                sampleCnt,
+                levelCnt
+            )
+            if (ptr == NullPointer) throw RenderException("Can't create Vulkan BackendRenderTarget")
+            return BackendRenderTarget(ptr)
+        }
+
         init {
             staticLoad()
         }
@@ -85,6 +124,19 @@ private external fun _nMakeDirect3D(
     height: Int,
     texturePtr: NativePointer,
     format: Int,
+    sampleCnt: Int,
+    levelCnt: Int
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nMakeVulkan")
+private external fun _nMakeVulkan(
+    width: Int,
+    height: Int,
+    imagePtr: NativePointer,
+    imageTiling: Int,
+    imageLayout: Int,
+    format: Int,
+    imageUsageFlags: Int,
     sampleCnt: Int,
     levelCnt: Int
 ): NativePointer
