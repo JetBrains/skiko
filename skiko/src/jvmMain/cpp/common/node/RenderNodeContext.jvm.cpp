@@ -3,8 +3,8 @@
 #include "node/RenderNodeContext.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake
-  (JNIEnv *env, jclass jclass, jboolean measureDrawBounds) {
-    auto instance = sk_make_sp<skiko::node::RenderNodeContext>(measureDrawBounds);
+  (JNIEnv *env, jclass jclass, jboolean measureDrawBounds, jboolean snapshotCache) {
+    auto instance = sk_make_sp<skiko::node::RenderNodeContext>(measureDrawBounds, snapshotCache);
     return reinterpret_cast<jlong>(instance.release());
 }
 

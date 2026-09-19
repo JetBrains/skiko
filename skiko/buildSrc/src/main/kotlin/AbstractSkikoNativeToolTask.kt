@@ -2,6 +2,7 @@ import internal.utils.*
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.internal.file.FileOperations
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
@@ -102,10 +103,11 @@ abstract class AbstractSkikoNativeToolTask : DefaultTask() {
 
     protected open fun beforeRun() {}
     protected open fun afterRun() {}
-    protected fun logArgs(prefix: String, args: ArgBuilder, argFile: File) {
-        if (logger.isInfoEnabled) {
+    protected fun logArgs(prefix: String, args: ArgBuilder, argFile: File? = null) {
+        if (logger.isInfoEnabled || argFile == null) {
             val argsString = args.toArray().joinToString(", ", prefix = "[", postfix = "]")
-            logger.info("$prefix: $argsString")
+            val logLevel = if (logger.isInfoEnabled) LogLevel.INFO else LogLevel.WARN
+            logger.log(logLevel, "$prefix: $argsString")
         } else logger.warn("$prefix: '$argFile'")
     }
 }

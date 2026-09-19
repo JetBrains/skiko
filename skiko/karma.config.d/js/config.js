@@ -4,9 +4,23 @@ const path = require("path");
 
 config.browserConsoleLogOptions.level = "debug";
 
+config.customLaunchers = Object.assign(config.customLaunchers || {}, {
+    ChromeHeadlessWithWebGL: {
+        base: 'ChromeHeadless',
+        flags: [
+            '--no-sandbox',
+            '--use-gl=angle',
+            '--use-angle=swiftshader',
+            '--ignore-gpu-blocklist',
+        ]
+    }
+});
+config.browsers = ['ChromeHeadlessWithWebGL'];
+
 const basePath = config.basePath;
 const projectPath = path.resolve(basePath, "..", "..", "..", "..");
-const wasmPath = path.resolve(projectPath, "build", "out", "link", "Release-wasm-wasm")
+const wasmPath = path.resolve(basePath, "kotlin")
+const skottieWasmPath = path.resolve(basePath, "kotlin", "skiko-skottie.wasm")
 const generatedAssetsPath = path.resolve(projectPath, "build", "karma-webpack-out")
 
 const debug = message => console.log(`[karma-config] ${message}`);
@@ -18,6 +32,7 @@ debug(`karma generatedAssetsPath: ${generatedAssetsPath}`);
 config.proxies = {
     "/wasm/": wasmPath,
     "/resources": path.resolve(basePath, "kotlin"),
+    "/skiko-skottie.wasm": skottieWasmPath,
 }
 
 config.webpack.output = Object.assign(config.webpack.output || {}, {

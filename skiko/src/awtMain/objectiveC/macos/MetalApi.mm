@@ -8,13 +8,6 @@
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
 
-#import "ganesh/GrBackendSurface.h"
-#import "ganesh/GrDirectContext.h"
-#import "ganesh/mtl/GrMtlBackendContext.h"
-#import "ganesh/mtl/GrMtlDirectContext.h"
-#import "ganesh/mtl/GrMtlBackendSurface.h"
-#import "ganesh/mtl/GrMtlTypes.h"
-
 #import "MetalDevice.h"
 
 #define MuxGraphicsCard 7
@@ -31,12 +24,12 @@ void *objc_autoreleasePoolPush(void);
 void objc_autoreleasePoolPop(void *);
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_openAutoreleasepool(
-    JNIEnv *env, jobject redrawer) {
+    JNIEnv *env, jobject renderer) {
     return (jlong)objc_autoreleasePoolPush();
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_MetalApiKt_closeAutoreleasepool(
-    JNIEnv *env, jobject redrawer, jlong handle) {
+    JNIEnv *env, jobject renderer, jlong handle) {
     objc_autoreleasePoolPop((void *)handle);
 }
 

@@ -70,7 +70,7 @@ class ScreenshotTestRule : TestRule {
             actualFile.writeBytes(actual.encodeToData()!!.bytes)
             throw AssertionError(
                 "Missing screenshot image " +
-                        "${actualFile.absolutePath}. " +
+                        "${expectedFile.absolutePath}. " +
                         "Did you mean to check in a new image?"
             )
         }

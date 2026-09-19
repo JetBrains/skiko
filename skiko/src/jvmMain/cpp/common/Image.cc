@@ -78,14 +78,14 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nGetIma
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToData
-  (JNIEnv* env, jclass jclass, jlong ptr, jint format, jint quality) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint format, jint quality, jint pngCompressionLevel) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkEncodedImageFormat skFormat = static_cast<SkEncodedImageFormat>(format);
     if (!instance->isTextureBacked()) {
       switch (skFormat) {
         case SkEncodedImageFormat::kPNG: {
           SkPngEncoder::Options options = SkPngEncoder::Options();
-          options.fZLibLevel = std::max(0, std::min((int)(quality / 10), 9));
+          options.fZLibLevel = pngCompressionLevel;
           SkData* data = SkPngEncoder::Encode(nullptr, instance, options).release();
           return reinterpret_cast<jlong>(data);
         }
@@ -174,6 +174,21 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptTextu
         *backendTexture,
         static_cast<GrSurfaceOrigin>(surfaceOrigin),
         static_cast<SkColorType>(colorType)
+    );
+    return reinterpret_cast<jlong>(image.release());
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nAdoptTextureFromAlphaType
+  (JNIEnv* env, jclass jclass, jlong contextPtr, jlong backendTexturePtr, jint surfaceOrigin, jint colorType, jint alphaType) {
+    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(static_cast<uintptr_t>(backendTexturePtr));
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(contextPtr));
+
+    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
+        static_cast<GrRecordingContext*>(context),
+        *backendTexture,
+        static_cast<GrSurfaceOrigin>(surfaceOrigin),
+        static_cast<SkColorType>(colorType),
+        static_cast<SkAlphaType>(alphaType)
     );
     return reinterpret_cast<jlong>(image.release());
 }

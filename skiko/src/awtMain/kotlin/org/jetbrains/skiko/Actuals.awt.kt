@@ -1,32 +1,54 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.redrawer.*
+import org.jetbrains.skiko.renderer.*
 import javax.swing.UIManager
 
 actual fun setSystemLookAndFeel() = UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
 
-internal actual fun makeDefaultRenderFactory(): RenderFactory =
+internal fun makeDefaultRenderFactory(): RenderFactory =
     RenderFactory { layer, renderApi, analytics, properties ->
-        when (hostOs) {
-            OS.MacOS -> when (renderApi) {
-                GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareRedrawer(layer, analytics, properties)
-                GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan redrawers")
-                else -> MetalRedrawer(layer, analytics, properties)
-            }
-            OS.Windows -> when (renderApi) {
-                GraphicsApi.SOFTWARE_COMPAT -> SoftwareRedrawer(layer, analytics, properties)
-                GraphicsApi.SOFTWARE_FAST -> WindowsSoftwareRedrawer(layer, analytics, properties)
-                GraphicsApi.OPENGL -> WindowsOpenGLRedrawer(layer, analytics, properties)
-                GraphicsApi.ANGLE -> AngleRedrawer(layer, analytics, properties)
-                GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan redrawers")
-                else -> Direct3DRedrawer(layer, analytics, properties)
-            }
-            OS.Linux -> when (renderApi) {
-                GraphicsApi.SOFTWARE_COMPAT -> SoftwareRedrawer(layer, analytics, properties)
-                GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRedrawer(layer, analytics, properties)
-                GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan redrawers")
-                else -> LinuxOpenGLRedrawer(layer, analytics, properties)
-            }
-            else -> throw UnsupportedOperationException("AWT doesn't support $hostOs")
+        val renderer = createRenderer(layer, renderApi, analytics, properties)
+        try {
+            val producer = FrameProducer(layer, renderer)
+            FrameDriver(layer, producer, createFrameScheduler(producer, renderer))
+        } catch (e: Throwable) {
+            renderer.close()
+            throw e
         }
     }
+
+// The OpenGL backends draw every window from a cross-window batch, so their windows schedule into
+// the family batch instead of running a per-window dispatcher.
+private fun createFrameScheduler(producer: FrameProducer, renderer: AwtRenderer): FrameScheduler = when (renderer) {
+    is LinuxOpenGLRenderer -> LinuxGLFrameBatch.forWindow(producer, renderer)
+    is WindowsOpenGLRenderer -> WindowsGLFrameBatch.forWindow(producer, renderer)
+    else -> SingleFrameScheduler(producer)
+}
+
+private fun createRenderer(
+    layer: SkiaLayer,
+    renderApi: GraphicsApi,
+    analytics: SkiaLayerAnalytics,
+    properties: SkiaLayerProperties,
+): AwtRenderer = when (hostOs) {
+    OS.MacOS -> when (renderApi) {
+        GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareRenderer(layer, analytics, properties)
+        GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan renderers")
+        else -> MetalRenderer(layer, analytics, properties)
+    }
+    OS.Windows -> when (renderApi) {
+        GraphicsApi.SOFTWARE_COMPAT -> SoftwareRenderer(layer, analytics, properties)
+        GraphicsApi.SOFTWARE_FAST -> WindowsSoftwareRenderer(layer, analytics, properties)
+        GraphicsApi.OPENGL -> WindowsOpenGLRenderer(layer, analytics, properties)
+        GraphicsApi.ANGLE -> AngleRenderer(layer, analytics, properties)
+        GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan renderers")
+        else -> Direct3DRenderer(layer, analytics, properties)
+    }
+    OS.Linux -> when (renderApi) {
+        GraphicsApi.SOFTWARE_COMPAT -> SoftwareRenderer(layer, analytics, properties)
+        GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRenderer(layer, analytics, properties)
+        GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan renderers")
+        else -> LinuxOpenGLRenderer(layer, analytics, properties)
+    }
+    else -> throw UnsupportedOperationException("AWT doesn't support $hostOs")
+}

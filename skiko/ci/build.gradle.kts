@@ -5,6 +5,16 @@ val skiko = SkikoProperties(project)
 val mavenCentral = MavenCentralProperties(project)
 val GITHUB_REPO = "JetBrains/skiko"
 val skikoArtifacts = SkikoArtifacts()
+val skikoSkottieArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-skottie",
+    displayName = "Skiko Skottie",
+    pomDescription = "Kotlin Skia Skottie bindings",
+)
+val skikoGraphiteArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-graphite",
+    displayName = "Skiko Graphite",
+    pomDescription = "Kotlin Skia Graphite bindings",
+)
 
 val skikoArtifactIds: List<String> =
     listOf(
@@ -18,7 +28,6 @@ val skikoArtifactIds: List<String> =
         skikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
         skikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.X64),
         skikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.Arm64),
-        skikoArtifacts.jsWasmArtifactId,
         skikoArtifacts.jsArtifactId,
         skikoArtifacts.wasmArtifactId,
         skikoArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
@@ -31,6 +40,47 @@ val skikoArtifactIds: List<String> =
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+        skikoArtifacts.jvmRuntimeAllArtifactId,
+
+        skikoSkottieArtifacts.commonArtifactId,
+        skikoSkottieArtifacts.jvmArtifactId,
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoSkottieArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoSkottieArtifacts.jsArtifactId,
+        skikoSkottieArtifacts.wasmArtifactId,
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        skikoSkottieArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+        skikoSkottieArtifacts.jvmRuntimeAllArtifactId,
+
+        skikoGraphiteArtifacts.commonArtifactId,
+        skikoGraphiteArtifacts.jvmArtifactId,
+        skikoGraphiteArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        skikoGraphiteArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
+        skikoGraphiteArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoGraphiteArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoGraphiteArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoGraphiteArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGraphiteArtifacts.jvmRuntimeAllArtifactId,
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
@@ -46,10 +96,12 @@ val createGithubRelease by tasks.registering {
         val gh = connectToGitHub()
         val githubVersion = skiko.releaseGithubVersion
         val githubCommit = skiko.releaseGithubCommit
+        val githubPrerelease = skiko.releaseGithubPrerelease
         val repo = gh.getRepository(GITHUB_REPO)
         val release = repo.createRelease("v$githubVersion")
             .name("Version $githubVersion")
             .generateReleaseNotes(true)
+            .prerelease(githubPrerelease)
             .commitish(githubCommit)
             .create()
 
@@ -109,3 +161,4 @@ fun connectToGitHub() =
     GitHubBuilder()
         .withOAuthToken(System.getenv("SKIKO_GH_RELEASE_TOKEN"))
         .build()
+

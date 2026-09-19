@@ -121,6 +121,9 @@ class SurfaceTest {
             DirectContext.makeGL().useContext { ctx ->
                 val imageInfo = ImageInfo.makeN32Premul(16, 16)
                 val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
+                val surfaceContext = surface.recordingContext
+                assertNotNull(surfaceContext)
+                assertFails { surfaceContext.close() }
 
                 surface.canvas.drawRect(
                     r = Rect(4f, 4f, 12f, 12f),

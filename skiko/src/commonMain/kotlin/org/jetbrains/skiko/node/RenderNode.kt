@@ -16,6 +16,11 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  * everything from scratch. A RenderNode only needs its display list re-recorded when its content
  * alone should be changed. RenderNodes can also be transformed without re-recording the display
  * list through the transform properties.</p>
+ *
+ * <p>A tree of RenderNodes is owned by a single thread. Recording, changing a property and drawing
+ * all mutate the node they are called on, and changing a property of one node may also mutate the
+ * nodes drawing it, so none of them may run concurrently with each other. A picture recorded from
+ * a node is immutable and can be replayed on any thread.</p>
  */
 class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     private companion object {
@@ -28,6 +33,14 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
         Stats.onNativeCall()
     }
 
+    /**
+     * Optional paint used when compositing this RenderNode into an offscreen layer.
+     *
+     * When set, the paint alpha is applied to the composited layer content and therefore
+     * overrides [alpha] for content rendering semantics.
+     *
+     * This does not affect shadow opacity: shadows are still modulated by [alpha].
+     */
     var layerPaint: Paint?
         get() = try {
             Stats.onNativeCall()
@@ -73,6 +86,14 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
             reachabilityBarrier(this)
         }
 
+    /**
+     * Alpha multiplier for this RenderNode.
+     *
+     * When [layerPaint] is null, this alpha is applied during content replay. When [layerPaint]
+     * is set, content alpha is taken from [layerPaint] instead.
+     *
+     * Shadow opacity is always modulated by this alpha, regardless of [layerPaint].
+     */
     var alpha: Float
         get() = try {
             Stats.onNativeCall()

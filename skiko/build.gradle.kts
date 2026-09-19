@@ -1,9 +1,8 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
 
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.LibraryPlugin
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -11,12 +10,13 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.gradle.kotlin.dsl.withType
 import tasks.configuration.*
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import dsl.SkikoDependencyScope
 
 plugins {
     kotlin("multiplatform")
+    id("com.android.kotlin.multiplatform.library") apply false
     org.jetbrains.dokka
     `maven-publish`
     signing
@@ -25,7 +25,7 @@ plugins {
 }
 
 if (supportAndroid) {
-    apply<LibraryPlugin>()
+    apply(plugin = "com.android.kotlin.multiplatform.library")
 }
 
 apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
@@ -57,9 +57,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "webp_sse41",
                 "zlib",
                 "expat",
-                "skottie",
-                "sksg",
-                "jsonreader"
             )
         }
         jvm {
@@ -82,18 +79,22 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
 
             windows {
                     staticSkiaLibs("d3d12allocator")
+                    // m151 SkSL adopted Chromium's raw_ptr<T> (BackupRefPtr/MiraclePtr), which is
+                    // active on Windows (no-op elsewhere). skia.lib now references partition_alloc
+                    // and raw_ptr symbols that live in these split-out static libs, so link them.
+                    // allocator_shim is intentionally omitted: it overrides global malloc and is not
+                    // referenced by skia.
+                    staticSkiaLibs("raw_ptr", "allocator_core", "allocator_base")
             }
 
             linux {
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs(
-                    "sksg",
                     "skia",
                     "skia_ganesh_ext",
                     "skunicode_core",
                     "skunicode_icu",
                     "skshaper",
-                    "jsonreader"
                 )
                 dynamicSystemLibs("GL", "X11", "fontconfig")
                 arm64 { dynamicSystemLibs("EGL") }
@@ -114,9 +115,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             linux {
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs(
-                    "skottie",
-                    "jsonreader",
-                    "sksg",
                     "skshaper",
                     "skunicode_core",
                     "skunicode_icu",
@@ -165,12 +163,16 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "brotli",
             )
             linkFlags(
+                "-s", "MAIN_MODULE=2",
+                "-s", "AUTOLOAD_DYLIBS=0",
                 "-l", "GL",
                 "-s", "MAX_WEBGL_VERSION=2",
                 "-s", "MIN_WEBGL_VERSION=2",
                 "-s", "MODULARIZE=1",
+                "-s", "EXPORT_ES6=1",
                 "-s", "EXPORT_NAME=loadSkikoWASM",
-                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
+                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
+                "-s", "STACK_SIZE=1048576", // 1 MB
                 "--bind",
             )
         }
@@ -185,9 +187,6 @@ val skikoProjectContext = SkikoProjectContext(
     artifacts = skikoArtifacts,
     windowsSdkPathProvider = {
         findWindowsSdkPaths(gradle, targetArch)
-    },
-    createChecksumsTask = { targetOs: OS, targetArch: Arch, fileToChecksum: Provider<File> ->
-        createChecksumsTask(targetOs, targetArch, fileToChecksum)
     },
     additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko, skikoArtifacts),
     configureDependencies = coreDependencies
@@ -207,8 +206,8 @@ repositories {
 
 kotlin {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_2_2)
-        apiVersion.set(KotlinVersion.KOTLIN_2_2)
+        languageVersion.set(skikoKotlinLanguageVersion)
+        apiVersion.set(skikoKotlinApiVersion)
         freeCompilerArgs.add(
             "-opt-in=org.jetbrains.skiko.InternalSkikoApi"
         )
@@ -229,21 +228,16 @@ kotlin {
     }
 
     if (supportAndroid) {
-        androidTarget("android") {
-            publishLibraryVariants("release")
+        targets.withType<KotlinMultiplatformAndroidLibraryTarget>().configureEach {
+            namespace = "org.jetbrains.skiko"
+            compileSdk = 35
+            minSdk = 24
+            withJava()
+            withHostTest {}
 
-            compilations.all {
-                compileTaskProvider.configure {
-                    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
-                }
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_11)
             }
-
-            // Keep the previously defined attribute that was used to distinguish JVM and android variant
-            attributes {
-                attributes.attribute(Attribute.of("ui", String::class.java), "android")
-            }
-            // TODO: seems incorrect.
-            generateVersion(OS.Android, Arch.Arm64, skiko, "release")
         }
     }
 
@@ -270,7 +264,10 @@ kotlin {
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
             }
 
-            setupImportsGeneratorPlugin()
+            setupImportsGeneratorPlugin(
+                skikoArtifacts.artifactIdPrefix,
+                isSideModule = skikoProjectContext.kind == SkikoModuleKind.EXTENSION
+            )
         }
 
 
@@ -293,7 +290,10 @@ kotlin {
                 dependsOn(test.compileTaskProvider, tasks["compileTestKotlinJs"])
             }
 
-            setupImportsGeneratorPlugin()
+            setupImportsGeneratorPlugin(
+                skikoArtifacts.artifactIdPrefix,
+                isSideModule = false
+            )
         }
     }
 
@@ -356,6 +356,12 @@ kotlin {
         implementation(libs.coroutines.android)
     }
 
+    if (supportAndroid && supportAwt) {
+        sourceSets.named("androidMain") {
+            dependsOn(sourceSets.getByName("jvmMain"))
+        }
+    }
+
     skikoProjectContext.jvmTestSourceSet?.dependencies {
         implementation(libs.coroutines.test)
         implementation(kotlin("test-junit"))
@@ -364,7 +370,7 @@ kotlin {
 
     skikoProjectContext.webTestSourceSet?.apply {
         resources.srcDirs(
-            tasks.named("linkWasm"), wasmImports
+            tasks.named("optimizeWasm"), wasmImports
         )
     }
 
@@ -398,55 +404,23 @@ if (supportAwt) {
 
 
 if (supportAndroid) {
-    // Android configuration, when available
-    configure<LibraryExtension> {
-        compileSdk = 33
-        namespace = "org.jetbrains.skiko"
-
-        defaultConfig.minSdk = 24
-        defaultConfig.targetSdk = 24
-        defaultConfig.javaCompileOptions
-
-        compileOptions.sourceCompatibility = JavaVersion.VERSION_11
-        compileOptions.targetCompatibility = JavaVersion.VERSION_11
-
-        sourceSets.named("main") {
-            java.srcDirs("src/androidMain/java")
-            res.srcDirs("src/androidMain/res")
-        }
-    }
-
     val os = OS.Android
-    val skikoAndroidJar by project.tasks.registering(Jar::class) {
+    kotlin.targets.getByName("android").generateVersion(os, Arch.Arm64, skiko)
+    val skikoAndroidArtifact by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-android")
-        from(kotlin.androidTarget("android").compilations["release"].output.allOutputs)
+        from(kotlin.targets.getByName("android").compilations.getByName("main").output.allOutputs)
     }
     for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
-        skikoProjectContext.createSkikoJvmJarTask(os, arch, skikoAndroidJar)
+        skikoProjectContext.createSkikoJvmJarTask(os, arch, skikoAndroidArtifact)
     }
-    tasks.matching { name == "publishAndroidReleasePublicationToMavenLocal" }.configureEach {
-        // It needs to be compatible with Gradle 8.1
-        dependsOn(skikoAndroidJar)
-    }
-    tasks.matching { name == "generateMetadataFileForAndroidReleasePublication" }.configureEach {
-        // It needs to be compatible with Gradle 8.1
-        dependsOn(skikoAndroidJar)
+
+    tasks.withType<JavaCompile>().configureEach {
+        if (name.startsWith("compileAndroid") && name.endsWith("JavaWithJavac")) {
+            sourceCompatibility = JavaVersion.VERSION_11.toString()
+            targetCompatibility = JavaVersion.VERSION_11.toString()
+        }
     }
 }
-
-// TODO now it can be moved, move it if you change this
-// Can't be moved to buildSrc because of Checksum dependency
-fun createChecksumsTask(
-    targetOs: OS,
-    targetArch: Arch,
-    fileToChecksum: Provider<File>
-) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
-
-    inputFiles = project.files(fileToChecksum)
-    checksumAlgorithm = Checksum.Algorithm.SHA256
-    outputDirectory = layout.buildDirectory.dir("checksums-${targetId(targetOs, targetArch)}")
-}
-
 
 if (supportAwt) {
     val skikoAwtJarForTests by project.tasks.registering(Jar::class) {
@@ -457,26 +431,66 @@ if (supportAwt) {
 }
 
 afterEvaluate {
-    tasks.configureEach {
-        if (group == "publishing") {
-            // There are many intermediate tasks in 'publishing' group.
-            // There are a lot of them and they have verbose names.
-            // To decrease noise in './gradlew tasks' output and Intellij Gradle tool window,
-            // group verbose tasks in a separate group 'other publishing'.
-            val allRepositories = publishing.repositories.map { it.name } + "MavenLocal"
-            val publishToTasks = allRepositories.map { "publishTo$it" }
-            if (name != "publish" && name !in publishToTasks) {
-                group = "other publishing"
-            }
-        }
-    }
-
     tasks.named("clean").configure {
         doLast {
             delete(skiko.dependenciesDir)
             delete(project.file("src/jvmMain/java"))
         }
     }
+}
+
+fun configureSymbolsFor(os: OS, arch: Arch) {
+    val suffix = joinToTitleCamelCase(os.id, arch.id)
+    val skiaBindingsDir = skikoProjectContext.registerOrGetSkiaDirProvider(os, arch)
+    val coreCompile = tasks.named<CompileSkikoCppTask>("compileJvmBindings$suffix")
+    val coreObjcCompile = if (os.isMacOs) tasks.named<CompileSkikoObjCTask>("objcCompile$suffix") else null
+    val requiredSymbols = skikoProjectContext.jvmRequiredSymbolsFor(os, arch)
+    dependencies.add(requiredSymbols.name, project(":skiko-skottie"))
+    if (os != OS.Android && supportAwt) {
+        dependencies.add(requiredSymbols.name, project(":skiko-graphite"))
+    }
+    val requiredSymbolFiles = files(requiredSymbols)
+
+    skikoProjectContext.configureGenerateSymbolsList(
+        os, arch, skiaBindingsDir, coreCompile, coreObjcCompile, requiredSymbolFiles
+    )
+
+    tasks.named("linkJvmBindings$suffix") {
+        dependsOn("generateSymbolsList$suffix")
+    }
+}
+
+if (supportAwt) {
+    afterEvaluate {
+        configureSymbolsFor(targetOs, targetArch)
+
+        if (targetOs == OS.MacOS && targetArch == Arch.Arm64) {
+            configureSymbolsFor(OS.MacOS, Arch.X64)
+        }
+    }
+}
+
+if (supportAndroid) {
+    afterEvaluate {
+        for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
+            configureSymbolsFor(OS.Android, arch)
+        }
+    }
+}
+
+if (supportWeb) {
+    skikoProjectContext.provideWasmTestResources()
+
+    val linkWasmSideModules = skikoProjectContext.wasmSideModulesFor("linkWasm").also {
+        dependencies.add(it.name, project(":skiko-skottie"))
+    }
+    val linkWasmD8SideModules = skikoProjectContext.wasmSideModulesFor("linkWasmD8WithES6").also {
+        dependencies.add(it.name, project(":skiko-skottie"))
+    }
+    skikoProjectContext.configureWasmMainModuleSideModuleInputs(
+        linkWasmSideModules,
+        linkWasmD8SideModules,
+    )
 }
 
 skikoProjectContext.declarePublications()
@@ -499,22 +513,11 @@ tasks.withType<AbstractTestTask> {
     }
 }
 
-tasks.withType<JavaCompile> {
-    // Workaround to configure Java sources on Android (src/androidMain/java)
-    targetCompatibility = JavaVersion.VERSION_11.toString()
-    sourceCompatibility = JavaVersion.VERSION_11.toString()
-}
-
 project.tasks.withType<KotlinJsCompile>().configureEach {
     compilerOptions.freeCompilerArgs.addAll(listOf(
         "-Xwasm-enable-array-range-checks", "-Xir-dce=true", "-Xskip-prerelease-check",
     ))
 }
-
-tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
-    ?.dependsOn("publishWasmJsPublicationToComposeRepoRepository")
-tasks.findByName("publishSkikoWasmRuntimePublicationToMavenLocal")
-    ?.dependsOn("publishWasmJsPublicationToMavenLocal")
 
 skikoProjectContext.additionalRuntimeLibraries.forEach {
     it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))

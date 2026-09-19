@@ -69,14 +69,14 @@ SKIKO_EXPORT void org_jetbrains_skia_Image__1nGetImageInfo
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToData
-  (KNativePointer ptr, KInt format, KInt quality) {
+  (KNativePointer ptr, KInt format, KInt quality, KInt pngCompressionLevel) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     SkEncodedImageFormat skFormat = static_cast<SkEncodedImageFormat>(format);
     if (!instance->isTextureBacked()) {
        switch (skFormat) {
          case SkEncodedImageFormat::kPNG: {
            SkPngEncoder::Options options = SkPngEncoder::Options();
-           options.fZLibLevel = std::max(0, std::min(quality / 10, 9));
+           options.fZLibLevel = pngCompressionLevel;
            SkData* data = SkPngEncoder::Encode(nullptr, instance, options).release();
            return reinterpret_cast<KNativePointer>(data);
          }
@@ -167,6 +167,22 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nAdoptTextureFrom
         *backendTexture,
         static_cast<GrSurfaceOrigin>(surfaceOrigin),
         static_cast<SkColorType>(colorType)
+    );
+
+    return reinterpret_cast<KNativePointer>(image.release());
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nAdoptTextureFromAlphaType
+  (KNativePointer contextPtr, KNativePointer backendTexturePtr, KInt surfaceOrigin, KInt colorType, KInt alphaType) {
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(contextPtr);
+    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(backendTexturePtr);
+
+    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
+        static_cast<GrRecordingContext*>(context),
+        *backendTexture,
+        static_cast<GrSurfaceOrigin>(surfaceOrigin),
+        static_cast<SkColorType>(colorType),
+        static_cast<SkAlphaType>(alphaType)
     );
 
     return reinterpret_cast<KNativePointer>(image.release());

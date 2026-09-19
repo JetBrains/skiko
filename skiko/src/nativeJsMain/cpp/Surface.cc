@@ -272,7 +272,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Surface__1nNotifyContentWillChange
     surface->notifyContentWillChange(static_cast<SkSurface::ContentChangeMode>(mode));
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nGetRecordingContext
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nGetSurfaceRecordingContext
   (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     return reinterpret_cast<KNativePointer>(surface->recordingContext());

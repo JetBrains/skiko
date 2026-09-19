@@ -5,7 +5,7 @@
 #include <jni.h>
 #include <memory>
 #include "shaper/interop.hh"
-#include "src/base/SkUTF.h"
+#include "src/core/SkUTF.h"
 #include "paragraph/interop.hh"
 #include "TextStyle.h"
 #include "include/core/SkBlendMode.h"
@@ -339,41 +339,6 @@ namespace skija {
                 int code4 = (int)str[3];
                 return (code1 & 0xFF << 24) | (code2 & 0xFF << 16) | (code3 & 0xFF << 8) | (code4 & 0xFF);
             }
-        }
-    }
-
-    namespace FontMetrics {
-        jclass cls;
-        jmethodID ctor;
-
-        void onLoad(JNIEnv* env) {
-            jclass local = env->FindClass("org/jetbrains/skia/FontMetrics");
-            cls  = static_cast<jclass>(env->NewGlobalRef(local));
-            ctor = env->GetMethodID(cls, "<init>", "(FFFFFFFFFFFLjava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;)V");
-        }
-
-        void onUnload(JNIEnv* env) {
-            env->DeleteGlobalRef(cls);
-        }
-
-        jobject toJava(JNIEnv* env, const SkFontMetrics& m) {
-            float f1, f2, f3, f4;
-            return env->NewObject(cls, ctor,
-                m.fTop,
-                m.fAscent,
-                m.fDescent,
-                m.fBottom,
-                m.fLeading,
-                m.fAvgCharWidth,
-                m.fMaxCharWidth,
-                m.fXMin,
-                m.fXMax,
-                m.fXHeight,
-                m.fCapHeight,
-                m.hasUnderlineThickness(&f1) ? javaFloat(env, f1) : nullptr,
-                m.hasUnderlinePosition(&f2)  ? javaFloat(env, f2) : nullptr,
-                m.hasStrikeoutThickness(&f3) ? javaFloat(env, f3) : nullptr,
-                m.hasStrikeoutPosition(&f4)  ? javaFloat(env, f4) : nullptr);
         }
     }
 
@@ -887,7 +852,6 @@ namespace skija {
         Drawable::onLoad(env);
         FontFamilyName::onLoad(env);
         FontFeature::onLoad(env);
-        FontMetrics::onLoad(env);
         FontVariation::onLoad(env);
         FontVariationAxis::onLoad(env);
         ImageInfo::onLoad(env);
@@ -917,7 +881,6 @@ namespace skija {
         ImageInfo::onUnload(env);
         FontVariationAxis::onUnload(env);
         FontVariation::onUnload(env);
-        FontMetrics::onUnload(env);
         FontFeature::onUnload(env);
         FontFamilyName::onUnload(env);
         Drawable::onUnload(env);
@@ -1020,8 +983,7 @@ SkString skString(JNIEnv* env, jstring str) {
         // See https://docs.oracle.com/javase/1.5.0/docs/guide/jni/spec/types.html#wp16542
         // Instead, get data as-is (UTF-16) and convert to UTF-8 ourselves.
         jsize utf16Units = env->GetStringLength(str);
-        jboolean isCopy;
-        const jchar *utf16 = env->GetStringChars(str, &isCopy);
+        const jchar *utf16 = env->GetStringChars(str, nullptr);
 
         // SkUTF::UTF16ToUTF8 returns empty string if there is invalid unicode characters.
         // Use our replacement that carefully handles invalid unicode strings.
@@ -1031,9 +993,8 @@ SkString skString(JNIEnv* env, jstring str) {
             result.resize(utf8Units);
             UTF16ToUTF8(result.data(), utf8Units, utf16, utf16Units);
         }
-        if (isCopy == JNI_TRUE) {
-            env->ReleaseStringChars(str, utf16);
-        }
+        env->ReleaseStringChars(str, utf16);
+
         return result;
     }
 }

@@ -55,7 +55,8 @@ internal class UiTestScope(
         override val layer: SkiaLayer = SkiaLayer(
             properties = properties.copy(renderApi = renderApi),
             analytics = analytics,
-            renderFactory = renderFactory
+            renderFactory = renderFactory,
+            fillsWindow = true
         )
 
         init {

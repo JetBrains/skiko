@@ -1,4 +1,23 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
+import org.gradle.api.DefaultTask
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.Usage
+import org.gradle.api.file.ArchiveOperations
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
+import org.gradle.language.jvm.tasks.ProcessResources
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 buildscript {
     repositories {
@@ -17,7 +36,6 @@ buildscript {
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
 
 repositories {
@@ -46,37 +64,6 @@ var hostArch = when (osArch) {
 
 val host = "${hostOs}-${hostArch}"
 
-val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
-if (project.hasProperty("skiko.version") && isCompositeBuild) {
-    project.logger.warn("skiko.version property has no effect when skiko.composite.build is set")
-}
-
-
-val skikoWasm by configurations.creating
-
-dependencies {
-    skikoWasm(if (isCompositeBuild) {
-        // When we build skiko locally, we have no say in setting skiko.version in the included build.
-        // That said, it is always built as "0.0.0-SNAPSHOT" and setting any other version is misleading
-        // and can create conflict due to incompatibility of skiko runtime and skiko libs
-        files(gradle.includedBuild("skiko").projectDir.resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar"))
-    } else {
-        libs.skiko.wasm.runtime
-    })
-}
-
-val unpackWasmRuntime = tasks.register("unpackWasmRuntime", Copy::class) {
-    destinationDir = file("$buildDir/resources/")
-    from(skikoWasm.map { zipTree(it) })
-
-    if (isCompositeBuild) {
-        dependsOn(gradle.includedBuild("skiko").task(":skikoWasmJar"))
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
-    dependsOn(unpackWasmRuntime)
-}
 
 kotlin {
     if (hostOs == "macos") {
@@ -153,8 +140,6 @@ kotlin {
 
         val webMain by creating {
             dependsOn(commonMain)
-            resources.setSrcDirs(resources.srcDirs)
-            resources.srcDirs(unpackWasmRuntime.map { it.destinationDir })
         }
 
         val jsMain by getting {
@@ -203,34 +188,79 @@ kotlin {
             }
         }
     }
+
+    targets.withType<KotlinJsIrTarget>().all { configureSkikoWebRuntime(project, this) }
 }
 
 if (hostOs == "macos") {
-    project.tasks.register<Exec>("runIosSim") {
-        val device = "iPhone 11"
-        workingDir = project.buildDir
-        val linkExecutableTaskName = when (host) {
-            "macos-x64" -> "linkReleaseExecutableIosX64"
-            "macos-arm64" -> "linkReleaseExecutableIosSimulatorArm64"
-            else -> throw GradleException("Host OS is not supported")
-        }
-        val binTask = project.tasks.named(linkExecutableTaskName)
+    val iosSimDevice = providers.gradleProperty("skiko.iosSimulatorDevice").orElse("booted")
+    val iosSimAppName = "SkiaMultiplatformSample"
+    val iosSimBundleId = "org.jetbrains.skiko.sample"
+    val iosSimLinkExecutableTaskName = when (host) {
+        "macos-x64" -> throw GradleException("runIosSim is supported only on Apple Silicon hosts (iosSimulatorArm64 target)")
+        "macos-arm64" -> "linkReleaseExecutableIosSimulatorArm64"
+        else -> throw GradleException("Host OS is not supported")
+    }
+
+    val packageIosSimApp = project.tasks.register("packageIosSimApp") {
+        val binTask = project.tasks.named(iosSimLinkExecutableTaskName)
         dependsOn(binTask)
-        commandLine = listOf(
-            "xcrun",
-            "simctl",
-            "spawn",
-            "--standalone",
-            device
-        )
-        argumentProviders.add {
-            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
-            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+        doLast {
+            val executable = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
+                .single { it.name.endsWith(".kexe") }
+
+            val appDir = project.layout.buildDirectory.dir("iosSimulator/${iosSimAppName}.app").get().asFile
+            appDir.mkdirs()
+
+            val targetExecutable = appDir.resolve(iosSimAppName)
+            executable.copyTo(targetExecutable, overwrite = true)
+            targetExecutable.setExecutable(true)
+
+            appDir.resolve("PkgInfo").writeText("APPL????")
+            val plistTemplate = project.file("plists/Ios/Info.plist").readText()
+            appDir.resolve("Info.plist").writeText(
+                plistTemplate
+                    .replace("$(DEVELOPMENT_LANGUAGE)", "en")
+                    .replace("$(EXECUTABLE_NAME)", iosSimAppName)
+                    .replace("$(PRODUCT_BUNDLE_IDENTIFIER)", iosSimBundleId)
+                    .replace("$(PRODUCT_NAME)", iosSimAppName)
+            )
         }
     }
+
+    project.tasks.register("runIosSim") {
+        dependsOn(packageIosSimApp)
+        doLast {
+            fun runCommand(command: List<String>, ignoreFailure: Boolean = false) {
+                val process = ProcessBuilder(command)
+                    .directory(project.projectDir)
+                    .inheritIO()
+                    .start()
+                val exitCode = process.waitFor()
+                if (exitCode != 0 && !ignoreFailure) {
+                    throw GradleException("Command failed ($exitCode): ${command.joinToString(" ")}")
+                }
+            }
+
+            val appDir = project.layout.buildDirectory.dir("iosSimulator/${iosSimAppName}.app").get().asFile.absolutePath
+            val device = iosSimDevice.get()
+            val launchTarget = if (device == "booted") "booted" else device
+
+            if (device != "booted") {
+                runCommand(listOf("xcrun", "simctl", "boot", device), ignoreFailure = true)
+                runCommand(listOf("xcrun", "simctl", "bootstatus", device, "-b"))
+            }
+
+            runCommand(listOf("xcrun", "simctl", "install", launchTarget, appDir))
+            runCommand(listOf("xcrun", "simctl", "launch", "--terminate-running-process", launchTarget, iosSimBundleId))
+        }
+    }
+
     project.tasks.register<Exec>("runNative") {
         workingDir = project.buildDir
-        val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
+        val hostOsCap = hostOs.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        val hostArchCap = hostArch.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        val binTask = project.tasks.named("linkDebugExecutable${hostOsCap}${hostArchCap}")
         dependsOn(binTask)
         // Hacky approach.
         commandLine = listOf("bash", "-c")
@@ -302,7 +332,7 @@ if (hostOs == "macos") {
     val targetBuildDir: String? = System.getenv("TARGET_BUILD_DIR")
     val executablePath: String? = System.getenv("EXECUTABLE_PATH")
     val buildType = System.getenv("CONFIGURATION")?.let {
-        org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.valueOf(it.toUpperCase())
+        org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.valueOf(it.uppercase())
     } ?: org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.DEBUG
 
     val currentTarget = kotlin.targets[target.key] as org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -341,16 +371,6 @@ if (hostOs == "macos") {
     }
 }
 
-apple {
-    iosApp {
-        productName = "SkikoAppCode"
-        sceneDelegateClass = "SceneDelegate"
-        dependencies {
-            implementation(project(":"))
-        }
-    }
-}
-
 fun KotlinNativeTarget.configureToLaunchFromAppCode() {
     binaries {
         framework {
@@ -380,4 +400,76 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
     compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
+}
+
+private fun configureSkikoWebRuntime(
+    project: Project,
+    target: KotlinJsIrTarget,
+) {
+    val titledTargetName = target.name.replaceFirstChar { it.titlecase() }
+    val mainCompilation = target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)!!
+    val runtimeDepsConfig = project.configurations.findByName(mainCompilation.runtimeDependencyConfigurationName)!!
+    val skikoWebRuntimeJarFiles = runtimeDepsConfig.incoming.artifactView {
+        @Suppress("UnstableApiUsage")
+        withVariantReselection()
+        attributes {
+            runtimeDepsConfig.attributes.keySet().forEach {
+                @Suppress("UNCHECKED_CAST")
+                attribute(it as Attribute<Any>, runtimeDepsConfig.attributes.getAttribute(it) as Any)
+            }
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
+        }
+    }.files
+    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-${target.name}-runtime")
+
+    val unpackRuntime = project.tasks.register(
+        "unpackSkikoRuntimeFor$titledTargetName",
+        UnpackSkikoRuntimeTask::class.java,
+    ) {
+        runtimeFiles.from(skikoWebRuntimeJarFiles)
+        outputDirectory.set(unpackedRuntimeDir)
+    }
+
+    target.compilations.all {
+        if (target.wasmTargetType != null) {
+            binaries.all {
+                linkSyncTask.configure {
+                    dependsOn(unpackRuntime)
+                    from.from(unpackedRuntimeDir)
+                }
+            }
+        } else {
+            project.tasks.named(processResourcesTaskName, ProcessResources::class.java) {
+                from(unpackedRuntimeDir)
+                dependsOn(unpackRuntime)
+                exclude("META-INF")
+            }
+        }
+    }
+}
+
+@CacheableTask
+abstract class UnpackSkikoRuntimeTask : DefaultTask() {
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val runtimeFiles: ConfigurableFileCollection
+
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    @get:javax.inject.Inject
+    abstract val archiveOperations: ArchiveOperations
+
+    @get:javax.inject.Inject
+    abstract val fileSystemOperations: FileSystemOperations
+
+    @TaskAction
+    fun unpack() {
+        fileSystemOperations.copy {
+            from(runtimeFiles.files.map(archiveOperations::zipTree))
+            into(outputDirectory)
+            exclude("META-INF/**")
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+    }
 }

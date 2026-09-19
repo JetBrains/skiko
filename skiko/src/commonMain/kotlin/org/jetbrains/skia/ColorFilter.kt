@@ -28,9 +28,18 @@ class ColorFilter : RefCnt {
             }
         }
 
-        fun makeBlend(color: Int, mode: BlendMode): ColorFilter {
+        /**
+         * Returns a filter that blends [color] into the filtered color with [mode], or null when
+         * that combination leaves the color untouched. Skia collapses such no-ops away, so a null
+         * result means "apply no filter": [BlendMode.DST] with any color, a fully transparent
+         * [color] with [BlendMode.SRC_OVER], [BlendMode.DST_OVER], [BlendMode.DST_OUT],
+         * [BlendMode.SRC_ATOP], [BlendMode.XOR] or [BlendMode.DARKEN], and an opaque [color] with
+         * [BlendMode.DST_IN].
+         */
+        fun makeBlend(color: Int, mode: BlendMode): ColorFilter? {
             Stats.onNativeCall()
-            return ColorFilter(_nMakeBlend(color, mode.ordinal))
+            val ptr = _nMakeBlend(color, mode.ordinal)
+            return if (ptr == NullPointer) null else ColorFilter(ptr)
         }
 
         fun makeMatrix(matrix: ColorMatrix): ColorFilter {

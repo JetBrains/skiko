@@ -1,20 +1,5 @@
 import com.android.build.gradle.tasks.MergeSourceSetFolders
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
-
-buildscript {
-    repositories {
-        google()
-        mavenCentral {
-            url = uri("https://cache-redirector.jetbrains.com/maven-central")
-        }
-        maven("https://redirector.kotlinlang.org/maven/compose-dev")
-    }
-
-    dependencies {
-        classpath("com.android.tools.build:gradle:8.9.0")
-    }
-}
 
 repositories {
     mavenLocal()
@@ -26,8 +11,7 @@ repositories {
 }
 
 plugins {
-    id("com.android.application") version "8.9.0"
-    kotlin("android") version "2.3.20"
+    id("com.android.application") version "9.0.0"
 }
 
 val skikoNativeX64 by configurations.creating
@@ -38,12 +22,12 @@ val jniDir = "${projectDir.absolutePath}/src/main/jniLibs"
 // TODO: filter .so files only.
 val unzipTaskX64 = tasks.register("unzipNativeX64", Copy::class) {
     destinationDir = file("$jniDir/x86_64")
-    from(skikoNativeX64.map { zipTree(it) })
+    from({ skikoNativeX64.files.map { zipTree(it) } })
 }
 
 val unzipTaskArm64 = tasks.register("unzipNativeArm64", Copy::class) {
     destinationDir = file("$jniDir/arm64-v8a")
-    from(skikoNativeArm64.map { zipTree(it) })
+    from({ skikoNativeArm64.files.map { zipTree(it) } })
 }
 
 android {
@@ -88,22 +72,19 @@ dependencies {
     skikoNativeArm64("org.jetbrains.skiko:skiko-android-runtime-arm64:$version")
 }
 
-tasks.withType<KotlinJvmCompile>().configureEach {
+kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
     }
-    dependsOn(unzipTaskX64)
-    dependsOn(unzipTaskArm64)
 }
 
-// SKIKO-934: we need to unpack these libraries before these are collected from android
-// TODO the tasks we're actually targetting are mergeDebugJniLibFolders and mergeReleaseJniLibFolders,
-//  this adds unncessary dependencies
-tasks.withType<MergeSourceSetFolders>()
-    .configureEach {
+// SKIKO-934: we need to unpack these libraries before Android collects JNI libs.
+tasks.withType<MergeSourceSetFolders>().configureEach {
+    if (name.endsWith("JniLibFolders")) {
         dependsOn(unzipTaskX64)
         dependsOn(unzipTaskArm64)
     }
+}
 
 tasks.withType<Copy> {
     // This line needs to properly merge MANIFEST files from jars into dex

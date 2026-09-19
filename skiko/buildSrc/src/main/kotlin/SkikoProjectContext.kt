@@ -20,14 +20,16 @@ class SkikoProjectContext(
     val artifacts: SkikoArtifacts,
     val kotlin: KotlinMultiplatformExtension,
     val windowsSdkPathProvider: () -> WindowsSdkPaths,
-    val createChecksumsTask: (OS, Arch, Provider<File>) -> TaskProvider<*>,
     val additionalRuntimeLibraries: List<AdditionalRuntimeLibrary>,
     configureDependencies: (SkikoDependencyScope.() -> Unit)
 ) {
     val dependencyRegistry = BinaryRegistry()
+    val dependsOnCore: Boolean
 
     init {
-        SkikoDependencyScope(dependencyRegistry).configureDependencies()
+        val dependencyScope = SkikoDependencyScope(dependencyRegistry)
+        dependencyScope.configureDependencies()
+        dependsOnCore = dependencyScope.dependsOnCore
     }
 
     val buildType = skiko.buildType
@@ -79,7 +81,8 @@ class SkikoProjectContext(
             directStaticArchivePaths = directStaticArchivePaths(os, arch, env, skiaBinDir),
             dynamicLibNames = dynamicLibNames(os, arch, env),
             frameworks = dependencyRegistry.getFrameworks(os, arch, env),
-            linkFlags = dependencyRegistry.getLinkFlags(os, arch, env)
+            linkFlags = dependencyRegistry.getLinkFlags(os, arch, env),
+            compilerFlags = dependencyRegistry.getCompilerFlags(os, arch, env)
         )
     }
 }
@@ -102,7 +105,7 @@ fun SkikoProjectContext.declareSkiaTasks() {
 
             val skiaReleaseTag = project.skiaVersion(target)
 
-            val skiaBaseUrl = "https://github.com/LunasaVT/skia/releases/download/$skiaReleaseTag"
+            val skiaBaseUrl = "https://github.com/JetBrains/skia/releases/download/$skiaReleaseTag"
 
             val artifactId = "Skia-${skiaReleaseTag}-${config}-$buildType-${arch}"
 
@@ -167,7 +170,7 @@ fun SkikoProjectContext.registerOrGetSkiaDirProvider(
             skiaDir.absoluteFile
         }
     } else {
-        project.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
+        project.rootProject.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
     }
 }
 

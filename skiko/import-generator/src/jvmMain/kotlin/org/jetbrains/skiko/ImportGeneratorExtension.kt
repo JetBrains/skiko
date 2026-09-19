@@ -9,7 +9,8 @@ import java.io.File
 internal class ImportGeneratorExtension(
     private val path: String,
     private val prefix: String?,
-    private val reexportPath: String?
+    private val reexportPath: String?,
+    private val moduleName: String
 ) : IrGenerationExtension {
     override fun generate(
         moduleFragment: IrModuleFragment,
@@ -18,7 +19,7 @@ internal class ImportGeneratorExtension(
         val outputFile = File(path)
         outputFile.parentFile.mkdirs()
         val prefixFile = prefix?.let { File(it) }
-        val importGenerator = ImportGeneratorTransformer(pluginContext)
+        val importGenerator = ImportGeneratorTransformer(pluginContext, moduleName)
 
         outputFile.writer().use { writer ->
             prefixFile?.let { writer.appendLine(it.readText()) }
@@ -35,9 +36,14 @@ internal class ImportGeneratorExtension(
         reexportFile.parentFile.mkdirs()
 
         reexportFile.writer().use { reexportWriter ->
-            reexportWriter.appendLine("import * as wasmApi from \"./skiko.mjs\";")
-            reexportWriter.appendLine("window['GL'] = wasmApi.GL;")
-            reexportWriter.appendLine("export const api = { awaitSkiko: wasmApi.awaitSkiko }")
+            reexportWriter.appendLine("import * as wasmApi from \"./$moduleName.mjs\";")
+            if (moduleName == "skiko") {
+                reexportWriter.appendLine("window['GL'] = wasmApi.GL;")
+                reexportWriter.appendLine("export const api = { awaitSkiko: wasmApi.awaitSkiko }")
+            }
+            else {
+                reexportWriter.appendLine("export const isSideModuleLoaded = () => wasmApi.isSideModuleLoaded();")
+            }
 
             importGenerator.getExportSymbols().forEach { symbolName ->
                 reexportWriter.appendLine("window['${symbolName}'] = wasmApi['${symbolName}'];")
@@ -45,4 +51,3 @@ internal class ImportGeneratorExtension(
         }
     }
 }
-

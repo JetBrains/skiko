@@ -5,11 +5,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.fastForEach
-import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.RedrawerManager
+import org.jetbrains.skiko.renderer.FrameDriver
+import org.jetbrains.skiko.renderer.RenderApiFallbackManager
+import java.awt.*
 import java.awt.Color
-import java.awt.Component
 import java.awt.Graphics
 import java.awt.Point
 import java.awt.event.*
@@ -33,6 +34,14 @@ actual open class SkiaLayer internal constructor(
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+    /**
+     * Whether this layer fills its entire host window.
+     *
+     * When true, platform-specific window-level optimizations may be used (e.g., on macOS, driving the interactive
+     * live-resize redraw from the window). Set to false when the layer is embedded as a Swing component somewhere in
+     * the window's hierarchy rather than covering the whole window, so those window-level paths are disabled.
+     */
+    internal val fillsWindow: Boolean = false,
 ) : JComponent(), Accessible {
 
     internal companion object {
@@ -56,17 +65,19 @@ actual open class SkiaLayer internal constructor(
         renderApi: GraphicsApi = SkikoProperties.renderApi,
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
         pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+        fillsWindow: Boolean = false,
     ) : this(
-        accessibleContextProvider,
-        SkiaLayerProperties(
+        accessibleContextProvider = accessibleContextProvider,
+        properties = SkiaLayerProperties(
             isVsyncEnabled,
             isVsyncFramelimitFallbackEnabled,
             frameBuffering,
             renderApi
         ),
-        RenderFactory.Default,
-        analytics,
-        pixelGeometry
+        renderFactory = RenderFactory.Default,
+        analytics = analytics,
+        pixelGeometry = pixelGeometry,
+        fillsWindow = fillsWindow
     )
 
     constructor(
@@ -74,12 +85,14 @@ actual open class SkiaLayer internal constructor(
         properties: SkiaLayerProperties,
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
         pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+        fillsWindow: Boolean = false,
     ) : this(
-        accessibleContextProvider,
-        properties,
-        RenderFactory.Default,
-        analytics,
-        pixelGeometry
+        accessibleContextProvider = accessibleContextProvider,
+        properties = properties,
+        renderFactory = RenderFactory.Default,
+        analytics = analytics,
+        pixelGeometry = pixelGeometry,
+        fillsWindow = fillsWindow
     )
 
     val canvas: java.awt.Canvas
@@ -102,7 +115,7 @@ actual open class SkiaLayer internal constructor(
                 //    For example, on macOs when we resize window or change DPI
                 //
                 // 3. to avoid double paint in one single frame, use needRender instead of renderImmediately
-                redrawer?.needRender(throttledToVsync = false)
+                frameDriver?.needRender(throttledToVsync = false)
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
@@ -111,8 +124,7 @@ actual open class SkiaLayer internal constructor(
                 @Suppress("DEPRECATION")
                 super.reshape(x, y, width, height)
 
-                redrawer?.syncBounds()
-                redrawer?.needRender(throttledToVsync = false)
+                frameDriver?.onLayerComponentResized()
             }
 
             override fun getInputMethodRequests(): InputMethodRequests? {
@@ -132,8 +144,8 @@ actual open class SkiaLayer internal constructor(
                 return canReceiveFocus(cause) && super.requestFocusInWindow(cause)
             }
 
-            private fun canReceiveFocus(cause: FocusEvent.Cause?) = cause != FocusEvent.Cause.MOUSE_EVENT ||
-                    isRequestFocusEnabled
+            private fun canReceiveFocus(cause: FocusEvent.Cause?) =
+                cause != FocusEvent.Cause.MOUSE_EVENT || isRequestFocusEnabled
         }
         @Suppress("LeakingThis")
         add(backedLayer)
@@ -271,15 +283,15 @@ actual open class SkiaLayer internal constructor(
             isShowingCached = it
         }
         if (wasShowing != isShowingNow) {
-            // We don't want to call redrawer.setVisible(false) when the window becomes hidden, because that hides the
+            // We don't want to call frameDriver.setVisible(false) when the window becomes hidden, because that hides the
             // layer immediately and stops it from being painted (at the system level). But the window itself is still
             // actually visible for a few frames, and it draws its own background, causing a "flash".
             if (SwingUtilities.getWindowAncestor(this).isShowing) {
-                redrawer?.setVisible(isShowingNow)
+                frameDriver?.setVisible(isShowingNow)
             }
         }
         if (isShowingNow) {
-            redrawer?.syncBounds()
+            frameDriver?.syncBoundsFromPlatformComponent()
             repaint()
         }
     }
@@ -340,12 +352,12 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    private val redrawerManager = RedrawerManager<Redrawer>(
+    private val frameDriverManager = RenderApiFallbackManager<FrameDriver>(
         defaultRenderApi = properties.renderApi,
-        redrawerFactory = { renderApi, oldRedrawer ->
-            oldRedrawer?.dispose()
-            renderFactory.createRedrawer(this, renderApi, analytics, properties).also {
-                it.syncBounds()
+        factory = { renderApi, oldFrameDriver ->
+            oldFrameDriver?.dispose()
+            renderFactory.createFrameDriver(this, renderApi, analytics, properties).also {
+                it.syncBoundsFromPlatformComponent()
             }
         },
         onRenderApiChanged = {
@@ -353,15 +365,15 @@ actual open class SkiaLayer internal constructor(
         }
     )
 
-    internal val redrawer: Redrawer? by redrawerManager::redrawer
+    internal val frameDriver: FrameDriver? by frameDriverManager::current
 
-    actual var renderApi: GraphicsApi by redrawerManager::renderApi
+    actual var renderApi: GraphicsApi by frameDriverManager::renderApi
 
     val renderInfo: String
-        get() = if (redrawer == null)
+        get() = if (frameDriver == null)
             "SkiaLayer isn't initialized yet"
         else
-            redrawer!!.renderInfo
+            frameDriver!!.renderInfo
 
     @Volatile
     private var picture: PictureHolder? = null
@@ -372,7 +384,7 @@ actual open class SkiaLayer internal constructor(
         isDisposed = false
         backedLayer.init()
         pictureRecorder = PictureRecorder()
-        redrawerManager.findNextWorkingRenderApi(recreation)
+        frameDriverManager.findNextWorkingRenderApi(recreation)
         isInited = true
     }
 
@@ -394,9 +406,9 @@ actual open class SkiaLayer internal constructor(
     open fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         if (isInited && !isDisposed) {
-            // we should dispose redrawer first (to cancel `draw` in rendering thread)
-            redrawer?.dispose()
-            redrawerManager.dispose()
+            // we should dispose frameDriver first (to cancel `draw` in rendering thread)
+            frameDriver?.dispose()
+            frameDriverManager.dispose()
             picture?.instance?.close()
             picture = null
             pictureRecorder?.close()
@@ -418,11 +430,11 @@ actual open class SkiaLayer internal constructor(
         // scaled in the other direction from the window size), but this seems to
         // happen less often.
         //
-        // Calling redraw during layout might break software renderers,
-        // so apply this fix only for the Direct3D case.
-        if (renderApi == GraphicsApi.DIRECT3D && isShowing) {
-            redrawer?.syncBounds()
-            redrawer?.renderImmediately()
+        // Calling redraw during layout might break software renderers, so only backends that ask for it
+        // present here.
+        if (isShowing && frameDriver?.presentsOnLayout == true) {
+            frameDriver?.syncBoundsFromPlatformComponent()
+            frameDriver?.renderImmediately()
         }
 
         // Setting the bounds of children should be done only in the layout pass,
@@ -445,7 +457,7 @@ actual open class SkiaLayer internal constructor(
     override fun paint(g: Graphics) {
         Logger.debug { "paint called on SkiaLayer $this" }
         checkContentScale()
-        redrawer?.needRender(throttledToVsync = false)
+        frameDriver?.needRender(throttledToVsync = false)
     }
 
     // Workaround for JBR-5274 and JBR-5305
@@ -575,7 +587,7 @@ actual open class SkiaLayer internal constructor(
     actual fun needRender(throttledToVsync: Boolean) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
-        redrawer?.needRender(throttledToVsync)
+        frameDriver?.needRender(throttledToVsync)
     }
 
     @Deprecated(
@@ -588,12 +600,16 @@ actual open class SkiaLayer internal constructor(
      * Updates the layer and redraws synchronously.
      */
     fun renderImmediately() {
-        redrawer?.renderImmediately()
+        frameDriver?.renderImmediately()
     }
 
-    internal fun update(nanoTime: Long) {
+    internal fun update(nanoTime: Long, forcedSize: Dimension? = null) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
+
+        // Protects against re-entrant calls.
+        // This can actually happen if, for example, renderDelegate.onRender shows a modal dialog during a live-resize.
+        if (isRendering) return
 
         checkContentScale()
         FrameWatcher.nextFrame()
@@ -603,20 +619,27 @@ actual open class SkiaLayer internal constructor(
         // https://github.com/JetBrains/compose-multiplatform/blob/e4e2d329709cded91a09cc612d4defbce37aad96/benchmarks/multiplatform/benchmarks/src/commonMain/kotlin/MeasureComposable.kt#L151 as well
 
         val contentScale = this.contentScale
-        val pictureWidth = (backedLayer.width * contentScale).coerceAtLeast(0f)
-        val pictureHeight = (backedLayer.height * contentScale).coerceAtLeast(0f)
+        val pictureWidth: Float
+        val pictureHeight: Float
+        if (forcedSize != null) {
+            pictureWidth = forcedSize.width.toFloat().coerceAtLeast(0f)
+            pictureHeight = forcedSize.height.toFloat().coerceAtLeast(0f)
+        } else {
+            pictureWidth = (backedLayer.width * contentScale).coerceAtLeast(0f)
+            pictureHeight = (backedLayer.height * contentScale).coerceAtLeast(0f)
+        }
         val intWidth = pictureWidth.toInt()
         val intHeight = pictureHeight.toInt()
 
         val pictureRecorder = pictureRecorder!!
         val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth, pictureHeight).apply {
-            for (component in clipComponents) {
+            clipComponents.fastForEach { component ->
                 cutoutFromClip(component, contentScale)
             }
 
             val layerBg = background.rgb  // Will return an ancestor's non-null background after setBackground(null).
             clear(
-                if (transparency && (redrawer?.isTransparentBackgroundSupported() == true)) {
+                if (transparency && (frameDriver?.isTransparentBackgroundSupported() == true)) {
                     layerBg
                 } else {
                     layerBg or 0xFF000000.toInt()
@@ -645,19 +668,29 @@ actual open class SkiaLayer internal constructor(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    private fun createDrawScope() = LayerDrawScope(
-        pixelGeometry = pixelGeometry,
-        layerWidth = width,
-        layerHeight = height,
-        scale = contentScale
-    )
+    private fun createDrawScope(forcedSize: Dimension?): LayerDrawScope {
+        return if (forcedSize != null) {
+            LayerDrawScope(
+                pixelGeometry = pixelGeometry,
+                scaledLayerWidth = forcedSize.width,
+                scaledLayerHeight = forcedSize.height
+            )
+        } else {
+            LayerDrawScope(
+                pixelGeometry = pixelGeometry,
+                layerWidth = width,
+                layerHeight = height,
+                scale = contentScale
+            )
+        }
+    }
 
-    internal inline fun inDrawScope(body: LayerDrawScope.() -> Unit) {
+    internal inline fun inDrawScope(forcedSize: Dimension? = null, body: LayerDrawScope.() -> Unit) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
         try {
             fpsCounter?.tick()
-            with(createDrawScope()) {
+            with(createDrawScope(forcedSize)) {
                 body()
             }
         } catch (_: CancellationException) {
@@ -665,8 +698,8 @@ actual open class SkiaLayer internal constructor(
         } catch (e: RenderException) {
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
-                redrawerManager.findNextWorkingRenderApi()
-                redrawer?.renderImmediately()
+                frameDriverManager.findNextWorkingRenderApi()
+                frameDriver?.renderImmediately()
             }
         }
     }

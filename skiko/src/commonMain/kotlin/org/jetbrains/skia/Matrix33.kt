@@ -8,7 +8,7 @@ import kotlin.math.sin
 
 private const val radiansToDegrees = 180.0 / PI
 private const val tolerance = (1.0f / (1 shl 12)).toDouble()
-internal inline fun Float.toRadians(): Double = this.toDouble() * radiansToDegrees
+internal inline fun Float.toRadians(): Double = this.toDouble() / radiansToDegrees
 
 /**
  *

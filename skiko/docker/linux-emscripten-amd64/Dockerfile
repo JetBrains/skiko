@@ -1,10 +1,11 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -y && \
     apt install binutils build-essential software-properties-common -y && \
-    apt install zip unzip git python curl wget -y && \
+    apt install zip unzip git python3 curl wget -y && \
     apt install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
+    apt install libvulkan1 libvulkan-dev mesa-vulkan-drivers -y && \
     apt install openjdk-21-jdk -y && \
     rm -rf /var/lib/apt/lists/*
 

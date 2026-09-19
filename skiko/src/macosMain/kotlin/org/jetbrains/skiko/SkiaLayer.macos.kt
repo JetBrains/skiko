@@ -38,7 +38,7 @@ actual open class SkiaLayer {
      * https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
      */
     actual val contentScale: Float
-        get() = if (this::nsView.isInitialized) nsView.window!!.backingScaleFactor.toFloat() else 1.0f
+        get() = if (this::nsView.isInitialized) (nsView.window?.backingScaleFactor?.toFloat() ?: 1.0f) else 1.0f
 
     /**
      * Fullscreen is not supported
@@ -75,13 +75,13 @@ actual open class SkiaLayer {
     private val nsViewObserver = object : NSObject() {
         @ObjCAction
         fun frameDidChange(notification: NSNotification) {
-            redrawer?.syncBounds()
+            redrawer?.syncBoundsFromPlatformComponent()
             redrawer?.renderImmediately()
         }
 
         @ObjCAction
         fun windowDidChangeBackingProperties(notification: NSNotification) {
-            redrawer?.syncBounds()
+            redrawer?.syncBoundsFromPlatformComponent()
             redrawer?.renderImmediately()
         }
 
@@ -117,7 +117,7 @@ actual open class SkiaLayer {
         nsView.postsFrameChangedNotifications = true
         nsViewObserver.addObserver()
         redrawer = createNativeRedrawer(this, renderApi).apply {
-            syncBounds()
+            syncBoundsFromPlatformComponent()
             needRender()
         }
     }

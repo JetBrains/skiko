@@ -11,7 +11,7 @@ import java.io.Writer
 internal fun Provider<out FileSystemLocation>.resolveToIoFile(relative: Provider<String>): File =
     get().asFile.resolve(relative.get())
 
-internal inline fun <reified T> Task.provider(noinline fn: () -> T): Provider<T> =
+internal inline fun <reified T : Any> Task.provider(noinline fn: () -> T): Provider<T> =
     project.provider(fn)
 
 internal fun File.writeLines(lines: Collection<String>) {

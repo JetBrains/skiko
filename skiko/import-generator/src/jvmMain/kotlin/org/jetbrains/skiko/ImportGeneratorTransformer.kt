@@ -20,7 +20,10 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import kotlin.collections.plus
 
-internal class ImportGeneratorTransformer(private val pluginContext: IrPluginContext) : IrElementTransformerVoid() {
+internal class ImportGeneratorTransformer(
+    private val pluginContext: IrPluginContext,
+    private val moduleName: String
+) : IrElementTransformerVoid() {
 
     private val exportSymbols = mutableListOf<String>()
     fun getExportSymbols(): List<String> = exportSymbols
@@ -44,13 +47,13 @@ internal class ImportGeneratorTransformer(private val pluginContext: IrPluginCon
             constructorSymbol = ctor.symbol,
         )
 
-        val moduleName = if (name.startsWith("org_jetbrains_skiko_tests_")) "./skiko-test.mjs" else "./skiko.mjs"
+        val moduleImport = if (name.startsWith("org_jetbrains_skiko_tests_")) "./$moduleName-test.mjs" else "./$moduleName.mjs"
 
         annotationCall.putValueArgument(0, IrConstImpl.string(
             startOffset,
             endOffset,
             pluginContext.irBuiltIns.stringType,
-            moduleName
+            moduleImport
         ))
 
         annotationCall.putValueArgument(1, IrConstImpl.string(

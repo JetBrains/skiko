@@ -7,6 +7,15 @@ import org.jetbrains.skiko.Library
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.isVideoCardSupported
 
+// https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format
+@JvmInline
+internal value class DxgiFormat(val value: Int) {
+    companion object {
+        val R8G8B8A8_UNORM = DxgiFormat(28)
+        val B8G8R8A8_UNORM = DxgiFormat(87)
+    }
+}
+
 internal object InternalDirectXApi {
     init {
         Library.load()
@@ -32,7 +41,8 @@ internal object InternalDirectXApi {
     fun chooseAdapter(adapterPriority: GpuPriority): NativePointer = chooseAdapter(adapterPriority.ordinal)
     private external fun chooseAdapter(adapterPriority: Int): NativePointer
     external fun createDirectXOffscreenDevice(adapter: NativePointer): NativePointer
-    external fun makeDirectXContext(device: NativePointer): NativePointer
+    external fun getDirectXDevice(device: NativePointer): NativePointer
+    external fun getDirectXCommandQueue(device: NativePointer): NativePointer
 
     external fun waitForCompletion(device: NativePointer, texturePtr: NativePointer)
     external fun readPixels(texturePtr: NativePointer, byteArray: ByteArray): Boolean
@@ -46,7 +56,7 @@ internal object InternalDirectXApi {
     external fun makeDirectXTexture(device: NativePointer, oldTexturePtr: NativePointer, width: Int, height: Int): NativePointer
     external fun disposeDirectXTexture(texturePtr: NativePointer)
 
-    external fun makeDirectXRenderTargetOffScreen(texturePtr: NativePointer): NativePointer
+    external fun getDirectXTextureResource(texturePtr: NativePointer): NativePointer
 
     external fun disposeDevice(device: NativePointer)
 }

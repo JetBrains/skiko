@@ -6,12 +6,12 @@ import SkiaBuildType
 import SkikoProperties
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 import registerSkikoTask
 import skiaVersion
 import supportAndroid
-import supportAwt
 import supportNativeIosArm64
 import supportNativeIosSimulatorArm64
 import supportNativeIosX64
@@ -138,37 +138,35 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
 }
 
 fun Project.configureSignAndPublishDependencies() {
+    val hasAwtTarget = extensions.getByType<KotlinMultiplatformExtension>().targets.findByName("awt") != null
+
     if (supportWeb) {
         tasks.configureEach {
             val publishJs = "publishJsPublicationTo"
-            val publishWasm = "publishSkikoWasmRuntimePublicationTo"
             val publishWasmPub = "publishWasmJsPublicationTo"
-            val signWasm = "signSkikoWasmRuntimePublication"
             val signJs = "signJsPublication"
             val signWasmPub = "signWasmJsPublication"
 
             when {
-                name.startsWith(publishJs) -> dependsOn(signWasm, signWasmPub)
-                name.startsWith(publishWasm) -> dependsOn(signJs)
+                name.startsWith(publishJs) -> dependsOn(signWasmPub)
                 name.startsWith(publishWasmPub) -> dependsOn(signJs)
-                name.startsWith(signWasmPub) -> dependsOn(signWasm)
             }
         }
     }
     if (supportAndroid) {
         tasks.configureEach {
-            val signAndroid = "signAndroidReleasePublication"
-            val generateMetadata = "generateMetadataFileForAndroidReleasePublication"
-            val publishAndroid = "publishAndroidReleasePublicationTo"
+            val signAndroid = "signAndroidPublication"
+            val generateMetadata = "generateMetadataFileForAndroidPublication"
+            val publishAndroid = "publishAndroidPublicationTo"
             val publishX64 = "publishSkikoJvmRuntimeAndroidX64PublicationTo"
             val publishArm64 = "publishSkikoJvmRuntimeAndroidArm64PublicationTo"
             val signX64 = "signSkikoJvmRuntimeAndroidX64Publication"
             val signArm64 = "signSkikoJvmRuntimeAndroidArm64Publication"
-            val skikoAndroidJar = "skikoAndroidJar"
+            val skikoAndroidArtifact = "skikoAndroidArtifact"
 
             when {
                 name.startsWith(signAndroid) || name.startsWith(generateMetadata) -> {
-                    dependsOn(skikoAndroidJar)
+                    dependsOn(skikoAndroidArtifact)
                 }
                 name.startsWith(publishAndroid) -> {
                     dependsOn(signX64, signArm64)
@@ -284,7 +282,7 @@ fun Project.configureSignAndPublishDependencies() {
         }
     }
 
-    if (supportAwt) {
+    if (hasAwtTarget) {
         val publishJvmRuntimeAngleX64 = "publishSkikoJvmRuntimeAngleWindowsX64PublicationToComposeRepoRepository"
         val publishJvmRuntimeAngleArm64 = "publishSkikoJvmRuntimeAngleWindowsArm64PublicationToComposeRepoRepository"
         val signJvmRuntimeX64 = "signSkikoJvmRuntimeWindowsX64Publication"
@@ -313,7 +311,7 @@ fun Project.configureSignAndPublishDependencies() {
 
         when {
             name.startsWith(publishKmp) -> {
-                if (supportAwt) {
+                if (hasAwtTarget) {
                     dependsOn(signAwt)
                     dependsOn(signAwtRuntimeElements)
                 }
@@ -339,28 +337,31 @@ fun KotlinTarget.generateVersion(
     val targetName = this.name
     val isUikitSim = isUikitSimulator()
     val generatedDir = project.layout.buildDirectory.dir("generated/$targetName")
+
+    // Read at configuration time: the task action must not touch Project (configuration cache)
+    val skikoTag = skikoProperties.deployVersion
+    val skiaTag = project.skiaVersion("${targetOs.id}-${targetArch.id}")
+
     val generateVersionTask = project.registerSkikoTask<DefaultTask>(
         "generateVersion${toTitleCase(platformType.name)}".withSuffix(isUikitSim = isUikitSim),
         targetOs,
         targetArch
     ) {
-        inputs.property("buildType", skikoProperties.buildType.id)
+        inputs.property("skikoVersion", skikoTag)
+        inputs.property("skiaVersion", skiaTag)
         outputs.dir(generatedDir)
         doFirst {
-            val outDir = generatedDir.get().asFile
-            outDir.deleteRecursively()
+            val generatedDirFile = generatedDir.get().asFile
+            generatedDirFile.deleteRecursively()
+
+            val outDir = File(generatedDirFile, "org/jetbrains/skiko")
             outDir.mkdirs()
-            val out = "$outDir/Version.kt"
-
-            val target = "${targetOs.id}-${targetArch.id}"
-            val skiaTag = project.skiaVersion(target)
-
-            File(out).writeText(
+            File("$outDir/Version.kt").writeText(
                 """
                 package org.jetbrains.skiko
                 object Version {
-                val skiko = "${skikoProperties.deployVersion}"
-                val skia = "$skiaTag"
+                    val skiko = "$skikoTag"
+                    val skia = "$skiaTag"
                 }
                 """.trimIndent()
             )
@@ -369,9 +370,11 @@ fun KotlinTarget.generateVersion(
 
     // Needs to be lazily loaded as android compilations are not available right away
     compilations.matching { it.name == compilationName }.configureEach {
-        compileTaskProvider.configure {
-            dependsOn(generateVersionTask)
-            (this as KotlinCompileTool).source(generatedDir.get().asFile)
-        }
+        defaultSourceSet.kotlin.srcDir(generateVersionTask)
+    }
+
+    // Make IDEA run the generation during Gradle sync, so that the file resolves without building first
+    project.tasks.matching { it.name == "prepareKotlinIdeaImport" }.configureEach {
+        dependsOn(generateVersionTask)
     }
 }

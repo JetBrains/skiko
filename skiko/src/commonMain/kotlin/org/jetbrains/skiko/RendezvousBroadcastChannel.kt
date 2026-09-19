@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.jetbrains.skiko.internal.fastForEach
 import kotlin.coroutines.*
 
 /**
@@ -29,7 +30,7 @@ internal class RendezvousBroadcastChannel<T> {
         }
 
         // Safe to touch `suspendedCopy` without lock because receive will now add to `suspended`.
-        for (cont in suspendedCopy) {
+        suspendedCopy.fastForEach { cont ->
             cont.resume(value)
         }
         suspendedCopy.clear()

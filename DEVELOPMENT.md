@@ -2,6 +2,10 @@
 
 * Prepare the system
   * `macOs` Install Xcode Command Line Tools
+  * `macOs` Install LLVM — its `llvm-objcopy` is needed to patch symbols when building iOS/tvOS targets:
+    ```
+    brew install llvm
+    ```
   * `Linux` Install these tools:
     ```
     sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip multistrap libx11-dev
@@ -20,6 +24,8 @@
     4. Skiko is built using Clang-cl. Clang-cl is a part of LLVM and can be downloaded from the [LLVM project's website](https://releases.llvm.org/). Please also make sure that Clang-cl.exe is available in %PATH%.
 
 * Install Emscripten
+  * Skiko follows the Emscripten version used by the underlying Skia build. While other versions may work, we recommend using the same version that is currently used in the project to avoid compatibility issues. 
+  * The current version used by Skiko is `4.0.7`
 * Set `JAVA_HOME` to location of JDK, at least version 11
 * `./gradlew :skiko:publishToMavenLocal` will build the artifact and publish it to local Maven repo
 

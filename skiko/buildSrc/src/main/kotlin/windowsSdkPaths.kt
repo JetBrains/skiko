@@ -12,6 +12,7 @@ import kotlin.math.abs
 data class WindowsSdkPaths(
     val compiler: File,
     val linker: File,
+    val dumpbin: File,
     val includeDirs: Collection<File>,
     val libDirs: Collection<File>,
     val toolchainVersion: VersionNumber,
@@ -31,9 +32,12 @@ fun findWindowsSdkPaths(gradle: Gradle, arch: Arch): WindowsSdkPaths {
     val ucrt = finder.findUcrt()
     val winrt = finder.findWinrt()
     val systemLibraries = listOf(visualCpp, windowsSdk, ucrt, winrt)
+    val compiler = visualCpp.compilerExecutable.fixPathFor(arch)
+    val linker = visualCpp.linkerExecutable.fixPathFor(arch)
     return WindowsSdkPaths(
-        compiler = visualCpp.compilerExecutable.fixPathFor(arch),
-        linker = visualCpp.linkerExecutable.fixPathFor(arch),
+        compiler = compiler,
+        linker = linker,
+        dumpbin = linker.parentFile.resolve("dumpbin.exe"),
         includeDirs = systemLibraries.flatMap { it.includeDirs }.map { it.fixPathFor(arch) },
         libDirs = systemLibraries.flatMap { it.libDirs }.map { it.fixPathFor(arch) },
         toolchainVersion = visualCpp.implementationVersion,

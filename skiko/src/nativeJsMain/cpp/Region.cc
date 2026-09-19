@@ -81,7 +81,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nSetRects(KNativePointer ptr, 
     std::vector<SkIRect> rects(count);
     for (int i = 0, off = 0; i < count; i++, off += 4)
         rects[i] = {coords[off], coords[off+1], coords[off+2], coords[off+3]};
-    return instance->setRects(rects.data(), count);
+    return instance->setRects({rects.data(), count});
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nSetRegion(KNativePointer ptr, KNativePointer regionPtr) {

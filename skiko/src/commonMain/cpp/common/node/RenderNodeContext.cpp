@@ -3,8 +3,8 @@
 namespace skiko {
 namespace node {
 
-RenderNodeContext::RenderNodeContext(bool measureDrawBounds)
-    : measureDrawBounds(measureDrawBounds) {
+RenderNodeContext::RenderNodeContext(bool measureDrawBounds, bool snapshotCache)
+    : measureDrawBounds(measureDrawBounds), snapshotCache(snapshotCache) {
 }
 
 void RenderNodeContext::setLightingInfo(

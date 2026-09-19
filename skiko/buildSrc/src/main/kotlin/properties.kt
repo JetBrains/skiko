@@ -1,6 +1,7 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import java.io.File
 
 enum class OS(
@@ -21,6 +22,9 @@ enum class OS(
 
     val isMacOs
         get() = this == MacOS
+
+    val isLinux
+        get() = this == Linux
 
     fun idWithSuffix(isUikitSim: Boolean = false): String {
         return id + if (isUikitSim) "Sim" else ""
@@ -90,8 +94,8 @@ enum class SkiaBuildType(
         id = "Release",
         flags = arrayOf("-DNDEBUG"),
         clangFlags = arrayOf("-std=c++2a", "-O3"),
-        winCompilerFlags = arrayOf("/O2", "/std:c++20"),
-        winLinkerFlags = arrayOf("/DEBUG"),
+        winCompilerFlags = arrayOf("/O2", "/Zc:inline", "/std:c++20"),
+        winLinkerFlags = arrayOf("/DEBUG", "/OPT:ICF"),
     );
     override fun toString() = id
 }
@@ -119,15 +123,21 @@ fun targetId(os: OS, arch: Arch) = "${os.id}-${arch.id}"
 
 val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
 
+val Project.skikoKotlinLanguageVersion: KotlinVersion
+    get() = KotlinVersion.fromVersion(providers.gradleProperty(SkikoGradleProperties.KOTLIN_LANGUAGE_VERSION).get())
+
+val Project.skikoKotlinApiVersion: KotlinVersion
+    get() = KotlinVersion.fromVersion(providers.gradleProperty(SkikoGradleProperties.KOTLIN_API_VERSION).get())
+
 class SkikoProperties(private val myProject: Project) {
     val isTeamcityCIBuild: Boolean
         get() = myProject.hasProperty("teamcity")
 
-    val planeDeployVersion: String = myProject.property("deploy.version") as String
+    val baseDeployVersion: String = myProject.property("deploy.version") as String
 
     val deployVersion: String
         get() {
-            val main = if (isRelease) planeDeployVersion else "$planeDeployVersion-SNAPSHOT"
+            val main = if (isRelease) baseDeployVersion else "$baseDeployVersion-SNAPSHOT"
             var metadata = if (buildType == SkiaBuildType.DEBUG) "+debug" else ""
             metadata += if (isWasmBuildWithProfiling) "+profiling" else ""
             return main + metadata
@@ -153,6 +163,9 @@ class SkikoProperties(private val myProject: Project) {
 
     val releaseGithubCommit: String
         get() = (myProject.property("release.github.commit") as String)
+
+    val releaseGithubPrerelease: Boolean
+        get() = myProject.findProperty("release.github.prerelease") == "true"
 
     val visualStudioBuildToolsDir: File?
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
@@ -254,6 +267,8 @@ class SkikoProperties(private val myProject: Project) {
 }
 
 object SkikoGradleProperties {
+    const val KOTLIN_LANGUAGE_VERSION = "skiko.kotlin.language.version"
+    const val KOTLIN_API_VERSION = "skiko.kotlin.api.version"
     const val AWT_ENABLED = "skiko.awt.enabled"
     const val WASM_ENABLED = "skiko.wasm.enabled"
     const val ANDROID_ENABLED = "skiko.android.enabled"
@@ -279,12 +294,11 @@ class SkikoArtifacts(
     val commonArtifactId = artifactIdPrefix
     val jvmArtifactId = "$artifactIdPrefix-awt"
     val jvmRuntimeArtifactId = "$artifactIdPrefix-awt-runtime"
+    val jvmRuntimeAllArtifactId = "$jvmRuntimeArtifactId-all"
     // an artifact (klib) for k/js targets
     val jsArtifactId = "$artifactIdPrefix-js"
     // an artifact (klib) for k/wasm targets
     val wasmArtifactId = "$artifactIdPrefix-wasm-js"
-    // an artifact with skiko.wasm and supporting js code - jar
-    val jsWasmArtifactId = "$artifactIdPrefix-js-wasm-runtime"
     fun jvmRuntimeArtifactIdFor(os: OS, arch: Arch) =
         if (os == OS.Android)
             "$artifactIdPrefix-android-runtime-${arch.id}"

@@ -2,8 +2,8 @@
 #include "node/RenderNodeContext.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake
-  (KBoolean measureDrawBounds) {
-    auto instance = sk_make_sp<skiko::node::RenderNodeContext>(measureDrawBounds);
+  (KBoolean measureDrawBounds, KBoolean snapshotCache) {
+    auto instance = sk_make_sp<skiko::node::RenderNodeContext>(measureDrawBounds, snapshotCache);
     return reinterpret_cast<KNativePointer>(instance.release());
 }
 

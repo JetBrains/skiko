@@ -55,6 +55,23 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         reachabilityBarrier(bitmap)
     }
 
+    /**
+     * Returns the recording context being used by this Canvas.
+     *
+     * The returned context is borrowed from the Canvas and must not be closed.
+     *
+     * @return the recording context, if available; null otherwise
+     */
+    val recordingContext: DirectContext?
+        get() = try {
+            Stats.onNativeCall()
+            val ptr = _nGetCanvasRecordingContext(_ptr)
+            if (ptr == NullPointer) null else DirectContext(ptr, managed = false)
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(_owner)
+        }
+
     fun drawPoint(x: Float, y: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
@@ -1069,6 +1086,30 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return this
     }
 
+    /**
+     * Associates [key] and [value] with [rect] in the drawing stream.
+     *
+     * The annotation draws nothing itself. It is preserved when the canvas records into a [Picture]
+     * and is delivered again when that picture is played back, which makes it usable as a marker in
+     * a recorded drawing. A canvas that does not recognize the key ignores the annotation.
+     *
+     * @param rect   the region the annotation applies to
+     * @param key    identifies the annotation's meaning to whoever consumes the drawing
+     * @param value  the annotation's data; may be null
+     */
+    fun drawAnnotation(rect: Rect, key: String, value: Data? = null): Canvas {
+        Stats.onNativeCall()
+        try {
+            interopScope {
+                _nDrawAnnotation(_ptr, rect.left, rect.top, rect.right, rect.bottom, toInterop(key), getPtr(value))
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(value)
+        }
+        return this
+    }
+
     fun clear(color: Int): Canvas {
         Stats.onNativeCall()
         try {
@@ -1595,6 +1636,9 @@ private external fun Canvas_nGetFinalizer(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nMakeFromBitmap")
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer
 
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetRecordingContext")
+private external fun _nGetCanvasRecordingContext(ptr: NativePointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoint")
 private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
 
@@ -1732,6 +1776,17 @@ private external fun _nDrawPatch(
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDrawable")
 private external fun _nDrawDrawable(ptr: NativePointer, drawablePrt: NativePointer, matrix: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawAnnotation")
+private external fun _nDrawAnnotation(
+    ptr: NativePointer,
+    left: Float,
+    top: Float,
+    right: Float,
+    bottom: Float,
+    key: InteropPointer,
+    valuePtr: NativePointer
+)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClear")
 private external fun _nClear(ptr: NativePointer, color: Int)

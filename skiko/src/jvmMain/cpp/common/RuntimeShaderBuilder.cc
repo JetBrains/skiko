@@ -1,4 +1,5 @@
 #include <jni.h>
+#include <vector>
 
 #include "SkRuntimeEffect.h"
 #include "interop.hh"
@@ -86,19 +87,21 @@ extern "C" JNIEXPORT void JNICALL
 Java_org_jetbrains_skia_RuntimeShaderBuilderKt__1nUniformFloatArray
   (JNIEnv* env, jclass jclass, jlong builderPtr, jstring uniformName, jfloatArray uniformFloatArray, jint length) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = jlongToPtr<SkRuntimeShaderBuilder*>(builderPtr);
-    jfloat* floatArray = static_cast<jfloat*>(env->GetPrimitiveArrayCritical(uniformFloatArray, 0));
-    runtimeShaderBuilder->uniform(skString(env, uniformName).c_str()).set(floatArray, length);
-    env->ReleasePrimitiveArrayCritical(uniformFloatArray, floatArray, 0);
+    SkString name = skString(env, uniformName);
+    std::vector<jfloat> floatArray(length);
+    env->GetFloatArrayRegion(uniformFloatArray, 0, length, floatArray.data());
+    runtimeShaderBuilder->uniform(name.c_str()).set(floatArray.data(), length);
 }
 
 extern "C" JNIEXPORT void JNICALL
 Java_org_jetbrains_skia_RuntimeShaderBuilderKt__1nUniformFloatMatrix22
   (JNIEnv* env, jclass jclass, jlong builderPtr, jstring uniformName, jfloatArray uniformMatrix22) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = jlongToPtr<SkRuntimeShaderBuilder*>(builderPtr);
-    jfloat* matrix22 = static_cast<jfloat*>(env->GetPrimitiveArrayCritical(uniformMatrix22, 0));
-    runtimeShaderBuilder->uniform(skString(env, uniformName).c_str()) =
+    SkString name = skString(env, uniformName);
+    jfloat matrix22[4];
+    env->GetFloatArrayRegion(uniformMatrix22, 0, 4, matrix22);
+    runtimeShaderBuilder->uniform(name.c_str()) =
         std::array<float, 4> {matrix22[0], matrix22[1], matrix22[2], matrix22[3]};
-    env->ReleasePrimitiveArrayCritical(uniformMatrix22, matrix22, 0);
 }
 
 extern "C" JNIEXPORT void JNICALL

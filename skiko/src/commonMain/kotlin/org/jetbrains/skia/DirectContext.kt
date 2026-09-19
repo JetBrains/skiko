@@ -7,7 +7,7 @@ import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.loadOpenGLLibrary
 
-class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
+class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     companion object {
         fun makeGL(): DirectContext {
             Stats.onNativeCall()

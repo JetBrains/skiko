@@ -23,6 +23,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nMakeFromB
     return reinterpret_cast<jlong>(canvas);
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetCanvasRecordingContext
+  (JNIEnv* env, jclass jclass, jlong canvasPtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
+    return reinterpret_cast<jlong>(canvas->recordingContext());
+}
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoint
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat x, jfloat y, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
@@ -177,6 +183,9 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawVertic
         env->ReleaseFloatArrayElements(texCoordsArr, texCoords, 0);
     if (colors != nullptr)
         env->ReleaseIntArrayElements(colorsArr, colors, 0);
+    if (indices != nullptr) {
+        env->ReleaseShortArrayElements(indexArr, const_cast<jshort*>(indices), 0);
+    }
     env->ReleaseFloatArrayElements(positionsArr, positions, 0);
 }
 
@@ -202,6 +211,13 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawDrawab
     SkDrawable* drawable = reinterpret_cast<SkDrawable*>(static_cast<uintptr_t>(drawablePtr));
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
     canvas->drawDrawable(drawable, matrix.get());
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawAnnotation
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jstring key, jlong valuePtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    SkData* value = reinterpret_cast<SkData*>(static_cast<uintptr_t>(valuePtr));
+    canvas->drawAnnotation(SkRect::MakeLTRB(left, top, right, bottom), skString(env, key).c_str(), value);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nClear(JNIEnv* env, jclass jclass, jlong ptr, jint color) {
