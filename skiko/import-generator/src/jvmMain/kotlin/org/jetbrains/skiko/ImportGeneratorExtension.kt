@@ -43,6 +43,9 @@ internal class ImportGeneratorExtension(
             }
             else {
                 reexportWriter.appendLine("export const isSideModuleLoaded = () => wasmApi.isSideModuleLoaded();")
+                if (moduleName == "skiko-ganesh") {
+                    reexportWriter.appendLine("export const GL = wasmApi.GL;")
+                }
             }
 
             importGenerator.getExportSymbols().forEach { symbolName ->

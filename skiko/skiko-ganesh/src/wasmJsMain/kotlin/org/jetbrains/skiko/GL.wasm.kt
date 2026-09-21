@@ -1,4 +1,4 @@
-@file:JsModule("./skiko.mjs")
+@file:JsModule("./skiko-ganesh.mjs")
 package org.jetbrains.skiko
 
 @InternalSkikoApi
