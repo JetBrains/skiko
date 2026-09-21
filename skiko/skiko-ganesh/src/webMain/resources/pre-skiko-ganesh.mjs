@@ -1,5 +1,5 @@
-import "./js-skiko-reexport-symbols.mjs";
 import {
+    GL,
     loadedWasm,
     loadSkikoExtension,
     registerSkikoWasmReadyCallback,
@@ -22,4 +22,4 @@ registerSkikoWasmReadyCallback(() => ensureGaneshLoaded());
 
 const isSideModuleLoaded = () => ganeshLoaded;
 
-export { isSideModuleLoaded };
+export { GL, isSideModuleLoaded };
