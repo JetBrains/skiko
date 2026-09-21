@@ -67,12 +67,12 @@ var version = if (project.hasProperty("skiko.version")) {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
     implementation("org.jetbrains.skiko:skiko-android:$version")
-    implementation("org.jetbrains.skiko:skiko-rendering-android:$version")
+    implementation("org.jetbrains.skiko:skiko-platform-android:$version")
 
     skikoNativeX64("org.jetbrains.skiko:skiko-android-runtime-x64:$version")
-    skikoNativeX64("org.jetbrains.skiko:skiko-rendering-android-runtime-x64:$version")
+    skikoNativeX64("org.jetbrains.skiko:skiko-platform-android-runtime-x64:$version")
     skikoNativeArm64("org.jetbrains.skiko:skiko-android-runtime-arm64:$version")
-    skikoNativeArm64("org.jetbrains.skiko:skiko-rendering-android-runtime-arm64:$version")
+    skikoNativeArm64("org.jetbrains.skiko:skiko-platform-android-runtime-arm64:$version")
 }
 
 kotlin {
