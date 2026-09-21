@@ -115,10 +115,10 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 implementation("org.jetbrains.skiko:skiko:$skikoVersion")
-                implementation("org.jetbrains.skiko:skiko-rendering:$skikoVersion")
+                implementation("org.jetbrains.skiko:skiko-platform:$skikoVersion")
                 implementation("org.jetbrains.skiko:skiko-skottie:$skikoVersion")
                 implementation("org.jetbrains.skiko:skiko-awt-runtime-all:$skikoVersion")
-                implementation("org.jetbrains.skiko:skiko-rendering-awt-runtime-all:$skikoVersion")
+                implementation("org.jetbrains.skiko:skiko-platform-awt-runtime-all:$skikoVersion")
                 implementation("org.jetbrains.skiko:skiko-skottie-awt-runtime-all:$skikoVersion")
             }
         }
@@ -134,7 +134,7 @@ kotlin {
             dependsOn(webMain)
             dependencies {
                 implementation("org.jetbrains.skiko:skiko-js:$skikoVersion")
-                implementation("org.jetbrains.skiko:skiko-rendering-js:$skikoVersion")
+                implementation("org.jetbrains.skiko:skiko-platform-js:$skikoVersion")
                 implementation("org.jetbrains.skiko:skiko-skottie-js:$skikoVersion")
             }
         }
@@ -143,7 +143,7 @@ kotlin {
             dependsOn(webMain)
             dependencies {
                 implementation("org.jetbrains.skiko:skiko-wasm-js:$skikoVersion")
-                implementation("org.jetbrains.skiko:skiko-rendering-wasm-js:$skikoVersion")
+                implementation("org.jetbrains.skiko:skiko-platform-wasm-js:$skikoVersion")
                 implementation("org.jetbrains.skiko:skiko-skottie-wasm-js:$skikoVersion")
             }
         }
@@ -153,7 +153,7 @@ kotlin {
                 dependsOn(commonMain)
                 dependencies {
                     implementation("org.jetbrains.skiko:skiko:$skikoVersion")
-                    implementation("org.jetbrains.skiko:skiko-rendering:$skikoVersion")
+                    implementation("org.jetbrains.skiko:skiko-platform:$skikoVersion")
                     implementation("org.jetbrains.skiko:skiko-skottie:$skikoVersion")
                 }
             }
