@@ -14,4 +14,9 @@ import javax.accessibility.Accessible
  *
  * As such, this function is not to be considered public Skiko API.
  */
-external fun initializeCAccessible(accessible: Accessible)
+fun initializeCAccessible(accessible: Accessible) {
+    PlatformLibrary.load()
+    nativeInitializeCAccessible(accessible)
+}
+
+private external fun nativeInitializeCAccessible(accessible: Accessible)

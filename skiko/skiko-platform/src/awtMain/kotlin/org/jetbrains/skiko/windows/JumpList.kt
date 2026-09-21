@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.windows
 
+import org.jetbrains.skiko.PlatformLibrary
 import org.jetbrains.skiko.hostOs
 
 /**
@@ -108,6 +109,7 @@ class JumpListBuilder internal constructor() : AutoCloseable {
      * Starts the Jump List building transaction.
      */
     internal fun initialize() {
+        PlatformLibrary.load()
         jumpListPointer = jumpList_init().also { ptr ->
             check(ptr != 0L) { "Failed to initialize Windows jump list" }
         }
