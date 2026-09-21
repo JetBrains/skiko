@@ -446,7 +446,7 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
     val coreObjcCompile = if (os.isMacOs) tasks.named<CompileSkikoObjCTask>("objcCompile$suffix") else null
     val requiredSymbols = skikoProjectContext.jvmRequiredSymbolsFor(os, arch)
     dependencies.add(requiredSymbols.name, project(":skiko-skottie"))
-    dependencies.add(requiredSymbols.name, project(":skiko-rendering"))
+    dependencies.add(requiredSymbols.name, project(":skiko-platform"))
     if (os != OS.Android && supportAwt) {
         dependencies.add(requiredSymbols.name, project(":skiko-graphite"))
     }

@@ -106,13 +106,13 @@ object SkikoProperties {
     }
 
     val macOSWaitForPreviousFrameVsyncOnRedrawImmediately: Boolean
-        by lazyBooleanProperty("skiko.rendering.macos.waitForPreviousFrameVsyncOnRedrawImmediately", defaultValue = true)
+        by lazyBooleanProperty("skiko.platform.macos.waitForPreviousFrameVsyncOnRedrawImmediately", defaultValue = true)
 
     val windowsWaitForVsyncOnRedrawImmediately: Boolean
-        by lazyBooleanProperty("skiko.rendering.windows.waitForFrameVsyncOnRedrawImmediately", defaultValue = false)
+        by lazyBooleanProperty("skiko.platform.windows.waitForFrameVsyncOnRedrawImmediately", defaultValue = false)
 
     val linuxWaitForVsyncOnRedrawImmediately: Boolean
-        by lazyBooleanProperty("skiko.rendering.linux.waitForFrameVsyncOnRedrawImmediately", defaultValue = false)
+        by lazyBooleanProperty("skiko.platform.linux.waitForFrameVsyncOnRedrawImmediately", defaultValue = false)
 
     /**
      * Metal on macOS: during an interactive live resize (dragging a window edge), render and present
@@ -123,7 +123,7 @@ object SkikoProperties {
      * presented asynchronously off the resize transaction.
      */
     val metalSynchronousLiveResize: Boolean
-        by lazyBooleanProperty("skiko.rendering.macos.metalSynchronousLiveResize", defaultValue = false)
+        by lazyBooleanProperty("skiko.platform.macos.metalSynchronousLiveResize", defaultValue = false)
 
     /**
      * Direct3D on Windows: during an interactive live resize (dragging a window edge), render and present
@@ -134,7 +134,7 @@ object SkikoProperties {
      * and frames are presented asynchronously off the resize.
      */
     val direct3DSynchronousLiveResize: Boolean
-        by lazyBooleanProperty("skiko.rendering.windows.direct3DSynchronousLiveResize", defaultValue = false)
+        by lazyBooleanProperty("skiko.platform.windows.direct3DSynchronousLiveResize", defaultValue = false)
 
     /**
      * Is experimental ANGLE renderer API enabled (https://skia.org/docs/user/special/angle/).
@@ -149,7 +149,7 @@ object SkikoProperties {
      *   https://github.com/JetBrains/angle-pack/releases
      */
     val renderingAngleEnabled: Boolean
-        by lazyBooleanProperty("skiko.rendering.angle.enabled", defaultValue = false)
+        by lazyBooleanProperty("skiko.platform.angle.enabled", defaultValue = false)
 
     /**
      * If vsync is enabled, but platform can't support it (Software renderer, Linux with uninstalled drivers),
