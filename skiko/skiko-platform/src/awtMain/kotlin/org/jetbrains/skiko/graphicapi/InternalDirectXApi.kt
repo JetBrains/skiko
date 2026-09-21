@@ -4,7 +4,7 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.GpuPriority
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.InternalSkikoApi
-import org.jetbrains.skiko.RenderingLibrary
+import org.jetbrains.skiko.PlatformLibrary
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.isVideoCardSupported
 
@@ -21,7 +21,7 @@ value class DxgiFormat(val value: Int) {
 @InternalSkikoApi
 object InternalDirectXApi {
     init {
-        RenderingLibrary.load()
+        PlatformLibrary.load()
     }
 
     private external fun getTextureAlignment(): Long
