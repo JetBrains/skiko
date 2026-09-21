@@ -2,7 +2,7 @@
 #import <jawt_md.h>
 
 extern "C" {
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AccessibilityKt_initializeCAccessible(
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AccessibilityKt_nativeInitializeCAccessible(
     JNIEnv *env, jobject obj, jobject accessible)
 {
     @autoreleasepool {
