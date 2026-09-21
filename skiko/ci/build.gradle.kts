@@ -114,7 +114,7 @@ val skikoArtifactIds: List<String> =
         skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
-        skikoPlatformArtifacts.jvmRuntimeAllArtifactId,,
+        skikoPlatformArtifacts.jvmRuntimeAllArtifactId,
 
         skikoGaneshArtifacts.commonArtifactId,
         skikoGaneshArtifacts.jvmArtifactId,
