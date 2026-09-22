@@ -146,7 +146,7 @@ fun SkikoProjectContext.declareWasmTasks() {
                     "-s", "SUPPORT_LONGJMP=wasm",
                     // -O2 saves 800kB for the output file, and ~100kB for transferred size.
                     // -O3 breaks the exports in js/mjs files. skiko.wasm size is the same though
-                    "-O2"
+                    "-Os"
                 )
             )
 

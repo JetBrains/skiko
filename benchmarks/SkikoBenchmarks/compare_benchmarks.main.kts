@@ -108,9 +108,11 @@ fun main(args: Array<String>) {
     benchmarkName?.let { println("Filtering by benchmark: $it") }
 
     val resultsV1 = runBenchmarksForTarget(targetV1, runs, benchmarkName, platform, modes, requestedResultNames, metric, skipExisting)
+    val artifactSizeV1 = findArtifactSize(platform)
     val resultsV2 = runBenchmarksForTarget(targetV2, runs, benchmarkName, platform, modes, requestedResultNames, metric, skipExisting)
+    val artifactSizeV2 = findArtifactSize(platform)
 
-    compareResults(targetV1.version, resultsV1, targetV2.version, resultsV2, requestedResultNames, metric)
+    compareResults(targetV1.version, resultsV1, artifactSizeV1, targetV2.version, resultsV2, artifactSizeV2, requestedResultNames, metric)
 }
 
 fun runBenchmarksForTarget(
@@ -205,11 +207,35 @@ fun collectResults(
     return resultMap
 }
 
+fun findArtifactSize(platform: String): String? {
+    val artifactFile = when (platform) {
+        "web" -> projectDir.resolve("build/resources/skiko.wasm")
+        "jvm" -> {
+            val libsDir = projectDir.resolve("build/libs")
+            libsDir.listFiles { f -> f.name.startsWith("skiko") && f.extension == "jar" }
+                ?.maxByOrNull { it.lastModified() }
+        }
+        else -> null
+    }
+    if (artifactFile == null || !artifactFile.exists()) return null
+    return formatFileSize(artifactFile.length())
+}
+
+fun formatFileSize(bytes: Long): String {
+    if (bytes < 1024) return "$bytes B"
+    val kb = bytes / 1024.0
+    if (kb < 1024) return "%.1f KB".format(kb)
+    val mb = kb / 1024.0
+    return "%.1f MB".format(mb)
+}
+
 fun compareResults(
     v1: String,
     res1: Map<String, List<Double>>,
+    artifactSize1: String?,
     v2: String,
     res2: Map<String, List<Double>>,
+    artifactSize2: String?,
     requestedBenchmarks: Set<String>?,
     metric: CompareMetric,
 ) {
@@ -255,8 +281,10 @@ fun compareResults(
         }
         .sortedWith(compareBy<ComparisonRow> { it.benchmark }.thenBy { it.modeOrder })
 
-    val header1 = "$v1 ${metric.columnName}"
-    val header2 = "$v2 ${metric.columnName}"
+    val sizeLabel1 = artifactSize1?.let { " ($it)" } ?: ""
+    val sizeLabel2 = artifactSize2?.let { " ($it)" } ?: ""
+    val header1 = "$v1$sizeLabel1 ${metric.columnName}"
+    val header2 = "$v2$sizeLabel2 ${metric.columnName}"
     val benchmarkWidth = maxOf("Benchmark".length, rows.maxOfOrNull { it.benchmark.length } ?: 0)
     val modeWidth = maxOf("Mode".length, rows.maxOfOrNull { it.mode.length } ?: 0)
     val value1Width = maxOf(header1.length, rows.maxOfOrNull { it.value1.length } ?: 0)
