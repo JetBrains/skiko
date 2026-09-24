@@ -27,7 +27,13 @@ internal class ImportGeneratorExtension(
             moduleFragment.transformChildrenVoid(importGenerator)
 
             importGenerator.getExportSymbols().forEach { symbolName ->
-                writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
+//                writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
+                writer.appendLine(
+                    "export let ${symbolName} = (...a) => " +
+                            "($symbolName = " +
+                            "(globalThis.__skikoNativeHost?.[\"${symbolName}\"] " +
+                            "?? loadedWasm._[\"${symbolName}\"]))(...a)"
+                )
             }
         }
 
