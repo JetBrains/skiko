@@ -33,6 +33,7 @@ private fun createRenderer(
 ): AwtRenderer = when (hostOs) {
     OS.MacOS -> when (renderApi) {
         GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareRenderer(layer, analytics, properties)
+        GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan renderers")
         else -> MetalRenderer(layer, analytics, properties)
     }
     OS.Windows -> when (renderApi) {
@@ -40,11 +41,13 @@ private fun createRenderer(
         GraphicsApi.SOFTWARE_FAST -> WindowsSoftwareRenderer(layer, analytics, properties)
         GraphicsApi.OPENGL -> WindowsOpenGLRenderer(layer, analytics, properties)
         GraphicsApi.ANGLE -> AngleRenderer(layer, analytics, properties)
+        GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan renderers")
         else -> Direct3DRenderer(layer, analytics, properties)
     }
     OS.Linux -> when (renderApi) {
         GraphicsApi.SOFTWARE_COMPAT -> SoftwareRenderer(layer, analytics, properties)
         GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRenderer(layer, analytics, properties)
+        GraphicsApi.VULKAN -> throw UnsupportedOperationException("AWT doesn't support Vulkan renderers")
         else -> LinuxOpenGLRenderer(layer, analytics, properties)
     }
     else -> throw UnsupportedOperationException("AWT doesn't support $hostOs")

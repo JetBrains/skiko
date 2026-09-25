@@ -56,3 +56,27 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt
     return reinterpret_cast<jlong>(instance);
 }
 #endif //SK_DIRECT3D
+
+#ifdef SK_VULKAN
+#include "include/gpu/ganesh/vk/GrVkBackendSurface.h"
+#include "include/gpu/ganesh/vk/GrVkTypes.h"
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt__1nMakeVulkan
+  (JNIEnv* env, jclass jclass, jint width, jint height, jlong imagePtr, jint imageTiling, jint imageLayout, jint format, jint imageUsageFlags, jint sampleCnt, jint levelCnt) {
+    GrVkImageInfo vkInfo = {};
+    vkInfo.fImage = reinterpret_cast<VkImage>(static_cast<uintptr_t>(imagePtr));
+    vkInfo.fImageTiling = static_cast<VkImageTiling>(imageTiling);
+    vkInfo.fImageLayout = static_cast<VkImageLayout>(imageLayout);
+    vkInfo.fFormat = static_cast<VkFormat>(format);
+    vkInfo.fImageUsageFlags = static_cast<VkImageUsageFlags>(imageUsageFlags);
+    vkInfo.fSampleCount = static_cast<uint32_t>(sampleCnt);
+    vkInfo.fLevelCount = static_cast<uint32_t>(levelCnt);
+
+    GrBackendRenderTarget backendRenderTarget = GrBackendRenderTargets::MakeVk(width, height, vkInfo);
+    if (!backendRenderTarget.isValid()) {
+        return 0;
+    }
+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(backendRenderTarget);
+    return reinterpret_cast<jlong>(instance);
+}
+#endif // SK_VULKAN
