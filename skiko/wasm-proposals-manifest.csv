@@ -1,0 +1,14 @@
+proposal,chrome_min,firefox_min,safari_min
+mutable-globals,74,61,13.1
+sign-extension-ops,74,62,14.1
+threads,74,79,14.1
+nontrapping-float-to-int,75,64,15
+bulk-memory-operations,75,79,15
+multi-value,85,78,13.1
+simd,91,89,16.4
+legacy-exception-handling,95,100,15.2
+reference-types,96,79,15
+tail-call,112,121,18.2
+typed-function-references,119,120,18
+gc,119,120,18.2
+exception-handling,137,131,18.4
