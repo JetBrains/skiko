@@ -8,7 +8,7 @@
 #include <unordered_map>
 
 namespace {
-constexpr size_t kDefaultNumCachedImages = 256;
+constexpr size_t kMaxCachedImages = 256;
 // Textures uploaded by SkImages::TextureFromImage are not budgeted by the Recorder while the cache
 // holds them; once evicted, they are recycled by the Recorder's own resource cache. So this limit
 // is separate from, and smaller than, the Recorder's GPU budget.
@@ -55,6 +55,8 @@ struct SkikoGraphiteImageProvider::Impl {
     std::unordered_map<ImageKey, std::list<Entry>::iterator, ImageHash> index;
     size_t totalBytes = 0;
 
+    Impl() { index.reserve(kMaxCachedImages); }
+
     sk_sp<SkImage> find(const ImageKey& key) {
         auto found = index.find(key);
         if (found == index.end()) return nullptr;
@@ -69,7 +71,7 @@ struct SkikoGraphiteImageProvider::Impl {
         totalBytes += bytes;
         // Always keep the newest entry, even if it exceeds the limit on its own.
         while (entries.size() > 1 &&
-               (entries.size() > kDefaultNumCachedImages || totalBytes > kMaxCachedImageBytes)) {
+               (entries.size() > kMaxCachedImages || totalBytes > kMaxCachedImageBytes)) {
             totalBytes -= entries.back().bytes;
             index.erase(entries.back().key);
             entries.pop_back();
