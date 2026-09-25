@@ -1,0 +1,3444 @@
+{
+  "generatedFrom": {
+    "wasm": "build/wasm/packages/SkiaNonWebSample/kotlin/skiko.wasm",
+    "headers": [
+      "OpenGL/gl3.h",
+      "OpenGL/glext.h"
+    ]
+  },
+  "requiredFunctionCount": 163,
+  "resolvedFunctionCount": 163,
+  "unresolved": [],
+  "functions": [
+    {
+      "name": "glActiveTexture",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "texture",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glAttachShader",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLuint)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "shader",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glBeginQuery",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLuint)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "id",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glBindAttribLocation",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLuint, const GLchar *)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "name",
+          "type": "const GLchar *",
+          "spelledType": "const GLchar *"
+        }
+      ]
+    },
+    {
+      "name": "glBindBuffer",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLuint)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "buffer",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glBindFragDataLocation",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLuint, const GLchar *)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "color",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "name",
+          "type": "const GLchar *",
+          "spelledType": "const GLchar *"
+        }
+      ]
+    },
+    {
+      "name": "glBindFragDataLocationIndexed",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLuint, GLuint, const GLchar *)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "colorNumber",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "name",
+          "type": "const GLchar *",
+          "spelledType": "const GLchar *"
+        }
+      ]
+    },
+    {
+      "name": "glBindFramebuffer",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLuint)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "framebuffer",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glBindRenderbuffer",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLuint)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "renderbuffer",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glBindSampler",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLuint)",
+      "parameters": [
+        {
+          "name": "unit",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "sampler",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glBindTexture",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLuint)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "texture",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glBindVertexArray",
+      "returnType": "void ",
+      "functionType": "void (GLuint)",
+      "parameters": [
+        {
+          "name": "array",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glBlendColor",
+      "returnType": "void ",
+      "functionType": "void (GLfloat, GLfloat, GLfloat, GLfloat)",
+      "parameters": [
+        {
+          "name": "red",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "green",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "blue",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "alpha",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glBlendEquation",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glBlendFunc",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum)",
+      "parameters": [
+        {
+          "name": "sfactor",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "dfactor",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glBlitFramebuffer",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLbitfield, GLenum)",
+      "parameters": [
+        {
+          "name": "srcX0",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "srcY0",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "srcX1",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "srcY1",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "dstX0",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "dstY0",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "dstX1",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "dstY1",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "mask",
+          "type": "unsigned int",
+          "spelledType": "GLbitfield"
+        },
+        {
+          "name": "filter",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glBufferData",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLsizeiptr, const GLvoid *, GLenum)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "size",
+          "type": "long",
+          "spelledType": "GLsizeiptr"
+        },
+        {
+          "name": "data",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        },
+        {
+          "name": "usage",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glBufferSubData",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLintptr, GLsizeiptr, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "offset",
+          "type": "long",
+          "spelledType": "GLintptr"
+        },
+        {
+          "name": "size",
+          "type": "long",
+          "spelledType": "GLsizeiptr"
+        },
+        {
+          "name": "data",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glCheckFramebufferStatus",
+      "returnType": "GLenum ",
+      "functionType": "GLenum (GLenum)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glClear",
+      "returnType": "void ",
+      "functionType": "void (GLbitfield)",
+      "parameters": [
+        {
+          "name": "mask",
+          "type": "unsigned int",
+          "spelledType": "GLbitfield"
+        }
+      ]
+    },
+    {
+      "name": "glClearColor",
+      "returnType": "void ",
+      "functionType": "void (GLfloat, GLfloat, GLfloat, GLfloat)",
+      "parameters": [
+        {
+          "name": "red",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "green",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "blue",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "alpha",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glClearStencil",
+      "returnType": "void ",
+      "functionType": "void (GLint)",
+      "parameters": [
+        {
+          "name": "s",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glClientWaitSync",
+      "returnType": "GLenum ",
+      "functionType": "GLenum (GLsync, GLbitfield, GLuint64)",
+      "parameters": [
+        {
+          "name": "sync",
+          "type": "struct __GLsync *",
+          "spelledType": "GLsync"
+        },
+        {
+          "name": "flags",
+          "type": "unsigned int",
+          "spelledType": "GLbitfield"
+        },
+        {
+          "name": "timeout",
+          "type": "unsigned long long",
+          "spelledType": "GLuint64"
+        }
+      ]
+    },
+    {
+      "name": "glColorMask",
+      "returnType": "void ",
+      "functionType": "void (GLboolean, GLboolean, GLboolean, GLboolean)",
+      "parameters": [
+        {
+          "name": "red",
+          "type": "unsigned char",
+          "spelledType": "GLboolean"
+        },
+        {
+          "name": "green",
+          "type": "unsigned char",
+          "spelledType": "GLboolean"
+        },
+        {
+          "name": "blue",
+          "type": "unsigned char",
+          "spelledType": "GLboolean"
+        },
+        {
+          "name": "alpha",
+          "type": "unsigned char",
+          "spelledType": "GLboolean"
+        }
+      ]
+    },
+    {
+      "name": "glCompileShader",
+      "returnType": "void ",
+      "functionType": "void (GLuint)",
+      "parameters": [
+        {
+          "name": "shader",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glCompressedTexImage2D",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLsizei, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "internalformat",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "border",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "imageSize",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "data",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glCompressedTexSubImage2D",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLsizei, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "xoffset",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "yoffset",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "format",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "imageSize",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "data",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glCopyBufferSubData",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLintptr, GLintptr, GLsizeiptr)",
+      "parameters": [
+        {
+          "name": "readTarget",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "writeTarget",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "readOffset",
+          "type": "long",
+          "spelledType": "GLintptr"
+        },
+        {
+          "name": "writeOffset",
+          "type": "long",
+          "spelledType": "GLintptr"
+        },
+        {
+          "name": "size",
+          "type": "long",
+          "spelledType": "GLsizeiptr"
+        }
+      ]
+    },
+    {
+      "name": "glCopyTexSubImage2D",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint, GLint, GLint, GLint, GLint, GLsizei, GLsizei)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "xoffset",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "yoffset",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "x",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "y",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glCreateProgram",
+      "returnType": "GLuint ",
+      "functionType": "GLuint (void)",
+      "parameters": []
+    },
+    {
+      "name": "glCreateShader",
+      "returnType": "GLuint ",
+      "functionType": "GLuint (GLenum)",
+      "parameters": [
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glCullFace",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteBuffers",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "buffers",
+          "type": "const GLuint *",
+          "spelledType": "const GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteFramebuffers",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "framebuffers",
+          "type": "const GLuint *",
+          "spelledType": "const GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteProgram",
+      "returnType": "void ",
+      "functionType": "void (GLuint)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteQueries",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "ids",
+          "type": "const GLuint *",
+          "spelledType": "const GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteRenderbuffers",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "renderbuffers",
+          "type": "const GLuint *",
+          "spelledType": "const GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteSamplers",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const GLuint *)",
+      "parameters": [
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "samplers",
+          "type": "const GLuint *",
+          "spelledType": "const GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteShader",
+      "returnType": "void ",
+      "functionType": "void (GLuint)",
+      "parameters": [
+        {
+          "name": "shader",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteSync",
+      "returnType": "void ",
+      "functionType": "void (GLsync)",
+      "parameters": [
+        {
+          "name": "sync",
+          "type": "struct __GLsync *",
+          "spelledType": "GLsync"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteTextures",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "textures",
+          "type": "const GLuint *",
+          "spelledType": "const GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glDeleteVertexArrays",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "arrays",
+          "type": "const GLuint *",
+          "spelledType": "const GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glDepthMask",
+      "returnType": "void ",
+      "functionType": "void (GLboolean)",
+      "parameters": [
+        {
+          "name": "flag",
+          "type": "unsigned char",
+          "spelledType": "GLboolean"
+        }
+      ]
+    },
+    {
+      "name": "glDisable",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "cap",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glDisableVertexAttribArray",
+      "returnType": "void ",
+      "functionType": "void (GLuint)",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glDrawArrays",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint, GLsizei)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "first",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glDrawArraysIndirect",
+      "returnType": "void ",
+      "functionType": "void (GLenum, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "indirect",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glDrawArraysInstanced",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint, GLsizei, GLsizei)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "first",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "instancecount",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glDrawBuffer",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glDrawBuffers",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const GLenum *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "bufs",
+          "type": "const GLenum *",
+          "spelledType": "const GLenum *"
+        }
+      ]
+    },
+    {
+      "name": "glDrawElements",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLsizei, GLenum, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "indices",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glDrawElementsIndirect",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "indirect",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glDrawElementsInstanced",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLsizei, GLenum, const GLvoid *, GLsizei)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "indices",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        },
+        {
+          "name": "instancecount",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glDrawRangeElements",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLuint, GLuint, GLsizei, GLenum, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "start",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "end",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "indices",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glEnable",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "cap",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glEnableVertexAttribArray",
+      "returnType": "void ",
+      "functionType": "void (GLuint)",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glEndQuery",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glFenceSync",
+      "returnType": "GLsync ",
+      "functionType": "GLsync (GLenum, GLbitfield)",
+      "parameters": [
+        {
+          "name": "condition",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "flags",
+          "type": "unsigned int",
+          "spelledType": "GLbitfield"
+        }
+      ]
+    },
+    {
+      "name": "glFinish",
+      "returnType": "void ",
+      "functionType": "void (void)",
+      "parameters": []
+    },
+    {
+      "name": "glFlush",
+      "returnType": "void ",
+      "functionType": "void (void)",
+      "parameters": []
+    },
+    {
+      "name": "glFlushMappedBufferRange",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLintptr, GLsizeiptr)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "offset",
+          "type": "long",
+          "spelledType": "GLintptr"
+        },
+        {
+          "name": "length",
+          "type": "long",
+          "spelledType": "GLsizeiptr"
+        }
+      ]
+    },
+    {
+      "name": "glFramebufferRenderbuffer",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLenum, GLuint)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "attachment",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "renderbuffertarget",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "renderbuffer",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glFramebufferTexture2D",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLenum, GLuint, GLint)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "attachment",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "textarget",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "texture",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glFrontFace",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glGenBuffers",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "buffers",
+          "type": "GLuint *",
+          "spelledType": "GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glGenFramebuffers",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "framebuffers",
+          "type": "GLuint *",
+          "spelledType": "GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glGenQueries",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "ids",
+          "type": "GLuint *",
+          "spelledType": "GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glGenRenderbuffers",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "renderbuffers",
+          "type": "GLuint *",
+          "spelledType": "GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glGenSamplers",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, GLuint *)",
+      "parameters": [
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "samplers",
+          "type": "GLuint *",
+          "spelledType": "GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glGenTextures",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "textures",
+          "type": "GLuint *",
+          "spelledType": "GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glGenVertexArrays",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, GLuint *)",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "arrays",
+          "type": "GLuint *",
+          "spelledType": "GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glGenerateMipmap",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glGetBufferParameteriv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLint *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetError",
+      "returnType": "GLenum ",
+      "functionType": "GLenum (void)",
+      "parameters": []
+    },
+    {
+      "name": "glGetFloatv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLfloat *)",
+      "parameters": [
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLfloat *",
+          "spelledType": "GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glGetFramebufferAttachmentParameteriv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLenum, GLint *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "attachment",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetIntegerv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint *)",
+      "parameters": [
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetInternalformativ",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLenum, GLsizei, GLint *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "internalformat",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "params",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetMultisamplefv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLuint, GLfloat *)",
+      "parameters": [
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "val",
+          "type": "GLfloat *",
+          "spelledType": "GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glGetProgramBinary",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLsizei, GLsizei *, GLenum *, GLvoid *)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "bufSize",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "length",
+          "type": "GLsizei *",
+          "spelledType": "GLsizei *"
+        },
+        {
+          "name": "binaryFormat",
+          "type": "GLenum *",
+          "spelledType": "GLenum *"
+        },
+        {
+          "name": "binary",
+          "type": "GLvoid *",
+          "spelledType": "GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glGetProgramInfoLog",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLsizei, GLsizei *, GLchar *)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "bufSize",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "length",
+          "type": "GLsizei *",
+          "spelledType": "GLsizei *"
+        },
+        {
+          "name": "infoLog",
+          "type": "GLchar *",
+          "spelledType": "GLchar *"
+        }
+      ]
+    },
+    {
+      "name": "glGetProgramiv",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, GLint *)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetQueryObjecti64v",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, GLint64 *)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLint64 *",
+          "spelledType": "GLint64 *"
+        }
+      ]
+    },
+    {
+      "name": "glGetQueryObjectui64v",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, GLuint64 *)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLuint64 *",
+          "spelledType": "GLuint64 *"
+        }
+      ]
+    },
+    {
+      "name": "glGetQueryObjectuiv",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, GLuint *)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLuint *",
+          "spelledType": "GLuint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetQueryiv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLint *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetRenderbufferParameteriv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLint *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetShaderInfoLog",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLsizei, GLsizei *, GLchar *)",
+      "parameters": [
+        {
+          "name": "shader",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "bufSize",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "length",
+          "type": "GLsizei *",
+          "spelledType": "GLsizei *"
+        },
+        {
+          "name": "infoLog",
+          "type": "GLchar *",
+          "spelledType": "GLchar *"
+        }
+      ]
+    },
+    {
+      "name": "glGetShaderPrecisionFormat",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLint *, GLint *)",
+      "parameters": [
+        {
+          "name": "shadertype",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "precisiontype",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "range",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        },
+        {
+          "name": "precision",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetShaderiv",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, GLint *)",
+      "parameters": [
+        {
+          "name": "shader",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetString",
+      "returnType": "const GLubyte *",
+      "functionType": "const GLubyte *(GLenum)",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glGetStringi",
+      "returnType": "const GLubyte *",
+      "functionType": "const GLubyte *(GLenum, GLuint)",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glGetTexLevelParameteriv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint, GLenum, GLint *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "GLint *",
+          "spelledType": "GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glGetUniformLocation",
+      "returnType": "GLint ",
+      "functionType": "GLint (GLuint, const GLchar *)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "name",
+          "type": "const GLchar *",
+          "spelledType": "const GLchar *"
+        }
+      ]
+    },
+    {
+      "name": "glInsertEventMarkerEXT",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const char *)",
+      "parameters": [
+        {
+          "name": "length",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "marker",
+          "type": "const char *",
+          "spelledType": "const char *"
+        }
+      ]
+    },
+    {
+      "name": "glIsSync",
+      "returnType": "GLboolean ",
+      "functionType": "GLboolean (GLsync)",
+      "parameters": [
+        {
+          "name": "sync",
+          "type": "struct __GLsync *",
+          "spelledType": "GLsync"
+        }
+      ]
+    },
+    {
+      "name": "glIsTexture",
+      "returnType": "GLboolean ",
+      "functionType": "GLboolean (GLuint)",
+      "parameters": [
+        {
+          "name": "texture",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glLineWidth",
+      "returnType": "void ",
+      "functionType": "void (GLfloat)",
+      "parameters": [
+        {
+          "name": "width",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glLinkProgram",
+      "returnType": "void ",
+      "functionType": "void (GLuint)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glMapBuffer",
+      "returnType": "GLvoid *",
+      "functionType": "GLvoid *(GLenum, GLenum)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "access",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glMapBufferRange",
+      "returnType": "GLvoid *",
+      "functionType": "GLvoid *(GLenum, GLintptr, GLsizeiptr, GLbitfield)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "offset",
+          "type": "long",
+          "spelledType": "GLintptr"
+        },
+        {
+          "name": "length",
+          "type": "long",
+          "spelledType": "GLsizeiptr"
+        },
+        {
+          "name": "access",
+          "type": "unsigned int",
+          "spelledType": "GLbitfield"
+        }
+      ]
+    },
+    {
+      "name": "glPatchParameteri",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint)",
+      "parameters": [
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "value",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glPixelStorei",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint)",
+      "parameters": [
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "param",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glPolygonMode",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum)",
+      "parameters": [
+        {
+          "name": "face",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glPopGroupMarkerEXT",
+      "returnType": "void ",
+      "functionType": "void (void)",
+      "parameters": []
+    },
+    {
+      "name": "glProgramBinary",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, const GLvoid *, GLsizei)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "binaryFormat",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "binary",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        },
+        {
+          "name": "length",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glProgramParameteri",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, GLint)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "value",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glPushGroupMarkerEXT",
+      "returnType": "void ",
+      "functionType": "void (GLsizei, const char *)",
+      "parameters": [
+        {
+          "name": "length",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "marker",
+          "type": "const char *",
+          "spelledType": "const char *"
+        }
+      ]
+    },
+    {
+      "name": "glQueryCounter",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glReadBuffer",
+      "returnType": "void ",
+      "functionType": "void (GLenum)",
+      "parameters": [
+        {
+          "name": "mode",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glReadPixels",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, GLvoid *)",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "y",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "format",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pixels",
+          "type": "GLvoid *",
+          "spelledType": "GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glRenderbufferStorage",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLsizei, GLsizei)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "internalformat",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glRenderbufferStorageMultisample",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLsizei, GLenum, GLsizei, GLsizei)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "samples",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "internalformat",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glSamplerParameterf",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, GLfloat)",
+      "parameters": [
+        {
+          "name": "sampler",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "param",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glSamplerParameteri",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, GLint)",
+      "parameters": [
+        {
+          "name": "sampler",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "param",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glSamplerParameteriv",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLenum, const GLint *)",
+      "parameters": [
+        {
+          "name": "sampler",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "param",
+          "type": "const GLint *",
+          "spelledType": "const GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glScissor",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLint, GLsizei, GLsizei)",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "y",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glShaderSource",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLsizei, const GLchar *const *, const GLint *)",
+      "parameters": [
+        {
+          "name": "shader",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "string",
+          "type": "const GLchar *const *",
+          "spelledType": "const GLchar *const *"
+        },
+        {
+          "name": "length",
+          "type": "const GLint *",
+          "spelledType": "const GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glStencilFunc",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint, GLuint)",
+      "parameters": [
+        {
+          "name": "func",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "ref",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "mask",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glStencilFuncSeparate",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLint, GLuint)",
+      "parameters": [
+        {
+          "name": "face",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "func",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "ref",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "mask",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glStencilMask",
+      "returnType": "void ",
+      "functionType": "void (GLuint)",
+      "parameters": [
+        {
+          "name": "mask",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glStencilMaskSeparate",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLuint)",
+      "parameters": [
+        {
+          "name": "face",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "mask",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glStencilOp",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLenum)",
+      "parameters": [
+        {
+          "name": "fail",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "zfail",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "zpass",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glStencilOpSeparate",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLenum, GLenum)",
+      "parameters": [
+        {
+          "name": "face",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "sfail",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "dpfail",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "dppass",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glTexBuffer",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLuint)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "internalformat",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "buffer",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glTexImage2D",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "internalformat",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "border",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "format",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pixels",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glTexParameterf",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLfloat)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "param",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glTexParameterfv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glTexParameteri",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, GLint)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "param",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glTexParameteriv",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLenum, const GLint *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pname",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "params",
+          "type": "const GLint *",
+          "spelledType": "const GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glTexStorage2D",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLsizei, GLenum, GLsizei, GLsizei)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "levels",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "internalformat",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glTexSubImage2D",
+      "returnType": "void ",
+      "functionType": "void (GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "xoffset",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "yoffset",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "format",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "pixels",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glTextureBarrierNV",
+      "returnType": "void ",
+      "functionType": "void (void)",
+      "parameters": []
+    },
+    {
+      "name": "glUniform1f",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLfloat)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v0",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glUniform1fv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "value",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glUniform1i",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLint)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v0",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glUniform1iv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, const GLint *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "value",
+          "type": "const GLint *",
+          "spelledType": "const GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glUniform2f",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLfloat, GLfloat)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v0",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "v1",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glUniform2fv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "value",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glUniform2i",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLint, GLint)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v0",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v1",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glUniform2iv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, const GLint *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "value",
+          "type": "const GLint *",
+          "spelledType": "const GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glUniform3f",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLfloat, GLfloat, GLfloat)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v0",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "v1",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "v2",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glUniform3fv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "value",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glUniform3i",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLint, GLint, GLint)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v0",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v1",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v2",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glUniform3iv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, const GLint *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "value",
+          "type": "const GLint *",
+          "spelledType": "const GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glUniform4f",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLfloat, GLfloat, GLfloat, GLfloat)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v0",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "v1",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "v2",
+          "type": "float",
+          "spelledType": "GLfloat"
+        },
+        {
+          "name": "v3",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glUniform4fv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "value",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glUniform4i",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLint, GLint, GLint, GLint)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v0",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v1",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v2",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "v3",
+          "type": "int",
+          "spelledType": "GLint"
+        }
+      ]
+    },
+    {
+      "name": "glUniform4iv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, const GLint *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "value",
+          "type": "const GLint *",
+          "spelledType": "const GLint *"
+        }
+      ]
+    },
+    {
+      "name": "glUniformMatrix2fv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, GLboolean, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "transpose",
+          "type": "unsigned char",
+          "spelledType": "GLboolean"
+        },
+        {
+          "name": "value",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glUniformMatrix3fv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, GLboolean, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "transpose",
+          "type": "unsigned char",
+          "spelledType": "GLboolean"
+        },
+        {
+          "name": "value",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glUniformMatrix4fv",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLsizei, GLboolean, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "location",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "transpose",
+          "type": "unsigned char",
+          "spelledType": "GLboolean"
+        },
+        {
+          "name": "value",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glUnmapBuffer",
+      "returnType": "GLboolean ",
+      "functionType": "GLboolean (GLenum)",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        }
+      ]
+    },
+    {
+      "name": "glUseProgram",
+      "returnType": "void ",
+      "functionType": "void (GLuint)",
+      "parameters": [
+        {
+          "name": "program",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glVertexAttrib1f",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLfloat)",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "x",
+          "type": "float",
+          "spelledType": "GLfloat"
+        }
+      ]
+    },
+    {
+      "name": "glVertexAttrib2fv",
+      "returnType": "void ",
+      "functionType": "void (GLuint, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "v",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glVertexAttrib3fv",
+      "returnType": "void ",
+      "functionType": "void (GLuint, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "v",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glVertexAttrib4fv",
+      "returnType": "void ",
+      "functionType": "void (GLuint, const GLfloat *)",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "v",
+          "type": "const GLfloat *",
+          "spelledType": "const GLfloat *"
+        }
+      ]
+    },
+    {
+      "name": "glVertexAttribDivisor",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLuint)",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "divisor",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        }
+      ]
+    },
+    {
+      "name": "glVertexAttribIPointer",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLint, GLenum, GLsizei, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "stride",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "pointer",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glVertexAttribPointer",
+      "returnType": "void ",
+      "functionType": "void (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *)",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "unsigned int",
+          "spelledType": "GLuint"
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "type",
+          "type": "unsigned int",
+          "spelledType": "GLenum"
+        },
+        {
+          "name": "normalized",
+          "type": "unsigned char",
+          "spelledType": "GLboolean"
+        },
+        {
+          "name": "stride",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "pointer",
+          "type": "const GLvoid *",
+          "spelledType": "const GLvoid *"
+        }
+      ]
+    },
+    {
+      "name": "glViewport",
+      "returnType": "void ",
+      "functionType": "void (GLint, GLint, GLsizei, GLsizei)",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "y",
+          "type": "int",
+          "spelledType": "GLint"
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "spelledType": "GLsizei"
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "spelledType": "GLsizei"
+        }
+      ]
+    },
+    {
+      "name": "glWaitSync",
+      "returnType": "void ",
+      "functionType": "void (GLsync, GLbitfield, GLuint64)",
+      "parameters": [
+        {
+          "name": "sync",
+          "type": "struct __GLsync *",
+          "spelledType": "GLsync"
+        },
+        {
+          "name": "flags",
+          "type": "unsigned int",
+          "spelledType": "GLbitfield"
+        },
+        {
+          "name": "timeout",
+          "type": "unsigned long long",
+          "spelledType": "GLuint64"
+        }
+      ]
+    }
+  ]
+}

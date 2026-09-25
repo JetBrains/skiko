@@ -5,12 +5,14 @@
 #include <OpenGL/gl3.h>
 #include <OpenGL/gl3ext.h>
 
+#include <ffi/ffi.h>
 #include <cstdio>
 #include <cstdint>
 #include <cstring>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <array>
 #include <algorithm>
 #include <dlfcn.h>
 #include <memory>
@@ -34,6 +36,22 @@ namespace {
 napi_value Undefined(napi_env env);
 uint32_t U32(napi_env env, napi_value value);
 napi_value ToU32(napi_env env, uint32_t value);
+int32_t I32(napi_env env, napi_value value);
+float F32(napi_env env, napi_value value);
+
+napi_ref wasmMemoryRef = nullptr;
+napi_ref wasmMallocRef = nullptr;
+
+uint8_t* wasmMemoryBase = nullptr;
+size_t wasmMemorySize = 0;
+template <typename T>
+T* WasmPointer(uint32_t offset) {
+    if (offset == 0) {
+        return nullptr;
+    }
+
+    return reinterpret_cast<T*>(wasmMemoryBase + offset);
+}
 
 struct RenderTarget {
     CGLContextObj context = nullptr;
@@ -44,103 +62,44 @@ struct RenderTarget {
     GLsizei height = 0;
 };
 
-enum class DynamicGLSignature {
-    Void0,
-    VoidU32,
-    VoidU32U32,
-    VoidF32,
-    VoidF32F32F32F32,
-
-    VoidI32I32,
-    VoidI32I32I32,
-    VoidI32I32I32I32,
-    VoidI32F32F32,
-    VoidI32I32F32,
-
-    U32_0,
-    U32_U32,
+enum class FFIKind {
+    Void,
+    U8,
+    I32,
+    U32,
+    F32,
+    I64,
+    U64,
+    WasmPtr,
 };
 
-const std::unordered_map<
-    std::string,
-    DynamicGLSignature
-> dynamicGLSignatures = {
-    {"glFlush", DynamicGLSignature::Void0},
-    {"glFinish", DynamicGLSignature::Void0},
-
-    {"glActiveTexture", DynamicGLSignature::VoidU32},
-    {"glBindVertexArray", DynamicGLSignature::VoidU32},
-    {"glBlendEquation", DynamicGLSignature::VoidU32},
-    {"glClear", DynamicGLSignature::VoidU32},
-    {"glClearStencil", DynamicGLSignature::VoidU32},
-    {"glCullFace", DynamicGLSignature::VoidU32},
-    {"glDeleteProgram", DynamicGLSignature::VoidU32},
-    {"glDepthFunc", DynamicGLSignature::VoidU32},
-    {"glDepthMask", DynamicGLSignature::VoidU32},
-    {"glDisable", DynamicGLSignature::VoidU32},
-    {"glDrawBuffer", DynamicGLSignature::VoidU32},
-    {"glEnable", DynamicGLSignature::VoidU32},
-    {"glEndQuery", DynamicGLSignature::VoidU32},
-    {"glFrontFace", DynamicGLSignature::VoidU32},
-    {"glGenerateMipmap", DynamicGLSignature::VoidU32},
-    {"glReadBuffer", DynamicGLSignature::VoidU32},
-    {"glStencilMask", DynamicGLSignature::VoidU32},
-    {"glUseProgram", DynamicGLSignature::VoidU32},
-    {"glCompileShader", DynamicGLSignature::VoidU32},
-    {"glDeleteShader", DynamicGLSignature::VoidU32},
-    {"glDisableVertexAttribArray", DynamicGLSignature::VoidU32},
-    {"glEnableVertexAttribArray", DynamicGLSignature::VoidU32},
-    {"glLinkProgram", DynamicGLSignature::VoidU32},
-
-    {"glAttachShader", DynamicGLSignature::VoidU32U32},
-    {"glBeginQuery", DynamicGLSignature::VoidU32U32},
-    {"glBindBuffer", DynamicGLSignature::VoidU32U32},
-    {"glBindSampler", DynamicGLSignature::VoidU32U32},
-    {"glBindTexture", DynamicGLSignature::VoidU32U32},
-    {"glBlendFunc", DynamicGLSignature::VoidU32U32},
-    {"glPolygonMode", DynamicGLSignature::VoidU32U32},
-    {"glStencilMaskSeparate", DynamicGLSignature::VoidU32U32},
-    {"glVertexAttribDivisor", DynamicGLSignature::VoidU32U32},
-
-    {"glLineWidth", DynamicGLSignature::VoidF32},
-
-    {
-        "glClearColor",
-        DynamicGLSignature::VoidF32F32F32F32
-    },
-
-    {"glPixelStorei", DynamicGLSignature::VoidI32I32},
-    {"glUniform1i", DynamicGLSignature::VoidI32I32},
-
-    {"glDrawArrays", DynamicGLSignature::VoidI32I32I32},
-    {"glSamplerParameteri", DynamicGLSignature::VoidI32I32I32},
-    {"glTexParameteri", DynamicGLSignature::VoidI32I32I32},
-
-    {"glColorMask", DynamicGLSignature::VoidI32I32I32I32},
-    {"glScissor", DynamicGLSignature::VoidI32I32I32I32},
-    {"glViewport", DynamicGLSignature::VoidI32I32I32I32},
-
-    {"glUniform2f", DynamicGLSignature::VoidI32F32F32},
-
-    {"glSamplerParameterf", DynamicGLSignature::VoidI32I32F32},
-
-    {"glCreateProgram", DynamicGLSignature::U32_0},
-    {"glGetError", DynamicGLSignature::U32_0},
-
-    {"glCheckFramebufferStatus", DynamicGLSignature::U32_U32},
-    {"glCreateShader", DynamicGLSignature::U32_U32},
+struct GeneratedGLDescriptor {
+    const char* name;
+    FFIKind returnKind;
+    std::vector<FFIKind> argumentKinds;
 };
 
-struct DynamicGLDescriptor {
+const std::vector<GeneratedGLDescriptor>
+        generatedGLDescriptors = {
+#include "native-gl-descriptors.inc"
+};
+
+struct FFIDynamicGLDescriptor {
     std::string name;
     void* address = nullptr;
-    DynamicGLSignature signature;
+
+    FFIKind returnKind = FFIKind::Void;
+    std::vector<FFIKind> argumentKinds;
+
+    ffi_cif callInterface{};
+    ffi_type* returnType = nullptr;
+    std::vector<ffi_type*> argumentTypes;
 };
 
 std::unordered_map<
     std::string,
-    std::unique_ptr<DynamicGLDescriptor>
-> dynamicGLFunctions;
+    std::unique_ptr<FFIDynamicGLDescriptor>
+> ffiGLFunctions;
 
 // CGLContextObj nativeContext = nullptr;
 uint32_t nextContextId = 1;
@@ -151,9 +110,379 @@ void Throw(napi_env env, const char* message) {
     napi_throw_error(env, nullptr, message);
 }
 
-CGLContextObj CreateNativeContext(napi_env env) {
-//     if (nativeContext != nullptr) return true;
+ffi_type* GetFFIType(FFIKind kind) {
+    switch (kind) {
+        case FFIKind::Void:
+            return &ffi_type_void;
 
+        case FFIKind::U8:
+            return &ffi_type_uint8;
+
+        case FFIKind::I32:
+            return &ffi_type_sint32;
+
+        case FFIKind::U32:
+            return &ffi_type_uint32;
+
+        case FFIKind::F32:
+            return &ffi_type_float;
+
+        case FFIKind::I64:
+            return &ffi_type_sint64;
+
+        case FFIKind::U64:
+            return &ffi_type_uint64;
+
+        case FFIKind::WasmPtr:
+            return &ffi_type_pointer;
+    }
+
+    return nullptr;
+}
+
+union FFIValue {
+    uint8_t u8;
+    int32_t i32;
+    uint32_t u32;
+    float f32;
+    int64_t i64;
+    uint64_t u64;
+    void* pointer;
+};
+
+napi_value CallFFIGL(
+        napi_env env,
+        napi_callback_info info) {
+    napi_value args[16];
+    size_t argc = std::size(args);
+    void* callbackData = nullptr;
+
+    napi_get_cb_info(
+        env,
+        info,
+        &argc,
+        args,
+        nullptr,
+        &callbackData
+    );
+
+    auto* descriptor =
+        static_cast<FFIDynamicGLDescriptor*>(
+            callbackData
+        );
+
+    if (descriptor == nullptr ||
+        descriptor->address == nullptr) {
+        Throw(env, "Invalid libffi OpenGL descriptor");
+        return nullptr;
+    }
+
+    if (argc != descriptor->argumentKinds.size()) {
+        Throw(env, "Incorrect OpenGL argument count");
+        return nullptr;
+    }
+
+    std::vector<FFIValue> values(argc);
+    std::vector<void*> ffiArguments(argc);
+
+    for (size_t i = 0; i < argc; ++i) {
+        switch (descriptor->argumentKinds[i]) {
+            case FFIKind::U8:
+                values[i].u8 =
+                    static_cast<uint8_t>(
+                        U32(env, args[i])
+                    );
+                ffiArguments[i] = &values[i].u8;
+                break;
+
+            case FFIKind::I32:
+                values[i].i32 = I32(env, args[i]);
+                ffiArguments[i] = &values[i].i32;
+                break;
+
+            case FFIKind::U32:
+                values[i].u32 = U32(env, args[i]);
+                ffiArguments[i] = &values[i].u32;
+                break;
+
+            case FFIKind::F32:
+                values[i].f32 = F32(env, args[i]);
+                ffiArguments[i] = &values[i].f32;
+                break;
+
+            case FFIKind::I64:
+                napi_get_value_int64(
+                    env,
+                    args[i],
+                    &values[i].i64
+                );
+                ffiArguments[i] = &values[i].i64;
+                break;
+
+            case FFIKind::U64: {
+                double value = 0;
+
+                napi_get_value_double(
+                    env,
+                    args[i],
+                    &value
+                );
+
+                values[i].u64 =
+                    static_cast<uint64_t>(value);
+
+                ffiArguments[i] = &values[i].u64;
+                break;
+            }
+
+            case FFIKind::WasmPtr:
+                values[i].pointer =
+                    WasmPointer<uint8_t>(
+                        U32(env, args[i])
+                    );
+
+                ffiArguments[i] =
+                    &values[i].pointer;
+                break;
+
+            case FFIKind::Void:
+                Throw(
+                    env,
+                    "Void cannot be an argument type"
+                );
+                return nullptr;
+        }
+    }
+
+    FFIValue result{};
+
+    ffi_call(
+        &descriptor->callInterface,
+        FFI_FN(descriptor->address),
+        descriptor->returnKind == FFIKind::Void
+            ? nullptr
+            : &result,
+        ffiArguments.data()
+    );
+
+    napi_value returnValue;
+
+    switch (descriptor->returnKind) {
+        case FFIKind::Void:
+            return Undefined(env);
+
+        case FFIKind::U8:
+            napi_create_uint32(
+                env,
+                result.u8,
+                &returnValue
+            );
+            return returnValue;
+
+        case FFIKind::I32:
+            napi_create_int32(
+                env,
+                result.i32,
+                &returnValue
+            );
+            return returnValue;
+
+        case FFIKind::U32:
+            napi_create_uint32(
+                env,
+                result.u32,
+                &returnValue
+            );
+            return returnValue;
+
+        case FFIKind::F32:
+            napi_create_double(
+                env,
+                result.f32,
+                &returnValue
+            );
+            return returnValue;
+
+        case FFIKind::I64:
+            napi_create_bigint_int64(
+                env,
+                result.i64,
+                &returnValue
+            );
+            return returnValue;
+
+        case FFIKind::U64:
+            napi_create_bigint_uint64(
+                env,
+                result.u64,
+                &returnValue
+            );
+            return returnValue;
+
+        case FFIKind::WasmPtr:
+            Throw(
+                env,
+                "Native pointer returns require a special handler"
+            );
+            return nullptr;
+    }
+
+    return nullptr;
+}
+
+const GeneratedGLDescriptor*
+FindGeneratedGLDescriptor(const std::string& name) {
+    for (const auto& descriptor :
+         generatedGLDescriptors) {
+        if (name == descriptor.name) {
+            return &descriptor;
+        }
+    }
+
+    return nullptr;
+}
+
+napi_value GetFFIGLFunction(
+        napi_env env,
+        napi_callback_info info) {
+    napi_value args[1];
+    size_t argc = 1;
+
+    napi_get_cb_info(
+        env,
+        info,
+        &argc,
+        args,
+        nullptr,
+        nullptr
+    );
+
+    if (argc != 1) {
+        Throw(env, "getGLFunction expects a name");
+        return nullptr;
+    }
+
+    size_t length = 0;
+
+    napi_get_value_string_utf8(
+        env,
+        args[0],
+        nullptr,
+        0,
+        &length
+    );
+
+    std::string name(length + 1, '\0');
+
+    napi_get_value_string_utf8(
+        env,
+        args[0],
+        name.data(),
+        name.size(),
+        &length
+    );
+
+    name.resize(length);
+
+    const GeneratedGLDescriptor* generated =
+        FindGeneratedGLDescriptor(name);
+
+    // Special functions continue through their old wrappers.
+    if (generated == nullptr) {
+        return Undefined(env);
+    }
+
+    auto existing = ffiGLFunctions.find(name);
+
+    if (existing != ffiGLFunctions.end()) {
+        napi_value function;
+
+        napi_create_function(
+            env,
+            name.c_str(),
+            NAPI_AUTO_LENGTH,
+            CallFFIGL,
+            existing->second.get(),
+            &function
+        );
+
+        return function;
+    }
+
+    void* address = dlsym(
+        RTLD_DEFAULT,
+        name.c_str()
+    );
+
+    // Missing native functions use the old explicit fallback.
+    if (address == nullptr) {
+        return Undefined(env);
+    }
+
+    auto descriptor =
+        std::make_unique<FFIDynamicGLDescriptor>();
+
+    descriptor->name = name;
+    descriptor->address = address;
+    descriptor->returnKind =
+        generated->returnKind;
+    descriptor->argumentKinds =
+        generated->argumentKinds;
+    descriptor->returnType =
+        GetFFIType(descriptor->returnKind);
+
+    for (FFIKind kind :
+         descriptor->argumentKinds) {
+        descriptor->argumentTypes.push_back(
+            GetFFIType(kind)
+        );
+    }
+
+    const ffi_status status = ffi_prep_cif(
+        &descriptor->callInterface,
+        FFI_DEFAULT_ABI,
+        static_cast<unsigned int>(
+            descriptor->argumentTypes.size()
+        ),
+        descriptor->returnType,
+        descriptor->argumentTypes.data()
+    );
+
+    if (status != FFI_OK) {
+        Throw(env, "ffi_prep_cif failed");
+        return nullptr;
+    }
+
+    FFIDynamicGLDescriptor* descriptorPointer =
+        descriptor.get();
+
+    ffiGLFunctions.emplace(
+        name,
+        std::move(descriptor)
+    );
+
+    napi_value function;
+
+    napi_create_function(
+        env,
+        name.c_str(),
+        NAPI_AUTO_LENGTH,
+        CallFFIGL,
+        descriptorPointer,
+        &function
+    );
+
+    fprintf(
+        stderr,
+        "[ffi-gl] resolved: %s -> %p\n",
+        name.c_str(),
+        address
+    );
+
+    return function;
+}
+
+CGLContextObj CreateNativeContext(napi_env env) {
     CGLPixelFormatAttribute attributes[] = {
         kCGLPFAOpenGLProfile,
         static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_3_2_Core),
@@ -185,16 +514,6 @@ CGLContextObj CreateNativeContext(napi_env env) {
         return nullptr;
     }
 
-//     if (CGLSetCurrentContext(nativeContext) != kCGLNoError) {
-//         Throw(env, "CGLSetCurrentContext failed");
-//         return false;
-//     }
-//     std::fprintf(
-//         stderr,
-//         "[native-skiko] GL_VERSION=%s, GLSL_VERSION=%s\n",
-//         reinterpret_cast<const char*>(glGetString(GL_VERSION)),
-//         reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))
-//     );
     return context;
 }
 
@@ -364,12 +683,6 @@ napi_value DestroyContext(napi_env env, napi_callback_info info) {
     return Undefined(env);
 }
 
-napi_ref wasmMemoryRef = nullptr;
-napi_ref wasmMallocRef = nullptr;
-
-uint8_t* wasmMemoryBase = nullptr;
-size_t wasmMemorySize = 0;
-
 std::unordered_map<std::string, uint32_t> wasmStrings;
 
 napi_value Undefined(napi_env env) {
@@ -421,15 +734,6 @@ void RefreshWasmMemory(napi_env env) {
 
     wasmMemoryBase = static_cast<uint8_t*>(data);
     wasmMemorySize = size;
-}
-
-template <typename T>
-T* WasmPointer(uint32_t offset) {
-    if (offset == 0) {
-        return nullptr;
-    }
-
-    return reinterpret_cast<T*>(wasmMemoryBase + offset);
 }
 
 /*
@@ -569,619 +873,6 @@ napi_value AttachWasmRuntime(
 
 /* Context and capability queries */
 
-napi_value Host_glGetString(
-    napi_env env,
-    napi_callback_info info
-) {
-    napi_value args[1];
-    size_t argc = 1;
-    napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-
-    const GLubyte* result = glGetString(
-        static_cast<GLenum>(U32(env, args[0]))
-    );
-
-    return ToU32(env, CopyStringToWasm(env, result));
-}
-
-napi_value Host_glGetStringi(
-    napi_env env,
-    napi_callback_info info
-) {
-    napi_value args[2];
-    size_t argc = 2;
-    napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-
-    const GLubyte* result = glGetStringi(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1]))
-    );
-
-    return ToU32(env, CopyStringToWasm(env, result));
-}
-
-GL_VOID_BINDING(glGetIntegerv, 2, {
-    const GLenum pname =
-        static_cast<GLenum>(U32(env, args[0]));
-
-    GLint* params =
-        WasmPointer<GLint>(U32(env, args[1]));
-
-    glGetIntegerv(pname, params);
-
-    const bool framebufferBinding =
-        pname == GL_FRAMEBUFFER_BINDING ||
-        pname == GL_DRAW_FRAMEBUFFER_BINDING ||
-        pname == GL_READ_FRAMEBUFFER_BINDING;
-
-    if (framebufferBinding &&
-        params != nullptr &&
-        currentContextId != 0) {
-        const auto found =
-            renderTargets.find(currentContextId);
-
-        if (found != renderTargets.end() &&
-            static_cast<GLuint>(*params) ==
-                found->second.framebuffer) {
-            *params = 0;
-        }
-    }
-})
-
-GL_VOID_BINDING(glGetFloatv, 2, {
-    glGetFloatv(
-        static_cast<GLenum>(U32(env, args[0])),
-        WasmPointer<GLfloat>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glGetShaderPrecisionFormat, 4, {
-    glGetShaderPrecisionFormat(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1])),
-        WasmPointer<GLint>(U32(env, args[2])),
-        WasmPointer<GLint>(U32(env, args[3]))
-    );
-})
-
-napi_value Host_glGetError(
-    napi_env env,
-    napi_callback_info info
-) {
-    size_t argc = 0;
-    napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
-    return ToU32(env, glGetError());
-}
-
-/* Basic state */
-
-GL_VOID_BINDING(glDisable, 1, {
-    glDisable(static_cast<GLenum>(U32(env, args[0])));
-})
-
-GL_VOID_BINDING(glEnable, 1, {
-    glEnable(static_cast<GLenum>(U32(env, args[0])));
-})
-
-GL_VOID_BINDING(glDepthMask, 1, {
-    glDepthMask(static_cast<GLboolean>(U32(env, args[0])));
-})
-
-GL_VOID_BINDING(glFrontFace, 1, {
-    glFrontFace(static_cast<GLenum>(U32(env, args[0])));
-})
-
-GL_VOID_BINDING(glLineWidth, 1, {
-    glLineWidth(F32(env, args[0]));
-})
-
-GL_VOID_BINDING(glPixelStorei, 2, {
-    glPixelStorei(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLint>(I32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glViewport, 4, {
-    glViewport(
-        I32(env, args[0]),
-        I32(env, args[1]),
-        I32(env, args[2]),
-        I32(env, args[3])
-    );
-})
-
-GL_VOID_BINDING(glClearColor, 4, {
-    glClearColor(
-        F32(env, args[0]),
-        F32(env, args[1]),
-        F32(env, args[2]),
-        F32(env, args[3])
-    );
-})
-
-GL_VOID_BINDING(glColorMask, 4, {
-    glColorMask(
-        static_cast<GLboolean>(U32(env, args[0])),
-        static_cast<GLboolean>(U32(env, args[1])),
-        static_cast<GLboolean>(U32(env, args[2])),
-        static_cast<GLboolean>(U32(env, args[3]))
-    );
-})
-
-GL_VOID_BINDING(glClear, 1, {
-    glClear(static_cast<GLbitfield>(U32(env, args[0])));
-})
-
-GL_VOID_BINDING(glBlendEquation, 1, {
-    glBlendEquation(static_cast<GLenum>(U32(env, args[0])));
-})
-
-GL_VOID_BINDING(glBlendFunc, 2, {
-    glBlendFunc(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1]))
-    );
-})
-
-/* Buffers */
-
-GL_VOID_BINDING(glGenBuffers, 2, {
-    glGenBuffers(
-        I32(env, args[0]),
-        WasmPointer<GLuint>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glBindBuffer, 2, {
-    glBindBuffer(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glBufferData, 4, {
-    glBufferData(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLsizeiptr>(I32(env, args[1])),
-        WasmPointer<const void>(U32(env, args[2])),
-        static_cast<GLenum>(U32(env, args[3]))
-    );
-})
-
-GL_VOID_BINDING(glBufferSubData, 4, {
-    glBufferSubData(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLintptr>(I32(env, args[1])),
-        static_cast<GLsizeiptr>(I32(env, args[2])),
-        WasmPointer<const void>(U32(env, args[3]))
-    );
-})
-
-GL_VOID_BINDING(glBindVertexArray, 1, {
-    glBindVertexArray(
-        static_cast<GLuint>(U32(env, args[0]))
-    );
-})
-
-/* Framebuffers */
-
-GL_VOID_BINDING(glBindFramebuffer, 2, {
-    glBindFramebuffer(
-        static_cast<GLenum>(U32(env, args[0])),
-        ResolveFramebuffer(
-            static_cast<GLuint>(U32(env, args[1]))
-        )
-    );
-})
-
-GL_VOID_BINDING(glGenFramebuffers, 2, {
-    glGenFramebuffers(
-        I32(env, args[0]),
-        WasmPointer<GLuint>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glFramebufferTexture2D, 5, {
-    glFramebufferTexture2D(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1])),
-        static_cast<GLenum>(U32(env, args[2])),
-        static_cast<GLuint>(U32(env, args[3])),
-        I32(env, args[4])
-    );
-})
-
-/* Programs and shaders */
-
-napi_value Host_glCreateProgram(
-    napi_env env,
-    napi_callback_info info
-) {
-    size_t argc = 0;
-    napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
-    return ToU32(env, glCreateProgram());
-}
-
-napi_value Host_glCreateShader(
-    napi_env env,
-    napi_callback_info info
-) {
-    napi_value args[1];
-    size_t argc = 1;
-    napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-
-    return ToU32(
-        env,
-        glCreateShader(
-            static_cast<GLenum>(U32(env, args[0]))
-        )
-    );
-}
-
-GL_VOID_BINDING(glShaderSource, 4, {
-    const GLuint shader =
-        static_cast<GLuint>(U32(env, args[0]));
-
-    const GLsizei count =
-        static_cast<GLsizei>(I32(env, args[1]));
-
-    const uint32_t stringsOffset =
-        U32(env, args[2]);
-
-    const uint32_t lengthsOffset =
-        U32(env, args[3]);
-
-    const uint32_t* wasmStringOffsets =
-        WasmPointer<const uint32_t>(stringsOffset);
-
-    std::vector<const GLchar*> strings(
-        static_cast<size_t>(count)
-    );
-
-    for (GLsizei index = 0; index < count; ++index) {
-        strings[static_cast<size_t>(index)] =
-            WasmPointer<const GLchar>(
-                wasmStringOffsets[index]
-            );
-    }
-
-    const GLint* lengths =
-        WasmPointer<const GLint>(lengthsOffset);
-
-    glShaderSource(
-        shader,
-        count,
-        strings.data(),
-        lengths
-    );
-})
-
-GL_VOID_BINDING(glCompileShader, 1, {
-    glCompileShader(
-        static_cast<GLuint>(U32(env, args[0]))
-    );
-})
-
-GL_VOID_BINDING(glGetShaderiv, 3, {
-    glGetShaderiv(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1])),
-        WasmPointer<GLint>(U32(env, args[2]))
-    );
-})
-
-GL_VOID_BINDING(glAttachShader, 2, {
-    glAttachShader(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glBindAttribLocation, 3, {
-    glBindAttribLocation(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1])),
-        WasmPointer<const GLchar>(U32(env, args[2]))
-    );
-})
-
-GL_VOID_BINDING(glLinkProgram, 1, {
-    glLinkProgram(
-        static_cast<GLuint>(U32(env, args[0]))
-    );
-})
-
-GL_VOID_BINDING(glGetProgramiv, 3, {
-    glGetProgramiv(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1])),
-        WasmPointer<GLint>(U32(env, args[2]))
-    );
-})
-
-napi_value Host_glGetUniformLocation(
-    napi_env env,
-    napi_callback_info info
-) {
-    napi_value args[2];
-    size_t argc = 2;
-    napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-
-    const GLint result = glGetUniformLocation(
-        static_cast<GLuint>(U32(env, args[0])),
-        WasmPointer<const GLchar>(U32(env, args[1]))
-    );
-
-    return ToI32(env, result);
-}
-
-GL_VOID_BINDING(glDeleteShader, 1, {
-    glDeleteShader(
-        static_cast<GLuint>(U32(env, args[0]))
-    );
-})
-
-GL_VOID_BINDING(glUseProgram, 1, {
-    glUseProgram(
-        static_cast<GLuint>(U32(env, args[0]))
-    );
-})
-
-/* Uniforms */
-
-GL_VOID_BINDING(glUniform4fv, 3, {
-    glUniform4fv(
-        I32(env, args[0]),
-        I32(env, args[1]),
-        WasmPointer<const GLfloat>(U32(env, args[2]))
-    );
-})
-
-GL_VOID_BINDING(glUniform1i, 2, {
-    glUniform1i(
-        I32(env, args[0]),
-        I32(env, args[1])
-    );
-})
-
-GL_VOID_BINDING(glUniform2f, 3, {
-    glUniform2f(
-        I32(env, args[0]),
-        F32(env, args[1]),
-        F32(env, args[2])
-    );
-})
-
-/* Vertex attributes and drawing */
-
-GL_VOID_BINDING(glEnableVertexAttribArray, 1, {
-    glEnableVertexAttribArray(
-        static_cast<GLuint>(U32(env, args[0]))
-    );
-})
-
-GL_VOID_BINDING(glDisableVertexAttribArray, 1, {
-    glDisableVertexAttribArray(
-        static_cast<GLuint>(U32(env, args[0]))
-    );
-})
-
-GL_VOID_BINDING(glVertexAttribPointer, 6, {
-    glVertexAttribPointer(
-        static_cast<GLuint>(U32(env, args[0])),
-        I32(env, args[1]),
-        static_cast<GLenum>(U32(env, args[2])),
-        static_cast<GLboolean>(U32(env, args[3])),
-        I32(env, args[4]),
-        BufferOffset(U32(env, args[5]))
-    );
-})
-
-GL_VOID_BINDING(glVertexAttribIPointer, 5, {
-    glVertexAttribIPointer(
-        static_cast<GLuint>(U32(env, args[0])),
-        I32(env, args[1]),
-        static_cast<GLenum>(U32(env, args[2])),
-        I32(env, args[3]),
-        BufferOffset(U32(env, args[4]))
-    );
-})
-
-GL_VOID_BINDING(glVertexAttribDivisor, 2, {
-    glVertexAttribDivisor(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glDrawElementsInstanced, 5, {
-    glDrawElementsInstanced(
-        static_cast<GLenum>(U32(env, args[0])),
-        I32(env, args[1]),
-        static_cast<GLenum>(U32(env, args[2])),
-        BufferOffset(U32(env, args[3])),
-        I32(env, args[4])
-    );
-})
-
-GL_VOID_BINDING(glDrawRangeElements, 6, {
-    glDrawRangeElements(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1])),
-        static_cast<GLuint>(U32(env, args[2])),
-        I32(env, args[3]),
-        static_cast<GLenum>(U32(env, args[4])),
-        BufferOffset(U32(env, args[5]))
-    );
-})
-
-GL_VOID_BINDING(glDrawArrays, 3, {
-    glDrawArrays(
-        static_cast<GLenum>(U32(env, args[0])),
-        I32(env, args[1]),
-        I32(env, args[2])
-    );
-})
-
-/* Textures */
-
-GL_VOID_BINDING(glGenTextures, 2, {
-    glGenTextures(
-        I32(env, args[0]),
-        WasmPointer<GLuint>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glActiveTexture, 1, {
-    glActiveTexture(
-        static_cast<GLenum>(U32(env, args[0]))
-    );
-})
-
-GL_VOID_BINDING(glBindTexture, 2, {
-    glBindTexture(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glTexParameteri, 3, {
-    glTexParameteri(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1])),
-        I32(env, args[2])
-    );
-})
-
-GL_VOID_BINDING(glTexStorage2D, 5, {
-    glTexStorage2D(
-        static_cast<GLenum>(U32(env, args[0])),
-        I32(env, args[1]),
-        static_cast<GLenum>(U32(env, args[2])),
-        I32(env, args[3]),
-        I32(env, args[4])
-    );
-})
-
-GL_VOID_BINDING(glTexSubImage2D, 9, {
-    glTexSubImage2D(
-        static_cast<GLenum>(U32(env, args[0])),
-        I32(env, args[1]),
-        I32(env, args[2]),
-        I32(env, args[3]),
-        I32(env, args[4]),
-        I32(env, args[5]),
-        static_cast<GLenum>(U32(env, args[6])),
-        static_cast<GLenum>(U32(env, args[7])),
-        PixelUnpackPointer(U32(env, args[8]))
-    );
-})
-
-/* Samplers */
-
-GL_VOID_BINDING(glGenSamplers, 2, {
-    glGenSamplers(
-        I32(env, args[0]),
-        WasmPointer<GLuint>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glSamplerParameteri, 3, {
-    glSamplerParameteri(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1])),
-        I32(env, args[2])
-    );
-})
-
-GL_VOID_BINDING(glSamplerParameterf, 3, {
-    glSamplerParameterf(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1])),
-        F32(env, args[2])
-    );
-})
-
-GL_VOID_BINDING(glBindSampler, 2, {
-    glBindSampler(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1]))
-    );
-})
-
-/* macOS OpenGL extensions */
-
-GL_VOID_BINDING(glTextureBarrierNV, 0, {
-    glTextureBarrierNV();
-})
-
-GL_VOID_BINDING(glInsertEventMarkerEXT, 2, {
-    glInsertEventMarkerEXT(
-        I32(env, args[0]),
-        WasmPointer<const GLchar>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glPopGroupMarkerEXT, 0, {
-    glPopGroupMarkerEXT();
-})
-
-GL_VOID_BINDING(glPushGroupMarkerEXT, 2, {
-    glPushGroupMarkerEXT(
-        I32(env, args[0]),
-        WasmPointer<const GLchar>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glGetInternalformativ, 5, {
-    glGetInternalformativ(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1])),
-        static_cast<GLenum>(U32(env, args[2])),
-        static_cast<GLsizei>(I32(env, args[3])),
-        WasmPointer<GLint>(U32(env, args[4]))
-    );
-})
-
-GL_VOID_BINDING(glBindFragDataLocation, 3, {
-    glBindFragDataLocation(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1])),
-        WasmPointer<const GLchar>(U32(env, args[2]))
-    );
-})
-
-GL_VOID_BINDING(glBindFragDataLocationIndexed, 4, {
-    glBindFragDataLocationIndexed(
-        static_cast<GLuint>(U32(env, args[0])),
-        static_cast<GLuint>(U32(env, args[1])),
-        static_cast<GLuint>(U32(env, args[2])),
-        WasmPointer<const GLchar>(U32(env, args[3]))
-    );
-})
-
-GL_VOID_BINDING(glPolygonMode, 2, {
-    glPolygonMode(
-        static_cast<GLenum>(U32(env, args[0])),
-        static_cast<GLenum>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glGenVertexArrays, 2, {
-    glGenVertexArrays(
-        static_cast<GLsizei>(I32(env, args[0])),
-        WasmPointer<GLuint>(U32(env, args[1]))
-    );
-})
-
-GL_VOID_BINDING(glDeleteVertexArrays, 2, {
-    glDeleteVertexArrays(
-        static_cast<GLsizei>(I32(env, args[0])),
-        WasmPointer<const GLuint>(U32(env, args[1]))
-    );
-})
-
 #include "native-gl-missing-bindings.inc"
 
 #undef GL_VOID_BINDING
@@ -1198,408 +889,6 @@ GL_VOID_BINDING(glDeleteVertexArrays, 2, {
         nullptr                                                 \
     }
 
-napi_value CallDynamicGL(
-        napi_env env,
-        napi_callback_info info) {
-    void* callbackData = nullptr;
-    napi_value args[8];
-    size_t argc = 8;
-
-    napi_get_cb_info(
-        env,
-        info,
-        &argc,
-        args,
-        nullptr,
-        &callbackData
-    );
-
-    auto* descriptor =
-        static_cast<DynamicGLDescriptor*>(callbackData);
-
-    if (descriptor == nullptr ||
-        descriptor->address == nullptr) {
-        Throw(env, "Invalid dynamic OpenGL function");
-        return nullptr;
-    }
-
-    switch (descriptor->signature) {
-        case DynamicGLSignature::Void0: {
-            using Function = void (*)();
-
-            auto function =
-                reinterpret_cast<Function>(
-                    descriptor->address
-                );
-
-            function();
-            break;
-        }
-        case DynamicGLSignature::VoidU32: {
-            if (argc != 1) {
-                Throw(env, "Dynamic OpenGL function expects 1 argument");
-                return nullptr;
-            }
-
-            using Function = void (*)(uint32_t);
-
-            auto function =
-                reinterpret_cast<Function>(
-                    descriptor->address
-                );
-
-            function(U32(env, args[0]));
-            break;
-        }
-        case DynamicGLSignature::VoidU32U32: {
-            if (argc != 2) {
-                Throw(env, "Dynamic OpenGL function expects 2 arguments");
-                return nullptr;
-            }
-
-            using Function = void (*)(
-                uint32_t,
-                uint32_t
-            );
-
-            auto function =
-                reinterpret_cast<Function>(
-                    descriptor->address
-                );
-
-            function(
-                U32(env, args[0]),
-                U32(env, args[1])
-            );
-
-            break;
-        }
-        case DynamicGLSignature::VoidF32: {
-            if (argc != 1) {
-                Throw(env, "Dynamic OpenGL function expects 1 argument");
-                return nullptr;
-            }
-
-            double value = 0;
-
-            napi_get_value_double(
-                env,
-                args[0],
-                &value
-            );
-
-            using Function = void (*)(float);
-
-            auto function =
-                reinterpret_cast<Function>(
-                    descriptor->address
-                );
-
-            function(static_cast<float>(value));
-            break;
-        }
-        case DynamicGLSignature::VoidF32F32F32F32: {
-            if (argc != 4) {
-                Throw(env, "Dynamic OpenGL function expects 4 arguments");
-                return nullptr;
-            }
-
-            using Function = void (*)(
-                float,
-                float,
-                float,
-                float
-            );
-
-            auto function =
-                reinterpret_cast<Function>(
-                    descriptor->address
-                );
-
-            double values[4];
-
-            for (size_t i = 0; i < 4; ++i) {
-                napi_get_value_double(
-                    env,
-                    args[i],
-                    &values[i]
-                );
-            }
-
-            function(
-                static_cast<float>(values[0]),
-                static_cast<float>(values[1]),
-                static_cast<float>(values[2]),
-                static_cast<float>(values[3])
-            );
-
-            break;
-        }
-        case DynamicGLSignature::VoidI32I32: {
-            if (argc != 2) {
-                Throw(env, "Dynamic OpenGL function expects 2 arguments");
-                return nullptr;
-            }
-
-            using Function = void (*)(int32_t, int32_t);
-
-            reinterpret_cast<Function>(descriptor->address)(
-                I32(env, args[0]),
-                I32(env, args[1])
-            );
-
-            break;
-        }
-
-        case DynamicGLSignature::VoidI32I32I32: {
-            if (argc != 3) {
-                Throw(env, "Dynamic OpenGL function expects 3 arguments");
-                return nullptr;
-            }
-
-            using Function = void (*)(
-                int32_t,
-                int32_t,
-                int32_t
-            );
-
-            reinterpret_cast<Function>(descriptor->address)(
-                I32(env, args[0]),
-                I32(env, args[1]),
-                I32(env, args[2])
-            );
-
-            break;
-        }
-
-        case DynamicGLSignature::VoidI32I32I32I32: {
-            if (argc != 4) {
-                Throw(env, "Dynamic OpenGL function expects 4 arguments");
-                return nullptr;
-            }
-
-            using Function = void (*)(
-                int32_t,
-                int32_t,
-                int32_t,
-                int32_t
-            );
-
-            reinterpret_cast<Function>(descriptor->address)(
-                I32(env, args[0]),
-                I32(env, args[1]),
-                I32(env, args[2]),
-                I32(env, args[3])
-            );
-
-            break;
-        }
-
-        case DynamicGLSignature::VoidI32F32F32: {
-            if (argc != 3) {
-                Throw(env, "Dynamic OpenGL function expects 3 arguments");
-                return nullptr;
-            }
-
-            using Function = void (*)(
-                int32_t,
-                float,
-                float
-            );
-
-            reinterpret_cast<Function>(descriptor->address)(
-                I32(env, args[0]),
-                F32(env, args[1]),
-                F32(env, args[2])
-            );
-
-            break;
-        }
-
-        case DynamicGLSignature::VoidI32I32F32: {
-            if (argc != 3) {
-                Throw(env, "Dynamic OpenGL function expects 3 arguments");
-                return nullptr;
-            }
-
-            using Function = void (*)(
-                int32_t,
-                int32_t,
-                float
-            );
-
-            reinterpret_cast<Function>(descriptor->address)(
-                I32(env, args[0]),
-                I32(env, args[1]),
-                F32(env, args[2])
-            );
-
-            break;
-        }
-        case DynamicGLSignature::U32_0: {
-            if (argc != 0) {
-                Throw(env, "Dynamic OpenGL function expects no arguments");
-                return nullptr;
-            }
-
-            using Function = uint32_t (*)();
-
-            auto function =
-                reinterpret_cast<Function>(
-                    descriptor->address
-                );
-
-            const uint32_t result = function();
-
-            napi_value value;
-            napi_create_uint32(env, result, &value);
-            return value;
-        }
-
-        case DynamicGLSignature::U32_U32: {
-            if (argc != 1) {
-                Throw(env, "Dynamic OpenGL function expects 1 argument");
-                return nullptr;
-            }
-
-            using Function = uint32_t (*)(uint32_t);
-
-            auto function =
-                reinterpret_cast<Function>(
-                    descriptor->address
-                );
-
-            const uint32_t result =
-                function(U32(env, args[0]));
-
-            napi_value value;
-            napi_create_uint32(env, result, &value);
-            return value;
-        }
-    }
-
-    return Undefined(env);
-}
-
-napi_value GetDynamicGLFunction(
-        napi_env env,
-        napi_callback_info info) {
-    napi_value args[1];
-    size_t argc = 1;
-
-    napi_get_cb_info(
-        env,
-        info,
-        &argc,
-        args,
-        nullptr,
-        nullptr
-    );
-
-    if (argc != 1) {
-        Throw(env, "getGLFunction expects a function name");
-        return nullptr;
-    }
-
-    size_t nameLength = 0;
-
-    if (napi_get_value_string_utf8(
-            env,
-            args[0],
-            nullptr,
-            0,
-            &nameLength) != napi_ok) {
-        Throw(env, "OpenGL function name must be a string");
-        return nullptr;
-    }
-
-    std::string name(nameLength + 1, '\0');
-
-    napi_get_value_string_utf8(
-        env,
-        args[0],
-        name.data(),
-        name.size(),
-        &nameLength
-    );
-
-    name.resize(nameLength);
-    fprintf(
-        stderr,
-        "[generic-gl] resolver requested: %s\n",
-        name.c_str()
-    );
-
-    const auto signatureFound = dynamicGLSignatures.find(name);
-    if (signatureFound == dynamicGLSignatures.end()) {
-        return Undefined(env);
-    }
-    DynamicGLSignature signature = signatureFound->second;
-
-    auto existing = dynamicGLFunctions.find(name);
-
-    if (existing != dynamicGLFunctions.end()) {
-        napi_value function;
-
-        napi_create_function(
-            env,
-            name.c_str(),
-            NAPI_AUTO_LENGTH,
-            CallDynamicGL,
-            existing->second.get(),
-            &function
-        );
-
-        return function;
-    }
-
-    void* address = dlsym(RTLD_DEFAULT, name.c_str());
-
-    if (address == nullptr) {
-        fprintf(
-            stderr,
-            "[generic-gl] unresolved: %s\n",
-            name.c_str()
-        );
-
-        return Undefined(env);
-    }
-
-    auto descriptor =
-        std::make_unique<DynamicGLDescriptor>();
-
-    descriptor->name = name;
-    descriptor->address = address;
-    descriptor->signature = signature;
-
-    DynamicGLDescriptor* descriptorPointer =
-        descriptor.get();
-
-    dynamicGLFunctions.emplace(
-        name,
-        std::move(descriptor)
-    );
-
-    napi_value function;
-
-    napi_create_function(
-        env,
-        name.c_str(),
-        NAPI_AUTO_LENGTH,
-        CallDynamicGL,
-        descriptorPointer,
-        &function
-    );
-
-    fprintf(
-        stderr,
-        "[generic-gl] resolved: %s -> %p\n",
-        name.c_str(),
-        address
-    );
-
-    return function;
-}
 
 napi_value Initialize(
     napi_env env,
@@ -1610,108 +899,9 @@ napi_value Initialize(
         {"makeContextCurrent", nullptr, MakeContextCurrent, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"readContextPixels", nullptr, ReadContextPixels, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"destroyContext", nullptr, DestroyContext, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {
-            "attachWasmRuntime",
-            nullptr,
-            AttachWasmRuntime,
-            nullptr,
-            nullptr,
-            nullptr,
-            napi_default,
-            nullptr
-        },
-
-        EXPORT_GL(glGetString),
-        EXPORT_GL(glGetIntegerv),
-        EXPORT_GL(glGetStringi),
-        EXPORT_GL(glGetShaderPrecisionFormat),
-        EXPORT_GL(glGetFloatv),
-        EXPORT_GL(glGetError),
-
-        EXPORT_GL(glDisable),
-        EXPORT_GL(glDepthMask),
-        EXPORT_GL(glFrontFace),
-        EXPORT_GL(glLineWidth),
-        EXPORT_GL(glPixelStorei),
-
-        EXPORT_GL(glGenBuffers),
-        EXPORT_GL(glBindBuffer),
-        EXPORT_GL(glBufferData),
-        EXPORT_GL(glBindVertexArray),
-        EXPORT_GL(glBufferSubData),
-        EXPORT_GL(glBindFramebuffer),
-
-        EXPORT_GL(glViewport),
-        EXPORT_GL(glClearColor),
-        EXPORT_GL(glColorMask),
-        EXPORT_GL(glClear),
-
-        EXPORT_GL(glCreateProgram),
-        EXPORT_GL(glCreateShader),
-        EXPORT_GL(glShaderSource),
-        EXPORT_GL(glCompileShader),
-        EXPORT_GL(glGetShaderiv),
-        EXPORT_GL(glAttachShader),
-        EXPORT_GL(glBindAttribLocation),
-        EXPORT_GL(glLinkProgram),
-        EXPORT_GL(glGetProgramiv),
-        EXPORT_GL(glGetUniformLocation),
-        EXPORT_GL(glDeleteShader),
-        EXPORT_GL(glUseProgram),
-
-        EXPORT_GL(glEnable),
-        EXPORT_GL(glBlendEquation),
-        EXPORT_GL(glBlendFunc),
-        EXPORT_GL(glUniform4fv),
-
-        EXPORT_GL(glEnableVertexAttribArray),
-        EXPORT_GL(glDisableVertexAttribArray),
-        EXPORT_GL(glVertexAttribPointer),
-        EXPORT_GL(glVertexAttribDivisor),
-        EXPORT_GL(glDrawElementsInstanced),
-
-        EXPORT_GL(glGenTextures),
-        EXPORT_GL(glActiveTexture),
-        EXPORT_GL(glBindTexture),
-        EXPORT_GL(glTexParameteri),
-        EXPORT_GL(glTexStorage2D),
-
-        EXPORT_GL(glGenFramebuffers),
-        EXPORT_GL(glFramebufferTexture2D),
-        EXPORT_GL(glTexSubImage2D),
-
-        EXPORT_GL(glDrawRangeElements),
-        EXPORT_GL(glDrawArrays),
-        EXPORT_GL(glUniform1i),
-        EXPORT_GL(glUniform2f),
-
-        EXPORT_GL(glGenSamplers),
-        EXPORT_GL(glSamplerParameteri),
-        EXPORT_GL(glSamplerParameterf),
-        EXPORT_GL(glBindSampler),
-        EXPORT_GL(glVertexAttribIPointer),
-
-        EXPORT_GL(glTextureBarrierNV),
-        EXPORT_GL(glInsertEventMarkerEXT),
-        EXPORT_GL(glPopGroupMarkerEXT),
-        EXPORT_GL(glPushGroupMarkerEXT),
-        EXPORT_GL(glGetInternalformativ),
-        EXPORT_GL(glBindFragDataLocation),
-        EXPORT_GL(glBindFragDataLocationIndexed),
-        EXPORT_GL(glPolygonMode),
-        EXPORT_GL(glGenVertexArrays),
-        EXPORT_GL(glDeleteVertexArrays),
-        {
-            "getGLFunction",
-            nullptr,
-            GetDynamicGLFunction,
-            nullptr,
-            nullptr,
-            nullptr,
-            napi_default,
-            nullptr
-        },
-        #include "native-gl-missing-exports.inc"
+        {"attachWasmRuntime", nullptr, AttachWasmRuntime, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"getGLFunction", nullptr, GetFFIGLFunction, nullptr, nullptr, nullptr, napi_default, nullptr},
+        #include "native-gl-special-exports.inc"
     };
 
     napi_define_properties(

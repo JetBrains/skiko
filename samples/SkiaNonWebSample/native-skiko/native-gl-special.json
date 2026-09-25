@@ -1,0 +1,732 @@
+[
+  {
+    "name": "glBindFramebuffer",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLuint)",
+    "parameters": [
+      {
+        "name": "target",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "framebuffer",
+        "type": "unsigned int",
+        "spelledType": "GLuint"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "logical framebuffer 0 must map to the canvas FBO"
+  },
+  {
+    "name": "glClientWaitSync",
+    "returnType": "GLenum ",
+    "functionType": "GLenum (GLsync, GLbitfield, GLuint64)",
+    "parameters": [
+      {
+        "name": "sync",
+        "type": "struct __GLsync *",
+        "spelledType": "GLsync"
+      },
+      {
+        "name": "flags",
+        "type": "unsigned int",
+        "spelledType": "GLbitfield"
+      },
+      {
+        "name": "timeout",
+        "type": "unsigned long long",
+        "spelledType": "GLuint64"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "GLsync handle translation"
+  },
+  {
+    "name": "glCompressedTexImage2D",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLsizei, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "target",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "level",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "internalformat",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "width",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "height",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "border",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "imageSize",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "data",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent a pixel-buffer offset"
+  },
+  {
+    "name": "glCompressedTexSubImage2D",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLsizei, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "target",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "level",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "xoffset",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "yoffset",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "width",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "height",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "format",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "imageSize",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "data",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent a pixel-buffer offset"
+  },
+  {
+    "name": "glDeleteSync",
+    "returnType": "void ",
+    "functionType": "void (GLsync)",
+    "parameters": [
+      {
+        "name": "sync",
+        "type": "struct __GLsync *",
+        "spelledType": "GLsync"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "GLsync handle translation"
+  },
+  {
+    "name": "glDrawArraysIndirect",
+    "returnType": "void ",
+    "functionType": "void (GLenum, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "mode",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "indirect",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer represents an indirect-buffer offset"
+  },
+  {
+    "name": "glDrawElements",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLsizei, GLenum, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "mode",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "count",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "type",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "indices",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent an element-buffer offset"
+  },
+  {
+    "name": "glDrawElementsIndirect",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLenum, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "mode",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "type",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "indirect",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer represents an indirect-buffer offset"
+  },
+  {
+    "name": "glDrawElementsInstanced",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLsizei, GLenum, const GLvoid *, GLsizei)",
+    "parameters": [
+      {
+        "name": "mode",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "count",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "type",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "indices",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      },
+      {
+        "name": "instancecount",
+        "type": "int",
+        "spelledType": "GLsizei"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent an element-buffer offset"
+  },
+  {
+    "name": "glDrawRangeElements",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLuint, GLuint, GLsizei, GLenum, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "mode",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "start",
+        "type": "unsigned int",
+        "spelledType": "GLuint"
+      },
+      {
+        "name": "end",
+        "type": "unsigned int",
+        "spelledType": "GLuint"
+      },
+      {
+        "name": "count",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "type",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "indices",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent an element-buffer offset"
+  },
+  {
+    "name": "glFenceSync",
+    "returnType": "GLsync ",
+    "functionType": "GLsync (GLenum, GLbitfield)",
+    "parameters": [
+      {
+        "name": "condition",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "flags",
+        "type": "unsigned int",
+        "spelledType": "GLbitfield"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "GLsync handle translation"
+  },
+  {
+    "name": "glGetIntegerv",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLint *)",
+    "parameters": [
+      {
+        "name": "pname",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "params",
+        "type": "GLint *",
+        "spelledType": "GLint *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "framebuffer binding must be translated back to logical 0"
+  },
+  {
+    "name": "glGetString",
+    "returnType": "const GLubyte *",
+    "functionType": "const GLubyte *(GLenum)",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "native pointer return value"
+  },
+  {
+    "name": "glGetStringi",
+    "returnType": "const GLubyte *",
+    "functionType": "const GLubyte *(GLenum, GLuint)",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "index",
+        "type": "unsigned int",
+        "spelledType": "GLuint"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "native pointer return value"
+  },
+  {
+    "name": "glIsSync",
+    "returnType": "GLboolean ",
+    "functionType": "GLboolean (GLsync)",
+    "parameters": [
+      {
+        "name": "sync",
+        "type": "struct __GLsync *",
+        "spelledType": "GLsync"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "GLsync handle translation"
+  },
+  {
+    "name": "glMapBuffer",
+    "returnType": "GLvoid *",
+    "functionType": "GLvoid *(GLenum, GLenum)",
+    "parameters": [
+      {
+        "name": "target",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "access",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "mapped-buffer staging memory"
+  },
+  {
+    "name": "glMapBufferRange",
+    "returnType": "GLvoid *",
+    "functionType": "GLvoid *(GLenum, GLintptr, GLsizeiptr, GLbitfield)",
+    "parameters": [
+      {
+        "name": "target",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "offset",
+        "type": "long",
+        "spelledType": "GLintptr"
+      },
+      {
+        "name": "length",
+        "type": "long",
+        "spelledType": "GLsizeiptr"
+      },
+      {
+        "name": "access",
+        "type": "unsigned int",
+        "spelledType": "GLbitfield"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "mapped-buffer staging memory"
+  },
+  {
+    "name": "glReadPixels",
+    "returnType": "void ",
+    "functionType": "void (GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, GLvoid *)",
+    "parameters": [
+      {
+        "name": "x",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "y",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "width",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "height",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "format",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "type",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "pixels",
+        "type": "GLvoid *",
+        "spelledType": "GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent a pixel-buffer offset"
+  },
+  {
+    "name": "glShaderSource",
+    "returnType": "void ",
+    "functionType": "void (GLuint, GLsizei, const GLchar *const *, const GLint *)",
+    "parameters": [
+      {
+        "name": "shader",
+        "type": "unsigned int",
+        "spelledType": "GLuint"
+      },
+      {
+        "name": "count",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "string",
+        "type": "const GLchar *const *",
+        "spelledType": "const GLchar *const *"
+      },
+      {
+        "name": "length",
+        "type": "const GLint *",
+        "spelledType": "const GLint *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "nested pointer argument: const GLchar *const *"
+  },
+  {
+    "name": "glTexImage2D",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "target",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "level",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "internalformat",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "width",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "height",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "border",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "format",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "type",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "pixels",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent a pixel-buffer offset"
+  },
+  {
+    "name": "glTexSubImage2D",
+    "returnType": "void ",
+    "functionType": "void (GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "target",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "level",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "xoffset",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "yoffset",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "width",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "height",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "format",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "type",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "pixels",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent a pixel-buffer offset"
+  },
+  {
+    "name": "glUnmapBuffer",
+    "returnType": "GLboolean ",
+    "functionType": "GLboolean (GLenum)",
+    "parameters": [
+      {
+        "name": "target",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "mapped-buffer staging memory"
+  },
+  {
+    "name": "glVertexAttribIPointer",
+    "returnType": "void ",
+    "functionType": "void (GLuint, GLint, GLenum, GLsizei, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "index",
+        "type": "unsigned int",
+        "spelledType": "GLuint"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "type",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "stride",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "pointer",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent a vertex-buffer offset"
+  },
+  {
+    "name": "glVertexAttribPointer",
+    "returnType": "void ",
+    "functionType": "void (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *)",
+    "parameters": [
+      {
+        "name": "index",
+        "type": "unsigned int",
+        "spelledType": "GLuint"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "spelledType": "GLint"
+      },
+      {
+        "name": "type",
+        "type": "unsigned int",
+        "spelledType": "GLenum"
+      },
+      {
+        "name": "normalized",
+        "type": "unsigned char",
+        "spelledType": "GLboolean"
+      },
+      {
+        "name": "stride",
+        "type": "int",
+        "spelledType": "GLsizei"
+      },
+      {
+        "name": "pointer",
+        "type": "const GLvoid *",
+        "spelledType": "const GLvoid *"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "pointer may represent a vertex-buffer offset"
+  },
+  {
+    "name": "glWaitSync",
+    "returnType": "void ",
+    "functionType": "void (GLsync, GLbitfield, GLuint64)",
+    "parameters": [
+      {
+        "name": "sync",
+        "type": "struct __GLsync *",
+        "spelledType": "GLsync"
+      },
+      {
+        "name": "flags",
+        "type": "unsigned int",
+        "spelledType": "GLbitfield"
+      },
+      {
+        "name": "timeout",
+        "type": "unsigned long long",
+        "spelledType": "GLuint64"
+      }
+    ],
+    "dispatch": "special",
+    "reason": "GLsync handle translation"
+  }
+]
