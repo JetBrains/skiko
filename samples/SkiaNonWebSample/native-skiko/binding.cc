@@ -5,7 +5,6 @@
 #include <OpenGL/gl3.h>
 #include <OpenGL/gl3ext.h>
 
-#include <ffi/ffi.h>
 #include <cstdio>
 #include <cstdint>
 #include <cstring>
@@ -14,21 +13,9 @@
 #include <vector>
 #include <array>
 #include <algorithm>
-#include <dlfcn.h>
 #include <memory>
-#include "include/core/SkCanvas.h"
-#include "include/core/SkColor.h"
-#include "include/core/SkPaint.h"
-#include "include/core/SkRect.h"
-#include "include/core/SkSurface.h"
-#include "include/core/SkColorSpace.h"
 
-#include "include/gpu/ganesh/GrBackendSurface.h"
-#include "include/gpu/ganesh/GrDirectContext.h"
-#include "include/gpu/ganesh/SkSurfaceGanesh.h"
 #include "include/gpu/ganesh/gl/GrGLInterface.h"
-#include "include/gpu/ganesh/gl/GrGLDirectContext.h"
-#include "include/gpu/ganesh/gl/GrGLBackendSurface.h"
 #include "include/gpu/ganesh/gl/mac/GrGLMakeMacInterface.h"
 
 namespace {
@@ -43,7 +30,6 @@ napi_ref wasmMemoryRef = nullptr;
 napi_ref wasmMallocRef = nullptr;
 
 uint8_t* wasmMemoryBase = nullptr;
-size_t wasmMemorySize = 0;
 template <typename T>
 T* WasmPointer(uint32_t offset) {
     if (offset == 0) {
@@ -58,48 +44,11 @@ struct RenderTarget {
     GLuint framebuffer = 0;
     GLuint color = 0;
     GLuint depthStencil = 0;
-    GLsizei width = 0;
-    GLsizei height = 0;
+    int width = 0;
+    int height = 0;
+
+    sk_sp<const GrGLInterface> glInterface;
 };
-
-enum class FFIKind {
-    Void,
-    U8,
-    I32,
-    U32,
-    F32,
-    I64,
-    U64,
-    WasmPtr,
-};
-
-struct GeneratedGLDescriptor {
-    const char* name;
-    FFIKind returnKind;
-    std::vector<FFIKind> argumentKinds;
-};
-
-const std::vector<GeneratedGLDescriptor>
-        generatedGLDescriptors = {
-#include "native-gl-descriptors.inc"
-};
-
-struct FFIDynamicGLDescriptor {
-    std::string name;
-    void* address = nullptr;
-
-    FFIKind returnKind = FFIKind::Void;
-    std::vector<FFIKind> argumentKinds;
-
-    ffi_cif callInterface{};
-    ffi_type* returnType = nullptr;
-    std::vector<ffi_type*> argumentTypes;
-};
-
-std::unordered_map<
-    std::string,
-    std::unique_ptr<FFIDynamicGLDescriptor>
-> ffiGLFunctions;
 
 // CGLContextObj nativeContext = nullptr;
 uint32_t nextContextId = 1;
@@ -110,239 +59,21 @@ void Throw(napi_env env, const char* message) {
     napi_throw_error(env, nullptr, message);
 }
 
-ffi_type* GetFFIType(FFIKind kind) {
-    switch (kind) {
-        case FFIKind::Void:
-            return &ffi_type_void;
+const GrGLInterface* CurrentSkiaGL(napi_env env) {
+    const auto found = renderTargets.find(currentContextId);
 
-        case FFIKind::U8:
-            return &ffi_type_uint8;
-
-        case FFIKind::I32:
-            return &ffi_type_sint32;
-
-        case FFIKind::U32:
-            return &ffi_type_uint32;
-
-        case FFIKind::F32:
-            return &ffi_type_float;
-
-        case FFIKind::I64:
-            return &ffi_type_sint64;
-
-        case FFIKind::U64:
-            return &ffi_type_uint64;
-
-        case FFIKind::WasmPtr:
-            return &ffi_type_pointer;
-    }
-
-    return nullptr;
-}
-
-union FFIValue {
-    uint8_t u8;
-    int32_t i32;
-    uint32_t u32;
-    float f32;
-    int64_t i64;
-    uint64_t u64;
-    void* pointer;
-};
-
-napi_value CallFFIGL(
-        napi_env env,
-        napi_callback_info info) {
-    napi_value args[16];
-    size_t argc = std::size(args);
-    void* callbackData = nullptr;
-
-    napi_get_cb_info(
-        env,
-        info,
-        &argc,
-        args,
-        nullptr,
-        &callbackData
-    );
-
-    auto* descriptor =
-        static_cast<FFIDynamicGLDescriptor*>(
-            callbackData
-        );
-
-    if (descriptor == nullptr ||
-        descriptor->address == nullptr) {
-        Throw(env, "Invalid libffi OpenGL descriptor");
+    if (currentContextId == 0 ||
+        found == renderTargets.end() ||
+        !found->second.glInterface) {
+        Throw(env, "No active Skia GL interface");
         return nullptr;
     }
 
-    if (argc != descriptor->argumentKinds.size()) {
-        Throw(env, "Incorrect OpenGL argument count");
-        return nullptr;
-    }
-
-    std::vector<FFIValue> values(argc);
-    std::vector<void*> ffiArguments(argc);
-
-    for (size_t i = 0; i < argc; ++i) {
-        switch (descriptor->argumentKinds[i]) {
-            case FFIKind::U8:
-                values[i].u8 =
-                    static_cast<uint8_t>(
-                        U32(env, args[i])
-                    );
-                ffiArguments[i] = &values[i].u8;
-                break;
-
-            case FFIKind::I32:
-                values[i].i32 = I32(env, args[i]);
-                ffiArguments[i] = &values[i].i32;
-                break;
-
-            case FFIKind::U32:
-                values[i].u32 = U32(env, args[i]);
-                ffiArguments[i] = &values[i].u32;
-                break;
-
-            case FFIKind::F32:
-                values[i].f32 = F32(env, args[i]);
-                ffiArguments[i] = &values[i].f32;
-                break;
-
-            case FFIKind::I64:
-                napi_get_value_int64(
-                    env,
-                    args[i],
-                    &values[i].i64
-                );
-                ffiArguments[i] = &values[i].i64;
-                break;
-
-            case FFIKind::U64: {
-                double value = 0;
-
-                napi_get_value_double(
-                    env,
-                    args[i],
-                    &value
-                );
-
-                values[i].u64 =
-                    static_cast<uint64_t>(value);
-
-                ffiArguments[i] = &values[i].u64;
-                break;
-            }
-
-            case FFIKind::WasmPtr:
-                values[i].pointer =
-                    WasmPointer<uint8_t>(
-                        U32(env, args[i])
-                    );
-
-                ffiArguments[i] =
-                    &values[i].pointer;
-                break;
-
-            case FFIKind::Void:
-                Throw(
-                    env,
-                    "Void cannot be an argument type"
-                );
-                return nullptr;
-        }
-    }
-
-    FFIValue result{};
-
-    ffi_call(
-        &descriptor->callInterface,
-        FFI_FN(descriptor->address),
-        descriptor->returnKind == FFIKind::Void
-            ? nullptr
-            : &result,
-        ffiArguments.data()
-    );
-
-    napi_value returnValue;
-
-    switch (descriptor->returnKind) {
-        case FFIKind::Void:
-            return Undefined(env);
-
-        case FFIKind::U8:
-            napi_create_uint32(
-                env,
-                result.u8,
-                &returnValue
-            );
-            return returnValue;
-
-        case FFIKind::I32:
-            napi_create_int32(
-                env,
-                result.i32,
-                &returnValue
-            );
-            return returnValue;
-
-        case FFIKind::U32:
-            napi_create_uint32(
-                env,
-                result.u32,
-                &returnValue
-            );
-            return returnValue;
-
-        case FFIKind::F32:
-            napi_create_double(
-                env,
-                result.f32,
-                &returnValue
-            );
-            return returnValue;
-
-        case FFIKind::I64:
-            napi_create_bigint_int64(
-                env,
-                result.i64,
-                &returnValue
-            );
-            return returnValue;
-
-        case FFIKind::U64:
-            napi_create_bigint_uint64(
-                env,
-                result.u64,
-                &returnValue
-            );
-            return returnValue;
-
-        case FFIKind::WasmPtr:
-            Throw(
-                env,
-                "Native pointer returns require a special handler"
-            );
-            return nullptr;
-    }
-
-    return nullptr;
+    return found->second.glInterface.get();
 }
+#include "native-skia-gl-bindings.inc"
 
-const GeneratedGLDescriptor*
-FindGeneratedGLDescriptor(const std::string& name) {
-    for (const auto& descriptor :
-         generatedGLDescriptors) {
-        if (name == descriptor.name) {
-            return &descriptor;
-        }
-    }
-
-    return nullptr;
-}
-
-napi_value GetFFIGLFunction(
+napi_value GetSkiaGLFunction(
         napi_env env,
         napi_callback_info info) {
     napi_value args[1];
@@ -384,82 +115,13 @@ napi_value GetFFIGLFunction(
 
     name.resize(length);
 
-    const GeneratedGLDescriptor* generated =
-        FindGeneratedGLDescriptor(name);
+    napi_callback callback =
+        FindGeneratedSkiaGLCallback(name);
 
-    // Special functions continue through their old wrappers.
-    if (generated == nullptr) {
+    // Special functions use their explicit ABI adapters.
+    if (callback == nullptr) {
         return Undefined(env);
     }
-
-    auto existing = ffiGLFunctions.find(name);
-
-    if (existing != ffiGLFunctions.end()) {
-        napi_value function;
-
-        napi_create_function(
-            env,
-            name.c_str(),
-            NAPI_AUTO_LENGTH,
-            CallFFIGL,
-            existing->second.get(),
-            &function
-        );
-
-        return function;
-    }
-
-    void* address = dlsym(
-        RTLD_DEFAULT,
-        name.c_str()
-    );
-
-    // Missing native functions use the old explicit fallback.
-    if (address == nullptr) {
-        return Undefined(env);
-    }
-
-    auto descriptor =
-        std::make_unique<FFIDynamicGLDescriptor>();
-
-    descriptor->name = name;
-    descriptor->address = address;
-    descriptor->returnKind =
-        generated->returnKind;
-    descriptor->argumentKinds =
-        generated->argumentKinds;
-    descriptor->returnType =
-        GetFFIType(descriptor->returnKind);
-
-    for (FFIKind kind :
-         descriptor->argumentKinds) {
-        descriptor->argumentTypes.push_back(
-            GetFFIType(kind)
-        );
-    }
-
-    const ffi_status status = ffi_prep_cif(
-        &descriptor->callInterface,
-        FFI_DEFAULT_ABI,
-        static_cast<unsigned int>(
-            descriptor->argumentTypes.size()
-        ),
-        descriptor->returnType,
-        descriptor->argumentTypes.data()
-    );
-
-    if (status != FFI_OK) {
-        Throw(env, "ffi_prep_cif failed");
-        return nullptr;
-    }
-
-    FFIDynamicGLDescriptor* descriptorPointer =
-        descriptor.get();
-
-    ffiGLFunctions.emplace(
-        name,
-        std::move(descriptor)
-    );
 
     napi_value function;
 
@@ -467,16 +129,15 @@ napi_value GetFFIGLFunction(
         env,
         name.c_str(),
         NAPI_AUTO_LENGTH,
-        CallFFIGL,
-        descriptorPointer,
+        callback,
+        nullptr,
         &function
     );
 
     fprintf(
         stderr,
-        "[ffi-gl] resolved: %s -> %p\n",
-        name.c_str(),
-        address
+        "[skia-gl] resolved through GrGLInterface: %s\n",
+        name.c_str()
     );
 
     return function;
@@ -573,6 +234,13 @@ napi_value CreateContext(napi_env env, napi_callback_info info) {
     if (CGLSetCurrentContext(target.context) != kCGLNoError) {
         CGLDestroyContext(target.context);
         Throw(env, "CGLSetCurrentContext failed");
+        return nullptr;
+    }
+    target.glInterface = GrGLInterfaces::MakeMac();
+
+    if (!target.glInterface || !target.glInterface->validate()) {
+        CGLDestroyContext(target.context);
+        Throw(env, "Skia could not create a valid native GrGLInterface");
         return nullptr;
     }
     target.width = ObjectI32(env, args[0], "width");
@@ -715,12 +383,6 @@ napi_value ToU32(napi_env env, uint32_t value) {
     return result;
 }
 
-napi_value ToI32(napi_env env, int32_t value) {
-    napi_value result;
-    napi_create_int32(env, value, &result);
-    return result;
-}
-
 void RefreshWasmMemory(napi_env env) {
     napi_value memory;
     napi_get_reference_value(env, wasmMemoryRef, &memory);
@@ -733,7 +395,6 @@ void RefreshWasmMemory(napi_env env) {
     napi_get_arraybuffer_info(env, buffer, &data, &size);
 
     wasmMemoryBase = static_cast<uint8_t*>(data);
-    wasmMemorySize = size;
 }
 
 /*
@@ -900,7 +561,7 @@ napi_value Initialize(
         {"readContextPixels", nullptr, ReadContextPixels, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"destroyContext", nullptr, DestroyContext, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"attachWasmRuntime", nullptr, AttachWasmRuntime, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"getGLFunction", nullptr, GetFFIGLFunction, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"getGLFunction", nullptr, GetSkiaGLFunction, nullptr, nullptr, nullptr, napi_default, nullptr},
         #include "native-gl-special-exports.inc"
     };
 
