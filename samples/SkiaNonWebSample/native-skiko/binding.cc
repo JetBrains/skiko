@@ -12,6 +12,8 @@
 #include <unordered_map>
 #include <vector>
 #include <algorithm>
+#include <dlfcn.h>
+#include <memory>
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColor.h"
 #include "include/core/SkPaint.h"
@@ -41,6 +43,104 @@ struct RenderTarget {
     GLsizei width = 0;
     GLsizei height = 0;
 };
+
+enum class DynamicGLSignature {
+    Void0,
+    VoidU32,
+    VoidU32U32,
+    VoidF32,
+    VoidF32F32F32F32,
+
+    VoidI32I32,
+    VoidI32I32I32,
+    VoidI32I32I32I32,
+    VoidI32F32F32,
+    VoidI32I32F32,
+
+    U32_0,
+    U32_U32,
+};
+
+const std::unordered_map<
+    std::string,
+    DynamicGLSignature
+> dynamicGLSignatures = {
+    {"glFlush", DynamicGLSignature::Void0},
+    {"glFinish", DynamicGLSignature::Void0},
+
+    {"glActiveTexture", DynamicGLSignature::VoidU32},
+    {"glBindVertexArray", DynamicGLSignature::VoidU32},
+    {"glBlendEquation", DynamicGLSignature::VoidU32},
+    {"glClear", DynamicGLSignature::VoidU32},
+    {"glClearStencil", DynamicGLSignature::VoidU32},
+    {"glCullFace", DynamicGLSignature::VoidU32},
+    {"glDeleteProgram", DynamicGLSignature::VoidU32},
+    {"glDepthFunc", DynamicGLSignature::VoidU32},
+    {"glDepthMask", DynamicGLSignature::VoidU32},
+    {"glDisable", DynamicGLSignature::VoidU32},
+    {"glDrawBuffer", DynamicGLSignature::VoidU32},
+    {"glEnable", DynamicGLSignature::VoidU32},
+    {"glEndQuery", DynamicGLSignature::VoidU32},
+    {"glFrontFace", DynamicGLSignature::VoidU32},
+    {"glGenerateMipmap", DynamicGLSignature::VoidU32},
+    {"glReadBuffer", DynamicGLSignature::VoidU32},
+    {"glStencilMask", DynamicGLSignature::VoidU32},
+    {"glUseProgram", DynamicGLSignature::VoidU32},
+    {"glCompileShader", DynamicGLSignature::VoidU32},
+    {"glDeleteShader", DynamicGLSignature::VoidU32},
+    {"glDisableVertexAttribArray", DynamicGLSignature::VoidU32},
+    {"glEnableVertexAttribArray", DynamicGLSignature::VoidU32},
+    {"glLinkProgram", DynamicGLSignature::VoidU32},
+
+    {"glAttachShader", DynamicGLSignature::VoidU32U32},
+    {"glBeginQuery", DynamicGLSignature::VoidU32U32},
+    {"glBindBuffer", DynamicGLSignature::VoidU32U32},
+    {"glBindSampler", DynamicGLSignature::VoidU32U32},
+    {"glBindTexture", DynamicGLSignature::VoidU32U32},
+    {"glBlendFunc", DynamicGLSignature::VoidU32U32},
+    {"glPolygonMode", DynamicGLSignature::VoidU32U32},
+    {"glStencilMaskSeparate", DynamicGLSignature::VoidU32U32},
+    {"glVertexAttribDivisor", DynamicGLSignature::VoidU32U32},
+
+    {"glLineWidth", DynamicGLSignature::VoidF32},
+
+    {
+        "glClearColor",
+        DynamicGLSignature::VoidF32F32F32F32
+    },
+
+    {"glPixelStorei", DynamicGLSignature::VoidI32I32},
+    {"glUniform1i", DynamicGLSignature::VoidI32I32},
+
+    {"glDrawArrays", DynamicGLSignature::VoidI32I32I32},
+    {"glSamplerParameteri", DynamicGLSignature::VoidI32I32I32},
+    {"glTexParameteri", DynamicGLSignature::VoidI32I32I32},
+
+    {"glColorMask", DynamicGLSignature::VoidI32I32I32I32},
+    {"glScissor", DynamicGLSignature::VoidI32I32I32I32},
+    {"glViewport", DynamicGLSignature::VoidI32I32I32I32},
+
+    {"glUniform2f", DynamicGLSignature::VoidI32F32F32},
+
+    {"glSamplerParameterf", DynamicGLSignature::VoidI32I32F32},
+
+    {"glCreateProgram", DynamicGLSignature::U32_0},
+    {"glGetError", DynamicGLSignature::U32_0},
+
+    {"glCheckFramebufferStatus", DynamicGLSignature::U32_U32},
+    {"glCreateShader", DynamicGLSignature::U32_U32},
+};
+
+struct DynamicGLDescriptor {
+    std::string name;
+    void* address = nullptr;
+    DynamicGLSignature signature;
+};
+
+std::unordered_map<
+    std::string,
+    std::unique_ptr<DynamicGLDescriptor>
+> dynamicGLFunctions;
 
 // CGLContextObj nativeContext = nullptr;
 uint32_t nextContextId = 1;
@@ -141,120 +241,6 @@ bool ActivateRenderTarget(napi_env env, uint32_t contextId) {
     return true;
 }
 
-bool DrawNativeSkiaSmokeFrame(napi_env env, uint32_t contextId) {
-fprintf(stderr, "[smoke] 1 activate\n");
-    if (!ActivateRenderTarget(env, contextId)) {
-        return false;
-    }
-    const auto found = renderTargets.find(contextId);
-    if (found == renderTargets.end()) {
-        Throw(env, "Unknown native GL context id");
-        return false;
-    }
-
-    const RenderTarget& target = found->second;
-   CGLContextObj currentContext = CGLGetCurrentContext();
-
-   fprintf(
-       stderr,
-       "[smoke] target CGL=%p current CGL=%p\n",
-       target.context,
-       currentContext
-   );
-
-   if (currentContext == nullptr ||
-       currentContext != target.context) {
-       if (CGLSetCurrentContext(target.context) != kCGLNoError) {
-           Throw(env, "Could not activate CGL context for native Skia");
-           return false;
-       }
-   }
-
-fprintf(stderr, "[smoke] 2 make interface\n");
-//     sk_sp<const GrGLInterface> interface =
-//         GrGLInterfaces::MakeMac();
-    sk_sp<const GrGLInterface> interface = GrGLInterfaces::MakeMac();
-
-fprintf(stderr, "[smoke] 3 made interface\n");
-fprintf(stderr, "[smoke] 3 interface=%p\n", interface.get());
-    if (!interface) {
-        Throw(env, "GrGLInterfaces::MakeMac failed");
-        return false;
-    }
-
-//     std::unique_ptr<GrDirectContext> directContext =
-//         GrDirectContexts::MakeGL(interface);
-    sk_sp<GrDirectContext> directContext = GrDirectContexts::MakeGL(interface);
-
-    if (!directContext) {
-        Throw(env, "Native GrDirectContext creation failed");
-        return false;
-    }
-
-    GrGLFramebufferInfo framebufferInfo;
-    framebufferInfo.fFBOID = target.framebuffer;
-    framebufferInfo.fFormat = GL_RGBA8;
-
-GrBackendRenderTarget backendTarget =
-    GrBackendRenderTargets::MakeGL(
-        target.width,
-        target.height,
-        0,  // sample count
-        8,  // stencil bits
-        framebufferInfo
-    );
-
-    sk_sp<SkSurface> surface =
-        SkSurfaces::WrapBackendRenderTarget(
-            directContext.get(),
-            backendTarget,
-            kBottomLeft_GrSurfaceOrigin,
-            kRGBA_8888_SkColorType,
-            nullptr,
-            nullptr
-        );
-
-    if (!surface) {
-        Throw(env, "Native SkSurface creation failed");
-        return false;
-    }
-
-    SkCanvas* canvas = surface->getCanvas();
-
-    canvas->clear(SkColorSetRGB(245, 245, 245));
-fprintf(stderr, "[smoke] 11 draw\n");
-    SkPaint blue;
-    blue.setColor(SkColorSetRGB(35, 105, 220));
-    blue.setAntiAlias(true);
-
-    canvas->drawRoundRect(
-        SkRect::MakeXYWH(
-            40.0f,
-            40.0f,
-            static_cast<float>(target.width) - 80.0f,
-            static_cast<float>(target.height) - 80.0f
-        ),
-        24.0f,
-        24.0f,
-        blue
-    );
-
-    SkPaint yellow;
-    yellow.setColor(SkColorSetRGB(255, 210, 40));
-    yellow.setAntiAlias(true);
-
-    canvas->drawCircle(
-        target.width * 0.5f,
-        target.height * 0.5f,
-        std::min(target.width, target.height) * 0.18f,
-        yellow
-    );
-
-    directContext->flushAndSubmit(surface.get());
-
-    return true;
-}
-
 napi_value CreateContext(napi_env env, napi_callback_info info) {
     napi_value args[2];
     size_t argc = 2;
@@ -330,9 +316,6 @@ napi_value ReadContextPixels(napi_env env, napi_callback_info info) {
     napi_create_buffer(env, size, &bytes, &buffer);
     glFinish();
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    if (!DrawNativeSkiaSmokeFrame(env, contextId)) {
-        return nullptr;
-    }
     glReadPixels(0, 0, target.width, target.height,
                  GL_RGBA, GL_UNSIGNED_BYTE, bytes);
     return buffer;
@@ -1215,6 +1198,409 @@ GL_VOID_BINDING(glDeleteVertexArrays, 2, {
         nullptr                                                 \
     }
 
+napi_value CallDynamicGL(
+        napi_env env,
+        napi_callback_info info) {
+    void* callbackData = nullptr;
+    napi_value args[8];
+    size_t argc = 8;
+
+    napi_get_cb_info(
+        env,
+        info,
+        &argc,
+        args,
+        nullptr,
+        &callbackData
+    );
+
+    auto* descriptor =
+        static_cast<DynamicGLDescriptor*>(callbackData);
+
+    if (descriptor == nullptr ||
+        descriptor->address == nullptr) {
+        Throw(env, "Invalid dynamic OpenGL function");
+        return nullptr;
+    }
+
+    switch (descriptor->signature) {
+        case DynamicGLSignature::Void0: {
+            using Function = void (*)();
+
+            auto function =
+                reinterpret_cast<Function>(
+                    descriptor->address
+                );
+
+            function();
+            break;
+        }
+        case DynamicGLSignature::VoidU32: {
+            if (argc != 1) {
+                Throw(env, "Dynamic OpenGL function expects 1 argument");
+                return nullptr;
+            }
+
+            using Function = void (*)(uint32_t);
+
+            auto function =
+                reinterpret_cast<Function>(
+                    descriptor->address
+                );
+
+            function(U32(env, args[0]));
+            break;
+        }
+        case DynamicGLSignature::VoidU32U32: {
+            if (argc != 2) {
+                Throw(env, "Dynamic OpenGL function expects 2 arguments");
+                return nullptr;
+            }
+
+            using Function = void (*)(
+                uint32_t,
+                uint32_t
+            );
+
+            auto function =
+                reinterpret_cast<Function>(
+                    descriptor->address
+                );
+
+            function(
+                U32(env, args[0]),
+                U32(env, args[1])
+            );
+
+            break;
+        }
+        case DynamicGLSignature::VoidF32: {
+            if (argc != 1) {
+                Throw(env, "Dynamic OpenGL function expects 1 argument");
+                return nullptr;
+            }
+
+            double value = 0;
+
+            napi_get_value_double(
+                env,
+                args[0],
+                &value
+            );
+
+            using Function = void (*)(float);
+
+            auto function =
+                reinterpret_cast<Function>(
+                    descriptor->address
+                );
+
+            function(static_cast<float>(value));
+            break;
+        }
+        case DynamicGLSignature::VoidF32F32F32F32: {
+            if (argc != 4) {
+                Throw(env, "Dynamic OpenGL function expects 4 arguments");
+                return nullptr;
+            }
+
+            using Function = void (*)(
+                float,
+                float,
+                float,
+                float
+            );
+
+            auto function =
+                reinterpret_cast<Function>(
+                    descriptor->address
+                );
+
+            double values[4];
+
+            for (size_t i = 0; i < 4; ++i) {
+                napi_get_value_double(
+                    env,
+                    args[i],
+                    &values[i]
+                );
+            }
+
+            function(
+                static_cast<float>(values[0]),
+                static_cast<float>(values[1]),
+                static_cast<float>(values[2]),
+                static_cast<float>(values[3])
+            );
+
+            break;
+        }
+        case DynamicGLSignature::VoidI32I32: {
+            if (argc != 2) {
+                Throw(env, "Dynamic OpenGL function expects 2 arguments");
+                return nullptr;
+            }
+
+            using Function = void (*)(int32_t, int32_t);
+
+            reinterpret_cast<Function>(descriptor->address)(
+                I32(env, args[0]),
+                I32(env, args[1])
+            );
+
+            break;
+        }
+
+        case DynamicGLSignature::VoidI32I32I32: {
+            if (argc != 3) {
+                Throw(env, "Dynamic OpenGL function expects 3 arguments");
+                return nullptr;
+            }
+
+            using Function = void (*)(
+                int32_t,
+                int32_t,
+                int32_t
+            );
+
+            reinterpret_cast<Function>(descriptor->address)(
+                I32(env, args[0]),
+                I32(env, args[1]),
+                I32(env, args[2])
+            );
+
+            break;
+        }
+
+        case DynamicGLSignature::VoidI32I32I32I32: {
+            if (argc != 4) {
+                Throw(env, "Dynamic OpenGL function expects 4 arguments");
+                return nullptr;
+            }
+
+            using Function = void (*)(
+                int32_t,
+                int32_t,
+                int32_t,
+                int32_t
+            );
+
+            reinterpret_cast<Function>(descriptor->address)(
+                I32(env, args[0]),
+                I32(env, args[1]),
+                I32(env, args[2]),
+                I32(env, args[3])
+            );
+
+            break;
+        }
+
+        case DynamicGLSignature::VoidI32F32F32: {
+            if (argc != 3) {
+                Throw(env, "Dynamic OpenGL function expects 3 arguments");
+                return nullptr;
+            }
+
+            using Function = void (*)(
+                int32_t,
+                float,
+                float
+            );
+
+            reinterpret_cast<Function>(descriptor->address)(
+                I32(env, args[0]),
+                F32(env, args[1]),
+                F32(env, args[2])
+            );
+
+            break;
+        }
+
+        case DynamicGLSignature::VoidI32I32F32: {
+            if (argc != 3) {
+                Throw(env, "Dynamic OpenGL function expects 3 arguments");
+                return nullptr;
+            }
+
+            using Function = void (*)(
+                int32_t,
+                int32_t,
+                float
+            );
+
+            reinterpret_cast<Function>(descriptor->address)(
+                I32(env, args[0]),
+                I32(env, args[1]),
+                F32(env, args[2])
+            );
+
+            break;
+        }
+        case DynamicGLSignature::U32_0: {
+            if (argc != 0) {
+                Throw(env, "Dynamic OpenGL function expects no arguments");
+                return nullptr;
+            }
+
+            using Function = uint32_t (*)();
+
+            auto function =
+                reinterpret_cast<Function>(
+                    descriptor->address
+                );
+
+            const uint32_t result = function();
+
+            napi_value value;
+            napi_create_uint32(env, result, &value);
+            return value;
+        }
+
+        case DynamicGLSignature::U32_U32: {
+            if (argc != 1) {
+                Throw(env, "Dynamic OpenGL function expects 1 argument");
+                return nullptr;
+            }
+
+            using Function = uint32_t (*)(uint32_t);
+
+            auto function =
+                reinterpret_cast<Function>(
+                    descriptor->address
+                );
+
+            const uint32_t result =
+                function(U32(env, args[0]));
+
+            napi_value value;
+            napi_create_uint32(env, result, &value);
+            return value;
+        }
+    }
+
+    return Undefined(env);
+}
+
+napi_value GetDynamicGLFunction(
+        napi_env env,
+        napi_callback_info info) {
+    napi_value args[1];
+    size_t argc = 1;
+
+    napi_get_cb_info(
+        env,
+        info,
+        &argc,
+        args,
+        nullptr,
+        nullptr
+    );
+
+    if (argc != 1) {
+        Throw(env, "getGLFunction expects a function name");
+        return nullptr;
+    }
+
+    size_t nameLength = 0;
+
+    if (napi_get_value_string_utf8(
+            env,
+            args[0],
+            nullptr,
+            0,
+            &nameLength) != napi_ok) {
+        Throw(env, "OpenGL function name must be a string");
+        return nullptr;
+    }
+
+    std::string name(nameLength + 1, '\0');
+
+    napi_get_value_string_utf8(
+        env,
+        args[0],
+        name.data(),
+        name.size(),
+        &nameLength
+    );
+
+    name.resize(nameLength);
+    fprintf(
+        stderr,
+        "[generic-gl] resolver requested: %s\n",
+        name.c_str()
+    );
+
+    const auto signatureFound = dynamicGLSignatures.find(name);
+    if (signatureFound == dynamicGLSignatures.end()) {
+        return Undefined(env);
+    }
+    DynamicGLSignature signature = signatureFound->second;
+
+    auto existing = dynamicGLFunctions.find(name);
+
+    if (existing != dynamicGLFunctions.end()) {
+        napi_value function;
+
+        napi_create_function(
+            env,
+            name.c_str(),
+            NAPI_AUTO_LENGTH,
+            CallDynamicGL,
+            existing->second.get(),
+            &function
+        );
+
+        return function;
+    }
+
+    void* address = dlsym(RTLD_DEFAULT, name.c_str());
+
+    if (address == nullptr) {
+        fprintf(
+            stderr,
+            "[generic-gl] unresolved: %s\n",
+            name.c_str()
+        );
+
+        return Undefined(env);
+    }
+
+    auto descriptor =
+        std::make_unique<DynamicGLDescriptor>();
+
+    descriptor->name = name;
+    descriptor->address = address;
+    descriptor->signature = signature;
+
+    DynamicGLDescriptor* descriptorPointer =
+        descriptor.get();
+
+    dynamicGLFunctions.emplace(
+        name,
+        std::move(descriptor)
+    );
+
+    napi_value function;
+
+    napi_create_function(
+        env,
+        name.c_str(),
+        NAPI_AUTO_LENGTH,
+        CallDynamicGL,
+        descriptorPointer,
+        &function
+    );
+
+    fprintf(
+        stderr,
+        "[generic-gl] resolved: %s -> %p\n",
+        name.c_str(),
+        address
+    );
+
+    return function;
+}
+
 napi_value Initialize(
     napi_env env,
     napi_value exports
@@ -1315,6 +1701,16 @@ napi_value Initialize(
         EXPORT_GL(glPolygonMode),
         EXPORT_GL(glGenVertexArrays),
         EXPORT_GL(glDeleteVertexArrays),
+        {
+            "getGLFunction",
+            nullptr,
+            GetDynamicGLFunction,
+            nullptr,
+            nullptr,
+            nullptr,
+            napi_default,
+            nullptr
+        },
         #include "native-gl-missing-exports.inc"
     };
 

@@ -61,15 +61,34 @@ const syncNativeGLMemory = () => {
     }
 };
 
+const genericGLFunctions = new Map();
+
 const callNativeGL = (name, args) => {
-    const func = nativeGLHost?.[name];
-    if (typeof func !== "function") return {handled: false};
+    let fn = genericGLFunctions.get(name);
+
+    if (fn === undefined) {
+        fn = nativeGLHost?.getGLFunction(name);
+
+        if (typeof fn !== "function") {
+            fn = nativeGLHost?.[name];
+        }
+
+        if (typeof fn !== "function") {
+            return {handled: false};
+        }
+
+        // Cache both generic functions and legacy explicit wrappers.
+        genericGLFunctions.set(name, fn);
+    }
 
     syncNativeGLMemory();
     nativeGLCalls.add(name);
-    return {handled: true, value: func.apply(nativeGLHost, args)};
-};
 
+    return {
+        handled: true,
+        value: fn.apply(nativeGLHost, args),
+    };
+};
 const recordEmscriptenGLFallback = (name) => {
     const firstCall = !emscriptenGLFallbackCalls.has(name);
     emscriptenGLFallbackCalls.add(name);

@@ -16,7 +16,8 @@
                 "-framework CoreFoundation",
                 "-framework CoreGraphics",
                 "-framework CoreText",
-                "-framework Foundation"
+                "-framework Foundation",
+                "-lffi"
             ],
             "xcode_settings": {
                 "CLANG_CXX_LANGUAGE_STANDARD": "c++20",
