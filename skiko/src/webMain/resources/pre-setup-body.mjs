@@ -188,6 +188,7 @@ async function loadSkikoWASM() {
 
                 // Emscripten memory growth notification — refresh HEAP views
                 if (prop === 'emscripten_notify_memory_growth') return (memoryIndex) => {
+                    // TODO: Is this even needed anymore?
                     updateMemoryViews(wasmExports.memory.buffer);
                 };
 

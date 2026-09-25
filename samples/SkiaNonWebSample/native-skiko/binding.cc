@@ -11,6 +11,21 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
+#include "include/core/SkCanvas.h"
+#include "include/core/SkColor.h"
+#include "include/core/SkPaint.h"
+#include "include/core/SkRect.h"
+#include "include/core/SkSurface.h"
+#include "include/core/SkColorSpace.h"
+
+#include "include/gpu/ganesh/GrBackendSurface.h"
+#include "include/gpu/ganesh/GrDirectContext.h"
+#include "include/gpu/ganesh/SkSurfaceGanesh.h"
+#include "include/gpu/ganesh/gl/GrGLInterface.h"
+#include "include/gpu/ganesh/gl/GrGLDirectContext.h"
+#include "include/gpu/ganesh/gl/GrGLBackendSurface.h"
+#include "include/gpu/ganesh/gl/mac/GrGLMakeMacInterface.h"
 
 namespace {
 
@@ -126,6 +141,120 @@ bool ActivateRenderTarget(napi_env env, uint32_t contextId) {
     return true;
 }
 
+bool DrawNativeSkiaSmokeFrame(napi_env env, uint32_t contextId) {
+fprintf(stderr, "[smoke] 1 activate\n");
+    if (!ActivateRenderTarget(env, contextId)) {
+        return false;
+    }
+    const auto found = renderTargets.find(contextId);
+    if (found == renderTargets.end()) {
+        Throw(env, "Unknown native GL context id");
+        return false;
+    }
+
+    const RenderTarget& target = found->second;
+   CGLContextObj currentContext = CGLGetCurrentContext();
+
+   fprintf(
+       stderr,
+       "[smoke] target CGL=%p current CGL=%p\n",
+       target.context,
+       currentContext
+   );
+
+   if (currentContext == nullptr ||
+       currentContext != target.context) {
+       if (CGLSetCurrentContext(target.context) != kCGLNoError) {
+           Throw(env, "Could not activate CGL context for native Skia");
+           return false;
+       }
+   }
+
+fprintf(stderr, "[smoke] 2 make interface\n");
+//     sk_sp<const GrGLInterface> interface =
+//         GrGLInterfaces::MakeMac();
+    sk_sp<const GrGLInterface> interface = GrGLInterfaces::MakeMac();
+
+fprintf(stderr, "[smoke] 3 made interface\n");
+fprintf(stderr, "[smoke] 3 interface=%p\n", interface.get());
+    if (!interface) {
+        Throw(env, "GrGLInterfaces::MakeMac failed");
+        return false;
+    }
+
+//     std::unique_ptr<GrDirectContext> directContext =
+//         GrDirectContexts::MakeGL(interface);
+    sk_sp<GrDirectContext> directContext = GrDirectContexts::MakeGL(interface);
+
+    if (!directContext) {
+        Throw(env, "Native GrDirectContext creation failed");
+        return false;
+    }
+
+    GrGLFramebufferInfo framebufferInfo;
+    framebufferInfo.fFBOID = target.framebuffer;
+    framebufferInfo.fFormat = GL_RGBA8;
+
+GrBackendRenderTarget backendTarget =
+    GrBackendRenderTargets::MakeGL(
+        target.width,
+        target.height,
+        0,  // sample count
+        8,  // stencil bits
+        framebufferInfo
+    );
+
+    sk_sp<SkSurface> surface =
+        SkSurfaces::WrapBackendRenderTarget(
+            directContext.get(),
+            backendTarget,
+            kBottomLeft_GrSurfaceOrigin,
+            kRGBA_8888_SkColorType,
+            nullptr,
+            nullptr
+        );
+
+    if (!surface) {
+        Throw(env, "Native SkSurface creation failed");
+        return false;
+    }
+
+    SkCanvas* canvas = surface->getCanvas();
+
+    canvas->clear(SkColorSetRGB(245, 245, 245));
+fprintf(stderr, "[smoke] 11 draw\n");
+    SkPaint blue;
+    blue.setColor(SkColorSetRGB(35, 105, 220));
+    blue.setAntiAlias(true);
+
+    canvas->drawRoundRect(
+        SkRect::MakeXYWH(
+            40.0f,
+            40.0f,
+            static_cast<float>(target.width) - 80.0f,
+            static_cast<float>(target.height) - 80.0f
+        ),
+        24.0f,
+        24.0f,
+        blue
+    );
+
+    SkPaint yellow;
+    yellow.setColor(SkColorSetRGB(255, 210, 40));
+    yellow.setAntiAlias(true);
+
+    canvas->drawCircle(
+        target.width * 0.5f,
+        target.height * 0.5f,
+        std::min(target.width, target.height) * 0.18f,
+        yellow
+    );
+
+    directContext->flushAndSubmit(surface.get());
+
+    return true;
+}
+
 napi_value CreateContext(napi_env env, napi_callback_info info) {
     napi_value args[2];
     size_t argc = 2;
@@ -201,6 +330,9 @@ napi_value ReadContextPixels(napi_env env, napi_callback_info info) {
     napi_create_buffer(env, size, &bytes, &buffer);
     glFinish();
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    if (!DrawNativeSkiaSmokeFrame(env, contextId)) {
+        return nullptr;
+    }
     glReadPixels(0, 0, target.width, target.height,
                  GL_RGBA, GL_UNSIGNED_BYTE, bytes);
     return buffer;
