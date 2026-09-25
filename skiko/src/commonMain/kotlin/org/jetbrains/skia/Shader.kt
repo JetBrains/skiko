@@ -12,7 +12,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  *  w/o having to modify the original shader... only the paint's alpha needs
  *  to be modified.
  */
-class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
+class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr), RuntimeEffect.Child {
     companion object {
         init {
             staticLoad()

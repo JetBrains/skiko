@@ -1,6 +1,8 @@
 #include <iostream>
 #include <jni.h>
+#include "SkBlender.h"
 #include "SkCanvas.h"
+#include "SkMesh.h"
 #include "SkRRect.h"
 #include "SkTextBlob.h"
 #include "SkVertices.h"
@@ -187,6 +189,25 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawVertic
         env->ReleaseShortArrayElements(indexArr, const_cast<jshort*>(indices), 0);
     }
     env->ReleaseFloatArrayElements(positionsArr, positions, 0);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawMesh
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong meshPtr, jlong blenderPtr, jlong paintPtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    SkMesh* mesh = reinterpret_cast<SkMesh*>(static_cast<uintptr_t>(meshPtr));
+    SkBlender* blender = reinterpret_cast<SkBlender*>(static_cast<uintptr_t>(blenderPtr));
+    SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
+
+    canvas->drawMesh(*mesh, sk_ref_sp(blender), *paint);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawMeshBlendMode
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong meshPtr, jint blendMode, jlong paintPtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    SkMesh* mesh = reinterpret_cast<SkMesh*>(static_cast<uintptr_t>(meshPtr));
+    SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
+
+    canvas->drawMesh(*mesh, SkBlender::Mode(static_cast<SkBlendMode>(blendMode)), *paint);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPatch
