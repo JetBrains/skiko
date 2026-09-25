@@ -15,6 +15,11 @@ val skikoGraphiteArtifacts = SkikoArtifacts(
     displayName = "Skiko Graphite",
     pomDescription = "Kotlin Skia Graphite bindings",
 )
+val skikoPlatformArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-platform",
+    displayName = "Skiko Platform",
+    pomDescription = "Kotlin Skia platform layer",
+)
 
 val skikoArtifactIds: List<String> =
     listOf(
@@ -81,6 +86,30 @@ val skikoArtifactIds: List<String> =
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+
+        skikoPlatformArtifacts.commonArtifactId,
+        skikoPlatformArtifacts.jvmArtifactId,
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoPlatformArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.X64),
+        skikoPlatformArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.Arm64),
+        skikoPlatformArtifacts.jsArtifactId,
+        skikoPlatformArtifacts.wasmArtifactId,
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+        skikoPlatformArtifacts.jvmRuntimeAllArtifactId,
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {

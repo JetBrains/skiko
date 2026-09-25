@@ -7,7 +7,8 @@ private external fun loadOpenGLLibraryWindows()
 private var isLoaded = false
 
 @Synchronized
-internal actual fun loadOpenGLLibrary() {
+@InternalSkikoApi
+actual fun loadOpenGLLibrary() {
     if (!isLoaded) {
         when {
             // On Windows it is linked dynamically

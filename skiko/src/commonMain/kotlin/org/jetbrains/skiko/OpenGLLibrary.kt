@@ -11,4 +11,5 @@ package org.jetbrains.skiko
  *
  * @throws RenderException if OpenGL library can't be loaded.
  */
-internal expect fun loadOpenGLLibrary()
+@InternalSkikoApi
+expect fun loadOpenGLLibrary()

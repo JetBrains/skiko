@@ -1,0 +1,1772 @@
+@file:OptIn(ExperimentalSkikoApi::class)
+
+package org.jetbrains.skiko
+
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import org.jetbrains.skia.*
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.paragraph.FontCollection
+import org.jetbrains.skia.paragraph.ParagraphBuilder
+import org.jetbrains.skia.paragraph.ParagraphStyle
+import org.jetbrains.skia.paragraph.TextStyle
+import org.jetbrains.skiko.renderer.AwtRenderer
+import org.jetbrains.skiko.renderer.MetalVSyncer
+import org.jetbrains.skiko.renderer.FrameDriver
+import org.jetbrains.skiko.renderer.FrameProducer
+import org.jetbrains.skiko.renderer.SingleFrameScheduler
+import org.jetbrains.skiko.swing.SkiaSwingLayer
+import org.jetbrains.skiko.util.ScreenshotTestRule
+import org.jetbrains.skiko.util.UiTestScope
+import org.jetbrains.skiko.util.UiTestWindow
+import org.jetbrains.skiko.util.uiTest
+import org.junit.Assert.assertEquals
+import org.junit.Assume.assumeFalse
+import org.junit.Assume.assumeTrue
+import org.junit.Ignore
+import org.junit.Rule
+import org.junit.Test
+import java.awt.*
+import java.awt.Color
+import java.awt.Graphics
+import java.awt.Point
+import java.awt.event.*
+import java.io.File
+import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.swing.Box
+import javax.swing.JComponent
+import javax.swing.JFrame
+import javax.swing.JLayeredPane
+import javax.swing.JPanel
+import javax.swing.SwingUtilities
+import javax.swing.WindowConstants
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.thread
+import kotlin.coroutines.resume
+import kotlin.math.absoluteValue
+import kotlin.random.Random
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+
+@Suppress("SameParameterValue")
+class SkiaLayerTest {
+    private val fontCollection = FontCollection()
+        .setDefaultFontManager(FontMgr.default)
+
+    private fun paragraph(size: Float, text: String) =
+        ParagraphBuilder(ParagraphStyle(), fontCollection)
+            .pushStyle(
+                TextStyle().apply {
+                    color = Color.RED.rgb
+                    fontSize = size
+                }
+            )
+            .addText(text)
+            .popStyle()
+            .build()
+
+    @get:Rule
+    val screenshots = ScreenshotTestRule()
+
+    @Ignore
+    @Test
+    fun `metal drawables not lost`() = uiTest {
+        val window = UiTestWindow(
+            properties = SkiaLayerProperties(
+                isVsyncEnabled = true
+            )
+        )
+        val colors = arrayOf(
+            Color.RED,
+            Color.GREEN,
+            Color.BLUE,
+            Color.YELLOW
+        )
+
+        var counter1 = 0
+        var counter2 = 0
+        val paint = Paint()
+
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 600)
+            window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+            window.layer.renderDelegate = SkikoRenderDelegate { canvas, width, height, _ ->
+                val c1 = counter1
+                val c2 = counter2
+
+                paint.color = colors[c1.mod(colors.size)].rgb
+                canvas.drawRect(Rect(0f, 0f, width.toFloat(), height / 2f), paint)
+
+                paint.color = colors[c2.mod(colors.size)].rgb
+                canvas.drawRect(Rect(0f, height / 2f, width.toFloat(), height.toFloat()), paint)
+            }
+            window.isVisible = true
+
+            window.addKeyListener(object : KeyAdapter() {
+                override fun keyTyped(e: KeyEvent?) {
+                    launch {
+                        val frameDriver = window.layer.frameDriver!!
+                        frameDriver.renderImmediately()
+                        counter1 += 1
+                        frameDriver.renderImmediately()
+                        counter2 += 1
+                        frameDriver.renderImmediately()
+                    }
+                }
+            })
+
+            window.addWindowListener(object : WindowAdapter() {
+                override fun windowActivated(e: WindowEvent?) {
+                    window.requestFocus()
+                }
+            })
+
+            delay(Duration.INFINITE)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `should not leak native windows`() = uiTest {
+        assumeTrue(hostOs.isMacOS)
+
+        suspend fun createAndDisposeWindow() {
+            val layer = SkiaLayer()
+            val frame = JFrame()
+            frame.contentPane.add(layer)
+            frame.size = Dimension(200, 200)
+            frame.isVisible = true
+            delay(30.milliseconds)
+            layer.dispose()
+            frame.dispose()
+        }
+
+        // warm caches
+        repeat(8) {
+            createAndDisposeWindow()
+        }
+
+        delay(1.seconds)
+        val initialWindowCount = getApplicationWindowCount()
+
+        repeat(32) {
+            createAndDisposeWindow()
+        }
+
+        delay(1.seconds)
+        val actualWindowCount = getApplicationWindowCount()
+
+        assertTrue(
+            initialWindowCount >= actualWindowCount,
+            "initialWindowCount=$initialWindowCount, actualWindowCount=$actualWindowCount"
+        )
+    }
+
+    @Test
+    fun `render single window`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val app = RectRenderer(window.layer, 200, 100, Color.RED)
+            window.layer.renderDelegate = app
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame1")
+
+            app.rectWidth = 100
+            window.layer.needRender()
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame2")
+
+            assertRenderApiFor(window.layer)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `render single swing layer`() = uiTest {
+        val window = JFrame()
+        val app = RectRenderer(window, 200, 100, Color.RED)
+        val layer = SkiaSwingLayer(
+            app,
+            properties = SkiaLayerProperties(renderApi = renderApi)
+        )
+        window.contentPane.add(layer)
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            layer.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame1")
+
+            app.rectWidth = 100
+            layer.repaint()
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame2")
+
+            assertRenderApiFor(layer)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `render single window before window show`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.setLocation(200, 200)
+            window.preferredSize = Dimension(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val app = RectRenderer(window.layer, 200, 100, Color.RED)
+            window.layer.renderDelegate = app
+            window.isUndecorated = true
+            window.pack()
+            window.paint(window.graphics)
+            window.isVisible = true
+
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame1")
+
+            app.rectWidth = 100
+            window.layer.needRender()
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame2")
+
+            assertRenderApiFor(window.layer)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `render empty layer`() = uiTest {
+        val window = JFrame()
+        val layer = SkiaLayer(
+            properties = SkiaLayerProperties(renderApi = renderApi)
+        )
+        var renderedWidth = -1
+        layer.renderDelegate = SkikoRenderDelegate { _, width, _, _ -> renderedWidth = width }
+        layer.size = Dimension(0, 0)
+        val density = window.graphicsConfiguration.defaultTransform.scaleX
+        try {
+            val panel = JLayeredPane()
+            panel.add(layer)
+            window.contentPane.add(panel)
+            window.setLocation(200, 200)
+            window.size = Dimension(200, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.isUndecorated = true
+            window.isVisible = true
+            layer.needRender()
+            delay(1.seconds)
+            assertEquals(0, renderedWidth)
+
+            renderedWidth = -1
+            layer.needRender()
+            delay(1.seconds)
+            assertEquals(0, renderedWidth)
+
+            renderedWidth = -1
+            layer.size = Dimension(30, 40)
+            delay(1.seconds)
+            assertEquals((30 * density).toInt(), renderedWidth)
+
+            renderedWidth = -1
+            layer.size = Dimension(0, 0)
+            delay(1.seconds)
+            assertEquals(0, renderedWidth)
+
+            renderedWidth = -1
+            layer.size = Dimension(40, 40)
+            delay(1.seconds)
+            assertEquals((40 * density).toInt(), renderedWidth)
+
+            assertRenderApiFor(layer)
+        } finally {
+            layer.dispose()
+            window.close()
+        }
+    }
+
+    @Test
+    fun `move without redrawing`() = uiTest {
+        val window = JFrame()
+        val layer = SkiaLayer(
+            properties = SkiaLayerProperties(renderApi = renderApi)
+        )
+
+        layer.renderDelegate = SkikoRenderDelegate { canvas, width, height, _ ->
+            canvas.drawRect(
+                r = Rect(0f, 0f, width.toFloat(), height.toFloat()),
+                paint = Paint().apply { color = Color.RED.rgb }
+            )
+        }
+        layer.size = Dimension(100, 100)
+        val box = Box.createVerticalBox().apply {
+            add(layer)
+        }
+        box.setBounds(0, 0, 100, 100)
+
+        try {
+            val panel = JLayeredPane()
+            panel.add(box)
+            window.contentPane.add(panel)
+            window.setLocation(200, 200)
+            window.size = Dimension(200, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame1")
+
+            box.setBounds(100, 0, 100, 100)
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame2")
+
+            assertRenderApiFor(layer)
+        } finally {
+            layer.dispose()
+            window.close()
+        }
+    }
+
+    @Test
+    fun `resize window`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.setLocation(200, 200)
+            window.setSize(40, 20)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.renderDelegate = RectRenderer(window.layer, 20, 10, Color.RED)
+            window.isUndecorated = true
+            window.isVisible = true
+            delay(1.seconds)
+
+            window.setSize(80, 40)
+            delay(1.seconds)
+
+            screenshots.assert(window.bounds)
+
+            assertRenderApiFor(window.layer)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `drag resize window`() = uiTest {
+        assumeFalse(hostOs.isLinux)  // Robot mouse moving doesn't seem to work on Linux
+        System.setProperty("skiko.platform.macos.metalSynchronousLiveResize", "true")
+        System.setProperty("skiko.platform.windows.direct3DSynchronousLiveResize", "true")
+
+        val robot = Robot().apply { autoDelay = 16 }
+        suspend fun dragBottomRightCorner(window: Window, by: Dimension, steps: Int = 20) {
+            val startX = window.x + window.width - 1
+            val startY = window.y + window.height - 1
+            withContext(Dispatchers.Default) {
+                robot.mouseMove(startX, startY)
+                robot.waitForIdle()
+                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK)
+                try {
+                    for (step in 1..steps) {
+                        robot.mouseMove(startX + by.width * step / steps, startY + by.height * step / steps)
+                    }
+                } finally {
+                    robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK)
+                }
+                robot.waitForIdle()
+            }
+        }
+
+        // Everything is divisible by 24, to avoid rounding due to screen scaling
+        val initialContentSize = Dimension(480, 240)
+        val growBy = Dimension(120, 96)
+        val finalContentSize = Dimension(
+            initialContentSize.width + growBy.width,
+            initialContentSize.height + growBy.height
+        )
+
+        val window = UiTestWindow()
+        val renderer = BorderRenderer(window.layer, borderThickness = 40, borderColor = Color.RED)
+        try {
+            window.setLocation(200, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.renderDelegate = renderer
+
+            window.layer.preferredSize = initialContentSize
+            window.pack()
+            window.isVisible = true
+            delay(200.milliseconds)
+            assertEquals("The window didn't pack to the requested content size", initialContentSize, window.layer.size)
+
+            dragBottomRightCorner(window, by = growBy)
+            delay(200.milliseconds)
+
+            assertEquals("The drag didn't resize the content as requested", finalContentSize, window.layer.size)
+            assertEquals("The final layer's size is incorrect", finalContentSize, window.layer.size)
+
+            // Screenshot the window content
+            val screenshotRect = Rectangle(window.locationOnScreen, window.size).apply {
+                fun shrink(left: Int, top: Int, right: Int, bottom: Int) {
+                    x += left
+                    y += top
+                    width -= right + left
+                    height -= bottom + top
+                }
+                // Exclude insets
+                val insets = window.insets
+                shrink(insets.left, insets.top, insets.right, insets.bottom)
+                // Exclude corners, which can be round and show through pixels that don't belong to us
+                shrink(0, 20, 0, 20)
+            }
+            screenshots.assert(screenshotRect)
+
+            assertRenderApiFor(window.layer)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `render three windows`() = uiTest {
+        fun window(color: Color) = UiTestWindow().apply {
+            setLocation(200, 200)
+            setSize(400, 200)
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            layer.renderDelegate = RectRenderer(layer, 200, 100, color)
+            isUndecorated = true
+            isVisible = true
+        }
+
+        val window1 = window(Color.RED)
+        val window2 = window(Color.GREEN)
+        val window3 = window(Color.BLACK)
+
+        try {
+            delay(1.seconds)
+
+            window1.toFront()
+            delay(1.seconds)
+            screenshots.assert(window1.bounds, "window1")
+
+            window2.toFront()
+            delay(1.seconds)
+            screenshots.assert(window2.bounds, "window2")
+
+            window3.toFront()
+            delay(1.seconds)
+            screenshots.assert(window3.bounds, "window3")
+
+            assertRenderApiFor(window1.layer)
+            assertRenderApiFor(window2.layer)
+            assertRenderApiFor(window3.layer)
+        } finally {
+            window1.close()
+            window2.close()
+            window3.close()
+        }
+    }
+
+    @Test
+    fun `window fullscreen state in componentResized`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.fullscreen = true
+            var stateRemainsFullscreen = true
+            window.addComponentListener(object: ComponentAdapter() {
+                override fun componentResized(e: ComponentEvent?) {
+                    if (!window.layer.fullscreen)
+                        stateRemainsFullscreen = false
+                }
+            })
+            window.isVisible = true
+
+            delay(1.seconds)
+            assertEquals(true, stateRemainsFullscreen)
+            assertRenderApiFor(window.layer)
+        } finally {
+            window.close()
+
+            // Delay before starting the next test to let the window animation complete and allow the next window
+            // to become fullscreen
+            if (hostOs == OS.MacOS) {
+                delay(1.seconds)
+            }
+        }
+    }
+
+    @Test
+    fun `should call onRender after init, after resize, and only once after needRender`() = uiTest {
+        var renderCount = 0
+
+        val window = UiTestWindow()
+        try {
+            window.setLocation(200, 200)
+            window.setSize(40, 20)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ -> renderCount++ }
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1.seconds)
+            assertTrue(renderCount > 0)
+            renderCount = 0
+
+            window.setSize(50, 20)
+            delay(1.seconds)
+            assertTrue(renderCount > 0)
+            renderCount = 0
+
+            window.layer.needRender()
+            delay(1.seconds)
+            assertEquals(1, renderCount)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test(timeout = 120000)
+    fun `stress test - open multiple windows`() = uiTest {
+        fun window(isAnimated: Boolean) = UiTestWindow().apply {
+            setLocation(200, 200)
+            setSize(40, 20)
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            layer.renderDelegate = if (isAnimated) {
+                AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
+            } else {
+                RectRenderer(layer, 20, 10, Color.RED)
+            }
+            isUndecorated = true
+            isVisible = true
+        }
+
+        val random = Random(31415926)
+        val openedWindows = mutableListOf<UiTestWindow>()
+
+        repeat(10) {
+            val needOpen = random.nextDouble() > 0.5f
+
+            repeat(10) {
+                if (needOpen) {
+                    val window = window(isAnimated = random.nextDouble() > 0.5f)
+                    openedWindows.add(window)
+                } else if (openedWindows.isNotEmpty()) {
+                    val index = (random.nextDouble() * (openedWindows.size - 1)).toInt()
+                    openedWindows.removeAt(index).close()
+                }
+            }
+
+            val delayCount = random.nextLong(5)
+            if (delayCount > 0) {
+                delay((delayCount * 10).milliseconds)
+            }
+
+            openedWindows.forEach {
+                assertRenderApiFor(it.layer)
+            }
+        }
+
+        openedWindows.forEach(JFrame::close)
+
+        delay(5.seconds)
+    }
+
+    @Test(timeout = 60000)
+    fun `stress test - resize and paint immediately`() = uiTest {
+        fun openWindow() = UiTestWindow(
+            properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
+        ).apply {
+            setLocation(200, 200)
+            setSize(400, 200)
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            layer.renderDelegate = AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
+            isVisible = true
+        }
+
+        val window = openWindow()
+
+        repeat(100) {
+            window.size = Dimension(200 + Random.nextInt(200), 200 + Random.nextInt(200))
+            window.paint(window.graphics)
+            assertRenderApiFor(window.layer)
+            yield()
+        }
+
+        window.close()
+    }
+
+    @Test(timeout = 60000)
+    fun `stress test - open and paint immediately`() = uiTest {
+        fun openWindow() = UiTestWindow(
+            properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
+        ).apply {
+            setLocation(200, 200)
+            setSize(400, 200)
+            preferredSize = Dimension(400, 200)
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ -> }
+        }
+
+        repeat(30) {
+            delay(100.milliseconds)
+            val window = openWindow()
+            window.isVisible = true
+            window.layer.needRender()
+            yield()
+            window.paint(window.graphics)
+            assertRenderApiFor(window.layer)
+            window.close()
+        }
+    }
+
+    private abstract class BaseTestRenderer(
+        layer: SkiaLayer,
+        analytics: SkiaLayerAnalytics,
+        graphicsApi: GraphicsApi,
+    ) : AwtRenderer(layer, analytics, graphicsApi) {
+        init {
+            onDeviceChosen("Test")
+            onContextInit()
+        }
+
+        override val renderInfo: String get() = ""
+        override fun releaseResources() = Unit
+    }
+
+    @Test(timeout = 60000)
+    fun `fallback to software renderer, fail on create renderer`() = uiTest {
+        testFallbackToSoftware { _, _, _, _ -> throw RenderException() }
+    }
+
+    @Test(timeout = 60000)
+    fun `fallback to software renderer, fail on draw`() = uiTest {
+        testFallbackToSoftware { layer, renderApi, analytics, _ ->
+            object : BaseTestRenderer(layer, analytics, renderApi) {
+                override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) {
+                    throw RenderException()
+                }
+            }
+        }
+    }
+
+    private suspend fun UiTestScope.testFallbackToSoftware(
+        nonSoftware: (SkiaLayer, GraphicsApi, SkiaLayerAnalytics, SkiaLayerProperties) -> AwtRenderer
+    ) {
+        val window = UiTestWindow(
+            renderFactory = OverrideNonSoftwareRenderFactory(nonSoftware)
+        )
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val app = RectRenderer(window.layer, 200, 100, Color.RED)
+            window.layer.renderDelegate = app
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame1", "testFallbackToSoftware")
+
+            app.rectWidth = 100
+            window.layer.needRender()
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame2", "testFallbackToSoftware")
+
+            assertEquals(GraphicsApi.SOFTWARE_COMPAT, window.layer.renderApi)
+        } finally {
+            window.close()
+        }
+    }
+
+    private class OverrideNonSoftwareRenderFactory(
+        private val nonSoftware: (SkiaLayer, GraphicsApi, SkiaLayerAnalytics, SkiaLayerProperties) -> AwtRenderer
+    ) : RenderFactory {
+        override fun createFrameDriver(
+            layer: SkiaLayer,
+            renderApi: GraphicsApi,
+            analytics: SkiaLayerAnalytics,
+            properties: SkiaLayerProperties
+        ): FrameDriver {
+            return if (renderApi == GraphicsApi.SOFTWARE_COMPAT) {
+                RenderFactory.Default.createFrameDriver(layer, renderApi, analytics, properties)
+            } else {
+                val producer = FrameProducer(layer, nonSoftware(layer, renderApi, analytics, properties))
+                FrameDriver(layer, producer, SingleFrameScheduler(producer))
+            }
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun `renderApi change callback is invoked on fallback`() = uiTest {
+        val window = UiTestWindow(
+            renderFactory = OverrideNonSoftwareRenderFactory { layer, renderApi, analytics, _ ->
+                object : BaseTestRenderer(layer, analytics, renderApi) {
+                    override suspend fun LayerDrawScope.renderFrame(immediate: Boolean) {
+                        throw RenderException()
+                    }
+                }
+            }
+        )
+        try {
+            var rendererChangedCallbackInvoked = false
+            window.layer.onStateChanged(SkiaLayer.PropertyKind.Renderer) {
+                rendererChangedCallbackInvoked = true
+            }
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.isVisible = true
+
+            delay(1.seconds)
+
+            assertEquals(GraphicsApi.SOFTWARE_COMPAT, window.layer.renderApi)
+            assertTrue(rendererChangedCallbackInvoked)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test(timeout = 20000)
+    fun `render continuously empty content without vsync`() = uiTest {
+        val targetDrawCount = 500
+        var drawCount = 0
+        val onDrawCompleted = CompletableDeferred<Unit>()
+
+        val window = UiTestWindow(
+            properties = SkiaLayerProperties(
+                isVsyncEnabled = false,
+                isVsyncFramelimitFallbackEnabled = true
+            )
+        )
+
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ ->
+                drawCount++
+
+                if (drawCount < targetDrawCount) {
+                    window.layer.needRender()
+                } else {
+                    onDrawCompleted.complete(Unit)
+                }
+            }
+            window.isUndecorated = true
+            window.isVisible = true
+
+            onDrawCompleted.await()
+            assertRenderApiFor(window.layer)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `frame disposed inside of immediate repaint`() = uiTest {
+        val onDrawCompleted = CompletableDeferred<Unit>()
+        val window = UiTestWindow(
+            properties = SkiaLayerProperties(
+                isVsyncEnabled = true,
+                isVsyncFramelimitFallbackEnabled = true
+            )
+        )
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 400)
+            window.layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ ->
+                window.dispose()
+                SwingUtilities.invokeLater {
+                    onDrawCompleted.complete(Unit)
+                }
+            }
+            window.isVisible = true
+            onDrawCompleted.await()
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @Test
+    fun `hiding parent stops drawing layer`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val app = RectRenderer(window.layer, 200, 100, Color.RED)
+            window.layer.renderDelegate = app
+            window.isUndecorated = true
+            window.isVisible = true
+
+            // Force the layered pane to draw itself with a specific color so that the test doesn't depend on the
+            // default window background, which could be different on different platforms.
+            window.layeredPane.background = Color.BLUE
+            window.layeredPane.isOpaque = true
+
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "visible_parent")
+
+            window.contentPane.isVisible = false
+
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "hidden_parent")
+        } finally {
+            window.close()
+        }
+
+    }
+
+    @Test
+    fun `non zero layer origin`() = uiTest {
+        val window = UiTestWindow(setupContent = {
+            isUndecorated = true
+            setLocation(200, 200)
+            setSize(300, 100)
+
+            val panel = JPanel()
+            panel.preferredSize = Dimension(100, 100)
+            panel.background = Color.GREEN
+            contentPane.add(panel, BorderLayout.WEST)
+
+            layer.renderDelegate = RectRenderer(layer, 100, 100, Color.RED)
+            contentPane.add(layer, BorderLayout.CENTER)
+        })
+        try {
+            window.isUndecorated = true
+            window.isVisible = true
+            delay(1.seconds)
+            screenshots.assert(window.bounds, "frame")
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `second frame drawn without delay in metal`() = uiTest(
+        // SOFTWARE_COMPAT fails because it's just too slow
+        excludeRenderApis = listOf(GraphicsApi.SOFTWARE_COMPAT)
+    ) {
+        assumeTrue(hostOs == OS.MacOS) // since the test has 'metal' in its name (it is flaky on Windows)
+
+        val renderTimes = mutableListOf<Long>()
+        val renderer = SkikoRenderDelegate { _, _, _, _ ->
+            renderTimes.add(System.currentTimeMillis())
+        }
+        val window = UiTestWindow {
+            layer.renderDelegate = renderer
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+        try {
+            window.size = Dimension(800, 800)
+            repeat(10) {
+                window.isVisible = true
+                delay(16.milliseconds)
+                window.layer.needRender()
+                delay(500.milliseconds)
+                window.isVisible = false
+
+                val dt = renderTimes.last() - renderTimes.first()
+                assertTrue(
+                    actual = dt < 200,
+                    message = "2nd frame drawn ${dt}ms after 1st: ${renderTimes.map { it - renderTimes.first() }}}"
+                )
+                renderTimes.clear()
+            }
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @Test
+    fun `render text (Windows)`() {
+        testRenderText(OS.Windows)
+    }
+
+    @Test
+    fun `render text (Linux)`() {
+        testRenderText(OS.Linux)
+    }
+
+    @Test
+    fun `render text (MacOS)`() {
+        testRenderText(OS.MacOS)
+    }
+
+    @Test
+    fun analytics() = uiTest {
+        val analytics = object : SkiaLayerAnalytics {
+            val rendererInfo = object {
+                var skikoVersion: String? = null
+                var os: OS? = null
+                var api: GraphicsApi? = null
+
+                var init = 0
+                var deviceChosen = 0
+            }
+
+            val deviceInfo = object {
+                var skikoVersion: String? = null
+                var os: OS? = null
+                var api: GraphicsApi? = null
+                var deviceName: String? = null
+
+                var init = 0
+                var contextInit = 0
+                var beforeFirstFrameRender = 0
+                var afterFirstFrameRender = 0
+            }
+
+            @ExperimentalSkikoApi
+            override fun renderer(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi
+            ) = object : SkiaLayerAnalytics.RendererAnalytics {
+                init {
+                    rendererInfo.skikoVersion = skikoVersion
+                    rendererInfo.os = os
+                    rendererInfo.api = api
+                    rendererInfo.init = 0
+                    rendererInfo.deviceChosen = 0
+                }
+
+                override fun init() {
+                    rendererInfo.init++
+                }
+
+                override fun deviceChosen() {
+                    rendererInfo.deviceChosen++
+                }
+            }
+
+            @ExperimentalSkikoApi
+            override fun device(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi,
+                deviceName: String?
+            ) = object : SkiaLayerAnalytics.DeviceAnalytics {
+                init {
+                    deviceInfo.skikoVersion = skikoVersion
+                    deviceInfo.os = os
+                    deviceInfo.api = api
+                    deviceInfo.deviceName = deviceName
+
+                    deviceInfo.init = 0
+                    deviceInfo.contextInit = 0
+                    deviceInfo.beforeFirstFrameRender = 0
+                    deviceInfo.afterFirstFrameRender = 0
+                }
+
+                override fun init() {
+                    deviceInfo.init++
+                }
+
+                override fun contextInit() {
+                    deviceInfo.contextInit++
+                }
+
+                override fun beforeFirstFrameRender() {
+                    deviceInfo.beforeFirstFrameRender++
+                }
+
+                override fun afterFirstFrameRender() {
+                    deviceInfo.afterFirstFrameRender++
+                }
+            }
+        }
+
+        val window = UiTestWindow(analytics = analytics)
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val app = RectRenderer(window.layer, 200, 100, Color.RED)
+            window.layer.renderDelegate = app
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1.seconds)
+            assertEquals(Version.skiko, analytics.rendererInfo.skikoVersion)
+            assertEquals(hostOs, analytics.rendererInfo.os)
+            assertNotNull(analytics.rendererInfo.api)
+            assertEquals(1, analytics.rendererInfo.init)
+            assertEquals(1, analytics.rendererInfo.deviceChosen)
+
+            assertEquals(Version.skiko, analytics.deviceInfo.skikoVersion)
+            assertNotNull(analytics.deviceInfo.api)
+            assertNotNull(analytics.deviceInfo.deviceName)
+            assertEquals(1, analytics.deviceInfo.init)
+            assertEquals(1, analytics.deviceInfo.contextInit)
+            assertEquals(1, analytics.deviceInfo.beforeFirstFrameRender)
+            assertEquals(1, analytics.deviceInfo.afterFirstFrameRender)
+        } finally {
+            window.close()
+        }
+    }
+
+    private fun testRenderText(os: OS) = uiTest {
+        assumeTrue(hostOs == os)
+
+        val window = UiTestWindow()
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+
+            val paragraph by lazy { paragraph(window.layer.contentScale * 40, "=-+Нп") }
+
+            window.layer.renderDelegate = SkikoRenderDelegate { canvas, _, _, _ ->
+                canvas.clear(Color.WHITE.rgb)
+                paragraph.layout(Float.POSITIVE_INFINITY)
+                paragraph.paint(canvas, 0f, 0f)
+            }
+
+            window.isUndecorated = true
+            window.isVisible = true
+            delay(1.seconds)
+
+            // check the line metrics
+            val lineMetrics = paragraph.lineMetrics
+            assertTrue(lineMetrics.isNotEmpty())
+            assertEquals(0, lineMetrics.first().startIndex)
+            assertEquals(5, lineMetrics.first().endIndex)
+            assertEquals(5, lineMetrics.first().endExcludingWhitespaces)
+            assertEquals(5, lineMetrics.first().endIncludingNewline)
+            assertEquals(true, lineMetrics.first().isHardBreak)
+            assertEquals(0, lineMetrics.first().lineNumber)
+
+            screenshots.assert(window.bounds)
+            assertRenderApiFor(window.layer)
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `content not relaid out on window move`() = uiTest {
+        var layoutCount = 0
+
+        val window = UiTestWindow {
+            contentPane.layout = object: BorderLayout() {
+                override fun layoutContainer(parent: Container?) {
+                    super.layoutContainer(parent)
+                    layoutCount++
+                }
+            }
+            contentPane.add(layer)
+        }
+        try {
+            window.size = Dimension(400, 400)
+            window.isVisible = true
+
+            repeat(20) {
+                window.location = window.location.let {
+                    Point(it.x + 10, it.y + 10)
+                }
+                delay(50.milliseconds)
+            }
+
+            // Ideally, layoutCount would be just 1, but Swing appears to call layout one extra time, so it ends up being 2.
+            // Compare to 3 just to avoid a false-failure if there's another layout for whatever reason.
+            // What we're interested in validating is that there's no layout occurring on every window move.
+            assert(layoutCount <= 3) {
+                "Layout count: $layoutCount"
+            }
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @Test
+    fun `no window flash on hide or dispose while animation is running`() = uiTest {
+        assumeTrue(hostOs.isMacOS)
+        // Until the issue is fixed in other renderers
+        // Don't use assumeTrue, as uiTest iterates over multiple renderers,
+        // and if one of them skipped, the whole test is skipped
+        if (renderApi != GraphicsApi.METAL) return@uiTest
+
+        // Put up a large green window, and then repeatedly show and hide/dispose
+        // a smaller black window on top of it while screenshotting the pixel at the center
+        // and making sure that pixel is always either black or green.
+
+        val bgColor = Color.GREEN
+        val fgColor = Color.BLACK
+        val backgroundWindow = JFrame().also {
+            it.size = Dimension(1000, 1000)
+            it.location = Point(200, 200)
+            it.contentPane.background = bgColor
+            it.isVisible = true
+        }
+
+        lateinit var renderDelegate: SolidColorRenderer
+        val window = UiTestWindow {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            renderDelegate = SolidColorRenderer(
+                layer = layer,
+                color = fgColor,
+                continuousRedraw = true  // Continuously redraw to simulate a running animation
+            )
+            layer.renderDelegate = renderDelegate
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+
+        window.isVisible = true
+        delay(500.milliseconds)
+        val pixelLocation = window.bounds.let {
+            Point(it.x + it.width/2, it.y + it.height/2)
+        }
+
+        var nonBlackPixelDetected: Color? = null
+        val stopThread = AtomicBoolean(false)
+        // This semaphore ensures that screenshots are only taken when the window is becoming hidden/disposed.
+        // It's necessary because the window can (and does, with SOFTWARE_COMPAT) also flash when becoming visible.
+        val semaphore = Semaphore(1, true)
+        val t = thread {
+            val robot = Robot()
+            while(!stopThread.get()) {
+                semaphore.acquire()
+                val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
+                semaphore.release()
+                if (!pixel.closeTo(fgColor) && !pixel.closeTo(bgColor)) {
+                    nonBlackPixelDetected = pixel
+                    return@thread
+                }
+            }
+        }
+
+        try {
+            // Check with `window.isVisible = false`
+            repeat(20) {
+                delay(200.milliseconds)
+                window.isVisible = false
+                delay(300.milliseconds)
+                assertNull(nonBlackPixelDetected, "Detected a non-black pixel when hiding window")
+                // Acquire the semaphore while making the window visible, to disable screenshotting
+                semaphore.acquire()
+                window.isVisible = true
+                delay(500.milliseconds)
+                semaphore.release()
+            }
+
+            // Check with `window.dispose()`
+            repeat(20) {
+                delay(200.milliseconds)
+                window.dispose()
+                delay(300.milliseconds)
+                assertNull(nonBlackPixelDetected, "Detected a non-black pixel when disposing window")
+                // Acquire the semaphore while making the window visible, to disable screenshotting
+                semaphore.acquire()
+                window.isVisible = true
+                delay(500.milliseconds)
+                semaphore.release()
+            }
+        } finally {
+            stopThread.getAndSet(true)
+            t.join()
+
+            window.dispose()
+            backgroundWindow.dispose()
+        }
+    }
+
+    @OptIn(ExperimentalAtomicApi::class)
+    @Test(timeout = 240000)
+    fun `no window flash on first show`() = uiTest {
+        // Exclude known-bad pairs of OSes and graphics APIs. null values indicate all values
+        // Don't use assumeTrue, as uiTest iterates over multiple renderers,
+        // and if one of them is skipped, the whole test is skipped
+        val badRenderApis = setOf(
+            Pair(OS.Linux, null),
+            Pair(null, GraphicsApi.SOFTWARE_FAST),
+            Pair(null, GraphicsApi.SOFTWARE_COMPAT)
+        )
+        if (
+            (Pair(hostOs, renderApi) in badRenderApis) ||
+            (Pair(hostOs, null) in badRenderApis) ||
+            (Pair(null, renderApi) in badRenderApis))
+            return@uiTest
+
+        val bgColor = Color.GREEN
+        val fgColor = Color.BLACK
+
+        // The first-show flash only reproduces on the very FIRST window displayed in a process. This test's
+        // own JVM warmed that up long ago (earlier tests showed windows), so instead each run spawns a
+        // fresh JVM (FirstShowFlashHarness) whose single black Metal window is genuinely its first. We keep a
+        // large green background window here to provide a known reference color behind the child's window,
+        // then screenshot the center pixel while the child shows, making sure it is always either black (the
+        // child's content) or green (this background) - never a flash of some other color.
+
+        val backgroundWindow = JFrame(renderApi.name).also {
+            it.location = Point(200, 200)
+            it.size = Dimension(1000, 1000)
+            it.contentPane.background = bgColor
+        }
+        backgroundWindow.isVisible = true
+        backgroundWindow.waitUntilOpened()
+        delay(200.milliseconds)
+        backgroundWindow.toFront()
+
+        val pixelLocation = backgroundWindow.bounds.let {
+            Point(it.x + it.width / 2, it.y + it.height / 2)
+        }
+        // The child harness hard-codes its window bounds to cover this pixel (the background window's center).
+
+        val flashPixelDetected = AtomicReference<Color?>(null)
+        val lastPixelColorDetected = AtomicReference<Color?>(null)
+        val stopThread = AtomicBoolean(false)
+
+        // Sample continuously (never stops on detection, so every run is still checked) and latch the first
+        // pixel that is neither the background nor the content color.
+        val t = thread {
+            val robot = Robot()
+            try {
+                while (!stopThread.get()) {
+                    val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
+                    lastPixelColorDetected.store(pixel)
+                    if (!pixel.closeTo(fgColor) && !pixel.closeTo(bgColor)) {
+                        flashPixelDetected.compareAndSet(null, pixel)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        suspend fun waitForSampledPixelCloseTo(targetColor: Color) {
+            do {
+                delay(200.milliseconds)
+            } while (!lastPixelColorDetected.load().let { it != null && it.closeTo(targetColor) })
+        }
+
+        // Build the command that launches a child JVM running FirstShowFlashHarness, forwarding this JVM's
+        // classpath, every skiko.* system property (notably skiko.library.path, which is how the native
+        // library is located), and the same --add-opens the test task uses.
+        val javaExe = File(System.getProperty("java.home"), "bin${File.separator}java").absolutePath
+        val childCommand = buildList {
+            add(javaExe)
+            add("-cp")
+            add(System.getProperty("java.class.path"))
+            System.getProperties().stringPropertyNames()
+                .filter { it.startsWith("skiko.") || it.startsWith("sun.") }
+                .forEach { add("-D$it=${System.getProperty(it)}") }
+            add("--add-opens")
+            add("java.desktop/sun.font=ALL-UNNAMED")
+            add(FirstWindowShowFlashHelper::class.java.name)
+            add(renderApi.name)
+            add(fgColor.rgb.toString())
+        }
+
+        try {
+            repeat(20) { testRun ->
+                // Wait until the sampled pixel shows the (green) background before launching the child.
+                waitForSampledPixelCloseTo(bgColor)
+
+                val child = ProcessBuilder(childCommand)
+                    .redirectErrorStream(true)
+                    .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                    .start()
+                try {
+                    // Wait for the child's black content to reach the screen
+                    val contentShown = withTimeoutOrNull(30.seconds) {
+                        waitForSampledPixelCloseTo(fgColor)
+                        true
+                    } ?: false
+                    assertNull(
+                        flashPixelDetected.load(),
+                        "Detected a flash (neither background nor content color) on first show in run ${testRun + 1}."
+                    )
+                    assertTrue(contentShown, "Child window content never appeared in run ${testRun + 1}.")
+                } finally {
+                    child.destroy()
+                    if (!child.waitFor(5, TimeUnit.SECONDS)) child.destroyForcibly()
+                }
+            }
+        } finally {
+            stopThread.getAndSet(true)
+            t.join()
+            backgroundWindow.dispose()
+        }
+    }
+
+    @Test
+    fun `temporary change is not visible with needRender(throttledToVsync = false)`() = uiTest {
+        assumeTrue(hostOs.isMacOS)
+        // The separation between update and draw is only implemented in MetalRenderer at the moment
+        // Don't use assumeTrue, as uiTest iterates over multiple renderers,
+        // and if one of them skipped, the whole test is skipped
+        if (renderApi != GraphicsApi.METAL) return@uiTest
+
+        val color = Color.BLACK
+        val tempColor = Color.WHITE
+        lateinit var renderDelegate: SolidColorRenderer
+        val renderChannel = Channel<Unit>(Channel.CONFLATED)
+        val window = UiTestWindow {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            renderDelegate = object: SolidColorRenderer(
+                layer = layer,
+                color = color,
+                continuousRedraw = true
+            ) {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    super.onRender(canvas, width, height, nanoTime)
+                    assertTrue(renderChannel.trySend(Unit).isSuccess)
+                }
+            }
+            layer.renderDelegate = renderDelegate
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+
+        window.isVisible = true
+        delay(1.5.seconds)
+        val pixelLocation = window.bounds.let {
+            Point(it.x + it.width/2, it.y + it.height/2)
+        }
+        val robot = Robot()
+
+        var tempColorVisibleCount = 0
+        val testCount = 50
+        try {
+            repeat(testCount) {
+                // Wait for just after the next vsync, so we have plenty of time until the one after it
+                val vSyncer = MetalVSyncer(window.layer.windowHandle)
+                vSyncer.waitForVSync()
+
+                // Set the color to temp, then immediately back to normal
+                renderDelegate.color = tempColor
+                renderDelegate.layer.needRender(throttledToVsync = false)
+                renderChannel.receive()  // Wait until render is actually called
+                renderDelegate.color = color
+                renderDelegate.layer.needRender(throttledToVsync = false)
+
+                // Check whether the temp color was visible
+                val startTime = System.currentTimeMillis()
+                while (System.currentTimeMillis() - startTime < 400) {
+                    val pixel = robot.getPixelColor(pixelLocation.x, pixelLocation.y)
+                    if (pixel != color) {
+                        tempColorVisibleCount++
+                        break
+                    }
+                }
+            }
+
+            // Because the temp color can theoretically be visible if the JVM hiccups and a vsync happens before the
+            // color is reverted, we allow a small percentage of the tries to fail. This way the flakiness of the test
+            // is reduced.
+            // Note that in practice, however, this test had never failed on an M1 Ultra machine with a 60Hz monitor.
+            assertTrue(tempColorVisibleCount < 5, "Temp color was visible $tempColorVisibleCount/$testCount times")
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @Test
+    fun `needRender throttled and regular calls render and draw once`() = uiTest {
+        // Check that calling both needRender(true) and needRender(false) causes only one render and one draw call
+        var renderCalls = 0
+        val renderChannel = Channel<Unit>(Channel.CONFLATED)
+
+        var drawCalls = 0
+        val deviceAnalytics = object : SkiaLayerAnalytics.DeviceAnalytics {
+            override fun beforeFrameRender() {
+                drawCalls++
+            }
+        }
+        val analytics = object : SkiaLayerAnalytics {
+            @ExperimentalSkikoApi
+            override fun device(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi,
+                deviceName: String?
+            ): SkiaLayerAnalytics.DeviceAnalytics {
+                return deviceAnalytics
+            }
+        }
+        val window = UiTestWindow(analytics = analytics) {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ ->
+                renderCalls++
+                renderChannel.trySend(Unit)
+            }
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+        window.isVisible = true
+
+        // Wait for things to settle down, specifically the workaround for JBR-5259, which moves
+        // the backed layer when graphicsContextScaleTransform changes
+        delay(100.milliseconds)
+
+        try {
+            renderChannel.receive()
+            renderCalls = 0
+            drawCalls = 0
+            withContext(MainUIDispatcher) {
+                window.layer.needRender(true)
+                window.layer.needRender(false)
+            }
+            delay(100.milliseconds)
+            assertEquals("Render was called more than once on needRender(true), needRender(false)", 1, renderCalls)
+            assertEquals("Draw was called more than once on needRender(true), needRender(false)", 1, drawCalls)
+
+            renderCalls = 0
+            drawCalls = 0
+            withContext(MainUIDispatcher) {
+                window.layer.needRender(false)
+                window.layer.needRender(true)
+            }
+            delay(100.milliseconds)
+            assertEquals("Render was called more than once on needRender(false), needRender(true)", 1, renderCalls)
+            assertEquals("Draw was called more than once on needRender(true), needRender(true)", 1, drawCalls)
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @Test
+    fun `renderImmediately updates and draws synchronously`() = uiTest {
+        // Check that calling both needRender(true) and needRender(false) causes only one render and one draw call
+        var renderCalls = 0
+        val renderChannel = Channel<Unit>(Channel.CONFLATED)
+
+        var drawCalls = 0
+        val deviceAnalytics = object : SkiaLayerAnalytics.DeviceAnalytics {
+            override fun beforeFrameRender() {
+                drawCalls++
+            }
+        }
+        val analytics = object : SkiaLayerAnalytics {
+            @ExperimentalSkikoApi
+            override fun device(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi,
+                deviceName: String?
+            ): SkiaLayerAnalytics.DeviceAnalytics {
+                return deviceAnalytics
+            }
+        }
+        val window = UiTestWindow(analytics = analytics) {
+            size = Dimension(600, 600)
+            location = Point(400, 400)
+            layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ ->
+                renderCalls++
+                renderChannel.trySend(Unit)
+            }
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+        window.pack()
+
+        val initRenderCalls = renderCalls
+        val initDrawCalls = drawCalls
+        window.layer.renderImmediately()
+        // Can't check renderCalls == initRenderCalls+1 because if drawing fails, render will be called again with
+        // the fallback renderer.
+        assertTrue(renderCalls > initRenderCalls)
+        assertTrue(drawCalls > initDrawCalls)
+    }
+
+    private suspend fun  UiTestScope.testLayerBackground(
+        initLayer: UiTestWindow.() -> Unit = {}
+    ) {
+        val window = UiTestWindow()
+        try {
+            window.setLocation(200, 200)
+            window.setSize(300, 300)
+            val layer = window.layer
+            layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ -> }
+            initLayer(window)
+            layer.background = Color.RED
+            window.isVisible = true
+            delay(1.seconds)
+
+            val robot = Robot()
+            val windowBounds = window.bounds
+
+            fun assertLayerIs(color: Color) {
+                val pixel = robot.getPixelColor(windowBounds.centerX.toInt(), windowBounds.centerY.toInt())
+                assertTrue(pixel.closeTo(color), "Actual pixel $pixel not close to expected $color")
+            }
+            assertLayerIs(Color.RED)
+
+            layer.background = Color.BLUE
+            delay(100.milliseconds)
+            assertLayerIs(Color.BLUE)
+
+            layer.background = Color.GREEN
+            delay(100.milliseconds)
+            assertLayerIs(Color.GREEN)
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @Test
+    fun `layer background is drawn correctly`() = uiTest {
+        testLayerBackground()
+    }
+
+    @OptIn(DelicateSkikoApi::class)
+    @Test
+    fun `layer background is drawn correctly with transparency`() = uiTest {
+        if (renderApi == GraphicsApi.ANGLE) return@uiTest  // See https://youtrack.jetbrains.com/issue/SKIKO-1089
+
+        testLayerBackground {
+            layer.transparency = true
+            layer.background = Color(0, 0, 0, 0)
+            isUndecorated = true
+            background = transparentWindowBackgroundHack(renderApi)
+        }
+    }
+
+    @Test
+    fun `layer background is clipped`() = uiTest {
+        val window = JFrame()
+        try {
+            // Simulate how Swing Interop in Compose for Desktop works
+            val layeredPane = JLayeredPane()
+            layeredPane.layout = null
+            val swingComponent = object : JComponent() {
+                override fun paint(g: Graphics) {
+                    g.color = Color.GREEN
+                    g.fillRect(0, 0, width, height)
+                }
+            }
+
+            val layer = SkiaLayer(
+                properties = SkiaLayerProperties(renderApi = renderApi),
+            )
+            layer.bounds = Rectangle(0, 0, 300, 300)
+            layer.background = Color.YELLOW
+            val layerContentPaint = Paint().also { it.color = Color.RED.rgb }
+            layer.renderDelegate = SkikoRenderDelegate { canvas, width, height, _ ->
+                canvas.drawRect(Rect(0f, 0f, width.toFloat(), height/3f), layerContentPaint)
+            }
+
+            swingComponent.bounds = Rectangle(0, 200, 300, 100)
+            val clipRect = ClipRectangle(
+                x = swingComponent.x.toFloat(),
+                y = swingComponent.y.toFloat(),
+                width = swingComponent.width.toFloat(),
+                height = swingComponent.height.toFloat()
+            )
+            layer.clipComponents.add(clipRect)
+
+            layeredPane.add(layer, BorderLayout.CENTER)
+            layeredPane.add(swingComponent, BorderLayout.CENTER, 0)
+
+            window.contentPane.layout = BorderLayout()
+            window.contentPane.add(layeredPane, BorderLayout.CENTER)
+            window.setLocation(200, 200)
+            window.size = layer.size
+
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(100.milliseconds)
+            withContext(Dispatchers.Default) {
+                Robot().waitForIdle()
+            }
+
+            // Expect to see three layers:
+            // - Red, from the layer content
+            // - Yellow, from the layer background
+            // - Green, from the Swing component
+            screenshots.assert(window.bounds, "frame_1")
+
+            // Remove the swingComponent and its clip
+            layeredPane.remove(swingComponent)
+            layer.clipComponents.remove(clipRect)
+
+            delay(100.milliseconds)
+            withContext(Dispatchers.Default) {
+                Robot().waitForIdle()
+            }
+
+            // Expect to see two layers:
+            // - Red, from the layer content
+            // - Yellow, from the layer background (twice as tall as the Red)
+            screenshots.assert(window.bounds, "frame_2")
+        } finally {
+            window.close()
+        }
+    }
+
+    private class RectRenderer(
+        private val getContentScale: () -> Float,
+        var rectWidth: Int,
+        var rectHeight: Int,
+        private val rectColor: Color
+    ) : SkikoRenderDelegate {
+        constructor(
+            layer: SkiaLayer,
+            rectWidth: Int,
+            rectHeight: Int,
+            rectColor: Color
+        ) : this(
+            { layer.contentScale }, rectWidth, rectHeight, rectColor
+        )
+
+        constructor(
+            layer: JFrame,
+            rectWidth: Int,
+            rectHeight: Int,
+            rectColor: Color
+        ) : this(
+            { layer.graphicsConfiguration.defaultTransform.scaleX.toFloat() }, rectWidth, rectHeight, rectColor
+        )
+
+        private val contentScale get() = getContentScale()
+
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
+                color = Color.WHITE.rgb
+            })
+            canvas.drawRect(Rect(0f, 0f, rectWidth * contentScale, rectHeight * contentScale), Paint().apply {
+                color = rectColor.rgb
+            })
+        }
+    }
+
+    /**
+     * Fills the content with white and outlines it with a [borderThickness]-wide border, so that content lagging the
+     * window's size shows up as the border sitting away from the window's edges.
+     */
+    private class BorderRenderer(
+        private val layer: SkiaLayer,
+        private val borderThickness: Int,
+        private val borderColor: Color
+    ) : SkikoRenderDelegate {
+        /** The size, in pixels, that the last frame was laid out for. */
+        var lastRenderedSize: Dimension? = null
+            private set
+
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            lastRenderedSize = Dimension(width, height)
+
+            val w = width.toFloat()
+            val h = height.toFloat()
+            canvas.drawRect(Rect(0f, 0f, w, h), Paint().apply { color = Color.WHITE.rgb })
+
+            // Scaled, so the border keeps the same on-screen thickness whatever the content scale is.
+            val t = borderThickness * layer.contentScale
+            val border = Paint().apply { color = borderColor.rgb }
+            canvas.drawRect(Rect(0f, 0f, w, t), border)
+            canvas.drawRect(Rect(0f, h - t, w, h), border)
+            canvas.drawRect(Rect(0f, 0f, t, h), border)
+            canvas.drawRect(Rect(w - t, 0f, w, h), border)
+        }
+    }
+
+    private class AnimatedBoxRenderer(
+        private val layer: SkiaLayer,
+        private val pixelsPerSecond: Double,
+        private val size: Double
+    ) : SkikoRenderDelegate {
+        private var oldNanoTime = Long.MAX_VALUE
+        private var x = 0.0
+
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            canvas.clear(Color.WHITE.rgb)
+
+            val dt = (nanoTime - oldNanoTime).coerceAtLeast(0) / 1E9
+            oldNanoTime = nanoTime
+
+            x += dt * pixelsPerSecond
+            if (x - size > width) {
+                x = 0.0
+            }
+
+            canvas.drawRect(Rect(x.toFloat(), 0f, x.toFloat() + size.toFloat(), size.toFloat()), Paint().apply {
+                color = Color.RED.rgb
+            })
+
+            layer.needRender()
+        }
+    }
+
+    private open class SolidColorRenderer(
+        val layer: SkiaLayer,
+        color: Color,
+        continuousRedraw: Boolean = false
+    ) : SkikoRenderDelegate {
+
+        var continuousRedraw = continuousRedraw
+            set(value) {
+                if (value)
+                    layer.needRender(throttledToVsync = true)
+                field = value
+            }
+
+        var color = color
+            set(value) {
+                Logger.debug { "Color set to $value" }
+                field = value
+                paint.color = color.rgb
+            }
+
+        private var paint = Paint().also { it.color = color.rgb }
+
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), paint)
+            if (continuousRedraw) {
+                layer.needRender()
+            }
+        }
+    }
+
+    /**
+     * Compares two colors, within a certain tolerance.
+     * We can't compare colors exactly because java.awt.Robot can return a slightly different color due to
+     * system color profile
+     */
+    fun Color.closeTo(other: Color, diffLimit: Int = 10): Boolean {
+        return (red - other.red).absoluteValue < diffLimit
+                && (green - other.green).absoluteValue < diffLimit
+                && (blue - other.blue).absoluteValue < diffLimit
+    }
+}
+
+internal fun JFrame.close() = dispatchEvent(WindowEvent(this, WindowEvent.WINDOW_CLOSING))
+
+private suspend fun Window.waitUntilOpened() {
+    if (isShowing) return
+    lateinit var listener: WindowListener
+    try {
+        suspendCancellableCoroutine { continuation ->
+            listener = object : WindowAdapter() {
+                override fun windowOpened(e: WindowEvent?) {
+                    continuation.resume(Unit)
+                }
+            }
+            addWindowListener(listener)
+        }
+    } finally {
+        removeWindowListener(listener)
+    }
+}
