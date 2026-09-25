@@ -9,6 +9,7 @@ import android.view.KeyEvent
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.*
+import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
 import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10

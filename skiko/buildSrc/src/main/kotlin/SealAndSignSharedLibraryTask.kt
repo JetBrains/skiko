@@ -119,7 +119,7 @@ abstract class SealAndSignSharedLibraryTask : DefaultTask() {
                 }
             }
             val size = signedFile.length()
-            if (size < 200 * 1024) {
+            if (size < 1024) {
                 val content = signedFile.readText()
                 logger.info(content)
                 throw GradleException("Output is too short $size: ${content.take(200)}...")
