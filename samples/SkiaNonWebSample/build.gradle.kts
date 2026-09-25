@@ -94,6 +94,10 @@ kotlin {
     }
 
     wasmJs {
+        compilerOptions {
+            freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
+        }
+
         browser {
             commonWebpackConfig {
                 outputFileName = "webApp.js"
