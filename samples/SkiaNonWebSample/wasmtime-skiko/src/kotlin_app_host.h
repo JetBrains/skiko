@@ -24,7 +24,8 @@ public:
     );
     void AttachInstance(const wasmtime_instance_t& instance);
     void Start();
-    void RunContinuousFrame(double timestamp_millis);
+    size_t AnimationCallbackCount() const;
+    void RunNextAnimationCallback(double timestamp_millis);
     std::vector<uint8_t> CompositeFrame();
     const std::string& Title() const;
 
@@ -64,7 +65,6 @@ private:
     bool attached_ = false;
     std::deque<std::shared_ptr<Callback>> ready_callbacks_;
     std::deque<std::shared_ptr<Callback>> animation_callbacks_;
-    std::vector<std::shared_ptr<Callback>> continuous_callbacks_;
     int next_animation_id_ = 1;
     std::string title_ = "Skiko WASM native OpenGL";
     bool diagnostics_reported_ = false;

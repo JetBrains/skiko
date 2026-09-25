@@ -378,18 +378,15 @@ void KotlinAppHost::DrainReadyCallbacks() {
     }
 }
 
-void KotlinAppHost::RunContinuousFrame(double timestamp_millis) {
-    // Honor callbacks explicitly scheduled since the previous frame. If the
-    // application schedules only its initial frame (as this sample does), keep
-    // driving that callback set to provide a native continuous animation loop.
-    if (!animation_callbacks_.empty()) {
-        continuous_callbacks_.assign(
-            animation_callbacks_.begin(), animation_callbacks_.end());
-        animation_callbacks_.clear();
-    }
-    for (const auto& callback : continuous_callbacks_) {
-        Invoke(callback, timestamp_millis);
-    }
+size_t KotlinAppHost::AnimationCallbackCount() const {
+    return animation_callbacks_.size();
+}
+
+void KotlinAppHost::RunNextAnimationCallback(double timestamp_millis) {
+    if (animation_callbacks_.empty()) return;
+    const std::shared_ptr<Callback> callback = animation_callbacks_.front();
+    animation_callbacks_.pop_front();
+    Invoke(callback, timestamp_millis);
 }
 
 std::vector<uint8_t> KotlinAppHost::CompositeFrame() {

@@ -1,6 +1,6 @@
 #include "skiko_host.h"
 #include "kotlin_app_host.h"
-#include "macos_window.h"
+#include "sdl_window.h"
 
 #include <chrono>
 #include <fstream>
@@ -432,31 +432,41 @@ int main(int argc, char** argv) {
 
             constexpr int window_width = 606;
             constexpr int window_height = 706;
-            MacOSWindow window(
+            SDLWindow window(
                 window_width, window_height, application.Title());
             std::cout << "Skiko Wasmtime demo running. "
                          "Close the window to exit.\n";
 
             const auto start = std::chrono::steady_clock::now();
-            auto next_frame = start;
+            auto next_frame = start + std::chrono::microseconds(16667);
             while (window.IsOpen()) {
                 window.PollEvents();
                 if (!window.IsOpen()) break;
 
-                const auto now = std::chrono::steady_clock::now();
-                const double timestamp =
-                    std::chrono::duration<double, std::milli>(now - start)
-                        .count();
-                application.RunContinuousFrame(timestamp);
-                window.SetTitle(application.Title());
-                window.Present(application.CompositeFrame());
+                if (std::chrono::steady_clock::now() >= next_frame) {
+                    const auto now = std::chrono::steady_clock::now();
+                    const double timestamp = std::chrono::duration<
+                        double, std::milli>(now - start).count();
 
-                next_frame += std::chrono::microseconds(16667);
-                if (next_frame > std::chrono::steady_clock::now()) {
-                    std::this_thread::sleep_until(next_frame);
-                } else {
-                    next_frame = std::chrono::steady_clock::now();
+                    // requestAnimationFrame batches callbacks for one display
+                    // tick. Snapshotting the count leaves callbacks requested
+                    // during rendering queued for the following tick.
+                    const size_t callback_count =
+                        application.AnimationCallbackCount();
+                    for (size_t index = 0; index < callback_count; ++index) {
+                        application.RunNextAnimationCallback(timestamp);
+                    }
+                    if (callback_count != 0) {
+                        window.SetTitle(application.Title());
+                        window.Present(application.CompositeFrame());
+                    }
+
+                    do {
+                        next_frame += std::chrono::microseconds(16667);
+                    } while (next_frame <= now);
                 }
+
+                std::this_thread::sleep_until(next_frame);
             }
         }
 

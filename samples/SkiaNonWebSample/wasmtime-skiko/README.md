@@ -13,12 +13,13 @@ WASIp1, and routes all 163 GL imports through Skia's `GrGLInterface`:
 The host can also instantiate the generated `SkiaNonWebSample.wasm`
 application. In application mode it links the 63 imported Skiko functions
 directly to exports of the native `skiko.wasm` instance, implements the small
-Kotlin/JS host surface, drives a continuous animation loop, and presents the
+Kotlin/JS host surface, drives requestAnimationFrame callbacks, and presents the
 three offscreen canvases in a native macOS window.
 
 ## Dependencies
 
 - macOS 11 or newer
+- SDL2 (`brew install sdl2`)
 - the same release-mode Skia archive used by `native-skiko`
 - a Wasmtime C API release archive (the C++ host uses its stable C ABI)
 - CMake 3.24 or newer
@@ -44,6 +45,9 @@ cmake -S . -B build \
 
 cmake --build build -j
 ```
+
+The application window uses an accelerated, vsynced SDL2 renderer, matching
+the presentation model used by the Node runner's `@kmamal/sdl` dependency.
 
 Use the exact Wasm artifact consumed by the Node runner:
 
@@ -76,9 +80,11 @@ APP=../build/wasm/packages/SkiaNonWebSample/kotlin/SkiaNonWebSample.wasm
 build/skiko-wasmtime "$CORE" "$APP"
 ```
 
-The window stays open and renders at approximately 60 frames per second until
-it is closed. `BouncingBalls` only requests its initial browser frame, so the
-interactive host retains that initial callback set and drives it continuously.
+The window stays open until it is closed. Animation callbacks remain one-shot,
+but callbacks queued for the same 60 Hz display tick are invoked with one shared
+timestamp and presented together. Callbacks requested while rendering are
+queued for the next tick. Batching keeps canvases synchronized and avoids
+performing three complete framebuffer readbacks per displayed frame.
 
 To troubleshoot the GL bridge, start the same window with diagnostics enabled:
 
