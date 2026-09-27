@@ -53,6 +53,44 @@ class CanvasTest {
     }
 
     @Test
+    fun surfaceReturnsNullForBitmapCanvas() {
+        val bitmap = Bitmap().apply { allocPixels(ImageInfo.makeN32Premul(8, 8)) }
+
+        assertNull(Canvas(bitmap).surface)
+    }
+
+    @Test
+    fun surfaceIsBorrowedForRasterSurfaceCanvas() {
+        Surface.makeRasterN32Premul(8, 8).use { surface ->
+            val canvasSurface = surface.canvas.surface
+            assertNotNull(canvasSurface)
+            assertEquals(surface, canvasSurface)
+            assertFails { canvasSurface.close() }
+        }
+    }
+
+    @Test
+    fun surfaceOfRenderTargetCanvasCarriesItsContext() {
+        if (!TestGlContext.isAvailable()) return
+
+        if (hostOs == OS.Linux && kotlinBackend == KotlinBackend.Native && hostArch == Arch.Arm64) {
+            // TODO: fix test on Linux arm64 using EGL
+            return
+        }
+
+        TestGlContext.run {
+            DirectContext.makeGL().useContext { ctx ->
+                val imageInfo = ImageInfo.makeN32Premul(16, 16)
+                val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
+                val canvasSurface = surface.canvas.surface
+                assertNotNull(canvasSurface)
+                assertEquals(surface, canvasSurface)
+                assertEquals(ctx, canvasSurface._context)
+            }
+        }
+    }
+
+    @Test
     fun drawVertices() {
         val surface = Surface.makeRasterN32Premul(8, 8)
 

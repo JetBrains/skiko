@@ -1020,6 +1020,11 @@ class Surface : RefCnt {
         _renderTarget = null
     }
 
+    internal constructor(ptr: NativePointer, context: DirectContext?, managed: Boolean) : super(ptr, managed) {
+        _context = context
+        _renderTarget = null
+    }
+
     internal constructor(ptr: NativePointer, context: DirectContext?, renderTarget: BackendRenderTarget?) : super(ptr) {
         _context = context
         _renderTarget = renderTarget
