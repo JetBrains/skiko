@@ -1650,6 +1650,7 @@ class SkiaLayerTest {
                 })
             }
 
+            val robot = Robot().apply { autoDelay = 16 }
             try {
                 backgroundWindow.isVisible = true
                 backgroundWindow.waitUntilOpened()
@@ -1659,7 +1660,6 @@ class SkiaLayerTest {
 
                 delay(100.milliseconds)
 
-                val robot = Robot().apply { autoDelay = 16 }
                 val x = transparentWindow.x + transparentWindow.width / 2
                 val y = transparentWindow.y + transparentWindow.height / 2
                 robot.mouseMove(x, y)
@@ -1675,6 +1675,9 @@ class SkiaLayerTest {
             } finally {
                 transparentWindow.dispose()
                 backgroundWindow.dispose()
+                // Move the mouse away to avoid interfering with other tests
+                val screenBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.bounds
+                robot.mouseMove(screenBounds.x + screenBounds.width, screenBounds.y + screenBounds.height)
             }
         }
     }
