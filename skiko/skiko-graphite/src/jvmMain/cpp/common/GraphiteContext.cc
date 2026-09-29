@@ -10,7 +10,7 @@
 #if defined(SK_METAL)
 #include "include/gpu/graphite/mtl/MtlBackendContext.h"
 #endif
-#if defined(SK_VULKAN)
+#if defined(SK_VULKAN) && (defined(_WIN32) || defined(__linux__))
 #include "include/gpu/graphite/vk/VulkanGraphiteContext.h"
 #include "include/gpu/graphite/vk/VulkanGraphiteTypes.h"
 #include "VulkanUtils.hh"
@@ -48,7 +48,7 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_org_jetbrains_skia_gpu_graphite_GraphiteContextKt__1nMakeVulkan(
         JNIEnv*, jclass, jlong instancePtr, jlong physicalDevicePtr, jlong devicePtr,
         jlong queuePtr, jint graphicsQueueIndex, jint maxApiVersion) {
-#if defined(SK_VULKAN)
+#if defined(SK_VULKAN) && (defined(_WIN32) || defined(__linux__))
     skgpu::VulkanBackendContext backendContext{};
     backendContext.fInstance = reinterpret_cast<VkInstance>(static_cast<uintptr_t>(instancePtr));
     backendContext.fPhysicalDevice =
