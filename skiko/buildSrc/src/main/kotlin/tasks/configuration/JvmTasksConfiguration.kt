@@ -764,7 +764,7 @@ fun SkikoProjectContext.createSkikoJvmJarTask(
         // Add ICU data files.
         nativeFiles.add(skiaBindingsDir.map { file(it.resolve("out/${buildType.id}-$target/icudtl.dat")) })
     }
-    // For ARM macOS add x86 native code for compatibility.
+    // macOS ARM64 builds also produce a separate x64 runtime for the all-target artifact.
     if (os == OS.MacOS && arch == Arch.Arm64) {
         val altArch = Arch.X64
         val skiaBindingsDir2 = registerOrGetSkiaDirProvider(os, altArch)
@@ -778,9 +778,12 @@ fun SkikoProjectContext.createSkikoJvmJarTask(
         val maybeSign2 = maybeSignOrSealTask(os, altArch, linkBindings2)
         val nativeLib2 = maybeSign2.map { it.outputFiles.get().single { f -> f.name.endsWith(os.dynamicLibExt) } }
         val createChecksums2 = createChecksumsTask(os, altArch, nativeLib2)
-        nativeFiles.add(nativeLib2)
-        nativeFiles.add(createChecksums2.map { it.outputs.files.singleFile })
-        allJvmRuntimeJars[os to altArch] = skikoJvmRuntimeJarTask(os, altArch, commonJar, nativeFiles)
+        allJvmRuntimeJars[os to altArch] = skikoJvmRuntimeJarTask(
+            os,
+            altArch,
+            commonJar,
+            listOf(nativeLib2, createChecksums2.map { it.outputs.files.singleFile })
+        )
     }
     val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(os, arch, commonJar, nativeFiles)
     allJvmRuntimeJars[os to arch] = skikoJvmRuntimeJar
