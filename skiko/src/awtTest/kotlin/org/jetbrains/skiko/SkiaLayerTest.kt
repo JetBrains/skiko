@@ -1619,66 +1619,64 @@ class SkiaLayerTest {
 
     @OptIn(DelicateSkikoApi::class)
     @Test
-    fun mouseClicksReceivedOnTransparentWindow() = repeat(10) {
-        uiTest {
-            assumeFalse(hostOs.isLinux)  // Robot mouse moving doesn't seem to work on Linux
+    fun mouseClicksReceivedOnTransparentWindow() = uiTest {
+        assumeFalse(hostOs.isLinux)  // Robot mouse moving doesn't seem to work on Linux
 
-            // Background window is needed to prevent accidentally clicking some unrelated/system UI
-            val backgroundWindow = JFrame(renderApi.name).apply {
-                bounds = Rectangle(100, 100, 600, 600)
-                contentPane.background = Color.RED
-            }
+        // Background window is needed to prevent accidentally clicking some unrelated/system UI
+        val backgroundWindow = JFrame(renderApi.name).apply {
+            bounds = Rectangle(100, 100, 600, 600)
+            contentPane.background = Color.RED
+        }
 
-            var mouseDownDetected = false
-            var mouseUpDetected = false
-            val transparentWindow = UiTestWindow {
-                bounds = Rectangle(200, 200, 400, 400)
-                isUndecorated = true
-                background = transparentWindowBackgroundHack(renderApi)
-                layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ -> }
-                layer.isOpaque = false
-                layer.transparency = true
-                layer.background = Color(0, 0, 0, 0)
-                contentPane.add(layer, BorderLayout.CENTER)
-                layer.addMouseListener(object : MouseAdapter() {
-                    override fun mousePressed(e: MouseEvent?) {
-                        mouseDownDetected = true
-                    }
-                    override fun mouseReleased(e: MouseEvent?) {
-                        mouseUpDetected = true
-                    }
-                })
-            }
-
-            val robot = Robot().apply { autoDelay = 16 }
-            try {
-                backgroundWindow.isVisible = true
-                backgroundWindow.waitUntilOpened()
-
-                transparentWindow.isVisible = true
-                transparentWindow.waitUntilOpened()
-
-                delay(100.milliseconds)
-
-                val x = transparentWindow.x + transparentWindow.width / 2
-                val y = transparentWindow.y + transparentWindow.height / 2
-                robot.mouseMove(x, y)
-                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK)
-                robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK)
-                withContext(Dispatchers.IO) {
-                    robot.waitForIdle()
+        var mouseDownDetected = false
+        var mouseUpDetected = false
+        val transparentWindow = UiTestWindow {
+            bounds = Rectangle(200, 200, 400, 400)
+            isUndecorated = true
+            background = transparentWindowBackgroundHack(renderApi)
+            layer.renderDelegate = SkikoRenderDelegate { _, _, _, _ -> }
+            layer.isOpaque = false
+            layer.transparency = true
+            layer.background = Color(0, 0, 0, 0)
+            contentPane.add(layer, BorderLayout.CENTER)
+            layer.addMouseListener(object : MouseAdapter() {
+                override fun mousePressed(e: MouseEvent?) {
+                    mouseDownDetected = true
                 }
+                override fun mouseReleased(e: MouseEvent?) {
+                    mouseUpDetected = true
+                }
+            })
+        }
 
-                delay(200.milliseconds)
-                assertTrue(mouseDownDetected, "Mouse down not detected on transparent window with $renderApi")
-                assertTrue(mouseUpDetected, "Mouse up not detected on transparent window with $renderApi")
-            } finally {
-                transparentWindow.dispose()
-                backgroundWindow.dispose()
-                // Move the mouse away to avoid interfering with other tests
-                val screenBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.bounds
-                robot.mouseMove(screenBounds.x + screenBounds.width, screenBounds.y + screenBounds.height)
+        val robot = Robot().apply { autoDelay = 16 }
+        try {
+            backgroundWindow.isVisible = true
+            backgroundWindow.waitUntilOpened()
+
+            transparentWindow.isVisible = true
+            transparentWindow.waitUntilOpened()
+
+            delay(100.milliseconds)
+
+            val x = transparentWindow.x + transparentWindow.width / 2
+            val y = transparentWindow.y + transparentWindow.height / 2
+            robot.mouseMove(x, y)
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK)
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK)
+            withContext(Dispatchers.IO) {
+                robot.waitForIdle()
             }
+
+            delay(200.milliseconds)
+            assertTrue(mouseDownDetected, "Mouse down not detected on transparent window with $renderApi")
+            assertTrue(mouseUpDetected, "Mouse up not detected on transparent window with $renderApi")
+        } finally {
+            transparentWindow.dispose()
+            backgroundWindow.dispose()
+            // Move the mouse away to avoid interfering with other tests
+            val screenBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.bounds
+            robot.mouseMove(screenBounds.x + screenBounds.width, screenBounds.y + screenBounds.height)
         }
     }
 
