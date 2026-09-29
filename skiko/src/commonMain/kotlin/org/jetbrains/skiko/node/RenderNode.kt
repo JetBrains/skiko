@@ -3,7 +3,7 @@ package org.jetbrains.skiko.node
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-
+import org.jetbrains.skiko.InternalSkikoApi
 /**
  * <p>RenderNode is used to build hardware accelerated rendering hierarchies. Each RenderNode
  * contains both a display list as well as a set of properties that affect the rendering of the
@@ -70,7 +70,8 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
     /**
      * Sets the bounds for this RenderNode internally and can be used to avoid Rect object creation.
      */
-    internal fun setNodeBounds(left: Float, top: Float, right: Float, bottom: Float) {
+    @InternalSkikoApi
+    fun setNodeBounds(left: Float, top: Float, right: Float, bottom: Float) {
         try {
             Stats.onNativeCall()
             RenderNode_nSetBounds(_ptr, left, top, right, bottom)
@@ -91,7 +92,8 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
     /**
      * Sets the pivot point for this RenderNode internally and can be used to avoid Point object creation.
      */
-    internal fun setNodePivot(x: Float, y: Float) {
+    @InternalSkikoApi
+    fun setNodePivot(x: Float, y: Float) {
         try {
             Stats.onNativeCall()
             RenderNode_nSetPivot(_ptr, x, y)
