@@ -1,6 +1,7 @@
 #include <iostream>
 #include <jni.h>
 #include "SkCanvas.h"
+#include "SkSurface.h"
 #include "SkRRect.h"
 #include "SkTextBlob.h"
 #include "SkVertices.h"
@@ -27,6 +28,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetCanvas
   (JNIEnv* env, jclass jclass, jlong canvasPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     return reinterpret_cast<jlong>(canvas->recordingContext());
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetCanvasSurface
+  (JNIEnv* env, jclass jclass, jlong canvasPtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
+    return reinterpret_cast<jlong>(canvas->getSurface());
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoint

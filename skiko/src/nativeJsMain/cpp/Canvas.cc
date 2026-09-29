@@ -1,5 +1,6 @@
 #include <iostream>
 #include "SkCanvas.h"
+#include "SkSurface.h"
 #include "SkRRect.h"
 #include "SkTextBlob.h"
 #include "SkVertices.h"
@@ -26,6 +27,12 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Canvas__1nGetRecordingContext
   (KNativePointer canvasPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
     return reinterpret_cast<KNativePointer>(canvas->recordingContext());
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Canvas__1nGetSurface
+  (KNativePointer canvasPtr) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
+    return reinterpret_cast<KNativePointer>(canvas->getSurface());
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPoint

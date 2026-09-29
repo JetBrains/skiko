@@ -72,6 +72,27 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             reachabilityBarrier(_owner)
         }
 
+    /**
+     * Returns the Surface this Canvas draws into.
+     *
+     * Canvases obtained from [Surface.canvas] return that surface. Canvases that draw into
+     * a [Bitmap], a [Picture] recording or a document return null.
+     *
+     * The returned surface is borrowed from the Canvas and must not be closed. It carries the
+     * canvas's [recordingContext], so [Surface.flush] and [Surface.flushAndSubmit] work on it.
+     *
+     * @return the Surface backing this Canvas, if any; null otherwise
+     */
+    val surface: Surface?
+        get() = try {
+            Stats.onNativeCall()
+            val ptr = _nGetCanvasSurface(_ptr)
+            if (ptr == NullPointer) null else Surface(ptr, recordingContext, managed = false)
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(_owner)
+        }
+
     fun drawPoint(x: Float, y: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
@@ -1638,6 +1659,9 @@ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixe
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetRecordingContext")
 private external fun _nGetCanvasRecordingContext(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSurface")
+private external fun _nGetCanvasSurface(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoint")
 private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
