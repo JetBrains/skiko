@@ -1,7 +1,5 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.InternalSkikoApi
 
 internal expect fun <R> commonSynchronized(lock: Any, block: () -> R)
@@ -57,15 +55,3 @@ expect annotation class ExternalSymbolName(val name: String)
 @Target(AnnotationTarget.FUNCTION)
 expect annotation class ForceNativeThreadState()
 
-@OptIn(ExperimentalSkikoApi::class)
-internal expect fun nMakeVulkanImpl(
-    instancePtr: NativePointer,
-    physicalDevicePtr: NativePointer,
-    devicePtr: NativePointer,
-    queuePtr: NativePointer,
-    graphicsQueueIndex: Int,
-    instanceProcAddr: NativePointer,
-    deviceProcAddr: NativePointer,
-    apiVersion: Int,
-    memoryAllocator: VulkanMemoryAllocator?
-): NativePointer
