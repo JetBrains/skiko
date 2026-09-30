@@ -1,4 +1,4 @@
-#if defined(_WIN32) || defined(__linux__)
+#if defined(SK_VULKAN)
 
 #if defined(_WIN32)
 #include <windows.h>
