@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(SK_VULKAN)
+#if defined(SK_VULKAN) && (defined(_WIN32) || defined(__linux__))
 
 #include <memory>
 

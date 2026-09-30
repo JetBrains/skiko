@@ -43,6 +43,7 @@ fun skiaHeadersDirs(skiaDir: File): List<File> =
     listOf(
         skiaDir,
         skiaDir.resolve("include"),
+        skiaDir.resolve("include/third_party/vulkan"),
         skiaDir.resolve("include/core"),
         skiaDir.resolve("include/gpu"),
         skiaDir.resolve("include/effects"),
@@ -93,7 +94,8 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         OS.MacOS -> listOf(
             "-DSK_SHAPER_CORETEXT_AVAILABLE",
             "-DSK_BUILD_FOR_MAC",
-            "-DSK_METAL"
+            "-DSK_METAL",
+            "-DSK_VULKAN"
         )
         OS.IOS -> listOf(
             "-DSK_BUILD_FOR_IOS",
@@ -114,18 +116,21 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
             "-DNOMINMAX",
             "-DSK_GAMMA_APPLY_TO_A8",
             "-DSK_DIRECT3D",
-            "-DSK_ANGLE"
+            "-DSK_ANGLE",
+            "-DSK_VULKAN"
         )
         OS.Linux -> listOf(
             "-DSK_BUILD_FOR_LINUX",
-            "-D_GLIBCXX_USE_CXX11_ABI=0"
+            "-D_GLIBCXX_USE_CXX11_ABI=0",
+            "-DSK_VULKAN"
         )
         OS.Wasm -> listOf(
             "-DSKIKO_WASM",
             "-sSUPPORT_LONGJMP=wasm"
         )
         OS.Android -> listOf(
-            "-DSK_BUILD_FOR_ANDROID"
+            "-DSK_BUILD_FOR_ANDROID",
+            "-DSK_VULKAN"
         )
     }
 
