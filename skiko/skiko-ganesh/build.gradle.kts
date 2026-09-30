@@ -50,27 +50,29 @@ val ganeshDependencies: SkikoDependencyScope.() -> Unit = {
             macos {
                 linkFlags("-lobjc")
                 frameworks("AppKit", "CoreFoundation", "CoreGraphics", "CoreServices", "CoreText", "Foundation", "IOKit", "Metal", "OpenGL", "QuartzCore")
-                compilerFlags("-DSK_METAL")
+                compilerFlags("-DSK_METAL", "-DSK_VULKAN")
             }
             windows {
                 staticSkiaLibs("d3d12allocator")
-                compilerFlags("-DSK_DIRECT3D", "-DSK_ANGLE")
+                compilerFlags("-DSK_DIRECT3D", "-DSK_ANGLE", "-DSK_VULKAN")
                 arm64 {
                     linkFlags("/OPT:REF", "/OPT:NOICF")
                 }
             }
             linux {
                 dynamicSystemLibs("GL")
+                compilerFlags("-DSK_VULKAN")
                 arm64 { dynamicSystemLibs("EGL") }
             }
             android {
                 dynamicSystemLibs("GLESv3", "EGL")
+                compilerFlags("-DSK_VULKAN")
             }
         }
         native {
             macos {
                 frameworks("Metal", "CoreGraphics", "CoreText", "CoreServices")
-                compilerFlags("-DSK_METAL")
+                compilerFlags("-DSK_METAL", "-DSK_VULKAN")
             }
             ios {
                 frameworks("Metal", "CoreGraphics", "CoreText", "UIKit")
@@ -82,6 +84,7 @@ val ganeshDependencies: SkikoDependencyScope.() -> Unit = {
             }
             linux {
                 dynamicSystemLibs("GL")
+                compilerFlags("-DSK_VULKAN")
                 arm64 { dynamicSystemLibs("EGL") }
             }
         }

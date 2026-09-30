@@ -18,6 +18,27 @@ import kotlin.test.assertNotNull
 
 class GaneshSurfaceTest {
     @Test
+    fun surfaceOfRenderTargetCanvasCarriesItsContext() {
+        if (!TestGlContext.isAvailable()) return
+
+        if (hostOs == OS.Linux && kotlinBackend == KotlinBackend.Native && hostArch == Arch.Arm64) {
+            // TODO: fix test on Linux arm64 using EGL
+            return
+        }
+
+        TestGlContext.run {
+            DirectContext.makeGL().useContext { ctx ->
+                val imageInfo = ImageInfo.makeN32Premul(16, 16)
+                val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
+                val canvasSurface = surface.canvas.surface
+                assertNotNull(canvasSurface)
+                assertEquals(surface, canvasSurface)
+                assertEquals(ctx, canvasSurface.recordingContext)
+            }
+        }
+    }
+
+    @Test
     fun canMakeRenderTarget() {
         if (!TestGlContext.isAvailable()) return
 
