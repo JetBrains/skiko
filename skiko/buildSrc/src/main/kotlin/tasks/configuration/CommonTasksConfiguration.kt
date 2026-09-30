@@ -43,6 +43,7 @@ fun skiaHeadersDirs(skiaDir: File): List<File> =
     listOf(
         skiaDir,
         skiaDir.resolve("include"),
+        skiaDir.resolve("include/third_party/vulkan"),
         skiaDir.resolve("include/core"),
         skiaDir.resolve("include/gpu"),
         skiaDir.resolve("include/effects"),
