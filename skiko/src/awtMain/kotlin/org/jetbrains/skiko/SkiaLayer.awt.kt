@@ -50,10 +50,10 @@ actual open class SkiaLayer internal constructor(
         }
 
         @JvmStatic
-        val AlmostTransparentColor = Color(0, 0, 0, 1)
+        private val AlmostTransparentColor = Color(0, 0, 0, 1)
 
         @JvmStatic
-        val TransparentColor = Color(0, 0, 0, 0)
+        private val TransparentColor = Color(0, 0, 0, 0)
     }
 
     enum class PropertyKind {
