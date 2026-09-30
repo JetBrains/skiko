@@ -3,9 +3,7 @@ package org.jetbrains.skia
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
 import org.jetbrains.skia.impl.InteropPointer
-import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.withResult
-import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.InternalSkikoApi
 
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
@@ -49,22 +47,6 @@ actual typealias ExternalSymbolName = kotlin.native.SymbolName
 
 @InternalSkikoApi
 actual typealias ForceNativeThreadState = kotlin.native.ForceNativeThreadState
-
-@OptIn(ExperimentalSkikoApi::class)
-internal actual fun nMakeVulkanImpl(
-    instancePtr: NativePointer,
-    physicalDevicePtr: NativePointer,
-    devicePtr: NativePointer,
-    queuePtr: NativePointer,
-    graphicsQueueIndex: Int,
-    instanceProcAddr: NativePointer,
-    deviceProcAddr: NativePointer,
-    apiVersion: Int,
-    memoryAllocator: VulkanMemoryAllocator?
-): NativePointer = nMakeVulkanNoAllocator(
-    instancePtr, physicalDevicePtr, devicePtr, queuePtr,
-    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion
-)
 
 @SymbolName("uloc_getDefault_skiko")
 private external fun uloc_getDefault(): CPointer<ByteVar>
