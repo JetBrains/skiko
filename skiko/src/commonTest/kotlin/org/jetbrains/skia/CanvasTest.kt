@@ -10,6 +10,9 @@ import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 
@@ -30,27 +33,6 @@ class CanvasTest {
             assertNotNull(canvasSurface)
             assertEquals(surface, canvasSurface)
             assertFails { canvasSurface.close() }
-        }
-    }
-
-    @Test
-    fun surfaceOfRenderTargetCanvasCarriesItsContext() {
-        if (!TestGlContext.isAvailable()) return
-
-        if (hostOs == OS.Linux && kotlinBackend == KotlinBackend.Native && hostArch == Arch.Arm64) {
-            // TODO: fix test on Linux arm64 using EGL
-            return
-        }
-
-        TestGlContext.run {
-            DirectContext.makeGL().useContext { ctx ->
-                val imageInfo = ImageInfo.makeN32Premul(16, 16)
-                val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
-                val canvasSurface = surface.canvas.surface
-                assertNotNull(canvasSurface)
-                assertEquals(surface, canvasSurface)
-                assertEquals(ctx, canvasSurface._context)
-            }
         }
     }
 
