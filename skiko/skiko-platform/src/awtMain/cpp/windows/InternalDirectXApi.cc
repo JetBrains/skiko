@@ -1,0 +1,435 @@
+#ifdef SK_DIRECT3D
+
+#include <locale>
+#include <Windows.h>
+#include <jawt_md.h>
+#include <d3d12sdklayers.h>
+#include <d3d12.h>
+#include <dxgi1_4.h>
+#include <dxgi1_6.h>
+#include <wrl/client.h>
+#include "jni_helpers.h"
+
+namespace {
+const D3D_FEATURE_LEVEL minSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
+const D3D_FEATURE_LEVEL featureLevels[] = {
+    // TODO add D3D_FEATURE_LEVEL_12_2
+    D3D_FEATURE_LEVEL_12_1,
+    D3D_FEATURE_LEVEL_12_0
+};
+}
+
+class DirectXOffscreenDevice
+{
+public:
+    Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
+    Microsoft::WRL::ComPtr<ID3D12Device> device;
+    Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue;
+
+    ID3D12CommandAllocator* commandAllocator;
+    ID3D12GraphicsCommandList* commandList;
+
+    ID3D12Fence* fence;
+    HANDLE fenceEvent;
+    UINT64 fenceValue = 0;
+
+    DirectXOffscreenDevice(
+        const Microsoft::WRL::ComPtr<IDXGIAdapter1>& adapter,
+        const Microsoft::WRL::ComPtr<ID3D12Device>& device,
+        const Microsoft::WRL::ComPtr<ID3D12CommandQueue>& queue,
+        ID3D12CommandAllocator* commandAllocator,
+        ID3D12GraphicsCommandList* commandList,
+        ID3D12Fence* fence,
+        HANDLE fenceEvent
+    ) :
+        adapter(adapter),
+        device(device),
+        queue(queue),
+        commandAllocator(commandAllocator),
+        commandList(commandList),
+        fence(fence),
+        fenceEvent(fenceEvent)
+    {}
+
+    ~DirectXOffscreenDevice()
+    {
+        if (fenceEvent) {
+            CloseHandle(fenceEvent);
+        }
+
+        if (fence) {
+            fence->Release();
+        }
+
+        if (commandList) {
+            commandList->Release();
+        }
+
+        if (commandAllocator) {
+            commandAllocator->Release();
+        }
+
+        queue.Reset();
+        device.Reset();
+        adapter.Reset();
+    }
+};
+
+static UINT calculateRowPitch(UINT width) {
+    UINT rowPitch = width * 4; // 4 bytes per pixel for DXGI_FORMAT_B8G8R8A8_UNORM
+    rowPitch = (rowPitch + (D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1)) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1);
+    return rowPitch;
+}
+
+class DirectXOffScreenTexture {
+public:
+    int width;
+    int height;
+    ID3D12Resource* resource;
+    ID3D12Resource* readbackBufferResource;
+
+    DirectXOffScreenTexture(DirectXOffscreenDevice* offscreenDevice, int _width, int _height) {
+        width = _width;
+        height = _height;
+        D3D12_RESOURCE_DESC textureDesc;
+        textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        textureDesc.Alignment = 0;
+        textureDesc.Width = _width;
+        textureDesc.Height = _height;
+        textureDesc.DepthOrArraySize = 1;
+        textureDesc.MipLevels = 1;
+        textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.SampleDesc.Quality = 0;
+        textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+        D3D12_HEAP_PROPERTIES textureHeapProperties;
+        textureHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+        textureHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        textureHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        textureHeapProperties.CreationNodeMask = 1;
+        textureHeapProperties.VisibleNodeMask = 1;
+
+        D3D12_RESOURCE_DESC readbackBufferDesc;
+        readbackBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        readbackBufferDesc.Alignment = 0;
+        readbackBufferDesc.Width = readbackBufferWidth(_width, _height);
+        readbackBufferDesc.Height = 1;
+        readbackBufferDesc.DepthOrArraySize = 1;
+        readbackBufferDesc.MipLevels = 1;
+        readbackBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+        readbackBufferDesc.SampleDesc.Count = 1;
+        readbackBufferDesc.SampleDesc.Quality = 0;
+        readbackBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        readbackBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+        D3D12_HEAP_PROPERTIES readbackHeapProperties;
+        readbackHeapProperties.Type = D3D12_HEAP_TYPE_READBACK;
+        readbackHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        readbackHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        readbackHeapProperties.CreationNodeMask = 1;
+        readbackHeapProperties.VisibleNodeMask = 1;
+
+        offscreenDevice->device->CreateCommittedResource(&textureHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&resource));
+        offscreenDevice->device->CreateCommittedResource(&readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&readbackBufferResource));
+    }
+
+    ~DirectXOffScreenTexture() {
+        if (resource) {
+            resource->Release();
+        }
+
+        if (readbackBufferResource) {
+            readbackBufferResource->Release();
+        }
+    }
+
+    int readbackBufferWidth() {
+        return readbackBufferWidth(width, height);
+    }
+private:
+    static int readbackBufferWidth(int width, int height) {
+         return calculateRowPitch(width) * height;
+    }
+};
+
+static bool isAdapterSupported2(JNIEnv *env, jobject renderer, IDXGIAdapter1 *hardwareAdapter) {
+    DXGI_ADAPTER_DESC1 desc;
+    hardwareAdapter->GetDesc1(&desc);
+    if ((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0) {
+        return false;
+    }
+
+    std::wstring tmp(desc.Description);
+    std::string name(tmp.begin(), tmp.end());
+    jstring jname = env->NewStringUTF(name.c_str());
+
+    static jclass cls = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/graphicapi/InternalDirectXApi"));
+    static jmethodID method = env->GetMethodID(cls, "isAdapterSupported", "(Ljava/lang/String;)Z");
+
+    return env->CallBooleanMethod(renderer, method, jname);
+}
+
+extern "C"
+{
+    // TODO: extract common code with directXRenderer
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_chooseAdapter(
+            JNIEnv *env, jobject renderer, jint adapterPriority) {
+        Microsoft::WRL::ComPtr<IDXGIFactory4> deviceFactory;
+        if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory)))) {
+            return 0;
+        }
+
+        Microsoft::WRL::ComPtr<IDXGIFactory6> factory6;
+        if (!SUCCEEDED(deviceFactory->QueryInterface(IID_PPV_ARGS(&factory6)))) {
+            return 0;
+        }
+
+        for (UINT adapterIndex = 0;; ++adapterIndex) {
+            IDXGIAdapter1 *adapter = nullptr;
+            if (!SUCCEEDED(factory6->EnumAdapterByGpuPreference(adapterIndex, (DXGI_GPU_PREFERENCE) adapterPriority, IID_PPV_ARGS(&adapter)))) {
+                break;
+            }
+            if (
+                SUCCEEDED(D3D12CreateDevice(adapter, minSupportedFeatureLevel, _uuidof(ID3D12Device), nullptr)) &&
+                isAdapterSupported2(env, renderer, adapter)
+            ) {
+                return toJavaPointer(adapter);
+            } else {
+                adapter->Release();
+            }
+        }
+
+        return 0;
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_createDirectXOffscreenDevice(
+        JNIEnv *env, jobject renderer, jlong adapterPtr) {
+
+        Microsoft::WRL::ComPtr<IDXGIFactory4> deviceFactory;
+        if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory)))) {
+            return 0;
+        }
+        if (adapterPtr == 0) {
+            return 0;
+        }
+        Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
+        adapter.Attach((IDXGIAdapter1 *) adapterPtr);
+
+        D3D_FEATURE_LEVEL maxSupportedFeatureLevel = minSupportedFeatureLevel;
+
+        for (int i = 0; i < _countof(featureLevels); i++) {
+            if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), featureLevels[i], _uuidof(ID3D12Device), nullptr))) {
+                maxSupportedFeatureLevel = featureLevels[i];
+                break;
+            }
+        }
+
+        Microsoft::WRL::ComPtr<ID3D12Device> device;
+        if (!SUCCEEDED(D3D12CreateDevice(adapter.Get(), maxSupportedFeatureLevel, IID_PPV_ARGS(&device)))) {
+            return 0;
+        }
+
+        // Create the command queue
+        Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue;
+        D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+        queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+        queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
+        if (!SUCCEEDED(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&queue)))) {
+            return 0;
+        }
+
+        ID3D12CommandAllocator* commandAllocator;
+        if (!SUCCEEDED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)))) {
+            return 0;
+        }
+
+        ID3D12GraphicsCommandList* commandList;
+        if (!SUCCEEDED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList)))) {
+            return 0;
+        }
+
+        ID3D12Fence* fence;
+        if (!SUCCEEDED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))) {
+            return 0;
+        }
+
+        HANDLE fenceEvent = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+        if (!fenceEvent) {
+            return 0;
+        }
+
+        DirectXOffscreenDevice *offscreenDevice = new DirectXOffscreenDevice(
+            adapter, device, queue, commandAllocator, commandList, fence, fenceEvent);
+
+        return toJavaPointer(offscreenDevice);
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getDirectXDevice(
+        JNIEnv *env, jobject renderer, jlong devicePtr)
+    {
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        return toJavaPointer(offscreenDevice->device.Get());
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getDirectXCommandQueue(
+        JNIEnv *env, jobject renderer, jlong devicePtr)
+    {
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        return toJavaPointer(offscreenDevice->queue.Get());
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getDirectXTextureResource(
+        JNIEnv *env, jobject redrawer, jlong texturePtr)
+    {
+        DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
+        return toJavaPointer(texture->resource);
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_makeDirectXTexture(
+        JNIEnv *env, jobject renderer, jlong devicePtr, jlong oldTexturePtr, jint width, jint height) {
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        DirectXOffScreenTexture *oldTexture = fromJavaPointer<DirectXOffScreenTexture *>(oldTexturePtr);
+
+        DirectXOffScreenTexture *texture;
+
+        if (oldTexture == nullptr || oldTexture->width != width || oldTexture->height != height) {
+            if (oldTexture != nullptr) {
+                delete oldTexture;
+            }
+            texture = new DirectXOffScreenTexture(offscreenDevice, width, height);
+
+            if (texture->resource == nullptr || texture->readbackBufferResource == nullptr) {
+                delete texture;
+                return 0;
+            }
+        } else {
+            texture = oldTexture;
+        }
+
+        return toJavaPointer(texture);
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_disposeDirectXTexture(
+        JNIEnv *env, jobject renderer, jlong texturePtr) {
+        DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
+        delete texture;
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_waitForCompletion(
+            JNIEnv *env, jobject renderer, jlong devicePtr, jlong texturePtr) {
+
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+
+        DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
+
+        auto commandAllocator = offscreenDevice->commandAllocator;
+        auto commandList = offscreenDevice->commandList;
+
+        commandAllocator->Reset();
+        commandList->Reset(commandAllocator, nullptr);
+
+        D3D12_RESOURCE_BARRIER textureResourceBarrier;
+        textureResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        textureResourceBarrier.Transition.pResource = texture->resource;
+        textureResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        textureResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+        textureResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES ;
+        textureResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+
+        commandList->ResourceBarrier(1, &textureResourceBarrier);
+
+        D3D12_TEXTURE_COPY_LOCATION src = {};
+        src.pResource = texture->resource;
+        src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+        src.SubresourceIndex = 0;
+
+        D3D12_TEXTURE_COPY_LOCATION dst = {};
+        dst.pResource = texture->readbackBufferResource;
+        dst.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+        dst.PlacedFootprint.Offset = 0;
+        dst.PlacedFootprint.Footprint.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        dst.PlacedFootprint.Footprint.Width = texture->width;
+        dst.PlacedFootprint.Footprint.Height = texture->height;
+        dst.PlacedFootprint.Footprint.Depth = 1;
+        dst.PlacedFootprint.Footprint.RowPitch = calculateRowPitch(texture->width);
+
+        D3D12_BOX srcBox = {0, 0, 0, static_cast<UINT>(texture->width), static_cast<UINT>(texture->height), 1};
+
+        commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, &srcBox);
+
+        commandList->Close();
+
+        ID3D12CommandList* commandLists[] = { commandList };
+        offscreenDevice->queue->ExecuteCommandLists(_countof(commandLists), commandLists);
+
+        // Wait for the command list to finish executing; the readback buffer will be ready to read
+        auto fence = offscreenDevice->fence;
+        auto fenceEvent = offscreenDevice->fenceEvent;
+        auto& fenceValue = offscreenDevice->fenceValue;
+
+        fenceValue += 1;
+        offscreenDevice->queue->Signal(fence, fenceValue);
+
+        if (fence->GetCompletedValue() < fenceValue) {
+            fence->SetEventOnCompletion(fenceValue, fenceEvent);
+            WaitForSingleObject(fenceEvent, INFINITE);
+        }
+    }
+
+    JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_readPixels(
+            JNIEnv *env, jobject renderer, jlong texturePtr, jbyteArray byteArray) {
+        jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
+
+        DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
+
+        auto rangeLength = texture->readbackBufferWidth();
+        D3D12_RANGE readbackBufferRange{ 0, static_cast<SIZE_T>(rangeLength) };
+
+        /*
+         * TODO: memcpy from unaligned texture is not supported, line by line copy is very slow,
+         *       write compute shader to copy texture to readback buffer with no RowPitch padding
+         *       to support arbitary texture size
+         */
+        if (rangeLength != texture->width * texture->height * 4) {
+            return false;
+        }
+
+        void *readbackBufferBytesPtr = nullptr;
+        texture->readbackBufferResource->Map(
+            0,
+            &readbackBufferRange,
+            &readbackBufferBytesPtr
+        );
+
+        if (!readbackBufferBytesPtr) {
+            // Couldn't map readback buffer
+            return false;
+        }
+
+        memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
+
+        D3D12_RANGE emptyRange{ 0, 0 };
+        texture->readbackBufferResource->Unmap(0, &emptyRange);
+
+        env->ReleaseByteArrayElements(byteArray, bytesPtr, 0);
+
+        return true;
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_disposeDevice(
+        JNIEnv *env, jobject renderer, jlong devicePtr) {
+        DirectXOffscreenDevice *offscreenDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        delete offscreenDevice;
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_graphicapi_InternalDirectXApi_getTextureAlignment(
+            JNIEnv *env, jobject renderer) {
+        return D3D12_TEXTURE_DATA_PITCH_ALIGNMENT;
+    }
+
+} // extern "C"
+
+#endif // SK_DIRECT3D

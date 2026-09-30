@@ -1,0 +1,65 @@
+package org.jetbrains.skiko.graphicapi
+
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skiko.GpuPriority
+import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.InternalSkikoApi
+import org.jetbrains.skiko.PlatformLibrary
+import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.isVideoCardSupported
+
+// https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format
+@JvmInline
+@InternalSkikoApi
+value class DxgiFormat(val value: Int) {
+    companion object {
+        val R8G8B8A8_UNORM = DxgiFormat(28)
+        val B8G8R8A8_UNORM = DxgiFormat(87)
+    }
+}
+
+@InternalSkikoApi
+object InternalDirectXApi {
+    init {
+        PlatformLibrary.load()
+    }
+
+    private external fun getTextureAlignment(): Long
+    private val rowBytesAlignment = getTextureAlignment().toInt()
+    private val widthSizeAlignment = rowBytesAlignment / 4
+
+    /**
+     * Calculate aligned width/height that is needed for performance optimization,
+     * since DirectX uses aligned bytebuffer.
+     */
+    fun alignedTextureWidth(width: Int) = if (width % widthSizeAlignment != 0) {
+        width + widthSizeAlignment - (width % widthSizeAlignment);
+    } else {
+        width
+    }
+
+    // Called from native code
+    private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
+
+    fun chooseAdapter(adapterPriority: GpuPriority): NativePointer = chooseAdapter(adapterPriority.ordinal)
+    private external fun chooseAdapter(adapterPriority: Int): NativePointer
+    external fun createDirectXOffscreenDevice(adapter: NativePointer): NativePointer
+    external fun getDirectXDevice(device: NativePointer): NativePointer
+    external fun getDirectXCommandQueue(device: NativePointer): NativePointer
+
+    external fun waitForCompletion(device: NativePointer, texturePtr: NativePointer)
+    external fun readPixels(texturePtr: NativePointer, byteArray: ByteArray): Boolean
+
+
+    /**
+     * Provides ID3D12Resource texture taking given [oldTexturePtr] into account
+     * since it can be reused if width and height are not changed,
+     * or the new one will be created.
+     */
+    external fun makeDirectXTexture(device: NativePointer, oldTexturePtr: NativePointer, width: Int, height: Int): NativePointer
+    external fun disposeDirectXTexture(texturePtr: NativePointer)
+
+    external fun getDirectXTextureResource(texturePtr: NativePointer): NativePointer
+
+    external fun disposeDevice(device: NativePointer)
+}

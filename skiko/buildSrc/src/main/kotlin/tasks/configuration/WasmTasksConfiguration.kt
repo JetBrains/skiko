@@ -110,6 +110,7 @@ fun SkikoProjectContext.declareWasmTasks() {
                 add("-fno-rtti")
                 add("-fno-exceptions")
                 add("-fPIC")
+                addAll(compilerFlags(OS.Wasm, Arch.Wasm, TargetEnv.WASM))
                 if (skiko.isWasmBuildWithProfiling) add("--profiling")
             }
         )

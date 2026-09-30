@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(SK_VULKAN) && (defined(_WIN32) || defined(__linux__))
+#if defined(SK_VULKAN)
 
 #include "include/third_party/vulkan/vulkan/vulkan_core.h"
 
