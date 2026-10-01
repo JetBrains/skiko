@@ -48,6 +48,12 @@ actual open class SkiaLayer internal constructor(
         init {
             Library.load()
         }
+
+        @JvmStatic
+        private val AlmostTransparentColor = Color(0, 0, 0, 1)
+
+        @JvmStatic
+        private val TransparentColor = Color(0, 0, 0, 0)
     }
 
     enum class PropertyKind {
@@ -236,7 +242,7 @@ actual open class SkiaLayer internal constructor(
         super.setBackground(bg)
 
         // To enable transparency, the backedLayer's background must be transparent (also the window background).
-        backedLayer.background = if (transparency) Color(0, 0, 0, 0) else bg
+        backedLayer.background = if (transparency) TransparentColor else bg
 
         needRender()
     }
@@ -454,8 +460,37 @@ actual open class SkiaLayer internal constructor(
         backedLayer.validate()
     }
 
+    /**
+     * Windows makes clicks on transparent pixels fall through, but it doesn't work
+     * with GPU accelerated rendering since this check requires having access to pixels from CPU.
+     *
+     * JVM doesn't allow overriding this behavior with low-level Windows methods, so we work around
+     * this by filling the background with an almost transparent color.
+     *
+     * Based on tests, it doesn't visibly affect the resulting pixel color.
+     */
+    private fun paintTransparentWindowMouseEventWorkaround(g: Graphics) {
+        if (!fillsWindow || (hostOs != OS.Windows)) return
+
+        // Ideally, we want to check everything between the window and backedLayer (including both)
+        // and only draw if they're all transparent. Unfortunately, `transparentWindowBackgroundHack` makes this hard
+        // because it sets the window background to a non-transparent color (`null` resets it to SystemColor(7))
+        val isBackedLayerTransparent = backedLayer.background.let { (it == null) || (it.alpha == 0) }
+        if (!transparency || !isBackedLayerTransparent) return
+
+        // Fill the background with an almost transparent color
+        g.color = AlmostTransparentColor
+        val r = g.clipBounds
+        if (r != null) {
+            g.fillRect(r.x, r.y, r.width, r.height)
+        } else {
+            g.fillRect(0, 0, width, height)
+        }
+    }
+
     override fun paint(g: Graphics) {
         Logger.debug { "paint called on SkiaLayer $this" }
+        paintTransparentWindowMouseEventWorkaround(g)
         checkContentScale()
         frameDriver?.needRender(throttledToVsync = false)
     }
