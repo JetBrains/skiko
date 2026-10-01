@@ -292,8 +292,8 @@ fun SkikoProjectContext.configureNativeTarget(
     // inserting the `skiko` namespace into the mangled name; C symbols and
     // unsupported shapes fall back to a "_skiko" suffix.
     val requiresSymbolPatching = os == OS.IOS || os == OS.TVOS
-    // iOS/tvOS KLIBs contain a single deduplicated Skia archive per module.
-    val requiresSkiaArchiveMerging = os == OS.IOS || os == OS.TVOS
+    // Apple KLIBs contain a single deduplicated Skia archive per module.
+    val requiresSkiaArchiveMerging = os == OS.MacOS || os == OS.IOS || os == OS.TVOS
     val patchedLibsDir = layout.buildDirectory.dir("nativeBridges/patched/$targetString").get().asFile
 
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
@@ -471,6 +471,7 @@ fun SkikoProjectContext.configureNativeTarget(
 
     hideSkiaSymbols.configure {
         dependsOn(unzipper)
+        mergeAppleArchivesTask?.let { dependsOn(it) }
         dependsOn(compilationDependency)
     }
 
