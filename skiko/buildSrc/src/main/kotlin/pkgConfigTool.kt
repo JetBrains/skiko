@@ -20,3 +20,15 @@ fun runPkgConfig(
         .map { it.removePrefix("-I") }
         .map(::File)
 }
+
+fun runPkgConfigVariable(packageName: String, variable: String): String {
+    val process = ProcessBuilder(
+        "pkg-config", "--variable=$variable", packageName
+    ).start().also { it.waitFor(10, TimeUnit.SECONDS) }
+
+    if (process.exitValue() != 0) {
+        throw GradleException("Error executing pkg-config: ${process.errorStream.bufferedReader().readText()}")
+    }
+
+    return process.inputStream.bufferedReader().readText().trim()
+}
