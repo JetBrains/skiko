@@ -259,13 +259,6 @@ GLuint SkikoHost::ContextTexture(int context_id) const {
     return contexts_[static_cast<size_t>(context_id - 1)]->color;
 }
 
-void SkikoHost::FlushContexts() {
-    for (const auto& item : contexts_) {
-        CGLSetCurrentContext(item->context);
-        glFlush();
-    }
-}
-
 void SkikoHost::RecordGLCall(const char* name, GLuint object) {
     if (current_ == nullptr) return;
     ++current_->gl_calls;

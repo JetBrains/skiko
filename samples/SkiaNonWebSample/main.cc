@@ -470,7 +470,6 @@ int main(int argc, char** argv) {
                     }
                     if (callback_count != 0) {
                         window.SetTitle(application.Title());
-                        host.FlushContexts();
                         window.Present(canvas_textures);
                     }
 

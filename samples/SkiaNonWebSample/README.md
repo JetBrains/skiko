@@ -101,16 +101,12 @@ This executes the existing Kotlin `main`, `BouncingBalls`, `DemoApp`, and
 `CanvasRenderer` code. The native window uses the same 606x706 three-panel
 composition as `node-runner.mjs`.
 
-The Node runner uses the existing `native-skiko` bridge. That addon owns the
-SDL window and composites the three shared CGL textures directly on the GPU;
-there is no JavaScript WebGL package or CPU pixel readback. Install SDL2 and
-build the addon once:
+The Node runner now uses its shared EGL-context texture compositor by default.
+Its patched `node-gles-webgl2` dependency must be rebuilt once:
 
 ```bash
-brew install sdl2
 cd samples/SkiaNonWebSample
-npm --prefix native-skiko ci
-npm --prefix native-skiko run build
+./gradlew rebuildNodeWindowedDeps
 node node-runner.mjs
 ```
 

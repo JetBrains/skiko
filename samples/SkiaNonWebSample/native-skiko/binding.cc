@@ -5,6 +5,8 @@
 #include <OpenGL/gl3.h>
 #include <OpenGL/gl3ext.h>
 
+#include <SDL.h>
+
 #include <cstdio>
 #include <cstdint>
 #include <cstring>
@@ -25,6 +27,7 @@ uint32_t U32(napi_env env, napi_value value);
 napi_value ToU32(napi_env env, uint32_t value);
 int32_t I32(napi_env env, napi_value value);
 float F32(napi_env env, napi_value value);
+napi_value ToBool(napi_env env, bool value);
 
 napi_ref wasmMemoryRef = nullptr;
 napi_ref wasmMallocRef = nullptr;
@@ -50,6 +53,12 @@ struct RenderTarget {
     sk_sp<const GrGLInterface> glInterface;
 };
 
+SDL_Window* presentationWindow = nullptr;
+SDL_GLContext presentationGL = nullptr;
+CGLContextObj presentationCGL = nullptr;
+GLuint presentationReadFramebuffer = 0;
+bool presentationOpen = false;
+
 // CGLContextObj nativeContext = nullptr;
 uint32_t nextContextId = 1;
 uint32_t currentContextId = 0;
@@ -57,6 +66,20 @@ std::unordered_map<uint32_t, RenderTarget> renderTargets;
 
 void Throw(napi_env env, const char* message) {
     napi_throw_error(env, nullptr, message);
+}
+
+void ThrowSDLError(napi_env env, const char* operation) {
+    const std::string message = std::string(operation) + ": " + SDL_GetError();
+    Throw(env, message.c_str());
+}
+
+std::string String(napi_env env, napi_value value) {
+    size_t length = 0;
+    napi_get_value_string_utf8(env, value, nullptr, 0, &length);
+    std::string result(length + 1, '\0');
+    napi_get_value_string_utf8(env, value, result.data(), result.size(), &length);
+    result.resize(length);
+    return result;
 }
 
 const GrGLInterface* CurrentSkiaGL(napi_env env) {
@@ -168,7 +191,8 @@ CGLContextObj CreateNativeContext(napi_env env) {
     }
 
     CGLContextObj context = nullptr;
-    const CGLError result = CGLCreateContext(pixelFormat, nullptr, &context);
+    const CGLError result =
+        CGLCreateContext(pixelFormat, presentationCGL, &context);
     CGLDestroyPixelFormat(pixelFormat);
     if (result != kCGLNoError || context == nullptr) {
         Throw(env, "CGLCreateContext failed");
@@ -227,6 +251,11 @@ napi_value CreateContext(napi_env env, napi_callback_info info) {
     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if (argc < 1) return nullptr;
 
+    if (presentationCGL == nullptr) {
+        Throw(env, "createWindow must be called before createContext");
+        return nullptr;
+    }
+
     RenderTarget target;
     target.context = CreateNativeContext(env);
     if (target.context == nullptr) return nullptr;
@@ -239,6 +268,7 @@ napi_value CreateContext(napi_env env, napi_callback_info info) {
     target.glInterface = GrGLInterfaces::MakeMac();
 
     if (!target.glInterface || !target.glInterface->validate()) {
+        CGLSetCurrentContext(nullptr);
         CGLDestroyContext(target.context);
         Throw(env, "Skia could not create a valid native GrGLInterface");
         return nullptr;
@@ -249,11 +279,17 @@ napi_value CreateContext(napi_env env, napi_callback_info info) {
     glGenFramebuffers(1, &target.framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, target.framebuffer);
 
-    glGenRenderbuffers(1, &target.color);
-    glBindRenderbuffer(GL_RENDERBUFFER, target.color);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, target.width, target.height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                              GL_RENDERBUFFER, target.color);
+    glGenTextures(1, &target.color);
+    glBindTexture(GL_TEXTURE_2D, target.color);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
+                 target.width, target.height, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, target.color, 0);
 
     glGenRenderbuffers(1, &target.depthStencil);
     glBindRenderbuffer(GL_RENDERBUFFER, target.depthStencil);
@@ -264,8 +300,9 @@ napi_value CreateContext(napi_env env, napi_callback_info info) {
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         glDeleteRenderbuffers(1, &target.depthStencil);
-        glDeleteRenderbuffers(1, &target.color);
+        glDeleteTextures(1, &target.color);
         glDeleteFramebuffers(1, &target.framebuffer);
+        CGLSetCurrentContext(nullptr);
         CGLDestroyContext(target.context);
         Throw(env, "Native OpenGL framebuffer is incomplete");
         return nullptr;
@@ -287,25 +324,232 @@ napi_value MakeContextCurrent(napi_env env, napi_callback_info info) {
     return result;
 }
 
-napi_value ReadContextPixels(napi_env env, napi_callback_info info) {
+napi_value CreateWindow(napi_env env, napi_callback_info info) {
+    napi_value args[3];
+    size_t argc = 3;
+    napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    if (argc != 3) {
+        Throw(env, "createWindow expects width, height, and title");
+        return nullptr;
+    }
+    if (presentationWindow != nullptr) {
+        Throw(env, "The native presentation window already exists");
+        return nullptr;
+    }
+
+    SDL_SetMainReady();
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
+        ThrowSDLError(env, "SDL_InitSubSystem");
+        return nullptr;
+    }
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
+    presentationWindow = SDL_CreateWindow(
+        String(env, args[2]).c_str(),
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        I32(env, args[0]),
+        I32(env, args[1]),
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
+    if (presentationWindow == nullptr) {
+        ThrowSDLError(env, "SDL_CreateWindow");
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        return nullptr;
+    }
+
+    presentationGL = SDL_GL_CreateContext(presentationWindow);
+    if (presentationGL == nullptr) {
+        ThrowSDLError(env, "SDL_GL_CreateContext");
+        SDL_DestroyWindow(presentationWindow);
+        presentationWindow = nullptr;
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        return nullptr;
+    }
+    if (SDL_GL_MakeCurrent(presentationWindow, presentationGL) != 0) {
+        ThrowSDLError(env, "SDL_GL_MakeCurrent");
+        SDL_GL_DeleteContext(presentationGL);
+        SDL_DestroyWindow(presentationWindow);
+        presentationGL = nullptr;
+        presentationWindow = nullptr;
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        return nullptr;
+    }
+    currentContextId = 0;
+
+    presentationCGL = CGLGetCurrentContext();
+    if (presentationCGL == nullptr) {
+        Throw(env, "SDL did not expose a native CGL context");
+        SDL_GL_DeleteContext(presentationGL);
+        SDL_DestroyWindow(presentationWindow);
+        presentationGL = nullptr;
+        presentationWindow = nullptr;
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        return nullptr;
+    }
+
+    SDL_GL_SetSwapInterval(1);
+    glGenFramebuffers(1, &presentationReadFramebuffer);
+    presentationOpen = true;
+    return Undefined(env);
+}
+
+napi_value PollEvents(napi_env env, napi_callback_info) {
+    if (presentationWindow == nullptr) return ToBool(env, false);
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT ||
+            (event.type == SDL_WINDOWEVENT &&
+             event.window.windowID == SDL_GetWindowID(presentationWindow) &&
+             event.window.event == SDL_WINDOWEVENT_CLOSE)) {
+            presentationOpen = false;
+        }
+    }
+    return ToBool(env, presentationOpen);
+}
+
+napi_value SetWindowTitle(napi_env env, napi_callback_info info) {
     napi_value args[1];
     size_t argc = 1;
     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    if (argc != 1) return nullptr;
-    const uint32_t contextId = U32(env, args[0]);
-    if (!ActivateRenderTarget(env, contextId)) return nullptr;
-    const RenderTarget& target = renderTargets.at(contextId);
+    if (argc == 1 && presentationWindow != nullptr) {
+        SDL_SetWindowTitle(presentationWindow, String(env, args[0]).c_str());
+    }
+    return Undefined(env);
+}
 
-    napi_value buffer;
-    void* bytes = nullptr;
-    const size_t size = static_cast<size_t>(target.width) *
-                        static_cast<size_t>(target.height) * 4;
-    napi_create_buffer(env, size, &bytes, &buffer);
-    glFinish();
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glReadPixels(0, 0, target.width, target.height,
-                 GL_RGBA, GL_UNSIGNED_BYTE, bytes);
-    return buffer;
+struct CanvasLayout {
+    int x;
+    int y;
+    int width;
+    int height;
+};
+
+napi_value Present(napi_env env, napi_callback_info info) {
+    napi_value args[3];
+    size_t argc = 3;
+    napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    if (argc != 3 || presentationWindow == nullptr || !presentationOpen) {
+        return Undefined(env);
+    }
+
+    const std::array<uint32_t, 3> contextIds = {
+        U32(env, args[0]), U32(env, args[1]), U32(env, args[2])};
+    constexpr std::array<CanvasLayout, 3> layouts = {{
+        {0, 0, 300, 300},
+        {306, 0, 300, 300},
+        {0, 306, 606, 400},
+    }};
+
+    // Submit every producer context before consuming its shared texture.
+    for (uint32_t contextId : contextIds) {
+        if (contextId == 0) continue;
+        const auto found = renderTargets.find(contextId);
+        if (found == renderTargets.end()) continue;
+        CGLSetCurrentContext(found->second.context);
+        glFlush();
+    }
+
+    if (CGLSetCurrentContext(presentationCGL) != kCGLNoError) {
+        Throw(env, "CGLSetCurrentContext failed for presentation context");
+        return nullptr;
+    }
+    currentContextId = 0;
+
+    int pixelWidth = 0;
+    int pixelHeight = 0;
+    SDL_GL_GetDrawableSize(presentationWindow, &pixelWidth, &pixelHeight);
+    const double scaleX = static_cast<double>(pixelWidth) / 606.0;
+    const double scaleY = static_cast<double>(pixelHeight) / 706.0;
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glViewport(0, 0, pixelWidth, pixelHeight);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_STENCIL_TEST);
+    glDisable(GL_BLEND);
+    glEnable(GL_SCISSOR_TEST);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glScissor(0, 0, pixelWidth, pixelHeight);
+    glClearColor(1, 1, 1, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    for (size_t index = 0; index < contextIds.size(); ++index) {
+        const auto found = renderTargets.find(contextIds[index]);
+        if (found == renderTargets.end()) continue;
+        const RenderTarget& target = found->second;
+        const CanvasLayout& layout = layouts[index];
+        const int x = static_cast<int>(layout.x * scaleX);
+        const int top = static_cast<int>(layout.y * scaleY);
+        const int width = static_cast<int>(layout.width * scaleX);
+        const int height = static_cast<int>(layout.height * scaleY);
+        const int bottom = pixelHeight - top - height;
+        const int borderX = std::max(1, static_cast<int>(scaleX));
+        const int borderY = std::max(1, static_cast<int>(scaleY));
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glScissor(x, bottom, width, height);
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, presentationReadFramebuffer);
+        glFramebufferTexture2D(
+            GL_READ_FRAMEBUFFER,
+            GL_COLOR_ATTACHMENT0,
+            GL_TEXTURE_2D,
+            target.color,
+            0);
+        if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) !=
+            GL_FRAMEBUFFER_COMPLETE) {
+            Throw(env, "Shared canvas framebuffer is incomplete");
+            return nullptr;
+        }
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glScissor(
+            x + borderX,
+            bottom + borderY,
+            width - 2 * borderX,
+            height - 2 * borderY);
+        glBlitFramebuffer(
+            0,
+            0,
+            target.width,
+            target.height,
+            x + borderX,
+            bottom + borderY,
+            x + width - borderX,
+            bottom + height - borderY,
+            GL_COLOR_BUFFER_BIT,
+            GL_LINEAR);
+    }
+
+    glDisable(GL_SCISSOR_TEST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    SDL_GL_SwapWindow(presentationWindow);
+    return Undefined(env);
+}
+
+napi_value DestroyWindow(napi_env env, napi_callback_info) {
+    if (presentationWindow == nullptr) return Undefined(env);
+    CGLSetCurrentContext(presentationCGL);
+    if (presentationReadFramebuffer != 0) {
+        glDeleteFramebuffers(1, &presentationReadFramebuffer);
+    }
+    SDL_GL_DeleteContext(presentationGL);
+    SDL_DestroyWindow(presentationWindow);
+    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+    presentationReadFramebuffer = 0;
+    presentationCGL = nullptr;
+    presentationGL = nullptr;
+    presentationWindow = nullptr;
+    presentationOpen = false;
+    return Undefined(env);
 }
 
 napi_value DestroyContext(napi_env env, napi_callback_info info) {
@@ -336,16 +580,13 @@ napi_value DestroyContext(napi_env env, napi_callback_info info) {
     CGLSetCurrentContext(target.context);
 
     glDeleteRenderbuffers(1, &target.depthStencil);
-    glDeleteRenderbuffers(1, &target.color);
+    glDeleteTextures(1, &target.color);
     glDeleteFramebuffers(1, &target.framebuffer);
 
     renderTargets.erase(found);
 
-    if (currentContextId == contextId) {
-        currentContextId = 0;
-        CGLSetCurrentContext(nullptr);
-    }
-
+    if (currentContextId == contextId) currentContextId = 0;
+    CGLSetCurrentContext(nullptr);
     CGLDestroyContext(target.context);
 
     return Undefined(env);
@@ -380,6 +621,12 @@ float F32(napi_env env, napi_value value) {
 napi_value ToU32(napi_env env, uint32_t value) {
     napi_value result;
     napi_create_uint32(env, value, &result);
+    return result;
+}
+
+napi_value ToBool(napi_env env, bool value) {
+    napi_value result;
+    napi_get_boolean(env, value, &result);
     return result;
 }
 
@@ -556,9 +803,13 @@ napi_value Initialize(
     napi_value exports
 ) {
     napi_property_descriptor functions[] = {
+        {"createWindow", nullptr, CreateWindow, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"pollEvents", nullptr, PollEvents, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"setWindowTitle", nullptr, SetWindowTitle, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"present", nullptr, Present, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"destroyWindow", nullptr, DestroyWindow, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"createContext", nullptr, CreateContext, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"makeContextCurrent", nullptr, MakeContextCurrent, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"readContextPixels", nullptr, ReadContextPixels, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"destroyContext", nullptr, DestroyContext, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"attachWasmRuntime", nullptr, AttachWasmRuntime, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"getGLFunction", nullptr, GetSkiaGLFunction, nullptr, nullptr, nullptr, napi_default, nullptr},

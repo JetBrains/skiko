@@ -3,9 +3,5 @@
   "type": "module",
   "scripts": {
     "skiko-node-window": "node node-runner.mjs"
-  },
-  "dependencies": {
-    "@kmamal/sdl": "^0.11.13",
-    "node-gles-webgl2": "0.4.0"
   }
 }

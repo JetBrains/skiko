@@ -25,12 +25,11 @@ struct SDLWindow::Impl {
     bool open = true;
     SDL_Window* window = nullptr;
     SDL_GLContext gl_context = nullptr;
-    CGLContextObj cgl_context = nullptr;
     GLuint read_framebuffer = 0;
 
     ~Impl() {
         if (window != nullptr && gl_context != nullptr) {
-            CGLSetCurrentContext(cgl_context);
+            SDL_GL_MakeCurrent(window, gl_context);
             if (read_framebuffer != 0) {
                 glDeleteFramebuffers(1, &read_framebuffer);
             }
@@ -75,10 +74,6 @@ SDLWindow::SDLWindow(int width, int height, const std::string& title)
     if (SDL_GL_MakeCurrent(impl_->window, impl_->gl_context) != 0) {
         throw SDLError("SDL_GL_MakeCurrent");
     }
-    impl_->cgl_context = CGLGetCurrentContext();
-    if (impl_->cgl_context == nullptr) {
-        throw std::runtime_error("SDL did not expose a native CGL context");
-    }
     SDL_GL_SetSwapInterval(1);
     glGenFramebuffers(1, &impl_->read_framebuffer);
 }
@@ -103,9 +98,8 @@ void SDLWindow::PollEvents() {
 }
 
 void SDLWindow::Present(const std::vector<CanvasTexture>& canvases) {
-    if (CGLSetCurrentContext(impl_->cgl_context) != kCGLNoError) {
-        throw std::runtime_error(
-            "CGLSetCurrentContext failed for presentation context");
+    if (SDL_GL_MakeCurrent(impl_->window, impl_->gl_context) != 0) {
+        throw SDLError("SDL_GL_MakeCurrent");
     }
     int pixel_width = 0;
     int pixel_height = 0;
@@ -177,6 +171,6 @@ void SDLWindow::SetTitle(const std::string& title) {
 }
 
 void* SDLWindow::NativeGLContext() const {
-    CGLSetCurrentContext(impl_->cgl_context);
-    return impl_->cgl_context;
+    SDL_GL_MakeCurrent(impl_->window, impl_->gl_context);
+    return CGLGetCurrentContext();
 }

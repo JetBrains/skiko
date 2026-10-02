@@ -34,51 +34,37 @@ val nodeExecutable = providers.gradleProperty("skiko.node.executable").orElse("n
 val npmExecutable = providers.gradleProperty("skiko.npm.executable").orElse("npm")
 
 
-val installNodeWindowedDeps = tasks.register<Exec>("installNodeWindowedDeps") {
+val installNativeSkikoDeps = tasks.register<Exec>("installNativeSkikoDeps") {
     group = "NodeJs"
-    description = "Installs the sample-only Node dependencies for the Skiko Node windowed runner."
-    inputs.file(layout.projectDirectory.file("package.json"))
-    inputs.file(layout.projectDirectory.file("package-lock.json"))
-    inputs.property("useCpuCopy", providers.environmentVariable("SKIKO_NODE_CPU_COPY").orElse("0"))
-    inputs.file(layout.projectDirectory.file("scripts/patch-node-gles-webgl2-window-surface.mjs"))
+    description = "Installs node-gyp for the native Skiko bridge."
+    workingDir(layout.projectDirectory.dir("native-skiko"))
+    inputs.file(layout.projectDirectory.file("native-skiko/package.json"))
+    inputs.file(layout.projectDirectory.file("native-skiko/package-lock.json"))
     inputs.property("npmExecutable", npmExecutable)
-    outputs.dir(layout.projectDirectory.dir("node_modules/node-gles-webgl2"))
-    outputs.dir(layout.projectDirectory.dir("node_modules/@kmamal/sdl"))
-    environment("CXXFLAGS", "-std=c++20")
+    outputs.dir(layout.projectDirectory.dir("native-skiko/node_modules"))
     commandLine(npmExecutable.get(), "ci", "--no-audit", "--no-fund")
 }
 
-val patchNodeWindowedDeps = tasks.register<Exec>("patchNodeWindowedDeps") {
+val buildNativeSkiko = tasks.register<Exec>("buildNativeSkiko") {
     group = "NodeJs"
-    description = "Patches and rebuilds node-gles-webgl2 for native SDL window-surface presentation."
-    dependsOn(installNodeWindowedDeps)
-    onlyIf { providers.environmentVariable("SKIKO_NODE_CPU_COPY").orElse("0").get() != "1" }
-    inputs.file(layout.projectDirectory.file("scripts/patch-node-gles-webgl2-window-surface.mjs"))
-    inputs.property("nodeExecutable", nodeExecutable)
-    outputs.dir(layout.projectDirectory.dir("node_modules/node-gles-webgl2"))
-    commandLine(nodeExecutable.get(), "scripts/patch-node-gles-webgl2-window-surface.mjs")
-}
-
-val rebuildNodeWindowedDeps = tasks.register<Exec>("rebuildNodeWindowedDeps") {
-    group = "NodeJs"
-    description = "Rebuilds node-gles-webgl2 after applying the native SDL window-surface patch."
-    dependsOn(patchNodeWindowedDeps)
-    onlyIf { providers.environmentVariable("SKIKO_NODE_CPU_COPY").orElse("0").get() != "1" }
+    description = "Builds the native Skiko OpenGL and SDL presentation bridge."
+    dependsOn(installNativeSkikoDeps)
+    workingDir(layout.projectDirectory.dir("native-skiko"))
+    inputs.file(layout.projectDirectory.file("native-skiko/binding.cc"))
+    inputs.file(layout.projectDirectory.file("native-skiko/binding.gyp"))
+    inputs.files(layout.projectDirectory.dir("native-skiko").asFileTree.matching {
+        include("*.inc")
+    })
     inputs.property("npmExecutable", npmExecutable)
-    outputs.dir(layout.projectDirectory.dir("node_modules/node-gles-webgl2"))
-    environment("CXXFLAGS", "-std=c++20")
-    commandLine(npmExecutable.get(), "rebuild", "node-gles-webgl2")
+    outputs.file(layout.projectDirectory.file("native-skiko/build/Release/native_skiko.node"))
+    commandLine(npmExecutable.get(), "run", "build")
 }
 
 tasks.register<Exec>("skikoNodeWindowedRun") {
     group = "application"
     description = "Builds and runs the Skiko WASM sample under Node.js in a native SDL window."
-    dependsOn("wasmJsProductionExecutableCompileSync", installNodeWindowedDeps, rebuildNodeWindowedDeps)
+    dependsOn("wasmJsProductionExecutableCompileSync", buildNativeSkiko)
     inputs.property("nodeExecutable", nodeExecutable)
-    environment(
-        "SKIKO_NODE_CPU_COPY",
-        providers.environmentVariable("SKIKO_NODE_CPU_COPY").orElse("0").get()
-    )
     commandLine(nodeExecutable.get(), "node-runner.mjs")
 }
 

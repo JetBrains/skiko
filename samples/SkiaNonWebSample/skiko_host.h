@@ -38,7 +38,6 @@ public:
     GLuint ResolveFramebuffer(GLuint framebuffer) const;
     GLuint Framebuffer() const;
     GLuint ContextTexture(int context_id) const;
-    void FlushContexts();
     void RecordGLCall(const char* name, GLuint object = 0);
     void PrintGLDiagnostics(int context_id) const;
     uint32_t WasmAllocate(
