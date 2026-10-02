@@ -385,30 +385,32 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
  * Constraints are added to the awt target's configurations, which automatically propagates them to both:
  * - Maven POM (via dependencyManagement section)
  * - Gradle Module Metadata (via dependencyConstraints in variants)
+ *
+ * Note that the consumable 'awtApiElements'/'awtRuntimeElements' configurations do not allow declaring
+ * dependency constraints, so the constraints are declared on the 'awtCompilationApi' bucket, which both
+ * of them extend.
  */
 private fun SkikoPublishingContext.configureAwtPublicationConstraints() {
     // Add constraints to Gradle configurations
     // This will automatically generate both POM dependencyManagement and Gradle Module Metadata dependencyConstraints
-    listOf("awtApiElements", "awtRuntimeElements").forEach { configName ->
-        project.configurations.findByName(configName)?.let { config ->
-            // Note: "!!" suffix is used to enforce a strict version
-            // See https://docs.gradle.org/current/userguide/dependency_versions.html#sec:rich-version-constraints
+    project.configurations.findByName("awtCompilationApi")?.let { config ->
+        // Note: "!!" suffix is used to enforce a strict version
+        // See https://docs.gradle.org/current/userguide/dependency_versions.html#sec:rich-version-constraints
 
-            // Add constraint for the uber runtime artifact
+        // Add constraint for the uber runtime artifact
+        config.dependencyConstraints.add(
+            project.dependencies.constraints.create(
+                "${SkikoArtifacts.DEFAULT_GROUP_ID}:${skikoArtifacts.jvmRuntimeArtifactId}:${skiko.deployVersion}!!"
+            )
+        )
+
+        // Add constraints for platform-specific runtime artifacts
+        awtRuntimeTargets.forEach { (os, arch) ->
             config.dependencyConstraints.add(
                 project.dependencies.constraints.create(
-                    "${SkikoArtifacts.DEFAULT_GROUP_ID}:${skikoArtifacts.jvmRuntimeArtifactId}:${skiko.deployVersion}!!"
+                    "${SkikoArtifacts.DEFAULT_GROUP_ID}:${skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)}:${skiko.deployVersion}!!"
                 )
             )
-            
-            // Add constraints for platform-specific runtime artifacts
-            awtRuntimeTargets.forEach { (os, arch) ->
-                config.dependencyConstraints.add(
-                    project.dependencies.constraints.create(
-                        "${SkikoArtifacts.DEFAULT_GROUP_ID}:${skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)}:${skiko.deployVersion}!!"
-                    )
-                )
-            }
         }
     }
 }
