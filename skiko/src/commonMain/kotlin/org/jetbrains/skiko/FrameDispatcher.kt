@@ -23,6 +23,12 @@ class FrameDispatcher(
         onFrame
     )
 
+    // A one-slot, never-dropping mailbox for frame requests. Conflated is not for
+    // coalescing — [frameScheduled] already ensures at most one request in flight —
+    // but because it never fails a send: [scheduleFrame] can be called while the loop
+    // is busy in [onFrame] (no receiver suspended), and that request must be buffered,
+    // not lost. A rendezvous channel would drop such a send and leave [frameScheduled]
+    // stuck `true`, wedging the loop.
     private val frameChannel = Channel<Unit>(Channel.CONFLATED)
     private var frameScheduled = false
 
