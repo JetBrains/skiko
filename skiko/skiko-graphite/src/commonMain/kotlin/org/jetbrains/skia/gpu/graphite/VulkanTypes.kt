@@ -124,21 +124,21 @@ value class VulkanImageCreateFlags(val value: Int) {
 class VulkanTextureInfo(
     val sampleCount: Int = 1,
     val mipmapped: Boolean = false,
-    val flags: Int = VulkanImageCreateFlags.NONE.value,
-    val format: Int,
-    val imageTiling: Int = VulkanImageTiling.OPTIMAL.value,
-    val imageUsageFlags: Int,
-    val sharingMode: Int = VulkanSharingMode.EXCLUSIVE.value,
-    val aspectMask: Int = VulkanImageAspectFlags.COLOR.value,
+    val flags: VulkanImageCreateFlags = VulkanImageCreateFlags.NONE,
+    val format: VulkanFormat,
+    val imageTiling: VulkanImageTiling = VulkanImageTiling.OPTIMAL,
+    val imageUsageFlags: VulkanImageUsageFlags,
+    val sharingMode: VulkanSharingMode = VulkanSharingMode.EXCLUSIVE,
+    val aspectMask: VulkanImageAspectFlags = VulkanImageAspectFlags.COLOR,
 ) {
     internal fun packToIntArray(): IntArray = intArrayOf(
         sampleCount,
         if (mipmapped) 1 else 0,
-        flags,
-        format,
-        imageTiling,
-        imageUsageFlags,
-        sharingMode,
-        aspectMask,
+        flags.value,
+        format.value,
+        imageTiling.value,
+        imageUsageFlags.value,
+        sharingMode.value,
+        aspectMask.value,
     )
 }
