@@ -183,8 +183,8 @@ fun SkikoProjectContext.declareWasmTasks() {
         )
 
         buildSuffix.set("es6")
-        emccOutputFileName.set(if (isSideModule) "$libBaseName.unoptimized.wasm" else "skiko.unoptimized.mjs") // this determines the name .wasm file too
-        libOutputFileName.set("$libBaseName.unoptimized.wasm")
+        emccOutputFileName.set(if (isSideModule) "$libBaseName.wasm" else "skiko.unoptimized.mjs") // this determines the name .wasm file too
+        libOutputFileName.set(if (isSideModule) "$libBaseName.wasm" else "$libBaseName.unoptimized.wasm")
         val prefixPath = if (isSideModule) {
             project.sideModuleSetupMjs(libBaseName).normalize().absolutePath
         } else {
@@ -200,8 +200,8 @@ fun SkikoProjectContext.declareWasmTasks() {
         )
 
         buildSuffix.set("d8")
-        emccOutputFileName.set(if (isSideModule) "${libBaseName}d8.unoptimized.wasm" else "skikod8.unoptimized.mjs") // this determines the name .wasm file too
-        libOutputFileName.set("${libBaseName}d8.unoptimized.wasm")
+        emccOutputFileName.set(if (isSideModule) "${libBaseName}d8.wasm" else "skikod8.unoptimized.mjs") // this determines the name .wasm file too
+        libOutputFileName.set(if (isSideModule) "${libBaseName}d8.wasm" else "skikod8.unoptimized.wasm")
 
         flags.addAll(listOf("-s", "ENVIRONMENT=shell"))
 
