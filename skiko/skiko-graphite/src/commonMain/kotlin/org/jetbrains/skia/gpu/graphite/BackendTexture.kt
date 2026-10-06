@@ -68,6 +68,44 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
             check(ptr != NullPointer) { "Failed to create a Graphite Vulkan backend texture" }
             return BackendTexture(ptr)
         }
+
+        /**
+         * Creates a Graphite backend texture that wraps an existing `VkImage` using raw Vulkan values.
+         *
+         * The image memory is assumed to be managed by the client (or by the driver, as is the case
+         * for swapchain images), so no allocation info is passed to Skia.
+         */
+        fun makeVulkan(
+            width: Int,
+            height: Int,
+            sampleCount: Int,
+            mipmapped: Boolean,
+            flags: Int,
+            format: Int,
+            imageTiling: Int,
+            imageUsageFlags: Int,
+            sharingMode: Int,
+            aspectMask: Int,
+            imageLayout: Int,
+            queueFamilyIndex: Int,
+            imagePtr: NativePointer,
+        ): BackendTexture = makeVulkan(
+            width = width,
+            height = height,
+            textureInfo = VulkanTextureInfo(
+                sampleCount = sampleCount,
+                mipmapped = mipmapped,
+                flags = VulkanImageCreateFlags(flags),
+                format = VulkanFormat(format),
+                imageTiling = VulkanImageTiling(imageTiling),
+                imageUsageFlags = VulkanImageUsageFlags(imageUsageFlags),
+                sharingMode = VulkanSharingMode(sharingMode),
+                aspectMask = VulkanImageAspectFlags(aspectMask),
+            ),
+            imageLayout = imageLayout,
+            queueFamilyIndex = queueFamilyIndex,
+            imagePtr = imagePtr,
+        )
     }
 
     private object _FinalizerHolder {
