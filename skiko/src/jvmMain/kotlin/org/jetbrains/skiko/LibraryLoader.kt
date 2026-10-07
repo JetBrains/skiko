@@ -58,7 +58,7 @@ class LibraryLoader internal constructor(
                 System.load(tempFile.absolutePath)
                 return copyDir
             } else {
-                throw LibraryLoadException("Failed to loade library $library", cause = e)
+                throw LibraryLoadException("Failed to load library $library", cause = e)
             }
         }
     }
@@ -71,7 +71,9 @@ class LibraryLoader internal constructor(
                 val tempFile = File.createTempFile("skiko", "", dest)
                 if (deleteOnExit)
                     file.deleteOnExit()
-                Library::class.java.getResourceAsStream("/$resourceName").use { input ->
+                val resourceStream = Library::class.java.getResourceAsStream("/$resourceName")
+                    ?: Library::class.java.classLoader.getResourceAsStream(resourceName)
+                resourceStream.use { input ->
                     Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
                 }
                 Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
@@ -158,6 +160,8 @@ class LibraryLoader internal constructor(
         // Key the cache by the hash of the library.
         val hashResourceStream = Library::class.java.getResourceAsStream(
             "/$platformName.sha256"
+        ) ?: Library::class.java.classLoader.getResourceAsStream(
+            "$platformName.sha256"
         ) ?: throw LibraryLoadException(
             "Cannot find $platformName.sha256, proper native dependency missing."
         )
