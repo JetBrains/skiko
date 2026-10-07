@@ -1,0 +1,7 @@
+@file:JsModule("./js-skiko-ganesh-reexport-symbols.mjs")
+@file:JsNonModule
+
+package org.jetbrains.skiko
+
+@InternalSkikoApi
+actual external val GL: GLInterface

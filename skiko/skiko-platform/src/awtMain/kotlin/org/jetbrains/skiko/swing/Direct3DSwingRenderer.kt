@@ -1,6 +1,8 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.gpu.ganesh.flushAndSubmit
+import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.alignedTextureWidth
 import org.jetbrains.skiko.graphicapi.InternalDirectXApi.createDirectXOffscreenDevice
