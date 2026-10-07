@@ -423,6 +423,8 @@ if (supportAndroid) {
 }
 
 if (supportAwt) {
+    skikoProjectContext.configureAwtModuleInfo()
+
     val skikoAwtJarForTests by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-awt-test")
         from(kotlin.jvm("awt").compilations["main"].output.allOutputs)

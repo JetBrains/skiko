@@ -4,6 +4,7 @@ import AdditionalRuntimeLibrary
 import Arch
 import CompileSkikoCppTask
 import CompileSkikoObjCTask
+import GenerateModuleInfoTask
 import LinkSkikoTask
 import OS
 import SealAndSignSharedLibraryTask
@@ -20,6 +21,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
@@ -29,11 +31,14 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.crypto.checksum.Checksum
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.gradle.kotlin.dsl.register
+import org.gradle.process.CommandLineArgumentProvider
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import projectDirs
 import registerOrGetSkiaDirProvider
 import registerSkikoTask
@@ -52,6 +57,43 @@ private val jvmTargetArchAttribute =
 private const val REQUIRED_SYMBOLS_USAGE = "skiko-required-symbols"
 private const val JVM_LINKED_LIBRARY_USAGE = "skiko-jvm-linked-library"
 private const val JVM_RUNTIME_JAR_USAGE = "skiko-jvm-runtime-jar"
+private const val SKIKO_AWT_MODULE = "skiko.awt"
+
+fun SkikoProjectContext.coreAwtModulePath(): FileCollection = project.configurations
+    .getByName("awtCompileClasspath")
+    .incoming.artifactView {
+        componentFilter { it is ProjectComponentIdentifier && it.projectPath == project.rootProject.path }
+    }
+    .files
+
+fun SkikoProjectContext.configureAwtModuleInfo(
+    javaModuleName: String = SKIKO_AWT_MODULE,
+    modulePath: FileCollection = project.files(),
+) = with(project) {
+    val compileKotlinAwt = tasks.named<KotlinJvmCompile>("compileKotlinAwt")
+    val generateModuleInfo = registerSkikoTask<GenerateModuleInfoTask>("generateSkikoAwtModuleInfo") {
+        dependsOn(compileKotlinAwt)
+        classesDir.set(compileKotlinAwt.flatMap { it.destinationDirectory })
+        moduleName.set(javaModuleName)
+        this.modulePath.from(modulePath)
+        outputDir.set(layout.buildDirectory.dir("generated/sources/${javaModuleName.replace('.', '-')}ModuleInfo"))
+    }
+
+    tasks.named<JavaCompile>("compileAwtMainJava") {
+        dependsOn(generateModuleInfo)
+        source(generateModuleInfo.flatMap { it.outputDir })
+        options.release.set(compileKotlinAwt.flatMap { it.compilerOptions.jvmTarget }.map { it.target.toInt() })
+        options.compilerArgumentProviders.add(CommandLineArgumentProvider {
+            buildList {
+                addAll(listOf(
+                    "--patch-module",
+                    "$javaModuleName=${compileKotlinAwt.get().destinationDirectory.get().asFile}",
+                ))
+                if (!modulePath.isEmpty) addAll(listOf("--module-path", modulePath.asPath))
+            }
+        })
+    }
+}
 
 fun SkikoProjectContext.createChecksumsTask(
     targetOs: OS,

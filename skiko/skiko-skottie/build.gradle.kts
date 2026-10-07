@@ -314,6 +314,11 @@ if (supportAndroid) {
 }
 
 if (supportAwt) {
+    skikoSkottieProjectContext.configureAwtModuleInfo(
+        javaModuleName = "skiko.skottie",
+        modulePath = skikoSkottieProjectContext.coreAwtModulePath(),
+    )
+
     val skikoSkottieAwtJarForTests by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-skottie-awt-test")
         from(kotlin.jvm("awt").compilations["main"].output.allOutputs)

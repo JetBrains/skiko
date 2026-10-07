@@ -177,6 +177,11 @@ kotlin.run {
 
 
 if (supportAwt) {
+    graphiteProjectContext.configureAwtModuleInfo(
+        javaModuleName = "skiko.graphite",
+        modulePath = graphiteProjectContext.coreAwtModulePath(),
+    )
+
     val graphiteAwtJarForTests by project.tasks.registering(Jar::class) {
         archiveBaseName.set("skiko-graphite-awt-test")
         from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
