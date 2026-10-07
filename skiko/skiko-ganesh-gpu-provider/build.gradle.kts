@@ -71,13 +71,9 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         implementation(kotlin("stdlib"))
-    }
-    sourceSets.named("iosMain") {
-        dependencies {
-            compileOnly(project(":"))
-            api(project(":skiko-gpu"))
-            implementation("${project.group}:skiko-ganesh:${project.version}")
-        }
+        compileOnly(project(":"))
+        api(project(":skiko-gpu"))
+        implementation("${project.group}:skiko-ganesh:${project.version}")
     }
 }
 
