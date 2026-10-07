@@ -66,18 +66,17 @@ public:
         Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain1;
         CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
         HRESULT result = S_OK;
-        // NONE is safe only behind the live-resize pre-render, which fills the content at every new size. Otherwise
-        // it would expose a hard uncovered edge on any size change (maximize/snap/DPI/async).
-        DXGI_SCALING scaling = preferNoneScaling ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
         if (transparency) {
-            result = CreateSwapChainForComposition(swapChainFactory4.Get(), width, height, scaling, swapChain1.GetAddressOf());
+            result = CreateSwapChainForComposition(swapChainFactory4.Get(), width, height, swapChain1.GetAddressOf());
         }
         if (!transparency || FAILED(result)) {
-            /*
-             * It's just a fallback path that added for compatibility.
-             * In this case transparency won't be supported.
-             */
+            // Fallback path, added for compatibility.
+            // In this case transparency won't be supported.
             swapChain1.Reset();
+
+            // NONE is safe only behind the live-resize pre-render, which fills the content at every new size. Otherwise
+            // it would expose a hard uncovered edge on any size change (maximize/snap/DPI/async).
+            DXGI_SCALING scaling = preferNoneScaling ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
             CreateSwapChainForHwnd(swapChainFactory4.Get(), width, height, scaling, swapChain1.GetAddressOf());
         }
         swapChainFactory4->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
@@ -86,7 +85,7 @@ public:
     }
 
 private:
-    HRESULT CreateSwapChainForComposition(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, DXGI_SCALING scaling, IDXGISwapChain1 **swapChain1) {
+    HRESULT CreateSwapChainForComposition(IDXGIFactory4 *swapChainFactory4, UINT width, UINT height, IDXGISwapChain1 **swapChain1) {
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = width;
         swapChainDesc.Height = height;
@@ -95,7 +94,7 @@ private:
         swapChainDesc.SampleDesc.Quality = 0;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.BufferCount = BuffersCount;
-        swapChainDesc.Scaling = scaling;
+        swapChainDesc.Scaling = DXGI_SCALING_STRETCH; // CreateSwapChainForComposition requires DXGI_SCALING_STRETCH
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_PREMULTIPLIED;
         HRESULT result = swapChainFactory4->CreateSwapChainForComposition(queue.Get(), &swapChainDesc, nullptr, swapChain1);
