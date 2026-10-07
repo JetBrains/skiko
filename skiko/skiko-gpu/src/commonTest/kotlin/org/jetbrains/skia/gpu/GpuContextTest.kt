@@ -10,7 +10,6 @@ import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.NativePointer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -33,7 +32,7 @@ class GpuContextTest {
         context.close()
 
         assertFailsWith<IllegalStateException> {
-            context.makeSurface(1, 1, Native.NullPointer)
+            context.makeSurface(MetalGpuTexture(1, 1, Native.NullPointer))
         }
     }
 
@@ -51,13 +50,11 @@ class GpuContextTest {
         var closeCount = 0
 
         override fun makeSurface(
-            width: Int,
-            height: Int,
-            texturePtr: NativePointer,
+            texture: GpuTexture,
             colorSpace: ColorSpace?,
             surfaceProps: SurfaceProps?,
         ): Surface {
-            return Surface.makeRasterN32Premul(width, height)
+            return Surface.makeRasterN32Premul(texture.width, texture.height)
         }
 
         var submitCount = 0

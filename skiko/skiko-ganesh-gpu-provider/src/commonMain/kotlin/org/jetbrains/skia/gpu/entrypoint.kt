@@ -3,11 +3,10 @@
 
 package org.jetbrains.skia.gpu
 
-import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.Logger
 
 fun makeMetalContext(devicePtr: NativePointer, queuePtr: NativePointer): GpuContext {
     Logger.info { "Metal backend: Ganesh" }
-    return GpuContext(GaneshMetalContext(DirectContext.makeMetal(devicePtr, queuePtr)))
+    return GpuContext(GaneshGpuContextBackend.makeMetal(devicePtr, queuePtr))
 }
