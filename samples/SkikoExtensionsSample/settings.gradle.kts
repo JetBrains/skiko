@@ -8,7 +8,7 @@ pluginManagement {
     }
 
     plugins {
-        val kotlinVersion = providers.gradleProperty("kotlin.version").getOrElse("2.3.20")
+        val kotlinVersion = providers.gradleProperty("kotlin.version").getOrElse("2.4.20")
         kotlin("multiplatform").version(kotlinVersion)
     }
 }
