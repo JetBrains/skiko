@@ -140,6 +140,9 @@ kotlin {
 
         val webMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
+            }
         }
 
         val jsMain by getting {
