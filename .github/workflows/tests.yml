@@ -9,10 +9,7 @@ on:
 jobs:
   macos:
     name: 'macOS'
-    # On `macos-15` UI tests blocked by a system popup with
-    # "bash" is requesting to bypass the system private window picker and directly access your screen and audio.
-    # TODO: Update once resolved
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'

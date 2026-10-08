@@ -1221,7 +1221,7 @@ class SkiaLayerTest {
 
         val backgroundWindow = JFrame(renderApi.name).also {
             it.location = Point(200, 200)
-            it.size = Dimension(1000, 1000)
+            it.size = Dimension(600, 600)
             it.contentPane.background = bgColor
         }
         backgroundWindow.isVisible = true
