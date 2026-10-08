@@ -11,7 +11,7 @@ jobs:
     name: 'macOS (${{ matrix.os }})'
     strategy:
       matrix:
-        os: [macos-15, macos-26]
+        os: [macos-15, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
