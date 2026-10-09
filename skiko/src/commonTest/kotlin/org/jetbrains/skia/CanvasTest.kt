@@ -269,6 +269,22 @@ class CanvasTest {
         assertContentSame(expected = expected, got = surface.makeImageSnapshot(), sensitivity = 0.25)
     }
 
+    @Test
+    fun testLocalClipBounds() = runTest {
+        val surface = Surface.makeRasterN32Premul(8, 8)
+        surface.canvas.scale(2f, 2f)
+        surface.canvas.clipRect(1f, 1f, 3f, 3f, true)
+
+        assertEquals(Rect(0.5f, 0.5f, 3.5f, 3.5f), surface.canvas.localClipBounds)
+    }
+
+    @Test
+    fun testEmptyLocalClipBounds() = runTest {
+        val surface = Surface.makeRasterN32Premul(4, 4)
+        surface.canvas.clipRect(8f, 8f, 12f, 12f, true)
+
+        assertEquals(Rect(0f, 0f, 0f, 0f), surface.canvas.localClipBounds)
+    }
 
     @Test
     fun testTranslate() {

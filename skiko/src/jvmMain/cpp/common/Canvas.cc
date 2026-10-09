@@ -36,6 +36,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetCanvas
     return reinterpret_cast<jlong>(canvas->getSurface());
 }
 
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetLocalClipBounds
+  (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloatArray resultArray) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
+    skija::Rect::copyToInterop(env, canvas->getLocalClipBounds(), resultArray);
+}
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoint
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat x, jfloat y, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));

@@ -289,6 +289,13 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nConcat44
 }
 
 
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nGetLocalClipBounds
+  (KNativePointer canvasPtr, KInteropPointer resultArray) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
+    skija::Rect::copyToInterop(canvas->getLocalClipBounds(), resultArray);
+}
+
+
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nTranslate
   (KNativePointer canvasPtr, KFloat dx, KFloat dy) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));

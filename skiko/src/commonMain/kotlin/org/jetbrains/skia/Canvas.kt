@@ -1298,6 +1298,22 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return clipRegion(r, ClipMode.INTERSECT)
     }
 
+    /**
+     * Returns bounds of clip in local coordinates.
+     *
+     * The returned [Rect] is outset by one device pixel to account for partial pixel coverage
+     * in case the clip is anti-aliased.
+     *
+     * If the clip is empty, returns an empty [Rect].
+     */
+    val localClipBounds: Rect
+        get() = try {
+            Stats.onNativeCall()
+            Rect.fromInteropPointer { _nGetLocalClipBounds(_ptr, it) }
+        } finally {
+            reachabilityBarrier(this)
+        }
+
     fun translate(dx: Float, dy: Float): Canvas {
         interopScope {
             Stats.onNativeCall()
@@ -1857,6 +1873,9 @@ private external fun _nClipPath(ptr: NativePointer, nativePath: NativePointer, m
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRegion")
 private external fun _nClipRegion(ptr: NativePointer, nativeRegion: NativePointer, mode: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalClipBounds")
+private external fun _nGetLocalClipBounds(ptr: NativePointer, rectPtr: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nTranslate")
 private external fun _nTranslate(ptr: NativePointer, dx: Float, dy: Float)
