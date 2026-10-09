@@ -8,8 +8,11 @@ on:
 # Example: https://github.com/JetBrains/skiko/pull/1211
 jobs:
   macos:
-    name: 'macOS'
-    runs-on: macos-15
+    name: 'macOS (${{ matrix.os }})'
+    strategy:
+      matrix:
+        os: [macos-15, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
@@ -45,7 +48,7 @@ jobs:
         name: 'Upload Test Results'
         if: failure()
         with:
-          name: test-reports-macos
+          name: test-reports-${{ matrix.os }}
           path: |
             ./skiko/**/build/reports/tests
             ./skiko/**/src/jvmTest/screenshots/*_actual.png
