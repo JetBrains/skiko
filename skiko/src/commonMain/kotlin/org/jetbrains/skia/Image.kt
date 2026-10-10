@@ -263,20 +263,26 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
      * It must be in the 0..9 range, where 6 is the default, 9 is maximal compression,
      * and 0 skips zlib compression.
      *
+     * webpLossless is used only for WebP. If true, WebP is encoded lossless and quality
+     * is used as compression effort. In this case, 0 for quality is the fastest and 100
+     * is the smallest output.
+     *
      * @param format               one of: [EncodedImageFormat.JPEG], [EncodedImageFormat.PNG], [EncodedImageFormat.WEBP]
      * @param quality              encoder specific metric with 100 equaling best, ignored for PNG
      * @param pngCompressionLevel  PNG zlib compression level in 0..9
+     * @param webpLossless         WebP lossless compression option
      * @return                     encoded Image, or null
      *
      */
     fun encodeToData(
         format: EncodedImageFormat = EncodedImageFormat.PNG,
         quality: Int = 100,
-        pngCompressionLevel: Int = 6
+        pngCompressionLevel: Int = 6,
+        webpLossless: Boolean = false,
     ): Data? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nEncodeToData(_ptr, format.ordinal, quality, pngCompressionLevel)
+            val ptr = _nEncodeToData(_ptr, format.ordinal, quality, pngCompressionLevel, webpLossless)
             if (ptr == NullPointer) null else org.jetbrains.skia.Data(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -503,7 +509,8 @@ private external fun _nEncodeToData(
     ptr: NativePointer,
     format: Int,
     quality: Int,
-    pngCompressionLevel: Int
+    pngCompressionLevel: Int,
+    webpLossless: Boolean,
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")

@@ -78,7 +78,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nGetIma
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToData
-  (JNIEnv* env, jclass jclass, jlong ptr, jint format, jint quality, jint pngCompressionLevel) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint format, jint quality, jint pngCompressionLevel, jboolean webpLossless) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkEncodedImageFormat skFormat = static_cast<SkEncodedImageFormat>(format);
     if (!instance->isTextureBacked()) {
@@ -97,6 +97,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToDa
         }
         case SkEncodedImageFormat::kWEBP: {
           SkWebpEncoder::Options options = SkWebpEncoder::Options();
+          options.fCompression = webpLossless ? SkWebpEncoder::Compression::kLossless : SkWebpEncoder::Compression::kLossy;
           options.fQuality = quality;
           SkData* data = SkWebpEncoder::Encode(nullptr, instance, options).release();
           return reinterpret_cast<jlong>(data);
