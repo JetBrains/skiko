@@ -283,7 +283,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         return try {
             Stats.onNativeCall()
             val ptr = _nEncodeToData(_ptr, format.ordinal, quality, pngCompressionLevel, webpLossless)
-            if (ptr == NullPointer) null else org.jetbrains.skia.Data(ptr)
+            if (ptr == NullPointer) null else Data(ptr)
         } finally {
             reachabilityBarrier(this)
         }
