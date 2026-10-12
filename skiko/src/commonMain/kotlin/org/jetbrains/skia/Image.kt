@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.encode.ImageEncoder
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
@@ -282,6 +283,9 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             reachabilityBarrier(this)
         }
     }
+
+    /** Encodes this image with the supplied encoder. */
+    fun encodeToData(encoder: ImageEncoder): Data? = encoder.encode(this)
 
     fun makeShader(localMatrix: Matrix33?): Shader {
         return makeShader(FilterTileMode.CLAMP, FilterTileMode.CLAMP, SamplingMode.DEFAULT, localMatrix)
