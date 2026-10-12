@@ -62,7 +62,7 @@ SDLWindow::SDLWindow(int width, int height, const std::string& title)
         SDL_WINDOWPOS_CENTERED,
         width,
         height,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (impl_->window == nullptr) {
         throw SDLError("SDL_CreateWindow");
     }

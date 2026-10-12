@@ -356,7 +356,7 @@ napi_value CreateWindow(napi_env env, napi_callback_info info) {
         SDL_WINDOWPOS_CENTERED,
         I32(env, args[0]),
         I32(env, args[1]),
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (presentationWindow == nullptr) {
         ThrowSDLError(env, "SDL_CreateWindow");
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
