@@ -69,7 +69,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Image__1nGetImageInfo
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToData
-  (KNativePointer ptr, KInt format, KInt quality, KInt pngCompressionLevel) {
+  (KNativePointer ptr, KInt format, KInt quality, KInt pngCompressionLevel, KBoolean webpLossless) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     SkEncodedImageFormat skFormat = static_cast<SkEncodedImageFormat>(format);
     if (!instance->isTextureBacked()) {
@@ -88,6 +88,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToData
          }
          case SkEncodedImageFormat::kWEBP: {
            SkWebpEncoder::Options options = SkWebpEncoder::Options();
+           options.fCompression = webpLossless ? SkWebpEncoder::Compression::kLossless : SkWebpEncoder::Compression::kLossy;
            options.fQuality = quality;
            SkData* data = SkWebpEncoder::Encode(nullptr, instance, options).release();
            return reinterpret_cast<KNativePointer>(data);

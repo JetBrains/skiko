@@ -22,6 +22,7 @@ class ImageTest {
             assertTrue(image.encodeToData(EncodedImageFormat.JPEG, 50)?.bytes!!.isNotEmpty())
             assertTrue(image.encodeToData(EncodedImageFormat.WEBP)?.bytes!!.isNotEmpty())
             assertTrue(image.encodeToData(EncodedImageFormat.WEBP, 50)?.bytes!!.isNotEmpty())
+            assertTrue(image.encodeToData(EncodedImageFormat.WEBP, webpLossless = true)?.bytes!!.isNotEmpty())
         }
     }
 
