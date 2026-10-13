@@ -35,11 +35,11 @@ private class DemoApp: SkikoRenderDelegate {
         canvas.drawOval(Rect(110f, 220f, 50f, 70f), paint)
         canvas.drawOval(Rect(110f, 220f, 50f, 70f), paint)
 
-        // https://youtrack.jetbrains.com/issue/CMP-7439
+        // TextLine.make() needs a process wide SkUnicode, which an ICU-less skiko.wasm
+        // does not have (Shaper.makeShapeDontWrapOrReorder() returns null there).
+        // drawString() only maps glyphs, so it works in both builds.
         font?.let { f ->
-            TextLine.make("Hello, drawTextLine!", f).use { line ->
-                canvas.drawTextLine(line, 10f, 300f, textPaint)
-            }
+            canvas.drawString("Hello, drawString!", 10f, 300f, f, textPaint)
         }
     }
 }
@@ -50,7 +50,7 @@ internal fun runApp() {
         val canvas = document.getElementById("c$index")!!
         val app = when (index) {
             3 -> DemoApp()
-            4 -> SegmenterComparison()
+            4 -> JsSegmenterSample()
             else -> BouncingBalls()
         }
         skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, app)
