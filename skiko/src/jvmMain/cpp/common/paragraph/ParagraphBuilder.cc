@@ -3,6 +3,7 @@
 #include <string>
 #include "../interop.hh"
 #include "modules/skunicode/include/SkUnicode_icu.h"
+#include "SkikoUnicodeHolder.hh"
 #include "ParagraphBuilder.h"
 
 using namespace std;
@@ -13,13 +14,14 @@ static void deleteParagraphBuilder(ParagraphBuilder* instance) {
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphBuilderKt__1nMake
-  (JNIEnv* env, jclass jclass, jlong paragraphStylePtr, jlong fontCollectionPtr) {
+  (JNIEnv* env, jclass jclass, jlong paragraphStylePtr, jlong fontCollectionPtr, jlong unicodePtr) {
     ParagraphStyle* paragraphStyle = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(paragraphStylePtr));
     FontCollection* fontCollection = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(fontCollectionPtr));
+    SkikoUnicodeHolder* unicodeHolder = reinterpret_cast<SkikoUnicodeHolder*>(static_cast<uintptr_t>(unicodePtr));
     ParagraphBuilder* instance = ParagraphBuilder::make(
         *paragraphStyle,
         sk_ref_sp(fontCollection),
-        SkUnicodes::ICU::Make()
+        unicodeHolder != nullptr ? unicodeHolder->unicode : SkUnicodes::ICU::Make()
     ).release();
     return reinterpret_cast<jlong>(instance);
 }

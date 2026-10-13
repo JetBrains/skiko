@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "modules/skunicode/include/SkUnicode_icu.h"
+#include "SkikoUnicodeHolder.hh"
 #include "ParagraphBuilder.h"
 
 using namespace std;
@@ -12,13 +13,14 @@ static void deleteParagraphBuilder(ParagraphBuilder* instance) {
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake
-  (KNativePointer paragraphStylePtr, KNativePointer fontCollectionPtr) {
+  (KNativePointer paragraphStylePtr, KNativePointer fontCollectionPtr, KNativePointer unicodePtr) {
     ParagraphStyle* paragraphStyle = reinterpret_cast<ParagraphStyle*>((paragraphStylePtr));
     FontCollection* fontCollection = reinterpret_cast<FontCollection*>((fontCollectionPtr));
+    SkikoUnicodeHolder* unicodeHolder = reinterpret_cast<SkikoUnicodeHolder*>((unicodePtr));
     ParagraphBuilder* instance = ParagraphBuilder::make(
         *paragraphStyle,
         sk_ref_sp(fontCollection),
-        SkUnicodes::ICU::Make()
+        unicodeHolder != nullptr ? unicodeHolder->unicode : SkUnicodes::ICU::Make()
     ).release();
     return reinterpret_cast<KNativePointer>(instance);
 }
