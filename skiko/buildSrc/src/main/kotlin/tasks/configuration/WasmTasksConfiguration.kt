@@ -105,7 +105,8 @@ fun SkikoProjectContext.declareWasmTasks() {
 
         flags.set(
             buildList {
-                addAll(skiaPreprocessorFlags(OS.Wasm, buildType))
+                addAll(skiaPreprocessorFlags(OS.Wasm, buildType, useIcu = skiko.wasmUseIcu))
+                addAll(dependencyRegistry.getCompilerFlags(OS.Wasm, Arch.Wasm, TargetEnv.WASM))
                 addAll(buildType.clangFlags)
                 add("-fno-rtti")
                 add("-fno-exceptions")
@@ -119,7 +120,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         dependsOn(setupEmscripten)
         dependsOn(compileWasm)
         dependsOn(skiaWasmDir)
-        val skiaBinDir = skiaWasmDir.get().resolve("out/${buildType.id}-wasm-wasm").absolutePath
+        val skiaBinDir = skiaWasmDir.get().resolve("out/${skiko.wasmSkiaOutDirName}").absolutePath
         val resolvedBinaryInputs = resolveBinaryInputs(OS.Wasm, Arch.Wasm, TargetEnv.WASM, skiaBinDir)
 
         linker.set(emscriptenToolPath(linkerForTarget(OS.Wasm, Arch.Wasm)))

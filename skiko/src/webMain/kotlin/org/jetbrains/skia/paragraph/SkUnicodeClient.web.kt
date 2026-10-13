@@ -11,8 +11,10 @@ import org.jetbrains.skia.impl.interopScope
  * An [SkUnicode] backed by Skia's `SkUnicode_client`, fed with text segmentation boundaries
  * computed by the browser-native `Intl.Segmenter`.
  *
- * BiDi resolution (UAX #9) and character property lookups are still served by the ICU
- * implementation embedded into the Skiko binary.
+ * BiDi resolution (UAX #9) and character property lookups are served by the native side:
+ * by the embedded ICU when it is available, and by Skiko's own UAX #9 implementation and
+ * Skia's hardcoded character tables in an ICU-less binary
+ * (see [SkikoUnicodeBackend.isIcuAvailable]).
  */
 class SkUnicodeClient private constructor(ptr: NativePointer) : SkUnicode(ptr, _FinalizerHolder.PTR) {
     companion object {

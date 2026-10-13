@@ -520,12 +520,25 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 }
 
+/**
+ * `U_UNSUPPORTED_ERROR` of ICU's `UErrorCode`.
+ *
+ * Reported by the native bindings of an ICU-less binary (a wasm build made with
+ * `-Pskiko.wasm.useIcu=false`), where the ICU break iterator subsystem is absent.
+ */
+private const val ICU_UNSUPPORTED_ERROR = 16
+
 private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer) -> NativePointer): NativePointer {
     val errorCode = IntArray(1)
     return interopScope {
         val handle = toInterop(errorCode)
         val res = block.invoke(this, handle)
         handle.fromInterop(errorCode)
+        if (errorCode[0] == ICU_UNSUPPORTED_ERROR) {
+            throw UnsupportedOperationException(
+                "ICU is excluded from this Skiko binary; use WebBreakIteratorProvider instead. ($message)"
+            )
+        }
         if (errorCode[0] > 0) {
             throw RuntimeException("$message; operation failed with status ${errorCode}")
         }

@@ -2,7 +2,13 @@
 #include "TextLine.hh"
 #include "SkShaper.h"
 #include "SkTextBlob.h"
+#ifdef SKIKO_USE_ICU
 #include "unicode/ubrk.h"
+#else
+// ICU is excluded from this binary (wasm built with -Pskiko.wasm.useIcu=false):
+// use the UBreakIterator compatible shim instead.
+#include "grapheme_shim.h"
+#endif
 
 class TextLineRunHandler: public SkShaper::RunHandler {
 public:

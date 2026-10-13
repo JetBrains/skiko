@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
+#ifdef SKIKO_USE_ICU
 #include "modules/skunicode/include/SkUnicode_icu.h"
+#endif
 #include "SkikoUnicodeHolder.hh"
 #include "ParagraphBuilder.h"
 
@@ -17,10 +19,21 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphBuilder__1nMak
     ParagraphStyle* paragraphStyle = reinterpret_cast<ParagraphStyle*>((paragraphStylePtr));
     FontCollection* fontCollection = reinterpret_cast<FontCollection*>((fontCollectionPtr));
     SkikoUnicodeHolder* unicodeHolder = reinterpret_cast<SkikoUnicodeHolder*>((unicodePtr));
+#ifdef SKIKO_USE_ICU
+    sk_sp<SkUnicode> unicode =
+        unicodeHolder != nullptr ? unicodeHolder->unicode : SkUnicodes::ICU::Make();
+#else
+    // ICU is excluded from this binary, so an SkUnicode must be supplied by the
+    // caller (see SkUnicodeClient, backed by the browser Intl.Segmenter).
+    sk_sp<SkUnicode> unicode = unicodeHolder != nullptr ? unicodeHolder->unicode : nullptr;
+    if (unicode == nullptr) {
+        return nullptr;
+    }
+#endif
     ParagraphBuilder* instance = ParagraphBuilder::make(
         *paragraphStyle,
         sk_ref_sp(fontCollection),
-        unicodeHolder != nullptr ? unicodeHolder->unicode : SkUnicodes::ICU::Make()
+        unicode
     ).release();
     return reinterpret_cast<KNativePointer>(instance);
 }

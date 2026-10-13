@@ -5,9 +5,10 @@
 // hands them over as flat Int32 buffers with UTF-16 code unit indices. Here they are
 // translated into the UTF-8 byte offsets expected by SkUnicodes::Client::Make().
 //
-// ICU stays linked in the binary: SkUnicode_client delegates BiDi resolution (UAX #9)
-// to the embedded ICU bidi implementation and uses hardcoded character properties,
-// so mixed-direction text keeps working.
+// BiDi resolution (UAX #9) is delegated either to the embedded ICU bidi implementation
+// or, in the ICU-less build (-Pskiko.wasm.useIcu=false), to Skiko's own UAX #9
+// implementation (SkikoBidi). Character properties come from Skia's hardcoded tables,
+// so mixed-direction text keeps working in both cases.
 #include <string>
 #include <vector>
 

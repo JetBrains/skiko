@@ -3,9 +3,14 @@
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_IcuBidiRunIterator__1nMake
   (KNativePointer textPtr, KInt bidiLevel) {
+#ifdef SKIKO_USE_ICU
     SkString* text = reinterpret_cast<SkString*>((textPtr));
     std::unique_ptr<SkShaper::BiDiRunIterator> instance(SkShaper::MakeIcuBiDiRunIterator(text->c_str(), text->size(), bidiLevel & 0xFF));
     return reinterpret_cast<KNativePointer>(instance.release());
+#else
+    // ICU is excluded from this binary.
+    return nullptr;
+#endif
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_shaper_IcuBidiRunIterator__1nGetCurrentLevel

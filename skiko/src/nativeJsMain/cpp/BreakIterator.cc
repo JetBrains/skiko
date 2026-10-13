@@ -1,6 +1,9 @@
-#include "unicode/ubrk.h"
 #include "common.h"
 #include <iostream>
+
+#ifdef SKIKO_USE_ICU
+
+#include "unicode/ubrk.h"
 
 static void deleteBreakIterator(UBreakIterator* instance) {
   ubrk_close(instance);
@@ -111,3 +114,45 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nSetText
     errorCode[0] = status;
     return reinterpret_cast<KNativePointer>(text);
 }
+#else
+
+// ICU is excluded from this binary, so the ICU break iterator subsystem is not
+// available. The exported symbols are kept (the JS glue code references them),
+// but they report a failure so that the Kotlin side can fall back to
+// `WebBreakIteratorProvider`, which is based on the browser `Intl.Segmenter`.
+//
+// U_UNSUPPORTED_ERROR of ICU's UErrorCode enum.
+static const KInt kUnsupportedError = 16;
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nGetFinalizer() {
+    return nullptr;
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nMake
+  (KInt type, KInteropPointer localeStr, KInt* errorCode) {
+    errorCode[0] = kUnsupportedError;
+    return nullptr;
+}
+
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nCurrent(KNativePointer ptr) { return -1; }
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nNext(KNativePointer ptr) { return -1; }
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nPrevious(KNativePointer ptr) { return -1; }
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nFirst(KNativePointer ptr) { return -1; }
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nLast(KNativePointer ptr) { return -1; }
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nPreceding(KNativePointer ptr, KInt offset) { return -1; }
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nFollowing(KNativePointer ptr, KInt offset) { return -1; }
+SKIKO_EXPORT KBoolean org_jetbrains_skia_BreakIterator__1nIsBoundary(KNativePointer ptr, KInt offset) { return false; }
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nGetRuleStatus(KNativePointer ptr) { return 0; }
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen(KNativePointer ptr) { return 0; }
+
+SKIKO_EXPORT void org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
+  (KNativePointer ptr, KInteropPointer result, KInt len) {
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nSetText
+  (KNativePointer ptr, KChar* textArr, KInt len, KInt* errorCode) {
+    errorCode[0] = kUnsupportedError;
+    return nullptr;
+}
+
+#endif  // SKIKO_USE_ICU
