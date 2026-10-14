@@ -34,10 +34,8 @@ import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
-import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import projectDirs
 import registerOrGetSkiaDirProvider
 import resolveSdkDir
@@ -165,34 +163,6 @@ fun SkikoProjectContext.declareWasiTasks() {
                     "generated/emscriptenWebGLLibs/webMain/pre-setup.mjs"
                 )
             )
-        }.also { taskProvider ->
-//            val wasmWasiTarget = project.extensions.findByType(KotlinMultiplatformExtension::class.java)
-//                ?.targets?.findByName("wasmWasi") as? KotlinJsIrTarget
-//            wasmWasiTarget?.compilations?.named("main")?.configure {
-//                compileTaskProvider.configure {
-//                    dependsOn(taskProvider)
-//                    inputs.file(taskProvider.flatMap { it.outputFile })
-//                        .withPathSensitivity(PathSensitivity.RELATIVE)
-//                }
-//            }
-//            listOf(/*"compileKotlinJs", */"compileKotlinWasmJs").forEach { taskName ->
-//                project.tasks.named(taskName).configure {
-//                    dependsOn(taskProvider)
-//                    inputs.file(
-//                        taskProvider.flatMap { it.outputFile }
-//                    ).withPathSensitivity(PathSensitivity.RELATIVE)
-//                }
-//            }
-//            project.tasks.matching {
-//                it.name in listOf("compileKotlinJs", "compileKotlinWasmJs")
-//            }.configureEach {
-//                // The compiler plugin reads generatedPreSetupMjs while producing setup.mjs.
-//                dependsOn(taskProvider)
-//
-//                inputs.file(
-//                    taskProvider.flatMap { it.outputFile }
-//                ).withPathSensitivity(PathSensitivity.RELATIVE)
-//            }
         }
     } else {
         null

@@ -323,32 +323,6 @@ kotlin {
     if (supportNativeWasm) {
         skikoProjectContext.declareWasiTasks()
 
-//        js {
-//            outputModuleName.set("skiko-kjs") // override the name to avoid name collision with a different skiko.js file
-//            browser {
-//                testTask {
-//                    useKarma {
-//                        useChromeHeadless()
-//                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
-//                    }
-//                }
-//            }
-//            binaries.executable()
-//            generateVersion(OS.Wasm, Arch.Wasm, skiko)
-//
-//            val test by compilations.getting
-//
-//            project.tasks.named<Copy>(test.processResourcesTaskName) {
-//                dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
-//            }
-//
-//            setupImportsGeneratorPlugin(
-//                skikoArtifacts.artifactIdPrefix,
-//                isSideModule = skikoProjectContext.kind == SkikoModuleKind.EXTENSION
-//            )
-//        }
-
-
         @OptIn(ExperimentalWasmDsl::class)
         wasmJs {
             outputModuleName.set("skiko-kjs-wasm") // override the name to avoid name collision with a different skiko.js file
