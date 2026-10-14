@@ -356,16 +356,13 @@ fun SkikoProjectContext.declareWasiTasks() {
     val linkWasi by project.tasks.registering(LinkSkikoWasmTask::class) {
         dependsOn(
             kotlin.wasmJs().compilations["main"].compileTaskProvider,
-//            kotlin.wasmJs().compilations["main"].compileTaskProvider
         )
         if (skiko.includeTestHelpers) {
             dependsOn(
                 kotlin.wasmJs().compilations["test"].compileTaskProvider,
-//                kotlin.wasmWasi().compilations["test"].compileTaskProvider
             )
         }
 
-        buildSuffix.set("es6")
         emccOutputFileName.set(if (isSideModule) "$libBaseName.unoptimized.wasm" else "skiko.unoptimized.mjs") // this determines the name .wasm file too
         libOutputFileName.set("$libBaseName.unoptimized.wasm")
         val prefixPath = if (isSideModule) {
@@ -376,34 +373,8 @@ fun SkikoProjectContext.declareWasiTasks() {
         configureCommon(prefixPath)
     }
 
-    val linkWasiD8WithES6 by project.tasks.registering(LinkSkikoWasmTask::class) {
-        dependsOn(
-            kotlin.wasmJs().compilations["main"].compileTaskProvider,
-//            kotlin.wasmWasi().compilations["main"].compileTaskProvider
-        )
-        if (skiko.includeTestHelpers) {
-            dependsOn(
-                kotlin.wasmJs().compilations["test"].compileTaskProvider,
-//                kotlin.wasmWasi().compilations["test"].compileTaskProvider
-            )
-        }
-
-        buildSuffix.set("d8")
-        emccOutputFileName.set(if (isSideModule) "${libBaseName}d8.unoptimized.wasm" else "skikod8.unoptimized.mjs") // this determines the name .wasm file too
-        libOutputFileName.set("${libBaseName}d8.unoptimized.wasm")
-
-        val prefixPath = if (isSideModule) {
-            project.sideModuleSetupMjs(libBaseName).normalize().absolutePath
-        } else {
-            project.setupMjs.normalize().absolutePath
-        }
-        configureCommon(prefixPath)
-    }
-
-    fun OptimizeSkikoWasmTask.configureCommonOptimize(
-        linkTask: TaskProvider<LinkSkikoWasmTask>,
-        nameSuffix: String = ""
-    ) {
+    val optimizeWasi by project.tasks.registering(OptimizeSkikoWasmTask::class) {
+        dependsOn(linkWasi)
         dependsOn(setupEmscripten)
         buildTargetOS.set(OS.NativeWasm)
         buildTargetArch.set(Arch.Wasm)
@@ -411,8 +382,8 @@ fun SkikoProjectContext.declareWasiTasks() {
 
         val wasmOptName = if (System.getProperty("os.name").startsWith("Win")) "wasm-opt.exe" else "wasm-opt"
         optimizer.set(emscriptenBinaryToolPath(wasmOptName))
-        inputDir.set(linkTask.flatMap { it.outDir })
-        libOutputFileName.set("$libBaseName$nameSuffix")
+        inputDir.set(linkWasi.flatMap { it.outDir })
+        libOutputFileName.set(libBaseName)
 
         flags.addAll(
             buildList {
@@ -435,18 +406,6 @@ fun SkikoProjectContext.declareWasiTasks() {
         )
     }
 
-    val optimizeWasi by project.tasks.registering(OptimizeSkikoWasmTask::class) {
-        dependsOn(linkWasi)
-        buildSuffix.set("es6")
-        configureCommonOptimize(linkWasi)
-    }
-
-    val optimizeWasiD8 by project.tasks.registering(OptimizeSkikoWasmTask::class) {
-        dependsOn(linkWasiD8WithES6)
-        buildSuffix.set("d8")
-        configureCommonOptimize(linkWasiD8WithES6, "d8")
-    }
-
     // skikoWasmJar is used by task name
     val skikoWasiJar by project.tasks.registering(Jar::class) {
         // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
@@ -461,13 +420,6 @@ fun SkikoProjectContext.declareWasiTasks() {
         from(optimizeWasi) {
             include("$libBaseName.wasm")
             include("*.mjs")
-        }
-
-        from(optimizeWasiD8) {
-            include("*.mjs")
-            filesMatching("*.mjs") {
-                filter { it.replace("${libBaseName}d8.wasm", "$libBaseName.wasm") }
-            }
         }
 
         archiveBaseName.set("skiko-wasm")
