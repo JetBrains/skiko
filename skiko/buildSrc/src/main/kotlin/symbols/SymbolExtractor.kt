@@ -35,7 +35,7 @@ internal class SymbolExtractor(
                     .mapTo(mutableSetOf()) { it.name }
             }
 
-            OS.Wasm -> error("Symbol extraction does not support ${os.name} target")
+            OS.Wasm, OS.NativeWasm -> error("Symbol extraction does not support ${os.name} target")
         }
     }
 

@@ -139,6 +139,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
         args.createArgFile(commonArgsFile)
         logArgs("Compiler args", args, commonArgsFile)
 
+        val isClang = File(compiler.get()).name.startsWith("clang")
         for ((sourceFile, outputFile) in sourceOutputPairs) {
             val workId = "Compiling '${sourceFile.absolutePath}'"
             submittedWorks.add(workId)
@@ -147,7 +148,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
                 // Replace slash for Windows paths
                 arg("-o", outputFile.absolutePath.replace("\\", "/"))
                 arg(value = sourceFile.absolutePath.replace("\\", "/"))
-                if (compiler.get().startsWith("clang")) {
+                if (isClang) {
                     // We use Clang-CL on Windows which doesn't directly support the -MJ flag.
                     // We have to use the /clang:-MJ"path" form instead.
                     when {
@@ -189,12 +190,17 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
             }
 
             // Create compile_commands.json to be able to open the project in Fleet. It is CLang convention (https://clang.llvm.org/docs/JSONCompilationDatabase.html#build-system-integration)
-            if (compiler.get().startsWith("clang")) {
+            if (isClang) {
                 val compileCommands = buildString {
                     appendLine("[")
-                    append(sourceOutputPairs.joinToString(",\n") { (_, outputFile) ->
-                        Files.readString(Path.of(outputFile.absolutePath + ".json")).trim().removeSuffix(",")
-                    })
+                    append(
+                        sourceOutputPairs.mapNotNull { (_, outputFile) ->
+                            val jsonFile = Path.of(outputFile.absolutePath + ".json")
+                            if (Files.exists(jsonFile)) {
+                                Files.readString(jsonFile).trim().removeSuffix(",")
+                            } else null
+                        }.joinToString(",\n")
+                    )
                     appendLine("]")
                 }
                 Files.writeString(outDir.toPath().resolve("compile_commands.json"), compileCommands)

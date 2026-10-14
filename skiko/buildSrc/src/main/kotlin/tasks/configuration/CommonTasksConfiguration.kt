@@ -128,6 +128,10 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
             "-DSKIKO_WASM",
             "-sSUPPORT_LONGJMP=wasm"
         )
+        OS.NativeWasm -> listOf(
+            "-DSKIKO_WASI",
+            "-DSK_DISABLE_TRACING"
+        )
         OS.Android -> listOf(
             "-DSK_BUILD_FOR_ANDROID",
             "-DSK_VULKAN"

@@ -16,8 +16,10 @@ abstract class LinkSkikoWasmTask : LinkSkikoTask() {
 
     override fun configureArgs() =
         super.configureArgs().apply {
-            arg("-o", outDir.resolveToIoFile(emccOutputFileName))
-            // https://emscripten.org/docs/tools_reference/emcc.html
-            repeatedArg("--extern-post-js", externPostJs.files)
+            if (buildTargetOS.get() != OS.NativeWasm) {
+                arg("-o", outDir.resolveToIoFile(emccOutputFileName))
+                // https://emscripten.org/docs/tools_reference/emcc.html
+                repeatedArg("--extern-post-js", externPostJs.files)
+            }
         }
 }

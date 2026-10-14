@@ -308,7 +308,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
                 "-fPIC"
             )
         }
-        OS.Wasm, OS.IOS, OS.TVOS -> error("Should not reach here")
+        OS.Wasm, OS.NativeWasm, OS.IOS, OS.TVOS -> error("Should not reach here")
     }
 
     flags.set(
@@ -604,7 +604,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
             osFlags = androidFlags.toTypedArray()
             linker.set(project.androidClangFor(targetArch))
         }
-        OS.Wasm, OS.IOS, OS.TVOS -> {
+        OS.Wasm, OS.NativeWasm, OS.IOS, OS.TVOS -> {
             throw GradleException("This task shalln't be used with $targetOs")
         }
     }

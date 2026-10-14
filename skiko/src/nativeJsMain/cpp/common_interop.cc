@@ -338,7 +338,43 @@ namespace skija {
 
 // Callback support
 
-#ifdef __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__ || __wasm__
+
+#ifdef __wasm__
+
+extern "C" {
+    void _releaseCallback(KInteropPointer cb);
+    KBoolean _callBooleanCallback(KInteropPointer cb);
+    KInt _callIntCallback(KInteropPointer cb);
+    KNativePointer _callNativePointerCallback(KInteropPointer cb);
+    void _callVoidCallback(KInteropPointer cb);
+}
+
+void disposeCallback(KInteropPointer cb) {
+    _releaseCallback(cb);
+}
+
+KBoolean callBooleanCallback(KInteropPointer cb) {
+    return _callBooleanCallback(cb);
+}
+
+KInt callIntCallback(KInteropPointer cb) {
+    return _callIntCallback(cb);
+}
+
+KNativePointer callNativePointerCallback(KInteropPointer cb) {
+    return _callNativePointerCallback(cb);
+}
+
+KInteropPointer callInteropPointerCallback(KInteropPointer cb) {
+    return reinterpret_cast<KInteropPointer>(_callNativePointerCallback(cb));
+}
+
+void callVoidCallback(KInteropPointer cb) {
+    _callVoidCallback(cb);
+}
+
+#else
 
 void disposeCallback(KInteropPointer cb) {
     EM_ASM({ _releaseCallback($0) }, cb);
@@ -378,6 +414,7 @@ void callVoidCallback(KInteropPointer cb) {
     }, cb);
 }
 
+#endif // __wasm__
 
 SKIKO_EXPORT KByte skia_memGetByte(KByte* address) { return *address; }
 SKIKO_EXPORT void skia_memSetByte(KByte* address, KByte value) { address[0] = value; }

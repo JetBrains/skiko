@@ -96,7 +96,9 @@ fun SkikoProjectContext.declarePublications() {
         ctx.configureAwtPublicationConstraints()
     }
     ctx.configureAdditionalRuntimeLibrariesPublication()
-    ctx.configureWebPublication()
+    if (project.supportWeb) {
+        ctx.configureWebPublication()
+    }
     ctx.configureAndroidPublication()
 
     ctx.configurePomNames()

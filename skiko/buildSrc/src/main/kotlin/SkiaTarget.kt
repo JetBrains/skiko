@@ -7,7 +7,8 @@ enum class SkiaTarget(
     MACOS("macos", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
     WINDOWS("windows", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
     LINUX("linux", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
-    WASM("wasm", listOf("-P${SkikoGradleProperties.WASM_ENABLED}=true", "-P${SkikoGradleProperties.AWT_ENABLED}=false"));
+    WASM("wasm", listOf("-P${SkikoGradleProperties.WASM_ENABLED}=true", "-P${SkikoGradleProperties.AWT_ENABLED}=false")),
+    NATIVE_WASM("native_wasm", listOf("-P${SkikoGradleProperties.NATIVE_WASM_ENABLED}=true", "-P${SkikoGradleProperties.AWT_ENABLED}=false"));
 
     private val Arch.gradleProperty: String
         get() = when (this) {
@@ -30,6 +31,7 @@ enum class SkiaTarget(
         WINDOWS -> listOf(hostArch)
         LINUX -> listOf(hostArch)
         WASM -> listOf(hostArch)
+        NATIVE_WASM -> listOf(hostArch)
     }
 
     fun getGradleFlags(hostArch: Arch): List<String> {
@@ -49,8 +51,9 @@ enum class SkiaTarget(
             "windows" -> WINDOWS
             "linux" -> LINUX
             "wasm" -> WASM
+            "wasm_non_browser" -> NATIVE_WASM
             else -> throw IllegalArgumentException(
-                "Unknown SKIA_TARGET: $target. Valid targets: ios, iosSim, macos, windows, linux, wasm"
+                "Unknown SKIA_TARGET: $target. Valid targets: ios, iosSim, macos, windows, linux, wasm, wasm_non_browser"
             )
         }
     }

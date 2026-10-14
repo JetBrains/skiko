@@ -3,21 +3,21 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinHierarchyTemplate
 
-val SkikoProjectContext.jvmMainSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("jvmMain") else null
+val SkikoProjectContext.jvmMainSourceSet get() = if (project.supportAwt) kotlin.sourceSets.findByName("jvmMain") else null
 
-val SkikoProjectContext.jvmTestSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("jvmTest") else null
+val SkikoProjectContext.jvmTestSourceSet get() = if (project.supportAwt) kotlin.sourceSets.findByName("jvmTest") else null
 
-val SkikoProjectContext.awtMainSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("awtMain") else null
+val SkikoProjectContext.awtMainSourceSet get() = if (project.supportAwt) kotlin.sourceSets.findByName("awtMain") else null
 
-val SkikoProjectContext.awtTestSourceSet get() = if (project.supportAwt) kotlin.sourceSets.getByName("awtTest") else null
+val SkikoProjectContext.awtTestSourceSet get() = if (project.supportAwt) kotlin.sourceSets.findByName("awtTest") else null
 
-val SkikoProjectContext.androidMainSourceSet get() = if (project.supportAndroid) kotlin.sourceSets.getByName("androidMain") else null
+val SkikoProjectContext.androidMainSourceSet get() = if (project.supportAndroid) kotlin.sourceSets.findByName("androidMain") else null
 
-val SkikoProjectContext.webMainSourceSet get() = if (project.supportWeb) kotlin.sourceSets.getByName("webMain") else null
+val SkikoProjectContext.webMainSourceSet get() = if (project.supportWeb || project.supportNativeWasm) kotlin.sourceSets.findByName("webMain") else null
 
-val SkikoProjectContext.webTestSourceSet get() = if (project.supportWeb) kotlin.sourceSets.getByName("webTest") else null
+val SkikoProjectContext.webTestSourceSet get() = if (project.supportWeb || project.supportNativeWasm) kotlin.sourceSets.findByName("webTest") else null
 
-val SkikoProjectContext.wasmJsTest get() = if (project.supportWeb) kotlin.sourceSets.getByName("wasmJsTest") else null
+val SkikoProjectContext.wasmJsTestSourceSet get() = if (project.supportWeb || project.supportNativeWasm) kotlin.sourceSets.findByName("wasmJsTest") else null
 
 val skikoSourceSetHierarchyTemplate = KotlinHierarchyTemplate {
     common {
@@ -57,6 +57,7 @@ val skikoSourceSetHierarchyTemplate = KotlinHierarchyTemplate {
         group("nativeJs") {
             group("web")
             group("native")
+            withWasmWasi()
         }
     }
 }

@@ -28,8 +28,13 @@ if (supportAndroid) {
     apply(plugin = "com.android.kotlin.multiplatform.library")
 }
 
-apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
-apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
+if (supportNativeWasm) {
+    apply<WasiImportsGeneratorCompilerPluginSupportPlugin>()
+    apply<WasiImportsGeneratorForTestCompilerPluginSupportPlugin>()
+} else {
+    apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
+    apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
+}
 
 val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
@@ -162,19 +167,37 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "skcms",
                 "brotli",
             )
-            linkFlags(
-                "-s", "MAIN_MODULE=2",
-                "-s", "AUTOLOAD_DYLIBS=0",
-                "-l", "GL",
-                "-s", "MAX_WEBGL_VERSION=2",
-                "-s", "MIN_WEBGL_VERSION=2",
-                "-s", "MODULARIZE=1",
-                "-s", "EXPORT_ES6=1",
-                "-s", "EXPORT_NAME=loadSkikoWASM",
-                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
-                "-s", "STACK_SIZE=1048576", // 1 MB
-                "--bind",
-            )
+            if (supportNativeWasm) {
+                linkFlags(
+                    "-lsetjmp", // Links setjmp support for non-local jumps.
+                    "-lwasi-emulated-mman", // Links WASI mmap/munmap emulation.
+                    "-lwasi-emulated-signal", // Links WASI signal handling emulation.
+                    "-lwasi-emulated-process-clocks", // Links WASI process clock emulation.
+                    "-lwasi-emulated-getpid", // Links WASI getpid emulation.
+                    "-mllvm", // Passes the next option through to LLVM.
+                    "-wasm-enable-sjlj", // Enables setjmp/longjmp support for WebAssembly.
+                    "-mexception-handling", // Enables WebAssembly exception handling.
+                    "-fuse-ld=lld", // Uses LLVM lld as the linker.
+                    "-Wl,--gc-sections", // Removes unused sections during linking.
+                    "-Wl,--no-entry", // Builds a module without a start entry point.
+                    "-Wl,--error-limit=0", // Reports all linker errors without a limit.
+                    "-Wl,-z,stack-size=1048576", // Sets the stack size to 1 MB.
+                )
+            } else {
+                linkFlags(
+                    "-s", "MAIN_MODULE=2",
+                    "-s", "AUTOLOAD_DYLIBS=0",
+                    "-l", "GL",
+                    "-s", "MAX_WEBGL_VERSION=2",
+                    "-s", "MIN_WEBGL_VERSION=2",
+                    "-s", "MODULARIZE=1",
+                    "-s", "EXPORT_ES6=1",
+                    "-s", "EXPORT_NAME=loadSkikoWASM",
+                    "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
+                    "-s", "STACK_SIZE=1048576", // 1 MB
+                    "--bind",
+                )
+            }
         }
     }
 }
@@ -297,6 +320,65 @@ kotlin {
         }
     }
 
+    if (supportNativeWasm) {
+        skikoProjectContext.declareWasiTasks()
+
+//        js {
+//            outputModuleName.set("skiko-kjs") // override the name to avoid name collision with a different skiko.js file
+//            browser {
+//                testTask {
+//                    useKarma {
+//                        useChromeHeadless()
+//                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
+//                    }
+//                }
+//            }
+//            binaries.executable()
+//            generateVersion(OS.Wasm, Arch.Wasm, skiko)
+//
+//            val test by compilations.getting
+//
+//            project.tasks.named<Copy>(test.processResourcesTaskName) {
+//                dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
+//            }
+//
+//            setupImportsGeneratorPlugin(
+//                skikoArtifacts.artifactIdPrefix,
+//                isSideModule = skikoProjectContext.kind == SkikoModuleKind.EXTENSION
+//            )
+//        }
+
+
+        @OptIn(ExperimentalWasmDsl::class)
+        wasmJs {
+            outputModuleName.set("skiko-kjs-wasm") // override the name to avoid name collision with a different skiko.js file
+            browser {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
+                    }
+                }
+            }
+            generateVersion(OS.NativeWasm, Arch.Wasm, skiko)
+
+            val test by compilations.getting
+
+            project.tasks.named<Copy>(test.processResourcesTaskName) {
+                if (project.tasks.names.contains("compileTestKotlinJs")) {
+                    dependsOn(test.compileTaskProvider, tasks["compileTestKotlinJs"])
+                } else {
+                    dependsOn(test.compileTaskProvider)
+                }
+            }
+
+            setupWasiImportsGeneratorPlugin(
+                skikoArtifacts.artifactIdPrefix,
+                isSideModule = false
+            )
+        }
+    }
+
     if (supportNativeMac) {
         skikoProjectContext.configureNativeTarget(OS.MacOS, Arch.X64, macosX64())
         skikoProjectContext.configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
@@ -369,12 +451,13 @@ kotlin {
     }
 
     skikoProjectContext.webTestSourceSet?.apply {
+        val optimizeTaskName = if (supportWeb) "optimizeWasm" else "optimizeWasi"
         resources.srcDirs(
-            tasks.named("optimizeWasm"), wasmImports
+            tasks.named(optimizeTaskName), wasmImports
         )
     }
 
-    skikoProjectContext.wasmJsTest?.dependencies {
+    skikoProjectContext.wasmJsTestSourceSet?.dependencies {
         implementation(kotlin("test-wasm-js"))
     }
 

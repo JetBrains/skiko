@@ -60,6 +60,12 @@ kotlin {
         }
     }
 
+    if (supportNativeWasm) {
+        wasmJs {
+            browser()
+        }
+    }
+
     if (supportNativeMac) {
         macosX64()
         macosArm64()

@@ -55,7 +55,7 @@ class SkikoProjectContext(
         val prefix = if (os == OS.Windows) "" else "lib"
         val suffix = when (os) {
             OS.Windows -> ".lib"
-            OS.Wasm -> ".wasm.a"
+            OS.Wasm, OS.NativeWasm -> ".wasm.a"
             else -> ".a"
         }
 
@@ -97,6 +97,7 @@ fun SkikoProjectContext.declareSkiaTasks() {
         "tvos" to listOf("arm64"),
         "tvosSim" to listOf("arm64", "x64"),
         "wasm" to listOf("wasm"),
+        "native_wasm" to listOf("wasm"),
         "windows" to listOf("arm64", "x64"),
     ).forEach { (config, architectures) ->
         architectures.forEach { arch ->
@@ -229,6 +230,9 @@ val Project.supportAnyNative: Boolean
 
 val Project.supportWeb: Boolean
     get() = findProperty(SkikoGradleProperties.WASM_ENABLED) == "true" || isInIdea
+
+val Project.supportNativeWasm: Boolean
+    get() = findProperty(SkikoGradleProperties.NATIVE_WASM_ENABLED) == "true" || isInIdea
 
 fun Project.skiaVersion(target: String): String {
     val platformSpecificVersion = "dependencies.skia.$target"

@@ -413,3 +413,43 @@ jobs:
           paths: |
             ./skiko/**/build/test-results/**/TEST-*.xml
         if: always()
+
+  wasm-non-browser:
+    name: 'WASI / Non-browser WASM'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        name: 'Check out code'
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - shell: bash
+        name: 'Run WASI Tests'
+        working-directory: skiko
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            -Pskiko.wasi.enabled=true \
+            -Dskiko.test.onci=true \
+            wasmWasiTest
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-reports-wasi
+          path: |
+            ./skiko/**/build/reports/tests
+          retention-days: 5
+
+      - uses: test-summary/action@v2
+        name: 'Test Summary'
+        with:
+          paths: |
+            ./skiko/**/build/test-results/**/TEST-*.xml
+        if: always()

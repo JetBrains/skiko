@@ -18,6 +18,7 @@ class ImportGeneratorRegistrar : CompilerPluginRegistrar() {
                 configuration.get(ImportGeneratorConfigurationKeys.PATH)!!,
                 configuration.get(ImportGeneratorConfigurationKeys.PREFIX),
                 configuration.get(ImportGeneratorConfigurationKeys.REEXPORT_PATH),
+                configuration.get(ImportGeneratorConfigurationKeys.EXPORTS_PATH),
                 configuration.get(ImportGeneratorConfigurationKeys.MODULE_NAME)!!
             )
         )

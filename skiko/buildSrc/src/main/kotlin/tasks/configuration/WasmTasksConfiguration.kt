@@ -26,11 +26,13 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import projectDirs
 import registerOrGetSkiaDirProvider
+import resolveSdkDir
 import supportWeb
 import wasmImports
 import wasmImport
@@ -60,23 +62,39 @@ fun SkikoProjectContext.declareWasmTasks() {
     }
     val isSideModule = kind == SkikoModuleKind.EXTENSION
 
-    val emsdkVersion = project.findProperty("skiko.emsdk.version") ?:
-        throw GradleException("skiko.emsdk.version property is not set")
-    val setupEmscripten by project.tasks.registering(SetupEmscriptenTask::class) {
-        this.emsdkVersion.set(emsdkVersion.toString())
-        project.findProperty("skiko.emsdk.dir")?.toString()?.let {
-            emsdkDir.set(project.layout.dir(project.provider { project.resolveEmsdkDir(it) }))
-            requireExistingEmsdk.set(true)
+//    val emsdkVersion = project.findProperty("skiko.emsdk.version") ?:
+//        throw GradleException("skiko.emsdk.version property is not set")
+//    val setupEmscripten by project.tasks.registering(SetupEmscriptenTask::class) {
+//        sdkVersion.set(emsdkVersion.toString())
+//        project.findProperty("skiko.emsdk.dir")?.toString()?.let {
+//            sdkDir.set(project.layout.dir(project.provider { project.resolveEmsdkDir(it) }))
+//            requireExistingSdk.set(true)
+//        }
+
+    val setupEmscripten: TaskProvider<SetupEmscriptenTask> =
+        if (project.tasks.names.contains("setupEmscripten")) {
+            project.tasks.named<SetupEmscriptenTask>("setupEmscripten")
+        } else {
+            val emsdkVersion = project.findProperty("skiko.emsdk.version")
+                ?: throw GradleException("skiko.emsdk.version property is not set")
+            project.tasks.register<SetupEmscriptenTask>("setupEmscripten") {
+                sdkVersion.set(emsdkVersion.toString())
+                project.findProperty("skiko.emsdk.dir")?.toString()?.let {
+                    sdkDir.set(project.layout.dir(project.provider {
+                        project.resolveSdkDir(it)
+                    }))
+                    requireExistingSdk.set(true)
+                }
+            }
         }
-    }
 
     fun emscriptenToolPath(toolName: String) =
-        setupEmscripten.flatMap { it.emsdkDir.dir("upstream/emscripten") }.map {
+        setupEmscripten.flatMap { it.sdkDir.dir("upstream/emscripten") }.map {
             it.file(toolName).asFile.absolutePath
         }
 
     fun emscriptenBinaryToolPath(toolName: String) =
-        setupEmscripten.flatMap { it.emsdkDir.dir("upstream/bin") }.map {
+        setupEmscripten.flatMap { it.sdkDir.dir("upstream/bin") }.map {
             it.file(toolName).asFile.absolutePath
         }
 
@@ -260,7 +278,7 @@ fun SkikoProjectContext.declareWasmTasks() {
         configureCommonOptimize(linkWasmD8WithES6, "d8")
     }
 
-    // skikoWasmJar is used by task name
+// skikoWasmJar is used by task name
     val skikoWasmJar by project.tasks.registering(Jar::class) {
         // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
         from(project.setupReexportMjs(libBaseName).parentFile) {
@@ -432,7 +450,7 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
         SubpluginArtifact(SkikoArtifacts.DEFAULT_GROUP_ID, IMPORT_GENERATOR)
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
-        return ((kotlinCompilation.platformType == KotlinPlatformType.wasm) || (kotlinCompilation.platformType == KotlinPlatformType.js))
+        return (kotlinCompilation.target.name == "wasmJs" || kotlinCompilation.target.name == "js")
                 && kotlinCompilation.name == compilationName
     }
 }

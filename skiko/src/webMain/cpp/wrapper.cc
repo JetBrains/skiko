@@ -1,3 +1,4 @@
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #include "webgl/webgl1.h"
@@ -11,3 +12,4 @@ EMSCRIPTEN_WEBGL_CONTEXT_HANDLE createContext(char* id) {
     emscripten_webgl_make_context_current(ctx);
     return ctx;
 }
+#endif // __EMSCRIPTEN__

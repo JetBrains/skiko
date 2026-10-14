@@ -254,7 +254,7 @@ kotlin {
         }
     }
 
-    skikoSkottieProjectContext.wasmJsTest?.dependencies {
+    skikoSkottieProjectContext.wasmJsTestSourceSet?.dependencies {
         implementation(kotlin("test-wasm-js"))
     }
     skikoSkottieProjectContext.webTestSourceSet?.dependencies {

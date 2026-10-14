@@ -129,9 +129,11 @@ KNativePointer ptrToInterop(T* ptr) {
 [[ noreturn ]] void TODO(const char*);
 void SKIKO_ASSERT(bool, const char*);
 
-#ifdef SKIKO_WASM
+#if defined(SKIKO_WASM) && defined(__EMSCRIPTEN__)
 #include <emscripten.h>
 #define SKIKO_EXPORT EMSCRIPTEN_KEEPALIVE extern "C"
+#elif defined(SKIKO_WASI) || (defined(__wasm__) && !defined(__EMSCRIPTEN__))
+#define SKIKO_EXPORT extern "C" __attribute__((visibility("default"), used))
 #else
 #define SKIKO_EXPORT extern "C"
 #endif

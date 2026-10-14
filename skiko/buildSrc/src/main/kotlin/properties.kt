@@ -13,6 +13,7 @@ enum class OS(
     Windows("windows", arrayOf()),
     MacOS("macos", arrayOf("-mmacosx-version-min=11.0")),
     Wasm("wasm", arrayOf()),
+    NativeWasm("native_wasm", arrayOf()),
     IOS("ios", arrayOf()),
     TVOS("tvos", arrayOf())
     ;
@@ -36,7 +37,7 @@ val OS.isCompatibleWithHost: Boolean
         OS.Linux -> hostOs == OS.Linux
         OS.Windows -> hostOs == OS.Windows
         OS.MacOS, OS.IOS, OS.TVOS -> hostOs == OS.MacOS
-        OS.Wasm -> true
+        OS.Wasm, OS.NativeWasm -> true
         OS.Android -> true
     }
 
@@ -52,6 +53,7 @@ fun compilerForTarget(os: OS, arch: Arch): String =
         OS.Windows -> "clang-cl.exe"
         OS.MacOS, OS.IOS, OS.TVOS -> "clang++"
         OS.Wasm -> if (Os.isFamily(Os.FAMILY_WINDOWS)) "emcc.bat" else "emcc"
+        OS.NativeWasm -> "clang++"
     }
 
 fun linkerForTarget(os: OS, arch: Arch): String =
@@ -62,7 +64,7 @@ val OS.dynamicLibExt: String
         OS.Linux, OS.Android -> ".so"
         OS.Windows -> ".dll"
         OS.MacOS, OS.IOS, OS.TVOS -> ".dylib"
-        OS.Wasm -> ".wasm"
+        OS.Wasm, OS.NativeWasm -> ".wasm"
     }
 
 
@@ -271,6 +273,7 @@ object SkikoGradleProperties {
     const val KOTLIN_API_VERSION = "skiko.kotlin.api.version"
     const val AWT_ENABLED = "skiko.awt.enabled"
     const val WASM_ENABLED = "skiko.wasm.enabled"
+    const val NATIVE_WASM_ENABLED = "skiko.native_wasm.enabled"
     const val ANDROID_ENABLED = "skiko.android.enabled"
     const val NATIVE_ENABLED = "skiko.native.enabled"
     const val NATIVE_IOS = "skiko.native.ios"
@@ -299,6 +302,7 @@ class SkikoArtifacts(
     val jsArtifactId = "$artifactIdPrefix-js"
     // an artifact (klib) for k/wasm targets
     val wasmArtifactId = "$artifactIdPrefix-wasm-js"
+    val wasmWasiArtifactId = "$artifactIdPrefix-wasmwasi"
     fun jvmRuntimeArtifactIdFor(os: OS, arch: Arch) =
         if (os == OS.Android)
             "$artifactIdPrefix-android-runtime-${arch.id}"

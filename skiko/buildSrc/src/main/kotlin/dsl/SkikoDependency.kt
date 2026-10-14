@@ -25,7 +25,7 @@ val OS.validEnvs: List<TargetEnv>
         OS.MacOS, OS.Linux -> listOf(TargetEnv.JVM, TargetEnv.NATIVE)
         OS.Windows, OS.Android -> listOf(TargetEnv.JVM)
         OS.IOS, OS.TVOS -> listOf(TargetEnv.NATIVE)
-        OS.Wasm -> listOf(TargetEnv.WASM)
+        OS.Wasm, OS.NativeWasm -> listOf(TargetEnv.WASM)
     }
 
 class BinaryRegistry {
@@ -180,6 +180,7 @@ class EnvScope internal constructor(
     fun ios(configure: OSScope.() -> Unit) = applyIfValid(OS.IOS, configure)
     fun tvos(configure: OSScope.() -> Unit) = applyIfValid(OS.TVOS, configure)
     fun wasm(configure: OSScope.() -> Unit) = applyIfValid(OS.Wasm, configure)
+    fun nativeWasm(configure: OSScope.() -> Unit) = applyIfValid(OS.NativeWasm, configure)
 
     private fun applyIfValid(os: OS, configure: OSScope.() -> Unit) {
         if (env in os.validEnvs) {
