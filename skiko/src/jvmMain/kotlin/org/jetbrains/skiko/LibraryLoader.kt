@@ -63,6 +63,9 @@ class LibraryLoader internal constructor(
         }
     }
 
+    private fun getModuleResourceAsStream(resourceName: String) =
+        Library::class.java.classLoader.getResourceAsStream(resourceName)
+
     private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
         val file = File(dest, resourceName)
         if (!file.exists()) {
@@ -71,8 +74,7 @@ class LibraryLoader internal constructor(
                 val tempFile = File.createTempFile("skiko", "", dest)
                 if (deleteOnExit)
                     file.deleteOnExit()
-                val resourceStream = Library::class.java.getResourceAsStream("/$resourceName")
-                    ?: Library::class.java.classLoader.getResourceAsStream(resourceName)
+                val resourceStream = getModuleResourceAsStream(resourceName)
                 resourceStream.use { input ->
                     Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
                 }
@@ -158,9 +160,7 @@ class LibraryLoader internal constructor(
 
         // Third try: look up in or extract to a local cache directory.
         // Key the cache by the hash of the library.
-        val hashResourceStream = Library::class.java.getResourceAsStream(
-            "/$platformName.sha256"
-        ) ?: Library::class.java.classLoader.getResourceAsStream(
+        val hashResourceStream = getModuleResourceAsStream(
             "$platformName.sha256"
         ) ?: throw LibraryLoadException(
             "Cannot find $platformName.sha256, proper native dependency missing."
