@@ -1,0 +1,837 @@
+[
+  {
+    "module": "env",
+    "name": "_releaseCallback",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "_callBooleanCallback",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "_callIntCallback",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "_callNativePointerCallback",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "_callVoidCallback",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "setjmp",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "longjmp",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glActiveTexture",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glAttachShader",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBeginQuery",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBindAttribLocation",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBindBuffer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBindFramebuffer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBindRenderbuffer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBindSampler",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBindTexture",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBindVertexArray",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBlendColor",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBlendEquation",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBlendFunc",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBlitFramebuffer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBufferData",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glBufferSubData",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glCheckFramebufferStatus",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glClear",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glClearColor",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glClearStencil",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glClientWaitSync",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glColorMask",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glCompileShader",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glCompressedTexImage2D",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glCompressedTexSubImage2D",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glCopyBufferSubData",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glCopyTexSubImage2D",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glCreateProgram",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glCreateShader",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glCullFace",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteBuffers",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteFramebuffers",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteProgram",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteQueries",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteRenderbuffers",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteSamplers",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteShader",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteSync",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteTextures",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDeleteVertexArrays",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDepthMask",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDisable",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDisableVertexAttribArray",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDrawArrays",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDrawArraysInstanced",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDrawBuffers",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDrawElements",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDrawElementsInstanced",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glDrawRangeElements",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glEnable",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glEnableVertexAttribArray",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glEndQuery",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glFenceSync",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glFinish",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glFlush",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glFramebufferRenderbuffer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glFramebufferTexture2D",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glFrontFace",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGenBuffers",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGenFramebuffers",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGenQueries",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGenRenderbuffers",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGenSamplers",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGenTextures",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGenVertexArrays",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGenerateMipmap",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetBufferParameteriv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetError",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetFloatv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetFramebufferAttachmentParameteriv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetIntegerv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetInternalformativ",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetProgramInfoLog",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetProgramiv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetQueryObjectuiv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetQueryiv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetRenderbufferParameteriv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetShaderInfoLog",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetShaderiv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetShaderPrecisionFormat",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetUniformLocation",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glInvalidateFramebuffer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glInvalidateSubFramebuffer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glIsSync",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glIsTexture",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glLineWidth",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glLinkProgram",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glPixelStorei",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glReadBuffer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glReadPixels",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glRenderbufferStorage",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glRenderbufferStorageMultisample",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glSamplerParameterf",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glSamplerParameteri",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glSamplerParameteriv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glScissor",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glShaderSource",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glStencilFunc",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glStencilFuncSeparate",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glStencilMask",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glStencilMaskSeparate",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glStencilOp",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glStencilOpSeparate",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glTexImage2D",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glTexParameterf",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glTexParameterfv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glTexParameteri",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glTexParameteriv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glTexStorage2D",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glTexSubImage2D",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform1f",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform1fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform1i",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform1iv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform2f",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform2fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform2i",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform2iv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform3f",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform3fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform3i",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform3iv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform4f",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform4fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform4i",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniform4iv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniformMatrix2fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniformMatrix3fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUniformMatrix4fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glUseProgram",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glVertexAttrib1f",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glVertexAttrib2fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glVertexAttrib3fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glVertexAttrib4fv",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glVertexAttribDivisor",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glVertexAttribIPointer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glVertexAttribPointer",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glViewport",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glWaitSync",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetString",
+    "kind": "function"
+  },
+  {
+    "module": "env",
+    "name": "glGetStringi",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "args_get",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "args_sizes_get",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "environ_get",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "environ_sizes_get",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "clock_time_get",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_close",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_fdstat_get",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_fdstat_set_flags",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_filestat_get",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_pread",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_prestat_get",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_prestat_dir_name",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_read",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_seek",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "fd_write",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "path_filestat_get",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "path_open",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "proc_exit",
+    "kind": "function"
+  },
+  {
+    "module": "wasi_snapshot_preview1",
+    "name": "random_get",
+    "kind": "function"
+  }
+]

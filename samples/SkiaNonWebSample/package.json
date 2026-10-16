@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "skiko-node-window": "node node-runner.mjs"
+  }
+}

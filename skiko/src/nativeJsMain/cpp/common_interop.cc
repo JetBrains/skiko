@@ -338,9 +338,9 @@ namespace skija {
 
 // Callback support
 
-#ifdef __EMSCRIPTEN__ || __wasm__
+#if defined(__EMSCRIPTEN__) || defined(__wasm__)
 
-#ifdef __wasm__
+#ifndef __EMSCRIPTEN__
 
 extern "C" {
     void _releaseCallback(KInteropPointer cb);

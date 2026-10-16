@@ -99,6 +99,9 @@ fun SkikoProjectContext.declarePublications() {
     if (project.supportWeb) {
         ctx.configureWebPublication()
     }
+    if (project.supportNativeWasm) {
+        ctx.configureNativeWasmPublication()
+    }
     ctx.configureAndroidPublication()
 
     ctx.configurePomNames()
@@ -438,6 +441,28 @@ private fun SkikoPublishingContext.configureWebPublication() {
                 attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
             }
             outgoing.artifact(project.tasks.named("skikoWasmJar")) {
+                classifier = "skiko-runtime"
+            }
+        }
+        addVariantToKotlinTarget(this, skikoWasmRuntimeConfig)
+    }
+}
+
+private fun SkikoPublishingContext.configureNativeWasmPublication() {
+    kotlin.targets.withType(KotlinJsIrTarget::class.java).all {
+        val skikoWasmRuntimeConfig = project.configurations.create("skikoWasmRuntimeElementsFor${toTitleCase(name)}") {
+            isCanBeConsumed = true
+            isCanBeResolved = false
+            attributes {
+                val runtimeConf = this@all.project.configurations.getByName(
+                    this@all.compilations.getByName("main").runtimeDependencyConfigurationName
+                )
+                runtimeConf.attributes.keySet().forEach {
+                    attribute(it as Attribute<Any>, runtimeConf.attributes.getAttribute(it) as Any)
+                }
+                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
+            }
+            outgoing.artifact(project.tasks.named("skikoWasiJar")) {
                 classifier = "skiko-runtime"
             }
         }

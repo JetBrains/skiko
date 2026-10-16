@@ -2,6 +2,101 @@
 
 let wasmExports = null;
 
+// Optional host for replacing Emscripten's WebGL adapters one function at a time.
+// A host function receives the original WebAssembly arguments. Pointer arguments
+// are therefore offsets into wasm memory, not native process pointers.
+let nativeGLHost = globalThis.__skikoNativeGL ?? globalThis.__skikoNativeHost ?? null;
+let nativeGLMemoryBuffer = null;
+const nativeGLCalls = new Set();
+const emscriptenGLFallbackCalls = new Set();
+
+export const setSkikoNativeGLHost = (host) => {
+    if (host !== null && (typeof host !== "object" && typeof host !== "function")) {
+        throw new TypeError("The Skiko native GL host must be an object, function, or null");
+    }
+
+    nativeGLHost = host;
+    nativeGLMemoryBuffer = null;
+    nativeGLRuntimeAttachedTo = null;
+};
+
+export const getSkikoGLImportUsage = () => ({
+    native: [...nativeGLCalls].sort(),
+    emscriptenFallback: [...emscriptenGLFallbackCalls].sort(),
+});
+
+let nativeGLRuntimeAttachedTo = null;
+
+const syncNativeGLMemory = () => {
+    // if (!nativeGLHost || typeof nativeGLHost.attachWasmMemory !== "function") return;
+    //
+    // const buffer = wasmExports?.memory?.buffer;
+    // if (buffer && buffer !== nativeGLMemoryBuffer) {
+    //     nativeGLHost.attachWasmMemory(buffer);
+    //     nativeGLMemoryBuffer = buffer;
+    // }
+    if (!nativeGLHost) return;
+
+    if (
+        typeof nativeGLHost.attachWasmRuntime === "function" &&
+        nativeGLRuntimeAttachedTo !== nativeGLHost
+    ) {
+        nativeGLHost.attachWasmRuntime(
+            wasmExports.memory,
+            wasmExports.malloc
+        );
+
+        nativeGLRuntimeAttachedTo = nativeGLHost;
+        return;
+    }
+
+    if (typeof nativeGLHost.attachWasmMemory !== "function") {
+        return;
+    }
+
+    const buffer = wasmExports?.memory?.buffer;
+    if (buffer && buffer !== nativeGLMemoryBuffer) {
+        nativeGLHost.attachWasmMemory(buffer);
+        nativeGLMemoryBuffer = buffer;
+    }
+};
+
+const genericGLFunctions = new Map();
+
+const callNativeGL = (name, args) => {
+    let fn = genericGLFunctions.get(name);
+
+    if (fn === undefined) {
+        fn = nativeGLHost?.getGLFunction(name);
+
+        if (typeof fn !== "function") {
+            fn = nativeGLHost?.[name];
+        }
+
+        if (typeof fn !== "function") {
+            return {handled: false};
+        }
+
+        // Cache both generic functions and legacy explicit wrappers.
+        genericGLFunctions.set(name, fn);
+    }
+
+    syncNativeGLMemory();
+    nativeGLCalls.add(name);
+
+    return {
+        handled: true,
+        value: fn.apply(nativeGLHost, args),
+    };
+};
+const recordEmscriptenGLFallback = (name) => {
+    const firstCall = !emscriptenGLFallbackCalls.has(name);
+    emscriptenGLFallbackCalls.add(name);
+    if (firstCall && globalThis.__skikoLogGLFallbacks === true) {
+        console.warn(`[Skiko GL fallback] ${name}`);
+    }
+};
+
 const createWasiImports = () => ({
     proc_exit: (code) => {
         console.log(`WASI exit with code ${code}`);
@@ -112,33 +207,56 @@ async function loadSkikoWASM() {
 
                 // Emscripten memory growth notification — refresh HEAP views
                 if (prop === 'emscripten_notify_memory_growth') return (memoryIndex) => {
+                    // TODO: Is this even needed anymore?
                     updateMemoryViews(wasmExports.memory.buffer);
                 };
 
-                // GL support — look up in the merged library, resolving string aliases
-                var glFunc = LibraryManager.library[prop];
-                // Resolve string aliases (recordGLProcAddressGet sets glX = 'emscripten_glX')
-                while (typeof glFunc === 'string') {
-                    glFunc = LibraryManager.library[glFunc];
-                }
-                if (typeof glFunc === 'function') {
-                    return (...args) => {
-                        // Refresh HEAP views in case wasm memory grew since last call
-                        updateMemoryViews(wasmExports.memory.buffer);
-                        return glFunc(...args);
-                    };
-                }
+                // Desktop GL is supplied exclusively by the native host.  Do
+                // not route these imports through Emscripten's WebGL library.
                 if (prop.startsWith('gl')) {
-                    let glProp = prop.substring(2);
-                    let methodName = glProp.charAt(0).toLowerCase() + glProp.slice(1);
                     return (...args) => {
-                        if (gl && typeof gl[methodName] === 'function') {
-                            return gl[methodName](...args);
+                        const nativeResult = callNativeGL(prop, args);
+                        if (!nativeResult.handled) {
+                            throw new Error(`Native OpenGL host does not implement env.${prop}`);
                         }
-                        console.warn(`Unimplemented Skiko GL call: ${prop} -> ${methodName}`, args);
-                        return 0;
+                        return nativeResult.value;
                     };
                 }
+
+                // GL support — prefer the optional native host, then retain the
+                // Emscripten implementation as an incremental migration fallback.
+                // var glFunc = LibraryManager.library[prop];
+                // // Resolve string aliases (recordGLProcAddressGet sets glX = 'emscripten_glX')
+                // while (typeof glFunc === 'string') {
+                //     glFunc = LibraryManager.library[glFunc];
+                // }
+                // if (typeof glFunc === 'function') {
+                //     return (...args) => {
+                //         const nativeResult = callNativeGL(prop, args);
+                //         if (nativeResult.handled) return nativeResult.value;
+                //
+                //         recordEmscriptenGLFallback(prop);
+                //         // Refresh HEAP views in case wasm memory grew since last call
+                //         updateMemoryViews(wasmExports.memory.buffer);
+                //         return glFunc(...args);
+                //     };
+                // }
+                // if (prop.startsWith('gl')) {
+                //     let glProp = prop.substring(2);
+                //     let methodName = glProp.charAt(0).toLowerCase() + glProp.slice(1);
+                //     return (...args) => {
+                //         // TODO: Is this not already covered by the check for glFunc type a view lines above?
+                //         const nativeResult = callNativeGL(prop, args);
+                //         if (nativeResult.handled) return nativeResult.value;
+                //
+                //         recordEmscriptenGLFallback(prop);
+                //         if (gl && typeof gl[methodName] === 'function') {
+                //             return gl[methodName](...args);
+                //         }
+                //         console.warn(`Unimplemented Skiko GL call: ${prop} -> ${methodName}`, args);
+                //         return 0;
+                //     };
+                // }
 
                 // System stubs
                 if (prop === 'sem_init' || prop === 'sem_destroy' || prop === 'sem_post' || prop === 'sem_wait') return () => 0;
@@ -170,10 +288,10 @@ async function loadSkikoWASM() {
             "return import('node:fs/promises').then((fs) => fs.readFile(url));"
         );
         const wasmBytes = await loadFile(url);
-        ({ instance } = await WebAssembly.instantiate(wasmBytes, importObject));
+        ({instance} = await WebAssembly.instantiate(wasmBytes, importObject));
     } else {
         const response = await fetch(url.href);
-        ({ instance } = await WebAssembly.instantiateStreaming(response, importObject));
+        ({instance} = await WebAssembly.instantiateStreaming(response, importObject));
     }
     wasmExports = instance.exports;
 
@@ -555,6 +673,12 @@ export const GL = new Proxy({}, {
     get(target, prop) {
         if (prop === 'createContext') {
             return (canvas, attr) => {
+                if (typeof nativeGLHost?.createContext === 'function') {
+                    const contextId = nativeGLHost.createContext(canvas, attr);
+                    canvas.__skikoNativeContext = contextId;
+                    return contextId;
+                }
+
                 const webGLCtx = canvas.getContext('webgl2', attr);
                 if (webGLCtx) {
                     // Use Emscripten's registerContext to properly wrap the context
@@ -571,6 +695,10 @@ export const GL = new Proxy({}, {
         }
         if (prop === 'makeContextCurrent') {
             return (contextId) => {
+                if (typeof nativeGLHost?.makeContextCurrent === 'function') {
+                    return nativeGLHost.makeContextCurrent(contextId);
+                }
+
                 // Delegate to Emscripten's makeContextCurrent which sets
                 // GL.currentContext, GLctx, etc.
                 return _emscriptenGL.makeContextCurrent(contextId);
