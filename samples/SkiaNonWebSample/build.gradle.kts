@@ -1,5 +1,3 @@
-@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
-
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ArchiveOperations
@@ -32,7 +30,7 @@ repositories {
 
 val nodeExecutable = providers.gradleProperty("skiko.node.executable").orElse("node")
 val npmExecutable = providers.gradleProperty("skiko.npm.executable").orElse("npm")
-
+val cmakeExecutable = providers.gradleProperty("skiko.cmake.executable").orElse("cmake")
 
 val installNativeSkikoDeps = tasks.register<Exec>("installNativeSkikoDeps") {
     group = "NodeJs"
@@ -60,7 +58,36 @@ val buildNativeSkiko = tasks.register<Exec>("buildNativeSkiko") {
     commandLine(npmExecutable.get(), "run", "build")
 }
 
-tasks.register<Exec>("skikoNodeWindowedRun") {
+val configureWasmtimeHost = tasks.register<Exec>("configureWasmtimeHost") {
+    group = "wasmtime"
+    description = "Configures CMake build for the native Skiko Wasmtime host runner."
+    workingDir(layout.projectDirectory.dir("wasmtime-skiko"))
+    onlyIf {
+        !layout.projectDirectory.file("wasmtime-skiko/build/CMakeCache.txt").asFile.exists()
+    }
+    val cmakeArgs = mutableListOf(cmakeExecutable.get(), "-S", ".", "-B", "build")
+    if (project.hasProperty("skia.dir")) {
+        cmakeArgs.add("-DSKIA_ROOT=${project.property("skia.dir")}")
+    }
+    if (project.hasProperty("wasmtime.root")) {
+        cmakeArgs.add("-DWASMTIME_ROOT=${project.property("wasmtime.root")}")
+    }
+    commandLine(cmakeArgs)
+}
+
+val buildNativeWasmtime = tasks.register<Exec>("buildNativeWasmtime") {
+    group = "wasmtime"
+    description = "Builds the native Skiko Wasmtime host runner executable."
+    dependsOn(configureWasmtimeHost)
+    workingDir(layout.projectDirectory.dir("wasmtime-skiko"))
+    inputs.dir(layout.projectDirectory.dir("wasmtime-skiko/src"))
+    inputs.dir(layout.projectDirectory.dir("wasmtime-skiko/generated"))
+    inputs.file(layout.projectDirectory.file("wasmtime-skiko/CMakeLists.txt"))
+    outputs.file(layout.projectDirectory.file("wasmtime-skiko/build/skiko-wasmtime"))
+    commandLine(cmakeExecutable.get(), "--build", "build", "-j")
+}
+
+val wasmJsNodeRun = tasks.register<Exec>("wasmJsNodeRun") {
     group = "application"
     description = "Builds and runs the Skiko WASM sample under Node.js in a native SDL window."
     dependsOn("wasmJsProductionExecutableCompileSync", buildNativeSkiko)
@@ -68,16 +95,24 @@ tasks.register<Exec>("skikoNodeWindowedRun") {
     commandLine(nodeExecutable.get(), "node-runner.mjs")
 }
 
-kotlin {
+val wasmJsWasmtimeRun = tasks.register<Exec>("wasmJsWasmtimeRun") {
+    group = "application"
+    description = "Builds and runs the Skiko WASM sample under Wasmtime host in a native SDL window."
+    dependsOn("wasmJsProductionExecutableCompileSync", buildNativeWasmtime)
+    workingDir(layout.projectDirectory)
+    val coreWasm = layout.projectDirectory.file("build/wasm/packages/SkiaNonWebSample/kotlin/skiko.wasm")
+    val appWasm = layout.projectDirectory.file("build/wasm/packages/SkiaNonWebSample/kotlin/SkiaNonWebSample.wasm")
+    val wasmtimeExecutable = layout.projectDirectory.file("wasmtime-skiko/build/skiko-wasmtime")
+    commandLine(wasmtimeExecutable.asFile.absolutePath, coreWasm.asFile.absolutePath, appWasm.asFile.absolutePath)
+}
 
-//    js(IR) {
-//        browser {
-//            commonWebpackConfig {
-//                outputFileName = "webApp.js"
-//            }
-//        }
-//        binaries.executable()
-//    }
+tasks.register("skikoNodeWindowedRun") {
+    group = "application"
+    description = "Alias for wasmJsNodeRun."
+    dependsOn(wasmJsNodeRun)
+}
+
+kotlin {
 
     wasmJs {
         compilerOptions {
