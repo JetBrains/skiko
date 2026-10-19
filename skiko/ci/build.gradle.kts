@@ -1,5 +1,10 @@
-import org.kohsuke.github.*
 import org.jetbrains.compose.internal.publishing.*
+
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.SkikoProperties
+import org.kohsuke.github.*
 
 val skiko = SkikoProperties(project)
 val mavenCentral = MavenCentralProperties(project)
