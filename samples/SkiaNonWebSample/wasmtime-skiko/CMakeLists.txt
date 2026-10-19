@@ -10,14 +10,45 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(WASMTIME_ROOT "" CACHE PATH "Root of an unpacked Wasmtime C API release")
-set(SKIA_ROOT "/Users/dustin.feucht/projects/skia" CACHE PATH "Skia source tree")
-set(
-    SKIA_LIBRARY
-    "${SKIA_ROOT}/out/Release-macos-arm64-gl/libskia.a"
-    CACHE FILEPATH
-    "Release-mode Skia archive built with Ganesh and desktop GL"
-)
+if(NOT WASMTIME_ROOT)
+    if(DEFINED ENV{WASMTIME_ROOT})
+        set(WASMTIME_ROOT "$ENV{WASMTIME_ROOT}" CACHE PATH "Root of an unpacked Wasmtime C API release" FORCE)
+    elseif(DEFINED ENV{WASMTIME_DIR})
+        set(WASMTIME_ROOT "$ENV{WASMTIME_DIR}" CACHE PATH "Root of an unpacked Wasmtime C API release" FORCE)
+    else()
+        set(WASMTIME_ROOT "" CACHE PATH "Root of an unpacked Wasmtime C API release")
+    endif()
+endif()
+
+if(NOT SKIA_ROOT)
+    if(DEFINED ENV{SKIA_DIR})
+        set(SKIA_ROOT "$ENV{SKIA_DIR}" CACHE PATH "Skia source tree" FORCE)
+    elseif(DEFINED ENV{SKIA_ROOT})
+        set(SKIA_ROOT "$ENV{SKIA_ROOT}" CACHE PATH "Skia source tree" FORCE)
+    else()
+        set(SKIA_ROOT "" CACHE PATH "Skia source tree")
+    endif()
+endif()
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64")
+    set(SKIA_ARCH "arm64")
+else()
+    set(SKIA_ARCH "x64")
+endif()
+
+if(NOT SKIA_LIBRARY)
+    if(DEFINED ENV{SKIA_LIBRARY})
+        set(SKIA_LIBRARY "$ENV{SKIA_LIBRARY}" CACHE FILEPATH "Release-mode Skia archive built with Ganesh and desktop GL" FORCE)
+    elseif(SKIA_ROOT)
+        if(EXISTS "${SKIA_ROOT}/out/Release-macos-${SKIA_ARCH}-gl/libskia.a")
+            set(SKIA_LIBRARY "${SKIA_ROOT}/out/Release-macos-${SKIA_ARCH}-gl/libskia.a" CACHE FILEPATH "Release-mode Skia archive built with Ganesh and desktop GL" FORCE)
+        else()
+            set(SKIA_LIBRARY "${SKIA_ROOT}/out/Release-macos-${SKIA_ARCH}/libskia.a" CACHE FILEPATH "Release-mode Skia archive built with Ganesh and desktop GL" FORCE)
+        endif()
+    else()
+        set(SKIA_LIBRARY "" CACHE FILEPATH "Release-mode Skia archive built with Ganesh and desktop GL")
+    endif()
+endif()
 
 find_path(
     WASMTIME_INCLUDE_DIR
@@ -62,7 +93,7 @@ else()
 endif()
 
 if(NOT EXISTS "${SKIA_LIBRARY}")
-    message(FATAL_ERROR "SKIA_LIBRARY does not exist: ${SKIA_LIBRARY}")
+    message(FATAL_ERROR "SKIA_LIBRARY does not exist: '${SKIA_LIBRARY}'. Please specify a valid Skia build via -DSKIA_ROOT, -DSKIA_LIBRARY, or SKIA_DIR / SKIA_ROOT environment variable.")
 endif()
 
 add_executable(

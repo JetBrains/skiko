@@ -1,10 +1,14 @@
 {
+    "variables": {
+        "skia_dir%": "<!(node -p \"process.env.SKIA_DIR || process.env.SKIA_ROOT || ''\")",
+        "skia_library%": "<!(node -p \"process.env.SKIA_LIBRARY || (process.env.SKIA_DIR || process.env.SKIA_ROOT || '') + '/out/Release-macos-' + process.arch + '/libskia.a'\")"
+    },
     "targets": [
         {
             "target_name": "native_skiko",
             "sources": ["binding.cc"],
             "include_dirs": [
-                "/Users/dustin.feucht/projects/skia",
+                "<(skia_dir)",
                 "<!(sdl2-config --prefix)/include/SDL2"
             ],
 
@@ -14,10 +18,10 @@
                 "-Wunused-member-function"
             ],
             "libraries": [
-                "/Users/dustin.feucht/projects/skia/out/Release-macos-arm64/libskia.a",
+                "<(skia_library)",
                 "-L<!(sdl2-config --prefix)/lib",
                 "-lSDL2",
-                "-framework OpenGL",
+                "-framework OpenGL"
             ],
             "xcode_settings": {
                 "CLANG_CXX_LANGUAGE_STANDARD": "c++20",

@@ -39,12 +39,45 @@ node tools/generate-wasmtime-gl-bindings.mjs
 
 ```bash
 cmake -S . -B build \
-  -DWASMTIME_ROOT=/path/to/wasmtime-v49.0.1-aarch64-macos-c-api \
-  -DSKIA_ROOT=/Users/dustin.feucht/projects/skia \
-  -DSKIA_LIBRARY=/Users/dustin.feucht/projects/skia/out/Release-macos-arm64-gl/libskia.a
+  -DWASMTIME_ROOT=/path/to/wasmtime-c-api \
+  -DSKIA_ROOT=/path/to/skia \
+  -DSKIA_LIBRARY=/path/to/skia/out/Release-macos-arm64-gl/libskia.a
 
 cmake --build build -j
 ```
+
+### Running via Gradle
+
+You can build and launch both runners directly through Gradle from the project root:
+
+#### Node.js Runner (`wasmJsNodeRun`)
+```bash
+./gradlew -p samples/SkiaNonWebSample wasmJsNodeRun \
+  -Pskia.dir=/path/to/skia \
+  -Pwasmtime.root=/path/to/wasmtime-c-api \
+  -Pskia.library=/path/to/skia/out/Release-macos-arm64-gl/libskia.a \
+  --rerun-tasks
+```
+
+#### Wasmtime Runner (`wasmJsWasmtimeRun`)
+```bash
+./gradlew -p samples/SkiaNonWebSample wasmJsWasmtimeRun \
+  -Pskia.dir=/path/to/skia \
+  -Pwasmtime.root=/path/to/wasmtime-c-api \
+  -Pskia.library=/path/to/skia/out/Release-macos-arm64-gl/libskia.a \
+  --rerun-tasks
+```
+
+*(Note: If you have configured the environment variables `SKIA_DIR`, `WASMTIME_ROOT`, and optional `SKIA_LIBRARY`, the `-P` property flags can be omitted.)*
+
+### Environment Variables and Gradle Properties
+
+Paths can be configured via environment variables or Gradle project properties:
+
+- **Skia directory**: Set `SKIA_DIR` or `SKIA_ROOT` in the environment, or pass `-Pskia.dir=/path/to/skia` in Gradle.
+- **Wasmtime root**: Set `WASMTIME_ROOT` or `WASMTIME_DIR` in the environment, or pass `-Pwasmtime.root=/path/to/wasmtime-c-api` in Gradle.
+- **Skia library** (optional): Set `SKIA_LIBRARY` in the environment, or pass `-Pskia.library=/path/to/libskia.a` in Gradle (defaults automatically to `${SKIA_ROOT}/out/Release-macos-<arch>[-gl]/libskia.a`).
+- **Executable overrides** (optional): Pass `-Pskiko.node.executable=...`, `-Pskiko.npm.executable=...`, or `-Pskiko.cmake.executable=...` in Gradle.
 
 The application window is an SDL2 OpenGL window. Each Skiko context renders to
 a texture shared with the presentation context; `glBlitFramebuffer` scales and
@@ -101,12 +134,16 @@ This executes the existing Kotlin `main`, `BouncingBalls`, `DemoApp`, and
 `CanvasRenderer` code. The native window uses the same 606x706 three-panel
 composition as `node-runner.mjs`.
 
-The Node runner now uses its shared EGL-context texture compositor by default.
-Its patched `node-gles-webgl2` dependency must be rebuilt once:
+The Node runner uses the existing `native-skiko` bridge. That addon owns the
+SDL window and composites the three shared CGL textures directly on the GPU;
+there is no JavaScript WebGL package or CPU pixel readback. Install SDL2 and
+build the addon once:
 
 ```bash
+brew install sdl2
 cd samples/SkiaNonWebSample
-./gradlew rebuildNodeWindowedDeps
+npm --prefix native-skiko ci
+npm --prefix native-skiko run build
 node node-runner.mjs
 ```
 

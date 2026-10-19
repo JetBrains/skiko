@@ -32,6 +32,17 @@ val nodeExecutable = providers.gradleProperty("skiko.node.executable").orElse("n
 val npmExecutable = providers.gradleProperty("skiko.npm.executable").orElse("npm")
 val cmakeExecutable = providers.gradleProperty("skiko.cmake.executable").orElse("cmake")
 
+val skiaDir = providers.gradleProperty("skia.dir")
+    .orElse(providers.environmentVariable("SKIA_DIR"))
+    .orElse(providers.environmentVariable("SKIA_ROOT"))
+
+val wasmtimeRoot = providers.gradleProperty("wasmtime.root")
+    .orElse(providers.environmentVariable("WASMTIME_ROOT"))
+    .orElse(providers.environmentVariable("WASMTIME_DIR"))
+
+val skiaLibrary = providers.gradleProperty("skia.library")
+    .orElse(providers.environmentVariable("SKIA_LIBRARY"))
+
 val installNativeSkikoDeps = tasks.register<Exec>("installNativeSkikoDeps") {
     group = "NodeJs"
     description = "Installs node-gyp for the native Skiko bridge."
@@ -40,7 +51,7 @@ val installNativeSkikoDeps = tasks.register<Exec>("installNativeSkikoDeps") {
     inputs.file(layout.projectDirectory.file("native-skiko/package-lock.json"))
     inputs.property("npmExecutable", npmExecutable)
     outputs.dir(layout.projectDirectory.dir("native-skiko/node_modules"))
-    commandLine(npmExecutable.get(), "ci", "--no-audit", "--no-fund")
+    commandLine(npmExecutable.get(), "ci", "--no-audit", "--no-fund", "--ignore-scripts")
 }
 
 val buildNativeSkiko = tasks.register<Exec>("buildNativeSkiko") {
@@ -54,6 +65,14 @@ val buildNativeSkiko = tasks.register<Exec>("buildNativeSkiko") {
         include("*.inc")
     })
     inputs.property("npmExecutable", npmExecutable)
+    if (skiaDir.isPresent) {
+        inputs.property("skiaDir", skiaDir)
+        environment("SKIA_DIR", skiaDir.get())
+    }
+    if (skiaLibrary.isPresent) {
+        inputs.property("skiaLibrary", skiaLibrary)
+        environment("SKIA_LIBRARY", skiaLibrary.get())
+    }
     outputs.file(layout.projectDirectory.file("native-skiko/build/Release/native_skiko.node"))
     commandLine(npmExecutable.get(), "run", "build")
 }
@@ -66,11 +85,14 @@ val configureWasmtimeHost = tasks.register<Exec>("configureWasmtimeHost") {
         !layout.projectDirectory.file("wasmtime-skiko/build/CMakeCache.txt").asFile.exists()
     }
     val cmakeArgs = mutableListOf(cmakeExecutable.get(), "-S", ".", "-B", "build")
-    if (project.hasProperty("skia.dir")) {
-        cmakeArgs.add("-DSKIA_ROOT=${project.property("skia.dir")}")
+    if (skiaDir.isPresent) {
+        cmakeArgs.add("-DSKIA_ROOT=${skiaDir.get()}")
     }
-    if (project.hasProperty("wasmtime.root")) {
-        cmakeArgs.add("-DWASMTIME_ROOT=${project.property("wasmtime.root")}")
+    if (wasmtimeRoot.isPresent) {
+        cmakeArgs.add("-DWASMTIME_ROOT=${wasmtimeRoot.get()}")
+    }
+    if (skiaLibrary.isPresent) {
+        cmakeArgs.add("-DSKIA_LIBRARY=${skiaLibrary.get()}")
     }
     commandLine(cmakeArgs)
 }
