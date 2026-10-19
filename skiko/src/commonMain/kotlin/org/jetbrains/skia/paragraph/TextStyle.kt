@@ -645,12 +645,14 @@ private external fun _nSetColor(ptr: NativePointer, color: Int)
 private external fun _nGetForeground(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetForeground")
+@ForceNativeThreadState
 private external fun _nSetForeground(ptr: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBackground")
 private external fun _nGetBackground(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetBackground")
+@ForceNativeThreadState
 private external fun _nSetBackground(ptr: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle")
@@ -711,6 +713,7 @@ private external fun _nSetWordSpacing(ptr: NativePointer, wordSpacing: Float)
 private external fun _nGetTypeface(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetTypeface")
+@ForceNativeThreadState
 private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetLocale")
@@ -726,6 +729,7 @@ private external fun _nGetBaselineMode(ptr: NativePointer): Int
 private external fun _nSetBaselineMode(ptr: NativePointer, mode: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics")
+@ForceNativeThreadState
 private external fun _nGetFontMetrics(ptr: NativePointer, fontMetrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nIsPlaceholder")

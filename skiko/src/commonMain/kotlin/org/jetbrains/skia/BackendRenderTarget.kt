@@ -116,6 +116,7 @@ private external fun BackendRenderTarget_nGetFinalizer(): NativePointer
 private external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer
 
 @ExternalSymbolName("BackendRenderTarget_nMakeMetal")
+@ForceNativeThreadState
 private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("BackendRenderTarget_MakeDirect3D")

@@ -3,6 +3,7 @@ package org.jetbrains.skia.svg
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.*
 
 private fun makeSVGDOM(data: Data): NativePointer {
@@ -79,4 +80,5 @@ private external fun SVGDOM_nGetContainerSize(ptr: NativePointer, dst: InteropPo
 private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, height: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nRender")
+@ForceNativeThreadState
 private external fun SVGDOM_nRender(ptr: NativePointer, canvasPtr: NativePointer)

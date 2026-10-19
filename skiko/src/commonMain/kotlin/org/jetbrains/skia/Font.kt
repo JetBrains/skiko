@@ -676,6 +676,7 @@ private external fun _nGetScaleX(ptr: NativePointer): Float
 private external fun _nGetSkewX(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetTypeface")
+@ForceNativeThreadState
 private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSize")
@@ -688,40 +689,52 @@ private external fun _nSetScaleX(ptr: NativePointer, value: Float)
 private external fun _nSetSkewX(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyph")
+@ForceNativeThreadState
 private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyphs")
+@ForceNativeThreadState
 private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: InteropPointer, uniArrLen: Int, resultGlyphs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
 private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: InteropPointer, len: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
+@ForceNativeThreadState
 private external fun _nMeasureText(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer, rect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureTextWidth")
+@ForceNativeThreadState
 private external fun _nMeasureTextWidth(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetWidths")
+@ForceNativeThreadState
 private external fun _nGetWidths(ptr: NativePointer, glyphs: InteropPointer, count: Int, width: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetBounds")
+@ForceNativeThreadState
 private external fun _nGetBounds(ptr: NativePointer, glyphs: InteropPointer, count: Int, paintPtr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPositions")
+@ForceNativeThreadState
 private external fun _nGetPositions(ptr: NativePointer, glyphs: InteropPointer, count: Int, x: Float, y: Float, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
+@ForceNativeThreadState
 private external fun _nGetXPositions(ptr: NativePointer, glyphs: InteropPointer, x: Float, count: Int, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPath")
+@ForceNativeThreadState
 private external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPaths")
+@ForceNativeThreadState
 private external fun _nGetPaths(ptr: NativePointer, glyphs: InteropPointer, count: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetMetrics")
+@ForceNativeThreadState
 private external fun _nGetMetrics(ptr: NativePointer, metrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSpacing")
+@ForceNativeThreadState
 private external fun _nGetSpacing(ptr: NativePointer): Float

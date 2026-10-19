@@ -144,6 +144,7 @@ private external fun Drawable_nMake(): NativePointer
 private external fun Drawable_nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
+@ForceNativeThreadState
 private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")

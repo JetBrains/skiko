@@ -602,6 +602,7 @@ private external fun Paint_nMakeClone(ptr: NativePointer): NativePointer
 private external fun Paint_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nReset")
+@ForceNativeThreadState
 private external fun Paint_nReset(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsAntiAlias")
@@ -662,12 +663,14 @@ private external fun _nSetStrokeJoin(ptr: NativePointer, value: Int)
 private external fun _nGetShader(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetShader")
+@ForceNativeThreadState
 private external fun _nSetShader(ptr: NativePointer, shaderPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColorFilter")
 private external fun _nGetColorFilter(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColorFilter")
+@ForceNativeThreadState
 private external fun _nSetColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlendMode")
@@ -686,12 +689,14 @@ private external fun _nSetPathEffect(ptr: NativePointer, pathEffectPtr: NativePo
 private external fun _nGetMaskFilter(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetMaskFilter")
+@ForceNativeThreadState
 private external fun _nSetMaskFilter(ptr: NativePointer, filterPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetImageFilter")
 private external fun _nGetImageFilter(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetImageFilter")
+@ForceNativeThreadState
 private external fun _nSetImageFilter(ptr: NativePointer, filterPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlender")

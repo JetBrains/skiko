@@ -1,6 +1,7 @@
 package org.jetbrains.skia.gpu.graphite
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
@@ -42,4 +43,5 @@ class Recorder internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
 private external fun _nGetRecorderFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_Recorder__1nSnap")
+@ForceNativeThreadState
 private external fun _nSnap(recorderPtr: NativePointer): NativePointer

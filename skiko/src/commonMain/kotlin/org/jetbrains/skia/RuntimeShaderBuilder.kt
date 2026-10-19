@@ -188,9 +188,11 @@ private external fun _nUniformFloatMatrix33(builderPtr: NativePointer, uniformNa
 private external fun _nUniformFloatMatrix44(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix44: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildShader")
+@ForceNativeThreadState
 private external fun _nChildShader(builderPtr: NativePointer, uniformName: InteropPointer, shaderPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildColorFilter")
+@ForceNativeThreadState
 private external fun _nChildColorFilter(builderPtr: NativePointer, uniformName: InteropPointer, colorFilterPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeShader")

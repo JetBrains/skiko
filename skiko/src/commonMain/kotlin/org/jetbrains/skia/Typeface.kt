@@ -378,6 +378,7 @@ private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
 private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
+@ForceNativeThreadState
 private external fun Typeface_nGetUTF32Glyphs(
     ptr: NativePointer,
     uni: InteropPointer,
@@ -386,9 +387,11 @@ private external fun Typeface_nGetUTF32Glyphs(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
+@ForceNativeThreadState
 private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
+@ForceNativeThreadState
 private external fun Typeface_nGetBounds(ptr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
@@ -398,18 +401,23 @@ private external fun _nGetFontStyle(ptr: NativePointer): Int
 private external fun _nIsFixedPitch(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationsCount")
+@ForceNativeThreadState
 private external fun _nGetVariationsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
+@ForceNativeThreadState
 private external fun _nGetVariations(ptr: NativePointer, variations: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
+@ForceNativeThreadState
 private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
+@ForceNativeThreadState
 private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
+@ForceNativeThreadState
 private external fun _nMakeClone(
     ptr: NativePointer,
     variations: InteropPointer,
@@ -421,24 +429,31 @@ private external fun _nMakeClone(
 private external fun _nMakeEmptyTypeface(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
+@ForceNativeThreadState
 private external fun _nGetGlyphsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTablesCount")
+@ForceNativeThreadState
 private external fun _nGetTablesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTagsCount")
+@ForceNativeThreadState
 private external fun _nGetTableTagsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTags")
+@ForceNativeThreadState
 private external fun _nGetTableTags(ptr: NativePointer, tags: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableSize")
+@ForceNativeThreadState
 private external fun _nGetTableSize(ptr: NativePointer, tag: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableData")
+@ForceNativeThreadState
 private external fun _nGetTableData(ptr: NativePointer, tag: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
+@ForceNativeThreadState
 private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
@@ -450,7 +465,9 @@ private external fun _nGetKerningPairAdjustments(
 ): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
+@ForceNativeThreadState
 private external fun _nGetFamilyNames(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
+@ForceNativeThreadState
 private external fun _nGetFamilyName(ptr: NativePointer): NativePointer

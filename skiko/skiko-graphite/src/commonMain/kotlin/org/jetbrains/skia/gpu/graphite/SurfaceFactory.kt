@@ -2,6 +2,7 @@ package org.jetbrains.skia.gpu.graphite
 
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.InteropPointer
@@ -48,6 +49,7 @@ fun Surface.Companion.wrapBackendTexture(
 }
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_SurfaceFactory__1nWrapBackendTexture")
+@ForceNativeThreadState
 private external fun _nWrapBackendTexture(
     recorderPtr: NativePointer,
     backendTexturePtr: NativePointer,

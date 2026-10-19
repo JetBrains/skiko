@@ -77,13 +77,17 @@ private external fun FontStyleSet_nMakeEmpty(): NativePointer
 private external fun _nCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyle")
+@ForceNativeThreadState
 private external fun _nGetStyle(ptr: NativePointer, index: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyleName")
+@ForceNativeThreadState
 private external fun _nGetStyleName(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetTypeface")
+@ForceNativeThreadState
 private external fun _nGetTypeface(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMatchStyle")
+@ForceNativeThreadState
 private external fun _nMatchStyle(ptr: NativePointer, style: Int): NativePointer

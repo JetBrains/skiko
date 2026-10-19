@@ -1680,15 +1680,19 @@ private external fun _nGetCanvasRecordingContext(ptr: NativePointer): NativePoin
 private external fun _nGetCanvasSurface(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoint")
+@ForceNativeThreadState
 private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoints")
+@ForceNativeThreadState
 private external fun _nDrawPoints(ptr: NativePointer, mode: Int, coordsCount: Int, coords: InteropPointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawLine")
+@ForceNativeThreadState
 private external fun _nDrawLine(ptr: NativePointer, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawArc")
+@ForceNativeThreadState
 private external fun _nDrawArc(
     ptr: NativePointer,
     left: Float,
@@ -1702,12 +1706,15 @@ private external fun _nDrawArc(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRect")
+@ForceNativeThreadState
 private external fun _nDrawRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawOval")
+@ForceNativeThreadState
 private external fun _nDrawOval(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRRect")
+@ForceNativeThreadState
 private external fun _nDrawRRect(
     ptr: NativePointer,
     left: Float,
@@ -1721,6 +1728,7 @@ private external fun _nDrawRRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDRRect")
+@ForceNativeThreadState
 private external fun _nDrawDRRect(
     ptr: NativePointer,
     ol: Float,
@@ -1740,9 +1748,11 @@ private external fun _nDrawDRRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPath")
+@ForceNativeThreadState
 private external fun _nDrawPath(ptr: NativePointer, nativePath: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageRect")
+@ForceNativeThreadState
 private external fun _nDrawImageRect(
     ptr: NativePointer,
     nativeImage: NativePointer,
@@ -1761,6 +1771,7 @@ private external fun _nDrawImageRect(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageNine")
+@ForceNativeThreadState
 private external fun _nDrawImageNine(
     ptr: NativePointer,
     nativeImage: NativePointer,
@@ -1777,18 +1788,23 @@ private external fun _nDrawImageNine(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRegion")
+@ForceNativeThreadState
 private external fun _nDrawRegion(ptr: NativePointer, nativeRegion: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawString")
+@ForceNativeThreadState
 private external fun _nDrawString(ptr: NativePointer, string: InteropPointer, x: Float, y: Float, font: NativePointer, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawTextBlob")
+@ForceNativeThreadState
 private external fun _nDrawTextBlob(ptr: NativePointer, blob: NativePointer, x: Float, y: Float, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPicture")
+@ForceNativeThreadState
 private external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer, matrix: InteropPointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawVertices")
+@ForceNativeThreadState
 private external fun _nDrawVertices(
     ptr: NativePointer,
     verticesMode: Int,
@@ -1804,6 +1820,7 @@ private external fun _nDrawVertices(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPatch")
+@ForceNativeThreadState
 private external fun _nDrawPatch(
     ptr: NativePointer,
     cubics: InteropPointer,
@@ -1815,9 +1832,11 @@ private external fun _nDrawPatch(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDrawable")
+@ForceNativeThreadState
 private external fun _nDrawDrawable(ptr: NativePointer, drawablePrt: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawAnnotation")
+@ForceNativeThreadState
 private external fun _nDrawAnnotation(
     ptr: NativePointer,
     left: Float,
@@ -1829,9 +1848,11 @@ private external fun _nDrawAnnotation(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClear")
+@ForceNativeThreadState
 private external fun _nClear(ptr: NativePointer, color: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPaint")
+@ForceNativeThreadState
 private external fun _nDrawPaint(ptr: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSetMatrix")
@@ -1896,18 +1917,22 @@ private external fun _nConcat(ptr: NativePointer, matrix: InteropPointer)
 private external fun _nConcat44(ptr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nReadPixels")
+@ForceNativeThreadState
 private external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nWritePixels")
+@ForceNativeThreadState
 private external fun _nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSave")
 private external fun _nSave(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayer")
+@ForceNativeThreadState
 private external fun _nSaveLayer(ptr: NativePointer, paintPtr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerRect")
+@ForceNativeThreadState
 private external fun _nSaveLayerRect(
     ptr: NativePointer,
     left: Float,
@@ -1918,6 +1943,7 @@ private external fun _nSaveLayerRect(
 ): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRec")
+@ForceNativeThreadState
 private external fun _nSaveLayerSaveLayerRec(
     ptr: NativePointer,
     paintPtr: NativePointer,
@@ -1927,6 +1953,7 @@ private external fun _nSaveLayerSaveLayerRec(
 ): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRecRect")
+@ForceNativeThreadState
 private external fun _nSaveLayerSaveLayerRecRect(
     ptr: NativePointer,
     left: Float,
@@ -1943,9 +1970,11 @@ private external fun _nSaveLayerSaveLayerRecRect(
 private external fun _nGetSaveCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestore")
+@ForceNativeThreadState
 private external fun _nRestore(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestoreToCount")
+@ForceNativeThreadState
 private external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)
 
 internal inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {

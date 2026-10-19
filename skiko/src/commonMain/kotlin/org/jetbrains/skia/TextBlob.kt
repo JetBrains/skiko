@@ -385,18 +385,23 @@ private external fun TextBlob_nMakeFromData(dataPtr: NativePointer /*, SkDeseria
 private external fun _nBounds(ptr: NativePointer, resultRect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetInterceptsLength")
+@ForceNativeThreadState
 private external fun _nGetInterceptsLength(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
+@ForceNativeThreadState
 private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer, resultArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
+@ForceNativeThreadState
 private external fun _nMakeFromPosH(glyphs: InteropPointer, glyphsLen: Int, xpos: InteropPointer, ypos: Float, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
+@ForceNativeThreadState
 private external fun _nMakeFromPos(glyphs: InteropPointer, glyphsLen: Int, pos: InteropPointer, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
+@ForceNativeThreadState
 private external fun _nMakeFromRSXform(glyphs: InteropPointer, glyphsLen: Int, xform: InteropPointer, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphsLength")
@@ -418,9 +423,11 @@ private external fun _nGetClustersLength(ptr: NativePointer): Int
 private external fun _nGetClusters(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
+@ForceNativeThreadState
 private external fun _nGetTightBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
+@ForceNativeThreadState
 private external fun _nGetBlockBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")

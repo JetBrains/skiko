@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 
@@ -101,15 +102,19 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nAbandon")
+@ForceNativeThreadState
 private external fun _nAbandon(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nReset")
+@ForceNativeThreadState
 private external fun _nReset(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nUpdateParagraph")
+@ForceNativeThreadState
 private external fun _nUpdateParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nFindParagraph")
+@ForceNativeThreadState
 private external fun _nFindParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nPrintStatistics")

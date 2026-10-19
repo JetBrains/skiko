@@ -2,6 +2,7 @@ package org.jetbrains.skia.skottie
 
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.impl.*
 
@@ -89,16 +90,20 @@ private external fun AnimationBuilder_nGetFinalizer(): NativePointer
 private external fun AnimationBuilder_nMake(flags: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
+@ForceNativeThreadState
 private external fun _nSetFontManager(ptr: NativePointer, fontMgrPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
 private external fun _nSetLogger(ptr: NativePointer, loggerPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
+@ForceNativeThreadState
 private external fun _nBuildFromString(ptr: NativePointer, data: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
+@ForceNativeThreadState
 internal external fun _nBuildFromFile(ptr: NativePointer, path: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
+@ForceNativeThreadState
 private external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer

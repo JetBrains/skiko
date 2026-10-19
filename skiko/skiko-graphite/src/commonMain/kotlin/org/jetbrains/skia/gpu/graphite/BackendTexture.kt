@@ -1,6 +1,7 @@
 package org.jetbrains.skia.gpu.graphite
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.InteropPointer
@@ -117,6 +118,7 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
 private external fun _nGetBackendTextureFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeMetal")
+@ForceNativeThreadState
 private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeVulkan")

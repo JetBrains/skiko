@@ -6,6 +6,7 @@ import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
@@ -50,4 +51,5 @@ open class TypefaceFontProvider internal constructor(
 private external fun TypefaceFontProvider_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface")
+@ForceNativeThreadState
 private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: InteropPointer): Int

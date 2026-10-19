@@ -1,6 +1,7 @@
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.getPtr
@@ -45,6 +46,7 @@ class TypefaceFontProviderWithFallback private constructor(
 private external fun _nMakeAsFallbackProvider(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallback__1nRegisterTypefaceForFallback")
+@ForceNativeThreadState
 private external fun _nRegisterTypefaceForFallback(
     ptr: NativePointer,
     typefacePtr: NativePointer,

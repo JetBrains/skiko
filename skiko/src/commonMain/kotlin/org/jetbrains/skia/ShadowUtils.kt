@@ -92,6 +92,7 @@ object ShadowUtils {
 
 
 @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nDrawShadow")
+@ForceNativeThreadState
 private external fun _nDrawShadow(
     canvasPtr: NativePointer,
     pathPtr: NativePointer,

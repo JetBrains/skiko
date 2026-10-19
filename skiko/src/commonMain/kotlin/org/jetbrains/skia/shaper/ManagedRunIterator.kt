@@ -1,6 +1,7 @@
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
@@ -56,6 +57,7 @@ abstract class ManagedRunIterator<T> internal constructor(
 private external fun _nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nConsume")
+@ForceNativeThreadState
 internal external fun _nConsume(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nGetEndOfCurrentRun")

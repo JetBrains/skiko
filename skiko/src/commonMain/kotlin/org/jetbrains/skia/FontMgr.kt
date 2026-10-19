@@ -190,18 +190,23 @@ open class FontMgr : RefCnt {
 private external fun _nGetFamiliesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamilyName")
+@ForceNativeThreadState
 private external fun _nGetFamilyName(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeStyleSet")
+@ForceNativeThreadState
 private external fun _nMakeStyleSet(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamily")
+@ForceNativeThreadState
 private external fun _nMatchFamily(ptr: NativePointer, familyName: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
+@ForceNativeThreadState
 private external fun _nMatchFamilyStyle(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter")
+@ForceNativeThreadState
 private external fun _nMatchFamilyStyleCharacter(
     ptr: NativePointer,
     familyName: InteropPointer,
@@ -212,13 +217,17 @@ private external fun _nMatchFamilyStyleCharacter(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromData")
+@ForceNativeThreadState
 private external fun _nMakeFromData(ptr: NativePointer, dataPtr: NativePointer, ttcIndex: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromFile")
+@ForceNativeThreadState
 private external fun _nMakeFromFile(ptr: NativePointer, pathPtr: InteropPointer, ttcIndex: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
+@ForceNativeThreadState
 private external fun _nDefault(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nLegacyMakeTypeface")
+@ForceNativeThreadState
 private external fun _nLegacyMakeTypeface(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer

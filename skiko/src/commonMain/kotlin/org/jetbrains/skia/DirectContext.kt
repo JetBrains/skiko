@@ -208,27 +208,34 @@ fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
+@ForceNativeThreadState
 private external fun DirectContext_nFlush(ptr: NativePointer, surfacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushDefault")
+@ForceNativeThreadState
 private external fun DirectContext_nFlushDefault(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nGetResourceCacheLimit")
 private external fun DirectContext_nGetResourceCacheLimit(ptr: NativePointer): Long
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSetResourceCacheLimit")
+@ForceNativeThreadState
 private external fun DirectContext_nSetResourceCacheLimit(ptr: NativePointer, maxResourceBytes: Long)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
+@ForceNativeThreadState
 private external fun _nMakeGL(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
+@ForceNativeThreadState
 private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
+@ForceNativeThreadState
 private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeVulkan")
+@ForceNativeThreadState
 private external fun _nMakeVulkan(
     instancePtr: NativePointer,
     physicalDevicePtr: NativePointer,
@@ -242,15 +249,18 @@ private external fun _nMakeVulkan(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
+@ForceNativeThreadState
 private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushAndSubmit")
+@ForceNativeThreadState
 private external fun _nFlushAndSubmit(ptr: NativePointer, surfacePtr: NativePointer, syncCpu: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
 private external fun _nReset(ptr: NativePointer, flags: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
+@ForceNativeThreadState
 private external fun _nAbandon(ptr: NativePointer, flags: Int)
 
 internal fun nMakeVulkanNoAllocator(

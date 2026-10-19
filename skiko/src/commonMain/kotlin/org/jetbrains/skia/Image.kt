@@ -510,9 +510,11 @@ private external fun _nEncodeToData(
 private external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
+@ForceNativeThreadState
 private external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptionsVal1: Int, samplingOptionsVal2: Int, cache: Boolean): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
+@ForceNativeThreadState
 private external fun _nReadPixelsBitmap(
     ptr: NativePointer,
     contextPtr: NativePointer,
@@ -524,9 +526,11 @@ private external fun _nReadPixelsBitmap(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
+@ForceNativeThreadState
 private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
+@ForceNativeThreadState
 private external fun _nAdoptTextureFrom(
     contextPtr: NativePointer,
     backendTexture: NativePointer,
@@ -535,6 +539,7 @@ private external fun _nAdoptTextureFrom(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFromAlphaType")
+@ForceNativeThreadState
 private external fun _nAdoptTextureFromAlphaType(
     contextPtr: NativePointer,
     backendTexture: NativePointer,

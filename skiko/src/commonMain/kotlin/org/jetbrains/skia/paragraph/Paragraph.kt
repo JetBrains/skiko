@@ -342,9 +342,11 @@ private external fun _nGetLongestLine(ptr: NativePointer): Float
 private external fun _nDidExceedMaxLines(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nLayout")
+@ForceNativeThreadState
 private external fun _nLayout(ptr: NativePointer, width: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nPaint")
+@ForceNativeThreadState
 private external fun _nPaint(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange")
@@ -367,6 +369,7 @@ private external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Floa
 private external fun _nGetWordBoundary(ptr: NativePointer, offset: Int, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics")
+@ForceNativeThreadState
 private external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): InteropPointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetLineNumber")
@@ -391,7 +394,9 @@ private external fun _nUpdateAlignment(ptr: NativePointer, Align: Int)
 private external fun _nUpdateFontSize(ptr: NativePointer, from: Int, to: Int, size: Float, textPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateForegroundPaint")
+@ForceNativeThreadState
 private external fun _nUpdateForegroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateBackgroundPaint")
+@ForceNativeThreadState
 private external fun _nUpdateBackgroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)

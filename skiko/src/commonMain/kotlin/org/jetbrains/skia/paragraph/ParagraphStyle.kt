@@ -2,6 +2,7 @@ package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.FontEdging
 import org.jetbrains.skia.FontHinting
 import org.jetbrains.skia.impl.*
@@ -267,6 +268,7 @@ private external fun _nSetStrutStyle(ptr: NativePointer, stylePtr: NativePointer
 private external fun _nGetTextStyle(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextStyle")
+@ForceNativeThreadState
 private external fun _nSetTextStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetDirection")

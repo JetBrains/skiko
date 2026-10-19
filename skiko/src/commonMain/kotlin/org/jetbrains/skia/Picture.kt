@@ -255,6 +255,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
+@ForceNativeThreadState
 private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
@@ -264,6 +265,7 @@ private external fun _nGetCullRect(ptr: NativePointer, ltrb: InteropPointer)
 private external fun _nGetUniqueId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
+@ForceNativeThreadState
 private external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
@@ -290,4 +292,5 @@ private external fun _nMakeShader(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
+@ForceNativeThreadState
 private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, data: InteropPointer)

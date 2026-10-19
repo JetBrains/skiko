@@ -2,6 +2,7 @@ package org.jetbrains.skia.impl
 
 import kotlinx.cinterop.nativeNullPtr
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import kotlin.concurrent.AtomicNativePtr
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.native.concurrent.freeze
@@ -61,4 +62,5 @@ actual abstract class Managed actual constructor(
 }
 
 @ExternalSymbolName("org_jetbrains_skia_impl_Managed__invokeFinalizer")
+@ForceNativeThreadState
 internal external fun _nInvokeFinalizer(finalizer: NativePointer, ptr: NativePointer)

@@ -311,6 +311,7 @@ internal external fun _nMakeFromFile(path: InteropPointer): NativePointer
 private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nRender")
+@ForceNativeThreadState
 private external fun _nRender(
     ptr: NativePointer,
     canvasPtr: NativePointer,
@@ -323,12 +324,15 @@ private external fun _nRender(
 
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeek")
+@ForceNativeThreadState
 private external fun _nSeek(ptr: NativePointer, t: Float, icPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrame")
+@ForceNativeThreadState
 private external fun _nSeekFrame(ptr: NativePointer, t: Float, icPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
+@ForceNativeThreadState
 private external fun _nSeekFrameTime(ptr: NativePointer, t: Float, icPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetDuration")

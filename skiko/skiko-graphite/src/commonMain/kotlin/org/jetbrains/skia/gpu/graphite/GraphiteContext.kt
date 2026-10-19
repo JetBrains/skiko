@@ -1,6 +1,7 @@
 package org.jetbrains.skia.gpu.graphite
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
@@ -172,6 +173,7 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
 private external fun _nGetGraphiteContextFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeMetal")
+@ForceNativeThreadState
 private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeVulkan")
@@ -185,9 +187,11 @@ private external fun _nMakeVulkan(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeRecorder")
+@ForceNativeThreadState
 private external fun _nMakeRecorder(contextPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nInsertRecording")
+@ForceNativeThreadState
 private external fun _nInsertRecording(
     contextPtr: NativePointer,
     recordingPtr: NativePointer,
@@ -198,4 +202,5 @@ private external fun _nInsertRecording(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nSubmit")
+@ForceNativeThreadState
 private external fun _nSubmit(contextPtr: NativePointer, syncCpu: Boolean)

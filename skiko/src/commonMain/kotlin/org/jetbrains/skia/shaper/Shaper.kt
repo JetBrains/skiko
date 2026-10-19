@@ -256,6 +256,7 @@ private external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: NativePointer): Na
 private external fun _nMakeCoreText(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeBlob")
+@ForceNativeThreadState
 private external fun _nShapeBlob(
     ptr: NativePointer,
     text: NativePointer,
@@ -270,6 +271,7 @@ private external fun _nShapeBlob(
 
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeLine")
+@ForceNativeThreadState
 private external fun _nShapeLine(
     ptr: NativePointer,
     text: NativePointer,
@@ -280,6 +282,7 @@ private external fun _nShapeLine(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShape")
+@ForceNativeThreadState
 internal external fun Shaper_nShape(
     ptr: NativePointer,
     textPtr: NativePointer,

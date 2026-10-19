@@ -6,6 +6,7 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 
@@ -85,4 +86,5 @@ private external fun TextBlobBuilderRunHandler_nGetFinalizer(): NativePointer
 private external fun TextBlobBuilderRunHandler_nMake(textPtr: NativePointer, offsetX: Float, offsetY: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nMakeBlob")
+@ForceNativeThreadState
 private external fun _nMakeBlob(ptr: NativePointer): NativePointer

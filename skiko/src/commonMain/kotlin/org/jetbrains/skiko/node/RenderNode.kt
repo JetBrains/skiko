@@ -381,6 +381,7 @@ private external fun RenderNode_nMake(context: NativePointer): NativePointer
 private external fun RenderNode_nGetLayerPaint(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetLayerPaint")
+@ForceNativeThreadState
 private external fun RenderNode_nSetLayerPaint(ptr: NativePointer, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds")
@@ -486,7 +487,9 @@ private external fun RenderNode_nSetClip(ptr: NativePointer, clip: Boolean)
 private external fun RenderNode_nBeginRecording(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nEndRecording")
+@ForceNativeThreadState
 private external fun RenderNode_nEndRecording(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nDrawInto")
+@ForceNativeThreadState
 private external fun RenderNode_nDrawInto(ptr: NativePointer, canvas: NativePointer)

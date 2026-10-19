@@ -240,9 +240,11 @@ private external fun TextBlobBuilder_nGetFinalizer(): NativePointer
 private external fun TextBlobBuilder_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nBuild")
+@ForceNativeThreadState
 private external fun _nBuild(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
+@ForceNativeThreadState
 private external fun _nAppendRun(
     ptr: NativePointer, fontPtr: NativePointer,
     glyphs: InteropPointer, glyphsLen: Int,
@@ -251,6 +253,7 @@ private external fun _nAppendRun(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
+@ForceNativeThreadState
 private external fun _nAppendRunPosH(
     ptr: NativePointer,
     fontPtr: NativePointer,
@@ -263,6 +266,7 @@ private external fun _nAppendRunPosH(
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
+@ForceNativeThreadState
 private external fun _nAppendRunPos(
     ptr: NativePointer, fontPtr: NativePointer,
     glyphs: InteropPointer, glyphsLen: Int,
@@ -271,6 +275,7 @@ private external fun _nAppendRunPos(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
+@ForceNativeThreadState
 private external fun _nAppendRunRSXform(
     ptr: NativePointer, fontPtr: NativePointer,
     glyphs: InteropPointer, glyphsLen: Int,

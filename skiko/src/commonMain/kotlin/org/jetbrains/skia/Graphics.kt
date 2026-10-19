@@ -130,21 +130,27 @@ class Graphics {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheLimit")
+@ForceNativeThreadState
 private external fun _nGetFontCacheLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCacheLimit")
+@ForceNativeThreadState
 private external fun _nSetFontCacheLimit(bytes: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheUsed")
+@ForceNativeThreadState
 private external fun _nGetFontCacheUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountLimit")
+@ForceNativeThreadState
 private external fun _nGetFontCacheCountLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCacheCountLimit")
+@ForceNativeThreadState
 private external fun _nSetFontCacheCountLimit(count: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountUsed")
+@ForceNativeThreadState
 private external fun _nGetFontCacheCountUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalByteLimit")
@@ -163,10 +169,12 @@ private external fun _nSetResourceCacheSingleAllocationByteLimit(bytes: Int): In
 private external fun _nGetResourceCacheTotalBytesUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeFontCache")
+@ForceNativeThreadState
 private external fun _nPurgeFontCache()
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeResourceCache")
 private external fun _nPurgeResourceCache()
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeAllCaches")
+@ForceNativeThreadState
 private external fun _nPurgeAllCaches()

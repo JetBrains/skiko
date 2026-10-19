@@ -3,6 +3,7 @@ package org.jetbrains.skia.paragraph
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.*
 
 class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
@@ -160,24 +161,30 @@ private external fun _nMake(): NativePointer
 private external fun _nGetFontManagersCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager")
+@ForceNativeThreadState
 private external fun _nSetAssetFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager")
+@ForceNativeThreadState
 private external fun _nSetDynamicFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager")
+@ForceNativeThreadState
 private external fun _nSetTestFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager")
+@ForceNativeThreadState
 private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyName: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFallbackManager")
 private external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces")
+@ForceNativeThreadState
 private external fun _nFindTypefaces(ptr: NativePointer, familyNames: InteropPointer, len: Int, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar")
+@ForceNativeThreadState
 private external fun _nDefaultFallbackChar(
     ptr: NativePointer,
     unicode: Int,
@@ -188,6 +195,7 @@ private external fun _nDefaultFallbackChar(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallback")
+@ForceNativeThreadState
 private external fun _nDefaultFallback(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetEnableFallback")

@@ -3,6 +3,7 @@ package org.jetbrains.skia.paragraph
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.*
 
 class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
@@ -106,6 +107,7 @@ private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr:
 private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
+@ForceNativeThreadState
 private external fun _nPopStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
