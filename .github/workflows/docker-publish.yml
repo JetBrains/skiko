@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       linux_amd64: ${{ steps.filter.outputs.linux_amd64 }}
-      linux_compat: ${{ steps.filter.outputs.linux_compat }}
       linux_emscripten_amd64: ${{ steps.filter.outputs.linux_emscripten_amd64 }}
       windows: ${{ steps.filter.outputs.windows }}
       docker_workflow: ${{ steps.filter.outputs.docker_workflow }}
@@ -39,8 +38,6 @@ jobs:
               - '.github/workflows/docker-publish.yml'
             linux_amd64:
               - 'skiko/docker/linux-amd64/**'
-            linux_compat:
-              - 'skiko/docker/linux-compat/**'
             linux_emscripten_amd64:
               - 'skiko/docker/linux-emscripten-amd64/**'
             windows:
@@ -66,31 +63,6 @@ jobs:
         id: docker-publish
         with:
           image_name: linux-amd64
-          tag: ${{ github.ref_name }}
-          should_publish: ${{ inputs.publish }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-  linux-compat:
-    name: 'Docker Linux (Compatibility)'
-    runs-on: ubuntu-24.04
-    needs: changes
-    if: |
-      needs.changes.outputs.linux_compat == 'true' ||
-      needs.changes.outputs.docker_workflow == 'true'
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - uses: actions/checkout@v4
-        name: 'Check out code'
-
-      - uses: ./.github/actions/docker-skiko-publish
-        name: 'Build and Publish Docker Image'
-        id: docker-publish
-        with:
-          image_name: linux-compat
-          platforms: linux/amd64,linux/arm64
           tag: ${{ github.ref_name }}
           should_publish: ${{ inputs.publish }}
           github_token: ${{ secrets.GITHUB_TOKEN }}

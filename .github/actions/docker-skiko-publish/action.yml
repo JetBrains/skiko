@@ -3,7 +3,7 @@ description: 'Build and optionally publish a Docker image to ghcr.io for skiko'
 
 inputs:
   image_name:
-    description: 'Image name (e.g., linux-compat)'
+    description: 'Image name (e.g., linux-amd64)'
     required: true
   platforms:
     description: 'Target platforms (e.g., linux/amd64 or linux/amd64,linux/arm64). If not specified, uses runner architecture.'

@@ -356,13 +356,15 @@ fun SkikoProjectContext.configureNativeTarget(
             options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
             options.addAll(resolvedBinaryInputs.linkFlags)
+            options.add("-lstdc++")
+            options.add("--unresolved-symbols=ignore-all")
+            options.add("-lc_nonshared")
             // When cross-compiling for ARM64 from x64, use the ARM toolchain sysroot
             if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
-                // ARM GNU toolchain sysroot paths
                 options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
                 options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
             }
-            options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
+            options.add("--exclude-libs=${mergedArchive.get().asFile.name}")
             mutableListOfLinkerOptions(options)
         }
         else -> mutableListOf()

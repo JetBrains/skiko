@@ -190,7 +190,7 @@ jobs:
         name: 'Run AWT Tests'
         timeout-minutes: 25
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           virtual-display: true
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
@@ -266,7 +266,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name: 'Run Linux (arm64) Tests'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           working_directory: skiko
           virtual-display: true
           command: |
@@ -280,7 +280,7 @@ jobs:
         name: 'Run AWT Tests'
         timeout-minutes: 25
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           virtual-display: true
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \

@@ -3,7 +3,7 @@ description: 'Build Docker image locally if needed and run commands inside it'
 
 inputs:
   image_name:
-    description: 'Image name (e.g., linux-compat)'
+    description: 'Image name (e.g., linux-amd64)'
     required: true
   command:
     description: 'Command to run inside the container'

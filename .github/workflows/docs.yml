@@ -26,7 +26,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name: 'Build Dokka Documentation'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \

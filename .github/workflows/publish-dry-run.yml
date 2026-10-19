@@ -17,7 +17,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish Maven Local'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.android.enabled=true \
@@ -26,7 +26,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name: 'Check Android Sample'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           working_directory: samples/SkiaAndroidSample
           command: |
             ./gradlew --no-daemon --stacktrace \
@@ -107,7 +107,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name: 'Publish x64 Maven Local'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \
@@ -129,7 +129,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name: 'Check AWT Sample'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           command: |
             ./gradlew --no-daemon --stacktrace \
               :SkiaAwtSample:installDist
@@ -137,7 +137,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name: 'Check Skiko Extensions Sample'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           virtual-display: true
           command: |
             ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
@@ -157,7 +157,7 @@ jobs:
       - uses: ./.github/actions/docker-skiko-run
         name:  'Publish AWT Runtime arm64 Maven Local'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           command: |
             ./gradlew -p skiko --no-daemon --stacktrace \
               -Pskiko.awt.enabled=true \
