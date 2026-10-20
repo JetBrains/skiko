@@ -1,16 +1,12 @@
-# Multi-architecture Dockerfile for building Skiko on Linux, compatible with GLIBC 2.26
+# Multi-architecture Dockerfile for building Skiko on Linux
 # Supports both amd64 (x64) and arm64 architectures
 
-FROM amazonlinux:2
+FROM amazonlinux:2023
 ARG TARGETARCH
 
 # Install basic & development tools
-RUN yum install -y tar xz git wget curl zip unzip gzip && \
-    yum install -y gcc10 gcc10-c++ gcc10-binutils make && \
-    ln -sf /usr/bin/gcc10-gcc /usr/bin/gcc && \
-    ln -sf /usr/bin/gcc10-g++ /usr/bin/g++ && \
-    ln -sf /usr/bin/gcc10-ar /usr/bin/ar && \
-    ln -sf /usr/bin/gcc10-nm /usr/bin/nm && \
+RUN yum install -y tar xz git wget zip unzip gzip libxcrypt-compat && \
+    yum install -y gcc gcc-c++ binutils make && \
     yum clean all
 
 # Install Xvfb (and GLX module) for headless UI testing
@@ -20,6 +16,7 @@ RUN yum install -y xorg-x11-server-Xvfb xorg-x11-server-Xorg && \
 # Install libraries for native builds
 RUN yum install -y \
     fontconfig fontconfig-devel \
+    dejavu-sans-fonts \
     freetype freetype-devel \
     mesa-libGL mesa-libGL-devel \
     mesa-libEGL mesa-libEGL-devel \
@@ -91,14 +88,14 @@ RUN git clone 'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 # Linux ARM64 as a HOST platform (only as a target). When cross-compiling from x64 to ARM64,
 # Kotlin/Native's linker needs ARM64 versions of system libraries.
 # See: https://youtrack.jetbrains.com/issue/KT-36871
-ENV ARM_TOOLCHAIN_VERSION=10.3-2021.07
+ENV ARM_TOOLCHAIN_VERSION=11.2-2022.02
 ENV ARM_TOOLCHAIN_NAME=gcc-arm-${ARM_TOOLCHAIN_VERSION}-x86_64-aarch64-none-linux-gnu
 ENV ARM_TOOLCHAIN_PATH=/opt/arm-gnu-toolchain
 ENV PATH="/usr/local/bin:$ARM_TOOLCHAIN_PATH/bin:$PATH"
 ENV ARM_TOOLCHAIN_SYSROOT=$ARM_TOOLCHAIN_PATH/aarch64-none-linux-gnu/libc
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
     cd /tmp && mkdir -p $ARM_TOOLCHAIN_PATH && \
-    wget -q https://developer.arm.com/-/media/Files/downloads/gnu-a/$ARM_TOOLCHAIN_VERSION/binrel/$ARM_TOOLCHAIN_NAME.tar.xz && \
+    wget -q https://developer.arm.com/-/media/Files/downloads/gnu/$ARM_TOOLCHAIN_VERSION/binrel/$ARM_TOOLCHAIN_NAME.tar.xz && \
     tar -xf $ARM_TOOLCHAIN_NAME.tar.xz --strip-components=1 -C $ARM_TOOLCHAIN_PATH && rm $ARM_TOOLCHAIN_NAME.tar.xz && \
     ln -s $ARM_TOOLCHAIN_PATH/bin/aarch64-none-linux-gnu-g++ /usr/local/bin/aarch64-linux-gnu-g++ && \
     ln -s $ARM_TOOLCHAIN_PATH/bin/aarch64-none-linux-gnu-gcc /usr/local/bin/aarch64-linux-gnu-gcc && \
