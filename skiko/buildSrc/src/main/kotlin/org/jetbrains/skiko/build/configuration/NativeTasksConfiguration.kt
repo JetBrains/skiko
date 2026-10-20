@@ -387,6 +387,9 @@ fun SkikoProjectContext.configureNativeTarget(
             options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
             options.addAll(resolvedBinaryInputs.linkFlags)
+            options.add("-lstdc++")
+            options.add("--unresolved-symbols=ignore-all")
+            options.add("--undefined-version")
             options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
             mutableListOfLinkerOptions(options)
         }
