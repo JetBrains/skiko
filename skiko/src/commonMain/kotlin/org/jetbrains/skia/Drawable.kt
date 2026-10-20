@@ -148,12 +148,14 @@ private external fun Drawable_nGetGenerationId(ptr: NativePointer): Int
 private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
+@ForceNativeThreadState
 private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
 private external fun _nNotifyDrawingChanged(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetBounds")
+@ForceNativeThreadState
 private external fun Drawable_nGetBounds(ptr: NativePointer, result: InteropPointer)
 
 // For Native/JS usage only

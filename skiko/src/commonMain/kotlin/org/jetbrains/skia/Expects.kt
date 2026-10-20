@@ -43,6 +43,8 @@ expect annotation class ExternalSymbolName(val name: String)
  *   canvas that can be GPU-backed, read or write GPU pixels, or flush or submit GPU work;
  * - take a Skia lock that is held across such calls, such as the glyph cache lock or the
  *   paragraph cache lock;
+ * - call back into Kotlin, because the callback bridge switches the thread to the Native state
+ *   when it returns;
  * - wait for another thread.
  *
  * Other bindings stay unmarked: getters and setters of plain values, geometry, and CPU work without text.
