@@ -48,8 +48,10 @@ fun Surface.Companion.wrapBackendTexture(
     }
 }
 
-// Native: SkSurfaces::WrapBackendTexture -> MtlResourceProvider::createWrappedTexture -> Device::Make
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_SurfaceFactory__1nWrapBackendTexture")
+// Needs ForceNativeThreadState: wraps a Metal texture in a new surface and drops the old color space and surface
+// references.
+// Native call path: SkSurfaces::WrapBackendTexture -> MtlResourceProvider::createWrappedTexture -> Device::Make
 @ForceNativeThreadState
 private external fun _nWrapBackendTexture(
     recorderPtr: NativePointer,

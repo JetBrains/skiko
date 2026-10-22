@@ -44,11 +44,14 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
     }
 }
 
-// Native: MakeIcuBiDiRunIterator -> UTF8ToUTF16 copy -> makeBidiIterator -> ubidi_setPara over whole text
 @ExternalSymbolName("org_jetbrains_skia_shaper_IcuBidiRunIterator__1nMake")
+// Needs ForceNativeThreadState: copies the whole text to UTF-16 and runs bidi analysis over all of it, so its time
+// grows with the text length.
+// Native call path: MakeIcuBiDiRunIterator -> UTF8ToUTF16 -> makeBidiIterator -> ubidi_setPara
 @ForceNativeThreadState
 private external fun _nMake(textPtr: NativePointer, bidiLevel: Int): NativePointer
 
-// Runnable: SkUnicodeBidiRunIterator::currentLevel returns the stored fLevel
 @ExternalSymbolName("org_jetbrains_skia_shaper_IcuBidiRunIterator__1nGetCurrentLevel")
+// No ForceNativeThreadState: only returns a stored level, so it is short and cannot block.
+// Native call path: SkUnicodeBidiRunIterator::currentLevel
 private external fun _nGetCurrentLevel(ptr: NativePointer): Int

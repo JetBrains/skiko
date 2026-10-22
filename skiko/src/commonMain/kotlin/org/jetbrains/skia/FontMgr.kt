@@ -186,33 +186,45 @@ open class FontMgr : RefCnt {
 }
 
 
-// Native: SkFontMgr_DirectWrite::onCountFamilies -> GetFontFamilyCount lacks a source proof of bounded work
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamiliesCount")
+// Needs ForceNativeThreadState: calls into the DirectWrite font library, whose code cannot be shown to avoid blocking
+// or long work.
+// Native call path: SkFontMgr_DirectWrite::onCountFamilies -> GetFontFamilyCount
 @ForceNativeThreadState
 private external fun _nGetFamiliesCount(ptr: NativePointer): Int
 
-// Native: SkFontMgr_Mac::onGetFamilyName -> SkStringFromCFString on a CFString
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamilyName")
+// Needs ForceNativeThreadState: reads a font family name through CoreFoundation, an Apple platform API that converts it
+// to a string.
+// Native call path: SkFontMgr_Mac::onGetFamilyName -> SkStringFromCFString
 @ForceNativeThreadState
 private external fun _nGetFamilyName(ptr: NativePointer, index: Int): NativePointer
 
-// Native: SkFontMgr_Mac::onCreateStyleSet -> CreateSet -> CTFontDescriptorCreateMatchingFontDescriptors
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeStyleSet")
+// Needs ForceNativeThreadState: asks CoreText for the font descriptors of a family and builds a style set from them.
+// Native call path: SkFontMgr_Mac::onCreateStyleSet -> CreateSet -> CTFontDescriptorCreateMatchingFontDescriptors
 @ForceNativeThreadState
 private external fun _nMakeStyleSet(ptr: NativePointer, index: Int): NativePointer
 
-// Native: SkFontMgr_Mac::onMatchFamily -> CreateSet -> CTFontDescriptorCreateMatchingFontDescriptors
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamily")
+// Needs ForceNativeThreadState: asks CoreText to match a font family name and builds a style set from the result.
+// Native call path: SkFontMgr_Mac::onMatchFamily -> CreateSet -> CTFontDescriptorCreateMatchingFontDescriptors
 @ForceNativeThreadState
 private external fun _nMatchFamily(ptr: NativePointer, familyName: InteropPointer): NativePointer
 
-// Native: SkFontMgr_Mac::onMatchFamilyStyle -> CTFontDescriptorCreateMatchingFontDescriptor -> create_from_desc
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
+// Needs ForceNativeThreadState: asks CoreText for the one font that matches a family and style, and creates a typeface
+// from it.
+// Native call path: SkFontMgr_Mac::onMatchFamilyStyle -> CTFontDescriptorCreateMatchingFontDescriptor ->
+//   create_from_desc
 @ForceNativeThreadState
 private external fun _nMatchFamilyStyle(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer
 
-// Native: SkFontMgr_Mac::onMatchFamilyStyleCharacter -> CTFontCreateForStringWithLanguage -> SkTypeface_Mac::Make
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter")
+// Needs ForceNativeThreadState: asks CoreText for a font that can draw a given character, and creates a typeface from
+// it.
+// Native call path: SkFontMgr_Mac::onMatchFamilyStyleCharacter -> CTFontCreateForStringWithLanguage ->
+//   SkTypeface_Mac::Make
 @ForceNativeThreadState
 private external fun _nMatchFamilyStyleCharacter(
     ptr: NativePointer,
@@ -223,22 +235,27 @@ private external fun _nMatchFamilyStyleCharacter(
     character: Int
 ): NativePointer
 
-// Native: SkFontMgr_Mac::onMakeFromData -> SkTypeface_Mac::MakeFromStream -> ctfont_from_skdata (CoreText)
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromData")
+// Needs ForceNativeThreadState: loads a font from a block of bytes in memory through CoreText.
+// Native call path: SkFontMgr_Mac::onMakeFromData -> SkTypeface_Mac::MakeFromStream -> ctfont_from_skdata
 @ForceNativeThreadState
 private external fun _nMakeFromData(ptr: NativePointer, dataPtr: NativePointer, ttcIndex: Int): NativePointer
 
-// Native: SkFontMgr_Mac::onMakeFromFile -> SkData::MakeFromFileName (file I/O) -> onMakeFromData -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromFile")
+// Needs ForceNativeThreadState: reads a font file from disk, then loads its bytes through CoreText.
+// Native call path: SkFontMgr_Mac::onMakeFromFile -> SkData::MakeFromFileName -> onMakeFromData
 @ForceNativeThreadState
 private external fun _nMakeFromFile(ptr: NativePointer, pathPtr: InteropPointer, ttcIndex: Int): NativePointer
 
-// Native: SkFontMgrSkikoDefault -> SkFontMgr_New_CoreText -> SkFontMgr_Mac ctor -> CoreText font collection
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
+// Needs ForceNativeThreadState: builds the list of installed fonts by asking CoreText for the full font collection.
+// Native call path: SkFontMgrSkikoDefault -> SkFontMgr_New_CoreText -> SkFontMgr_Mac::SkFontMgr_Mac
 @ForceNativeThreadState
 private external fun _nDefault(): NativePointer
 
-// Native: SkFontMgr_Mac::onLegacyMakeTypeface -> create_from_name -> CTFontCreateWithFontDescriptor
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nLegacyMakeTypeface")
+// Needs ForceNativeThreadState: asks CoreText to create a font from a family name and style, and creates a typeface
+// from it.
+// Native call path: SkFontMgr_Mac::onLegacyMakeTypeface -> create_from_name -> CTFontCreateWithFontDescriptor
 @ForceNativeThreadState
 private external fun _nLegacyMakeTypeface(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer

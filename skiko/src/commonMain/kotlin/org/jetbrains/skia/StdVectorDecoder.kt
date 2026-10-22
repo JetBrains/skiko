@@ -2,17 +2,22 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.NativePointer
 
-// Runnable: std::vector::size returns a stored value
 @ExternalSymbolName("org_jetbrains_skia_StdVectorDecoder__1nGetArraySize")
+// No ForceNativeThreadState: returns the stored size of a vector, so it is short and cannot block.
+// Native call path: std::vector::size
 private external fun StdVectorDecoder_nGetArraySize(array: NativePointer): Int
 
-// Native: calls the caller-supplied dtor on every element -> Typeface/Data/etc. last unref
 @ExternalSymbolName("org_jetbrains_skia_StdVectorDecoder__1nDisposeArray")
+// Needs ForceNativeThreadState: calls a caller-supplied destructor for each non-null element, which can release a
+// CoreText font; work grows with the vector size.
+// Native call path: disposePtr -> SkRefCnt::unref
 @ForceNativeThreadState
 private external fun StdVectorDecoder_nDisposeArray(array: NativePointer, disposePtr: NativePointer)
 
-// Runnable: moves one pointer out of the vector and nulls the slot
 @ExternalSymbolName("org_jetbrains_skia_StdVectorDecoder__1nReleaseElement")
+// No ForceNativeThreadState: moves one pointer out of the vector and clears its slot without running any destructor, so
+// it is short and cannot block.
+// Native call path: std::vector::operator[]
 private external fun StdVectorDecoder_nReleaseElement(array: NativePointer, index: Int): NativePointer
 
 

@@ -82,8 +82,10 @@ object SVGCanvas {
     }
 }
 
-// Native: SkSVGCanvas::Make -> SkSVGDevice ctor writes the XML header and root element into an arbitrary SkWStream
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGCanvasKt__1nMake")
+// Needs ForceNativeThreadState: writes the SVG header and root element to a caller-supplied output stream, which may
+// block.
+// Native call path: SkSVGCanvas::Make -> SkSVGDevice::SkSVGDevice
 @ForceNativeThreadState
 private external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: NativePointer, flags: Int): NativePointer
 

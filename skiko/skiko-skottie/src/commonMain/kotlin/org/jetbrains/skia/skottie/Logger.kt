@@ -30,25 +30,32 @@ abstract class Logger : RefCnt(_nMake()) {
 
 internal expect fun Logger.doInit(ptr: NativePointer)
 
-// Runnable: new SkikoLogger default-constructs empty SkStrings and a KVoidCallback holding nullptr
 @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nMake")
+// No ForceNativeThreadState: creates a logger with empty strings and no callback, so it is short and cannot block.
+// Native call path: SkikoLogger::SkikoLogger
 private external fun _nMake(): NativePointer
 
 // Native/JS only
 
-// Native: assigning KVoidCallback destroys the old one -> ~KCallback -> disposeCallback into Kotlin
 @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nInit")
+// Needs ForceNativeThreadState: replacing the callback destroys the old one, which calls back into Kotlin to dispose
+// it.
+// Native call path: KVoidCallback::operator= -> ~KCallback -> disposeCallback
 @ForceNativeThreadState
 internal external fun Logger_nInit(ptr: NativePointer, onLog: InteropPointer)
 
-// Runnable: SkikoLogger::logMessage returns the address of the stored SkString
 @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nGetLogMessage")
+// No ForceNativeThreadState: returns the address of the stored log message string, so it is short and cannot block.
+// Native call path: SkikoLogger::logMessage
 internal external fun Logger_nGetLogMessage(ptr: NativePointer): NativePointer
 
-// Runnable: SkikoLogger::logJson returns the address of a stored SkString or null
 @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nGetLogJson")
+// No ForceNativeThreadState: returns the address of the stored JSON log string, or null when there is none, so it is
+// short and cannot block.
+// Native call path: SkikoLogger::logJson
 internal external fun Logger_nGetLogJson(ptr: NativePointer): NativePointer
 
-// Runnable: SkikoLogger::logLevel returns the stored level field
 @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nGetLogLevel")
+// No ForceNativeThreadState: returns the stored log level, so it is short and cannot block.
+// Native call path: SkikoLogger::logLevel
 internal external fun Logger_nGetLogLevel(ptr: NativePointer): Int

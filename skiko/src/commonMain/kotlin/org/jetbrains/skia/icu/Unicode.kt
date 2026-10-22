@@ -185,12 +185,16 @@ object CharProperties {
     }
 }
 
-// Runnable: u_charDirection -> ubidi_getClass reads a compiled-in UTrie2 table
 @ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCharDirection")
+// No ForceNativeThreadState: looks up a character's direction in a built-in table, with no lazy setup or lock, so it is
+// short and cannot block.
+// Native call path: u_charDirection -> ubidi_getClass
 private external fun _nCharDirection(codePoint: Int): Int
 
-// Native: u_hasBinaryProperty -> Normalizer2Factory::getNFCImpl -> umtx_initOnce (mutex wait, udata load)
 @ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCodePointHasBinaryProperty")
+// Needs ForceNativeThreadState: loads Unicode data on first use, and can wait for another thread that is still loading
+// it.
+// Native call path: u_hasBinaryProperty -> Normalizer2Factory::getNFCImpl -> umtx_initOnce
 @ForceNativeThreadState
 private external fun _nCodePointHasBinaryProperty(codePoint: Int, property: Int): Boolean
 

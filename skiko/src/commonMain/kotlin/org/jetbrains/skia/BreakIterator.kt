@@ -536,68 +536,92 @@ private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer)
     }
 }
 
-// Runnable: returns the address of deleteBreakIterator
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteBreakIterator
 private external fun BreakIterator_nGetFinalizer(): NativePointer
 
-// Native: ubrk_open -> BreakIterator::createInstance -> makeInstance loads rule data under ICU global locks
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
+// Needs ForceNativeThreadState: loads ICU break rules and dictionaries under a lock that all threads share, so it can
+// wait for another thread.
+// Native call path: ubrk_open -> BreakIterator::createInstance -> makeInstance
 @ForceNativeThreadState
 private external fun _nMake(type: Int, locale: InteropPointer, errorCode: InteropPointer): NativePointer
 
-// Runnable: RuleBasedBreakIterator::current returns fPosition
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nCurrent")
+// No ForceNativeThreadState: returns the stored current position, so it is short and cannot block.
+// Native call path: ubrk_current -> RuleBasedBreakIterator::current
 private external fun _nCurrent(ptr: NativePointer): Int
 
-// Native: BreakCache::next -> populateFollowing -> populateDictionary segments a whole dictionary run
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nNext")
+// Needs ForceNativeThreadState: splits a whole dictionary run of text into segments, so its time grows with the run
+// length.
+// Native call path: ubrk_next -> BreakCache::next -> populateFollowing -> populateDictionary
 @ForceNativeThreadState
 private external fun _nNext(ptr: NativePointer): Int
 
-// Native: BreakCache::previous -> populatePreceding scans back and may segment a dictionary run
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPrevious")
+// Needs ForceNativeThreadState: scans back through the text and may split a dictionary run into segments, so its time
+// grows with the text.
+// Native call path: ubrk_previous -> BreakCache::previous -> populatePreceding -> populateDictionary
 @ForceNativeThreadState
 private external fun _nPrevious(ptr: NativePointer): Int
 
-// Native: first -> BreakCache::populateNear(0) runs the state machine and dictionary segmentation
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFirst")
+// Needs ForceNativeThreadState: finds text boundaries from the start and can split a text run using dictionary rules,
+// so work grows with the text processed.
+// Native call path: ubrk_first -> BreakCache::populateNear -> populateDictionary
 @ForceNativeThreadState
 private external fun _nFirst(ptr: NativePointer): Int
 
-// Native: last -> isBoundary(end) -> populateNear scans back over the text with safe-reverse rules
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nLast")
+// Needs ForceNativeThreadState: scans back over the text from its end, so its time grows with the text length.
+// Native call path: ubrk_last -> isBoundary -> populateNear -> handleSafePrevious
 @ForceNativeThreadState
 private external fun _nLast(ptr: NativePointer): Int
 
-// Native: preceding -> BreakCache::preceding -> populateNear scans back from an arbitrary offset
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPreceding")
+// Needs ForceNativeThreadState: scans back from an arbitrary offset in the text, so its time grows with the text
+// length.
+// Native call path: ubrk_preceding -> BreakCache::preceding -> populateNear -> handleSafePrevious
 @ForceNativeThreadState
 private external fun _nPreceding(ptr: NativePointer, offset: Int): Int
 
-// Native: following -> BreakCache::following -> populateNear scans from an arbitrary offset
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFollowing")
+// Needs ForceNativeThreadState: scans forward from an arbitrary offset in the text, so its time grows with the text
+// length.
+// Native call path: ubrk_following -> BreakCache::following -> populateNear -> populateFollowing
 @ForceNativeThreadState
 private external fun _nFollowing(ptr: NativePointer, offset: Int): Int
 
-// Native: isBoundary -> BreakCache::populateNear scans back from an arbitrary offset, then next()
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nIsBoundary")
+// Needs ForceNativeThreadState: scans back from an arbitrary offset, then moves forward again, so its time grows with
+// the text length.
+// Native call path: ubrk_isBoundary -> isBoundary -> BreakCache::populateNear -> handleSafePrevious
 @ForceNativeThreadState
 private external fun _nIsBoundary(ptr: NativePointer, offset: Int): Boolean
 
-// Runnable: getRuleStatus indexes the compiled rule status table
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatus")
+// No ForceNativeThreadState: reads two values from the compiled rule status table, so it is short and cannot block.
+// Native call path: ubrk_getRuleStatus -> RuleBasedBreakIterator::getRuleStatus
 private external fun _nGetRuleStatus(ptr: NativePointer): Int
 
-// Runnable: getRuleStatusVec with capacity 0 returns a count from the status table
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen")
+// No ForceNativeThreadState: reads the count of rule statuses from the table without copying any, so it is short and
+// cannot block.
+// Native call path: ubrk_getRuleStatusVec -> RuleBasedBreakIterator::getRuleStatusVec
 private external fun _nGetRuleStatusesLen(ptr: NativePointer): Int
 
-// Native: ubrk_getRuleStatusVec -> RuleBasedBreakIterator::getRuleStatusVec loops over rule statuses
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatuses")
+// Needs ForceNativeThreadState: copies one value per rule status, so its time grows with the status count.
+// Native call path: ubrk_getRuleStatusVec -> RuleBasedBreakIterator::getRuleStatusVec
 @ForceNativeThreadState
 private external fun _nGetRuleStatuses(ptr: NativePointer, result: InteropPointer, len: Int)
 
-// Native: copies the whole text into a std::vector, then ubrk_setText resets caches and calls first()
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
+// Needs ForceNativeThreadState: copies the whole text into a new vector, then resets caches and finds the first break,
+// so its time grows with the text length.
+// Native call path: std::vector::vector -> ubrk_setText -> RuleBasedBreakIterator::first
 @ForceNativeThreadState
 private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int, errorCode: InteropPointer): NativePointer

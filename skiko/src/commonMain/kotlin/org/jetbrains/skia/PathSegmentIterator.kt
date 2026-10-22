@@ -125,15 +125,19 @@ private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
     }
 }
 
-// Runnable: _nGetFinalizer returns the address of its delete function; the delete runs via Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
+// No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 private external fun PathSegmentIterator_nGetFinalizer(): NativePointer
 
-// Native: SkPath::Iter::isClosedContour scans the remaining verbs of the contour on every call
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nNext")
+// Needs ForceNativeThreadState: scans the contour's remaining drawing commands on every call, so its time grows with
+// the number of commands remaining.
+// Native call path: SkPath::Iter::isClosedContour
 @ForceNativeThreadState
 private external fun PathSegmentIterator_nNext(ptr: NativePointer, points: InteropPointer)
 
-// Runnable: SkPath::Iter ctor stores the path's verb, point and weight pointers and flags only
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nMake")
+// No ForceNativeThreadState: stores pointers to the path's drawing commands and points plus a few flags, so it is short
+// and cannot block.
+// Native call path: SkPath::Iter::Iter
 private external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer

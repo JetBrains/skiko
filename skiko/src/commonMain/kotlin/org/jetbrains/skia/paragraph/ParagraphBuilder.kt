@@ -97,32 +97,43 @@ private fun makeParagraphBuilder(
     }
 }
 
-// Runnable: returns &deleteParagraphBuilder; the delete itself runs in Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of the delete function without calling it, so it is short and cannot
+// block.
+// Native call path: deleteParagraphBuilder
 private external fun ParagraphBuilder_nGetFinalizer(): NativePointer
 
-// Native: SkUnicodes::ICU::Make -> SkLoadICU -> win_mmap reads icudtl.dat via _wfopen (Windows)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
+// Needs ForceNativeThreadState: on Windows, _wfopen opens icudtl.dat and CreateFileMapping maps it into memory. It also
+// copies the paragraph style.
+// Native call path: SkUnicodes::ICU::Make -> SkLoadICU -> win_mmap -> _wfopen
 @ForceNativeThreadState
 private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
 
-// Native: ParagraphBuilderImpl::pushStyle copies TextStyle vectors and calls TextStyle::equals
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
+// Needs ForceNativeThreadState: copies a text style and compares its font family, shadow and feature lists, so its time
+// grows with their lengths.
+// Native call path: ParagraphBuilderImpl::pushStyle -> TextStyle::equals
 @ForceNativeThreadState
 private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
-// Native: ParagraphBuilderImpl::pop -> ~TextStyle/~Block can drop the last typeface or shader ref
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
+// Needs ForceNativeThreadState: removing a style can release the last reference to a font typeface or paint shader.
+// Native call path: ParagraphBuilderImpl::pop -> ~TextStyle
 @ForceNativeThreadState
 private external fun _nPopStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
-// Native: ParagraphBuilderImpl::addText -> SkString append copies the whole text
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
+// Needs ForceNativeThreadState: copies the whole input text into a string buffer, so its time grows with the text
+// length.
+// Native call path: ParagraphBuilderImpl::addText -> SkString::append
 @ForceNativeThreadState
 private external fun _nAddText(ptr: NativePointer, text: InteropPointer)
 
-// Native: ParagraphBuilderImpl::addPlaceholder -> TextStyle::cloneForPlaceholder copies style vectors
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
+// Needs ForceNativeThreadState: copies the current style, including its font family and feature lists, so its time
+// grows with how many entries they hold.
+// Native call path: ParagraphBuilderImpl::addPlaceholder -> TextStyle::cloneForPlaceholder
 @ForceNativeThreadState
 private external fun _nAddPlaceholder(
     ptr: NativePointer,
@@ -133,7 +144,9 @@ private external fun _nAddPlaceholder(
     baseline: Float
 )
 
-// Native: ParagraphBuilderImpl::Build -> make_unique<ParagraphImpl> copies text, blocks and placeholders
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
+// Needs ForceNativeThreadState: builds the paragraph by copying the text, styled blocks and placeholders, so its time
+// grows with the input size.
+// Native call path: ParagraphBuilderImpl::Build -> make_unique<ParagraphImpl>
 @ForceNativeThreadState
 private external fun _nBuild(ptr: NativePointer): NativePointer

@@ -171,16 +171,21 @@ class LineMetrics(
     }
 }
 
-// Runnable: std::vector::size of the LineMetrics array
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArraySize")
+// No ForceNativeThreadState: returns the number of stored line metrics, so it is short and cannot block.
+// Native call path: std::vector::size
 private external fun LineMetrics_nGetArraySize(array: InteropPointer): Int
 
-// Native: delete vector<LineMetrics> destroys every line std::map of StyleMetrics, growing with line count
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nDisposeArray")
+// Needs ForceNativeThreadState: destroys every line's metrics and frees each style-run entry, so its time grows with
+// the line count and total style-run count.
+// Native call path: std::vector::~vector -> LineMetrics::~LineMetrics -> std::map::~map
 @ForceNativeThreadState
 private external fun LineMetrics_nDisposeArray(array: InteropPointer)
 
-// Native: LineMetrics copy duplicates the fLineMetrics std::map, growing with the style runs on the line
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement")
+// Needs ForceNativeThreadState: copies the metrics of one line, allocating one entry per style run, so its time grows
+// with the style-run count on that line.
+// Native call path: LineMetrics::LineMetrics
 @ForceNativeThreadState
 private external fun LineMetrics_nGetArrayElement(array: InteropPointer, index: Int, intArgs: InteropPointer, doubleArgs: InteropPointer)

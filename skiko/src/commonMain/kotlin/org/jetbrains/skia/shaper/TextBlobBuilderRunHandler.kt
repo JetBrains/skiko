@@ -79,15 +79,19 @@ class TextBlobBuilderRunHandler internal constructor(
     }
 }
 
-// Runnable: returns the address of deleteTextBlobBuilderRunHandler only
 @ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nGetFinalizer")
+// No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
+// Native call path: deleteTextBlobBuilderRunHandler
 private external fun TextBlobBuilderRunHandler_nGetFinalizer(): NativePointer
 
-// Runnable: new SkTextBlobBuilderRunHandler stores the text pointer and offset, builder starts empty
 @ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nMake")
+// No ForceNativeThreadState: stores the text pointer and offset and starts an empty builder, so it is short and cannot
+// block.
+// Native call path: SkTextBlobBuilderRunHandler::SkTextBlobBuilderRunHandler
 private external fun TextBlobBuilderRunHandler_nMake(textPtr: NativePointer, offsetX: Float, offsetY: Float): NativePointer
 
-// Native: SkTextBlobBuilder::make -> updateDeferredBounds -> TightRunBounds -> SkFont::getBounds -> glyph metrics
 @ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nMakeBlob")
+// Needs ForceNativeThreadState: computing the text's bounds obtains glyph measurements through the macOS font scaler.
+// Native call path: SkTextBlobBuilder::make -> updateDeferredBounds -> TightRunBounds -> SkFont::getBounds
 @ForceNativeThreadState
 private external fun _nMakeBlob(ptr: NativePointer): NativePointer

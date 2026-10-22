@@ -397,20 +397,28 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
-// Runnable: SkShaders::Empty only allocates SkEmptyShader
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
+// No ForceNativeThreadState: allocates an empty shader that has no fields or references, so it is short and cannot
+// block.
+// Native call path: SkShaders::Empty
 private external fun Shader_nMakeEmpty(): NativePointer
 
-// Runnable: SkShader::makeWithLocalMatrix allocates SkLocalMatrixShader holding sk_ref_sp of this
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithLocalMatrix")
+// No ForceNativeThreadState: wraps the shader in a local-matrix shader that takes a reference to it, so it is short and
+// cannot block.
+// Native call path: SkShader::makeWithLocalMatrix
 private external fun _nMakeWithLocalMatrix(ptr: NativePointer, localMatrix: InteropPointer): NativePointer
 
-// Runnable: SkColorFilterShader::Make allocates a wrapper holding refs to shader and filter
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithColorFilter")
+// No ForceNativeThreadState: wraps a shader and a color filter in a new shader that holds references to both, so it is
+// short and cannot block.
+// Native call path: SkShader::makeWithColorFilter -> SkColorFilterShader::Make
 private external fun _nMakeWithColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer): NativePointer
 
-// Native: SkShaders::LinearGradient -> SkGradientBaseShader ctor copies and scans every color stop
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradient")
+// Needs ForceNativeThreadState: copies and scans every color stop of the gradient, so its time grows with the number of
+// stops.
+// Native call path: SkShaders::LinearGradient -> SkGradientBaseShader::SkGradientBaseShader
 @ForceNativeThreadState
 private external fun _nMakeLinearGradient(
     x0: Float,
@@ -428,8 +436,10 @@ private external fun _nMakeLinearGradient(
     matrix: InteropPointer
 ): NativePointer
 
-// Native: SkShaders::RadialGradient -> SkGradientBaseShader ctor copies and scans every color stop
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradient")
+// Needs ForceNativeThreadState: copies and scans every color stop of the gradient, so its time grows with the number of
+// stops.
+// Native call path: SkShaders::RadialGradient -> SkGradientBaseShader::SkGradientBaseShader
 @ForceNativeThreadState
 private external fun _nMakeRadialGradient(
     x: Float,
@@ -446,8 +456,10 @@ private external fun _nMakeRadialGradient(
     matrix: InteropPointer
 ): NativePointer
 
-// Native: SkShaders::TwoPointConicalGradient -> SkGradientBaseShader ctor copies and scans every color stop
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
+// Needs ForceNativeThreadState: copies and scans every color stop of the gradient, so its time grows with the number of
+// stops.
+// Native call path: SkShaders::TwoPointConicalGradient -> SkGradientBaseShader::SkGradientBaseShader
 @ForceNativeThreadState
 private external fun _nMakeTwoPointConicalGradient(
     x0: Float,
@@ -467,8 +479,10 @@ private external fun _nMakeTwoPointConicalGradient(
     matrix: InteropPointer
 ): NativePointer
 
-// Native: SkShaders::SweepGradient -> SkGradientBaseShader ctor copies and scans every color stop
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradient")
+// Needs ForceNativeThreadState: copies and scans every color stop of the gradient, so its time grows with the number of
+// stops.
+// Native call path: SkShaders::SweepGradient -> SkGradientBaseShader::SkGradientBaseShader
 @ForceNativeThreadState
 private external fun _nMakeSweepGradient(
     x: Float,
@@ -486,8 +500,10 @@ private external fun _nMakeSweepGradient(
     matrix: InteropPointer
 ): NativePointer
 
-// Native: SkShaders::MakeFractalNoise -> sk_srgb_singleton -> __cxa_guard_acquire may wait (zero octaves)
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeFractalNoise")
+// Needs ForceNativeThreadState: with zero octaves it uses a shared static color space, which may wait for another
+// thread that is still initializing it.
+// Native call path: SkShaders::MakeFractalNoise -> sk_srgb_singleton -> __cxa_guard_acquire
 @ForceNativeThreadState
 private external fun _nMakeFractalNoise(
     baseFrequencyX: Float,
@@ -498,8 +514,10 @@ private external fun _nMakeFractalNoise(
     tileHeight: Int,
 ): NativePointer
 
-// Native: SkShaders::MakeTurbulence -> sk_srgb_singleton -> __cxa_guard_acquire may wait (zero octaves)
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTurbulence")
+// Needs ForceNativeThreadState: with zero octaves it uses a shared static color space, which may wait for another
+// thread that is still initializing it.
+// Native call path: SkShaders::MakeTurbulence -> sk_srgb_singleton -> __cxa_guard_acquire
 @ForceNativeThreadState
 private external fun _nMakeTurbulence(
     baseFrequencyX: Float,
@@ -510,17 +528,23 @@ private external fun _nMakeTurbulence(
     tileHeight: Int,
 ): NativePointer
 
-// Native: SkShaders::Color -> SkColorSpace::MakeSRGB -> sk_srgb_singleton may wait on its static guard
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
+// Needs ForceNativeThreadState: uses a shared static sRGB color space that may wait for another thread initializing it
+// on first use.
+// Native call path: SkShaders::Color -> SkColorSpace::MakeSRGB -> sk_srgb_singleton
 @ForceNativeThreadState
 private external fun _nMakeColor(color: Int): NativePointer
 
-// Native: SkShaders::Color -> SkColorSpace::computeLazyDstFields -> SkOnce::operator() may spin-wait
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColorCS")
+// Needs ForceNativeThreadState: computes lazy color space fields behind a one-time guard that may spin-wait for another
+// thread.
+// Native call path: SkShaders::Color -> SkColorSpace::computeLazyDstFields -> SkOnce::operator()
 @ForceNativeThreadState
 private external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: NativePointer): NativePointer
 
-// Native: SkShaders::Blend -> SkShaders::Color -> sk_srgb_singleton may wait on its static guard
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeBlend")
+// Needs ForceNativeThreadState: a clear blend uses a shared static sRGB color space that may wait for another thread
+// initializing it.
+// Native call path: SkShaders::Blend -> SkShaders::Color -> sk_srgb_singleton
 @ForceNativeThreadState
 private external fun _nMakeBlend(blendMode: Int, dst: NativePointer, src: NativePointer): NativePointer

@@ -312,45 +312,60 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
 }
 
 
-// Runnable: returns the address of deletePixmap
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of the deletion function, so it is short and cannot block.
+// Native call path: deletePixmap
 private external fun Pixmap_nGetFinalizer(): NativePointer
 
-// Runnable: SkPixmap::reset clears fields; old SkColorSpace is plain skcms data
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReset")
+// No ForceNativeThreadState: clears the pixmap's fields, and the color space it drops is plain data, so it is short and
+// cannot block.
+// Native call path: SkPixmap::reset
 private external fun Pixmap_nReset(ptr: NativePointer)
 
-// Runnable: SkPixmap::extractSubset intersects rects and calls reset with pointer math
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nExtractSubset")
+// No ForceNativeThreadState: intersects two rectangles and copies the pixmap fields into a subset, so it is short and
+// cannot block.
+// Native call path: SkPixmap::extractSubset -> SkPixmap::reset
 private external fun Pixmap_nExtractSubset(ptr: NativePointer, subsetPtr: NativePointer, l: Int, t: Int, r: Int, b: Int): Boolean
 
-// Runnable: SkPixmap::rowBytes returns the stored fRowBytes
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytes")
+// No ForceNativeThreadState: returns the stored row byte count, so it is short and cannot block.
+// Native call path: SkPixmap::rowBytes
 private external fun Pixmap_nGetRowBytes(ptr: NativePointer): Int
 
-// Runnable: SkPixmap::rowBytesAsPixels shifts the stored fRowBytes
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytesAsPixels")
+// No ForceNativeThreadState: shifts the stored row byte count to get a pixel count, so it is short and cannot block.
+// Native call path: SkPixmap::rowBytesAsPixels
 private external fun Pixmap_nGetRowBytesAsPixels(ptr: NativePointer): Int
 
-// Runnable: SkPixmap::computeByteSize is SkImageInfo size arithmetic
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeByteSize")
+// No ForceNativeThreadState: does integer size arithmetic on the image info and row bytes, so it is short and cannot
+// block.
+// Native call path: SkPixmap::computeByteSize
 private external fun Pixmap_nComputeByteSize(ptr: NativePointer): Int
 
-// Native: SkPixmap::computeIsOpaque scans every pixel of the image
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeIsOpaque")
+// Needs ForceNativeThreadState: scans every pixel of the image for alpha, so its time grows with the image size in
+// pixels.
+// Native call path: SkPixmap::computeIsOpaque
 @ForceNativeThreadState
 private external fun Pixmap_nComputeIsOpaque(ptr: NativePointer): Boolean
 
-// Runnable: SkPixmap::getColor decodes one pixel with a fixed switch
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetColor")
+// No ForceNativeThreadState: decodes one pixel with a fixed switch on the color type, so it is short and cannot block.
+// Native call path: SkPixmap::getColor
 private external fun Pixmap_nGetColor(ptr: NativePointer, x: Int, y: Int): Int
 
-// Runnable: new SkPixmap() holds only null pointers and an unknown SkImageInfo
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nMakeNull")
+// No ForceNativeThreadState: allocates an empty pixmap that holds only null pointers, so it is short and cannot block.
+// Native call path: SkPixmap::SkPixmap
 private external fun _nMakeNull(): NativePointer
 
-// Runnable: new SkPixmap wraps caller memory and refs the SkColorSpace
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nMake")
+// No ForceNativeThreadState: allocates a pixmap that wraps caller memory and takes a reference to the color space, so
+// it is short and cannot block.
+// Native call path: SkPixmap::SkPixmap
 private external fun Pixmap_nMake(
     width: Int,
     height: Int,
@@ -361,8 +376,10 @@ private external fun Pixmap_nMake(
     rowBytes: Int
 ): NativePointer
 
-// Runnable: SkPixmap::reset(info, ptr, rowBytes) stores fields; old SkColorSpace is plain data
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nResetWithInfo")
+// No ForceNativeThreadState: stores new pixel, row byte and image info fields, and the old color space is plain data,
+// so it is short and cannot block.
+// Native call path: SkPixmap::reset
 private external fun _nResetWithInfo(
     ptr: NativePointer,
     width: Int,
@@ -375,34 +392,44 @@ private external fun _nResetWithInfo(
 )
 
 
-// Runnable: SkPixmap::setColorSpace swaps the stored sk_sp<SkColorSpace>
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nSetColorSpace")
+// No ForceNativeThreadState: swaps in a new color space, and the one it replaces is plain data, so it is short and
+// cannot block.
+// Native call path: SkPixmap::setColorSpace
 private external fun _nSetColorSpace(ptr: NativePointer, colorSpacePtr: NativePointer)
 
-// Runnable: writeImageInfoForInterop copies four ints and refs the SkColorSpace
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetInfo")
+// No ForceNativeThreadState: copies four ints from the image info and takes a reference to its color space, so it is
+// short and cannot block.
+// Native call path: writeImageInfoForInterop
 private external fun _nGetInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
-// Runnable: SkPixmap::addr returns the stored fPixels
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAddr")
+// No ForceNativeThreadState: returns the stored pixel address, so it is short and cannot block.
+// Native call path: SkPixmap::addr
 private external fun _nGetAddr(ptr: NativePointer): NativePointer
 
 // TODO methods flattening ImageInfo not included yet - use GetInfo() instead.
 
 // TODO shiftPerPixel
 
-// Runnable: SkPixmap::getAlphaf reads one pixel with a fixed switch
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAlphaF")
+// No ForceNativeThreadState: reads the alpha of one pixel with a fixed switch, so it is short and cannot block.
+// Native call path: SkPixmap::getAlphaf
 private external fun _nGetAlphaF(ptr: NativePointer, x: Int, y: Int): Float
 
-// Runnable: SkPixmap::addr(x, y) is pointer arithmetic
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAddrAt")
+// No ForceNativeThreadState: computes the address of one pixel with pointer arithmetic, so it is short and cannot
+// block.
+// Native call path: SkPixmap::addr
 private external fun _nGetAddrAt(ptr: NativePointer, x: Int, y: Int): NativePointer
 
 // methods related to C++ types(addr8/16/32/64, writable_addr8/16/32/64) not included - not needed
 
-// Native: SkPixmap::readPixels -> SkConvertPixels converts every pixel of the region
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixels")
+// Needs ForceNativeThreadState: converts every pixel of the region into the destination format, so its time grows with
+// the pixel count.
+// Native call path: SkPixmap::readPixels -> SkConvertPixels
 @ForceNativeThreadState
 private external fun _nReadPixels(
     ptr: NativePointer,
@@ -416,8 +443,10 @@ private external fun _nReadPixels(
 ): Boolean
 
 
-// Native: SkPixmap::readPixels -> SkConvertPixels converts every pixel of the region
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixelsFromPoint")
+// Needs ForceNativeThreadState: converts every pixel of the region into the destination format, so its time grows with
+// the pixel count.
+// Native call path: SkPixmap::readPixels -> SkConvertPixels
 @ForceNativeThreadState
 private external fun _nReadPixelsFromPoint(
     ptr: NativePointer,
@@ -433,28 +462,37 @@ private external fun _nReadPixelsFromPoint(
 ): Boolean
 
 
-// Native: SkPixmap::readPixels -> SkConvertPixels converts every pixel of the region
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixelsToPixmap")
+// Needs ForceNativeThreadState: converts every pixel of the region into the destination format, so its time grows with
+// the pixel count.
+// Native call path: SkPixmap::readPixels -> SkConvertPixels
 @ForceNativeThreadState
 private external fun _nReadPixelsToPixmap(ptr: NativePointer, dstPixmapPtr: NativePointer): Boolean
 
-// Native: SkPixmap::readPixels -> SkConvertPixels converts every pixel of the region
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixelsToPixmapFromPoint")
+// Needs ForceNativeThreadState: converts every pixel of the region into the destination format, so its time grows with
+// the pixel count.
+// Native call path: SkPixmap::readPixels -> SkConvertPixels
 @ForceNativeThreadState
 private external fun _nReadPixelsToPixmapFromPoint(ptr: NativePointer, dstPixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
 
-// Native: SkPixmap::scalePixels -> raster SkCanvas draws the whole image scaled
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nScalePixels")
+// Needs ForceNativeThreadState: draws the whole image scaled through a raster canvas, so its time grows with the image
+// size.
+// Native call path: SkPixmap::scalePixels
 @ForceNativeThreadState
 private external fun _nScalePixels(ptr: NativePointer, dstPixmapPtr: NativePointer, samplingOptionsVal1: Int, samplingOptionsVal2: Int): Boolean
 
-// Native: SkPixmap::erase fills every pixel row with memsetT
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nErase")
+// Needs ForceNativeThreadState: fills every pixel row with one color, so its time grows with the image size.
+// Native call path: SkPixmap::erase -> memsetT
 @ForceNativeThreadState
 private external fun _nErase(ptr: NativePointer, color: Int): Boolean
 
-// Native: SkPixmap::erase fills every pixel row of the subset with memsetT
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nEraseSubset")
+// Needs ForceNativeThreadState: fills every pixel row of the subset with one color, so its time grows with the subset
+// size.
+// Native call path: SkPixmap::erase -> memsetT
 @ForceNativeThreadState
 private external fun _nEraseSubset(
     ptr: NativePointer,

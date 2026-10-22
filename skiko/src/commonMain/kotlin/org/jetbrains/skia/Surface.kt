@@ -1031,30 +1031,41 @@ class Surface : RefCnt {
     }
 }
 
-// Runnable: SkSurface::width returns stored field fWidth
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetWidth")
+// No ForceNativeThreadState: returns the stored surface width, so it is short and cannot block.
+// Native call path: SkSurface::width
 private external fun Surface_nGetWidth(ptr: NativePointer): Int
 
-// Runnable: SkSurface::height returns stored field fHeight
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetHeight")
+// No ForceNativeThreadState: returns the stored surface height, so it is short and cannot block.
+// Native call path: SkSurface::height
 private external fun Surface_nGetHeight(ptr: NativePointer): Int
 
-// Runnable: SkSurface::imageInfo copies a stored SkImageInfo and refs its color space
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetImageInfo")
+// No ForceNativeThreadState: copies the stored image info and takes a reference to its color space, so it is short and
+// cannot block.
+// Native call path: SkSurface::imageInfo
 private external fun Surface_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
-// Native: SkSurface::readPixels -> Device::onReadPixels -> SurfaceContext::readPixels -> GrMtlGpu::onReadPixels
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixels")
+// Needs ForceNativeThreadState: on a GPU surface it reads pixels back through Metal and waits for the GPU, and on a
+// raster surface it converts every pixel.
+// Native call path: SkSurface::readPixels -> Device::onReadPixels -> SurfaceContext::readPixels ->
+//   GrMtlGpu::onReadPixels
 @ForceNativeThreadState
 private external fun Surface_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
 
-// Native: SkSurface::writePixels -> Device::onWritePixels -> SurfaceContext::writePixels -> GrMtlGpu upload
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixels")
+// Needs ForceNativeThreadState: on a GPU surface it uploads pixels through Metal, copying the surface first if needed,
+// and on a raster surface it converts every pixel.
+// Native call path: SkSurface::writePixels -> Device::onWritePixels -> SurfaceContext::writePixels -> GrMtlGpu
 @ForceNativeThreadState
 private external fun Surface_nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int)
 
-// Native: SkSurfaces::WrapPixels -> skcpu::Recorder::TODO -> __cxa_guard_acquire may wait
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirect")
+// Needs ForceNativeThreadState: wraps caller-owned pixel memory as a surface, and first use of a shared static can wait
+// for another thread.
+// Native call path: SkSurfaces::WrapPixels -> skcpu::Recorder::TODO -> __cxa_guard_acquire
 @ForceNativeThreadState
 private external fun _nMakeRasterDirect(
     width: Int,
@@ -1068,13 +1079,17 @@ private external fun _nMakeRasterDirect(
 ): NativePointer
 
 
-// Native: SkSurfaces::WrapPixels -> skcpu::Recorder::TODO -> __cxa_guard_acquire may wait
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap")
+// Needs ForceNativeThreadState: wraps caller-owned pixel memory as a surface, and first use of a shared static can wait
+// for another thread.
+// Native call path: SkSurfaces::WrapPixels -> skcpu::Recorder::TODO -> __cxa_guard_acquire
 @ForceNativeThreadState
 private external fun _nMakeRasterDirectWithPixmap(pixmapPtr: NativePointer, surfaceProps: InteropPointer): NativePointer
 
-// Native: SkSurfaces::Raster -> SkMallocPixelRef::MakeAllocate callocs the full pixel buffer
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRaster")
+// Needs ForceNativeThreadState: allocates and zero-fills a pixel buffer, so its time grows with the surface width and
+// height.
+// Native call path: SkSurfaces::Raster -> SkMallocPixelRef::MakeAllocate
 @ForceNativeThreadState
 private external fun _nMakeRaster(
     width: Int,
@@ -1087,13 +1102,17 @@ private external fun _nMakeRaster(
 ): NativePointer
 
 
-// Native: SkSurfaces::Raster -> SkMallocPixelRef::MakeAllocate callocs the full pixel buffer
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterN32Premul")
+// Needs ForceNativeThreadState: allocates and zero-fills a pixel buffer, so its time grows with the surface width and
+// height.
+// Native call path: SkSurfaces::Raster -> SkMallocPixelRef::MakeAllocate
 @ForceNativeThreadState
 private external fun _nMakeRasterN32Premul(width: Int, height: Int): NativePointer
 
-// Native: SkSurfaces::WrapBackendRenderTarget -> GrProxyProvider::wrapBackendRenderTarget -> GrMtlGpu
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget")
+// Needs ForceNativeThreadState: wraps an existing Metal render target, which reads the Metal texture and builds a GPU
+// surface.
+// Native call path: SkSurfaces::WrapBackendRenderTarget -> GrProxyProvider::wrapBackendRenderTarget -> GrMtlGpu
 @ForceNativeThreadState
 private external fun _nMakeFromBackendRenderTarget(
     pContext: NativePointer,
@@ -1104,8 +1123,10 @@ private external fun _nMakeFromBackendRenderTarget(
     surfaceProps: InteropPointer
 ): NativePointer
 
-// Native: SkSurfaces::WrapMTKView -> sends colorPixelFormat/drawableSize to MTKView
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromMTKView")
+// Needs ForceNativeThreadState: sends Objective-C messages to a MetalKit view to read its pixel format and size, then
+// builds a GPU surface.
+// Native call path: SkSurfaces::WrapMTKView
 @ForceNativeThreadState
 private external fun _nMakeFromMTKView(
     contextPtr: NativePointer,
@@ -1117,8 +1138,9 @@ private external fun _nMakeFromMTKView(
     surfaceProps: InteropPointer
 ): NativePointer
 
-// Native: SkSurfaces::RenderTarget -> GrRecordingContext::createDevice builds a GPU surface
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRenderTarget")
+// Needs ForceNativeThreadState: creates a GPU surface and records a command to clear it.
+// Native call path: SkSurfaces::RenderTarget -> GrRecordingContext::createDevice
 @ForceNativeThreadState
 private external fun _nMakeRenderTarget(
     contextPtr: NativePointer,
@@ -1135,30 +1157,42 @@ private external fun _nMakeRenderTarget(
 ): NativePointer
 
 
-// Runnable: SkSurfaces::Null allocates a SkNullSurface with no device
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeNull")
+// No ForceNativeThreadState: makes an empty placeholder surface that stores only two numbers and no pixels, so it is
+// short and cannot block.
+// Native call path: SkSurfaces::Null
 private external fun _nMakeNull(width: Int, height: Int): NativePointer
 
-// Runnable: SkSurface::generationID reads fGenerationID or bumps an atomic counter
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGenerationId")
+// No ForceNativeThreadState: returns a stored id, or takes the next id from a shared counter in one atomic step, so it
+// is short and cannot block.
+// Native call path: SkSurface::generationID -> SkSurface_Base::newGenerationID
 private external fun _nGenerationId(ptr: NativePointer): Int
 
-// Native: SkSurface::notifyContentWillChange -> aboutToDraw -> onCopyOnWrite memcpy of pixels / replaceBackingProxy
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nNotifyContentWillChange")
+// Needs ForceNativeThreadState: may copy the whole pixel buffer or replace the GPU backing before drawing; pixel-copy
+// time grows with the surface size.
+// Native call path: SkSurface::notifyContentWillChange -> SkSurface_Base::aboutToDraw -> onCopyOnWrite
 @ForceNativeThreadState
 private external fun _nNotifyContentWillChange(ptr: NativePointer, mode: Int)
 
-// Runnable: SkSurface::recordingContext returns the stored GrRecordingContext pointer
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetSurfaceRecordingContext")
+// No ForceNativeThreadState: returns a stored pointer to the recording context without doing any work, so it is short
+// and cannot block.
+// Native call path: SkSurface::recordingContext -> SkSurface_Ganesh::onGetRecordingContext
 private external fun _nGetSurfaceRecordingContext(ptr: NativePointer): NativePointer
 
-// Native: SkSurface::getCanvas -> SkCaptureManager::makeCaptureCanvas -> TArray::emplace_back moves canvases
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetCanvas")
+// Needs ForceNativeThreadState: with capture enabled, may grow a list that moves every tracked canvas, so its time
+// grows with the canvas count.
+// Native call path: SkSurface::getCanvas -> SkCaptureManager::makeCaptureCanvas -> TArray::emplace_back
 @ForceNativeThreadState
 private external fun _nGetCanvas(ptr: NativePointer): NativePointer
 
-// Native: SkSurface::makeSurface -> SkSurface_Ganesh::onNewSurface -> SkSurfaces::RenderTarget (GPU surface)
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurfaceI")
+// Needs ForceNativeThreadState: creates a GPU surface or allocates and zero-fills a pixel buffer whose size grows with
+// the surface dimensions.
+// Native call path: SkSurface::makeSurface -> SkSurface_Ganesh::onNewSurface -> SkSurfaces::RenderTarget
 @ForceNativeThreadState
 private external fun _nMakeSurfaceI(
     ptr: NativePointer,
@@ -1170,41 +1204,57 @@ private external fun _nMakeSurfaceI(
 ): NativePointer
 
 
-// Native: SkSurface::makeSurface -> SkSurface_Ganesh::onNewSurface -> SkSurfaces::RenderTarget (GPU surface)
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurface")
+// Needs ForceNativeThreadState: creates a GPU surface or allocates and zero-fills a pixel buffer whose size grows with
+// the surface dimensions.
+// Native call path: SkSurface::makeSurface -> SkSurface_Ganesh::onNewSurface -> SkSurfaces::RenderTarget
 @ForceNativeThreadState
 private external fun _nMakeSurface(ptr: NativePointer, width: Int, height: Int): NativePointer
 
-// Native: SkSurface::makeImageSnapshot -> onNewImageSnapshot (GrSurfaceProxyView::Copy / raster pixel copy)
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshot")
+// Needs ForceNativeThreadState: copies the surface into a new image, either as a GPU copy or a pixel copy whose time
+// grows with the surface size.
+// Native call path: SkSurface::makeImageSnapshot -> onNewImageSnapshot
 @ForceNativeThreadState
 private external fun _nMakeImageSnapshot(ptr: NativePointer): NativePointer
 
-// Native: SkSurface::makeImageSnapshot(bounds) -> onNewImageSnapshot copies the subset (GPU copy / raster readPixels)
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshotR")
+// Needs ForceNativeThreadState: copies part of the surface into a new image, either as a GPU copy or a pixel read whose
+// time grows with the copied area.
+// Native call path: SkSurface::makeImageSnapshot -> onNewImageSnapshot
 @ForceNativeThreadState
 private external fun _nMakeImageSnapshotR(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): NativePointer
 
-// Native: SkSurface::draw -> onDraw -> SkCanvas::drawImage on a possibly GPU-backed canvas
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nDraw")
+// Needs ForceNativeThreadState: draws an image onto a canvas that may use the GPU.
+// Native call path: SkSurface::draw -> onDraw -> SkCanvas::drawImage
 @ForceNativeThreadState
 private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float, samplingModeValue1: Int, samplingModeValue2: Int, paintPtr: NativePointer)
 
-// Native: SkSurface::peekPixels -> SkSurface::getCanvas -> SkCaptureManager::makeCaptureCanvas grows its array
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nPeekPixels")
+// Needs ForceNativeThreadState: with capture enabled, may grow a list that moves every tracked canvas, so its time
+// grows with the canvas count.
+// Native call path: SkSurface::peekPixels -> SkSurface::getCanvas -> SkCaptureManager::makeCaptureCanvas
 @ForceNativeThreadState
 private external fun _nPeekPixels(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
 
-// Native: SkSurface::readPixels -> Device::onReadPixels -> SurfaceContext::readPixels -> GrMtlGpu::onReadPixels
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixelsToPixmap")
+// Needs ForceNativeThreadState: reads pixels back from the GPU through Metal and waits for the GPU; for CPU surfaces
+// its time grows with the surface size.
+// Native call path: SkSurface::readPixels -> Device::onReadPixels -> SurfaceContext::readPixels ->
+//   GrMtlGpu::onReadPixels
 @ForceNativeThreadState
 private external fun _nReadPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
 
-// Native: SkSurface::writePixels -> Device::onWritePixels -> SurfaceContext::writePixels -> GrMtlGpu upload
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
+// Needs ForceNativeThreadState: uploads pixels to the GPU through Metal, or copies pixels on a CPU surface, so its time
+// grows with the pixel count.
+// Native call path: SkSurface::writePixels -> Device::onWritePixels -> SurfaceContext::writePixels ->
+//   GrMtlGpu::onWritePixels
 @ForceNativeThreadState
 private external fun _nWritePixelsFromPixmap(ptr: NativePointer, pixmapPtr: NativePointer, x: Int, y: Int)
 
-// Runnable: SkRefCnt::unique is one atomic load of the ref count
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nUnique")
+// No ForceNativeThreadState: reads a reference count with one atomic load, so it is short and cannot block.
+// Native call path: SkRefCnt::unique
 private external fun _nUnique(ptr: NativePointer): Boolean

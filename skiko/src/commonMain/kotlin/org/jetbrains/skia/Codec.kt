@@ -360,69 +360,92 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     }
 }
 
-// Runnable: _nGetFinalizer returns the &deleteCodec pointer; the finalizer runs via Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot
+// block.
+// Native call path: _nGetFinalizer
 private external fun Codec_nGetFinalizer(): NativePointer
 
-// Native: SkCodec::getInfo -> SkEncodedInfo::makeImageInfo -> SkColorSpace::Make walks ICC curve tables
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
+// Needs ForceNativeThreadState: builds a color space from the embedded ICC profile, walking its curve tables, so its
+// time grows with the profile.
+// Native call path: SkCodec::getInfo -> SkEncodedInfo::makeImageInfo -> SkColorSpace::Make
 @ForceNativeThreadState
 private external fun Codec_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
-// Native: SkCodec::getPixels -> onGetPixels decodes the image (libpng/libjpeg/webp/wuffs) plus skcms conversion
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
+// Needs ForceNativeThreadState: decodes the whole image from the stream, so its time grows with the image size.
+// Native call path: SkCodec::getPixels -> onGetPixels
 @ForceNativeThreadState
 private external fun Codec_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
 
-// Native: SkCodec::MakeFromData -> MakeFromStream -> format MakeFromStream parses headers, markers and ICC
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
+// Needs ForceNativeThreadState: tries each image decoder on the encoded data, scanning headers and markers, so its time
+// grows with the data size.
+// Native call path: SkCodec::MakeFromData -> SkCodec::MakeFromStream
 @ForceNativeThreadState
 private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
 
-// Runnable: SkCodec::dimensions returns the stored fEncodedInfo width
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeWidth")
+// No ForceNativeThreadState: returns the stored image width, so it is short and cannot block.
+// Native call path: SkCodec::dimensions
 private external fun _nGetSizeWidth(ptr: NativePointer): Int
 
-// Runnable: SkCodec::dimensions returns the stored fEncodedInfo height
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeHeight")
+// No ForceNativeThreadState: returns the stored image height, so it is short and cannot block.
+// Native call path: SkCodec::dimensions
 private external fun _nGetSizeHeight(ptr: NativePointer): Int
 
-// Runnable: SkCodec::getOrigin returns the stored const fOrigin
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
+// No ForceNativeThreadState: returns the stored origin value, so it is short and cannot block.
+// Native call path: SkCodec::getOrigin
 private external fun _nGetEncodedOrigin(ptr: NativePointer): Int
 
-// Runnable: SkCodec::getEncodedFormat -> onGetEncodedFormat returns an enum literal or stored fFormat
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
+// No ForceNativeThreadState: returns the encoded format from a constant or a stored field, so it is short and cannot
+// block.
+// Native call path: SkCodec::getEncodedFormat -> onGetEncodedFormat
 private external fun _nGetEncodedImageFormat(ptr: NativePointer): Int
 
-// Native: SkCodec::getFrameCount -> SkWuffsCodec::onGetFrameCountInternal decodes every frame config
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameCount")
+// Needs ForceNativeThreadState: walks the stream and decodes the config of every frame, so its time grows with the
+// frame count.
+// Native call path: SkCodec::getFrameCount -> SkWuffsCodec::onGetFrameCountInternal
 @ForceNativeThreadState
 private external fun _nGetFrameCount(ptr: NativePointer): Int
 
-// Native: SkBmpRustCodec::onGetFrameInfo -> SkCodec::getInfo -> skcms_MaxRoundtripError scans ICC curves
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameInfo")
+// Needs ForceNativeThreadState: builds a color space from the ICC profile and scans its curve tables, so its time grows
+// with the profile.
+// Native call path: SkBmpRustCodec::onGetFrameInfo -> SkCodec::getInfo -> skcms_MaxRoundtripError
 @ForceNativeThreadState
 private external fun _nGetFrameInfo(ptr: NativePointer, frame: Int, result: InteropPointer)
 
-// Native: SkCodec::getFrameInfo() -> getFrameCount scans all frames, then builds a vector of FrameInfo
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFramesInfo")
+// Needs ForceNativeThreadState: scans every frame in the stream and builds a list with one entry per frame, so its time
+// grows with the frame count.
+// Native call path: SkCodec::getFrameInfo -> getFrameCount
 @ForceNativeThreadState
 private external fun _nGetFramesInfo(ptr: NativePointer): NativePointer
 
-// Runnable: SkCodec::getRepetitionCount -> onGetRepetitionCount reads a stored loop count
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetRepetitionCount")
+// No ForceNativeThreadState: reads a stored loop count from the image header, so it is short and cannot block.
+// Native call path: SkCodec::getRepetitionCount -> onGetRepetitionCount
 private external fun _nGetRepetitionCount(ptr: NativePointer): Int
 
-// Runnable: delete of std::vector<SkCodec::FrameInfo>; FrameInfo is plain ints/enums/SkIRect, one free()
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_Delete")
+// No ForceNativeThreadState: frees a list of frame records that hold only plain numbers, so it is short and cannot
+// block.
+// Native call path: std::vector<SkCodec::FrameInfo>::~vector
 private external fun FramesInfo_nDelete(ptr: NativePointer)
 
-// Runnable: std::vector::size returns a stored value
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetSize")
+// No ForceNativeThreadState: returns the stored size of the frame list, so it is short and cannot block.
+// Native call path: std::vector::size
 private external fun FramesInfo_nGetSize(ptr: NativePointer): Int
 
-// Native: AnimationFrameInfo::copyToInterop loops over every frame in the vector writing 11 ints each
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetInfos")
+// Needs ForceNativeThreadState: writes 11 ints for every frame in the list, so its time grows with the frame count.
+// Native call path: AnimationFrameInfo::copyToInterop -> copyToInteropAtIndex
 @ForceNativeThreadState
 private external fun FramesInfo_nGetInfos(ptr: NativePointer, result: InteropPointer)

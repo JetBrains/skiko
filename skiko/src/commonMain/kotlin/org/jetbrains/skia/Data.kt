@@ -141,53 +141,68 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 }
 
-// Runnable: returns the address of deleteData; the finalizer itself runs through Managed
 @ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of an unref function without calling it, so it is short and cannot
+// block.
+// Native call path: _nGetFinalizer
 private external fun Data_nGetFinalizer(): NativePointer
 
-// Runnable: SkData::size returns the stored span length
 @ExternalSymbolName("org_jetbrains_skia_Data__1nSize")
+// No ForceNativeThreadState: returns the stored byte length, so it is short and cannot block.
+// Native call path: SkData::size
 private external fun _nSize(ptr: NativePointer): Int
 
-// Native: memcpy of caller-chosen length out of SkData grows with the input
 @ExternalSymbolName("org_jetbrains_skia_Data__1nBytes")
+// Needs ForceNativeThreadState: copies a caller-chosen number of bytes out, so its time grows with that length.
+// Native call path: memcpy
 @ForceNativeThreadState
 private external fun _nBytes(ptr: NativePointer, offset: Int, length: Int, destBytes: InteropPointer)
 
-// Native: SkData::equals -> sk_careful_memcmp over the full size grows with the input
 @ExternalSymbolName("org_jetbrains_skia_Data__1nEquals")
+// Needs ForceNativeThreadState: compares every byte of the data, so its time grows with the data size.
+// Native call path: SkData::equals -> sk_careful_memcmp
 @ForceNativeThreadState
 private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
-// Native: malloc plus memcpy of the whole array grows with the input
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
+// Needs ForceNativeThreadState: allocates and copies the whole byte array, so its time grows with the array length.
+// Native call path: memcpy
 @ForceNativeThreadState
 private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length: Int): NativePointer
 
-// Runnable: SkData::MakeWithoutCopy wraps the pointer in a new SkData, no copy
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeWithoutCopy")
+// No ForceNativeThreadState: wraps an existing pointer in a new data object without copying the bytes, so it is short
+// and cannot block.
+// Native call path: SkData::MakeWithoutCopy -> MakeWithProc
 private external fun _nMakeWithoutCopy(memoryAddr: NativePointer, length: Int): NativePointer
 
-// Native: SkData::MakeFromFileName -> sk_fopen and sk_fmmap do blocking file I/O
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
+// Needs ForceNativeThreadState: opens and maps a file, which is blocking file I/O.
+// Native call path: SkData::MakeFromFileName -> MakeFromFILE -> sk_fmmap
 @ForceNativeThreadState
 internal external fun _nMakeFromFileName(path: InteropPointer): NativePointer
 
-// Native: SkData::MakeSubset -> SkData::MakeEmpty can wait for concurrent static initialization
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeSubset")
+// Needs ForceNativeThreadState: can wait for another thread still initializing the shared empty data object.
+// Native call path: SkData::MakeSubset -> SkData::MakeEmpty
 @ForceNativeThreadState
 private external fun _nMakeSubset(ptr: NativePointer, offset: Int, length: Int): NativePointer
 
-// Native: SkData::MakeEmpty can wait for concurrent static initialization
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
+// Needs ForceNativeThreadState: can wait for another thread still initializing the shared empty data object on first
+// use.
+// Native call path: SkData::MakeEmpty
 @ForceNativeThreadState
 private external fun _nMakeEmpty(): NativePointer
 
-// Native: SkData::MakeUninitialized -> SkData::MakeEmpty can wait for static initialization
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeUninitialized")
+// Needs ForceNativeThreadState: for zero length, can wait for another thread still initializing the shared empty data
+// object.
+// Native call path: SkData::MakeUninitialized -> PrivateNewWithCopy -> SkData::MakeEmpty
 @ForceNativeThreadState
 private external fun _nMakeUninitialized(length: Int): NativePointer
 
-// Runnable: SkData::writable_data returns the stored span pointer
 @ExternalSymbolName("org_jetbrains_skia_Data__1nWritableData")
+// No ForceNativeThreadState: returns the stored data pointer, so it is short and cannot block.
+// Native call path: SkData::writable_data
 private external fun _nWritableData(dataPtr: NativePointer): NativePointer

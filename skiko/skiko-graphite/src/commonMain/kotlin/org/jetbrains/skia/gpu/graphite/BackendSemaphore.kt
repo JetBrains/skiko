@@ -41,10 +41,12 @@ class BackendSemaphore internal constructor(ptr: NativePointer) : Managed(ptr, _
     }
 }
 
-// Runnable: returns the address of deleteBackendSemaphore
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendSemaphore__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteBackendSemaphore
 private external fun _nGetBackendSemaphoreFinalizer(): NativePointer
 
-// Runnable: stub returns 0 without touching the argument
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendSemaphore__1nMakeVulkan")
+// No ForceNativeThreadState: returns 0 without touching its argument, so it is short and cannot block.
 private external fun _nMakeVulkan(semaphorePtr: NativePointer): NativePointer

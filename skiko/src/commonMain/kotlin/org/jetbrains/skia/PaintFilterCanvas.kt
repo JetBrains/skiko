@@ -55,7 +55,9 @@ private fun makePaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean): Nati
 
 internal expect fun PaintFilterCanvas.doInit(ptr: NativePointer)
 
-// Native: SkPaintFilterCanvas::onImageInfo -> SkCanvas::imageInfo recurses through nested canvases
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
+// Needs ForceNativeThreadState: asks nested canvases for their image info recursively, so its time grows with the
+// nesting depth.
+// Native call path: SkPaintFilterCanvas::onImageInfo -> SkCanvas::imageInfo
 @ForceNativeThreadState
 private external fun PaintFilterCanvas_nMake(canvasPtr: NativePointer, unrollDrawable: Boolean): NativePointer

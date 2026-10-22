@@ -456,20 +456,27 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
     }
 }
 
-// Runnable: SkImage::imageInfo returns stored fInfo; writeImageInfoForInterop copies ints and refs the SkColorSpace
 @ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
+// No ForceNativeThreadState: copies the stored image details and adds a reference to its color space, so it is short
+// and cannot block.
+// Native call path: SkImage::imageInfo -> writeImageInfoForInterop
 private external fun Image_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
-// Runnable: SkImage::makeShader -> SkImageShader::Make only stores the image ref, tile modes and a local matrix
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
+// No ForceNativeThreadState: wraps the image in a shader object that stores references, tile modes and a matrix, so it
+// is short and cannot block.
+// Native call path: SkImage::makeShader -> SkImageShader::Make
 private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingModeVal1: Int, samplingModeVal2: Int, localMatrix: InteropPointer): NativePointer
 
-// Runnable: SkImage::peekPixels -> SkImage_Raster::onPeekPixels exposes the stored bitmap; base returns false
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
+// No ForceNativeThreadState: exposes the stored pixels of a raster image and reports failure for other kinds of image,
+// so it is short and cannot block.
+// Native call path: SkImage::peekPixels -> SkImage_Raster::onPeekPixels
 private external fun Image_nPeekPixels(ptr: NativePointer): NativePointer
 
-// Native: SkImages::RasterFromPixmapCopy -> SkData::MakeWithCopy copies the whole pixel buffer
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRaster")
+// Needs ForceNativeThreadState: copies the whole pixel buffer of the image, so its time grows with the image size.
+// Native call path: SkImages::RasterFromPixmapCopy -> SkData::MakeWithCopy
 @ForceNativeThreadState
 private external fun _nMakeRaster(
     width: Int,
@@ -482,8 +489,9 @@ private external fun _nMakeRaster(
 ): NativePointer
 
 
-// Runnable: SkImages::RasterFromData wraps the SkData without copying; SkImage_Raster installs pixels
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRasterData")
+// No ForceNativeThreadState: wraps the caller's pixel data without copying it, so it is short and cannot block.
+// Native call path: SkImages::RasterFromData -> SkImage_Raster::SkImage_Raster
 private external fun _nMakeRasterData(
     width: Int,
     height: Int,
@@ -495,22 +503,28 @@ private external fun _nMakeRasterData(
 ): NativePointer
 
 
-// Native: SkImages::RasterFromBitmap -> SkImage_Raster::MakeFromBitmap copies pixels of a mutable bitmap
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBitmap")
+// Needs ForceNativeThreadState: copies the pixels of a mutable bitmap, so its time grows with the bitmap size.
+// Native call path: SkImages::RasterFromBitmap -> SkImage_Raster::MakeFromBitmap
 @ForceNativeThreadState
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
 
-// Runnable: SkImages::RasterFromPixmap wraps the pixels via SkData::MakeWithProc with a null proc; no copy
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
+// No ForceNativeThreadState: wraps the pixels without copying them, so it is short and cannot block.
+// Native call path: SkImages::RasterFromPixmap -> SkData::MakeWithProc
 private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 
-// Native: SkData::MakeWithCopy -> DeferredFromEncodedData -> SkCodec::MakeFromData parses the encoded header
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
+// Needs ForceNativeThreadState: copies the whole encoded file and parses its header, so its time grows with the file
+// size.
+// Native call path: SkData::MakeWithCopy -> SkImages::DeferredFromEncodedData -> SkCodec::MakeFromData
 @ForceNativeThreadState
 internal external fun _nMakeFromEncoded(bytes: InteropPointer, encodedLength: Int): NativePointer
 
-// Native: SkPngEncoder/SkJpegEncoder/SkWebpEncoder::Encode compress the image; lazy images decode first
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
+// Needs ForceNativeThreadState: compresses the whole image as PNG, JPEG or WebP, so its time grows with the image size,
+// and a lazily loaded image is decoded first.
+// Native call path: SkPngEncoder::Encode
 @ForceNativeThreadState
 private external fun _nEncodeToData(
     ptr: NativePointer,
@@ -519,17 +533,23 @@ private external fun _nEncodeToData(
     pngCompressionLevel: Int
 ): NativePointer
 
-// Runnable: SkImage::peekPixels -> SkImage_Raster::onPeekPixels exposes the stored bitmap; base returns false
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
+// No ForceNativeThreadState: exposes the pixels of a raster image without decoding or copying them and reports failure
+// for other kinds of image, so it is short and cannot block.
+// Native call path: SkImage::peekPixels -> SkImage_Raster::onPeekPixels
 private external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
 
-// Native: SkImage::scalePixels -> getROPixels lazy decode / SkImage_GaneshBase::onReadPixels -> GrMtlGpu
 @ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
+// Needs ForceNativeThreadState: may decode the image or read it back from the GPU through Metal, and waiting for the
+// GPU can take a while.
+// Native call path: SkImage::scalePixels -> SkImage_GaneshBase::onReadPixels -> GrMtlGpu::onReadPixels
 @ForceNativeThreadState
 private external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptionsVal1: Int, samplingOptionsVal2: Int, cache: Boolean): Boolean
 
-// Native: SkImage::readPixels -> SkImage_Lazy decode / SkImage_GaneshBase::onReadPixels -> GrMtlGpu::onReadPixels
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
+// Needs ForceNativeThreadState: may decode the image or read it back from the GPU through Metal, which makes it wait
+// for the GPU; raster pixels are converted in full.
+// Native call path: SkImage::readPixels -> SkImage_GaneshBase::onReadPixels -> GrMtlGpu::onReadPixels
 @ForceNativeThreadState
 private external fun _nReadPixelsBitmap(
     ptr: NativePointer,
@@ -541,13 +561,16 @@ private external fun _nReadPixelsBitmap(
 ): Boolean
 
 
-// Native: SkImage::readPixels -> SkImage_Lazy decode / SkImage_GaneshBase::onReadPixels -> GrMtlGpu::onReadPixels
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
+// Needs ForceNativeThreadState: may decode the image or read it back from the GPU through Metal, which makes it wait
+// for the GPU; raster pixels are converted in full.
+// Native call path: SkImage::readPixels -> SkImage_GaneshBase::onReadPixels -> GrMtlGpu::onReadPixels
 @ForceNativeThreadState
 private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
 
-// Native: SkImages::AdoptTextureFrom -> wrapBackendTexture -> GrMtlGpu::onWrapBackendTexture reads MTLTexture
 @ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
+// Needs ForceNativeThreadState: wraps a Metal GPU texture and reads its properties through Metal.
+// Native call path: SkImages::AdoptTextureFrom -> wrapBackendTexture -> GrMtlGpu::onWrapBackendTexture
 @ForceNativeThreadState
 private external fun _nAdoptTextureFrom(
     contextPtr: NativePointer,
@@ -556,8 +579,9 @@ private external fun _nAdoptTextureFrom(
     colorType: Int
 ): NativePointer
 
-// Native: SkImages::AdoptTextureFrom -> wrapBackendTexture -> GrMtlGpu::onWrapBackendTexture reads MTLTexture
 @ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFromAlphaType")
+// Needs ForceNativeThreadState: wraps a Metal GPU texture and reads its properties through Metal.
+// Native call path: SkImages::AdoptTextureFrom -> wrapBackendTexture -> GrMtlGpu::onWrapBackendTexture
 @ForceNativeThreadState
 private external fun _nAdoptTextureFromAlphaType(
     contextPtr: NativePointer,

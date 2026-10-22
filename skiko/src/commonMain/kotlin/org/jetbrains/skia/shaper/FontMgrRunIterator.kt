@@ -56,11 +56,16 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
     }
 }
 
-// Native: SkFontMgrSkikoDefault -> SkFontMgr_New_CoreText -> SkFontMgr_Mac ctor -> CTFontCollectionCreate
 @ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
+// Needs ForceNativeThreadState: with no font manager given, it builds the default one, which calls CoreText to create
+// the font collection.
+// Native call path: SkFontMgrSkikoDefault -> SkFontMgr_New_CoreText -> SkFontMgr_Mac::SkFontMgr_Mac ->
+//   CTFontCollectionCreate
 @ForceNativeThreadState
 private external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, fontMgrPtr: NativePointer, optsBooleanProps: Int): NativePointer
 
-// Runnable: new SkFont copy only adds a ref on the typeface the iterator keeps owning
 @ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont")
+// No ForceNativeThreadState: copying the font only adds a reference to a typeface the iterator still owns, so it is
+// short and cannot block.
+// Native call path: FontRunIterator::currentFont
 private external fun _nGetCurrentFont(ptr: NativePointer): NativePointer

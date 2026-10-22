@@ -836,177 +836,241 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 }
 
-// Runnable: _nGetFinalizer returns the address of deletePathBuilder; the delete runs via Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nGetFinalizer")
+// No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 private external fun PathBuilder_nGetFinalizer(): NativePointer
 
-// Runnable: SkPathBuilder ctor -> reset() clears inline STArray storage and sets fields
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nMake")
+// No ForceNativeThreadState: clears small inline storage and sets a few fields, so it is short and cannot block.
+// Native call path: SkPathBuilder::SkPathBuilder -> SkPathBuilder::reset
 private external fun PathBuilder_nMake(): NativePointer
 
-// Runnable: SkPathBuilder(fillType) ctor -> reset() clears inline STArray storage and sets fields
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nMakeWithFillType")
+// No ForceNativeThreadState: clears small inline storage and stores the fill type, so it is short and cannot block.
+// Native call path: SkPathBuilder::SkPathBuilder -> SkPathBuilder::reset
 private external fun PathBuilder_nMakeWithFillType(fillType: Int): NativePointer
 
-// Native: SkPathBuilder::operator=(SkPath) -> addRaw copies every verb and point of the source
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nMakeFromPath")
+// Needs ForceNativeThreadState: copies every drawing command and point of the source path, so its time grows with the
+// source path size.
+// Native call path: SkPathBuilder::operator= -> addRaw
 @ForceNativeThreadState
 private external fun PathBuilder_nMakeFromPath(pathPtr: NativePointer): NativePointer
 
-// Native: SkPathBuilder::snapshot -> SkPathData::MakeTransform allocates and copies all points and verbs
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nSnapshot")
+// Needs ForceNativeThreadState: allocates a new path and copies its points and drawing commands, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::snapshot -> SkPathData::MakeTransform
 @ForceNativeThreadState
 private external fun PathBuilder_nSnapshot(ptr: NativePointer): NativePointer
 
-// Native: SkPathBuilder::detach -> snapshot -> SkPathData::MakeTransform copies all points and verbs
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nDetach")
+// Needs ForceNativeThreadState: takes a snapshot that copies the points and drawing commands, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::detach -> SkPathBuilder::snapshot -> SkPathData::MakeTransform
 @ForceNativeThreadState
 private external fun PathBuilder_nDetach(ptr: NativePointer): NativePointer
 
-// Runnable: SkPathBuilder::setFillType stores one enum field
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nSetFillType")
+// No ForceNativeThreadState: stores one fill type value, so it is short and cannot block.
+// Native call path: SkPathBuilder::setFillType
 private external fun PathBuilder_nSetFillType(ptr: NativePointer, fillType: Int)
 
-// Native: SkPathBuilder::reset -> TArray::clear -> destroyAll iterates all stored path elements
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nReset")
+// Needs ForceNativeThreadState: clearing loops over every stored path element, so its time grows with the path size.
+// Native call path: SkPathBuilder::reset -> TArray::clear -> destroyAll
 @ForceNativeThreadState
 private external fun PathBuilder_nReset(ptr: NativePointer)
 
-// Native: SkPathBuilder::incReserve -> TArray::reserve -> TArray::move copies existing path storage
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nIncReserve")
+// Needs ForceNativeThreadState: if the storage must grow, it copies the existing path storage, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::incReserve -> TArray::reserve -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nIncReserve(ptr: NativePointer, extraPtCount: Int)
 
-// Native: SkPathBuilder::moveTo -> TArray::push_back -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nMoveTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::moveTo -> TArray::push_back -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nMoveTo(ptr: NativePointer, x: Float, y: Float)
 
-// Native: SkPathBuilder::rMoveTo -> moveTo -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nRMoveTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::rMoveTo -> SkPathBuilder::moveTo -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nRMoveTo(ptr: NativePointer, dx: Float, dy: Float)
 
-// Native: SkPathBuilder::lineTo -> TArray::push_back -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nLineTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::lineTo -> TArray::push_back -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nLineTo(ptr: NativePointer, x: Float, y: Float)
 
-// Native: SkPathBuilder::rLineTo -> lineTo -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nRLineTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::rLineTo -> SkPathBuilder::lineTo -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nRLineTo(ptr: NativePointer, dx: Float, dy: Float)
 
-// Native: SkPathBuilder::quadTo -> TArray::push_back_n -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nQuadTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::quadTo -> TArray::push_back_n -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nQuadTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float)
 
-// Native: SkPathBuilder::rQuadTo -> quadTo -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nRQuadTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::rQuadTo -> SkPathBuilder::quadTo -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nRQuadTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float)
 
-// Native: SkPathBuilder::conicTo -> TArray::push_back_n -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nConicTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::conicTo -> TArray::push_back_n -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nConicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, w: Float)
 
-// Native: SkPathBuilder::rConicTo -> conicTo -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nRConicTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::rConicTo -> SkPathBuilder::conicTo -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nRConicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float)
 
-// Native: SkPathBuilder::cubicTo -> TArray::push_back_n -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nCubicTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::cubicTo -> TArray::push_back_n -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nCubicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float)
 
-// Native: SkPathBuilder::rCubicTo -> cubicTo -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nRCubicTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::rCubicTo -> SkPathBuilder::cubicTo -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nRCubicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float)
 
-// Native: SkPathBuilder::arcTo -> incReserve -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nArcTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::arcTo -> SkPathBuilder::incReserve -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nArcTo(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float, forceMoveTo: Boolean)
 
-// Native: SkPathBuilder::arcTo -> lineTo -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nTangentArcTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::arcTo -> SkPathBuilder::lineTo -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nTangentArcTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, radius: Float)
 
-// Native: SkPathBuilder::arcTo -> conicTo -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nEllipticalArcTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::arcTo -> SkPathBuilder::conicTo -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nEllipticalArcTo(ptr: NativePointer, rx: Float, ry: Float, xAxisRotate: Float, arc: Int, direction: Int, x: Float, y: Float)
 
-// Native: SkPathBuilder::rArcTo -> arcTo -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nREllipticalArcTo")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::rArcTo -> SkPathBuilder::arcTo -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nREllipticalArcTo(ptr: NativePointer, rx: Float, ry: Float, xAxisRotate: Float, arc: Int, direction: Int, dx: Float, dy: Float)
 
-// Native: SkPathBuilder::close -> TArray::push_back -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nClosePath")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::close -> TArray::push_back -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nClosePath(ptr: NativePointer)
 
-// Native: SkPathBuilder::addRect -> addRaw -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nAddRect")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::addRect -> SkPathBuilder::addRaw -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nAddRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, dir: Int, start: Int)
 
-// Native: SkPathBuilder::addOval -> addRaw -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nAddOval")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::addOval -> SkPathBuilder::addRaw -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nAddOval(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, dir: Int, start: Int)
 
-// Native: SkPathBuilder::addCircle -> addOval -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nAddCircle")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::addCircle -> SkPathBuilder::addOval -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nAddCircle(ptr: NativePointer, x: Float, y: Float, radius: Float, dir: Int)
 
-// Native: SkPathBuilder::addArc -> addOval -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nAddArc")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::addArc -> SkPathBuilder::addOval -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nAddArc(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float)
 
-// Native: SkPathBuilder::addRRect -> addRaw -> TArray::move copies old path storage on growth
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nAddRRect")
+// Needs ForceNativeThreadState: if the storage must grow, it copies all existing path elements, so its time grows with
+// the path size.
+// Native call path: SkPathBuilder::addRRect -> SkPathBuilder::addRaw -> TArray::move
 @ForceNativeThreadState
 private external fun PathBuilder_nAddRRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, radii: InteropPointer, size: Int, dir: Int, start: Int)
 
-// Native: SkPathBuilder::addPolygon -> polylineTo copies and fills verbs for count points
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nAddPoly")
+// Needs ForceNativeThreadState: copies points and creates drawing commands for a caller-supplied point count, so its
+// time grows with that count.
+// Native call path: SkPathBuilder::addPolygon -> polylineTo
 @ForceNativeThreadState
 private external fun PathBuilder_nAddPoly(ptr: NativePointer, coords: InteropPointer, count: Int, close: Boolean)
 
-// Native: SkPathBuilder::addPath -> growForVerbsInPath + SkMatrix::mapPoints over every source point
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nAddPath")
+// Needs ForceNativeThreadState: copies the source path's drawing commands and transforms its points, so its time grows
+// with the source path size.
+// Native call path: SkPathBuilder::addPath -> SkMatrix::mapPoints
 @ForceNativeThreadState
 private external fun PathBuilder_nAddPath(ptr: NativePointer, srcPtr: NativePointer, mode: Int)
 
-// Native: SkPathBuilder::addPath -> growForVerbsInPath + SkMatrix::mapPoints over every source point
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nAddPathOffset")
+// Needs ForceNativeThreadState: copies the source path's drawing commands and transforms its points, so its time grows
+// with the source path size.
+// Native call path: SkPathBuilder::addPath -> SkMatrix::mapPoints
 @ForceNativeThreadState
 private external fun PathBuilder_nAddPathOffset(ptr: NativePointer, srcPtr: NativePointer, dx: Float, dy: Float, mode: Int)
 
-// Native: SkPathBuilder::addPath -> growForVerbsInPath + SkMatrix::mapPoints over every source point
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nAddPathTransform")
+// Needs ForceNativeThreadState: copies the source path's drawing commands and transforms its points, so its time grows
+// with the source path size.
+// Native call path: SkPathBuilder::addPath -> SkMatrix::mapPoints
 @ForceNativeThreadState
 private external fun PathBuilder_nAddPathTransform(ptr: NativePointer, srcPtr: NativePointer, matrix: InteropPointer, mode: Int)
 
-// Runnable: SkPathBuilder::setLastPt -> setPoint writes one point (or moveTo when empty)
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nSetLastPt")
+// No ForceNativeThreadState: writes one point, or moves to a start point when empty, so it is short and cannot block.
+// Native call path: SkPathBuilder::setLastPt -> setPoint
 private external fun PathBuilder_nSetLastPt(ptr: NativePointer, x: Float, y: Float)
 
-// Native: SkPathBuilder::offset loops over every point
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nOffset")
+// Needs ForceNativeThreadState: adds the offset to every point, so its time grows with the point count.
+// Native call path: SkPathBuilder::offset
 @ForceNativeThreadState
 private external fun PathBuilder_nOffset(ptr: NativePointer, dx: Float, dy: Float)
 
-// Native: SkPathBuilder::transform -> SkMatrix::mapPoints over every point (perspective re-walks the path)
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nTransform")
+// Needs ForceNativeThreadState: maps every point, and with perspective it re-walks the whole path, so its time grows
+// with the path size.
+// Native call path: SkPathBuilder::transform -> SkMatrix::mapPoints
 @ForceNativeThreadState
 private external fun PathBuilder_nTransform(ptr: NativePointer, matrix: InteropPointer)

@@ -39,11 +39,14 @@ class Recorder internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     }
 }
 
-// Runnable: returns the address of a delete function; the finalizer runs through Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_Recorder__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteRecorder
 private external fun _nGetRecorderFinalizer(): NativePointer
 
-// Native: Recorder::snap -> flushTrackedDevices -> ScratchResourceManager and resource provider (Metal)
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_Recorder__1nSnap")
+// Needs ForceNativeThreadState: finishes pending drawing work and prepares resources through Metal.
+// Native call path: Recorder::snap -> flushTrackedDevices -> prepareResources
 @ForceNativeThreadState
 private external fun _nSnap(recorderPtr: NativePointer): NativePointer

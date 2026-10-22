@@ -234,40 +234,50 @@ internal expect fun Shaper.doShape(
 )
 
 
-// Runnable: returns the address of deleteShaper only
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nGetFinalizer")
+// No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
+// Native call path: deleteShaper
 private external fun Shaper_nGetFinalizer(): NativePointer
 
-// Native: SkUnicodes::ICU::Make -> SkGetICULib can wait for concurrent gICU initialization
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMake")
+// Needs ForceNativeThreadState: a first call can wait for another thread that is still initializing ICU.
+// Native call path: SkUnicodes::ICU::Make -> SkGetICULib
 @ForceNativeThreadState
 private external fun Shaper_nMake(fontMgrPtr: NativePointer): NativePointer
 
-// Runnable: PrimitiveText() only does make_unique<SkShaperPrimitive>()
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakePrimitive")
+// No ForceNativeThreadState: only allocates an empty primitive shaper object, so it is short and cannot block.
+// Native call path: PrimitiveText -> make_unique<SkShaperPrimitive>
 private external fun _nMakePrimitive(): NativePointer
 
-// Native: SkUnicodes::ICU::Make -> SkGetICULib can wait for concurrent gICU initialization
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeShaperDrivenWrapper")
+// Needs ForceNativeThreadState: a first call can wait for another thread that is still initializing ICU.
+// Native call path: SkUnicodes::ICU::Make -> SkGetICULib
 @ForceNativeThreadState
 private external fun _nMakeShaperDrivenWrapper(fontMgrPtr: NativePointer): NativePointer
 
-// Native: SkUnicodes::ICU::Make -> SkGetICULib can wait for concurrent gICU initialization
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWrap")
+// Needs ForceNativeThreadState: a first call can wait for another thread that is still initializing ICU.
+// Native call path: SkUnicodes::ICU::Make -> SkGetICULib
 @ForceNativeThreadState
 private external fun _nMakeShapeThenWrap(fontMgrPtr: NativePointer): NativePointer
 
-// Native: SkUnicodes::ICU::Make -> SkGetICULib can wait for concurrent gICU initialization
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder")
+// Needs ForceNativeThreadState: a first call can wait for another thread that is still initializing ICU.
+// Native call path: SkUnicodes::ICU::Make -> SkGetICULib
 @ForceNativeThreadState
 private external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: NativePointer): NativePointer
 
-// Runnable: SkShaper_CoreText ctor only stores the line-break mode
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeCoreText")
+// No ForceNativeThreadState: only stores the line-break mode, and CoreText work happens later in shape, so it is short
+// and cannot block.
+// Native call path: SkShaper_CoreText::SkShaper_CoreText
 private external fun _nMakeCoreText(): NativePointer
 
-// Native: SkShaper::shape -> skhb_get_table -> SkTypeface_Mac::onCopyTableData -> CTFontCopyTable
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeBlob")
+// Needs ForceNativeThreadState: shaping reads font tables through CoreText, a platform API, and the result is built
+// into a blob.
+// Native call path: SkShaper::shape -> skhb_get_table -> SkTypeface_Mac::onCopyTableData -> CTFontCopyTable
 @ForceNativeThreadState
 private external fun _nShapeBlob(
     ptr: NativePointer,
@@ -282,8 +292,10 @@ private external fun _nShapeBlob(
 ): NativePointer
 
 
-// Native: SkShaper::shape -> skhb_get_table -> onCopyTableData -> CTFontCopyTable; also font.getMetrics
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeLine")
+// Needs ForceNativeThreadState: shaping reads font tables through CoreText, a platform API, and also asks the font for
+// metrics.
+// Native call path: SkShaper::shape -> skhb_get_table -> SkTypeface_Mac::onCopyTableData -> CTFontCopyTable
 @ForceNativeThreadState
 private external fun _nShapeLine(
     ptr: NativePointer,
@@ -294,8 +306,10 @@ private external fun _nShapeLine(
     optsBooleanProps: Int
 ): NativePointer
 
-// Native: SkShaper::shape -> HB shaping -> copyTableData -> CTFontCopyTable and calls Kotlin run iterators/handler
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShape")
+// Needs ForceNativeThreadState: reads font tables through CoreText and calls Kotlin callbacks for text-run iterators
+// and the result handler.
+// Native call path: SkShaper::shape -> skhb_get_table -> copyTableData -> CTFontCopyTable
 @ForceNativeThreadState
 internal external fun Shaper_nShape(
     ptr: NativePointer,
@@ -312,17 +326,21 @@ internal external fun Shaper_nShape(
 )
 
 // Native/JS only
-// Runnable: returns the address of deleteRunIterator only
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nGetFinalizer")
+// No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
+// Native call path: deleteRunIterator
 internal external fun RunIterator_nGetFinalizer(): NativePointer
 
-// Native: unsupported type -> TODO -> printf and fflush can block on stdout I/O
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator")
+// Needs ForceNativeThreadState: an unsupported type reaches a TODO path that prints and flushes stdout, which can block
+// on stdout I/O.
+// Native call path: TODO -> printf -> fflush
 @ForceNativeThreadState
 internal external fun RunIterator_nCreateRunIterator(type: Int, textPtr: NativePointer): NativePointer
 
-// Native: SkikoRunIterator::init -> KCallback::~KCallback -> disposeCallback on reinitialization
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator")
+// Needs ForceNativeThreadState: reinitializing replaces the old callback, whose disposal calls back into Kotlin.
+// Native call path: SkikoRunIterator::init -> KCallback::~KCallback -> disposeCallback
 @ForceNativeThreadState
 internal external fun RunIterator_nInitRunIterator(
     ptr: NativePointer,
@@ -333,16 +351,19 @@ internal external fun RunIterator_nInitRunIterator(
     onCurrent: InteropPointer
 )
 
-// Runnable: new SkikoRunHandler holds KCallback(nullptr) members and empty vectors
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nCreate")
+// No ForceNativeThreadState: creates a handler with empty callbacks and empty vectors, so it is short and cannot block.
+// Native call path: SkikoRunHandler::SkikoRunHandler
 internal external fun RunHandler_nCreate(): NativePointer
 
-// Runnable: returns the address of deleteRunHandler only
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetFinalizer")
+// No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
+// Native call path: deleteRunHandler
 internal external fun RunHandler_nGetFinalizer(): NativePointer
 
-// Native: SkikoRunHandler::init -> KCallback::~KCallback -> disposeCallback on reinitialization
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nInit")
+// Needs ForceNativeThreadState: reinitializing replaces the old callback, whose disposal calls back into Kotlin.
+// Native call path: SkikoRunHandler::init -> KCallback::~KCallback -> disposeCallback
 @ForceNativeThreadState
 internal external fun RunHandler_nInit(
     ptr: NativePointer,
@@ -354,25 +375,31 @@ internal external fun RunHandler_nInit(
     onCommitLine: InteropPointer
 )
 
-// Native: std::copy over the run vector, which grows with the glyph count of the run
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetGlyphs")
+// Needs ForceNativeThreadState: copies the whole run vector, so its time grows with the glyph count of the run.
+// Native call path: std::copy
 @ForceNativeThreadState
 internal external fun RunHandler_nGetGlyphs(ptr: NativePointer, result: InteropPointer)
 
-// Native: std::copy over the run vector, which grows with the glyph count of the run
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetClusters")
+// Needs ForceNativeThreadState: copies the whole run vector, so its time grows with the glyph count of the run.
+// Native call path: std::copy
 @ForceNativeThreadState
 internal external fun RunHandler_nGetClusters(ptr: NativePointer, result: InteropPointer)
 
-// Native: std::copy over the run vector, which grows with the glyph count of the run
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetPositions")
+// Needs ForceNativeThreadState: copies the whole run vector, so its time grows with the glyph count of the run.
+// Native call path: std::copy
 @ForceNativeThreadState
 internal external fun RunHandler_nGetPositions(ptr: NativePointer, result: InteropPointer)
 
-// Runnable: stores a SkPoint into _point
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nSetOffset")
+// No ForceNativeThreadState: only stores a point as the offset, so it is short and cannot block.
+// Native call path: SkikoRunHandler::setOffset
 internal external fun RunHandler_nSetOffset(ptr: NativePointer, x: Float, y: Float)
 
-// Runnable: copies six RunInfo fields and returns the address of fFont
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetRunInfo")
+// No ForceNativeThreadState: copies six stored run values and returns the address of the font, so it is short and
+// cannot block.
+// Native call path: SkikoRunHandler::runInfo
 internal external fun RunHandler_nGetRunInfo(ptr: NativePointer, result: InteropPointer): NativePointer

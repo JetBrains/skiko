@@ -47,11 +47,13 @@ open class TypefaceFontProvider internal constructor(
 }
 
 
-// Runnable: new TypefaceFontProvider() creates an empty family map and holds no typeface yet
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake")
+// No ForceNativeThreadState: creates an empty family map and holds no typeface yet, so it is short and cannot block.
+// Native call path: TypefaceFontProvider::TypefaceFontProvider
 private external fun TypefaceFontProvider_nMake(): NativePointer
 
-// Native: registerTypeface -> SkTypeface_Mac::onGetFamilyName -> CTFontCopyFamilyName (alias null)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface")
+// Needs ForceNativeThreadState: with no alias, it asks CoreText for the typeface's family name.
+// Native call path: registerTypeface -> SkTypeface_Mac::onGetFamilyName -> CTFontCopyFamilyName
 @ForceNativeThreadState
 private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: InteropPointer): Int

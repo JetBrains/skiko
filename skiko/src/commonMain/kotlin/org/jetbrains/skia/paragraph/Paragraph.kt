@@ -314,54 +314,70 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
 }
 
 
-// Runnable: returns &deleteParagraph; the delete itself runs in Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot
+// block.
+// Native call path: deleteParagraph
 private external fun Paragraph_nGetFinalizer(): NativePointer
 
-// Runnable: Paragraph::getMaxWidth returns the stored field fWidth
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetMaxWidth")
+// No ForceNativeThreadState: returns the stored maximum width, so it is short and cannot block.
+// Native call path: Paragraph::getMaxWidth
 private external fun _nGetMaxWidth(ptr: NativePointer): Float
 
-// Runnable: Paragraph::getHeight returns the stored field fHeight
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetHeight")
+// No ForceNativeThreadState: returns the stored height, so it is short and cannot block.
+// Native call path: Paragraph::getHeight
 private external fun _nGetHeight(ptr: NativePointer): Float
 
-// Runnable: Paragraph::getMinIntrinsicWidth returns the stored field fMinIntrinsicWidth
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetMinIntrinsicWidth")
+// No ForceNativeThreadState: returns the stored minimum intrinsic width, so it is short and cannot block.
+// Native call path: Paragraph::getMinIntrinsicWidth
 private external fun _nGetMinIntrinsicWidth(ptr: NativePointer): Float
 
-// Runnable: Paragraph::getMaxIntrinsicWidth returns the stored field fMaxIntrinsicWidth
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetMaxIntrinsicWidth")
+// No ForceNativeThreadState: returns the stored maximum intrinsic width, so it is short and cannot block.
+// Native call path: Paragraph::getMaxIntrinsicWidth
 private external fun _nGetMaxIntrinsicWidth(ptr: NativePointer): Float
 
-// Runnable: Paragraph::getAlphabeticBaseline returns the stored field fAlphabeticBaseline
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetAlphabeticBaseline")
+// No ForceNativeThreadState: returns the stored alphabetic baseline, so it is short and cannot block.
+// Native call path: Paragraph::getAlphabeticBaseline
 private external fun _nGetAlphabeticBaseline(ptr: NativePointer): Float
 
-// Runnable: Paragraph::getIdeographicBaseline returns the stored field fIdeographicBaseline
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetIdeographicBaseline")
+// No ForceNativeThreadState: returns the stored ideographic baseline, so it is short and cannot block.
+// Native call path: Paragraph::getIdeographicBaseline
 private external fun _nGetIdeographicBaseline(ptr: NativePointer): Float
 
-// Runnable: Paragraph::getLongestLine returns the stored field fLongestLine
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetLongestLine")
+// No ForceNativeThreadState: returns the stored longest line width, so it is short and cannot block.
+// Native call path: Paragraph::getLongestLine
 private external fun _nGetLongestLine(ptr: NativePointer): Float
 
-// Runnable: Paragraph::didExceedMaxLines returns the stored bool fExceededMaxLines
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nDidExceedMaxLines")
+// No ForceNativeThreadState: returns a stored true or false flag saying whether the text exceeded the maximum line
+// count, so it is short and cannot block.
+// Native call path: Paragraph::didExceedMaxLines
 private external fun _nDidExceedMaxLines(ptr: NativePointer): Boolean
 
-// Native: ParagraphImpl::layout -> OneLineShaper -> FontCollection::defaultFallback -> SkFontMgr_Mac
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nLayout")
+// Needs ForceNativeThreadState: lays out the text and can look up fallback fonts through CoreText, and it also takes a
+// cache lock.
+// Native call path: ParagraphImpl::layout -> OneLineShaper -> FontCollection::defaultFallback -> SkFontMgr_Mac
 @ForceNativeThreadState
 private external fun _nLayout(ptr: NativePointer, width: Float)
 
-// Native: ParagraphImpl::paint -> TextLine::paint -> CanvasParagraphPainter -> SkCanvas::drawTextBlob
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nPaint")
+// Needs ForceNativeThreadState: draws text using a glyph cache on a canvas that may use the GPU.
+// Native call path: ParagraphImpl::paint -> TextLine::paint -> CanvasParagraphPainter -> SkCanvas::drawTextBlob
 @ForceNativeThreadState
 private external fun _nPaint(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float)
 
-// Native: ParagraphImpl::getRectsForRange -> ensureUTF16Mapping and per-line TextLine scans over the text
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange")
+// Needs ForceNativeThreadState: its time grows with the length of the text, which it scans to map offsets, then with
+// the number of lines.
+// Native call path: ParagraphImpl::getRectsForRange -> ParagraphImpl::ensureUTF16Mapping -> TextLine::getRectsForRange
 @ForceNativeThreadState
 private external fun _nGetRectsForRange(
     ptr: NativePointer,
@@ -372,63 +388,88 @@ private external fun _nGetRectsForRange(
 ): InteropPointer
 
 
-// Native: ParagraphImpl::getRectsForPlaceholders loops over every TextLine and copies the boxes
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders")
+// Needs ForceNativeThreadState: its time grows with the number of lines, since it loops over every line and copies the
+// boxes.
+// Native call path: ParagraphImpl::getRectsForPlaceholders -> TextLine::getRectsForPlaceholders
 @ForceNativeThreadState
 private external fun _nGetRectsForPlaceholders(ptr: NativePointer): InteropPointer
 
-// Native: ParagraphImpl::getGlyphPositionAtCoordinate -> ensureUTF16Mapping, then TextLine cluster scan
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetGlyphPositionAtCoordinate")
+// Needs ForceNativeThreadState: its time grows with the length of the text and with the glyph clusters on every line it
+// scans.
+// Native call path: ParagraphImpl::getGlyphPositionAtCoordinate -> TextLine::getGlyphPositionAtCoordinate
 @ForceNativeThreadState
 private external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Float, dy: Float): Int
 
-// Native: ParagraphImpl::getWordBoundary -> SkUnicode::getWords (ICU word breaks over the whole text)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary")
+// Needs ForceNativeThreadState: on the first call it runs ICU word breaking over the whole text, so its time grows with
+// the text length.
+// Native call path: ParagraphImpl::getWordBoundary -> SkUnicode::getWords
 @ForceNativeThreadState
 private external fun _nGetWordBoundary(ptr: NativePointer, offset: Int, result: InteropPointer)
 
-// Native: ParagraphImpl::getLineMetrics -> TextLine::getMetrics -> SkFont::getMetrics -> strike cache
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics")
+// Needs ForceNativeThreadState: reads font measurements through a cache protected by a lock; a cache miss creates a Mac
+// font scaler.
+// Native call path: ParagraphImpl::getLineMetrics -> TextLine::getMetrics -> SkFont::getMetrics -> findOrCreateStrike
 @ForceNativeThreadState
 private external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): InteropPointer
 
-// Runnable: ParagraphImpl::lineNumber returns fLines.size()
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetLineNumber")
+// No ForceNativeThreadState: returns the stored number of lines, so it is short and cannot block.
+// Native call path: ParagraphImpl::lineNumber
 private external fun _nGetLineNumber(ptr: NativePointer): Int
 
-// Runnable: ParagraphImpl::markDirty lowers the fState enum
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nMarkDirty")
+// No ForceNativeThreadState: marks the paragraph as needing relayout by storing a state value, so it is short and
+// cannot block.
+// Native call path: ParagraphImpl::markDirty
 private external fun _nMarkDirty(ptr: NativePointer)
 
-// Runnable: ParagraphImpl::unresolvedGlyphs compares fState and returns a stored count
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetUnresolvedGlyphsCount")
+// No ForceNativeThreadState: checks the paragraph state and returns a stored glyph count, so it is short and cannot
+// block.
+// Native call path: ParagraphImpl::unresolvedGlyphs
 private external fun _nGetUnresolvedGlyphsCount(ptr: NativePointer): Int
 
-// Native: ParagraphImpl::unresolvedCodepoints returns a by-value copy of the unordered_set
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetUnresolvedCodepointsCount")
+// Needs ForceNativeThreadState: copies the whole set of unresolved codepoints just to count them, so its time grows
+// with the number of distinct codepoints.
+// Native call path: ParagraphImpl::unresolvedCodepoints
 @ForceNativeThreadState
 private external fun _nGetUnresolvedCodepointsCount(ptr: NativePointer): Int
 
-// Native: ParagraphImpl::unresolvedCodepoints set copy plus a loop over all unresolved codepoints
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetUnresolvedCodepoints")
+// Needs ForceNativeThreadState: copies the set of unresolved codepoints and then loops over all of them, so its time
+// grows with their count.
+// Native call path: ParagraphImpl::unresolvedCodepoints
 @ForceNativeThreadState
 private external fun _nGetUnresolvedCodepoints(ptr: NativePointer, result: InteropPointer)
 
-// Runnable: ParagraphImpl::updateTextAlign stores an enum in fParagraphStyle and lowers fState
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateAlignment")
+// No ForceNativeThreadState: stores an alignment value in the paragraph style and marks the paragraph state, so it is
+// short and cannot block.
+// Native call path: ParagraphImpl::updateTextAlign -> ParagraphStyle::setTextAlign
 private external fun _nUpdateAlignment(ptr: NativePointer, Align: Int)
 
-// Native: UtfIndicesConverter::from16To8 walks the text; updateFontSize loops over all fTextStyles
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateFontSize")
+// Needs ForceNativeThreadState: converts text indices over the whole text, and loops over all text styles, so its time
+// grows with the text length and style count.
+// Native call path: UtfIndicesConverter::from16To8 -> ParagraphImpl::updateFontSize
 @ForceNativeThreadState
 private external fun _nUpdateFontSize(ptr: NativePointer, from: Int, to: Int, size: Float, textPtr: NativePointer)
 
-// Native: updateForegroundPaint loops all fTextStyles; setForegroundColor drops the old SkPaint refs
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateForegroundPaint")
+// Needs ForceNativeThreadState: replacing each style's paint can free the last reference to a shader or image, and its
+// time grows with the number of text styles.
+// Native call path: ParagraphImpl::updateForegroundPaint -> TextStyle::setForegroundPaint
 @ForceNativeThreadState
 private external fun _nUpdateForegroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)
 
-// Native: updateBackgroundPaint loops all fTextStyles; setBackgroundColor drops the old SkPaint refs
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateBackgroundPaint")
+// Needs ForceNativeThreadState: replacing each style's paint can free the last reference to a shader or image, and its
+// time grows with the number of text styles.
+// Native call path: ParagraphImpl::updateBackgroundPaint -> TextStyle::setBackgroundPaint
 @ForceNativeThreadState
 private external fun _nUpdateBackgroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)

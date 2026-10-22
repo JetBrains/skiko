@@ -374,180 +374,243 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
     }
 }
 
-// Runnable: ctor only allocates SkRTreeFactory, SkPictureRecorder, SkRecordCanvas, camera; no typeface or GPU
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake")
+// No ForceNativeThreadState: only allocates a few recording objects and a camera, with no typeface or GPU work, so it
+// is short and cannot block.
+// Native call path: RenderNode::RenderNode
 private external fun RenderNode_nMake(context: NativePointer): NativePointer
 
-// Runnable: returns address of the stored optional<SkPaint> or null
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")
+// No ForceNativeThreadState: returns the address of a stored paint or null, so it is short and cannot block.
+// Native call path: RenderNode::getLayerPaint
 private external fun RenderNode_nGetLayerPaint(ptr: NativePointer): NativePointer
 
-// Native: RenderNode::setLayerPaint -> old SkPaint dtor unrefs shader/filters; invalidateSnapshot -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetLayerPaint")
+// Needs ForceNativeThreadState: replacing paint can release shaders or filters; clearing cached pictures can release
+// fonts and images, and time grows with the number of observing nodes.
+// Native call path: RenderNode::setLayerPaint -> invalidateSnapshot -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetLayerPaint(ptr: NativePointer, paint: NativePointer)
 
-// Runnable: RenderNode::getBounds returns a stored field, copied to the result array
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds")
+// No ForceNativeThreadState: returns stored bounds and copies them to the result array, so it is short and cannot
+// block.
+// Native call path: RenderNode::getBounds
 private external fun RenderNode_nGetBounds(ptr: NativePointer, result: InteropPointer)
 
-// Native: setBounds -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBounds")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setBounds -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)
 
-// Runnable: RenderNode::getPivot returns a stored field, copied to the result array
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetPivot")
+// No ForceNativeThreadState: returns a stored pivot and copies it to the result array, so it is short and cannot block.
+// Native call path: RenderNode::getPivot
 private external fun RenderNode_nGetPivot(ptr: NativePointer, result: InteropPointer)
 
-// Native: setPivot -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetPivot")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setPivot -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetPivot(ptr: NativePointer, x: Float, y: Float)
 
-// Runnable: RenderNode::getAlpha returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAlpha")
+// No ForceNativeThreadState: only returns a stored alpha value, so it is short and cannot block.
+// Native call path: RenderNode::getAlpha
 private external fun RenderNode_nGetAlpha(ptr: NativePointer): Float
 
-// Native: setAlpha -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAlpha")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setAlpha -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetAlpha(ptr: NativePointer, alpha: Float)
 
-// Runnable: RenderNode::getScaleX returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleX")
+// No ForceNativeThreadState: only returns a stored scale value, so it is short and cannot block.
+// Native call path: RenderNode::getScaleX
 private external fun RenderNode_nGetScaleX(ptr: NativePointer): Float
 
-// Native: setScaleX -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleX")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setScaleX -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetScaleX(ptr: NativePointer, scaleX: Float)
 
-// Runnable: RenderNode::getScaleY returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleY")
+// No ForceNativeThreadState: only returns a stored scale value, so it is short and cannot block.
+// Native call path: RenderNode::getScaleY
 private external fun RenderNode_nGetScaleY(ptr: NativePointer): Float
 
-// Native: setScaleY -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleY")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setScaleY -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetScaleY(ptr: NativePointer, scaleY: Float)
 
-// Runnable: RenderNode::getTranslationX returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationX")
+// No ForceNativeThreadState: only returns a stored translation value, so it is short and cannot block.
+// Native call path: RenderNode::getTranslationX
 private external fun RenderNode_nGetTranslationX(ptr: NativePointer): Float
 
-// Native: setTranslationX -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationX")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setTranslationX -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetTranslationX(ptr: NativePointer, translationX: Float)
 
-// Runnable: RenderNode::getTranslationY returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationY")
+// No ForceNativeThreadState: only returns a stored translation value, so it is short and cannot block.
+// Native call path: RenderNode::getTranslationY
 private external fun RenderNode_nGetTranslationY(ptr: NativePointer): Float
 
-// Native: setTranslationY -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationY")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setTranslationY -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetTranslationY(ptr: NativePointer, translationY: Float)
 
-// Runnable: RenderNode::getShadowElevation returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetShadowElevation")
+// No ForceNativeThreadState: only returns a stored shadow elevation, so it is short and cannot block.
+// Native call path: RenderNode::getShadowElevation
 private external fun RenderNode_nGetShadowElevation(ptr: NativePointer): Float
 
-// Native: RenderNode::setShadowElevation -> invalidateSnapshot(kContent) -> contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetShadowElevation")
+// Needs ForceNativeThreadState: clears this node's cached picture and those of observing nodes; picture cleanup can
+// release fonts and images, and time grows with the number of observers.
+// Native call path: RenderNode::setShadowElevation -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetShadowElevation(ptr: NativePointer, elevation: Float)
 
-// Runnable: RenderNode::getAmbientShadowColor returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAmbientShadowColor")
+// No ForceNativeThreadState: only returns a stored shadow color, so it is short and cannot block.
+// Native call path: RenderNode::getAmbientShadowColor
 private external fun RenderNode_nGetAmbientShadowColor(ptr: NativePointer): Int
 
-// Native: setAmbientShadowColor -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAmbientShadowColor")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setAmbientShadowColor -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetAmbientShadowColor(ptr: NativePointer, color: Int)
 
-// Runnable: RenderNode::getSpotShadowColor returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetSpotShadowColor")
+// No ForceNativeThreadState: only returns a stored shadow color, so it is short and cannot block.
+// Native call path: RenderNode::getSpotShadowColor
 private external fun RenderNode_nGetSpotShadowColor(ptr: NativePointer): Int
 
-// Native: setSpotShadowColor -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetSpotShadowColor")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setSpotShadowColor -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetSpotShadowColor(ptr: NativePointer, color: Int)
 
-// Runnable: RenderNode::getRotationX returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationX")
+// No ForceNativeThreadState: only reads a stored field, so it is short and cannot block.
+// Native call path: RenderNode::getRotationX
 private external fun RenderNode_nGetRotationX(ptr: NativePointer): Float
 
-// Native: setRotationX -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationX")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setRotationX -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetRotationX(ptr: NativePointer, rotationX: Float)
 
-// Runnable: RenderNode::getRotationY returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationY")
+// No ForceNativeThreadState: only reads a stored field, so it is short and cannot block.
+// Native call path: RenderNode::getRotationY
 private external fun RenderNode_nGetRotationY(ptr: NativePointer): Float
 
-// Native: setRotationY -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationY")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setRotationY -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetRotationY(ptr: NativePointer, rotationY: Float)
 
-// Runnable: RenderNode::getRotationZ returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationZ")
+// No ForceNativeThreadState: only reads a stored field, so it is short and cannot block.
+// Native call path: RenderNode::getRotationZ
 private external fun RenderNode_nGetRotationZ(ptr: NativePointer): Float
 
-// Native: setRotationZ -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationZ")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setRotationZ -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetRotationZ(ptr: NativePointer, rotationZ: Float)
 
-// Runnable: RenderNode::getCameraDistance divides a stored float by 72
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetCameraDistance")
+// No ForceNativeThreadState: divides a stored value by 72, so it is short and cannot block.
+// Native call path: RenderNode::getCameraDistance
 private external fun RenderNode_nGetCameraDistance(ptr: NativePointer): Float
 
-// Native: setCameraDistance -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetCameraDistance")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setCameraDistance -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetCameraDistance(ptr: NativePointer, distance: Float)
 
-// Native: setClipRect -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setClipRect -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetClipRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, mode: Int, antiAlias: Boolean)
 
-// Native: setClipRRect -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setClipRRect -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetClipRRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, radii: InteropPointer, radiiSize: Int, mode: Int, antiAlias: Boolean)
 
-// Native: setClipPath -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath")
+// Needs ForceNativeThreadState: clears observing nodes' cached pictures, which can release fonts and images; time grows
+// with the number of observers.
+// Native call path: RenderNode::setClipPath -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetClipPath(ptr: NativePointer, pathPtr: NativePointer, mode: Int, antiAlias: Boolean)
 
-// Runnable: RenderNode::getClip returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip")
+// No ForceNativeThreadState: returns a stored clip value, so it is short and cannot block.
+// Native call path: RenderNode::getClip
 private external fun RenderNode_nGetClip(ptr: NativePointer): Boolean
 
-// Native: RenderNode::setClip -> invalidateSnapshot(kContent) -> contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClip")
+// Needs ForceNativeThreadState: clears this node's cached picture and those of observing nodes; picture cleanup can
+// release fonts and images, and time grows with the number of observers.
+// Native call path: RenderNode::setClip -> invalidateSnapshot -> reset -> ~SkPicture
 @ForceNativeThreadState
 private external fun RenderNode_nSetClip(ptr: NativePointer, clip: Boolean)
 
-// Native: RenderNode::beginRecording -> SkPictureRecorder::beginRecording -> SkRecordCanvas::reset -> forgetRecord
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nBeginRecording")
+// Needs ForceNativeThreadState: starting a recording drops references to drawables from an unfinished earlier
+// recording, and the last one released can free a typeface, image, or Kotlin callback.
+// Native call path: RenderNode::beginRecording -> SkPictureRecorder::beginRecording -> SkRecordCanvas::reset ->
+//   forgetRecord
 @ForceNativeThreadState
 private external fun RenderNode_nBeginRecording(ptr: NativePointer): NativePointer
 
-// Native: RenderNode::endRecording -> finishRecordingAsDrawable, old contentCache dtor, updateDependencies replay
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nEndRecording")
+// Needs ForceNativeThreadState: replacing the old cached drawable can release fonts and images; finishing and replaying
+// the recording takes time that grows with the number of recorded operations.
+// Native call path: RenderNode::endRecording -> updateDependencies
 @ForceNativeThreadState
 private external fun RenderNode_nEndRecording(ptr: NativePointer)
 
-// Native: RenderNode::drawInto -> SkCanvas::drawDrawable -> onDraw -> drawPicture/saveLayer/DrawShadow
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nDrawInto")
+// Needs ForceNativeThreadState: draws onto a canvas that can be GPU-backed, and text can hit the CoreText glyph cache.
+// Native call path: RenderNode::drawInto -> SkCanvas::drawDrawable -> RenderNode::onDraw
 @ForceNativeThreadState
 private external fun RenderNode_nDrawInto(ptr: NativePointer, canvas: NativePointer)

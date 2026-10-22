@@ -19,10 +19,13 @@ class RTreeFactory : BBHFactory {
     }
 }
 
-// Runnable: new SkRTreeFactory is an empty polymorphic object, no members
 @ExternalSymbolName("org_jetbrains_skia_RTreeFactory__1nMake")
+// No ForceNativeThreadState: creates an empty tree factory with no members, so it is short and cannot block.
+// Native call path: SkRTreeFactory::SkRTreeFactory
 private external fun RTreeFactory_nMake(): NativePointer
 
-// Runnable: returns the address of deleteSkBBHFactory
 @ExternalSymbolName("org_jetbrains_skia_BBHFactory__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteSkBBHFactory
 private external fun BBHFactory_nGetFinalizer(): NativePointer

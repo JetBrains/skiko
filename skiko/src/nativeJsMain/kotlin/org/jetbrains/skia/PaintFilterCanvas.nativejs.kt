@@ -15,11 +15,13 @@ internal actual fun PaintFilterCanvas.doInit(ptr: NativePointer) {
     }
 }
 
-// Native: SkikoPaintFilterCanvas::init -> KCallback::operator= -> ~KCallback -> disposeCallback calls Kotlin
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nInit")
+// Needs ForceNativeThreadState: reinitializing replaces the old callback, whose disposal calls back into Kotlin.
+// Native call path: SkikoPaintFilterCanvas::init -> KCallback::operator= -> ~KCallback -> disposeCallback
 @ForceNativeThreadState
 internal external fun PaintFilterCanvas_nInit(ptr: NativePointer, onFilter: InteropPointer)
 
-// Runnable: SkikoPaintFilterCanvas::onFilterPaint returns a stored pointer
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint")
+// No ForceNativeThreadState: returns a stored pointer, so it is short and cannot block.
+// Native call path: SkikoPaintFilterCanvas::onFilterPaint
 internal external fun PaintFilterCanvas_nGetOnFilterPaint(ptr: NativePointer): NativePointer

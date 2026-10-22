@@ -145,86 +145,119 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
     }
 }
 
-// Native: SkRuntimeEffectBuilder -> SkData::MakeZeroInitialized clears input-sized uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeFromRuntimeEffect")
+// Needs ForceNativeThreadState: zero-fills storage for the shader program's uniform values and creates its child list;
+// work grows with the declared uniform storage and child count.
+// Native call path: SkRuntimeEffectBuilder -> SkData::MakeZeroInitialized
 @ForceNativeThreadState
 private external fun _nMakeFromRuntimeEffect(effectPtr: NativePointer): NativePointer
 
-// Runnable: returns the address of deleteRuntimeShaderBuilder
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of the deletion function, so it is short and cannot block.
+// Native call path: deleteRuntimeShaderBuilder
 private external fun RuntimeShaderBuilder_nGetFinalizer(): NativePointer
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformInt(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue: Int)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt2")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformInt2(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt3")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformInt3(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int, uniformValue3: Int)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt4")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformInt4(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int, uniformValue3: Int, uniformValue4: Int)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformFloat(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue: Float)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat2")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformFloat2(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat3")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformFloat3(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float, uniformValue3: Float)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat4")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformFloat4(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float, uniformValue3: Float, uniformValue4: Float)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatArray")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformFloatArray(builderPtr: NativePointer, uniformName: InteropPointer, uniformFloatArray: InteropPointer, length: Int)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix22")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformFloatMatrix22(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix22: InteropPointer)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix33")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformFloatMatrix33(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix33: InteropPointer)
 
-// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix44")
+// Needs ForceNativeThreadState: copies the uniform parameter's name and searches the declared parameters one by one;
+// work grows with the name length and parameter count.
+// Native call path: skString -> SkString
 @ForceNativeThreadState
 private external fun _nUniformFloatMatrix44(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix44: InteropPointer)
 
-// Native: assigning a child ChildPtr drops the old shader, whose last unref can free image or text
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildShader")
+// Needs ForceNativeThreadState: replacing a child shader drops the old one, and its last reference can free a GPU image
+// or typeface.
+// Native call path: BuilderChild::operator= -> ~ChildPtr
 @ForceNativeThreadState
 private external fun _nChildShader(builderPtr: NativePointer, uniformName: InteropPointer, shaderPtr: NativePointer)
 
-// Native: assigning a child ChildPtr drops the old filter, whose last unref can free image or shader
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildColorFilter")
+// Needs ForceNativeThreadState: replacing a child filter drops the old one, and its last reference can free a shader or
+// GPU image.
+// Native call path: BuilderChild::operator= -> ~ChildPtr
 @ForceNativeThreadState
 private external fun _nChildColorFilter(builderPtr: NativePointer, uniformName: InteropPointer, colorFilterPtr: NativePointer)
 
-// Native: SkRuntimeEffectBuilder::makeShader -> verify_child_effects scans input-sized children
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeShader")
+// Needs ForceNativeThreadState: scans every declared child and copies the child list, so its time grows with the number
+// of children.
+// Native call path: SkRuntimeEffectBuilder::makeShader -> verify_child_effects
 @ForceNativeThreadState
 private external fun _nMakeShader(builderPtr: NativePointer, localMatrix: InteropPointer): NativePointer

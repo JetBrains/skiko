@@ -71,22 +71,31 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 // "high quality" mode, in SkBlurMask::Blur() (1 / sqrt(3)).
 private const val kBLUR_SIGMA_SCALE = 0.57735f
 
-// Runnable: SkTableMaskFilter::Create copies a 256-byte table into a new object
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeTable")
+// No ForceNativeThreadState: copies a fixed 256-entry table into a new filter object, so it is short and cannot block.
+// Native call path: SkTableMaskFilter::Create
 private external fun MaskFilter_nMakeTable(table: InteropPointer): NativePointer
 
-// Runnable: SkMaskFilter::MakeBlur allocates an object holding sigma, style and flag
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeBlur")
+// No ForceNativeThreadState: allocates a blur filter object that stores a few plain settings, so it is short and cannot
+// block.
+// Native call path: SkMaskFilter::MakeBlur
 private external fun _nMakeBlur(mode: Int, sigma: Float, respectCTM: Boolean): NativePointer
 
-// Runnable: SkShaderMaskFilter::Make only stores a ref; the caller keeps its ref so no last unref
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeShader")
+// No ForceNativeThreadState: stores a reference to a shader in a new filter object, and the caller still holds its own
+// reference, so it is short and cannot block.
+// Native call path: SkShaderMaskFilter::Make
 private external fun _nMakeShader(shaderPtr: NativePointer): NativePointer
 
-// Runnable: SkTableMaskFilter::CreateGamma fills 256 entries with powf, then copies into a new object
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeGamma")
+// No ForceNativeThreadState: fills a fixed 256-entry gamma table and copies it into a new filter object, so it is short
+// and cannot block.
+// Native call path: SkTableMaskFilter::CreateGamma
 private external fun _nMakeGamma(gamma: Float): NativePointer
 
-// Runnable: SkTableMaskFilter::CreateClip fills a fixed 256-entry table, then allocates
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeClip")
+// No ForceNativeThreadState: fills a fixed 256-entry clip table and allocates a new filter object, so it is short and
+// cannot block.
+// Native call path: SkTableMaskFilter::CreateClip
 private external fun _nMakeClip(min: Byte, max: Byte): NativePointer

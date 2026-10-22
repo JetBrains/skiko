@@ -269,96 +269,130 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
 }
 
 
-// Runnable: returns the address of unrefTextLine without calling it
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot
+// block.
+// Native call path: unrefTextLine
 private external fun TextLine_nGetFinalizer(): NativePointer
 
-// Runnable: reads the stored TextLine::fWidth field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetWidth")
+// No ForceNativeThreadState: returns the stored width, so it is short and cannot block.
+// Native call path: TextLine::fWidth
 private external fun TextLine_nGetWidth(ptr: NativePointer): Float
 
-// Runnable: computes from three stored TextLine floats: fAscent, fDescent, fLeading
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetHeight")
+// No ForceNativeThreadState: subtracts stored ascent from stored descent and adds stored leading, so it is short and
+// cannot block.
+// Native call path: TextLine::fAscent
 private external fun TextLine_nGetHeight(ptr: NativePointer): Float
 
-// Runnable: reads the stored TextLine::fGlyphCount field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphsLength")
+// No ForceNativeThreadState: returns the stored glyph count, so it is short and cannot block.
+// Native call path: TextLine::fGlyphCount
 private external fun TextLine_nGetGlyphsLength(ptr: NativePointer): Int
 
-// Native: loops over all fRuns and memcpys each run glyph array (cost grows with glyph count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphs")
+// Needs ForceNativeThreadState: copies the glyph array of every run in the line, so its time grows with the glyph
+// count.
+// Native call path: memcpy
 @ForceNativeThreadState
 private external fun TextLine_nGetGlyphs(ptr: NativePointer, resultGlyphs: InteropPointer, resultLength: Int)
 
-// Native: loops over all fRuns and memcpys each run position array (cost grows with glyph count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
+// Needs ForceNativeThreadState: copies the position array of every run in the line, so its time grows with the glyph
+// count.
+// Native call path: memcpy
 @ForceNativeThreadState
 private external fun TextLine_nGetPositions(ptr: NativePointer, resultArray: InteropPointer)
 
-// Runnable: reads the stored TextLine::fAscent field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetAscent")
+// No ForceNativeThreadState: returns the stored ascent, so it is short and cannot block.
+// Native call path: TextLine::fAscent
 private external fun _nGetAscent(ptr: NativePointer): Float
 
-// Runnable: reads the stored TextLine::fCapHeight field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCapHeight")
+// No ForceNativeThreadState: returns the stored cap height, so it is short and cannot block.
+// Native call path: TextLine::fCapHeight
 private external fun _nGetCapHeight(ptr: NativePointer): Float
 
-// Runnable: reads the stored TextLine::fXHeight field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetXHeight")
+// No ForceNativeThreadState: returns the stored x-height, so it is short and cannot block.
+// Native call path: TextLine::fXHeight
 private external fun _nGetXHeight(ptr: NativePointer): Float
 
-// Runnable: reads the stored TextLine::fDescent field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetDescent")
+// No ForceNativeThreadState: returns the stored descent, so it is short and cannot block.
+// Native call path: TextLine::fDescent
 private external fun _nGetDescent(ptr: NativePointer): Float
 
-// Runnable: reads the stored TextLine::fLeading field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeading")
+// No ForceNativeThreadState: returns the stored leading, so it is short and cannot block.
+// Native call path: TextLine::fLeading
 private external fun _nGetLeading(ptr: NativePointer): Float
 
-// Runnable: SkTextBlob::ref is an atomic ref++ on the stored fBlob
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetTextBlob")
+// No ForceNativeThreadState: adds one reference to the stored text blob and returns it, so it is short and cannot
+// block.
+// Native call path: SkTextBlob::ref
 private external fun _nGetTextBlob(ptr: NativePointer): NativePointer
 
-// Native: loops over all fRuns copying fPosition floats (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositions")
+// Needs ForceNativeThreadState: copies the position of every run into the result array, so its time grows with the run
+// count.
+// Native call path: TextLine::fRuns
 @ForceNativeThreadState
 private external fun _nGetRunPositions(ptr: NativePointer, resultArray: InteropPointer)
 
-// Runnable: returns the size of the stored fRuns vector
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositionsCount")
+// No ForceNativeThreadState: returns the number of stored runs, so it is short and cannot block.
+// Native call path: TextLine::fRuns
 private external fun _nGetRunPositionsCount(ptr: NativePointer): Int
 
-// Native: loops over all fRuns summing fBreakPositions sizes (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositionsCount")
+// Needs ForceNativeThreadState: loops over every run to add up break position counts, so its time grows with the run
+// count.
+// Native call path: TextLine::fRuns
 @ForceNativeThreadState
 private external fun _nGetBreakPositionsCount(ptr: NativePointer): Int
 
-// Native: loops over all fRuns and memcpys fBreakPositions (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositions")
+// Needs ForceNativeThreadState: loops over every run and copies its break positions, so its time grows with the text
+// length.
+// Native call path: memcpy
 @ForceNativeThreadState
 private external fun _nGetBreakPositions(ptr: NativePointer, result: InteropPointer)
 
-// Native: loops over all fRuns summing fBreakOffsets sizes (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsetsCount")
+// Needs ForceNativeThreadState: loops over every run to add up break offset counts, so its time grows with the run
+// count.
+// Native call path: TextLine::fRuns
 @ForceNativeThreadState
 private external fun _nGetBreakOffsetsCount(ptr: NativePointer): Int
 
-// Native: loops over all fRuns and memcpys fBreakOffsets (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsets")
+// Needs ForceNativeThreadState: loops over every run and copies its break offsets, so its time grows with the text
+// length.
+// Native call path: memcpy
 @ForceNativeThreadState
 private external fun _nGetBreakOffsets(ptr: NativePointer, result: InteropPointer)
 
-// Native: linear scan over every run and break position (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
+// Needs ForceNativeThreadState: scans every run and break position in a nested loop, so its time grows with the text
+// length.
+// Native call path: TextLine::fRuns
 @ForceNativeThreadState
 private external fun _nGetOffsetAtCoord(ptr: NativePointer, x: Float): Int
 
-// Native: linear scan over every run and break position (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord")
+// Needs ForceNativeThreadState: scans every run and break position in a nested loop, so its time grows with the text
+// length.
+// Native call path: TextLine::fRuns
 @ForceNativeThreadState
 private external fun _nGetLeftOffsetAtCoord(ptr: NativePointer, x: Float): Int
 
-// Native: linear scan over every run and break offset (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCoordAtOffset")
+// Needs ForceNativeThreadState: scans every run and break offset in a nested loop, so its time grows with the text
+// length.
+// Native call path: TextLine::fRuns
 @ForceNativeThreadState
 private external fun _nGetCoordAtOffset(ptr: NativePointer, offset: Int): Float

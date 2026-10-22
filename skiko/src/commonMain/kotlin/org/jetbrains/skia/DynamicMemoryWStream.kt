@@ -45,20 +45,28 @@ class DynamicMemoryWStream() : WStream(DynamicMemoryWStream_nMake(), _FinalizerH
     }
 }
 
-// Runnable: new SkDynamicMemoryWStream is a defaulted constructor with null head/tail
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nMake")
+// No ForceNativeThreadState: creates an empty memory stream with null block pointers and no data blocks, so it is short
+// and cannot block.
+// Native call path: SkDynamicMemoryWStream::SkDynamicMemoryWStream
 private external fun DynamicMemoryWStream_nMake(): NativePointer
 
-// Runnable: returns the address of deleteDynamicMemoryWStream; the finalizer itself runs through Managed
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot
+// block.
+// Native call path: _nGetFinalizer
 private external fun DynamicMemoryWStream_nGetFinalizer(): NativePointer
 
-// Native: SkDynamicMemoryWStream::bytesWritten -> validate walks every stream block in SK_DEBUG
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nBytesWritten")
+// Needs ForceNativeThreadState: in debug builds, walks every block of the stream, so its time grows with the number of
+// blocks.
+// Native call path: SkDynamicMemoryWStream::bytesWritten -> validate
 @ForceNativeThreadState
 private external fun _nBytesWritten(stream: NativePointer): Int
 
-// Native: SkDynamicMemoryWStream::read walks the block list and memcpy-s a caller-chosen size
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nRead")
+// Needs ForceNativeThreadState: walks the block list and copies a caller-chosen number of bytes, so its time grows with
+// that size.
+// Native call path: SkDynamicMemoryWStream::read -> memcpy
 @ForceNativeThreadState
 private external fun _nRead(stream: NativePointer, buffer: InteropPointer, offset: Int, size: Int): Boolean

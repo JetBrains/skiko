@@ -1172,38 +1172,49 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
 }
 
-// Runnable: _nGetFinalizer only returns the address of deletePath
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFinalizer")
+// No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 internal external fun Path_nGetFinalizer(): NativePointer
 
-// Native: SkPath::SkPath -> SkPathData::Empty -> SkPathData::PeekEmptySingleton can wait on initialization
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMake")
+// Needs ForceNativeThreadState: the shared empty-path singleton can wait for another thread's one-time initialization.
+// Native call path: SkPath::SkPath -> SkPathData::Empty -> SkPathData::PeekEmptySingleton
 @ForceNativeThreadState
 private external fun Path_nMake(): NativePointer
 
-// Native: SkPath operator== -> SkSpanPriv::EQ over all points, verbs and conics
 @ExternalSymbolName("org_jetbrains_skia_Path__1nEquals")
+// Needs ForceNativeThreadState: compares the paths' points, drawing commands and curve weights, so its time grows with
+// the path size.
+// Native call path: operator== -> SkSpanPriv::EQ
 @ForceNativeThreadState
 private external fun Path_nEquals(aPtr: NativePointer, bPtr: NativePointer): Boolean
 
-// Runnable: SkPath::isVolatile returns the stored fIsVolatile flag
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsVolatile")
+// No ForceNativeThreadState: returns the stored volatile flag, so it is short and cannot block.
+// Native call path: SkPath::isVolatile
 private external fun Path_nIsVolatile(ptr: NativePointer): Boolean
 
-// Runnable: SkPath::setIsVolatile writes the stored fIsVolatile flag
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSetVolatile")
+// No ForceNativeThreadState: stores the volatile flag, so it is short and cannot block.
+// Native call path: SkPath::setIsVolatile
 private external fun Path_nSetVolatile(ptr: NativePointer, isVolatile: Boolean)
 
-// Runnable: SkPath::swap exchanges the sk_sp<SkPathData> pointers and two fields
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSwap")
+// No ForceNativeThreadState: swaps two path data pointers and a few fields without releasing anything, so it is short
+// and cannot block.
+// Native call path: SkPath::swap
 private external fun Path_nSwap(ptr: NativePointer, otherPtr: NativePointer)
 
-// Runnable: SkPath::getGenerationID returns SkPathData::fUniqueID set at construction
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetGenerationId")
+// No ForceNativeThreadState: returns an id that was stored when the path data was built, so it is short and cannot
+// block.
+// Native call path: SkPath::getGenerationID
 private external fun Path_nGetGenerationId(ptr: NativePointer): Int
 
-// Native: SkPath::Raw -> SkPathData::Make -> valid_path_data and bounds scan over all input
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromRaw")
+// Needs ForceNativeThreadState: validates and copies the input points, drawing commands and curve weights, so its time
+// grows with the input size.
+// Native call path: SkPath::Raw -> SkPathData::Make -> valid_path_data
 @ForceNativeThreadState
 private external fun _nMakeFromRaw(
     pts: InteropPointer, ptsCount: Int,
@@ -1212,113 +1223,140 @@ private external fun _nMakeFromRaw(
     fillType: Int, isVolatile: Boolean
 ): NativePointer
 
-// Native: SkPath::Rect -> SkPath::MakeNullCheck -> SkPath::PeekErrorSingleton can wait on initialization
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromRect")
+// Needs ForceNativeThreadState: the shared error-path singleton can wait for another thread's one-time initialization.
+// Native call path: SkPath::Rect -> SkPath::MakeNullCheck -> SkPath::PeekErrorSingleton
 @ForceNativeThreadState
 private external fun _nMakeFromRect(
     left: Float, top: Float, right: Float, bottom: Float,
     fillType: Int, direction: Int, startIndex: Int
 ): NativePointer
 
-// Native: SkPath::Oval -> SkPath::MakeNullCheck -> SkPath::PeekErrorSingleton can wait on initialization
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromOval")
+// Needs ForceNativeThreadState: the shared error-path singleton can wait for another thread's one-time initialization.
+// Native call path: SkPath::Oval -> SkPath::MakeNullCheck -> SkPath::PeekErrorSingleton
 @ForceNativeThreadState
 private external fun _nMakeFromOval(
     left: Float, top: Float, right: Float, bottom: Float,
     direction: Int, startIndex: Int
 ): NativePointer
 
-// Native: SkPath::Circle -> SkPath::SkPath -> SkPathData::Empty can wait for concurrent initialization
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromCircle")
+// Needs ForceNativeThreadState: a negative radius builds an empty path, and the shared empty singleton can wait for
+// another thread's initialization.
+// Native call path: SkPath::Circle -> SkPath::SkPath -> SkPathData::Empty
 @ForceNativeThreadState
 private external fun _nMakeFromCircle(
     centerX: Float, centerY: Float, radius: Float, direction: Int
 ): NativePointer
 
-// Runnable: SkPath::RRect -> SkPathData::RRect builds a fixed-size path
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromRRect")
+// No ForceNativeThreadState: builds a rounded-rect path of at most 13 points, so it is short and cannot block.
+// Native call path: SkPath::RRect -> SkPathData::RRect
 private external fun _nMakeFromRRect(
     radii: InteropPointer,
     left: Float, top: Float, right: Float, bottom: Float,
     direction: Int, startIndex: Int
 ): NativePointer
 
-// Native: SkPath::RRect -> SkPath::MakeNullCheck -> SkPath::PeekErrorSingleton can wait on initialization
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromRRectXY")
+// Needs ForceNativeThreadState: the shared error-path singleton can wait for another thread's one-time initialization.
+// Native call path: SkPath::RRect -> SkPath::MakeNullCheck -> SkPath::PeekErrorSingleton
 @ForceNativeThreadState
 private external fun _nMakeFromRRectXY(
     left: Float, top: Float, right: Float, bottom: Float,
     rx: Float, ry: Float, direction: Int
 ): NativePointer
 
-// Native: SkPath::Polygon -> SkPathData::Polygon copies and fills verbs per input point
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromPolygon")
+// Needs ForceNativeThreadState: copies the input points and creates drawing commands for them, so its time grows with
+// the point count.
+// Native call path: SkPath::Polygon -> SkPathData::Polygon
 @ForceNativeThreadState
 private external fun _nMakeFromPolygon(
     pts: InteropPointer, ptsCount: Int,
     isClosed: Boolean, fillType: Int, isVolatile: Boolean
 ): NativePointer
 
-// Native: SkParsePath::FromSVGString parses the whole string into a path
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromSVGString")
+// Needs ForceNativeThreadState: parses the whole input string into a path, so its time grows with the string length.
+// Native call path: SkParsePath::FromSVGString
 @ForceNativeThreadState
 private external fun _nMakeFromSVGString(svg: InteropPointer): NativePointer
 
-// Native: SkPath::isInterpolatable compares verbs and conic weights of both paths
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsInterpolatable")
+// Needs ForceNativeThreadState: compares the drawing commands and curve weights of both paths, so its time grows with
+// the path size.
+// Native call path: SkPath::isInterpolatable
 @ForceNativeThreadState
 private external fun _nIsInterpolatable(ptr: NativePointer, comparePtr: NativePointer): Boolean
 
-// Native: SkPath::interpolate -> builds a new path from every point of both paths
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeLerp")
+// Needs ForceNativeThreadState: builds a new path from every point of both input paths, so its time grows with the path
+// size.
+// Native call path: SkPath::interpolate
 @ForceNativeThreadState
 private external fun _nMakeLerp(ptr: NativePointer, endingPtr: NativePointer, weight: Float): NativePointer
 
-// Runnable: SkPath::getFillType returns the stored fFillType
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFillMode")
+// No ForceNativeThreadState: returns the stored fill type, so it is short and cannot block.
+// Native call path: SkPath::getFillType
 private external fun _nGetFillMode(ptr: NativePointer): Int
 
-// Runnable: SkPath::setFillType writes the stored fFillType
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSetFillMode")
+// No ForceNativeThreadState: stores the fill type, so it is short and cannot block.
+// Native call path: SkPath::setFillType
 private external fun _nSetFillMode(ptr: NativePointer, fillMode: Int)
 
-// Native: SkPath::isConvex -> getConvexity -> SkPathPriv::ComputeConvexity scans all points
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsConvex")
+// Needs ForceNativeThreadState: when convexity is not yet known, it scans all points, so its time grows with the path
+// size.
+// Native call path: SkPath::isConvex -> getConvexity -> SkPathPriv::ComputeConvexity
 @ForceNativeThreadState
 private external fun _nIsConvex(ptr: NativePointer): Boolean
 
-// Runnable: SkPath::isOval reads the oval info stored in SkPathData
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsOval")
+// No ForceNativeThreadState: reads the oval details stored in the path data, so it is short and cannot block.
+// Native call path: SkPath::isOval
 private external fun _nIsOval(ptr: NativePointer, rect: InteropPointer): Boolean
 
-// Native: SkPath::isRect -> SkPathPriv::IsRectContour loops over all verbs
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsRect")
+// Needs ForceNativeThreadState: scans the path's drawing commands to check for a rectangle, so its time grows with the
+// path size.
+// Native call path: SkPath::isRect -> SkPathPriv::IsRectContour
 @ForceNativeThreadState
 private external fun _nIsRect(ptr: NativePointer, rect: InteropPointer): Boolean
 
-// Runnable: SkPath::isRRect -> DeduceRRectFromContour on a fixed-size rrect path
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsRRect")
+// No ForceNativeThreadState: deduces a rounded rect from a path of at most 13 points, so it is short and cannot block.
+// Native call path: SkPath::isRRect -> DeduceRRectFromContour
 private external fun _nIsRRect(ptr: NativePointer, rrect: InteropPointer): Boolean
 
-// Runnable: SkPath::isEmpty checks whether the verb span is empty
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsEmpty")
+// No ForceNativeThreadState: checks whether the list of drawing commands is empty, so it is short and cannot block.
+// Native call path: SkPath::isEmpty
 private external fun _nIsEmpty(ptr: NativePointer): Boolean
 
-// Runnable: SkPath::isLastContourClosed tests the last verb
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsLastContourClosed")
+// No ForceNativeThreadState: checks whether the last drawing command closes the path's final contour, so it is short
+// and cannot block.
+// Native call path: SkPath::isLastContourClosed
 private external fun _nIsLastContourClosed(ptr: NativePointer): Boolean
 
-// Native: SkPath::isFinite -> SkPath::PeekErrorSingleton can wait for concurrent initialization
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsFinite")
+// Needs ForceNativeThreadState: the shared error-path singleton can wait for another thread's one-time initialization.
+// Native call path: SkPath::isFinite -> SkPath::PeekErrorSingleton
 @ForceNativeThreadState
 private external fun _nIsFinite(ptr: NativePointer): Boolean
 
-// Runnable: SkPath::IsLineDegenerate is a two-point comparison
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsLineDegenerate")
+// No ForceNativeThreadState: compares two points with fixed math, so it is short and cannot block.
+// Native call path: SkPath::IsLineDegenerate
 private external fun _nIsLineDegenerate(x0: Float, y0: Float, x1: Float, y1: Float, exact: Boolean): Boolean
 
-// Runnable: SkPath::IsQuadDegenerate is a three-point comparison
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsQuadDegenerate")
+// No ForceNativeThreadState: compares three points with fixed math, so it is short and cannot block.
+// Native call path: SkPath::IsQuadDegenerate
 private external fun _nIsQuadDegenerate(
     x0: Float,
     y0: Float,
@@ -1329,8 +1367,9 @@ private external fun _nIsQuadDegenerate(
     exact: Boolean
 ): Boolean
 
-// Runnable: SkPath::IsCubicDegenerate is a four-point comparison
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsCubicDegenerate")
+// No ForceNativeThreadState: compares four points with fixed math, so it is short and cannot block.
+// Native call path: SkPath::IsCubicDegenerate
 private external fun _nIsCubicDegenerate(
     x0: Float,
     y0: Float,
@@ -1343,52 +1382,69 @@ private external fun _nIsCubicDegenerate(
     exact: Boolean
 ): Boolean
 
-// Runnable: SkPath::isLine checks for exactly two verbs and copies two points
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMaybeGetAsLine")
+// No ForceNativeThreadState: checks for exactly two drawing commands and copies two points, so it is short and cannot
+// block.
+// Native call path: SkPath::isLine
 private external fun _nMaybeGetAsLine(ptr: NativePointer, rectBuffer: InteropPointer): Boolean
 
-// Runnable: SkPath::countPoints returns the points span size
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPointsCount")
+// No ForceNativeThreadState: returns the stored point count, so it is short and cannot block.
+// Native call path: SkPath::countPoints
 private external fun _nGetPointsCount(ptr: NativePointer): Int
 
-// Runnable: SkPath::getPoint indexes into the points span
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoint")
+// No ForceNativeThreadState: reads one point by index, so it is short and cannot block.
+// Native call path: SkPath::getPoint
 private external fun _nGetPoint(ptr: NativePointer, index: Int, result: InteropPointer)
 
-// Native: SkPath::getPoints memcpy of up to max points, grows with path size
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoints")
+// Needs ForceNativeThreadState: copies up to the requested number of points, so its time grows with the path size.
+// Native call path: SkPath::getPoints
 @ForceNativeThreadState
 private external fun _nGetPoints(ptr: NativePointer, points: InteropPointer, max: Int): Int
 
-// Runnable: SkPath::countVerbs returns the verbs span size
 @ExternalSymbolName("org_jetbrains_skia_Path__1nCountVerbs")
+// No ForceNativeThreadState: returns the stored number of drawing commands, so it is short and cannot block.
+// Native call path: SkPath::countVerbs
 private external fun _nCountVerbs(ptr: NativePointer): Int
 
-// Native: SkPath::getVerbs memcpy of up to max verbs, grows with path size
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetVerbs")
+// Needs ForceNativeThreadState: copies drawing commands up to the requested limit, so its time grows with the number
+// copied.
+// Native call path: SkPath::getVerbs
 @ForceNativeThreadState
 private external fun _nGetVerbs(ptr: NativePointer, verbs: InteropPointer, max: Int): Int
 
-// Runnable: SkPath::approximateBytesUsed adds sizeof(SkPath) and three span byte sizes
 @ExternalSymbolName("org_jetbrains_skia_Path__1nApproximateBytesUsed")
+// No ForceNativeThreadState: adds a fixed struct size and three stored span sizes, so it is short and cannot block.
+// Native call path: SkPath::approximateBytesUsed
 private external fun _nApproximateBytesUsed(ptr: NativePointer): Int
 
-// Runnable: SkPath::getBounds returns the SkRect stored in SkPathData
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetBounds")
+// No ForceNativeThreadState: returns the bounds rectangle stored when the path was built, so it is short and cannot
+// block.
+// Native call path: SkPath::getBounds
 private external fun _nGetBounds(ptr: NativePointer, rect: InteropPointer)
 
-// Native: SkPath::computeTightBounds -> SkPathPriv::ComputeTightBounds walks all segments
 @ExternalSymbolName("org_jetbrains_skia_Path__1nComputeTightBounds")
+// Needs ForceNativeThreadState: walks every segment of the path to compute tight bounds, so its time grows with the
+// path size.
+// Native call path: SkPath::computeTightBounds -> SkPathPriv::ComputeTightBounds
 @ForceNativeThreadState
 private external fun _nComputeTightBounds(ptr: NativePointer, rect: InteropPointer)
 
-// Native: SkPath::conservativelyContainsRect -> getConvexity and loop over verbs
 @ExternalSymbolName("org_jetbrains_skia_Path__1nConservativelyContainsRect")
+// Needs ForceNativeThreadState: checks whether the path is convex and scans its drawing commands, so its time grows
+// with the path size.
+// Native call path: SkPath::conservativelyContainsRect -> SkPathPriv::Iterate
 @ForceNativeThreadState
 private external fun _nConservativelyContainsRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float): Boolean
 
-// Native: SkPath::ConvertConicToQuads -> SkConic::chopIntoQuadsPOW2 -> subdivide scales as 2^pow2
 @ExternalSymbolName("org_jetbrains_skia_Path__1nConvertConicToQuads")
+// Needs ForceNativeThreadState: splits each conic into 2^pow2 quads, so its time grows exponentially with the pow2
+// argument.
+// Native call path: SkPath::ConvertConicToQuads -> SkConic::chopIntoQuadsPOW2 -> subdivide
 @ForceNativeThreadState
 private external fun _nConvertConicToQuads(
     x0: Float,
@@ -1402,45 +1458,56 @@ private external fun _nConvertConicToQuads(
     result: InteropPointer
 ): Int
 
-// Runnable: SkPath::getLastPt returns the last stored point
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetLastPt")
+// No ForceNativeThreadState: returns the last stored point, so it is short and cannot block.
+// Native call path: SkPath::getLastPt
 private external fun _nGetLastPt(ptr: NativePointer, result: InteropPointer): Boolean
 
-// Runnable: SkPath::getSegmentMasks returns the stored fSegmentMask
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetSegmentMasks")
+// No ForceNativeThreadState: returns the stored segment mask, so it is short and cannot block.
+// Native call path: SkPath::getSegmentMasks
 private external fun _nGetSegmentMasks(ptr: NativePointer): Int
 
-// Native: SkPath::contains -> SkPathPriv::Contains winding walk over all verbs
 @ExternalSymbolName("org_jetbrains_skia_Path__1nContains")
+// Needs ForceNativeThreadState: walks the path's segments to determine whether the given point is inside, so its time
+// grows with the path size.
+// Native call path: SkPath::contains -> SkPathPriv::Contains
 @ForceNativeThreadState
 private external fun _nContains(ptr: NativePointer, x: Float, y: Float): Boolean
 
-// Native: SkPath::dump -> SkDebugf writes the whole path text to stderr
 @ExternalSymbolName("org_jetbrains_skia_Path__1nDump")
+// Needs ForceNativeThreadState: writes the whole path as text to stderr, so its time grows with the path size.
+// Native call path: SkPath::dump -> SkDebugf
 @ForceNativeThreadState
 private external fun _nDump(ptr: NativePointer)
 
-// Native: SkPath::dumpHex -> SkDebugf writes the whole path text to stderr
 @ExternalSymbolName("org_jetbrains_skia_Path__1nDumpHex")
+// Needs ForceNativeThreadState: writes the whole path as text to stderr, so its time grows with the path size.
+// Native call path: SkPath::dumpHex -> SkDebugf
 @ForceNativeThreadState
 private external fun _nDumpHex(ptr: NativePointer)
 
-// Native: SkPath::writeToMemory serializes every point, verb and conic
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSerializeToBytes")
+// Needs ForceNativeThreadState: writes all path points, drawing commands and curve weights to bytes, so its time grows
+// with the path size.
+// Native call path: SkPath::writeToMemory
 @ForceNativeThreadState
 private external fun _nSerializeToBytes(ptr: NativePointer, dst: InteropPointer): Int
 
-// Native: SkPathOps Op(a, b, op) runs path boolean-op sweep on both paths
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeCombining")
+// Needs ForceNativeThreadState: combines the shapes defined by both paths, so its time grows with the input path sizes.
+// Native call path: Op
 @ForceNativeThreadState
 private external fun _nMakeCombining(onePtr: NativePointer, twoPtr: NativePointer, op: Int): NativePointer
 
-// Native: SkPath::ReadFromMemory parses and validates all serialized data, then copies
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromBytes")
+// Needs ForceNativeThreadState: parses and validates all the serialized bytes, so its time grows with the input size.
+// Native call path: SkPath::ReadFromMemory -> SkPathData::Make
 @ForceNativeThreadState
 private external fun _nMakeFromBytes(data: InteropPointer, size: Int): NativePointer
 
-// Native: SkPath::isValid -> SkPath::isFinite -> SkPath::PeekErrorSingleton can wait on initialization
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsValid")
+// Needs ForceNativeThreadState: the shared error-path singleton can wait for another thread's one-time initialization.
+// Native call path: SkPath::isValid -> SkPath::isFinite -> SkPath::PeekErrorSingleton
 @ForceNativeThreadState
 private external fun _nIsValid(ptr: NativePointer): Boolean

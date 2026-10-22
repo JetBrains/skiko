@@ -589,164 +589,219 @@ class Paint : Managed {
     }
 }
 
-// Runnable: returns the address of deletePaint; the finalizer runs through Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of the paint cleanup function without running it, so it is short and
+// cannot block.
+// Native call path: deletePaint
 private external fun Paint_nGetFinalizer(): NativePointer
 
-// Runnable: new SkPaint is plain fields with null sk_sp members, then setAntiAlias
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nMake")
+// No ForceNativeThreadState: creates a paint that holds only plain values and no object references, then turns on
+// anti-aliasing, so it is short and cannot block.
+// Native call path: SkPaint::SkPaint -> SkPaint::setAntiAlias
 private external fun Paint_nMake(): NativePointer
 
-// Runnable: SkPaint copy constructor copies fields and increments six sk_sp refs
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nMakeClone")
+// No ForceNativeThreadState: copies a paint's values and adds a reference to each object it holds, so it is short and
+// cannot block.
+// Native call path: SkPaint::SkPaint
 private external fun Paint_nMakeClone(ptr: NativePointer): NativePointer
 
-// Runnable: operator== compares sk_sp pointers and plain fields
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nEquals")
+// No ForceNativeThreadState: compares a paint's stored values and object references with another paint's, so it is
+// short and cannot block.
+// Native call path: SkPaint::operator==
 private external fun Paint_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
-// Native: SkPaint::reset -> *this=SkPaint() -> unref old shader/filters -> ~SkImage_Ganesh -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nReset")
+// Needs ForceNativeThreadState: clears the paint, which can free its shader or image and release a Metal GPU texture.
+// Native call path: SkPaint::reset -> SkPaint::operator= -> ~SkImage_Ganesh -> GrMtlAttachment::onRelease
 @ForceNativeThreadState
 private external fun Paint_nReset(ptr: NativePointer)
 
-// Runnable: SkPaint::isAntiAlias reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsAntiAlias")
+// No ForceNativeThreadState: reads a stored on/off flag, so it is short and cannot block.
+// Native call path: SkPaint::isAntiAlias
 private external fun _nIsAntiAlias(ptr: NativePointer): Boolean
 
-// Runnable: SkPaint::setAntiAlias writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetAntiAlias")
+// No ForceNativeThreadState: sets a stored on/off flag, so it is short and cannot block.
+// Native call path: SkPaint::setAntiAlias
 private external fun _nSetAntiAlias(ptr: NativePointer, value: Boolean)
 
-// Runnable: SkPaint::isDither reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsDither")
+// No ForceNativeThreadState: reads a stored on/off flag, so it is short and cannot block.
+// Native call path: SkPaint::isDither
 private external fun _nIsDither(ptr: NativePointer): Boolean
 
-// Runnable: SkPaint::setDither writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetDither")
+// No ForceNativeThreadState: sets a stored on/off flag, so it is short and cannot block.
+// Native call path: SkPaint::setDither
 private external fun _nSetDither(ptr: NativePointer, value: Boolean)
 
-// Runnable: SkPaint::getStyle reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetMode")
+// No ForceNativeThreadState: reads the stored paint style, so it is short and cannot block.
+// Native call path: SkPaint::getStyle
 private external fun _nGetMode(ptr: NativePointer): Int
 
-// Runnable: SkPaint::setStyle range-checks and writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetMode")
+// No ForceNativeThreadState: checks the style value's range and stores it, so it is short and cannot block.
+// Native call path: SkPaint::setStyle
 private external fun _nSetMode(ptr: NativePointer, value: Int)
 
-// Runnable: SkPaint::getColor converts the stored SkColor4f to SkColor
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor")
+// No ForceNativeThreadState: converts the stored float color to an integer color, so it is short and cannot block.
+// Native call path: SkPaint::getColor
 private external fun Paint_nGetColor(ptr: NativePointer): Int
 
-// Runnable: SkPaint::getColor4f returns the stored SkColor4f; four float stores follow
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor4f")
+// No ForceNativeThreadState: copies the four stored float color values into the result, so it is short and cannot
+// block.
+// Native call path: SkPaint::getColor4f
 private external fun _nGetColor4f(ptr: NativePointer, arr: InteropPointer)
 
-// Runnable: SkPaint::setColor stores SkColor4f::FromColor
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColor")
+// No ForceNativeThreadState: converts the color to float form and stores it, so it is short and cannot block.
+// Native call path: SkPaint::setColor -> SkColor4f::FromColor
 private external fun _nSetColor(ptr: NativePointer, argb: Int)
 
-// Native: SkPaint::setColor4f -> SkColorSpace::invTransferFn -> SkOnce::operator() waits for initialization
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColor4f")
+// Needs ForceNativeThreadState: for a color that is not in the sRGB color space, it can wait for another thread that is
+// still setting up shared color data.
+// Native call path: SkPaint::setColor4f -> SkColorSpace::invTransferFn -> SkOnce::operator()
 @ForceNativeThreadState
 private external fun _nSetColor4f(ptr: NativePointer, r: Float, g: Float, b: Float, a: Float, colorSpacePtr: NativePointer)
 
-// Runnable: SkPaint::getStrokeWidth returns a stored float
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeWidth")
+// No ForceNativeThreadState: returns the stored stroke width, so it is short and cannot block.
+// Native call path: SkPaint::getStrokeWidth
 private external fun _nGetStrokeWidth(ptr: NativePointer): Float
 
-// Runnable: SkPaint::setStrokeWidth range-checks and writes a float
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeWidth")
+// No ForceNativeThreadState: stores a new stroke width after checking it is not negative, so it is short and cannot
+// block.
+// Native call path: SkPaint::setStrokeWidth
 private external fun _nSetStrokeWidth(ptr: NativePointer, value: Float)
 
-// Runnable: SkPaint::getStrokeMiter returns a stored float
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeMiter")
+// No ForceNativeThreadState: returns the stored miter limit, so it is short and cannot block.
+// Native call path: SkPaint::getStrokeMiter
 private external fun _nGetStrokeMiter(ptr: NativePointer): Float
 
-// Runnable: SkPaint::setStrokeMiter range-checks and writes a float
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeMiter")
+// No ForceNativeThreadState: stores a new miter limit after checking it is not negative, so it is short and cannot
+// block.
+// Native call path: SkPaint::setStrokeMiter
 private external fun _nSetStrokeMiter(ptr: NativePointer, value: Float)
 
-// Runnable: SkPaint::getStrokeCap reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeCap")
+// No ForceNativeThreadState: reads the stored stroke cap style, so it is short and cannot block.
+// Native call path: SkPaint::getStrokeCap
 private external fun _nGetStrokeCap(ptr: NativePointer): Int
 
-// Runnable: SkPaint::setStrokeCap range-checks and writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeCap")
+// No ForceNativeThreadState: checks the cap style's range and stores it, so it is short and cannot block.
+// Native call path: SkPaint::setStrokeCap
 private external fun _nSetStrokeCap(ptr: NativePointer, value: Int)
 
-// Runnable: SkPaint::getStrokeJoin reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeJoin")
+// No ForceNativeThreadState: returns the stored stroke join style, so it is short and cannot block.
+// Native call path: SkPaint::getStrokeJoin
 private external fun _nGetStrokeJoin(ptr: NativePointer): Int
 
-// Runnable: SkPaint::setStrokeJoin range-checks and writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeJoin")
+// No ForceNativeThreadState: checks the join value is in range and stores it in a flag field, so it is short and cannot
+// block.
+// Native call path: SkPaint::setStrokeJoin
 private external fun _nSetStrokeJoin(ptr: NativePointer, value: Int)
 
-// Runnable: SkPaint::refShader copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetShader")
+// No ForceNativeThreadState: returns the shader with an extra reference count, so it is short and cannot block.
+// Native call path: SkPaint::refShader
 private external fun _nGetShader(ptr: NativePointer): NativePointer
 
-// Native: SkPaint::setShader -> unref old SkShader -> ~SkImageShader -> ~SkImage_Ganesh -> GrMtlAttachment::onRelease
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetShader")
+// Needs ForceNativeThreadState: can drop the last reference to an old image shader, which can free a Metal GPU texture.
+// Native call path: SkPaint::setShader -> ~SkImageShader -> ~SkImage_Ganesh -> GrMtlAttachment::onRelease
 @ForceNativeThreadState
 private external fun _nSetShader(ptr: NativePointer, shaderPtr: NativePointer)
 
-// Runnable: SkPaint::refColorFilter copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColorFilter")
+// No ForceNativeThreadState: returns the color filter with an extra reference count, so it is short and cannot block.
+// Native call path: SkPaint::refColorFilter
 private external fun _nGetColorFilter(ptr: NativePointer): NativePointer
 
-// Native: SkPaint::setColorFilter -> unref old SkRuntimeColorFilter -> child ~SkImageShader -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColorFilter")
+// Needs ForceNativeThreadState: can drop the last reference to an old runtime color filter, whose child image shader
+// can free a Metal GPU texture.
+// Native call path: SkPaint::setColorFilter -> ~SkRuntimeColorFilter -> ~SkImageShader -> GrMtlAttachment::onRelease
 @ForceNativeThreadState
 private external fun _nSetColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer)
 
-// Runnable: SkPaint::getBlendMode_or asks SkBlendModeBlender::asBlendMode, which returns a stored mode
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlendMode")
+// No ForceNativeThreadState: reads the stored blend mode or returns a fallback when the blender has no fixed mode, so
+// it is short and cannot block.
+// Native call path: SkPaint::getBlendMode_or -> SkBlendModeBlender::asBlendMode
 private external fun _nGetBlendMode(ptr: NativePointer): Int
 
-// Native: SkPaint::setBlendMode -> setBlender replaces old SkRuntimeBlender -> child shader image -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetBlendMode")
+// Needs ForceNativeThreadState: replacing a runtime blender can drop the last reference to its child image shader,
+// which can free a Metal GPU texture.
+// Native call path: SkPaint::setBlendMode -> ~SkRuntimeBlender -> ~SkImageShader -> GrMtlAttachment::onRelease
 @ForceNativeThreadState
 private external fun _nSetBlendMode(ptr: NativePointer, mode: Int)
 
-// Runnable: SkPaint::refPathEffect copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetPathEffect")
+// No ForceNativeThreadState: returns the path effect with an extra reference count, so it is short and cannot block.
+// Native call path: SkPaint::refPathEffect
 private external fun _nGetPathEffect(ptr: NativePointer): NativePointer
 
-// Native: SkPaint::setPathEffect -> sk_sp::reset -> ~SkPairPathEffect traverses the old effect tree
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetPathEffect")
+// Needs ForceNativeThreadState: can free the last reference to an old path effect tree, and freeing it visits every
+// node, so its time grows with the tree size.
+// Native call path: SkPaint::setPathEffect -> sk_sp::reset -> ~SkPairPathEffect
 @ForceNativeThreadState
 private external fun _nSetPathEffect(ptr: NativePointer, pathEffectPtr: NativePointer)
 
-// Runnable: SkPaint::refMaskFilter copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetMaskFilter")
+// No ForceNativeThreadState: returns the mask filter with an extra reference count, so it is short and cannot block.
+// Native call path: SkPaint::refMaskFilter
 private external fun _nGetMaskFilter(ptr: NativePointer): NativePointer
 
-// Native: SkPaint::setMaskFilter -> unref old SkShaderMaskFilterImpl -> fShader -> ~SkImageShader -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetMaskFilter")
+// Needs ForceNativeThreadState: can drop the last reference to an old mask filter that holds an image shader, which can
+// free a Metal GPU texture.
+// Native call path: SkPaint::setMaskFilter -> ~SkShaderMaskFilterImpl -> ~SkImageShader -> GrMtlAttachment::onRelease
 @ForceNativeThreadState
 private external fun _nSetMaskFilter(ptr: NativePointer, filterPtr: NativePointer)
 
-// Runnable: SkPaint::refImageFilter copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetImageFilter")
+// No ForceNativeThreadState: returns the image filter with an extra reference count, so it is short and cannot block.
+// Native call path: SkPaint::refImageFilter
 private external fun _nGetImageFilter(ptr: NativePointer): NativePointer
 
-// Native: SkPaint::setImageFilter -> unref old SkImageImageFilter -> ~SkImage_Ganesh -> GrMtlAttachment::onRelease
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetImageFilter")
+// Needs ForceNativeThreadState: can drop the last reference to an old image filter's image, which can free a Metal GPU
+// texture.
+// Native call path: SkPaint::setImageFilter -> ~SkImageImageFilter -> ~SkImage_Ganesh -> GrMtlAttachment::onRelease
 @ForceNativeThreadState
 private external fun _nSetImageFilter(ptr: NativePointer, filterPtr: NativePointer)
 
-// Runnable: SkPaint::refBlender copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlender")
+// No ForceNativeThreadState: returns the blender with an extra reference count, so it is short and cannot block.
+// Native call path: SkPaint::refBlender
 private external fun _nGetBlender(ptr: NativePointer): NativePointer
 
-// Native: SkPaint::setBlender -> unref old SkRuntimeBlender -> fChildren shader -> ~SkImageShader -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetBlender")
+// Needs ForceNativeThreadState: can drop the last reference to an old runtime blender, whose child image shader can
+// free a Metal GPU texture.
+// Native call path: SkPaint::setBlender -> ~SkRuntimeBlender -> ~SkImageShader -> GrMtlAttachment::onRelease
 @ForceNativeThreadState
 private external fun _nSetBlender(ptr: NativePointer, blenderPtr: NativePointer)
 
-// Native: SkPaint::nothingToDraw -> SkComposeColorFilter::onIsAlphaUnchanged recurses over filter trees
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nHasNothingToDraw")
+// Needs ForceNativeThreadState: with zero opacity and source-over blending, recursively checks nested color filters, so
+// its time grows with the filter tree size.
+// Native call path: SkPaint::nothingToDraw -> SkComposeColorFilter::onIsAlphaUnchanged
 @ForceNativeThreadState
 private external fun _nHasNothingToDraw(ptr: NativePointer): Boolean

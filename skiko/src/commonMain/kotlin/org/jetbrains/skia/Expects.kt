@@ -49,9 +49,7 @@ expect annotation class ExternalSymbolName(val name: String)
  * - run CPU work that grows with its input, such as decoding or encoding an image, path
  *   operations, or playing back a picture, because the GC waits for the call to return.
  *
- * A binding stays unmarked only when its native code is short and provably does none of the above.
- * Without that proof, the binding is marked. A comment above each binding states the proof or
- * the reason for the mark.
+ * When it is unclear whether the native code can do any of the above, mark the binding.
  */
 @InternalSkikoApi
 @OptIn(ExperimentalMultiplatform::class)

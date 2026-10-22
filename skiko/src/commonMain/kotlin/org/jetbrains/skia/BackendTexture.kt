@@ -59,12 +59,15 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
     }
 }
 
-// Runnable: returns the address of deleteBackendTexture
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteBackendTexture
 private external fun BackendTexture_nGetFinalizer(): NativePointer
 
-// Native: GrBackendTextures::MakeGL wraps a backend GL texture
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nMakeGL")
+// Needs ForceNativeThreadState: wraps a GL texture ID from the backend in a texture object.
+// Native call path: GrBackendTextures::MakeGL
 @ForceNativeThreadState
 private external fun _nMakeGL(
     width: Int,
@@ -75,6 +78,8 @@ private external fun _nMakeGL(
     format: Int
 ): NativePointer
 
-// Runnable: GLTextureParametersModified only resets cached GL parameter fields
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nGLTextureParametersModified")
+// No ForceNativeThreadState: only resets cached texture parameter fields, which are plain stored values, so it is short
+// and cannot block.
+// Native call path: GLTextureParametersModified -> invalidate
 private external fun _nGLTextureParametersModified(backendTexturePtr: NativePointer)
