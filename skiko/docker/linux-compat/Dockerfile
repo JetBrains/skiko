@@ -1,4 +1,4 @@
-# Multi-architecture Dockerfile for building Skiko on Linux
+# Multi-architecture Dockerfile for building Skiko on Linux, compatible with GLIBC 2.34
 # Supports both amd64 (x64) and arm64 architectures
 
 FROM amazonlinux:2023
