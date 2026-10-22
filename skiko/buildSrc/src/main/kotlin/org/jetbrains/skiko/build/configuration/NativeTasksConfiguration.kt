@@ -357,6 +357,8 @@ fun SkikoProjectContext.configureNativeTarget(
             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
             options.addAll(resolvedBinaryInputs.linkFlags)
             options.add("-lstdc++")
+            // Kotlin/Native's bundled Linux toolchain may not resolve symbols from newer system libraries.
+            // Work around this until the toolchain is updated: https://youtrack.jetbrains.com/issue/KT-67046
             options.add("--unresolved-symbols=ignore-all")
             // When cross-compiling for ARM64 from x64, use the ARM toolchain sysroot
             if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
