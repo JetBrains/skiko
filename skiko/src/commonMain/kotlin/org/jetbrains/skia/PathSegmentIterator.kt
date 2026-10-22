@@ -125,11 +125,15 @@ private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
     }
 }
 
+// Runnable: _nGetFinalizer returns the address of its delete function; the delete runs via Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
 private external fun PathSegmentIterator_nGetFinalizer(): NativePointer
 
+// Native: SkPath::Iter::isClosedContour scans the remaining verbs of the contour on every call
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nNext")
+@ForceNativeThreadState
 private external fun PathSegmentIterator_nNext(ptr: NativePointer, points: InteropPointer)
 
+// Runnable: SkPath::Iter ctor stores the path's verb, point and weight pointers and flags only
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nMake")
 private external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer

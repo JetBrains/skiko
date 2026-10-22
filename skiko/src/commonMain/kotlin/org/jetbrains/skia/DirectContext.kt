@@ -207,33 +207,42 @@ fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
     block(this).also { abandon() }
 }
 
+// Native: GrDirectContext::flush -> GrDrawingManager::flushSurfaces -> GrMtlGpu executes render tasks
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
 @ForceNativeThreadState
 private external fun DirectContext_nFlush(ptr: NativePointer, surfacePtr: NativePointer)
 
+// Native: GrDirectContext::flush -> GrDrawingManager::flushSurfaces -> GrMtlGpu executes render tasks
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushDefault")
 @ForceNativeThreadState
 private external fun DirectContext_nFlushDefault(ptr: NativePointer)
 
+// Native: getResourceCacheLimit -> SingleOwner::enter -> SkMutex::acquire can block in SK_DEBUG
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nGetResourceCacheLimit")
+@ForceNativeThreadState
 private external fun DirectContext_nGetResourceCacheLimit(ptr: NativePointer): Long
 
+// Native: GrResourceCache::setLimit -> purgeAsNeeded releases GrMtlTexture/GrMtlBuffer GPU resources
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSetResourceCacheLimit")
 @ForceNativeThreadState
 private external fun DirectContext_nSetResourceCacheLimit(ptr: NativePointer, maxResourceBytes: Long)
 
+// Native: GrDirectContexts::MakeGL -> GrGLGpu::Make creates a GPU context and queries GL caps
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
 @ForceNativeThreadState
 private external fun _nMakeGL(): NativePointer
 
+// Native: GrDirectContexts::MakeMetal -> GrMtlTrampoline::MakeGpu -> GrMtlGpu::Make queries the MTLDevice
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
 @ForceNativeThreadState
 private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
+// Native: GrDirectContexts::MakeD3D -> GrD3DGpu::Make creates a D3D12 GPU context
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
 @ForceNativeThreadState
 private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
+// Native: GrDirectContexts::MakeVulkan -> GrVkGpu::Make creates a Vulkan GPU context
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeVulkan")
 @ForceNativeThreadState
 private external fun _nMakeVulkan(
@@ -248,17 +257,22 @@ private external fun _nMakeVulkan(
     memoryAllocatorPtr: NativePointer
 ): NativePointer
 
+// Native: GrDirectContext::submit -> GrMtlGpu::onSubmitToGpu -> GrMtlCommandBuffer::commit, may wait
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
 @ForceNativeThreadState
 private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean)
 
+// Native: GrDirectContext::flushAndSubmit -> flush + GrMtlGpu::onSubmitToGpu -> MTLCommandBuffer commit
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlushAndSubmit")
 @ForceNativeThreadState
 private external fun _nFlushAndSubmit(ptr: NativePointer, surfacePtr: NativePointer, syncCpu: Boolean)
 
+// Native: GrDirectContext::resetContext -> SingleOwner::enter -> SkMutex::acquire can block in SK_DEBUG
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
+@ForceNativeThreadState
 private external fun _nReset(ptr: NativePointer, flags: Int)
 
+// Native: GrDirectContext::abandonContext -> syncAllOutstandingGpuWork and GrMtlGpu::disconnect release GPU objects
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
 @ForceNativeThreadState
 private external fun _nAbandon(ptr: NativePointer, flags: Int)

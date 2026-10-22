@@ -53,15 +53,21 @@ abstract class ManagedRunIterator<T> internal constructor(
 }
 
 
+// Runnable: returns the address of deleteRunIterator only
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nGetFinalizer")
 private external fun _nGetFinalizer(): NativePointer
 
+// Native: FontRunIterator::consume -> SkTypeface::unicharToGlyph -> SkTypeface_Mac::onCharsToGlyphs -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nConsume")
 @ForceNativeThreadState
 internal external fun _nConsume(ptr: NativePointer)
 
+// Native: UtfIndicesConverter::from8To16 rescans the UTF-8 text from its start on every call
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nGetEndOfCurrentRun")
+@ForceNativeThreadState
 private external fun _nGetEndOfCurrentRun(ptr: NativePointer, textPtr: NativePointer): Int
 
+// Native: SkikoRunIterator::atEnd -> KCallback::operator() -> callBooleanCallback -> Kotlin
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nIsAtEnd")
+@ForceNativeThreadState
 private external fun _nIsAtEnd(ptr: NativePointer): Boolean

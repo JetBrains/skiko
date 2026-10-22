@@ -173,13 +173,17 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
 }
 
 
+// Runnable: new SkPictureRecorder only makes an empty SkRecordCanvas (SkNoPixelsDevice)
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nMake")
 private external fun PictureRecorder_nMake(): NativePointer
 
+// Runnable: returns the address of deletePictureRecorder
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetFinalizer")
 private external fun PictureRecorder_nGetFinalizer(): NativePointer
 
+// Native: SkPictureRecorder::beginRecording -> SkRecordCanvas::forgetRecord -> ~SkDrawableList unrefs drawables
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nBeginRecording")
+@ForceNativeThreadState
 private external fun _nBeginRecording(
     ptr: NativePointer,
     left: Float,
@@ -189,13 +193,18 @@ private external fun _nBeginRecording(
     bbh: NativePointer
 ): NativePointer
 
+// Runnable: SkPictureRecorder::getRecordingCanvas returns the stored recorder canvas
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas")
 private external fun _nGetRecordingCanvas(ptr: NativePointer): NativePointer
 
+// Native: finishRecordingAsPicture -> newDrawableSnapshot -> SkDrawable::onDraw (Kotlin); SkRecordOptimize
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPicture")
+@ForceNativeThreadState
 private external fun _nFinishRecordingAsPicture(ptr: NativePointer): NativePointer
 
+// Native: finishRecordingAsPicture -> newDrawableSnapshot -> SkDrawable::onDraw (Kotlin); SkRecordOptimize
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPictureWithCull")
+@ForceNativeThreadState
 private external fun _nFinishRecordingAsPictureWithCull(
     ptr: NativePointer,
     left: Float,
@@ -205,6 +214,8 @@ private external fun _nFinishRecordingAsPictureWithCull(
 ): NativePointer
 
 
+// Native: finishRecordingAsDrawable -> SkRecordOptimize and SkRecordFillBounds over every recorded op
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsDrawable")
+@ForceNativeThreadState
 private external fun _nFinishRecordingAsDrawable(ptr: NativePointer): NativePointer
 

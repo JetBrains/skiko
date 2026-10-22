@@ -21,8 +21,10 @@ actual abstract class RefCnt : Managed {
     }
 }
 
+// Runnable: returns &unrefSkRefCnt; the unref itself runs through Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getFinalizer")
 internal actual external fun RefCnt_nGetFinalizer(): NativePointer
 
+// Runnable: relaxed atomic load of fRefCnt
 @ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getRefCount")
 private external fun _nGetRefCount(ptr: NativePointer): Int

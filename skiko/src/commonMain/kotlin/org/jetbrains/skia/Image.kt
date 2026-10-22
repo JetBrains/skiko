@@ -456,16 +456,21 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
     }
 }
 
+// Runnable: SkImage::imageInfo returns stored fInfo; writeImageInfoForInterop copies ints and refs the SkColorSpace
 @ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
 private external fun Image_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
+// Runnable: SkImage::makeShader -> SkImageShader::Make only stores the image ref, tile modes and a local matrix
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
 private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingModeVal1: Int, samplingModeVal2: Int, localMatrix: InteropPointer): NativePointer
 
+// Runnable: SkImage::peekPixels -> SkImage_Raster::onPeekPixels exposes the stored bitmap; base returns false
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
 private external fun Image_nPeekPixels(ptr: NativePointer): NativePointer
 
+// Native: SkImages::RasterFromPixmapCopy -> SkData::MakeWithCopy copies the whole pixel buffer
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRaster")
+@ForceNativeThreadState
 private external fun _nMakeRaster(
     width: Int,
     height: Int,
@@ -477,6 +482,7 @@ private external fun _nMakeRaster(
 ): NativePointer
 
 
+// Runnable: SkImages::RasterFromData wraps the SkData without copying; SkImage_Raster installs pixels
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRasterData")
 private external fun _nMakeRasterData(
     width: Int,
@@ -489,16 +495,23 @@ private external fun _nMakeRasterData(
 ): NativePointer
 
 
+// Native: SkImages::RasterFromBitmap -> SkImage_Raster::MakeFromBitmap copies pixels of a mutable bitmap
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBitmap")
+@ForceNativeThreadState
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
 
+// Runnable: SkImages::RasterFromPixmap wraps the pixels via SkData::MakeWithProc with a null proc; no copy
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
 private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 
+// Native: SkData::MakeWithCopy -> DeferredFromEncodedData -> SkCodec::MakeFromData parses the encoded header
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
+@ForceNativeThreadState
 internal external fun _nMakeFromEncoded(bytes: InteropPointer, encodedLength: Int): NativePointer
 
+// Native: SkPngEncoder/SkJpegEncoder/SkWebpEncoder::Encode compress the image; lazy images decode first
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
+@ForceNativeThreadState
 private external fun _nEncodeToData(
     ptr: NativePointer,
     format: Int,
@@ -506,13 +519,16 @@ private external fun _nEncodeToData(
     pngCompressionLevel: Int
 ): NativePointer
 
+// Runnable: SkImage::peekPixels -> SkImage_Raster::onPeekPixels exposes the stored bitmap; base returns false
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
 private external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
 
+// Native: SkImage::scalePixels -> getROPixels lazy decode / SkImage_GaneshBase::onReadPixels -> GrMtlGpu
 @ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
 @ForceNativeThreadState
 private external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptionsVal1: Int, samplingOptionsVal2: Int, cache: Boolean): Boolean
 
+// Native: SkImage::readPixels -> SkImage_Lazy decode / SkImage_GaneshBase::onReadPixels -> GrMtlGpu::onReadPixels
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
 @ForceNativeThreadState
 private external fun _nReadPixelsBitmap(
@@ -525,10 +541,12 @@ private external fun _nReadPixelsBitmap(
 ): Boolean
 
 
+// Native: SkImage::readPixels -> SkImage_Lazy decode / SkImage_GaneshBase::onReadPixels -> GrMtlGpu::onReadPixels
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
 @ForceNativeThreadState
 private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
 
+// Native: SkImages::AdoptTextureFrom -> wrapBackendTexture -> GrMtlGpu::onWrapBackendTexture reads MTLTexture
 @ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
 @ForceNativeThreadState
 private external fun _nAdoptTextureFrom(
@@ -538,6 +556,7 @@ private external fun _nAdoptTextureFrom(
     colorType: Int
 ): NativePointer
 
+// Native: SkImages::AdoptTextureFrom -> wrapBackendTexture -> GrMtlGpu::onWrapBackendTexture reads MTLTexture
 @ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFromAlphaType")
 @ForceNativeThreadState
 private external fun _nAdoptTextureFromAlphaType(

@@ -204,31 +204,46 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 }
 
+// Runnable: _nGetFinalizer returns the address of deletePathMeasure; the delete runs via Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
 private external fun PathMeasure_nGetFinalizer(): NativePointer
 
+// Runnable: SkPathMeasure() default-constructs an empty SkContourMeasureIter and a null sk_sp
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMake")
 private external fun PathMeasure_nMake(): NativePointer
 
+// Native: SkPathMeasure ctor -> SkContourMeasureIter::next -> Impl::buildSegments subdivides the first contour
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMakePath")
+@ForceNativeThreadState
 private external fun _nMakePath(pathPtr: NativePointer, forceClosed: Boolean, resScale: Float): NativePointer
 
+// Native: SkPathMeasure::setPath -> SkContourMeasureIter::next -> Impl::buildSegments subdivides the first contour
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nSetPath")
+@ForceNativeThreadState
 private external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, forceClosed: Boolean)
 
+// Runnable: SkPathMeasure::getLength returns SkContourMeasure::fLength computed at construction
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetLength")
 private external fun _nGetLength(ptr: NativePointer): Float
 
+// Native: SkContourMeasure::getPosTan -> distanceToSegment -> SkTKSearch does input-dependent binary search
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetPosition")
+@ForceNativeThreadState
 private external fun _nGetPosition(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
 
+// Native: SkContourMeasure::getPosTan -> distanceToSegment -> SkTKSearch does input-dependent binary search
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetTangent")
+@ForceNativeThreadState
 private external fun _nGetTangent(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
 
+// Native: SkContourMeasure::getPosTan -> distanceToSegment -> SkTKSearch does input-dependent binary search
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetRSXform")
+@ForceNativeThreadState
 private external fun _nGetRSXform(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
 
+// Native: SkContourMeasure::getMatrix -> distanceToSegment -> SkTKSearch does input-dependent binary search
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetMatrix")
+@ForceNativeThreadState
 private external fun _nGetMatrix(
     ptr: NativePointer,
     distance: Float,
@@ -237,7 +252,9 @@ private external fun _nGetMatrix(
     data: InteropPointer
 ): Boolean
 
+// Native: SkContourMeasure::getSegment -> SkContourMeasure_segTo loop over every segment in the distance range
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetSegment")
+@ForceNativeThreadState
 private external fun _nGetSegment(
     ptr: NativePointer,
     startD: Float,
@@ -247,8 +264,11 @@ private external fun _nGetSegment(
 ): Boolean
 
 
+// Runnable: SkPathMeasure::isClosed returns SkContourMeasure::fIsClosed stored at construction
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nIsClosed")
 private external fun _nIsClosed(ptr: NativePointer): Boolean
 
+// Native: SkPathMeasure::nextContour -> SkContourMeasureIter::next -> buildSegments subdivides the next contour
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nNextContour")
+@ForceNativeThreadState
 private external fun _nNextContour(ptr: NativePointer): Boolean

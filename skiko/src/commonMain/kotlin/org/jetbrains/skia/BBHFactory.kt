@@ -19,8 +19,10 @@ class RTreeFactory : BBHFactory {
     }
 }
 
+// Runnable: new SkRTreeFactory is an empty polymorphic object, no members
 @ExternalSymbolName("org_jetbrains_skia_RTreeFactory__1nMake")
 private external fun RTreeFactory_nMake(): NativePointer
 
+// Runnable: returns the address of deleteSkBBHFactory
 @ExternalSymbolName("org_jetbrains_skia_BBHFactory__1nGetFinalizer")
 private external fun BBHFactory_nGetFinalizer(): NativePointer

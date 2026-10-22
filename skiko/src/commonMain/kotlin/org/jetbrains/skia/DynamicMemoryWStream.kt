@@ -45,14 +45,20 @@ class DynamicMemoryWStream() : WStream(DynamicMemoryWStream_nMake(), _FinalizerH
     }
 }
 
+// Runnable: new SkDynamicMemoryWStream is a defaulted constructor with null head/tail
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nMake")
 private external fun DynamicMemoryWStream_nMake(): NativePointer
 
+// Runnable: returns the address of deleteDynamicMemoryWStream; the finalizer itself runs through Managed
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nGetFinalizer")
 private external fun DynamicMemoryWStream_nGetFinalizer(): NativePointer
 
+// Native: SkDynamicMemoryWStream::bytesWritten -> validate walks every stream block in SK_DEBUG
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nBytesWritten")
+@ForceNativeThreadState
 private external fun _nBytesWritten(stream: NativePointer): Int
 
+// Native: SkDynamicMemoryWStream::read walks the block list and memcpy-s a caller-chosen size
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nRead")
+@ForceNativeThreadState
 private external fun _nRead(stream: NativePointer, buffer: InteropPointer, offset: Int, size: Int): Boolean

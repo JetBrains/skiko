@@ -129,52 +129,72 @@ class Graphics {
     }
 }
 
+// Native: SkStrikeCache::getCacheSizeLimit takes fLock, held across strike creation -> SkScalerContext_Mac CTFont
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheLimit")
 @ForceNativeThreadState
 private external fun _nGetFontCacheLimit(): Int
 
+// Native: SkStrikeCache::setCacheSizeLimit -> internalPurge -> ~SkStrike -> ~SkScalerContext_Mac releases CTFont
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCacheLimit")
 @ForceNativeThreadState
 private external fun _nSetFontCacheLimit(bytes: Int): Int
 
+// Native: SkStrikeCache::getTotalMemoryUsed takes fLock, held across strike creation -> SkScalerContext_Mac CTFont
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheUsed")
 @ForceNativeThreadState
 private external fun _nGetFontCacheUsed(): Int
 
+// Native: SkStrikeCache::getCacheCountLimit takes fLock, held across strike creation -> SkScalerContext_Mac CTFont
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountLimit")
 @ForceNativeThreadState
 private external fun _nGetFontCacheCountLimit(): Int
 
+// Native: SkStrikeCache::setCacheCountLimit -> internalPurge -> ~SkStrike -> ~SkScalerContext_Mac releases CTFont
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCacheCountLimit")
 @ForceNativeThreadState
 private external fun _nSetFontCacheCountLimit(count: Int): Int
 
+// Native: SkStrikeCache::getCacheCountUsed takes fLock, held across strike creation -> SkScalerContext_Mac CTFont
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountUsed")
 @ForceNativeThreadState
 private external fun _nGetFontCacheCountUsed(): Int
 
+// Native: SkResourceCache::getTotalByteLimit takes fMutex, held across ~Rec -> ~SkPicture -> typeface release
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalByteLimit")
+@ForceNativeThreadState
 private external fun _nGetResourceCacheTotalByteLimit(): Int
 
+// Native: SkResourceCache::setTotalByteLimit locks fMutex; purgeAsNeeded -> ~Rec -> ~SkPicture -> typeface
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetResourceCacheTotalByteLimit")
+@ForceNativeThreadState
 private external fun _nSetResourceCacheTotalByteLimit(bytes: Int): Int
 
+// Native: SkResourceCache::getSingleAllocationByteLimit takes fMutex, held across ~Rec -> typeface release
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheSingleAllocationByteLimit")
+@ForceNativeThreadState
 private external fun _nGetResourceCacheSingleAllocationByteLimit(): Int
 
+// Native: SkResourceCache::setSingleAllocationByteLimit takes fMutex, held across ~Rec -> typeface release
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetResourceCacheSingleAllocationByteLimit")
+@ForceNativeThreadState
 private external fun _nSetResourceCacheSingleAllocationByteLimit(bytes: Int): Int
 
+// Native: SkResourceCache::getTotalBytesUsed takes fMutex, held across ~Rec -> ~SkPicture -> typeface release
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalBytesUsed")
+@ForceNativeThreadState
 private external fun _nGetResourceCacheTotalBytesUsed(): Int
 
+// Native: SkStrikeCache::purgeAll -> ~SkScalerContext_Mac; SkTypefaceCache::PurgeAll drops SkTypeface_Mac
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeFontCache")
 @ForceNativeThreadState
 private external fun _nPurgeFontCache()
 
+// Native: SkResourceCache::PurgeAll -> purgeAsNeeded -> ~Rec -> ~SkPicture -> ~SkTextBlob -> typeface release
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeResourceCache")
+@ForceNativeThreadState
 private external fun _nPurgeResourceCache()
 
+// Native: SkStrikeCache::purgeAll -> ~SkScalerContext_Mac; SkTypefaceCache::PurgeAll drops SkTypeface_Mac
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeAllCaches")
 @ForceNativeThreadState
 private external fun _nPurgeAllCaches()

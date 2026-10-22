@@ -59,10 +59,13 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
     }
 }
 
+// Runnable: returns the address of deleteBackendTexture
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nGetFinalizer")
 private external fun BackendTexture_nGetFinalizer(): NativePointer
 
+// Native: GrBackendTextures::MakeGL wraps a backend GL texture
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nMakeGL")
+@ForceNativeThreadState
 private external fun _nMakeGL(
     width: Int,
     height: Int,
@@ -72,5 +75,6 @@ private external fun _nMakeGL(
     format: Int
 ): NativePointer
 
+// Runnable: GLTextureParametersModified only resets cached GL parameter fields
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nGLTextureParametersModified")
 private external fun _nGLTextureParametersModified(backendTexturePtr: NativePointer)

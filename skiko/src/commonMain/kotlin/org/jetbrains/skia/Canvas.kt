@@ -1667,30 +1667,40 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 }
 
 
+// Runnable: _nGetFinalizer returns the &deleteCanvas pointer; the finalizer runs via Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetFinalizer")
 private external fun Canvas_nGetFinalizer(): NativePointer
 
+// Native: SkBitmapDevice::SkBitmapDevice -> skcpu::Recorder::TODO may wait for static initialization
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nMakeFromBitmap")
+@ForceNativeThreadState
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer
 
+// Native: SkPaintFilterCanvas::recordingContext recursively follows an arbitrary chain of canvas proxies
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetRecordingContext")
+@ForceNativeThreadState
 private external fun _nGetCanvasRecordingContext(ptr: NativePointer): NativePointer
 
+// Runnable: SkCanvas::getSurface returns the stored fSurfaceBase pointer
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSurface")
 private external fun _nGetCanvasSurface(ptr: NativePointer): NativePointer
 
+// Native: SkCanvas::onDrawPoints -> SkDevice::drawPoints on a Ganesh/Graphite Metal or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoint")
 @ForceNativeThreadState
 private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
 
+// Native: SkCanvas::onDrawPoints -> SkDevice::drawPoints on a Ganesh/Graphite Metal or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoints")
 @ForceNativeThreadState
 private external fun _nDrawPoints(ptr: NativePointer, mode: Int, coordsCount: Int, coords: InteropPointer, paintPtr: NativePointer)
 
+// Native: SkCanvas::drawLine -> onDrawPoints -> SkDevice::drawPoints on a GPU or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawLine")
 @ForceNativeThreadState
 private external fun _nDrawLine(ptr: NativePointer, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: NativePointer)
 
+// Native: SkCanvas::onDrawArc -> SkDevice::drawArc -> Ganesh/Graphite Metal ops or raster scan conversion
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawArc")
 @ForceNativeThreadState
 private external fun _nDrawArc(
@@ -1705,14 +1715,17 @@ private external fun _nDrawArc(
     paintPtr: NativePointer
 )
 
+// Native: SkCanvas::onDrawRect -> SkDevice::drawRect on a Ganesh/Graphite Metal or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRect")
 @ForceNativeThreadState
 private external fun _nDrawRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paintPtr: NativePointer)
 
+// Native: SkCanvas::onDrawOval -> SkDevice::drawOval on a Ganesh/Graphite Metal or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawOval")
 @ForceNativeThreadState
 private external fun _nDrawOval(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paint: NativePointer)
 
+// Native: SkCanvas::onDrawRRect -> SkDevice::drawRRect on a Ganesh/Graphite Metal or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRRect")
 @ForceNativeThreadState
 private external fun _nDrawRRect(
@@ -1727,6 +1740,7 @@ private external fun _nDrawRRect(
 )
 
 
+// Native: SkCanvas::onDrawDRRect -> SkDevice::drawDRRect on a Ganesh/Graphite Metal or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDRRect")
 @ForceNativeThreadState
 private external fun _nDrawDRRect(
@@ -1747,10 +1761,12 @@ private external fun _nDrawDRRect(
 )
 
 
+// Native: SkCanvas::onDrawPath -> SkDevice::drawPath -> GPU path renderers or raster scan conversion
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPath")
 @ForceNativeThreadState
 private external fun _nDrawPath(ptr: NativePointer, nativePath: NativePointer, paintPtr: NativePointer)
 
+// Native: SkCanvas::onDrawImageRect2 -> GrProxyProvider texture upload -> GrMtlGpu::onCreateTexture
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageRect")
 @ForceNativeThreadState
 private external fun _nDrawImageRect(
@@ -1770,6 +1786,7 @@ private external fun _nDrawImageRect(
     strict: Boolean
 )
 
+// Native: SkCanvas::onDrawImageLattice2 -> Ganesh lattice draw -> GrMtlGpu::uploadToTexture
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageNine")
 @ForceNativeThreadState
 private external fun _nDrawImageNine(
@@ -1787,22 +1804,27 @@ private external fun _nDrawImageNine(
     paintPtr: NativePointer
 )
 
+// Native: SkCanvas::onDrawRegion -> SkDevice::drawRegion -> drawPath on a GPU or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRegion")
 @ForceNativeThreadState
 private external fun _nDrawRegion(ptr: NativePointer, nativeRegion: NativePointer, paintPtr: NativePointer)
 
+// Native: SkCanvas::drawSimpleText -> GlyphRunBuilder::textToGlyphRunList -> SkTypeface_Mac::onCharsToGlyphs
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawString")
 @ForceNativeThreadState
 private external fun _nDrawString(ptr: NativePointer, string: InteropPointer, x: Float, y: Float, font: NativePointer, paint: NativePointer)
 
+// Native: SkCanvas::onDrawGlyphRunList -> glyph cache miss -> SkScalerContext_Mac::generateImage -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawTextBlob")
 @ForceNativeThreadState
 private external fun _nDrawTextBlob(ptr: NativePointer, blob: NativePointer, x: Float, y: Float, paint: NativePointer)
 
+// Native: SkCanvas::onDrawPicture -> SkPicture::playback re-issues every recorded op on a GPU or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPicture")
 @ForceNativeThreadState
 private external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer, matrix: InteropPointer, paintPtr: NativePointer)
 
+// Native: SkCanvas::onDrawVerticesObject -> SkDevice::drawVertices -> GPU shader/image proxy upload
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawVertices")
 @ForceNativeThreadState
 private external fun _nDrawVertices(
@@ -1819,6 +1841,7 @@ private external fun _nDrawVertices(
 )
 
 
+// Native: SkCanvas::onDrawPatch -> SkPatchUtils::MakeVertices -> drawVertices on a GPU or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPatch")
 @ForceNativeThreadState
 private external fun _nDrawPatch(
@@ -1831,10 +1854,12 @@ private external fun _nDrawPatch(
 )
 
 
+// Native: SkCanvas::onDrawDrawable -> SkDrawable::draw -> SkikoDrawable::onDraw calls back into Kotlin
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDrawable")
 @ForceNativeThreadState
 private external fun _nDrawDrawable(ptr: NativePointer, drawablePrt: NativePointer, matrix: InteropPointer)
 
+// Native: SkCanvas::onDrawAnnotation -> predrawNotify -> SkSurface_Base::aboutToDraw drops or copies a GPU image
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawAnnotation")
 @ForceNativeThreadState
 private external fun _nDrawAnnotation(
@@ -1847,24 +1872,33 @@ private external fun _nDrawAnnotation(
     valuePtr: NativePointer
 )
 
+// Native: SkCanvas::clear -> drawColor -> onDrawPaint -> SkDevice::drawPaint on a GPU or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClear")
 @ForceNativeThreadState
 private external fun _nClear(ptr: NativePointer, color: Int)
 
+// Native: SkCanvas::onDrawPaint -> SkDevice::drawPaint on a Ganesh/Graphite Metal or raster device
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPaint")
 @ForceNativeThreadState
 private external fun _nDrawPaint(ptr: NativePointer, paintPtr: NativePointer)
 
+// Native: SkRecordCanvas::didSetM44 -> SkRecord::append -> SkRecord::grow may copy the command array
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSetMatrix")
+@ForceNativeThreadState
 private external fun _nSetMatrix(ptr: NativePointer, matrix: InteropPointer)
 
+// Runnable: SkCanvas::getLocalToDevice returns the stored SkM44; getRowMajor copies 16 floats
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalToDevice")
 private external fun _nGetLocalToDevice(ptr: NativePointer, resultFloats: InteropPointer)
 
+// Native: SkRecordCanvas::didSetM44 -> SkRecord::append -> SkRecord::grow may copy the command array
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nResetMatrix")
+@ForceNativeThreadState
 private external fun _nResetMatrix(ptr: NativePointer)
 
+// Native: SkCanvas::onClipRect -> SkBitmapDevice::clipRect -> SkRasterClip::op -> SkRegion::op on the clip
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRect")
+@ForceNativeThreadState
 private external fun _nClipRect(
     ptr: NativePointer,
     left: Float,
@@ -1875,7 +1909,9 @@ private external fun _nClipRect(
     antiAlias: Boolean
 )
 
+// Native: SkCanvas::onClipRRect -> SkRasterClip::op(SkRRect) -> op(SkPath) scan-converts the rrect
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRRect")
+@ForceNativeThreadState
 private external fun _nClipRRect(
     ptr: NativePointer,
     left: Float,
@@ -1889,48 +1925,71 @@ private external fun _nClipRRect(
 )
 
 
+// Native: SkCanvas::onClipPath -> SkRasterClip::op(SkPath) -> SkAAClip/SkRegion setPath scan conversion
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipPath")
+@ForceNativeThreadState
 private external fun _nClipPath(ptr: NativePointer, nativePath: NativePointer, mode: Int, antiAlias: Boolean)
 
+// Native: SkCanvas::onClipRegion -> SkRasterClip::op(SkRegion) -> SkRegion::op on arbitrary regions
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRegion")
+@ForceNativeThreadState
 private external fun _nClipRegion(ptr: NativePointer, nativeRegion: NativePointer, mode: Int)
 
+// Runnable: SkCanvas::getLocalClipBounds -> SkDevice::devClipBounds reads stored bounds, then one matrix invert
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalClipBounds")
 private external fun _nGetLocalClipBounds(ptr: NativePointer, rectPtr: InteropPointer)
 
+// Native: SkRecordCanvas::didTranslate -> SkRecord::append -> SkRecord::grow may copy the command array
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nTranslate")
+@ForceNativeThreadState
 private external fun _nTranslate(ptr: NativePointer, dx: Float, dy: Float)
 
+// Native: SkRecordCanvas::didScale -> SkRecord::append -> SkRecord::grow may copy the command array
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nScale")
+@ForceNativeThreadState
 private external fun _nScale(ptr: NativePointer, sx: Float, sy: Float)
 
+// Native: SkRecordCanvas::didConcat44 -> SkRecord::append -> SkRecord::grow may copy the command array
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRotate")
+@ForceNativeThreadState
 private external fun _nRotate(ptr: NativePointer, deg: Float, x: Float, y: Float)
 
+// Native: SkRecordCanvas::didConcat44 -> SkRecord::append -> SkRecord::grow may copy the command array
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSkew")
+@ForceNativeThreadState
 private external fun _nSkew(ptr: NativePointer, sx: Float, sy: Float)
 
+// Native: SkRecordCanvas::didConcat44 -> SkRecord::append -> SkRecord::grow may copy the command array
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat")
+@ForceNativeThreadState
 private external fun _nConcat(ptr: NativePointer, matrix: InteropPointer)
 
+// Native: SkRecordCanvas::didConcat44 -> SkRecord::append -> SkRecord::grow may copy the command array
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat44")
+@ForceNativeThreadState
 private external fun _nConcat44(ptr: NativePointer, matrix: InteropPointer)
 
+// Native: SkCanvas::readPixels -> SkDevice::readPixels -> GrMtlGpu::onReadPixels, or raster pixel conversion
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nReadPixels")
 @ForceNativeThreadState
 private external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
 
+// Native: SkCanvas::writePixels -> predrawNotify -> SkDevice::writePixels -> GrMtlGpu::uploadToTexture
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nWritePixels")
 @ForceNativeThreadState
 private external fun _nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int): Boolean
 
+// Native: SkCanvas::save -> SkCanvas::getSaveCount traverses the entire save stack under SK_DEBUG
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSave")
+@ForceNativeThreadState
 private external fun _nSave(ptr: NativePointer): Int
 
+// Native: SkCanvas::internalSaveLayer -> createDevice allocs a GPU or raster layer; PaintFilterCanvas::onFilter
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayer")
 @ForceNativeThreadState
 private external fun _nSaveLayer(ptr: NativePointer, paintPtr: NativePointer): Int
 
+// Native: SkCanvas::internalSaveLayer -> createDevice allocs a GPU or raster layer; PaintFilterCanvas::onFilter
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerRect")
 @ForceNativeThreadState
 private external fun _nSaveLayerRect(
@@ -1942,6 +2001,7 @@ private external fun _nSaveLayerRect(
     paintPtr: NativePointer
 ): Int
 
+// Native: SkCanvas::internalSaveLayer -> backdrop image filter draw, createDevice allocs a GPU or raster layer
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRec")
 @ForceNativeThreadState
 private external fun _nSaveLayerSaveLayerRec(
@@ -1952,6 +2012,7 @@ private external fun _nSaveLayerSaveLayerRec(
     saveLayerFlags: Int
 ): Int
 
+// Native: SkCanvas::internalSaveLayer -> backdrop image filter draw, createDevice allocs a GPU or raster layer
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerSaveLayerRecRect")
 @ForceNativeThreadState
 private external fun _nSaveLayerSaveLayerRecRect(
@@ -1966,13 +2027,17 @@ private external fun _nSaveLayerSaveLayerRecRect(
     saveLayerFlags: Int
 ): Int
 
+// Native: SkCanvas::getSaveCount traverses the entire save stack under SK_DEBUG
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSaveCount")
+@ForceNativeThreadState
 private external fun _nGetSaveCount(ptr: NativePointer): Int
 
+// Native: SkCanvas::internalRestore -> drawDevice composites the layer; layer device release frees GPU objects
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestore")
 @ForceNativeThreadState
 private external fun _nRestore(ptr: NativePointer)
 
+// Native: SkCanvas::restoreToCount -> restore -> internalRestore: layer composite and GPU device release
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestoreToCount")
 @ForceNativeThreadState
 private external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)

@@ -2,13 +2,16 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.NativePointer
 
+// Runnable: std::vector::size returns a stored value
 @ExternalSymbolName("org_jetbrains_skia_StdVectorDecoder__1nGetArraySize")
 private external fun StdVectorDecoder_nGetArraySize(array: NativePointer): Int
 
+// Native: calls the caller-supplied dtor on every element -> Typeface/Data/etc. last unref
 @ExternalSymbolName("org_jetbrains_skia_StdVectorDecoder__1nDisposeArray")
 @ForceNativeThreadState
 private external fun StdVectorDecoder_nDisposeArray(array: NativePointer, disposePtr: NativePointer)
 
+// Runnable: moves one pointer out of the vector and nulls the slot
 @ExternalSymbolName("org_jetbrains_skia_StdVectorDecoder__1nReleaseElement")
 private external fun StdVectorDecoder_nReleaseElement(array: NativePointer, index: Int): NativePointer
 

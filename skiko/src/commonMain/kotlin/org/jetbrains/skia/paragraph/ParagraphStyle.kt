@@ -246,87 +246,120 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     }
 }
 
+// Runnable: returns the address of deleteParagraphStyle; the delete itself runs in Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetFinalizer")
 private external fun ParagraphStyle_nGetFinalizer(): NativePointer
 
+// Runnable: ParagraphStyle::ParagraphStyle creates a fixed family, null typeface and empty SkPaints
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nMake")
 private external fun ParagraphStyle_nMake(): NativePointer
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeight")
 private external fun ParagraphStyle_nGetHeight(ptr: NativePointer): Float
 
+// Native: ParagraphStyle::equals -> StrutStyle::operator== and TextStyle::equals scan arbitrary vectors
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nEquals")
+@ForceNativeThreadState
 private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
+// Native: ParagraphStyle::getStrutStyle -> StrutStyle::operator= copies an arbitrary font-family vector
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetStrutStyle")
+@ForceNativeThreadState
 private external fun _nGetStrutStyle(ptr: NativePointer): NativePointer
 
+// Native: ParagraphStyle::setStrutStyle -> StrutStyle::StrutStyle copies arbitrary font-family vectors
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetStrutStyle")
+@ForceNativeThreadState
 private external fun _nSetStrutStyle(ptr: NativePointer, stylePtr: NativePointer)
 
+// Native: ParagraphStyle::getTextStyle -> TextStyle::TextStyle copies arbitrary family, shadow and feature vectors
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextStyle")
+@ForceNativeThreadState
 private external fun _nGetTextStyle(ptr: NativePointer): NativePointer
 
+// Native: setTextStyle -> TextStyle::operator= -> ~SkTypeface_Mac -> CFRelease of CTFontRef
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextStyle")
 @ForceNativeThreadState
 private external fun _nSetTextStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetDirection")
 private external fun _nGetDirection(ptr: NativePointer): Int
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetDirection")
 private external fun _nSetDirection(ptr: NativePointer, direction: Int)
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetAlignment")
 private external fun _nGetAlignment(ptr: NativePointer): Int
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetAlignment")
 private external fun _nSetAlignment(ptr: NativePointer, align: Int)
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetMaxLinesCount")
 private external fun _nGetMaxLinesCount(ptr: NativePointer): Int
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetMaxLinesCount")
 private external fun _nSetMaxLinesCount(ptr: NativePointer, maxLines: Int)
 
+// Runnable: copies the ellipsis SkString (refcounted) into a new SkString
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis")
 private external fun _nGetEllipsis(ptr: NativePointer): NativePointer
 
+// Native: skString -> SkString::SkString -> SkString::Rec::Make scans and copies arbitrary ellipsis bytes
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis")
+@ForceNativeThreadState
 private external fun _nSetEllipsis(ptr: NativePointer, ellipsis: InteropPointer)
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeight")
 private external fun _nSetHeight(ptr: NativePointer, height: Float)
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeightMode")
 private external fun _nGetHeightMode(ptr: NativePointer): Int
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeightMode")
 private external fun _nSetHeightMode(ptr: NativePointer, v: Int)
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEffectiveAlignment")
 private external fun _nGetEffectiveAlignment(ptr: NativePointer): Int
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nIsHintingEnabled")
 private external fun _nIsHintingEnabled(ptr: NativePointer): Boolean
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting")
 private external fun _nDisableHinting(ptr: NativePointer)
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetApplyRoundingHack")
 private external fun _nGetApplyRoundingHack(ptr: NativePointer): Boolean
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetApplyRoundingHack")
 private external fun _nSetApplyRoundingHack(ptr: NativePointer, value: Boolean)
 
+// Runnable: fills a local TextIndent of two floats and copies it into the style
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent")
 private external fun _nSetTextIndent(ptr: NativePointer, firstLine: Float, restLine: Float)
 
+// Runnable: copies a TextIndent of two floats into the result buffer
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextIndent")
 private external fun _nGetTextIndent(ptr: NativePointer, result: InteropPointer)
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetReplaceTabCharacters")
 private external fun _nGetReplaceTabCharacters(ptr: NativePointer): Boolean
 
+// Runnable: ParagraphStyle accessor reads or writes a plain scalar or enum field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetReplaceTabCharacters")
 private external fun _nSetReplaceTabCharacters(ptr: NativePointer, value: Boolean)

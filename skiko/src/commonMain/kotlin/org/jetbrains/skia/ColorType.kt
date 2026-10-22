@@ -351,5 +351,6 @@ enum class ColorType {
 
 }
 
+// Runnable: SkColorTypeIsAlwaysOpaque tests alpha flags from the SkColorTypeChannelFlags switch
 @ExternalSymbolName("org_jetbrains_skia_ColorType__1nIsAlwaysOpaque")
 private external fun _nIsAlwaysOpaque(value: Int): Boolean

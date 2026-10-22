@@ -102,26 +102,35 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// Runnable: SkComposePathEffect holds two sk_sp<SkPathEffect>; path effects cannot own typefaces or GPU objects
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeCompose")
 private external fun PathEffect_nMakeCompose(outerPtr: NativePointer, innerPtr: NativePointer): NativePointer
 
+// Runnable: SkSumPathEffect holds two sk_sp<SkPathEffect>; path effects cannot own typefaces or GPU objects
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeSum")
 private external fun _nMakeSum(firstPtr: NativePointer, secondPtr: NativePointer): NativePointer
 
+// Runnable: SkPath1DPathEffect::Make refs the SkPathData and stores three scalars
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakePath1D")
 private external fun _nMakePath1D(pathPtr: NativePointer, advance: Float, phase: Float, style: Int): NativePointer
 
+// Runnable: SkPath2DPathEffect::Make inverts one matrix and refs the SkPathData
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakePath2D")
 private external fun _nMakePath2D(matrix: InteropPointer, pathPtr: NativePointer): NativePointer
 
+// Runnable: SkLine2DPathEffect::Make inverts one matrix and stores the width
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeLine2D")
 private external fun _nMakeLine2D(width: Float, matrix: InteropPointer): NativePointer
 
+// Runnable: SkCornerPathEffect::Make allocates an object holding one scalar
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeCorner")
 private external fun _nMakeCorner(radius: Float): NativePointer
 
+// Native: SkDashPathEffect::Make -> ValidDashPath / SkDashImpl ctor loop and memcpy over all intervals
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeDash")
+@ForceNativeThreadState
 private external fun _nMakeDash(intervals: InteropPointer, count: Int, phase: Float): NativePointer
 
+// Runnable: SkDiscretePathEffect::Make checks two floats and allocates an object holding three scalars
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeDiscrete")
 private external fun _nMakeDiscrete(segLength: Float, dev: Float, seed: Int): NativePointer

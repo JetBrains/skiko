@@ -114,41 +114,55 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     }
 }
 
+// Runnable: SkSVGSVG::getX returns the stored SkSVGLength, copyToInterop writes two ints
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetX")
 private external fun SVGSVG_nGetX(ptr: NativePointer, result: InteropPointer)
 
+// Runnable: SkSVGSVG::getY returns the stored SkSVGLength, copyToInterop writes two ints
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetY")
 private external fun SVGSVG_nGetY(ptr: NativePointer, result: InteropPointer)
 
+// Runnable: SkSVGSVG::getWidth returns the stored SkSVGLength, copyToInterop writes two ints
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetWidth")
 private external fun SVGSVG_nGetWidth(ptr: NativePointer, result: InteropPointer)
 
+// Runnable: SkSVGSVG::getHeight returns the stored SkSVGLength, copyToInterop writes two ints
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetHeight")
 private external fun SVGSVG_nGetHeight(ptr: NativePointer, result: InteropPointer)
 
+// Runnable: SkSVGSVG::getPreserveAspectRatio returns the stored field, copyToInterop writes two ints
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio")
 private external fun SVGSVG_nGetPreserveAspectRatio(ptr: NativePointer, result: InteropPointer)
 
+// Runnable: SkSVGSVG::getViewBox returns the stored optional SkRect, copied into the result
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetViewBox")
 private external fun SVGSVG_nGetViewBox(ptr: NativePointer, result: InteropPointer): Boolean
 
+// Native: SkSVGSVG::intrinsicSize -> SkSVGLengthContext::resolve -> SkDebugf -> SkLogVAList does debug I/O
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize")
+@ForceNativeThreadState
 private external fun SVGSVG_nGetIntrinsicSize(ptr: NativePointer, width: Float, height: Float, dpi: Float, result: InteropPointer)
 
+// Runnable: SkSVGSVG::setX assigns a small value type into a stored field
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetX")
 private external fun SVGSVG_nSetX(ptr: NativePointer, value: Float, unit: Int)
 
+// Runnable: SkSVGSVG::setY assigns a small value type into a stored field
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetY")
 private external fun SVGSVG_nSetY(ptr: NativePointer, value: Float, unit: Int)
 
+// Runnable: SkSVGSVG::setWidth assigns a small value type into a stored field
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetWidth")
 private external fun SVGSVG_nSetWidth(ptr: NativePointer, value: Float, unit: Int)
 
+// Runnable: SkSVGSVG::setHeight assigns a small value type into a stored field
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetHeight")
 private external fun SVGSVG_nSetHeight(ptr: NativePointer, value: Float, unit: Int)
 
+// Runnable: SkSVGSVG::setPreserveAspectRatio assigns a small value type into a stored field
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetPreserveAspectRatio")
 private external fun SVGSVG_nSetPreserveAspectRatio(ptr: NativePointer, align: Int, scale: Int)
 
+// Runnable: SkSVGSVG::setViewBox assigns a small value type into a stored field
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetViewBox")
 private external fun SVGSVG_nSetViewBox(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float)

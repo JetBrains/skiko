@@ -1,6 +1,7 @@
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.NativePointer
@@ -43,8 +44,11 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
     }
 }
 
+// Native: MakeIcuBiDiRunIterator -> UTF8ToUTF16 copy -> makeBidiIterator -> ubidi_setPara over whole text
 @ExternalSymbolName("org_jetbrains_skia_shaper_IcuBidiRunIterator__1nMake")
+@ForceNativeThreadState
 private external fun _nMake(textPtr: NativePointer, bidiLevel: Int): NativePointer
 
+// Runnable: SkUnicodeBidiRunIterator::currentLevel returns the stored fLevel
 @ExternalSymbolName("org_jetbrains_skia_shaper_IcuBidiRunIterator__1nGetCurrentLevel")
 private external fun _nGetCurrentLevel(ptr: NativePointer): Int

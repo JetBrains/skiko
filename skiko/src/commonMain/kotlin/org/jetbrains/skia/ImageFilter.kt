@@ -733,7 +733,9 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// Native: SkBlenders::Arithmetic -> GetKnownRuntimeEffect(kArithmetic) compiles SkSL on first use
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
+@ForceNativeThreadState
 private external fun _nMakeArithmetic(
     k1: Float,
     k2: Float,
@@ -745,19 +747,28 @@ private external fun _nMakeArithmetic(
     crop: InteropPointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
+@ForceNativeThreadState
 private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: InteropPointer): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
+@ForceNativeThreadState
 private external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: InteropPointer): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
+@ForceNativeThreadState
 private external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: InteropPointer): NativePointer
 
+// Runnable: SkImageFilters::Compose allocates SkComposeImageFilter holding two input refs
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
 private external fun _nMakeCompose(outer: NativePointer, inner: NativePointer): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
+@ForceNativeThreadState
 private external fun _nMakeDisplacementMap(
     xChan: Int,
     yChan: Int,
@@ -767,7 +778,9 @@ private external fun _nMakeDisplacementMap(
     crop: InteropPointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
+@ForceNativeThreadState
 private external fun _nMakeDropShadow(
     dx: Float,
     dy: Float,
@@ -778,7 +791,9 @@ private external fun _nMakeDropShadow(
     crop: InteropPointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
+@ForceNativeThreadState
 private external fun _nMakeDropShadowOnly(
     dx: Float,
     dy: Float,
@@ -789,6 +804,7 @@ private external fun _nMakeDropShadowOnly(
     crop: InteropPointer
 ): NativePointer
 
+// Runnable: SkImageFilters::Image allocates SkImageImageFilter holding an image ref and two rects
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeImage")
 private external fun _nMakeImage(
     image: NativePointer,
@@ -804,6 +820,7 @@ private external fun _nMakeImage(
     samplingModeVal2: Int,
 ): NativePointer
 
+// Runnable: SkImageFilters::Magnifier allocates SkMagnifierImageFilter and an optional crop
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
 private external fun _nMakeMagnifier(
     l: Float,
@@ -818,7 +835,9 @@ private external fun _nMakeMagnifier(
     crop: InteropPointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
+@ForceNativeThreadState
 private external fun _nMakeMatrixConvolution(
     kernelW: Int,
     kernelH: Int,
@@ -833,28 +852,42 @@ private external fun _nMakeMatrixConvolution(
     crop: InteropPointer
 ): NativePointer
 
+// Runnable: SkImageFilters::MatrixTransform checks invertibility and allocates SkMatrixTransformImageFilter
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
 private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingModeVal1: Int, samplingModeVal2: Int, input: NativePointer): NativePointer
 
+// Native: SkImageFilters::Merge copies an arbitrary-length filter array into the SkImageFilter_Base inputs
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
+@ForceNativeThreadState
 private external fun _nMakeMerge(filters: InteropPointer, filtersLength: Int, crop: InteropPointer): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
+@ForceNativeThreadState
 private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeShader")
+@ForceNativeThreadState
 private external fun _nMakeShader(shader: NativePointer, dither: Boolean, crop: InteropPointer): NativePointer
 
+// Runnable: SkImageFilters::Picture reads cullRect and allocates SkPictureImageFilter holding a picture ref
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
 private external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
 
+// Native: SkImageFilters::RuntimeShader -> SkRuntimeEffect::findChild scans children; builder copies fChildren
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader")
+@ForceNativeThreadState
 private external fun _nMakeRuntimeShader(runtimeShaderBuilderPtr: NativePointer, childShaderName: InteropPointer, input: NativePointer): NativePointer
 
+// Native: Skiko copies N input filters and names, SkImageFilters::RuntimeShader loops N validating each name
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray")
+@ForceNativeThreadState
 private external fun _nMakeRuntimeShaderFromArray(runtimeShaderBuilderPtr: NativePointer, childShaderNames: InteropPointer, inputs: InteropPointer, inputLength: Int): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
+@ForceNativeThreadState
 private external fun _nMakeTile(
     l0: Float,
     t0: Float,
@@ -867,13 +900,19 @@ private external fun _nMakeTile(
     input: NativePointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
+@ForceNativeThreadState
 private external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
+@ForceNativeThreadState
 private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
+@ForceNativeThreadState
 private external fun _nMakeDistantLitDiffuse(
     x: Float,
     y: Float,
@@ -885,7 +924,9 @@ private external fun _nMakeDistantLitDiffuse(
     crop: InteropPointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
+@ForceNativeThreadState
 private external fun _nMakePointLitDiffuse(
     x: Float,
     y: Float,
@@ -897,7 +938,9 @@ private external fun _nMakePointLitDiffuse(
     crop: InteropPointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
+@ForceNativeThreadState
 private external fun _nMakeSpotLitDiffuse(
     x0: Float,
     y0: Float,
@@ -914,7 +957,9 @@ private external fun _nMakeSpotLitDiffuse(
     crop: InteropPointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
+@ForceNativeThreadState
 private external fun _nMakeDistantLitSpecular(
     x: Float,
     y: Float,
@@ -927,7 +972,9 @@ private external fun _nMakeDistantLitSpecular(
     crop: InteropPointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
+@ForceNativeThreadState
 private external fun _nMakePointLitSpecular(
     x: Float,
     y: Float,
@@ -940,7 +987,9 @@ private external fun _nMakePointLitSpecular(
     crop: InteropPointer
 ): NativePointer
 
+// Native: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter waits on cache during sk_fmunmap
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
+@ForceNativeThreadState
 private external fun _nMakeSpotLitSpecular(
     x0: Float,
     y0: Float,

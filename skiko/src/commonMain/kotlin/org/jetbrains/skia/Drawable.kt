@@ -134,37 +134,48 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
 
 internal expect fun Drawable.doInit(ptr: NativePointer)
 
+// Runnable: returns the address of deleteSkikoDrawable; the finalizer itself runs through Managed
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetFinalizer")
 private external fun Drawable_nGetFinalizer(): NativePointer
 
+// Runnable: new SkikoDrawable with null callbacks; SkDrawable ctor only zeroes the generation id
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
 private external fun Drawable_nMake(): NativePointer
 
+// Runnable: SkDrawable::getGenerationID lazily takes an atomic counter value
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
 private external fun Drawable_nGetGenerationId(ptr: NativePointer): Int
 
+// Native: SkDrawable::draw -> SkikoDrawable::onDraw -> KVoidCallback calls back into Kotlin
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
 @ForceNativeThreadState
 private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: InteropPointer)
 
+// Native: SkDrawable::onMakePictureSnapshot -> onGetBounds/onDraw callbacks into Kotlin, picture recording
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
 @ForceNativeThreadState
 private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
 
+// Runnable: SkDrawable::notifyDrawingChanged resets fGenerationID to 0
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
 private external fun _nNotifyDrawingChanged(ptr: NativePointer)
 
+// Native: SkDrawable::getBounds -> SkikoDrawable::onGetBounds -> KVoidCallback calls back into Kotlin
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetBounds")
 @ForceNativeThreadState
 private external fun Drawable_nGetBounds(ptr: NativePointer, result: InteropPointer)
 
 // For Native/JS usage only
 
+// Native: KCallback move assignment destroys the old callback -> disposeCallback calls into Kotlin
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
+@ForceNativeThreadState
 internal external fun Drawable_nInit(ptr: NativePointer, onGetBounds: InteropPointer, onDraw: InteropPointer)
 
+// Runnable: SkikoDrawable::onDrawCanvas returns the stored _onDrawCanvas pointer
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetOnDrawCanvas")
 internal external fun _nGetOnDrawCanvas(ptr: NativePointer): NativePointer
 
+// Runnable: SkRect::setLTRB on the stored _bounds field
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nSetBounds")
 internal external fun _nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)

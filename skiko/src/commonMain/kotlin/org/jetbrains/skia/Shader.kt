@@ -397,16 +397,21 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// Runnable: SkShaders::Empty only allocates SkEmptyShader
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
 private external fun Shader_nMakeEmpty(): NativePointer
 
+// Runnable: SkShader::makeWithLocalMatrix allocates SkLocalMatrixShader holding sk_ref_sp of this
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithLocalMatrix")
 private external fun _nMakeWithLocalMatrix(ptr: NativePointer, localMatrix: InteropPointer): NativePointer
 
+// Runnable: SkColorFilterShader::Make allocates a wrapper holding refs to shader and filter
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithColorFilter")
 private external fun _nMakeWithColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer): NativePointer
 
+// Native: SkShaders::LinearGradient -> SkGradientBaseShader ctor copies and scans every color stop
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradient")
+@ForceNativeThreadState
 private external fun _nMakeLinearGradient(
     x0: Float,
     y0: Float,
@@ -423,7 +428,9 @@ private external fun _nMakeLinearGradient(
     matrix: InteropPointer
 ): NativePointer
 
+// Native: SkShaders::RadialGradient -> SkGradientBaseShader ctor copies and scans every color stop
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradient")
+@ForceNativeThreadState
 private external fun _nMakeRadialGradient(
     x: Float,
     y: Float,
@@ -439,7 +446,9 @@ private external fun _nMakeRadialGradient(
     matrix: InteropPointer
 ): NativePointer
 
+// Native: SkShaders::TwoPointConicalGradient -> SkGradientBaseShader ctor copies and scans every color stop
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
+@ForceNativeThreadState
 private external fun _nMakeTwoPointConicalGradient(
     x0: Float,
     y0: Float,
@@ -458,7 +467,9 @@ private external fun _nMakeTwoPointConicalGradient(
     matrix: InteropPointer
 ): NativePointer
 
+// Native: SkShaders::SweepGradient -> SkGradientBaseShader ctor copies and scans every color stop
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradient")
+@ForceNativeThreadState
 private external fun _nMakeSweepGradient(
     x: Float,
     y: Float,
@@ -475,7 +486,9 @@ private external fun _nMakeSweepGradient(
     matrix: InteropPointer
 ): NativePointer
 
+// Native: SkShaders::MakeFractalNoise -> sk_srgb_singleton -> __cxa_guard_acquire may wait (zero octaves)
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeFractalNoise")
+@ForceNativeThreadState
 private external fun _nMakeFractalNoise(
     baseFrequencyX: Float,
     baseFrequencyY: Float,
@@ -485,7 +498,9 @@ private external fun _nMakeFractalNoise(
     tileHeight: Int,
 ): NativePointer
 
+// Native: SkShaders::MakeTurbulence -> sk_srgb_singleton -> __cxa_guard_acquire may wait (zero octaves)
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTurbulence")
+@ForceNativeThreadState
 private external fun _nMakeTurbulence(
     baseFrequencyX: Float,
     baseFrequencyY: Float,
@@ -495,11 +510,17 @@ private external fun _nMakeTurbulence(
     tileHeight: Int,
 ): NativePointer
 
+// Native: SkShaders::Color -> SkColorSpace::MakeSRGB -> sk_srgb_singleton may wait on its static guard
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
+@ForceNativeThreadState
 private external fun _nMakeColor(color: Int): NativePointer
 
+// Native: SkShaders::Color -> SkColorSpace::computeLazyDstFields -> SkOnce::operator() may spin-wait
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColorCS")
+@ForceNativeThreadState
 private external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: NativePointer): NativePointer
 
+// Native: SkShaders::Blend -> SkShaders::Color -> sk_srgb_singleton may wait on its static guard
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeBlend")
+@ForceNativeThreadState
 private external fun _nMakeBlend(blendMode: Int, dst: NativePointer, src: NativePointer): NativePointer

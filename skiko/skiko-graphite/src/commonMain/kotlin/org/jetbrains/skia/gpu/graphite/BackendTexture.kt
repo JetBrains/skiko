@@ -114,13 +114,16 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
     }
 }
 
+// Runnable: returns the address of deleteBackendTexture
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nGetFinalizer")
 private external fun _nGetBackendTextureFinalizer(): NativePointer
 
+// Native: BackendTextures::MakeMetal -> TextureInfos::MakeMetal -> MtlTextureInfo reads id<MTLTexture>
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeMetal")
 @ForceNativeThreadState
 private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
 
+// Runnable: stub returns 0 without touching the arguments
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeVulkan")
 private external fun _nMakeVulkan(
     width: Int,

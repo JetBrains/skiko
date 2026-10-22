@@ -371,12 +371,15 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     override fun toString() = "Typeface(familyName='$familyName', fontStyle=$fontStyle, uniqueId=$uniqueId)"
 }
 
+// Runnable: SkTypeface::uniqueID returns the stored fUniqueID
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
 private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
 
+// Runnable: SkTypeface::Equal compares pointers and stored unique IDs
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nEquals")
 private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
+// Native: SkTypeface::unicharsToGlyphs -> SkTypeface_Mac::onCharsToGlyphs -> CTFontGetGlyphsForCharacters
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
 @ForceNativeThreadState
 private external fun Typeface_nGetUTF32Glyphs(
@@ -386,36 +389,45 @@ private external fun Typeface_nGetUTF32Glyphs(
     glyphs: InteropPointer
 )
 
+// Native: SkTypeface::unicharToGlyph -> SkTypeface_Mac::onCharsToGlyphs -> CTFontGetGlyphsForCharacters
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
 @ForceNativeThreadState
 private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
 
+// Native: SkTypeface::getBounds -> onComputeBounds -> SkScalerContext_Mac ctor and generateFontMetrics (CoreText)
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
 @ForceNativeThreadState
 private external fun Typeface_nGetBounds(ptr: NativePointer, bounds: InteropPointer)
 
+// Runnable: SkTypeface::fontStyle returns stored fStyle; no CoreText or FreeType override
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
 private external fun _nGetFontStyle(ptr: NativePointer): Int
 
+// Runnable: SkTypeface::isFixedPitch returns stored fIsFixedPitch; no CoreText or FreeType override
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nIsFixedPitch")
 private external fun _nIsFixedPitch(ptr: NativePointer): Boolean
 
+// Native: getVariationDesignPosition -> SkTypeface_Mac::onGetVariationDesignPosition -> CTFontCopyVariation
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationsCount")
 @ForceNativeThreadState
 private external fun _nGetVariationsCount(ptr: NativePointer): Int
 
+// Native: getVariationDesignPosition -> SkTypeface_Mac::onGetVariationDesignPosition -> CTFontCopyVariation
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
 @ForceNativeThreadState
 private external fun _nGetVariations(ptr: NativePointer, variations: InteropPointer, count: Int)
 
+// Native: getVariationDesignParameters -> SkTypeface_Mac::onGetVariationDesignParameters -> CTFontCopyVariationAxes
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
 @ForceNativeThreadState
 private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
 
+// Native: getVariationDesignParameters -> SkTypeface_Mac::onGetVariationDesignParameters -> CFDictionaryGetValue
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
 @ForceNativeThreadState
 private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
 
+// Native: SkTypeface::makeClone -> SkTypeface_Mac::onMakeClone -> CTFontCreateCopyWithAttributes
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
 @ForceNativeThreadState
 private external fun _nMakeClone(
@@ -425,38 +437,49 @@ private external fun _nMakeClone(
     collectionIndex: Int
 ): NativePointer
 
+// Native: SkTypeface::MakeEmpty -> SkEmptyTypeface::Make can wait for concurrent singleton initialization
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeEmptyTypeface")
+@ForceNativeThreadState
 private external fun _nMakeEmptyTypeface(): NativePointer
 
+// Native: SkTypeface::countGlyphs -> SkTypeface_Mac::onCountGlyphs -> CTFontGetGlyphCount
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
 @ForceNativeThreadState
 private external fun _nGetGlyphsCount(ptr: NativePointer): Int
 
+// Native: SkTypeface::countTables -> SkTypeface_Mac::onGetTableTags -> CTFontCopyAvailableTables
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTablesCount")
 @ForceNativeThreadState
 private external fun _nGetTablesCount(ptr: NativePointer): Int
 
+// Native: SkTypeface::countTables -> SkTypeface_Mac::onGetTableTags -> CTFontCopyAvailableTables
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTagsCount")
 @ForceNativeThreadState
 private external fun _nGetTableTagsCount(ptr: NativePointer): Int
 
+// Native: SkTypeface::readTableTags -> SkTypeface_Mac::onGetTableTags -> CTFontCopyAvailableTables
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTags")
 @ForceNativeThreadState
 private external fun _nGetTableTags(ptr: NativePointer, tags: InteropPointer, count: Int)
 
+// Native: SkTypeface::getTableSize -> SkTypeface_Mac::onGetTableData -> CTFontCopyTable
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableSize")
 @ForceNativeThreadState
 private external fun _nGetTableSize(ptr: NativePointer, tag: Int): NativePointer
 
+// Native: SkTypeface::copyTableData -> SkTypeface_Mac::onCopyTableData -> CTFontCopyTable
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableData")
 @ForceNativeThreadState
 private external fun _nGetTableData(ptr: NativePointer, tag: Int): NativePointer
 
+// Native: SkTypeface::getUnitsPerEm -> SkTypeface_Mac::onGetUPEM -> CTFontGetUnitsPerEm
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
 @ForceNativeThreadState
 private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
 
+// Native: SkTypeface_FreeType::onGetKerningPairAdjustments -> FT_Get_Kerning per pair under the FreeType lock
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
+@ForceNativeThreadState
 private external fun _nGetKerningPairAdjustments(
     ptr: NativePointer,
     glyphs: InteropPointer,
@@ -464,10 +487,12 @@ private external fun _nGetKerningPairAdjustments(
     adjustments: InteropPointer
 ): Boolean
 
+// Native: SkTypeface_Mac::onCreateFamilyNameIterator -> MakeForFamilyNames -> CTFontCopyTable
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
 @ForceNativeThreadState
 private external fun _nGetFamilyNames(ptr: NativePointer): NativePointer
 
+// Native: SkTypeface::getFamilyName -> SkTypeface_Mac::onGetFamilyName -> CTFontCopyFamilyName
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
 @ForceNativeThreadState
 private external fun _nGetFamilyName(ptr: NativePointer): NativePointer

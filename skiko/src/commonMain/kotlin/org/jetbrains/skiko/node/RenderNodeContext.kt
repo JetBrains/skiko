@@ -60,8 +60,10 @@ class RenderNodeContext internal constructor(ptr: NativePointer, managed: Boolea
     }
 }
 
+// Runnable: sk_make_sp<RenderNodeContext> allocates an SkRefCnt holding two PODs and two bools
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake")
 private external fun RenderNodeContext_nMake(measureDrawBounds: Boolean, snapshotCache: Boolean): NativePointer
 
+// Runnable: RenderNodeContext::setLightingInfo copies six floats into stored PODs
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nSetLightingInfo")
 private external fun RenderNodeContext_nSetLightingInfo(ptr: NativePointer, centerX: Float, centerY: Float, centerZ: Float, radius: Float, ambientShadowAlpha: Float, spotShadowAlpha: Float)

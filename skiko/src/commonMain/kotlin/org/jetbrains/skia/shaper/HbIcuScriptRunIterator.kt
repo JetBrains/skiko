@@ -42,8 +42,10 @@ private fun makeHbIcuScriptRunIterator(text: ManagedString): NativePointer {
     }
 }
 
+// Runnable: MakeHbIcuScriptRunIterator only stores the text pointer and range; scanning happens in consume()
 @ExternalSymbolName("org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nMake")
 private external fun _nMake(textPtr: NativePointer): NativePointer
 
+// Runnable: SkUnicodeHbScriptRunIterator::currentScript packs the stored fCurrentScript
 @ExternalSymbolName("org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nGetCurrentScriptTag")
 private external fun _nGetCurrentScriptTag(ptr: NativePointer): Int

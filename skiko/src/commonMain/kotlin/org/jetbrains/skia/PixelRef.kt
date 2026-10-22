@@ -90,26 +90,35 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// Runnable: SkPixelRef returns the stored fPixels
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetPixels")
 private external fun PixelRef_nGetPixels(ptr: NativePointer): NativePointer
 
+// Runnable: SkPixelRef returns the stored fRowBytes
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetRowBytes")
 private external fun PixelRef_nGetRowBytes(ptr: NativePointer): Int
 
+// Runnable: SkPixelRef::getGenerationID is an atomic load or compare-exchange
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetGenerationId")
 private external fun PixelRef_nGetGenerationId(ptr: NativePointer): Int
 
+// Native: SkPixelRef::notifyPixelsChanged -> SkIDChangeListener::List::changed walks all listeners
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nNotifyPixelsChanged")
+@ForceNativeThreadState
 private external fun PixelRef_nNotifyPixelsChanged(ptr: NativePointer)
 
+// Runnable: SkPixelRef returns fMutability != kMutable
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nIsImmutable")
 private external fun PixelRef_nIsImmutable(ptr: NativePointer): Boolean
 
+// Runnable: SkPixelRef::setImmutable stores fMutability = kImmutable
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nSetImmutable")
 private external fun PixelRef_nSetImmutable(ptr: NativePointer)
 
+// Runnable: SkPixelRef returns the stored fWidth
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetWidth")
 private external fun _nGetWidth(ptr: NativePointer): Int
 
+// Runnable: SkPixelRef returns the stored fHeight
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetHeight")
 private external fun _nGetHeight(ptr: NativePointer): Int

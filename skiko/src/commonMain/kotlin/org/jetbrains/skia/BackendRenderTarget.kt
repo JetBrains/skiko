@@ -109,16 +109,21 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
     }
 }
 
+// Runnable: returns the address of deleteBackendRenderTarget
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer")
 private external fun BackendRenderTarget_nGetFinalizer(): NativePointer
 
+// Native: GrBackendRenderTargets::MakeGL wraps a backend GL framebuffer
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nMakeGL")
+@ForceNativeThreadState
 private external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer
 
+// Native: fTexture.retain -> CFRetain; MakeMtl -> GrMtlTextureInfoSampleCount sends [texture sampleCount]
 @ExternalSymbolName("BackendRenderTarget_nMakeMetal")
 @ForceNativeThreadState
 private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
 
+// Runnable: body is compiled out (#ifdef SK_DIRECT3D) on every Kotlin/Native target and returns 0
 @ExternalSymbolName("BackendRenderTarget_MakeDirect3D")
 private external fun _nMakeDirect3D(
     width: Int,
@@ -129,7 +134,9 @@ private external fun _nMakeDirect3D(
     levelCnt: Int
 ): NativePointer
 
+// Native: GrBackendRenderTargets::MakeVk wraps a backend VkImage
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nMakeVulkan")
+@ForceNativeThreadState
 private external fun _nMakeVulkan(
     width: Int,
     height: Int,

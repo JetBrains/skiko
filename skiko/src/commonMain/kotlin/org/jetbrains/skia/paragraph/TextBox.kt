@@ -58,11 +58,14 @@ class TextBox(val rect: Rect, direction: Direction) {
     }
 }
 
+// Runnable: vector<TextBox>::size returns a stored value
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArraySize")
 private external fun TextBox_nGetArraySize(array: InteropPointer): Int
 
+// Runnable: deletes a vector of TextBox, a SkRect and an enum with no owned objects
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nDisposeArray")
 private external fun TextBox_nDisposeArray(array: InteropPointer)
 
+// Runnable: copies one TextBox rect and direction into caller arrays
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArrayElement")
 private external fun TextBox_nGetArrayElement(array: InteropPointer, index: Int, rectArray: InteropPointer, directionArray: InteropPointer)

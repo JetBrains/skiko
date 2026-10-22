@@ -70,24 +70,31 @@ class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 
+// Runnable: SkFontStyleSet::CreateEmpty allocates SkEmptyFontStyleSet, which owns nothing
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
 private external fun FontStyleSet_nMakeEmpty(): NativePointer
 
+// Native: SkFontStyleSet_DirectWrite::count -> GetFontCount lacks a source proof of bounded work
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nCount")
+@ForceNativeThreadState
 private external fun _nCount(ptr: NativePointer): Int
 
+// Native: SkFontStyleSet_Mac::getStyle -> SkCTFontDescriptorGetSkFontStyle -> CTFontDescriptorCopyAttribute
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyle")
 @ForceNativeThreadState
 private external fun _nGetStyle(ptr: NativePointer, index: Int): Int
 
+// Native: SkFontStyleSet_Mac::getStyle -> find_desc_str -> CTFontDescriptorCopyAttribute, SkStringFromCFString
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyleName")
 @ForceNativeThreadState
 private external fun _nGetStyleName(ptr: NativePointer, index: Int): NativePointer
 
+// Native: SkFontStyleSet_Mac::createTypeface -> create_from_desc -> CTFontCreateWithFontDescriptor
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetTypeface")
 @ForceNativeThreadState
 private external fun _nGetTypeface(ptr: NativePointer, index: Int): NativePointer
 
+// Native: SkFontStyleSet_Mac::matchStyle -> findMatchingDesc -> create_from_desc -> CTFontCreateWithFontDescriptor
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMatchStyle")
 @ForceNativeThreadState
 private external fun _nMatchStyle(ptr: NativePointer, style: Int): NativePointer

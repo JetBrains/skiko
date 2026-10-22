@@ -186,25 +186,32 @@ open class FontMgr : RefCnt {
 }
 
 
+// Native: SkFontMgr_DirectWrite::onCountFamilies -> GetFontFamilyCount lacks a source proof of bounded work
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamiliesCount")
+@ForceNativeThreadState
 private external fun _nGetFamiliesCount(ptr: NativePointer): Int
 
+// Native: SkFontMgr_Mac::onGetFamilyName -> SkStringFromCFString on a CFString
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamilyName")
 @ForceNativeThreadState
 private external fun _nGetFamilyName(ptr: NativePointer, index: Int): NativePointer
 
+// Native: SkFontMgr_Mac::onCreateStyleSet -> CreateSet -> CTFontDescriptorCreateMatchingFontDescriptors
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeStyleSet")
 @ForceNativeThreadState
 private external fun _nMakeStyleSet(ptr: NativePointer, index: Int): NativePointer
 
+// Native: SkFontMgr_Mac::onMatchFamily -> CreateSet -> CTFontDescriptorCreateMatchingFontDescriptors
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamily")
 @ForceNativeThreadState
 private external fun _nMatchFamily(ptr: NativePointer, familyName: InteropPointer): NativePointer
 
+// Native: SkFontMgr_Mac::onMatchFamilyStyle -> CTFontDescriptorCreateMatchingFontDescriptor -> create_from_desc
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
 @ForceNativeThreadState
 private external fun _nMatchFamilyStyle(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer
 
+// Native: SkFontMgr_Mac::onMatchFamilyStyleCharacter -> CTFontCreateForStringWithLanguage -> SkTypeface_Mac::Make
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter")
 @ForceNativeThreadState
 private external fun _nMatchFamilyStyleCharacter(
@@ -216,18 +223,22 @@ private external fun _nMatchFamilyStyleCharacter(
     character: Int
 ): NativePointer
 
+// Native: SkFontMgr_Mac::onMakeFromData -> SkTypeface_Mac::MakeFromStream -> ctfont_from_skdata (CoreText)
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromData")
 @ForceNativeThreadState
 private external fun _nMakeFromData(ptr: NativePointer, dataPtr: NativePointer, ttcIndex: Int): NativePointer
 
+// Native: SkFontMgr_Mac::onMakeFromFile -> SkData::MakeFromFileName (file I/O) -> onMakeFromData -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromFile")
 @ForceNativeThreadState
 private external fun _nMakeFromFile(ptr: NativePointer, pathPtr: InteropPointer, ttcIndex: Int): NativePointer
 
+// Native: SkFontMgrSkikoDefault -> SkFontMgr_New_CoreText -> SkFontMgr_Mac ctor -> CoreText font collection
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
 @ForceNativeThreadState
 private external fun _nDefault(): NativePointer
 
+// Native: SkFontMgr_Mac::onLegacyMakeTypeface -> create_from_name -> CTFontCreateWithFontDescriptor
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nLegacyMakeTypeface")
 @ForceNativeThreadState
 private external fun _nLegacyMakeTypeface(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer

@@ -47,9 +47,11 @@ open class TypefaceFontProvider internal constructor(
 }
 
 
+// Runnable: new TypefaceFontProvider() creates an empty family map and holds no typeface yet
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake")
 private external fun TypefaceFontProvider_nMake(): NativePointer
 
+// Native: registerTypeface -> SkTypeface_Mac::onGetFamilyName -> CTFontCopyFamilyName (alias null)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface")
 @ForceNativeThreadState
 private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: InteropPointer): Int

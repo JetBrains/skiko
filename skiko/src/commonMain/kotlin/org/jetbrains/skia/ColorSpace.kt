@@ -90,26 +90,38 @@ class ColorSpace : Managed {
     }
 }
 
+// Runnable: returns the address of unrefColorSpace; the finalizer itself runs through Managed
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
 private external fun ColorSpace_nGetFinalizer(): NativePointer
 
+// Native: SkColorSpace::invTransferFn -> computeLazyDstFields -> SkOnce::operator() can spin waiting
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__nConvert")
+@ForceNativeThreadState
 private external fun _nConvert(fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float, result: InteropPointer)
 
+// Native: SkColorSpace::MakeSRGB -> sk_srgb_singleton can wait for concurrent static initialization
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
+@ForceNativeThreadState
 private external fun _nMakeSRGB(): NativePointer
 
+// Runnable: SkColorSpace::MakeRGB hashes 16 floats and allocates a small SkColorSpace
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
 private external fun _nMakeDisplayP3(): NativePointer
 
+// Native: SkColorSpace::MakeSRGBLinear -> sk_srgb_linear_singleton can wait for static initialization
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
+@ForceNativeThreadState
 private external fun _nMakeSRGBLinear(): NativePointer
 
+// Runnable: SkColorSpace::gammaCloseToSRGB is a 28-byte memcmp of a stored field
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
 private external fun _nIsGammaCloseToSRGB(ptr: NativePointer): Boolean
 
+// Runnable: SkColorSpace::gammaIsLinear is a 28-byte memcmp of a stored field
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
 private external fun _nIsGammaLinear(ptr: NativePointer): Boolean
 
+// Native: SkColorSpace::isSRGB -> sk_srgb_singleton can wait for concurrent static initialization
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsSRGB")
+@ForceNativeThreadState
 private external fun _nIsSRGB(ptr: NativePointer): Boolean

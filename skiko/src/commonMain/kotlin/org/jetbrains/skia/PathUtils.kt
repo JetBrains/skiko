@@ -94,20 +94,26 @@ object PathUtils {
     }
 }
 
+// Native: FillPathWithPaint -> SkPathEffect::filterPath / SkStrokeRec::applyToPath -> SkStroke::strokePath
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaint")
+@ForceNativeThreadState
 private external fun _nFillPathWithPaint(
     srcPtr: NativePointer,
     paintPtr: NativePointer
 ): NativePointer
 
+// Native: FillPathWithPaint -> SkPathEffect::filterPath / SkStrokeRec::applyToPath -> SkStroke::strokePath
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintBuilder")
+@ForceNativeThreadState
 private external fun _nFillPathWithPaintBuilder(
     srcPtr: NativePointer,
     paintPtr: NativePointer,
     dstPtr: NativePointer
 ): Boolean
 
+// Native: FillPathWithPaint -> SkPathEffect::filterPath / SkStrokeRec::applyToPath -> SkStroke::strokePath
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintMatrix")
+@ForceNativeThreadState
 private external fun _nFillPathWithPaintMatrix(
     srcPtr: NativePointer,
     paintPtr: NativePointer,
@@ -115,7 +121,9 @@ private external fun _nFillPathWithPaintMatrix(
     matrix: InteropPointer
 ): Boolean
 
+// Native: FillPathWithPaint -> SkPathEffect::filterPath / SkStrokeRec::applyToPath -> SkStroke::strokePath
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintCull")
+@ForceNativeThreadState
 private external fun _nFillPathWithPaintCull(
     srcPtr: NativePointer,
     paintPtr: NativePointer,

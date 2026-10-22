@@ -264,71 +264,97 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
 }
 
 
+// Runnable: returns the address of deleteStrutStyle; StrutStyle owns only strings and scalars
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFinalizer")
 private external fun StrutStyle_nGetFinalizer(): NativePointer
 
+// Runnable: new StrutStyle() sets scalar fields; no typeface or Skia object
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nMake")
 private external fun StrutStyle_nMake(): NativePointer
 
+// Native: StrutStyle::operator== -> SkString::equals compares arbitrary family vectors and name bytes
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nEquals")
+@ForceNativeThreadState
 private external fun StrutStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetHeight")
 private external fun StrutStyle_nGetHeight(ptr: NativePointer): Float
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeight")
 private external fun StrutStyle_nSetHeight(ptr: NativePointer, value: Float)
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetEnabled")
 private external fun StrutStyle_nSetEnabled(ptr: NativePointer, value: Boolean)
 
+// Native: StrutStyle::getFontFamilies feeds an unbounded loop constructing SkString copies
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies")
+@ForceNativeThreadState
 private external fun _nGetFontFamilies(ptr: NativePointer): NativePointer
 
+// Native: skStringVector -> skString -> SkString::SkString scans and copies arbitrary family arrays
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies")
+@ForceNativeThreadState
 private external fun StrutStyle_nSetFontFamilies(ptr: NativePointer, families: InteropPointer, familiesCount: Int)
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle")
 private external fun _nGetFontStyle(ptr: NativePointer, fontStyleData: InteropPointer)
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle")
 private external fun _nSetFontStyle(ptr: NativePointer, value: Int)
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize")
 private external fun _nGetFontSize(ptr: NativePointer): Float
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontSize")
 private external fun _nSetFontSize(ptr: NativePointer, value: Float)
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetLeading")
 private external fun _nGetLeading(ptr: NativePointer): Float
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetLeading")
 private external fun _nSetLeading(ptr: NativePointer, value: Float)
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsEnabled")
 private external fun _nIsEnabled(ptr: NativePointer): Boolean
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightForced")
 private external fun _nIsHeightForced(ptr: NativePointer): Boolean
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightForced")
 private external fun _nSetHeightForced(ptr: NativePointer, value: Boolean)
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightOverridden")
 private external fun _nIsHeightOverridden(ptr: NativePointer): Boolean
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightOverridden")
 private external fun _nSetHeightOverridden(ptr: NativePointer, value: Boolean)
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHalfLeading")
 private external fun _nIsHalfLeading(ptr: NativePointer): Boolean
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading")
 private external fun _nSetHalfLeading(ptr: NativePointer, value: Boolean)
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetTopRatio")
 private external fun StrutStyle_nGetTopRatio(ptr: NativePointer): Float
 
+// Runnable: StrutStyle accessor reads or writes a plain scalar or flag field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetTopRatio")
 private external fun StrutStyle_nSetTopRatio(ptr: NativePointer, value: Float)

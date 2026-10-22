@@ -369,90 +369,127 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
 
 }
 
+// Runnable: returns the address of unrefTextBlob without calling it
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
 private external fun TextBlob_nGetFinalizer(): NativePointer
 
+// Runnable: SkTextBlob::uniqueID returns the stored fUniqueID field
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
 private external fun TextBlob_nGetUniqueId(ptr: NativePointer): Int
 
+// Native: SkTextBlob::serialize -> SkTextBlobPriv::Flatten copies every run into a growing buffer
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
+@ForceNativeThreadState
 private external fun TextBlob_nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
 
+// Native: SkTextBlob::Deserialize -> MakeFromBuffer allocates runs and copies arrays from input
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
+@ForceNativeThreadState
 private external fun TextBlob_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
+// Runnable: SkTextBlob::bounds returns the stored fBounds rect
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
 private external fun _nBounds(ptr: NativePointer, resultRect: InteropPointer)
 
+// Native: SkTextBlob::getIntercepts -> SkBulkGlyphMetricsAndPaths -> SkScalerContext_Mac::generatePath
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetInterceptsLength")
 @ForceNativeThreadState
 private external fun _nGetInterceptsLength(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): Int
 
+// Native: SkTextBlob::getIntercepts -> SkBulkGlyphMetricsAndPaths -> SkScalerContext_Mac::generatePath
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
 @ForceNativeThreadState
 private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer, resultArray: InteropPointer)
 
+// Native: MakeFromPosTextH -> SkTextBlobBuilder::make -> updateDeferredBounds -> GetFontBounds -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
 @ForceNativeThreadState
 private external fun _nMakeFromPosH(glyphs: InteropPointer, glyphsLen: Int, xpos: InteropPointer, ypos: Float, fontPtr: NativePointer): NativePointer
 
+// Native: MakeFromPosText -> SkTextBlobBuilder::make -> updateDeferredBounds -> GetFontBounds -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
 @ForceNativeThreadState
 private external fun _nMakeFromPos(glyphs: InteropPointer, glyphsLen: Int, pos: InteropPointer, fontPtr: NativePointer): NativePointer
 
+// Native: MakeFromRSXform -> SkTextBlobBuilder::make -> updateDeferredBounds -> GetFontBounds -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
 @ForceNativeThreadState
 private external fun _nMakeFromRSXform(glyphs: InteropPointer, glyphsLen: Int, xform: InteropPointer, fontPtr: NativePointer): NativePointer
 
+// Native: getGlyphsLength loops over all runs with SkTextBlob::Iter::next (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphsLength")
+@ForceNativeThreadState
 private external fun _nGetGlyphsLength(ptr: NativePointer): Int
 
+// Native: getGlyphs memcpys the glyph array of every run (cost grows with glyph count)
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
+@ForceNativeThreadState
 private external fun _nGetGlyphs(ptr: NativePointer, result: InteropPointer)
 
+// Native: getPositionsLength loops over all runs with SkTextBlob::Iter::next (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositionsLength")
+@ForceNativeThreadState
 private external fun _nGetPositionsLength(ptr: NativePointer): Int
 
+// Native: getPositions memcpys the position array of every run (cost grows with glyph count)
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
+@ForceNativeThreadState
 private external fun _nGetPositions(ptr: NativePointer, resultArray: InteropPointer)
 
+// Native: getClustersLength loops over all runs with SkTextBlob::Iter::next (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClustersLength")
+@ForceNativeThreadState
 private external fun _nGetClustersLength(ptr: NativePointer): Int
 
+// Native: getClusters runs UtfIndicesConverter over each run text and every glyph (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
+@ForceNativeThreadState
 private external fun _nGetClusters(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
+// Native: getTightBounds -> SkFont::measureText -> SkStrike glyph metrics -> SkScalerContext_Mac::generateMetrics
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
 @ForceNativeThreadState
 private external fun _nGetTightBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
+// Native: getBlockBounds -> SkFont::getMetrics and getWidths -> SkScalerContext_Mac (CoreText)
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
 @ForceNativeThreadState
 private external fun _nGetBlockBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
+// Runnable: getFirstBaseline does one Iter::next and reads one stored position float
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
 private external fun _nGetFirstBaseline(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
+// Native: getLastBaseline loops over all runs with SkTextBlob::Iter::next (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
+@ForceNativeThreadState
 private external fun _nGetLastBaseline(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
+// Runnable: new TextBlobIter does sk_ref_sp(blob) and one Iter::next that only reads RunRecord fields
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nCreate")
 private external fun Iter_nCreate(textBlobPtr: NativePointer): NativePointer
 
+// Runnable: returns the address of deleteTextBlobIter without calling it
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetFinalizer")
 private external fun Iter_nGetFinalizer(): NativePointer
 
+// Runnable: TextBlobIter::fetch -> SkTextBlob::Iter::next advances one RunRecord pointer
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nFetch")
 private external fun Iter_nFetch(ptr: NativePointer): Boolean
 
+// Runnable: sk_ref_sp(_buffer.fTypeface) is an atomic ref++ on a live typeface
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetTypeface")
 private external fun Iter_nGetTypeface(ptr: NativePointer): NativePointer
 
+// Runnable: TextBlobIter::hasNext returns a stored bool
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nHasNext")
 private external fun Iter_nHasNext(ptr: NativePointer): Boolean
 
+// Runnable: TextBlobIter::getGlyphCount returns a stored int
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphCount")
 private external fun Iter_nGetGlyphCount(ptr: NativePointer): Int
 
+// Native: TextBlobIter::writeGlyphs memcpys up to max glyph ids (cost grows with glyph count)
 @ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphs")
+@ForceNativeThreadState
 private external fun Iter_nGetGlyphs(ptr: NativePointer, glyphs: InteropPointer, max: Int): Int

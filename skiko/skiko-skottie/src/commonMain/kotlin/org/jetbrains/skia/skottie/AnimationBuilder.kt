@@ -83,27 +83,35 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     }
 }
 
+// Runnable: returns the address of a delete function; the finalizer runs through Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
 private external fun AnimationBuilder_nGetFinalizer(): NativePointer
 
+// Runnable: new Animation::Builder only stores flags and null sk_sp members and an empty vector
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
 private external fun AnimationBuilder_nMake(flags: Int): NativePointer
 
+// Native: Builder::setFontManager move-assign drops the old sk_sp<SkFontMgr> -> ~SkFontMgr_Mac (CoreText release)
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
 @ForceNativeThreadState
 private external fun _nSetFontManager(ptr: NativePointer, fontMgrPtr: NativePointer)
 
+// Native: setLogger drops the old Logger -> ~SkikoLogger -> ~KCallback -> disposeCallback into Kotlin
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
+@ForceNativeThreadState
 private external fun _nSetLogger(ptr: NativePointer, loggerPtr: NativePointer)
 
+// Native: skString -> Builder::make -> skjson::DOM parse, scene build, text shaping, Logger::log into Kotlin
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
 @ForceNativeThreadState
 private external fun _nBuildFromString(ptr: NativePointer, data: InteropPointer): NativePointer
 
+// Native: Builder::makeFromFile -> SkData::MakeFromFileName (file read) -> Builder::make parse
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
 @ForceNativeThreadState
 internal external fun _nBuildFromFile(ptr: NativePointer, path: InteropPointer): NativePointer
 
+// Native: Builder::make(SkStream*) -> SkData::MakeFromStream copy -> Builder::make JSON parse and build
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
 @ForceNativeThreadState
 private external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer

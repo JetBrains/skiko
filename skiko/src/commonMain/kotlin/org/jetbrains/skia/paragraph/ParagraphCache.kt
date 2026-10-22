@@ -101,27 +101,35 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
     }
 }
 
+// Native: ParagraphCache::reset -> fLRUCacheMap.reset destroys cached Runs (typeface unref) under mutex
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nAbandon")
 @ForceNativeThreadState
 private external fun _nAbandon(ptr: NativePointer)
 
+// Native: ParagraphCache::reset -> fLRUCacheMap.reset destroys cached Runs (typeface unref) under mutex
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nReset")
 @ForceNativeThreadState
 private external fun _nReset(ptr: NativePointer)
 
+// Native: ParagraphCache::updateParagraph -> key copies text/styles; LRU insert evicts cached Runs
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nUpdateParagraph")
 @ForceNativeThreadState
 private external fun _nUpdateParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
 
+// Native: ParagraphCache::findParagraph -> ParagraphCacheKey copy, updateTo reassigns fRuns under mutex
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nFindParagraph")
 @ForceNativeThreadState
 private external fun _nFindParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
 
+// Native: ParagraphCache::printStatistics -> SkDebugf -> SkLogVAList vfprintf(stderr)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nPrintStatistics")
+@ForceNativeThreadState
 private external fun _nPrintStatistics(ptr: NativePointer, paragraphPtr: NativePointer)
 
+// Runnable: ParagraphCache::turnOn stores a bool in fCacheIsOn
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nSetEnabled")
 private external fun _nSetEnabled(ptr: NativePointer, value: Boolean)
 
+// Runnable: ParagraphCache::count returns SkLRUCache::count, the stored map size
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nGetCount")
 private external fun _nGetCount(ptr: NativePointer): Int

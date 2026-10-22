@@ -67,18 +67,24 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// Native: SkSVGDOM::MakeFromStream parses the whole XML document and builds the node tree
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
+@ForceNativeThreadState
 private external fun SVGDOM_nMakeFromData(dataPtr: NativePointer): NativePointer
 
+// Runnable: SkSVGDOM::getRoot returns the stored root and ref() increments a counter
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetRoot")
 private external fun SVGDOM_nGetRoot(ptr: NativePointer): NativePointer
 
+// Runnable: SkSVGDOM::containerSize returns the stored fContainerSize
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
 private external fun SVGDOM_nGetContainerSize(ptr: NativePointer, dst: InteropPointer)
 
+// Runnable: SkSVGDOM::setContainerSize assigns fContainerSize
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
 private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, height: Float)
 
+// Native: SkSVGDOM::render -> SkCanvas draw calls on a canvas that can be GPU-backed
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nRender")
 @ForceNativeThreadState
 private external fun SVGDOM_nRender(ptr: NativePointer, canvasPtr: NativePointer)

@@ -15,5 +15,6 @@ class Recording internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     }
 }
 
+// Runnable: returns the address of a delete function; the finalizer runs through Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_Recording__1nGetFinalizer")
 private external fun _nGetRecordingFinalizer(): NativePointer

@@ -360,47 +360,69 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     }
 }
 
+// Runnable: _nGetFinalizer returns the &deleteCodec pointer; the finalizer runs via Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
 private external fun Codec_nGetFinalizer(): NativePointer
 
+// Native: SkCodec::getInfo -> SkEncodedInfo::makeImageInfo -> SkColorSpace::Make walks ICC curve tables
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
+@ForceNativeThreadState
 private external fun Codec_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
+// Native: SkCodec::getPixels -> onGetPixels decodes the image (libpng/libjpeg/webp/wuffs) plus skcms conversion
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
+@ForceNativeThreadState
 private external fun Codec_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
 
+// Native: SkCodec::MakeFromData -> MakeFromStream -> format MakeFromStream parses headers, markers and ICC
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
+@ForceNativeThreadState
 private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
 
+// Runnable: SkCodec::dimensions returns the stored fEncodedInfo width
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeWidth")
 private external fun _nGetSizeWidth(ptr: NativePointer): Int
 
+// Runnable: SkCodec::dimensions returns the stored fEncodedInfo height
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeHeight")
 private external fun _nGetSizeHeight(ptr: NativePointer): Int
 
+// Runnable: SkCodec::getOrigin returns the stored const fOrigin
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
 private external fun _nGetEncodedOrigin(ptr: NativePointer): Int
 
+// Runnable: SkCodec::getEncodedFormat -> onGetEncodedFormat returns an enum literal or stored fFormat
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
 private external fun _nGetEncodedImageFormat(ptr: NativePointer): Int
 
+// Native: SkCodec::getFrameCount -> SkWuffsCodec::onGetFrameCountInternal decodes every frame config
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameCount")
+@ForceNativeThreadState
 private external fun _nGetFrameCount(ptr: NativePointer): Int
 
+// Native: SkBmpRustCodec::onGetFrameInfo -> SkCodec::getInfo -> skcms_MaxRoundtripError scans ICC curves
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameInfo")
+@ForceNativeThreadState
 private external fun _nGetFrameInfo(ptr: NativePointer, frame: Int, result: InteropPointer)
 
+// Native: SkCodec::getFrameInfo() -> getFrameCount scans all frames, then builds a vector of FrameInfo
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFramesInfo")
+@ForceNativeThreadState
 private external fun _nGetFramesInfo(ptr: NativePointer): NativePointer
 
+// Runnable: SkCodec::getRepetitionCount -> onGetRepetitionCount reads a stored loop count
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetRepetitionCount")
 private external fun _nGetRepetitionCount(ptr: NativePointer): Int
 
+// Runnable: delete of std::vector<SkCodec::FrameInfo>; FrameInfo is plain ints/enums/SkIRect, one free()
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_Delete")
 private external fun FramesInfo_nDelete(ptr: NativePointer)
 
+// Runnable: std::vector::size returns a stored value
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetSize")
 private external fun FramesInfo_nGetSize(ptr: NativePointer): Int
 
+// Native: AnimationFrameInfo::copyToInterop loops over every frame in the vector writing 11 ints each
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetInfos")
+@ForceNativeThreadState
 private external fun FramesInfo_nGetInfos(ptr: NativePointer, result: InteropPointer)

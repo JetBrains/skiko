@@ -374,122 +374,180 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
     }
 }
 
+// Runnable: ctor only allocates SkRTreeFactory, SkPictureRecorder, SkRecordCanvas, camera; no typeface or GPU
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake")
 private external fun RenderNode_nMake(context: NativePointer): NativePointer
 
+// Runnable: returns address of the stored optional<SkPaint> or null
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetLayerPaint")
 private external fun RenderNode_nGetLayerPaint(ptr: NativePointer): NativePointer
 
+// Native: RenderNode::setLayerPaint -> old SkPaint dtor unrefs shader/filters; invalidateSnapshot -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetLayerPaint")
 @ForceNativeThreadState
 private external fun RenderNode_nSetLayerPaint(ptr: NativePointer, paint: NativePointer)
 
+// Runnable: RenderNode::getBounds returns a stored field, copied to the result array
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetBounds")
 private external fun RenderNode_nGetBounds(ptr: NativePointer, result: InteropPointer)
 
+// Native: setBounds -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetBounds")
+@ForceNativeThreadState
 private external fun RenderNode_nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)
 
+// Runnable: RenderNode::getPivot returns a stored field, copied to the result array
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetPivot")
 private external fun RenderNode_nGetPivot(ptr: NativePointer, result: InteropPointer)
 
+// Native: setPivot -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetPivot")
+@ForceNativeThreadState
 private external fun RenderNode_nSetPivot(ptr: NativePointer, x: Float, y: Float)
 
+// Runnable: RenderNode::getAlpha returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAlpha")
 private external fun RenderNode_nGetAlpha(ptr: NativePointer): Float
 
+// Native: setAlpha -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAlpha")
+@ForceNativeThreadState
 private external fun RenderNode_nSetAlpha(ptr: NativePointer, alpha: Float)
 
+// Runnable: RenderNode::getScaleX returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleX")
 private external fun RenderNode_nGetScaleX(ptr: NativePointer): Float
 
+// Native: setScaleX -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleX")
+@ForceNativeThreadState
 private external fun RenderNode_nSetScaleX(ptr: NativePointer, scaleX: Float)
 
+// Runnable: RenderNode::getScaleY returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetScaleY")
 private external fun RenderNode_nGetScaleY(ptr: NativePointer): Float
 
+// Native: setScaleY -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetScaleY")
+@ForceNativeThreadState
 private external fun RenderNode_nSetScaleY(ptr: NativePointer, scaleY: Float)
 
+// Runnable: RenderNode::getTranslationX returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationX")
 private external fun RenderNode_nGetTranslationX(ptr: NativePointer): Float
 
+// Native: setTranslationX -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationX")
+@ForceNativeThreadState
 private external fun RenderNode_nSetTranslationX(ptr: NativePointer, translationX: Float)
 
+// Runnable: RenderNode::getTranslationY returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetTranslationY")
 private external fun RenderNode_nGetTranslationY(ptr: NativePointer): Float
 
+// Native: setTranslationY -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetTranslationY")
+@ForceNativeThreadState
 private external fun RenderNode_nSetTranslationY(ptr: NativePointer, translationY: Float)
 
+// Runnable: RenderNode::getShadowElevation returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetShadowElevation")
 private external fun RenderNode_nGetShadowElevation(ptr: NativePointer): Float
 
+// Native: RenderNode::setShadowElevation -> invalidateSnapshot(kContent) -> contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetShadowElevation")
+@ForceNativeThreadState
 private external fun RenderNode_nSetShadowElevation(ptr: NativePointer, elevation: Float)
 
+// Runnable: RenderNode::getAmbientShadowColor returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetAmbientShadowColor")
 private external fun RenderNode_nGetAmbientShadowColor(ptr: NativePointer): Int
 
+// Native: setAmbientShadowColor -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetAmbientShadowColor")
+@ForceNativeThreadState
 private external fun RenderNode_nSetAmbientShadowColor(ptr: NativePointer, color: Int)
 
+// Runnable: RenderNode::getSpotShadowColor returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetSpotShadowColor")
 private external fun RenderNode_nGetSpotShadowColor(ptr: NativePointer): Int
 
+// Native: setSpotShadowColor -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetSpotShadowColor")
+@ForceNativeThreadState
 private external fun RenderNode_nSetSpotShadowColor(ptr: NativePointer, color: Int)
 
+// Runnable: RenderNode::getRotationX returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationX")
 private external fun RenderNode_nGetRotationX(ptr: NativePointer): Float
 
+// Native: setRotationX -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationX")
+@ForceNativeThreadState
 private external fun RenderNode_nSetRotationX(ptr: NativePointer, rotationX: Float)
 
+// Runnable: RenderNode::getRotationY returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationY")
 private external fun RenderNode_nGetRotationY(ptr: NativePointer): Float
 
+// Native: setRotationY -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationY")
+@ForceNativeThreadState
 private external fun RenderNode_nSetRotationY(ptr: NativePointer, rotationY: Float)
 
+// Runnable: RenderNode::getRotationZ returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetRotationZ")
 private external fun RenderNode_nGetRotationZ(ptr: NativePointer): Float
 
+// Native: setRotationZ -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetRotationZ")
+@ForceNativeThreadState
 private external fun RenderNode_nSetRotationZ(ptr: NativePointer, rotationZ: Float)
 
+// Runnable: RenderNode::getCameraDistance divides a stored float by 72
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetCameraDistance")
 private external fun RenderNode_nGetCameraDistance(ptr: NativePointer): Float
 
+// Native: setCameraDistance -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetCameraDistance")
+@ForceNativeThreadState
 private external fun RenderNode_nSetCameraDistance(ptr: NativePointer, distance: Float)
 
+// Native: setClipRect -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRect")
+@ForceNativeThreadState
 private external fun RenderNode_nSetClipRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, mode: Int, antiAlias: Boolean)
 
+// Native: setClipRRect -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect")
+@ForceNativeThreadState
 private external fun RenderNode_nSetClipRRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, radii: InteropPointer, radiiSize: Int, mode: Int, antiAlias: Boolean)
 
+// Native: setClipPath -> invalidateSnapshot -> observers' contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath")
+@ForceNativeThreadState
 private external fun RenderNode_nSetClipPath(ptr: NativePointer, pathPtr: NativePointer, mode: Int, antiAlias: Boolean)
 
+// Runnable: RenderNode::getClip returns a stored field
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nGetClip")
 private external fun RenderNode_nGetClip(ptr: NativePointer): Boolean
 
+// Native: RenderNode::setClip -> invalidateSnapshot(kContent) -> contentSnapshot.reset() -> ~SkPicture
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClip")
+@ForceNativeThreadState
 private external fun RenderNode_nSetClip(ptr: NativePointer, clip: Boolean)
 
+// Native: RenderNode::beginRecording -> SkPictureRecorder::beginRecording -> SkRecordCanvas::reset -> forgetRecord
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nBeginRecording")
+@ForceNativeThreadState
 private external fun RenderNode_nBeginRecording(ptr: NativePointer): NativePointer
 
+// Native: RenderNode::endRecording -> finishRecordingAsDrawable, old contentCache dtor, updateDependencies replay
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nEndRecording")
 @ForceNativeThreadState
 private external fun RenderNode_nEndRecording(ptr: NativePointer)
 
+// Native: RenderNode::drawInto -> SkCanvas::drawDrawable -> onDraw -> drawPicture/saveLayer/DrawShadow
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nDrawInto")
 @ForceNativeThreadState
 private external fun RenderNode_nDrawInto(ptr: NativePointer, canvas: NativePointer)

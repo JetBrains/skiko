@@ -154,35 +154,44 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 }
 
+// Runnable: constructs FontCollection and ParagraphCache members; no typeface, font manager or Apple object
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nMake")
 private external fun _nMake(): NativePointer
 
+// Runnable: getFontManagerOrder copies at most four sk_sp members; the unrefs are not the last
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFontManagersCount")
 private external fun _nGetFontManagersCount(ptr: NativePointer): Int
 
+// Native: FontCollection::setAssetFontManager drops the old SkFontMgr -> ~SkFontMgr_Mac -> CFRelease
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager")
 @ForceNativeThreadState
 private external fun _nSetAssetFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
+// Native: FontCollection::setDynamicFontManager drops the old SkFontMgr -> ~SkFontMgr_Mac -> CFRelease
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager")
 @ForceNativeThreadState
 private external fun _nSetDynamicFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
+// Native: FontCollection::setTestFontManager drops the old SkFontMgr -> ~SkFontMgr_Mac -> CFRelease
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager")
 @ForceNativeThreadState
 private external fun _nSetTestFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
+// Native: FontCollection::setDefaultFontManager drops the old SkFontMgr -> ~SkFontMgr_Mac -> CFRelease
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager")
 @ForceNativeThreadState
 private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyName: InteropPointer)
 
+// Runnable: returns an sk_sp copy of fDefaultFontManager, released to the caller; ref++ only
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFallbackManager")
 private external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
 
+// Native: FontCollection::findTypefaces -> matchTypeface -> SkFontMgr_Mac::onMatchFamily -> CTFontDescriptor APIs
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces")
 @ForceNativeThreadState
 private external fun _nFindTypefaces(ptr: NativePointer, familyNames: InteropPointer, len: Int, fontStyle: Int): NativePointer
 
+// Native: FontCollection::defaultFallback -> SkFontMgr_Mac::onMatchFamilyStyleCharacter -> CTFontCreateForString
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar")
 @ForceNativeThreadState
 private external fun _nDefaultFallbackChar(
@@ -194,12 +203,15 @@ private external fun _nDefaultFallbackChar(
     locale: InteropPointer
 ): NativePointer
 
+// Native: FontCollection::defaultFallback -> SkFontMgr::matchFamilyStyle -> SkFontMgr_Mac::onMatchFamilyStyle
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallback")
 @ForceNativeThreadState
 private external fun _nDefaultFallback(ptr: NativePointer): NativePointer
 
+// Runnable: enableFontFallback and disableFontFallback only write the fEnableFontFallback flag
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetEnableFallback")
 private external fun _nSetEnableFallback(ptr: NativePointer, value: Boolean)
 
+// Runnable: returns the address of the fParagraphCache member
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetParagraphCache")
 private external fun _nGetParagraphCache(ptr: NativePointer): NativePointer

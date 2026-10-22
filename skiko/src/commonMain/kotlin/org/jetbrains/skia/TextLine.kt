@@ -269,65 +269,96 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
 }
 
 
+// Runnable: returns the address of unrefTextLine without calling it
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetFinalizer")
 private external fun TextLine_nGetFinalizer(): NativePointer
 
+// Runnable: reads the stored TextLine::fWidth field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetWidth")
 private external fun TextLine_nGetWidth(ptr: NativePointer): Float
 
+// Runnable: computes from three stored TextLine floats: fAscent, fDescent, fLeading
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetHeight")
 private external fun TextLine_nGetHeight(ptr: NativePointer): Float
 
+// Runnable: reads the stored TextLine::fGlyphCount field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphsLength")
 private external fun TextLine_nGetGlyphsLength(ptr: NativePointer): Int
 
+// Native: loops over all fRuns and memcpys each run glyph array (cost grows with glyph count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphs")
+@ForceNativeThreadState
 private external fun TextLine_nGetGlyphs(ptr: NativePointer, resultGlyphs: InteropPointer, resultLength: Int)
 
+// Native: loops over all fRuns and memcpys each run position array (cost grows with glyph count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
+@ForceNativeThreadState
 private external fun TextLine_nGetPositions(ptr: NativePointer, resultArray: InteropPointer)
 
+// Runnable: reads the stored TextLine::fAscent field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetAscent")
 private external fun _nGetAscent(ptr: NativePointer): Float
 
+// Runnable: reads the stored TextLine::fCapHeight field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCapHeight")
 private external fun _nGetCapHeight(ptr: NativePointer): Float
 
+// Runnable: reads the stored TextLine::fXHeight field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetXHeight")
 private external fun _nGetXHeight(ptr: NativePointer): Float
 
+// Runnable: reads the stored TextLine::fDescent field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetDescent")
 private external fun _nGetDescent(ptr: NativePointer): Float
 
+// Runnable: reads the stored TextLine::fLeading field
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeading")
 private external fun _nGetLeading(ptr: NativePointer): Float
 
+// Runnable: SkTextBlob::ref is an atomic ref++ on the stored fBlob
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetTextBlob")
 private external fun _nGetTextBlob(ptr: NativePointer): NativePointer
 
+// Native: loops over all fRuns copying fPosition floats (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositions")
+@ForceNativeThreadState
 private external fun _nGetRunPositions(ptr: NativePointer, resultArray: InteropPointer)
 
+// Runnable: returns the size of the stored fRuns vector
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositionsCount")
 private external fun _nGetRunPositionsCount(ptr: NativePointer): Int
 
+// Native: loops over all fRuns summing fBreakPositions sizes (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositionsCount")
+@ForceNativeThreadState
 private external fun _nGetBreakPositionsCount(ptr: NativePointer): Int
 
+// Native: loops over all fRuns and memcpys fBreakPositions (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositions")
+@ForceNativeThreadState
 private external fun _nGetBreakPositions(ptr: NativePointer, result: InteropPointer)
 
+// Native: loops over all fRuns summing fBreakOffsets sizes (cost grows with run count)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsetsCount")
+@ForceNativeThreadState
 private external fun _nGetBreakOffsetsCount(ptr: NativePointer): Int
 
+// Native: loops over all fRuns and memcpys fBreakOffsets (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsets")
+@ForceNativeThreadState
 private external fun _nGetBreakOffsets(ptr: NativePointer, result: InteropPointer)
 
+// Native: linear scan over every run and break position (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
+@ForceNativeThreadState
 private external fun _nGetOffsetAtCoord(ptr: NativePointer, x: Float): Int
 
+// Native: linear scan over every run and break position (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord")
+@ForceNativeThreadState
 private external fun _nGetLeftOffsetAtCoord(ptr: NativePointer, x: Float): Int
 
+// Native: linear scan over every run and break offset (cost grows with text length)
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCoordAtOffset")
+@ForceNativeThreadState
 private external fun _nGetCoordAtOffset(ptr: NativePointer, offset: Int): Float

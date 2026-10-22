@@ -23,5 +23,6 @@ abstract class SVGNode internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 }
 
+// Runnable: SkSVGNode::tag returns the stored fTag
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGNode__1nGetTag")
 private external fun SVGNode_nGetTag(ptr: NativePointer): Int

@@ -169,13 +169,16 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
     }
 }
 
+// Runnable: returns the address of a delete function; the finalizer runs through Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nGetFinalizer")
 private external fun _nGetGraphiteContextFinalizer(): NativePointer
 
+// Native: ContextFactory::MakeMetal -> MtlSharedContext::Make -> retain of MTLDevice and MTLCommandQueue
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeMetal")
 @ForceNativeThreadState
 private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
+// Runnable: body only returns 0 and ignores all six arguments
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeVulkan")
 private external fun _nMakeVulkan(
     instancePtr: NativePointer,
@@ -186,10 +189,12 @@ private external fun _nMakeVulkan(
     maxApiVersion: Int,
 ): NativePointer
 
+// Native: Context::makeRecorder -> new Recorder -> backend MtlResourceProvider (Metal objects)
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeRecorder")
 @ForceNativeThreadState
 private external fun _nMakeRecorder(contextPtr: NativePointer): NativePointer
 
+// Native: Context::insertRecording -> QueueManager::addRecording (GPU work, Metal command buffer)
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nInsertRecording")
 @ForceNativeThreadState
 private external fun _nInsertRecording(
@@ -201,6 +206,7 @@ private external fun _nInsertRecording(
     signalSemaphoresCount: Int,
 )
 
+// Native: Context::submit -> QueueManager::submitToGpu -> MtlCommandBuffer::commit
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nSubmit")
 @ForceNativeThreadState
 private external fun _nSubmit(contextPtr: NativePointer, syncCpu: Boolean)

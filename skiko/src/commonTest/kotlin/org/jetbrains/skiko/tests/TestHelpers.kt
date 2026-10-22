@@ -93,47 +93,62 @@ class TestHelpers {
 }
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Runnable: writes five constant elements into the caller's array
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillByteArrayOf5")
 private external fun _nFillByteArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Runnable: writes five constant elements into the caller's array
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillFloatArrayOf5")
 private external fun _nFillFloatArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Runnable: writes five constant elements into the caller's array
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillShortArrayOf5")
 private external fun _nFillShortArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Runnable: writes five constant elements into the caller's array
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillIntArrayOf5")
 private external fun _nFillIntArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Runnable: writes five constant elements into the caller's array
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillDoubleArrayOf5")
 private external fun _nFillDoubleArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Runnable: copies 12 ints from three arrays into a malloc'd block (fixed size)
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nWriteArraysOfInts")
 private external fun _nWriteArraysOfInts(interopPointer: InteropPointer): NativePointer
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Native: TODO -> printf/fflush(stdout) can block on file or pipe I/O
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__nStringByIndex")
+@ForceNativeThreadState
 private external fun _nStringByIndex(index: Int): NativePointer
 
 internal fun nativeStringByIndex(index: Int): NativePointer = _nStringByIndex(index)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Native: XOpenDisplay -> glXCreateNewContext -> XMapWindow -> XIfEvent blocks waiting for MapNotify
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext")
+@ForceNativeThreadState
 private external fun TestGlContext_nCreate(): NativePointer
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Runnable: returns the address of the delete function
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nGlContextGetFinalizer")
 private external fun TestGlContext_nGetFinalizer(): NativePointer
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Native: glXMakeContextCurrent binds a GL context (X server round trip, GL driver)
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent")
+@ForceNativeThreadState
 private external fun TestGlContext_nMakeCurrent(ptr: NativePointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
+// Native: glXSwapBuffers presents the GL surface and may block on vsync or the X server
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers")
+@ForceNativeThreadState
 private external fun TestGlContext_nSwapBuffers(ptr: NativePointer)

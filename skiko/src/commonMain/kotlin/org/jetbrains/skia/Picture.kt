@@ -254,29 +254,37 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
     }
 }
 
+// Native: SkPictureData::parseStream -> SkTypeface::MakeDeserialize -> SkTypeface_Mac::MakeFromStream
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
 @ForceNativeThreadState
 private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
+// Runnable: SkPicture::cullRect returns the stored fCullRect
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
 private external fun _nGetCullRect(ptr: NativePointer, ltrb: InteropPointer)
 
+// Runnable: SkPicture::uniqueID returns the stored fUniqueID
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
 private external fun _nGetUniqueId(ptr: NativePointer): Int
 
+// Native: SkPicture::serialize -> SkPictureData::WriteTypefaces -> SkTypeface::serialize -> SkTypeface_Mac
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
 @ForceNativeThreadState
 private external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
 
+// Runnable: SkPicture::MakePlaceholder allocates an SkPicture with a null record
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
 private external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): NativePointer
 
+// Runnable: SkPicture::approximateOpCount(false) returns fRecord->count()
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
 private external fun _nGetApproximateOpCount(ptr: NativePointer): Int
 
+// Runnable: SkPicture::approximateBytesUsed sums stored sizes
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
 private external fun _nGetApproximateBytesUsed(ptr: NativePointer): Int
 
+// Runnable: SkPicture::makeShader -> SkPictureShader::Make only wraps the picture in a lazy shader
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
 private external fun _nMakeShader(
     ptr: NativePointer,
@@ -291,6 +299,7 @@ private external fun _nMakeShader(
     tileB: Float,
 ): NativePointer
 
+// Native: SkPicture::playback -> SkRecordDraw -> SkCanvas draw calls, KotlinAbortCallback::abort
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
 @ForceNativeThreadState
 private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, data: InteropPointer)

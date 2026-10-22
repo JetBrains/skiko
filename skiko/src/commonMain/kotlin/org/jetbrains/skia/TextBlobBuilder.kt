@@ -233,16 +233,20 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
 }
 
 
+// Runnable: returns the address of deleteTextBlobBuilder without calling it
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
 private external fun TextBlobBuilder_nGetFinalizer(): NativePointer
 
+// Runnable: new SkTextBlobBuilder only zero-initializes members and owns no typeface yet
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nMake")
 private external fun TextBlobBuilder_nMake(): NativePointer
 
+// Native: SkTextBlobBuilder::make -> updateDeferredBounds -> TightRunBounds -> SkFont::measureText -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nBuild")
 @ForceNativeThreadState
 private external fun _nBuild(ptr: NativePointer): NativePointer
 
+// Native: allocRun -> allocInternal -> updateDeferredBounds (previous run) -> SkFont::measureText -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
 @ForceNativeThreadState
 private external fun _nAppendRun(
@@ -252,6 +256,7 @@ private external fun _nAppendRun(
     bounds: InteropPointer
 )
 
+// Native: allocRunPosH -> allocInternal -> updateDeferredBounds (previous run) -> GetFontBounds -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
 @ForceNativeThreadState
 private external fun _nAppendRunPosH(
@@ -265,6 +270,7 @@ private external fun _nAppendRunPosH(
 )
 
 
+// Native: allocRunPos -> allocInternal -> updateDeferredBounds (previous run) -> GetFontBounds -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
 @ForceNativeThreadState
 private external fun _nAppendRunPos(
@@ -274,6 +280,7 @@ private external fun _nAppendRunPos(
     bounds: InteropPointer
 )
 
+// Native: allocRunRSXform -> allocInternal -> updateDeferredBounds (previous run) -> GetFontBounds -> CoreText
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
 @ForceNativeThreadState
 private external fun _nAppendRunRSXform(

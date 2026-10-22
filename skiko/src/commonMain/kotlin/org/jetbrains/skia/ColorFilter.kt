@@ -126,42 +126,63 @@ class ColorFilter : RefCnt {
 }
 
 
+// Runnable: SkColorFilter::makeComposed allocates SkComposeColorFilter holding two refs
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeComposed")
 private external fun _nMakeComposed(outer: NativePointer, inner: NativePointer): NativePointer
 
+// Native: SkColorFilters::Blend -> sk_srgb_singleton can wait for concurrent static initialization
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeBlend")
+@ForceNativeThreadState
 private external fun _nMakeBlend(color: Int, blendMode: Int): NativePointer
 
+// Runnable: SkColorFilters::Matrix checks 20 floats and allocates SkMatrixColorFilter
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeMatrix")
 private external fun _nMakeMatrix(rowMajor: InteropPointer): NativePointer
 
+// Runnable: SkColorFilters::HSLAMatrix checks 20 floats and allocates SkMatrixColorFilter
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix")
 private external fun _nMakeHSLAMatrix(rowMajor: InteropPointer): NativePointer
 
+// Native: SkColorFilters::LinearToSRGBGamma can wait for concurrent static initialization
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma")
+@ForceNativeThreadState
 private external fun _nGetLinearToSRGBGamma(): NativePointer
 
+// Native: SkColorFilters::SRGBToLinearGamma can wait for concurrent static initialization
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetSRGBToLinearGamma")
+@ForceNativeThreadState
 private external fun _nGetSRGBToLinearGamma(): NativePointer
 
+// Native: SkColorFilters::Lerp -> GetKnownRuntimeEffect(kLerp) -> make_lerp_shader compiles SkSL on first use
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLerp")
+@ForceNativeThreadState
 private external fun _nMakeLerp(t: Float, dstPtr: NativePointer, srcPtr: NativePointer): NativePointer
 
+// Native: SkColorFilters::Lighting -> SkColorFilters::Blend -> sk_srgb_singleton can wait
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLighting")
+@ForceNativeThreadState
 private external fun _nMakeLighting(colorMul: Int, colorAdd: Int): NativePointer
 
+// Native: SkHighContrastFilter::Make -> GetKnownRuntimeEffect(kHighContrast) compiles SkSL on first use
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHighContrast")
+@ForceNativeThreadState
 private external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): NativePointer
 
+// Runnable: SkColorFilters::Table copies a fixed 256-byte table into a 256x4 A8 SkBitmap
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTable")
 private external fun _nMakeTable(table: InteropPointer): NativePointer
 
+// Native: SkOverdrawColorFilter::MakeWithSkColors -> GetKnownRuntimeEffect(kOverdraw) compiles SkSL on first use
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
+@ForceNativeThreadState
 private external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): NativePointer
 
+// Native: SkLumaColorFilter::Make -> GetKnownRuntimeEffect(kLuma) -> make_luma_color_filter compiles SkSL
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLuma")
+@ForceNativeThreadState
 private external fun _nGetLuma(): NativePointer
 
+// Runnable: SkColorFilters::TableARGB copies four fixed 256-byte tables into a 256x4 A8 SkBitmap
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTableARGB")
 private external fun _nMakeTableARGB(
     a: InteropPointer,

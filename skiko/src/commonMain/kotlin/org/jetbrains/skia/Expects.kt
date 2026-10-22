@@ -45,9 +45,13 @@ expect annotation class ExternalSymbolName(val name: String)
  *   paragraph cache lock;
  * - call back into Kotlin, because the callback bridge switches the thread to the Native state
  *   when it returns;
- * - wait for another thread.
+ * - wait for another thread, or block in a system call, such as reading a file;
+ * - run CPU work that grows with its input, such as decoding or encoding an image, path
+ *   operations, or playing back a picture, because the GC waits for the call to return.
  *
- * Other bindings stay unmarked: getters and setters of plain values, geometry, and CPU work without text.
+ * A binding stays unmarked only when its native code is short and provably does none of the above.
+ * Without that proof, the binding is marked. A comment above each binding states the proof or
+ * the reason for the mark.
  */
 @InternalSkikoApi
 @OptIn(ExperimentalMultiplatform::class)

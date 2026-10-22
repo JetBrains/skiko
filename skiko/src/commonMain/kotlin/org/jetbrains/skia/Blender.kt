@@ -44,7 +44,9 @@ class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// Native: SkBlenders::Arithmetic -> GetKnownRuntimeEffect compiles SkSL in a function-local static
 @ExternalSymbolName("org_jetbrains_skia_Blender__1nMakeArithmetic")
+@ForceNativeThreadState
 private external fun _nMakeArithmetic(
     k1: Float,
     k2: Float,
@@ -53,5 +55,7 @@ private external fun _nMakeArithmetic(
     enforcePMColor: Boolean
 ): NativePointer
 
+// Native: SkBlender::Mode -> GetBlendModeSingleton can wait for function-local static initialization
 @ExternalSymbolName("org_jetbrains_skia_Blender__1nMakeMode")
+@ForceNativeThreadState
 private external fun _nMakeMode(mode: Int): NativePointer

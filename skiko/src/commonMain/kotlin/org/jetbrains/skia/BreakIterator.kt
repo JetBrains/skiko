@@ -536,44 +536,68 @@ private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer)
     }
 }
 
+// Runnable: returns the address of deleteBreakIterator
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
 private external fun BreakIterator_nGetFinalizer(): NativePointer
 
+// Native: ubrk_open -> BreakIterator::createInstance -> makeInstance loads rule data under ICU global locks
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
+@ForceNativeThreadState
 private external fun _nMake(type: Int, locale: InteropPointer, errorCode: InteropPointer): NativePointer
 
+// Runnable: RuleBasedBreakIterator::current returns fPosition
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nCurrent")
 private external fun _nCurrent(ptr: NativePointer): Int
 
+// Native: BreakCache::next -> populateFollowing -> populateDictionary segments a whole dictionary run
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nNext")
+@ForceNativeThreadState
 private external fun _nNext(ptr: NativePointer): Int
 
+// Native: BreakCache::previous -> populatePreceding scans back and may segment a dictionary run
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPrevious")
+@ForceNativeThreadState
 private external fun _nPrevious(ptr: NativePointer): Int
 
+// Native: first -> BreakCache::populateNear(0) runs the state machine and dictionary segmentation
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFirst")
+@ForceNativeThreadState
 private external fun _nFirst(ptr: NativePointer): Int
 
+// Native: last -> isBoundary(end) -> populateNear scans back over the text with safe-reverse rules
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nLast")
+@ForceNativeThreadState
 private external fun _nLast(ptr: NativePointer): Int
 
+// Native: preceding -> BreakCache::preceding -> populateNear scans back from an arbitrary offset
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPreceding")
+@ForceNativeThreadState
 private external fun _nPreceding(ptr: NativePointer, offset: Int): Int
 
+// Native: following -> BreakCache::following -> populateNear scans from an arbitrary offset
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFollowing")
+@ForceNativeThreadState
 private external fun _nFollowing(ptr: NativePointer, offset: Int): Int
 
+// Native: isBoundary -> BreakCache::populateNear scans back from an arbitrary offset, then next()
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nIsBoundary")
+@ForceNativeThreadState
 private external fun _nIsBoundary(ptr: NativePointer, offset: Int): Boolean
 
+// Runnable: getRuleStatus indexes the compiled rule status table
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatus")
 private external fun _nGetRuleStatus(ptr: NativePointer): Int
 
+// Runnable: getRuleStatusVec with capacity 0 returns a count from the status table
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen")
 private external fun _nGetRuleStatusesLen(ptr: NativePointer): Int
 
+// Native: ubrk_getRuleStatusVec -> RuleBasedBreakIterator::getRuleStatusVec loops over rule statuses
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatuses")
+@ForceNativeThreadState
 private external fun _nGetRuleStatuses(ptr: NativePointer, result: InteropPointer, len: Int)
 
+// Native: copies the whole text into a std::vector, then ubrk_setText resets caches and calls first()
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
+@ForceNativeThreadState
 private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int, errorCode: InteropPointer): NativePointer

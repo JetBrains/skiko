@@ -42,9 +42,11 @@ class TypefaceFontProviderWithFallback private constructor(
     }
 }
 
+// Runnable: new TypefaceFontProviderWithFallback() creates empty maps and an empty typeface vector
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallback__1nMakeAsFallbackProvider")
 private external fun _nMakeAsFallbackProvider(): NativePointer
 
+// Native: registerTypeface -> SkTypeface_Mac::onGetFamilyName -> CTFontCopyFamilyName (alias null)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallback__1nRegisterTypefaceForFallback")
 @ForceNativeThreadState
 private external fun _nRegisterTypefaceForFallback(

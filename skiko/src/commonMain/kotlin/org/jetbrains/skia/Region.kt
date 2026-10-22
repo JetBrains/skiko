@@ -412,85 +412,125 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 }
 
+// Runnable: new SkRegion only stores empty bounds and the shared empty run head
 @ExternalSymbolName("org_jetbrains_skia_Region__1nMake")
 private external fun Region_nMake(): NativePointer
 
+// Runnable: returns the address of deleteRegion
 @ExternalSymbolName("org_jetbrains_skia_Region__1nGetFinalizer")
 private external fun Region_nGetFinalizer(): NativePointer
 
+// Runnable: SkRegion::isEmpty compares fRunHead to the empty head pointer
 @ExternalSymbolName("org_jetbrains_skia_Region__1nIsEmpty")
 private external fun Region_nIsEmpty(ptr: NativePointer): Boolean
 
+// Runnable: SkRegion::isRect compares fRunHead to the rect head pointer
 @ExternalSymbolName("org_jetbrains_skia_Region__1nIsRect")
 private external fun Region_nIsRect(ptr: NativePointer): Boolean
 
+// Runnable: SkRegion::getBounds returns the stored fBounds
 @ExternalSymbolName("org_jetbrains_skia_Region__1nGetBounds")
 private external fun Region_nGetBounds(ptr: NativePointer, ltrb: InteropPointer)
 
+// Runnable: SkRegion::set -> setRegion shares the run block by refcount, no copy
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSet")
 private external fun Region_nSet(ptr: NativePointer, regionPtr: NativePointer): Boolean
 
+// Runnable: SkRegion::isComplex is two pointer comparisons
 @ExternalSymbolName("org_jetbrains_skia_Region__1nIsComplex")
 private external fun Region_nIsComplex(ptr: NativePointer): Boolean
 
+// Runnable: SkRegion::computeRegionComplexity returns a stored interval count
 @ExternalSymbolName("org_jetbrains_skia_Region__1nComputeRegionComplexity")
 private external fun Region_nComputeRegionComplexity(ptr: NativePointer): Int
 
+// Native: SkRegion::addBoundaryPath -> Iterator over all spans -> SkTQSort edges, path grows with region
 @ExternalSymbolName("org_jetbrains_skia_Region__1nAddBoundaryPath")
+@ForceNativeThreadState
 private external fun Region_nAddBoundaryPath(ptr: NativePointer, pathBuilderPtr: NativePointer): Boolean
 
+// Native: SkRegion::getBoundaryPath -> addBoundaryPath sorts and links all edges, copies SkPath
 @ExternalSymbolName("org_jetbrains_skia_Region__1nGetBoundaryPath")
+@ForceNativeThreadState
 private external fun Region_nGetBoundaryPath(ptr: NativePointer): NativePointer
 
+// Runnable: SkRegion::setEmpty -> freeRuns decrements the run refcount, plain sk_free at zero
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetEmpty")
 private external fun Region_nSetEmpty(ptr: NativePointer): Boolean
 
+// Runnable: SkRegion::setRect -> freeRuns of old runs, then stores bounds and the rect head
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRect")
 private external fun Region_nSetRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
+// Native: SkRegion::setRects loops all rects and unions halves with SkRegion::op, input-sized
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRects")
+@ForceNativeThreadState
 private external fun Region_nSetRects(ptr: NativePointer, rects: InteropPointer, count: Int): Boolean
 
+// Runnable: SkRegion::setRegion shares the run block by refcount, no copy
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRegion")
 private external fun Region_nSetRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
 
+// Native: SkRegion::setPath -> SkScan::FillPath scan-converts the path into runs
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetPath")
+@ForceNativeThreadState
 private external fun Region_nSetPath(ptr: NativePointer, pathPtr: NativePointer, regionPtr: NativePointer): Boolean
 
+// Native: SkRegion::intersects(rect) -> findScanline and scanline walk grow with scanline count
 @ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsIRect")
+@ForceNativeThreadState
 private external fun Region_nIntersectsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
+// Native: SkRegion::intersects(region) walks the scanlines of both regions
 @ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsRegion")
+@ForceNativeThreadState
 private external fun Region_nIntersectsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
 
+// Native: SkRegion::contains(x,y) -> RunHead::findScanline loops over scanlines
 @ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIPoint")
+@ForceNativeThreadState
 private external fun Region_nContainsIPoint(ptr: NativePointer, x: Int, y: Int): Boolean
 
+// Native: SkRegion::contains(rect) -> findScanline and scanline_contains loop over scanlines
 @ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIRect")
+@ForceNativeThreadState
 private external fun Region_nContainsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
+// Native: SkRegion::contains(region) walks the runs of both regions
 @ExternalSymbolName("org_jetbrains_skia_Region__1nContainsRegion")
+@ForceNativeThreadState
 private external fun Region_nContainsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
 
+// Runnable: SkRegion::quickContains compares the head pointer and the stored bounds
 @ExternalSymbolName("org_jetbrains_skia_Region__1nQuickContains")
 private external fun Region_nQuickContains(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
+// Runnable: SkRegion::quickReject(rect) is isEmpty plus a bounds intersection test
 @ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectIRect")
 private external fun Region_nQuickRejectIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
+// Runnable: SkRegion::quickReject(region) is isEmpty plus a bounds intersection test
 @ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectRegion")
 private external fun Region_nQuickRejectRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
 
+// Native: SkRegion::translate -> rewrites every run of a complex region (ensureWritable copy)
 @ExternalSymbolName("org_jetbrains_skia_Region__1nTranslate")
+@ForceNativeThreadState
 private external fun Region_nTranslate(ptr: NativePointer, dx: Int, dy: Int)
 
+// Native: SkRegion::op -> Oper merges the runs of both regions into a new run array
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRect")
+@ForceNativeThreadState
 private external fun Region_nOpIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int, op: Int): Boolean
 
+// Native: SkRegion::op -> Oper merges the runs of both regions into a new run array
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegion")
+@ForceNativeThreadState
 private external fun Region_nOpRegion(ptr: NativePointer, regionPtr: NativePointer, op: Int): Boolean
 
+// Native: SkRegion::op -> Oper merges the runs of both regions into a new run array
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRectRegion")
+@ForceNativeThreadState
 private external fun Region_nOpIRectRegion(
     ptr: NativePointer,
     left: Int,
@@ -501,7 +541,9 @@ private external fun Region_nOpIRectRegion(
     op: Int
 ): Boolean
 
+// Native: SkRegion::op -> Oper merges the runs of both regions into a new run array
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionIRect")
+@ForceNativeThreadState
 private external fun Region_nOpRegionIRect(
     ptr: NativePointer,
     regionPtr: NativePointer,
@@ -512,7 +554,9 @@ private external fun Region_nOpRegionIRect(
     op: Int
 ): Boolean
 
+// Native: SkRegion::op -> Oper merges the runs of both regions into a new run array
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionRegion")
+@ForceNativeThreadState
 private external fun Region_nOpRegionRegion(
     ptr: NativePointer,
     regionPtrA: NativePointer,

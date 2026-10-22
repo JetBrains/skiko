@@ -97,23 +97,33 @@ private fun makeParagraphBuilder(
     }
 }
 
+// Runnable: returns &deleteParagraphBuilder; the delete itself runs in Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
 private external fun ParagraphBuilder_nGetFinalizer(): NativePointer
 
+// Native: SkUnicodes::ICU::Make -> SkLoadICU -> win_mmap reads icudtl.dat via _wfopen (Windows)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
+@ForceNativeThreadState
 private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
 
+// Native: ParagraphBuilderImpl::pushStyle copies TextStyle vectors and calls TextStyle::equals
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
+@ForceNativeThreadState
 private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
+// Native: ParagraphBuilderImpl::pop -> ~TextStyle/~Block can drop the last typeface or shader ref
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
 @ForceNativeThreadState
 private external fun _nPopStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
+// Native: ParagraphBuilderImpl::addText -> SkString append copies the whole text
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
+@ForceNativeThreadState
 private external fun _nAddText(ptr: NativePointer, text: InteropPointer)
 
+// Native: ParagraphBuilderImpl::addPlaceholder -> TextStyle::cloneForPlaceholder copies style vectors
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
+@ForceNativeThreadState
 private external fun _nAddPlaceholder(
     ptr: NativePointer,
     width: Float,
@@ -123,5 +133,7 @@ private external fun _nAddPlaceholder(
     baseline: Float
 )
 
+// Native: ParagraphBuilderImpl::Build -> make_unique<ParagraphImpl> copies text, blocks and placeholders
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
+@ForceNativeThreadState
 private external fun _nBuild(ptr: NativePointer): NativePointer

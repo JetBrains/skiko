@@ -1,6 +1,7 @@
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.*
 
 class LineMetrics(
@@ -170,11 +171,16 @@ class LineMetrics(
     }
 }
 
+// Runnable: std::vector::size of the LineMetrics array
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArraySize")
 private external fun LineMetrics_nGetArraySize(array: InteropPointer): Int
 
+// Native: delete vector<LineMetrics> destroys every line std::map of StyleMetrics, growing with line count
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nDisposeArray")
+@ForceNativeThreadState
 private external fun LineMetrics_nDisposeArray(array: InteropPointer)
 
+// Native: LineMetrics copy duplicates the fLineMetrics std::map, growing with the style runs on the line
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement")
+@ForceNativeThreadState
 private external fun LineMetrics_nGetArrayElement(array: InteropPointer, index: Int, intArgs: InteropPointer, doubleArgs: InteropPointer)

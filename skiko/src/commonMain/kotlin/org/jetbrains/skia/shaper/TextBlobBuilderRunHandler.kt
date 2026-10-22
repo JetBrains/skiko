@@ -79,12 +79,15 @@ class TextBlobBuilderRunHandler internal constructor(
     }
 }
 
+// Runnable: returns the address of deleteTextBlobBuilderRunHandler only
 @ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nGetFinalizer")
 private external fun TextBlobBuilderRunHandler_nGetFinalizer(): NativePointer
 
+// Runnable: new SkTextBlobBuilderRunHandler stores the text pointer and offset, builder starts empty
 @ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nMake")
 private external fun TextBlobBuilderRunHandler_nMake(textPtr: NativePointer, offsetX: Float, offsetY: Float): NativePointer
 
+// Native: SkTextBlobBuilder::make -> updateDeferredBounds -> TightRunBounds -> SkFont::getBounds -> glyph metrics
 @ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nMakeBlob")
 @ForceNativeThreadState
 private external fun _nMakeBlob(ptr: NativePointer): NativePointer

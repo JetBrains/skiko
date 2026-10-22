@@ -283,6 +283,7 @@ private fun disposeCallback(ptr: COpaquePointer) {
     ptr.asStableRef<Any>().dispose()
 }
 
+// Runnable: stores five function pointers into globals
 @ExternalSymbolName("skiko_initCallbacks")
 private external fun initCallbacks(
     callBoolean: COpaquePointer,

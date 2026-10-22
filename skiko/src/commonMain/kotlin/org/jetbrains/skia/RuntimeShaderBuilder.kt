@@ -145,55 +145,86 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
     }
 }
 
+// Native: SkRuntimeEffectBuilder -> SkData::MakeZeroInitialized clears input-sized uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeFromRuntimeEffect")
+@ForceNativeThreadState
 private external fun _nMakeFromRuntimeEffect(effectPtr: NativePointer): NativePointer
 
+// Runnable: returns the address of deleteRuntimeShaderBuilder
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nGetFinalizer")
 private external fun RuntimeShaderBuilder_nGetFinalizer(): NativePointer
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt")
+@ForceNativeThreadState
 private external fun _nUniformInt(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue: Int)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt2")
+@ForceNativeThreadState
 private external fun _nUniformInt2(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt3")
+@ForceNativeThreadState
 private external fun _nUniformInt3(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int, uniformValue3: Int)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt4")
+@ForceNativeThreadState
 private external fun _nUniformInt4(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int, uniformValue3: Int, uniformValue4: Int)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat")
+@ForceNativeThreadState
 private external fun _nUniformFloat(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue: Float)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat2")
+@ForceNativeThreadState
 private external fun _nUniformFloat2(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat3")
+@ForceNativeThreadState
 private external fun _nUniformFloat3(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float, uniformValue3: Float)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat4")
+@ForceNativeThreadState
 private external fun _nUniformFloat4(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float, uniformValue3: Float, uniformValue4: Float)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatArray")
+@ForceNativeThreadState
 private external fun _nUniformFloatArray(builderPtr: NativePointer, uniformName: InteropPointer, uniformFloatArray: InteropPointer, length: Int)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix22")
+@ForceNativeThreadState
 private external fun _nUniformFloatMatrix22(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix22: InteropPointer)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix33")
+@ForceNativeThreadState
 private external fun _nUniformFloatMatrix33(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix33: InteropPointer)
 
+// Native: skString -> SkString copies the input name; SkRuntimeEffect::findUniform scans uniforms
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix44")
+@ForceNativeThreadState
 private external fun _nUniformFloatMatrix44(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix44: InteropPointer)
 
+// Native: assigning a child ChildPtr drops the old shader, whose last unref can free image or text
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildShader")
 @ForceNativeThreadState
 private external fun _nChildShader(builderPtr: NativePointer, uniformName: InteropPointer, shaderPtr: NativePointer)
 
+// Native: assigning a child ChildPtr drops the old filter, whose last unref can free image or shader
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildColorFilter")
 @ForceNativeThreadState
 private external fun _nChildColorFilter(builderPtr: NativePointer, uniformName: InteropPointer, colorFilterPtr: NativePointer)
 
+// Native: SkRuntimeEffectBuilder::makeShader -> verify_child_effects scans input-sized children
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeShader")
+@ForceNativeThreadState
 private external fun _nMakeShader(builderPtr: NativePointer, localMatrix: InteropPointer): NativePointer

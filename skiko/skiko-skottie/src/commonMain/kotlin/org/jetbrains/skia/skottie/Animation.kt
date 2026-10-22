@@ -298,18 +298,26 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 }
 
 
+// Runnable: returns the address of a delete function; the finalizer runs through Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
 private external fun _nGetFinalizer(): NativePointer
 
+// Native: skString copy -> Animation::Builder::make -> skjson::DOM parse and scene build, may log to Kotlin
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromString")
+@ForceNativeThreadState
 private external fun _nMakeFromString(data: InteropPointer): NativePointer
 
+// Native: Animation::MakeFromFile -> Builder::makeFromFile -> SkData::MakeFromFileName (file read) -> parse
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
+@ForceNativeThreadState
 internal external fun _nMakeFromFile(path: InteropPointer): NativePointer
 
+// Native: Animation::Make(SkStream*) -> SkData::MakeFromStream copy -> Builder::make JSON parse and build
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromData")
+@ForceNativeThreadState
 private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
 
+// Native: Animation::render -> sksg RenderNode::render -> SkCanvas draw calls (GPU-backed canvas, text)
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nRender")
 @ForceNativeThreadState
 private external fun _nRender(
@@ -323,32 +331,41 @@ private external fun _nRender(
 )
 
 
+// Native: Animation::seekFrame -> TextAdapter::onSync -> reshape -> Shaper::Shape (font API) and revalidate
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeek")
 @ForceNativeThreadState
 private external fun _nSeek(ptr: NativePointer, t: Float, icPtr: NativePointer)
 
+// Native: Animation::seekFrame -> TextAdapter::onSync -> reshape -> Shaper::Shape (font API) and revalidate
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrame")
 @ForceNativeThreadState
 private external fun _nSeekFrame(ptr: NativePointer, t: Float, icPtr: NativePointer)
 
+// Native: Animation::seekFrame -> TextAdapter::onSync -> reshape -> Shaper::Shape (font API) and revalidate
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
 @ForceNativeThreadState
 private external fun _nSeekFrameTime(ptr: NativePointer, t: Float, icPtr: NativePointer)
 
+// Runnable: Animation::duration returns a stored double field
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetDuration")
 private external fun _nGetDuration(ptr: NativePointer): Float
 
+// Runnable: Animation::fps returns a stored double field
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFPS")
 private external fun _nGetFPS(ptr: NativePointer): Float
 
+// Runnable: Animation::inPoint returns a stored double field
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetInPoint")
 private external fun _nGetInPoint(ptr: NativePointer): Float
 
+// Runnable: Animation::outPoint returns a stored double field
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetOutPoint")
 private external fun _nGetOutPoint(ptr: NativePointer): Float
 
+// Runnable: Animation::version returns the address of the stored SkString fVersion
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetVersion")
 private external fun _nGetVersion(ptr: NativePointer): NativePointer
 
+// Runnable: Animation::size returns a stored SkSize; Point::copyToInterop writes two floats
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetSize")
 private external fun _nGetSize(ptr: NativePointer, dst: InteropPointer)

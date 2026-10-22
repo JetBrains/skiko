@@ -48,6 +48,7 @@ fun Surface.Companion.wrapBackendTexture(
     }
 }
 
+// Native: SkSurfaces::WrapBackendTexture -> MtlResourceProvider::createWrappedTexture -> Device::Make
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_SurfaceFactory__1nWrapBackendTexture")
 @ForceNativeThreadState
 private external fun _nWrapBackendTexture(

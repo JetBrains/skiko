@@ -584,80 +584,108 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     }
 }
 
+// Runnable: returns the address of deleteTextStyle; the finalizer itself runs via Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFinalizer")
 private external fun TextStyle_nGetFinalizer(): NativePointer
 
+// Runnable: TextStyle() copies one fixed default family and creates paints with null effect refs and no typeface
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nMake")
 private external fun TextStyle_nMake(): NativePointer
 
+// Native: TextStyle::equals compares arbitrary-length family, shadow and feature vectors
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nEquals")
+@ForceNativeThreadState
 private external fun TextStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
+// Runnable: TextStyle::getFontStyle returns a stored SkFontStyle packed into an int
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle")
 private external fun TextStyle_nGetFontStyle(ptr: NativePointer): Int
 
+// Runnable: TextStyle::setFontStyle stores a packed SkFontStyle value
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle")
 private external fun TextStyle_nSetFontStyle(ptr: NativePointer, fontStyle: Int)
 
+// Runnable: TextStyle::getFontSize returns a stored field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontSize")
 private external fun TextStyle_nGetFontSize(ptr: NativePointer): Float
 
+// Runnable: TextStyle::setFontSize stores a field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontSize")
 private external fun TextStyle_nSetFontSize(ptr: NativePointer, size: Float)
 
+// Native: TextStyle::getFontFamilies feeds an arbitrary-length loop allocating SkString wrappers
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies")
+@ForceNativeThreadState
 private external fun TextStyle_nGetFontFamilies(ptr: NativePointer): NativePointer
 
+// Runnable: TextStyle::getHeightOverride/getHeight return stored fields
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetHeight")
 private external fun TextStyle_nGetHeight(ptr: NativePointer): Float
 
+// Runnable: TextStyle::setHeightOverride/setHeight store fields
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHeight")
 private external fun TextStyle_nSetHeight(ptr: NativePointer, override: Boolean, height: Float)
 
+// Runnable: TextStyle::getHalfLeading compares a stored field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetHalfLeading")
 private external fun TextStyle_nGetHalfLeading(ptr: NativePointer): Boolean
 
+// Runnable: TextStyle::setHalfLeading stores a field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHalfLeading")
 private external fun TextStyle_nSetHalfLeading(ptr: NativePointer, value: Boolean)
 
+// Runnable: TextStyle::getTopRatio returns a stored field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetTopRatio")
 private external fun TextStyle_nGetTopRatio(ptr: NativePointer): Float
 
+// Runnable: TextStyle::setTopRatio stores a field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetTopRatio")
 private external fun TextStyle_nSetTopRatio(ptr: NativePointer, value: Float)
 
+// Runnable: TextStyle::getBaselineShift returns a stored field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineShift")
 private external fun TextStyle_nGetBaselineShift(ptr: NativePointer): Float
 
+// Runnable: TextStyle::setBaselineShift stores a field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineShift")
 private external fun TextStyle_nSetBaselineShift(ptr: NativePointer, baselineShift: Float)
 
+// Native: TextStyle::equalsByFonts and TextStyle::matchOneAttribute compare arbitrary-length vectors
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAttributeEquals")
+@ForceNativeThreadState
 private external fun _nAttributeEquals(ptr: NativePointer, attribute: Int, otherPtr: NativePointer): Boolean
 
+// Runnable: TextStyle::getColor returns a stored SkColor
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetColor")
 private external fun _nGetColor(ptr: NativePointer): Int
 
+// Runnable: TextStyle::setColor stores a SkColor
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetColor")
 private external fun _nSetColor(ptr: NativePointer, color: Int)
 
+// Runnable: new SkPaint copy only adds refs; TextStyle keeps its own refs so no last unref
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetForeground")
 private external fun _nGetForeground(ptr: NativePointer): NativePointer
 
+// Native: setForegroundColor -> assign fForeground drops old SkPaint -> last unref of shader or GPU image
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetForeground")
 @ForceNativeThreadState
 private external fun _nSetForeground(ptr: NativePointer, paintPtr: NativePointer)
 
+// Runnable: new SkPaint copy only adds refs; TextStyle keeps its own refs so no last unref
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBackground")
 private external fun _nGetBackground(ptr: NativePointer): NativePointer
 
+// Native: setBackgroundColor -> assign fBackground drops old SkPaint -> last unref of shader or GPU image
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetBackground")
 @ForceNativeThreadState
 private external fun _nSetBackground(ptr: NativePointer, paintPtr: NativePointer)
 
+// Runnable: TextStyle::getDecoration returns a small POD copied into the result array
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle")
 private external fun _nGetDecorationStyle(ptr: NativePointer, decorationStyle: InteropPointer)
 
+// Runnable: TextStyle decoration setters store POD fields
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetDecorationStyle")
 private external fun _nSetDecorationStyle(
     ptr: NativePointer,
@@ -670,88 +698,126 @@ private external fun _nSetDecorationStyle(
     thicknessMultiplier: Float
 )
 
+// Native: TextStyle::getShadows copies the entire shadow vector before size()
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetShadowsCount")
+@ForceNativeThreadState
 private external fun _nGetShadowsCount(ptr: NativePointer): Int
 
+// Native: TextStyle::getShadows copies every shadow, then the binding serializes the whole vector
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetShadows")
+@ForceNativeThreadState
 private external fun _nGetShadows(ptr: NativePointer, res: InteropPointer)
 
+// Native: TextStyle::addShadow -> std::vector::emplace_back may relocate the entire shadow vector
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddShadow")
+@ForceNativeThreadState
 private external fun _nAddShadow(ptr: NativePointer, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
 
+// Native: TextStyle::resetShadows -> std::vector::clear may traverse every shadow
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nClearShadows")
+@ForceNativeThreadState
 private external fun _nClearShadows(ptr: NativePointer)
 
+// Native: TextStyle::getFontFeatures copies all features; skija::FontFeature::writeToIntArray loops over them
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures")
+@ForceNativeThreadState
 private external fun _nGetFontFeatures(ptr: NativePointer, resultIntsArray: InteropPointer)
 
+// Native: TextStyle::getFontFeatures copies the entire feature vector before size()
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeaturesSize")
+@ForceNativeThreadState
 private external fun _nGetFontFeaturesSize(ptr: NativePointer): Int
 
+// Native: TextStyle::addFontFeature -> std::vector::emplace_back may relocate every existing feature
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature")
+@ForceNativeThreadState
 private external fun _nAddFontFeature(ptr: NativePointer, name: InteropPointer, value: Int)
 
+// Native: TextStyle::resetFontFeatures -> std::vector::clear destroys every FontFeature and SkString
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nClearFontFeatures")
+@ForceNativeThreadState
 private external fun _nClearFontFeatures(ptr: NativePointer)
 
+// Native: skStringVector loops over all families; skString -> SkString::SkString scans and copies names
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies")
+@ForceNativeThreadState
 private external fun _nSetFontFamilies(ptr: NativePointer, families: InteropPointer, familiesSize: Int)
 
+// Runnable: TextStyle::getLetterSpacing returns a stored field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetLetterSpacing")
 private external fun _nGetLetterSpacing(ptr: NativePointer): Float
 
+// Runnable: TextStyle::setLetterSpacing stores a field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetLetterSpacing")
 private external fun _nSetLetterSpacing(ptr: NativePointer, letterSpacing: Float)
 
+// Runnable: TextStyle::getWordSpacing returns a stored field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetWordSpacing")
 private external fun _nGetWordSpacing(ptr: NativePointer): Float
 
+// Runnable: TextStyle::setWordSpacing stores a field
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetWordSpacing")
 private external fun _nSetWordSpacing(ptr: NativePointer, wordSpacing: Float)
 
+// Runnable: refTypeface().release() is a ref++ on the typeface TextStyle keeps owning, never a dealloc
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetTypeface")
 private external fun _nGetTypeface(ptr: NativePointer): NativePointer
 
+// Native: TextStyle::setTypeface -> drops old sk_sp<SkTypeface> -> ~SkTypeface_Mac -> CFRelease(fFontRef)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetTypeface")
 @ForceNativeThreadState
 private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
 
+// Runnable: copies the locale SkString
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetLocale")
 private external fun _nGetLocale(ptr: NativePointer): NativePointer
 
+// Native: skString -> SkString::SkString calls strlen and SkString::Rec::Make copies the locale bytes
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetLocale")
+@ForceNativeThreadState
 private external fun _nSetLocale(ptr: NativePointer, locale: InteropPointer)
 
+// Runnable: TextStyle::getTextBaseline returns a stored enum
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineMode")
 private external fun _nGetBaselineMode(ptr: NativePointer): Int
 
+// Runnable: TextStyle::setTextBaseline stores an enum
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineMode")
 private external fun _nSetBaselineMode(ptr: NativePointer, mode: Int)
 
+// Native: SkFont::getMetrics -> SkStrikeSpec::findOrCreateStrike -> SkTypeface_Mac::onFilterRec
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics")
 @ForceNativeThreadState
 private external fun _nGetFontMetrics(ptr: NativePointer, fontMetrics: InteropPointer)
 
+// Runnable: TextStyle::isPlaceholder returns a stored flag
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nIsPlaceholder")
 private external fun _nIsPlaceholder(ptr: NativePointer): Boolean
 
+// Runnable: TextStyle::setPlaceholder sets a stored flag
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetPlaceholder")
 private external fun _nSetPlaceholder(ptr: NativePointer)
 
+// Runnable: TextStyle::getFontEdging returns a stored enum
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontEdging")
 private external fun _nGetFontEdging(ptr: NativePointer): Int
 
+// Runnable: TextStyle::setFontEdging stores an enum
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontEdging")
 private external fun _nSetFontEdging(ptr: NativePointer, fontEdging: Int)
 
+// Runnable: TextStyle::getSubpixel returns a stored flag
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetSubpixel")
 private external fun _nGetSubpixel(ptr: NativePointer): Boolean
 
+// Runnable: TextStyle::setSubpixel stores a flag
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetSubpixel")
 private external fun _nSetSubpixel(ptr: NativePointer, subpixel: Boolean)
 
+// Runnable: TextStyle::getFontHinting returns a stored enum
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontHinting")
 private external fun _nGetFontHinting(ptr: NativePointer): Int
 
+// Runnable: TextStyle::setFontHinting stores an enum
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontHinting")
 private external fun _nSetFontHinting(ptr: NativePointer, fontHinting: Int)

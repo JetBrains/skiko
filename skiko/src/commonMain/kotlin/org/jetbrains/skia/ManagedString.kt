@@ -61,26 +61,40 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
     }
 }
 
+// Runnable: returns the address of skikoMpp::finalizers::deleteString, no work here
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nGetFinalizer")
 internal external fun ManagedString_nGetFinalizer(): NativePointer
 
+// Native: skString(textStr) runs strlen and copies the whole text into a new SkString
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nMake")
+@ForceNativeThreadState
 private external fun _nMake(s: InteropPointer): NativePointer
 
+// Runnable: SkString::size returns the stored length field
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringSize")
 private external fun _nStringSize(ptr: NativePointer): Int
 
+// Native: memcpy copies the whole string into the caller buffer
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringData")
+@ForceNativeThreadState
 private external fun _nStringData(ptr: NativePointer, result: InteropPointer, size: Int)
 
+// Native: UtfIndicesConverter::from16To8 scans UTF-8 up to the offset, then SkString::insert copies
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nInsert")
+@ForceNativeThreadState
 private external fun _nInsert(ptr: NativePointer, offset: Int, s: InteropPointer)
 
+// Native: skString(s) strlen-copies the argument, then SkString::append reallocates and copies
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nAppend")
+@ForceNativeThreadState
 private external fun _nAppend(ptr: NativePointer, s: InteropPointer)
 
+// Native: UtfIndicesConverter::from16To8 scans UTF-8 to the offset, then SkString::remove shifts bytes
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nRemoveSuffix")
+@ForceNativeThreadState
 private external fun _nRemoveSuffix(ptr: NativePointer, from: Int)
 
+// Native: UtfIndicesConverter::from16To8 scans UTF-8 to from and to, then SkString::remove shifts bytes
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nRemove")
+@ForceNativeThreadState
 private external fun _nRemove(ptr: NativePointer, from: Int, length: Int)

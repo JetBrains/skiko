@@ -61,6 +61,7 @@ actual abstract class Managed actual constructor(
         get() = _ptr == NullPointer
 }
 
+// Native: finalizer_f(obj) runs any class finalizer, e.g. ~SkTypeface_Mac CFRelease or GPU object release
 @ExternalSymbolName("org_jetbrains_skia_impl_Managed__invokeFinalizer")
 @ForceNativeThreadState
 internal external fun _nInvokeFinalizer(finalizer: NativePointer, ptr: NativePointer)

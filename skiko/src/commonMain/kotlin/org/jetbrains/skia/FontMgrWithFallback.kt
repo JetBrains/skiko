@@ -14,6 +14,7 @@ class FontMgrWithFallback(
     fallbackProvider: TypefaceFontProviderWithFallback
 ) : FontMgr(_nDefaultWithFallbackFontProvider(fallbackProvider._ptr))
 
+// Native: FontMgrWithFallbackWrapper ctor -> SkFontMgrSkikoDefault -> SkFontMgr_New_CoreText -> CoreText collection
 @ExternalSymbolName("org_jetbrains_skia_FontMgrWithFallback__1nDefaultWithFallbackFontProvider")
 @ForceNativeThreadState
 private external fun _nDefaultWithFallbackFontProvider(fallbackPtr: NativePointer): NativePointer

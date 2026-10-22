@@ -589,121 +589,164 @@ class Paint : Managed {
     }
 }
 
+// Runnable: returns the address of deletePaint; the finalizer runs through Managed__invokeFinalizer
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFinalizer")
 private external fun Paint_nGetFinalizer(): NativePointer
 
+// Runnable: new SkPaint is plain fields with null sk_sp members, then setAntiAlias
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nMake")
 private external fun Paint_nMake(): NativePointer
 
+// Runnable: SkPaint copy constructor copies fields and increments six sk_sp refs
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nMakeClone")
 private external fun Paint_nMakeClone(ptr: NativePointer): NativePointer
 
+// Runnable: operator== compares sk_sp pointers and plain fields
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nEquals")
 private external fun Paint_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
+// Native: SkPaint::reset -> *this=SkPaint() -> unref old shader/filters -> ~SkImage_Ganesh -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nReset")
 @ForceNativeThreadState
 private external fun Paint_nReset(ptr: NativePointer)
 
+// Runnable: SkPaint::isAntiAlias reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsAntiAlias")
 private external fun _nIsAntiAlias(ptr: NativePointer): Boolean
 
+// Runnable: SkPaint::setAntiAlias writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetAntiAlias")
 private external fun _nSetAntiAlias(ptr: NativePointer, value: Boolean)
 
+// Runnable: SkPaint::isDither reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsDither")
 private external fun _nIsDither(ptr: NativePointer): Boolean
 
+// Runnable: SkPaint::setDither writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetDither")
 private external fun _nSetDither(ptr: NativePointer, value: Boolean)
 
+// Runnable: SkPaint::getStyle reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetMode")
 private external fun _nGetMode(ptr: NativePointer): Int
 
+// Runnable: SkPaint::setStyle range-checks and writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetMode")
 private external fun _nSetMode(ptr: NativePointer, value: Int)
 
+// Runnable: SkPaint::getColor converts the stored SkColor4f to SkColor
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor")
 private external fun Paint_nGetColor(ptr: NativePointer): Int
 
+// Runnable: SkPaint::getColor4f returns the stored SkColor4f; four float stores follow
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor4f")
 private external fun _nGetColor4f(ptr: NativePointer, arr: InteropPointer)
 
+// Runnable: SkPaint::setColor stores SkColor4f::FromColor
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColor")
 private external fun _nSetColor(ptr: NativePointer, argb: Int)
 
+// Native: SkPaint::setColor4f -> SkColorSpace::invTransferFn -> SkOnce::operator() waits for initialization
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColor4f")
+@ForceNativeThreadState
 private external fun _nSetColor4f(ptr: NativePointer, r: Float, g: Float, b: Float, a: Float, colorSpacePtr: NativePointer)
 
+// Runnable: SkPaint::getStrokeWidth returns a stored float
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeWidth")
 private external fun _nGetStrokeWidth(ptr: NativePointer): Float
 
+// Runnable: SkPaint::setStrokeWidth range-checks and writes a float
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeWidth")
 private external fun _nSetStrokeWidth(ptr: NativePointer, value: Float)
 
+// Runnable: SkPaint::getStrokeMiter returns a stored float
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeMiter")
 private external fun _nGetStrokeMiter(ptr: NativePointer): Float
 
+// Runnable: SkPaint::setStrokeMiter range-checks and writes a float
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeMiter")
 private external fun _nSetStrokeMiter(ptr: NativePointer, value: Float)
 
+// Runnable: SkPaint::getStrokeCap reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeCap")
 private external fun _nGetStrokeCap(ptr: NativePointer): Int
 
+// Runnable: SkPaint::setStrokeCap range-checks and writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeCap")
 private external fun _nSetStrokeCap(ptr: NativePointer, value: Int)
 
+// Runnable: SkPaint::getStrokeJoin reads a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeJoin")
 private external fun _nGetStrokeJoin(ptr: NativePointer): Int
 
+// Runnable: SkPaint::setStrokeJoin range-checks and writes a bitfield
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeJoin")
 private external fun _nSetStrokeJoin(ptr: NativePointer, value: Int)
 
+// Runnable: SkPaint::refShader copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetShader")
 private external fun _nGetShader(ptr: NativePointer): NativePointer
 
+// Native: SkPaint::setShader -> unref old SkShader -> ~SkImageShader -> ~SkImage_Ganesh -> GrMtlAttachment::onRelease
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetShader")
 @ForceNativeThreadState
 private external fun _nSetShader(ptr: NativePointer, shaderPtr: NativePointer)
 
+// Runnable: SkPaint::refColorFilter copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColorFilter")
 private external fun _nGetColorFilter(ptr: NativePointer): NativePointer
 
+// Native: SkPaint::setColorFilter -> unref old SkRuntimeColorFilter -> child ~SkImageShader -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColorFilter")
 @ForceNativeThreadState
 private external fun _nSetColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer)
 
+// Runnable: SkPaint::getBlendMode_or asks SkBlendModeBlender::asBlendMode, which returns a stored mode
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlendMode")
 private external fun _nGetBlendMode(ptr: NativePointer): Int
 
+// Native: SkPaint::setBlendMode -> setBlender replaces old SkRuntimeBlender -> child shader image -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetBlendMode")
+@ForceNativeThreadState
 private external fun _nSetBlendMode(ptr: NativePointer, mode: Int)
 
+// Runnable: SkPaint::refPathEffect copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetPathEffect")
 private external fun _nGetPathEffect(ptr: NativePointer): NativePointer
 
+// Native: SkPaint::setPathEffect -> sk_sp::reset -> ~SkPairPathEffect traverses the old effect tree
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetPathEffect")
+@ForceNativeThreadState
 private external fun _nSetPathEffect(ptr: NativePointer, pathEffectPtr: NativePointer)
 
+// Runnable: SkPaint::refMaskFilter copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetMaskFilter")
 private external fun _nGetMaskFilter(ptr: NativePointer): NativePointer
 
+// Native: SkPaint::setMaskFilter -> unref old SkShaderMaskFilterImpl -> fShader -> ~SkImageShader -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetMaskFilter")
 @ForceNativeThreadState
 private external fun _nSetMaskFilter(ptr: NativePointer, filterPtr: NativePointer)
 
+// Runnable: SkPaint::refImageFilter copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetImageFilter")
 private external fun _nGetImageFilter(ptr: NativePointer): NativePointer
 
+// Native: SkPaint::setImageFilter -> unref old SkImageImageFilter -> ~SkImage_Ganesh -> GrMtlAttachment::onRelease
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetImageFilter")
 @ForceNativeThreadState
 private external fun _nSetImageFilter(ptr: NativePointer, filterPtr: NativePointer)
 
+// Runnable: SkPaint::refBlender copies an sk_sp, which only increments the ref count
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlender")
 private external fun _nGetBlender(ptr: NativePointer): NativePointer
 
+// Native: SkPaint::setBlender -> unref old SkRuntimeBlender -> fChildren shader -> ~SkImageShader -> Metal release
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetBlender")
+@ForceNativeThreadState
 private external fun _nSetBlender(ptr: NativePointer, blenderPtr: NativePointer)
 
+// Native: SkPaint::nothingToDraw -> SkComposeColorFilter::onIsAlphaUnchanged recurses over filter trees
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nHasNothingToDraw")
+@ForceNativeThreadState
 private external fun _nHasNothingToDraw(ptr: NativePointer): Boolean
