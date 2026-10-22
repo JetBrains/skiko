@@ -13,16 +13,7 @@ Skiko uses the following version format:
 - **`patch`** — Represents the Skiko release within the corresponding Skia milestone. Incremented for subsequent releases without changing the Skia milestone. **Patch releases should not introduce breaking changes.**
 - **`number`** — Sequential number identifying alpha releases for a given version.
 
-## Alpha Releases
-
-Alpha releases are the default development releases of Skiko.
-
-- Alpha releases can be published at any time from the `master` branch.
-- They follow the usual development and publishing workflow.
-- Multiple alpha releases can be published between stable releases.
-- Alpha releases may include new features, bug fixes, and other ongoing development changes.
-
-Alpha releases make the latest changes available without waiting for the next stable release.
+Alpha releases can be published at any time from the `master` branch.
 
 ## Stable Releases
 
@@ -40,6 +31,6 @@ The release order is:
 
 ### Patch Releases for Previous Milestones
 
-If the patch targets a previous Skia milestone, create a `release/0.<skia-milestone>` branch from that milestone's stable release. Apply the changes to this branch and publish the release from the branch. Keep applicable fixes on `master` as well.
+For a patch to a previous Skia milestone, first merge the fix into `master` (if applicable). Create a `release/0.<skia-milestone>` branch from that milestone's stable release, then cherry-pick the fix from `master` onto the release branch. Increment the patch number and publish the resulting version from `release/0.<skia-milestone>`.
 
 If the release needs a previous TeamCity build configuration, create a separate TeamCity branch with the same name as the GitHub release branch. TeamCity will then pick it up automatically.
