@@ -1,6 +1,10 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.shaper.RunHandler
+import org.jetbrains.skia.shaper.RunInfo
+import org.jetbrains.skia.shaper.Shaper
+import org.jetbrains.skia.shaper.ShapingOptions
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
@@ -21,6 +25,123 @@ private val COARSE_EPSILON = 2.4f
 internal const val jbMonoPath = "./fonts/JetBrainsMono-Regular.ttf"
 
 class FontTests {
+    @Test
+    fun defaultFontSizeAndTransformsRoundTrip() {
+        Font().use { font ->
+            assertEquals(12f, font.size)
+            assertEquals(1f, font.scaleX)
+            assertEquals(0f, font.skewX)
+
+            font.size = 24f
+            font.scaleX = 1.5f
+            font.skewX = -0.25f
+
+            assertEquals(24f, font.size)
+            assertEquals(1.5f, font.scaleX)
+            assertEquals(-0.25f, font.skewX)
+        }
+    }
+
+    @Test
+    fun fontRasterizationFlagsRoundTrip() {
+        Font().use { font ->
+            for (enabled in listOf(true, false)) {
+                font.isAutoHintingForced = enabled
+                font.setBitmapsEmbedded(enabled)
+                font.isSubpixel = enabled
+                font.isEmboldened = enabled
+                font.isBaselineSnapped = enabled
+
+                assertEquals(enabled, font.isAutoHintingForced)
+                assertEquals(enabled, font.areBitmapsEmbedded())
+                assertEquals(enabled, font.isSubpixel)
+                assertEquals(enabled, font.isEmboldened)
+                assertEquals(enabled, font.isBaselineSnapped)
+            }
+
+            for (edging in FontEdging.entries) {
+                font.edging = edging
+                assertEquals(edging, font.edging)
+            }
+            for (hinting in FontHinting.entries) {
+                font.hinting = hinting
+                assertEquals(hinting, font.hinting)
+            }
+        }
+    }
+
+    @Test
+    fun fontConstructionEqualityAndTypefaceReplacement() = runTest {
+        Typeface.makeFromResource(jbMonoPath).use { typeface ->
+            Font(typeface, 20f, 1.5f, -0.25f).use { font ->
+                Font(typeface, 20f, 1.5f, -0.25f).use { same ->
+                    assertEquals(font, same)
+                    same.size = 21f
+                    assertNotEquals(font, same)
+                }
+                assertEquals(20f, font.size)
+                assertEquals(1.5f, font.scaleX)
+                assertEquals(-0.25f, font.skewX)
+                font.typeface!!.use { assertEquals(typeface, it) }
+
+                assertSame(font, font.setTypeface(null))
+                assertNotNull(font.typeface).use { empty ->
+                    assertEquals(0, empty.glyphsCount)
+                }
+                font.setTypeface(typeface)
+                font.typeface!!.use { assertEquals(typeface, it) }
+            }
+        }
+    }
+
+    @Test
+    fun measuredTextHasInkBounds() = runTest {
+        Typeface.makeFromResource(jbMonoPath).use { typeface ->
+            Font(typeface, 24f).use { font ->
+                val bounds = font.measureText("ABC")
+                assertTrue(bounds.width > 0f)
+                assertTrue(bounds.height > 0f)
+                assertTrue(bounds.top < 0f)
+                assertEquals(Rect(0f, 0f, 0f, 0f), font.measureText(""))
+            }
+        }
+    }
+
+    @Test
+    fun runInfoFontIsAnIndependentClone() = runTest {
+        Typeface.makeFromResource(jbMonoPath).use { typeface ->
+            Font(typeface, 24f).use { font ->
+                val clones = mutableListOf<Font>()
+                try {
+                    Shaper.makePrimitive().use { shaper ->
+                        shaper.shape("ABC", font, ShapingOptions.DEFAULT, 1000f, object : RunHandler {
+                            override fun beginLine() {}
+                            override fun runInfo(info: RunInfo?) {
+                                info?.let { clones.add(it.font) }
+                            }
+                            override fun commitRunInfo() {}
+                            override fun runOffset(info: RunInfo?): Point = Point.ZERO
+                            override fun commitRun(
+                                info: RunInfo?, glyphs: ShortArray?, positions: Array<Point?>?, clusters: IntArray?
+                            ) {}
+                            override fun commitLine() {}
+                        })
+                    }
+                    assertTrue(clones.isNotEmpty())
+                    for (clone in clones) {
+                        assertEquals(font, clone)
+                        clone.size = 36f
+                        assertEquals(36f, clone.size)
+                        assertNotEquals(font, clone)
+                    }
+                    assertEquals(24f, font.size)
+                } finally {
+                    clones.forEach { it.close() }
+                }
+            }
+        }
+    }
+
     @Test
     fun fontTest() = runTest {
         val jbMono = Typeface.makeFromResource(jbMonoPath)
