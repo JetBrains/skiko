@@ -22,6 +22,7 @@ import org.jetbrains.skiko.build.cpp.PatchSkiaSymbolsTask
 import org.jetbrains.skiko.build.cpp.WriteCInteropDefFile
 import org.jetbrains.skiko.build.symbols.HideSkiaSymbolsTask
 import org.jetbrains.skiko.build.dependencies.TargetEnv
+import org.jetbrains.skiko.build.threadstate.configureThreadStateChecker
 import org.jetbrains.skiko.build.utils.Arch
 import org.jetbrains.skiko.build.utils.OS
 import org.jetbrains.skiko.build.utils.compilerForTarget
@@ -219,6 +220,10 @@ fun SkikoProjectContext.compileNativeBridgesTask(
             else -> throw GradleException("$os not yet supported")
         }
 
+        if (os == OS.MacOS && skiko.isThreadStateCheckerEnabled) {
+            flags.add("-finstrument-functions")
+        }
+
         val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
@@ -270,6 +275,9 @@ fun SkikoProjectContext.configureNativeTarget(
 
     if (kind != SkikoModuleKind.EXTENSION) {
         target.generateVersion(os, arch, skiko)
+    }
+    if (os == OS.MacOS && skiko.isThreadStateCheckerEnabled) {
+        configureThreadStateChecker(target, joinToTitleCamelCase(os.idWithSuffix(), arch.id))
     }
     val isUikitSim = target.isUikitSimulator()
 

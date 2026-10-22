@@ -6,6 +6,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.skiko.build.context.SkiaTarget
+import org.jetbrains.skiko.build.threadstate.configureThreadStateCheckerTaskGraph
 
 enum class OS(
     val id: String,
@@ -157,6 +158,15 @@ class SkikoProperties(private val myProject: Project) {
     val buildType: SkiaBuildType
         get() = if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
 
+    val isThreadStateCheckerEnabled: Boolean
+        get() = myProject.findProperty(SkikoGradleProperties.THREAD_STATE_CHECKER_ENABLED) == "true"
+
+    init {
+        if (isThreadStateCheckerEnabled) {
+            myProject.configureThreadStateCheckerTaskGraph()
+        }
+    }
+
     val isWasmBuildWithProfiling: Boolean
         get() = myProject.findProperty("skiko.wasm.withProfiling") == "true"
 
@@ -282,6 +292,7 @@ object SkikoGradleProperties {
     const val AWT_ENABLED = "skiko.awt.enabled"
     const val WASM_ENABLED = "skiko.wasm.enabled"
     const val ANDROID_ENABLED = "skiko.android.enabled"
+    const val THREAD_STATE_CHECKER_ENABLED = "skiko.test.threadStateChecker.enabled"
     const val NATIVE_ENABLED = "skiko.native.enabled"
     const val NATIVE_IOS = "skiko.native.ios"
     const val NATIVE_IOS_ARM64 = "skiko.native.ios.arm64.enabled"
