@@ -90,11 +90,11 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     }
 
     fun shape(text: String, font: Font): TextBlob? {
-        return shape(text, font, ShapingOptions.DEFAULT, Float.POSITIVE_INFINITY, Point.Companion.ZERO)
+        return shape(text, font, ShapingOptions.DEFAULT, Float.POSITIVE_INFINITY, Point.ZERO)
     }
 
     fun shape(text: String, font: Font, width: Float): TextBlob? {
-        return shape(text, font, ShapingOptions.DEFAULT, width, Point.Companion.ZERO)
+        return shape(text, font, ShapingOptions.DEFAULT, width, Point.ZERO)
     }
 
     fun shape(text: String, font: Font, width: Float, offset: Point): TextBlob? {
