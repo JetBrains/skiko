@@ -11,7 +11,8 @@ import java.util.UUID
 
 enum class Platform(val platformName: String) {
     WEB("web"),
-    JVM("jvm");
+    JVM("jvm"),
+    MACOS("macos");
 
     companion object {
         fun fromString(name: String): Platform =
@@ -140,6 +141,14 @@ fun executeBenchmarks(
                 extraGradleArgs = gradleArgs
             )
         }
+        Platform.MACOS -> {
+            executeGradleBenchmark(
+                task = "macosBenchmark",
+                runArgs = runArgs,
+                isServerStopped = null,
+                extraGradleArgs = gradleArgs
+            )
+        }
     }
 }
 
@@ -160,6 +169,12 @@ fun gradleArgsFor(version: String, extraArgs: Map<String, String>, platform: Pla
             Platform.JVM -> {
                 args += "-Pskiko.wasm.enabled=false"
                 args += "-Pskiko.awt.enabled=true"
+            }
+            Platform.MACOS -> {
+                args += "-Pskiko.wasm.enabled=false"
+                args += "-Pskiko.awt.enabled=true"
+                args += "-Pskiko.native.enabled=true"
+                args += "-Pskiko.native.mac.enabled=true"
             }
         }
     }

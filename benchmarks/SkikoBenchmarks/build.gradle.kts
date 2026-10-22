@@ -5,6 +5,8 @@ import org.gradle.nativeplatform.MachineArchitecture
 import org.gradle.nativeplatform.OperatingSystemFamily
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 plugins {
     kotlin("multiplatform")
@@ -187,6 +189,7 @@ gradle.taskGraph.whenReady {
 val Task.requiresSkikoVersion: Boolean
     get() = name in setOf(
         "jvmBenchmark",
+        "macosBenchmark",
         "wasmJsBrowserProductionRun",
         "wasmJsBrowserDevelopmentRun",
         "runBrowserAndSaveStats",
@@ -197,6 +200,7 @@ val String.referencesSkikoBenchmarkTask: Boolean
         val taskName = substringAfterLast(":")
         return taskName in setOf(
             "jvmBenchmark",
+            "macosBenchmark",
             "wasmJsBrowserProductionRun",
             "wasmJsBrowserDevelopmentRun",
             "runBrowserAndSaveStats",
@@ -228,6 +232,12 @@ kotlin {
             }
         }
         binaries.executable()
+    }
+
+    macosArm64 {
+        binaries.executable {
+            entryPoint = "org.jetbrains.skiko.benchmarks.main"
+        }
     }
 
     sourceSets {
@@ -290,6 +300,18 @@ tasks.register<JavaExec>("jvmBenchmark") {
     }
     classpath = files(mainCompilation.output.allOutputs, mainCompilation.runtimeDependencyFiles)
     mainClass.set("org.jetbrains.skiko.benchmarks.JvmMainKt")
+    args(runArguments?.split(" ")?.filter { it.isNotBlank() }.orEmpty())
+}
+
+tasks.register<Exec>("macosBenchmark") {
+    group = "benchmark"
+    description = "Runs Skiko API benchmarks on the macOS Native target."
+
+    val macosTarget = kotlin.targets.getByName("macosArm64") as KotlinNativeTarget
+    val releaseExecutable = macosTarget.binaries.getExecutable(NativeBuildType.RELEASE)
+    dependsOn("linkReleaseExecutableMacosArm64")
+    workingDir = projectDir
+    commandLine(releaseExecutable.outputFile.absolutePath)
     args(runArguments?.split(" ")?.filter { it.isNotBlank() }.orEmpty())
 }
 
