@@ -8,7 +8,6 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -31,6 +30,8 @@ import org.jetbrains.skiko.build.utils.SkikoProperties
 import org.jetbrains.skiko.build.utils.registerSkikoTask
 import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
 import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinNativeApiVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinNativeLanguageVersion
 import org.jetbrains.skiko.build.utils.toTitleCase
 
 private fun Project.appleToolchainOutputOrNull(vararg args: String): String? =
@@ -406,10 +407,8 @@ fun Project.configureKotlinCompilerOptions() {
             "-opt-in=kotlinx.cinterop.ExperimentalForeignApi",
             "-opt-in=kotlin.native.SymbolNameIsInternal",
         )
-        // kotlin.native.ForceNativeThreadState needs API version 2.4. A lower version would not widen
-        // compatibility: a klib carries the ABI version of the compiler that built it (KT-66755, KT-76131).
-        compilerOptions.languageVersion.set(KotlinVersion.KOTLIN_2_4)
-        compilerOptions.apiVersion.set(KotlinVersion.KOTLIN_2_4)
+        compilerOptions.languageVersion.set(skikoKotlinNativeLanguageVersion)
+        compilerOptions.apiVersion.set(skikoKotlinNativeApiVersion)
     }
     tasks.withType<KotlinCompilationTask<*>>().configureEach {
         compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
