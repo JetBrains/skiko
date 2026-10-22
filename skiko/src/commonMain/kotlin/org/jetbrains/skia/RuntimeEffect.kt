@@ -76,9 +76,9 @@ private external fun _nMakeShader(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeBlender")
-// No ForceNativeThreadState: checks the child types and allocates a blender that only holds references, so it is short
-// and cannot block.
-// Native call path: SkRuntimeEffect::makeBlender
+// Needs ForceNativeThreadState: can wait for another thread still initializing the shared empty data object.
+// Native call path: SkRuntimeEffect::makeBlender -> SkData::MakeEmpty
+@ForceNativeThreadState
 private external fun _nMakeBlender(
     runtimeEffectPtr: NativePointer, uniformPtr: NativePointer
 ): NativePointer
