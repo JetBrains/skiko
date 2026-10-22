@@ -163,7 +163,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         ): Path {
             Stats.onNativeCall()
             return interopScope {
-                val result = _nMakeFromRRect(toInterop(rrect.radii), rrect.left, rrect.top, rrect.right, rrect.bottom, direction.ordinal, startIndex)
+                val result = _nMakeFromRRect(toInterop(rrect.radii), rrect.radii.size, rrect.left, rrect.top, rrect.right, rrect.bottom, direction.ordinal, startIndex)
                 require(result != NullPointer) { "Failed to create Path from rounded rectangle" }
                 Path(result)
             }
@@ -1220,7 +1220,7 @@ private external fun _nMakeFromCircle(
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromRRect")
 private external fun _nMakeFromRRect(
-    radii: InteropPointer,
+    radii: InteropPointer, radiiSize: Int,
     left: Float, top: Float, right: Float, bottom: Float,
     direction: Int, startIndex: Int
 ): NativePointer
