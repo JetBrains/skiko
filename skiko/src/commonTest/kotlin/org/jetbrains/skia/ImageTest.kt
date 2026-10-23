@@ -5,9 +5,97 @@ import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class ImageTest {
+
+    @Test
+    fun canMakeRasterFromDataAndPeekIntoPixmap() = runTest {
+        val bytes = byteArrayOf(0, 64, 127, -1)
+        val info = ImageInfo(2, 2, ColorType.GRAY_8, ColorAlphaType.OPAQUE)
+        Data.makeFromBytes(bytes).use { data ->
+            Image.makeRaster(info, data, 2).use { image ->
+                assertEquals(2, image.width)
+                assertEquals(2, image.height)
+                Pixmap().use { pixmap ->
+                    assertTrue(image.peekPixels(pixmap))
+                    assertEquals(2, pixmap.info.width)
+                    assertEquals(2, pixmap.info.height)
+                    assertEquals(ColorType.GRAY_8, pixmap.info.colorType)
+                    pixmap.buffer.use { buffer ->
+                        assertContentEquals(bytes, buffer.bytes)
+                    }
+                    assertEquals(Color.BLACK, pixmap.getColor(0, 0))
+                    assertEquals(Color.WHITE, pixmap.getColor(1, 1))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun canMakeImageFromPixmap() = runTest {
+        Bitmap().use { bitmap ->
+            assertTrue(bitmap.allocPixels(ImageInfo.makeN32Premul(2, 2)))
+            bitmap.erase(Color.RED)
+            bitmap.erase(Color.BLUE, IRect.makeXYWH(1, 1, 1, 1))
+            assertNotNull(bitmap.peekPixels()).use { source ->
+                Image.makeFromPixmap(source).use { image ->
+                    assertEquals(2, image.width)
+                    assertEquals(2, image.height)
+                    assertNotNull(image.peekPixels()).use { pixels ->
+                        assertEquals(Color.RED, pixels.getColor(0, 0))
+                        assertEquals(Color.BLUE, pixels.getColor(1, 1))
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun canReadImagePixelsIntoPixmapAtOffset() = runTest {
+        Bitmap().use { source ->
+            assertTrue(source.allocPixels(ImageInfo.makeN32Premul(3, 2)))
+            source.erase(Color.RED)
+            source.erase(Color.BLUE, IRect.makeXYWH(1, 1, 2, 1))
+            Image.makeFromBitmap(source).use { image ->
+                Bitmap().use { destination ->
+                    assertTrue(destination.allocPixels(ImageInfo.makeN32Premul(2, 1)))
+                    destination.erase(Color.TRANSPARENT)
+                    assertNotNull(destination.peekPixels()).use { pixels ->
+                        assertTrue(image.readPixels(pixels, 1, 1, false))
+                        assertEquals(Color.BLUE, pixels.getColor(0, 0))
+                        assertEquals(Color.BLUE, pixels.getColor(1, 0))
+                        assertFalse(image.readPixels(pixels, 3, 2, true))
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun canScaleImagePixelsIntoPixmap() = runTest {
+        Bitmap().use { source ->
+            assertTrue(source.allocPixels(ImageInfo.makeN32Premul(2, 2)))
+            source.erase(Color.RED)
+            source.erase(Color.BLUE, IRect.makeXYWH(1, 1, 1, 1))
+            Image.makeFromBitmap(source).use { image ->
+                Bitmap().use { destination ->
+                    assertTrue(destination.allocPixels(ImageInfo.makeN32Premul(4, 4)))
+                    assertNotNull(destination.peekPixels()).use { pixels ->
+                        assertTrue(image.scalePixels(pixels, SamplingMode.DEFAULT, false))
+                        for (y in 0 until 4) {
+                            for (x in 0 until 4) {
+                                val expected = if (x >= 2 && y >= 2) Color.BLUE else Color.RED
+                                assertEquals(expected, pixels.getColor(x, y))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun imageTest() {

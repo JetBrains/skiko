@@ -13,6 +13,110 @@ import kotlin.test.*
 class TextStyleTest {
 
     @Test
+    fun textStyleFontAndColorTest() {
+        TextStyle().use { textStyle ->
+            val fontStyle = FontStyle(FontWeight.BOLD, FontWidth.CONDENSED, FontSlant.ITALIC)
+            textStyle.fontStyle = fontStyle
+            textStyle.fontSize = 24f
+            textStyle.color = Color.BLUE
+
+            assertEquals(fontStyle, textStyle.fontStyle)
+            assertEquals(24f, textStyle.fontSize)
+            assertEquals(Color.BLUE, textStyle.color)
+        }
+    }
+
+    @Test
+    fun textStyleSpacingTest() {
+        TextStyle().use { textStyle ->
+            textStyle.letterSpacing = 1.25f
+            textStyle.wordSpacing = 3.5f
+            assertEquals(1.25f, textStyle.letterSpacing)
+            assertEquals(3.5f, textStyle.wordSpacing)
+
+            textStyle.letterSpacing = -0.5f
+            textStyle.wordSpacing = 0f
+            assertEquals(-0.5f, textStyle.letterSpacing)
+            assertEquals(0f, textStyle.wordSpacing)
+        }
+    }
+
+    @Test
+    fun textStylePaintsTest() {
+        TextStyle().use { textStyle ->
+            assertNull(textStyle.foreground)
+            assertNull(textStyle.background)
+
+            Paint().use { paint ->
+                paint.color = Color.RED
+                textStyle.foreground = paint
+                paint.color = Color.BLUE
+                textStyle.background = paint
+            }
+
+            assertNotNull(textStyle.foreground).use { foreground ->
+                assertEquals(Color.RED, foreground.color)
+            }
+            assertNotNull(textStyle.background).use { background ->
+                assertEquals(Color.BLUE, background.color)
+            }
+
+            textStyle.foreground = null
+            textStyle.background = null
+            assertNull(textStyle.foreground)
+            assertNull(textStyle.background)
+        }
+    }
+
+    @Test
+    fun textStyleBaselineModeTest() {
+        TextStyle().use { textStyle ->
+            textStyle.baselineMode = BaselineMode.IDEOGRAPHIC
+            assertEquals(BaselineMode.IDEOGRAPHIC, textStyle.baselineMode)
+            textStyle.baselineMode = BaselineMode.ALPHABETIC
+            assertEquals(BaselineMode.ALPHABETIC, textStyle.baselineMode)
+        }
+    }
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun textStyleHalfLeadingTest() {
+        TextStyle().use { textStyle ->
+            textStyle.isHalfLeading = true
+            assertTrue(textStyle.isHalfLeading)
+            assertEquals(0.5f, textStyle.topRatio)
+
+            textStyle.isHalfLeading = false
+            assertFalse(textStyle.isHalfLeading)
+            assertEquals(-1f, textStyle.topRatio)
+        }
+    }
+
+    @Test
+    fun textStylePlaceholderTest() {
+        TextStyle().use { textStyle ->
+            assertFalse(textStyle.isPlaceholder)
+            textStyle.setPlaceholder()
+            assertTrue(textStyle.isPlaceholder)
+        }
+    }
+
+    @Test
+    fun textStyleTypefaceTest() = runTest {
+        Typeface.makeFromResource(jbMonoPath).use { typeface ->
+            TextStyle().use { textStyle ->
+                assertNull(textStyle.typeface)
+                textStyle.typeface = typeface
+                assertNotNull(textStyle.typeface).use { actual ->
+                    assertEquals(typeface.uniqueId, actual.uniqueId)
+                }
+                textStyle.typeface = null
+                assertNull(textStyle.typeface)
+            }
+        }
+    }
+
+    @Test
     fun textStyleTest() {
         assertEquals(TextStyle(), TextStyle())
         TextStyle().use { ts1 ->
@@ -65,6 +169,9 @@ class TextStyleTest {
                 FontFeature(70, 1, 0u, 4294967295u),
                 FontFeature(73, 0, 0u, 4294967295u),
             ),  textStyle.fontFeatures)
+
+            textStyle.clearFontFeatures()
+            assertTrue(textStyle.fontFeatures.isEmpty())
         }
     }
 
@@ -125,6 +232,9 @@ class TextStyleTest {
                     Shadow(100, 0.3f, 0.1f, 2.0)
                 ), textStyle.shadows, if (kotlinBackend == KotlinBackend.JS) 0.00001f else 0f
             )
+
+            textStyle.clearShadows()
+            assertTrue(textStyle.shadows.isEmpty())
 
         }
     }

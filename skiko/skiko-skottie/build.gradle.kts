@@ -292,6 +292,7 @@ kotlin {
             tasks.named("optimizeWasm"),
             wasmImports,
             coreWasmTestResources,
+            rootProject.file("src/commonTest/resources"),
         )
     }
 

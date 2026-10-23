@@ -1,12 +1,16 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.tests.assertCloseEnough
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class PathTest {
@@ -239,5 +243,78 @@ class PathTest {
 
         val result = triangle1.intersect(triangle2)
         assertTrue(result.isNotEmpty())
+    }
+
+    @Test
+    fun roundedRectangleObjectFactory() {
+        val rrect = RRect.makeLTRB(10f, 20f, 110f, 80f, 8f, 12f)
+        Path.RRect(rrect, PathDirection.COUNTER_CLOCKWISE, 3).use { path ->
+            assertEquals(rrect, path.isRRect)
+            assertEquals(Rect(10f, 20f, 110f, 80f), path.bounds)
+            assertTrue(path.isValid)
+        }
+    }
+
+    @Test
+    fun interpolatesCompatiblePaths() {
+        Path.Line(Point(0f, 0f), Point(20f, 10f)).use { start ->
+            Path.Line(Point(10f, 20f), Point(40f, 30f)).use { end ->
+                assertTrue(start.isInterpolatable(end))
+                start.makeLerp(end, 0.5f).use { midpoint ->
+                    assertEquals(Point(5f, 10f), midpoint.getPoint(0))
+                    assertEquals(Point(30f, 20f), midpoint.getPoint(1))
+                    assertTrue(midpoint.isValid)
+                }
+                start.makeLerp(end, 1f).use { assertEquals(start, it) }
+                start.makeLerp(end, 0f).use { assertEquals(end, it) }
+            }
+            Path.Rect(Rect(0f, 0f, 10f, 10f)).use { incompatible ->
+                assertFalse(start.isInterpolatable(incompatible))
+                assertFailsWith<IllegalArgumentException> { start.makeLerp(incompatible, 0.5f) }
+            }
+        }
+    }
+
+    @Test
+    fun combinesOverlappingPaths() {
+        Path.Rect(Rect(0f, 0f, 20f, 20f)).use { first ->
+            Path.Rect(Rect(10f, 5f, 30f, 15f)).use { second ->
+                assertNotNull(Path.makeCombining(first, second, PathOp.INTERSECT)).use { intersection ->
+                    assertEquals(Rect(10f, 5f, 20f, 15f), intersection.bounds)
+                    assertTrue(intersection.contains(15f, 10f))
+                    assertFalse(intersection.contains(5f, 10f))
+                    assertTrue(intersection.isValid)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun fillModeRoundTrip() {
+        Path.Rect(Rect(0f, 0f, 20f, 20f)).use { path ->
+            assertEquals(PathFillMode.WINDING, path.fillMode)
+            for (mode in PathFillMode.entries) {
+                path.fillMode = mode
+                assertEquals(mode, path.fillMode)
+            }
+            path.fillMode = PathFillMode.WINDING
+            assertTrue(path.contains(10f, 10f))
+            assertFalse(path.contains(30f, 30f))
+            path.fillMode = PathFillMode.INVERSE_WINDING
+            assertFalse(path.contains(10f, 10f))
+            assertTrue(path.contains(30f, 30f))
+        }
+    }
+
+    @Test
+    fun dumpingReturnsThePathAndPreservesGeometry() {
+        Path.Line(Point(1.25f, 2.5f), Point(10.5f, 20.25f)).use { path ->
+            val original = path.serializeToBytes()
+            assertSame(path, path.dump())
+            assertContentEquals(original, path.serializeToBytes())
+            assertSame(path, path.dumpHex())
+            assertContentEquals(original, path.serializeToBytes())
+            assertTrue(path.isValid)
+        }
     }
 }
