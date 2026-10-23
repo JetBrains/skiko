@@ -727,9 +727,7 @@ fun SkikoProjectContext.skikoJvmRuntimeJarTask(
         archiveClassifier.set(target)
         nativeFiles.forEach { provider -> from(provider) }
     }
-    if (kind == SkikoModuleKind.CORE) {
-        configureJvmRuntimeJarElements(targetOs, targetArch, runtimeJar)
-    }
+    configureJvmRuntimeJarElements(targetOs, targetArch, runtimeJar)
     return runtimeJar
 }
 
