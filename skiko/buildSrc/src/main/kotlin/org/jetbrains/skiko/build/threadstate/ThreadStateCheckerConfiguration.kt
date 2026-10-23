@@ -2,15 +2,23 @@ package org.jetbrains.skiko.build.threadstate
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Exec
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
+import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
+import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.skiko.build.cpp.LinkSkikoTask
 import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
 import org.jetbrains.skiko.build.utils.SkikoGradleProperties
+import org.jetbrains.skiko.build.utils.THREAD_STATE_BINDINGS
 
 fun Project.configureThreadStateCheckerTaskGraph() {
     gradle.taskGraph.whenReady {
@@ -29,6 +37,7 @@ fun Project.configureThreadStateCheckerTaskGraph() {
 }
 
 fun Project.configureThreadStateChecker(target: KotlinNativeTarget, taskNameSuffix: String) {
+    pluginManager.apply(ThreadStateBindingsCompilerPluginSupportPlugin::class.java)
     val binary = target.binaries.getTest("DEBUG")
     binary.linkerOpts("-Wl,-U,___cyg_profile_func_enter", "-Wl,-U,___cyg_profile_func_exit")
 
@@ -48,16 +57,15 @@ fun Project.configureThreadStateChecker(target: KotlinNativeTarget, taskNameSuff
     val bindings = tasks.register("threadStateCheckerBindings$taskNameSuffix", ThreadStateCheckerBindingsTask::class.java) {
         dependsOn(binary.linkTaskProvider)
         executableFile.set(binary.outputFile)
-        sourceFiles.from(nativeSourceFiles(target))
+        bindingsFiles.from(nativeBindingsFiles(target))
         if (this@configureThreadStateChecker != rootProject) {
             val coreTarget = rootProject.extensions.findByType(KotlinMultiplatformExtension::class.java)
                 ?.targets?.findByName(target.name) as? KotlinNativeTarget
             if (coreTarget != null) {
-                sourceFiles.from(rootProject.nativeSourceFiles(coreTarget))
+                val main = coreTarget.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME)
+                bindingsFiles.from(rootProject.files(main.threadStateBindingsFile()).builtBy(main.compileTaskProvider))
             }
         }
-        moduleDirectory.set(projectDir)
-        rootModuleDirectory.set(rootProject.projectDir)
         outputFile.set(bindingsFile)
     }
     val report = tasks.register("threadStateCheckerReport$taskNameSuffix", ThreadStateCheckerReportTask::class.java) {
@@ -86,6 +94,38 @@ fun Project.configureThreadStateChecker(target: KotlinNativeTarget, taskNameSuff
     }
 }
 
-private fun Project.nativeSourceFiles(target: KotlinNativeTarget) = target.compilations.flatMap { compilation ->
-    compilation.allKotlinSourceSets.flatMap { it.kotlin.srcDirs }
-}.distinct().map { dir -> fileTree(dir) { include("**/*.kt") } }
+private fun Project.nativeBindingsFiles(target: KotlinNativeTarget) = target.compilations.map { compilation ->
+    files(compilation.threadStateBindingsFile()).builtBy(compilation.compileTaskProvider)
+}
+
+class ThreadStateBindingsCompilerPluginSupportPlugin : KotlinCompilerPluginSupportPlugin {
+    override fun getCompilerPluginId() = "org.jetbrains.skiko.thread.state.bindings"
+
+    override fun getPluginArtifact() = SubpluginArtifact(SkikoArtifacts.DEFAULT_GROUP_ID, THREAD_STATE_BINDINGS)
+
+    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
+        (kotlinCompilation.target as? KotlinNativeTarget)?.konanTarget?.name in setOf("macos_arm64", "macos_x64")
+
+    override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
+        val project = kotlinCompilation.target.project
+        val outputFile = kotlinCompilation.threadStateBindingsFile()
+        kotlinCompilation.compileTaskProvider.configure {
+            outputs.file(outputFile)
+        }
+        (kotlinCompilation as KotlinNativeCompilation).configurations.pluginConfiguration.resolutionStrategy.dependencySubstitution {
+            substitute(module("${SkikoArtifacts.DEFAULT_GROUP_ID}:$THREAD_STATE_BINDINGS"))
+                .using(project(":$THREAD_STATE_BINDINGS"))
+        }
+        val moduleDirectory = project.projectDir.absolutePath
+        return project.provider {
+            listOf(
+                SubpluginOption("thread-state-bindings-path", outputFile.get().asFile.absolutePath),
+                SubpluginOption("thread-state-bindings-module-directory", moduleDirectory)
+            )
+        }
+    }
+}
+
+private fun KotlinCompilation<*>.threadStateBindingsFile() = target.project.layout.buildDirectory.file(
+    "thread-state-checker/${target.name}/$name-bindings.txt"
+)

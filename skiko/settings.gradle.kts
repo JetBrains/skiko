@@ -19,6 +19,7 @@ rootProject.name = "skiko"
 include("ci")
 include("docs")
 include("import-generator")
+include("thread-state-bindings")
 include("test-utils")
 include("skiko-skottie")
 include("skiko-graphite")

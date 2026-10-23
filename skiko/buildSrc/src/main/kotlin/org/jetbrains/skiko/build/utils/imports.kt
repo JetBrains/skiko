@@ -8,3 +8,5 @@ val Project.wasmImports
 fun Project.wasmImport(name: String) = wasmImports.resolve(name)
 
 const val IMPORT_GENERATOR = "import-generator"
+
+const val THREAD_STATE_BINDINGS = "thread-state-bindings"
