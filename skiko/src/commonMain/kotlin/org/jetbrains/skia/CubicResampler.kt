@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skiko.internal.floatFromBits
+
 /**
  *
  * Specify B and C (each between 0...1) to create a shader that applies the corresponding
@@ -34,7 +36,7 @@ val SamplingMode.isCubicResampler: Boolean
 val SamplingMode.b: Float
     get() {
         require(isCubicResampler)
-        return Float.fromBits(((packedValue and Long.MAX_VALUE) ushr 32).toInt())
+        return floatFromBits(((packedValue and Long.MAX_VALUE) ushr 32).toInt())
     }
 
 /**
@@ -44,5 +46,5 @@ val SamplingMode.b: Float
 val SamplingMode.c: Float
     get() {
         require(isCubicResampler)
-        return Float.fromBits((packedValue and 0xFFFFFFFFL).toInt())
+        return floatFromBits((packedValue and 0xFFFFFFFFL).toInt())
     }
