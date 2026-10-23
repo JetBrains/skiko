@@ -24,7 +24,7 @@ import platform.Metal.MTLTextureUsageShaderWrite
 internal actual fun makeGpuBenchmarkSurfaceProvider(): BenchmarkSurfaceProvider? =
     try {
         MetalBenchmarkSurfaceProvider()
-    } catch (_: IllegalStateException) {
+    } catch (_: Exception) {
         null
     }
 
@@ -36,7 +36,7 @@ private class MetalBenchmarkSurfaceProvider : BenchmarkSurfaceProvider {
     private val commandQueue = device.newCommandQueue() ?: error("Can't create MTLCommandQueue")
     private val directContext = DirectContext.makeMetal(device.objcPtr(), commandQueue.objcPtr())
 
-    override fun withSurface(width: Int, height: Int, block: (Surface) -> Long): Long {
+    override fun withSurface(width: Int, height: Int, block: (Surface) -> Long): Long = autoreleasepool {
         val descriptor = MTLTextureDescriptor()
         descriptor.width = width.toULong()
         descriptor.height = height.toULong()
