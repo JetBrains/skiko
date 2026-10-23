@@ -277,7 +277,78 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         return try {
             Stats.onNativeCall()
             val ptr = _nEncodeToData(_ptr, format.ordinal, quality, pngCompressionLevel)
-            if (ptr == NullPointer) null else org.jetbrains.skia.Data(ptr)
+            if (ptr == NullPointer) null else Data(ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
+    /**
+     * Encodes Image pixels in JPEG format, returning result as [Data].
+     *
+     * Returns null if encoding fails.
+     *
+     * @param options JPEG encoder options.
+     * @return        Encoded image, or null
+     */
+    fun encodeToData(options: JpegEncoderOptions): Data? {
+        return try {
+            Stats.onNativeCall()
+            val ptr = _nEncodeToJpegData(
+                _ptr,
+                options.quality,
+                options.downSample.ordinal,
+                options.alphaOption.ordinal,
+                getPtr(options.xmpMetadata),
+                options.origin?.ordinal ?: 0,
+            )
+            if (ptr == NullPointer) null else Data(ptr)
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(options.xmpMetadata)
+        }
+    }
+
+    /**
+     * Encodes Image pixels in PNG format, returning result as [Data].
+     *
+     * Returns null if encoding fails.
+     *
+     * @param options PNG encoder options.
+     * @return        Encoded image, or null
+     */
+    fun encodeToData(options: PngEncoderOptions): Data? {
+        return try {
+            Stats.onNativeCall()
+            val comments = options.comments.flatMap { listOf(it.key, it.value) }.toTypedArray()
+            val ptr = interopScope {
+                _nEncodeToPngData(
+                    _ptr,
+                    options.compressionLevel,
+                    options.filterFlags.bits,
+                    toInterop(comments),
+                    comments.size,
+                )
+            }
+            if (ptr == NullPointer) null else Data(ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
+    /**
+     * Encodes Image pixels in WebP format, returning result as [Data].
+     *
+     * Returns null if encoding fails.
+     *
+     * @param options WebP encoder options.
+     * @return        Encoded image, or null
+     */
+    fun encodeToData(options: WebpEncoderOptions): Data? {
+        return try {
+            Stats.onNativeCall()
+            val ptr = _nEncodeToWebpData(_ptr, options.quality, options.compression.ordinal)
+            if (ptr == NullPointer) null else Data(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -531,6 +602,32 @@ private external fun _nEncodeToData(
     format: Int,
     quality: Int,
     pngCompressionLevel: Int
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToJpegData")
+private external fun _nEncodeToJpegData(
+    ptr: NativePointer,
+    quality: Int,
+    downSample: Int,
+    alphaOption: Int,
+    xmpMetadata: NativePointer,
+    origin: Int,
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToPngData")
+private external fun _nEncodeToPngData(
+    ptr: NativePointer,
+    compressionLevel: Int,
+    filterFlags: Int,
+    comments: InteropPointer,
+    commentsSize: Int,
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToWebpData")
+private external fun _nEncodeToWebpData(
+    ptr: NativePointer,
+    quality: Int,
+    compression: Int,
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
