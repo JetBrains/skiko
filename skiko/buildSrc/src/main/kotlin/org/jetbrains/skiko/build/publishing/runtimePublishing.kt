@@ -165,10 +165,20 @@ private fun Project.configureRuntimePublicationFamily(
         configureAwtRuntimeJarPublication(skiko, family, prefix, emptyJavadocJar)
     }
 
+    val angleTargets = if (family.producerProjectPath == ":") {
+        family.targets.filter { (os, _) -> os == OS.Windows }
+    } else emptyList()
+    angleTargets.forEach { (os, arch) ->
+        configureAngleRuntimePublication(skiko, family, prefix, os, arch)
+    }
+
     // Keep the producer projects' publishing entry points after moving their publications here.
     val publicationNames = runtimeInputs.keys.map { (os, arch) ->
         "SkikoJvmRuntime${joinToTitleCamelCase(os.id, arch.id)}" to
             "${toTitleCase(prefix)}JvmRuntime${joinToTitleCamelCase(os.id, arch.id)}"
+    } + angleTargets.map { (os, arch) ->
+        val name = "SkikoJvmRuntimeAngle${joinToTitleCamelCase(os.id, arch.id)}"
+        name to name
     } + if (supportAwt) listOf(
         "AwtRuntimeAll" to "${toTitleCase(prefix)}AwtRuntimeAll",
         "AwtRuntimeElements" to "${toTitleCase(prefix)}AwtRuntimeElements",
@@ -193,6 +203,51 @@ private fun Project.configureRuntimePublicationFamily(
         }
         producerTasks.matching { it.name == "publishToMavenLocal" }
             .configureEach { dependsOn(publishToMavenLocal) }
+    }
+
+    angleTargets.forEach { (os, arch) ->
+        val suffix = joinToTitleCamelCase(os.id, arch.id)
+        repositories.forEach { repository ->
+            val taskSuffix = "PublicationTo${repository.name}Repository"
+            runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}$taskSuffix").configure {
+                dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntimeAngle${suffix}$taskSuffix"))
+            }
+        }
+        runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}PublicationToMavenLocal").configure {
+            dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntimeAngle${suffix}PublicationToMavenLocal"))
+        }
+    }
+}
+
+private fun Project.configureAngleRuntimePublication(
+    skiko: SkikoProperties,
+    family: JvmRuntimePublicationFamily,
+    prefix: String,
+    os: OS,
+    arch: Arch,
+) {
+    val suffix = joinToTitleCamelCase(os.id, arch.id)
+    val input = configurations.create("${prefix}AngleRuntimeInput$suffix") {
+        isCanBeConsumed = false
+        isCanBeResolved = true
+        dependencies.add(project.dependencies.project(family.producerProjectPath, "jvmAdditionalRuntimeJarElementsAngle$suffix"))
+    }
+    val publicationName = "${prefix}JvmRuntimeAngle$suffix"
+    val artifactId = family.artifacts.jvmAdditionalRuntimeArtifactIdFor("angle", os, arch)
+    val sourcesJar = emptyPublicationJar(publicationName, artifactId, "sources")
+    val javadocJar = emptyPublicationJar(publicationName, artifactId, "javadoc")
+    extensions.getByType<PublishingExtension>().publications.create<MavenPublication>(publicationName) {
+        groupId = SkikoArtifacts.DEFAULT_GROUP_ID
+        this.artifactId = artifactId
+        version = skiko.deployVersion
+        artifact(layout.file(provider { input.singleFile })) { builtBy(input) }
+        artifact(sourcesJar)
+        artifact(javadocJar)
+        pom {
+            name.set("${family.artifacts.displayName} Angle Runtime for ${os.id} ${arch.id}")
+            description.set(family.artifacts.pomDescription)
+            configureSkikoPomMetadata()
+        }
     }
 }
 

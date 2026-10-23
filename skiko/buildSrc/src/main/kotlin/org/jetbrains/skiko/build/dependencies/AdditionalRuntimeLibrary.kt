@@ -3,9 +3,6 @@ package org.jetbrains.skiko.build.dependencies
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.provider.Provider
-import org.gradle.api.publish.PublicationContainer
-import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.crypto.checksum.Checksum
@@ -20,14 +17,6 @@ import org.jetbrains.skiko.build.utils.toTitleCase
 
 interface AdditionalRuntimeLibrary {
     val jarTask: TaskProvider<Jar>
-
-    fun registerMavenPublication(
-        container: PublicationContainer,
-        emptySourcesJar: Provider<Jar>,
-        pomNameForPublication: MutableMap<String, String>
-    )
-
-    fun registerRuntimePublishTaskDependency(repos: List<String>)
 }
 
 fun Project.registerAdditionalRuntimeLibrary(
@@ -84,30 +73,13 @@ fun Project.registerAdditionalRuntimeLibrary(
         from(checksumTask)
     }
 
+    configurations.create("jvmAdditionalRuntimeJarElements$taskSuffix") {
+        isCanBeConsumed = true
+        isCanBeResolved = false
+        outgoing.artifact(jarTask.flatMap { it.archiveFile })
+    }
+
     return object : AdditionalRuntimeLibrary {
         override val jarTask = jarTask
-        
-        override fun registerMavenPublication(
-            container: PublicationContainer,
-            emptySourcesJar: Provider<Jar>,
-            pomNameForPublication: MutableMap<String, String>
-        ) {
-            container.create("skikoJvmRuntime$taskSuffix", MavenPublication::class.java) {
-                pomNameForPublication[this.name] = "${artifacts.displayName} $visibleName for ${targetOs.id} ${targetArch.id}"
-                artifactId = artifacts.jvmAdditionalRuntimeArtifactIdFor(name, targetOs, targetArch)
-                afterEvaluate {
-                    artifact(jarTask.map { it.archiveFile.get() })
-                    artifact(emptySourcesJar)
-                }
-            }
-        }
-
-        override fun registerRuntimePublishTaskDependency(repos: List<String>) {
-            repos.forEach { repo ->
-                val mainTaskSuffix = "${toTitleCase(targetOs.id)}${toTitleCase(targetArch.id)}"
-                project.tasks.findByName("publishSkikoJvmRuntime${mainTaskSuffix}PublicationTo${repo}")
-                    ?.dependsOn("publishSkikoJvmRuntime${taskSuffix}PublicationTo${repo}")
-            }
-        }
     }
 }
