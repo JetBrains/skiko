@@ -1083,48 +1083,91 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteBitmap
 private external fun Bitmap_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMake")
+// No ForceNativeThreadState: creates an empty bitmap with no pixel storage and empty pixel layout information, so it is
+// short and cannot block.
+// Native call path: SkBitmap::SkBitmap
 private external fun _nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeClone")
+// No ForceNativeThreadState: copies the bitmap and bumps the pixel reference count without copying pixels, so it is
+// short and cannot block.
+// Native call path: SkBitmap::SkBitmap
 private external fun _nMakeClone(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSwap")
+// No ForceNativeThreadState: swaps the fields of two bitmaps without changing any reference counts, so it is short and
+// cannot block.
+// Native call path: SkBitmap::swap
 private external fun _nSwap(ptr: NativePointer, otherPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetImageInfo")
+// No ForceNativeThreadState: copies the image info and adds a reference to its color space, so it is short and cannot
+// block.
+// Native call path: SkImageInfo::refColorSpace
 private external fun _nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetRowBytesAsPixels")
+// No ForceNativeThreadState: returns the stored row size converted to pixels, so it is short and cannot block.
+// Native call path: SkBitmap::rowBytesAsPixels -> SkPixmap::rowBytesAsPixels
 private external fun _nGetRowBytesAsPixels(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsNull")
+// No ForceNativeThreadState: checks whether the pixel reference is null, so it is short and cannot block.
+// Native call path: SkBitmap::isNull
 private external fun _nIsNull(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetRowBytes")
+// No ForceNativeThreadState: returns the stored row size in bytes, so it is short and cannot block.
+// Native call path: SkBitmap::rowBytes
 private external fun _nGetRowBytes(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetAlphaType")
+// No ForceNativeThreadState: checks the alpha type and rewrites the stored image info without touching any pixels, so
+// it is short and cannot block.
+// Native call path: SkBitmap::setAlphaType -> SkPixmap::reset
 private external fun _nSetAlphaType(ptr: NativePointer, alphaType: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nComputeByteSize")
+// No ForceNativeThreadState: does integer math on height and row bytes with an overflow check, so it is short and
+// cannot block.
+// Native call path: SkBitmap::computeByteSize -> SkImageInfo::computeByteSize
 private external fun _nComputeByteSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsImmutable")
+// No ForceNativeThreadState: reads the stored immutability flag of the pixel reference, so it is short and cannot
+// block.
+// Native call path: SkBitmap::isImmutable
 private external fun _nIsImmutable(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetImmutable")
+// No ForceNativeThreadState: stores an immutable flag on the pixel reference, so it is short and cannot block.
+// Native call path: SkBitmap::setImmutable -> SkPixelRef::setImmutable
 private external fun _nSetImmutable(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nReset")
+// Needs ForceNativeThreadState: releasing old pixel storage notifies change listeners, including GPU caches, so time
+// grows with the listener count.
+// Native call path: SkBitmap::reset -> ~SkPixelRef -> callGenIDChangeListeners -> SkIDChangeListener::List::changed
+@ForceNativeThreadState
 private external fun _nReset(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nComputeIsOpaque")
+// Needs ForceNativeThreadState: scans every pixel, so its time grows with the bitmap size.
+// Native call path: SkPixmap::computeIsOpaque
+@ForceNativeThreadState
 private external fun _nComputeIsOpaque(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetImageInfo")
+// Needs ForceNativeThreadState: releasing old pixel storage notifies change listeners, including GPU caches, so time
+// grows with the listener count.
+// Native call path: SkBitmap::setInfo -> ~SkPixelRef -> callGenIDChangeListeners -> SkIDChangeListener::List::changed
+@ForceNativeThreadState
 private external fun _nSetImageInfo(
     ptr: NativePointer,
     width: Int,
@@ -1137,6 +1180,10 @@ private external fun _nSetImageInfo(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nAllocPixelsFlags")
+// Needs ForceNativeThreadState: releasing old pixel storage notifies change listeners, including GPU caches, so time
+// grows with the listener count.
+// Native call path: tryAllocPixelsFlags -> ~SkPixelRef -> callGenIDChangeListeners -> SkIDChangeListener::List::changed
+@ForceNativeThreadState
 private external fun _nAllocPixelsFlags(
     ptr: NativePointer,
     width: Int,
@@ -1149,6 +1196,10 @@ private external fun _nAllocPixelsFlags(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nAllocPixelsRowBytes")
+// Needs ForceNativeThreadState: releasing old pixel storage notifies change listeners, including GPU caches, so time
+// grows with the listener count.
+// Native call path: tryAllocPixels -> ~SkPixelRef -> callGenIDChangeListeners -> SkIDChangeListener::List::changed
+@ForceNativeThreadState
 private external fun _nAllocPixelsRowBytes(
     ptr: NativePointer,
     width: Int,
@@ -1161,6 +1212,10 @@ private external fun _nAllocPixelsRowBytes(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nInstallPixels")
+// Needs ForceNativeThreadState: copies the whole pixel array into newly allocated memory, so its time grows with the
+// image size.
+// Native call path: malloc -> memcpy -> SkBitmap::installPixels
+@ForceNativeThreadState
 private external fun _nInstallPixels(
     ptr: NativePointer,
     width: Int,
@@ -1175,45 +1230,89 @@ private external fun _nInstallPixels(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nAllocPixels")
+// Needs ForceNativeThreadState: releasing old pixel storage notifies change listeners, including GPU caches, so time
+// grows with the listener count.
+// Native call path: tryAllocPixels -> setPixelRef -> ~SkPixelRef -> SkIDChangeListener::List::changed
+@ForceNativeThreadState
 private external fun _nAllocPixels(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRef")
+// No ForceNativeThreadState: increments the pixel reference count, so it is short and cannot block.
+// Native call path: SkBitmap::pixelRef -> SkPixelRef::ref
 private external fun _nGetPixelRef(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRefOriginX")
+// No ForceNativeThreadState: computes the origin from pointer and row size arithmetic, so it is short and cannot block.
+// Native call path: SkBitmap::pixelRefOrigin
 private external fun _nGetPixelRefOriginX(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRefOriginY")
+// No ForceNativeThreadState: computes the origin from pointer and row size arithmetic, so it is short and cannot block.
+// Native call path: SkBitmap::pixelRefOrigin
 private external fun _nGetPixelRefOriginY(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetPixelRef")
+// Needs ForceNativeThreadState: releasing old pixel storage notifies change listeners, including GPU caches, so time
+// grows with the listener count.
+// Native call path: SkBitmap::setPixelRef -> ~SkPixelRef -> callGenIDChangeListeners ->
+//   SkIDChangeListener::List::changed
+@ForceNativeThreadState
 private external fun _nSetPixelRef(ptr: NativePointer, pixelRefPtr: NativePointer, dx: Int, dy: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsReadyToDraw")
+// No ForceNativeThreadState: checks whether pixels are present, so it is short and cannot block.
+// Native call path: SkBitmap::readyToDraw
 private external fun _nIsReadyToDraw(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetGenerationId")
+// No ForceNativeThreadState: reads the generation id, or atomically assigns one if it is not set yet, so it is short
+// and cannot block.
+// Native call path: SkBitmap::getGenerationID -> SkPixelRef::getGenerationID
 private external fun _nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nNotifyPixelsChanged")
+// Needs ForceNativeThreadState: notifies every change listener, and the number of listeners is not fixed because GPU
+// caches add their own.
+// Native call path: SkPixelRef::notifyPixelsChanged -> SkIDChangeListener::List::changed
+@ForceNativeThreadState
 private external fun _nNotifyPixelsChanged(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nEraseColor")
+// Needs ForceNativeThreadState: fills every pixel of the bitmap, so its time grows with the bitmap size.
+// Native call path: SkBitmap::erase -> SkPixmap::erase
+@ForceNativeThreadState
 private external fun _nEraseColor(ptr: NativePointer, color: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nErase")
+// Needs ForceNativeThreadState: fills the pixels of the given rectangle one by one, so its time grows with the
+// rectangle area.
+// Native call path: SkBitmap::erase -> SkPixmap::erase
+@ForceNativeThreadState
 private external fun _nErase(ptr: NativePointer, color: Int, left: Int, top: Int, right: Int, bottom: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetColor")
+// No ForceNativeThreadState: reads the color of one pixel through a color type switch, so it is short and cannot block.
+// Native call path: SkPixmap::getColor -> SkPixmap::getColor4f
 private external fun Bitmap_nGetColor(ptr: NativePointer, x: Int, y: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetAlphaf")
+// No ForceNativeThreadState: reads the alpha of one pixel through a color type switch, so it is short and cannot block.
+// Native call path: SkPixmap::getAlphaf
 private external fun _nGetAlphaf(ptr: NativePointer, x: Int, y: Int): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nExtractSubset")
+// Needs ForceNativeThreadState: releasing old pixel storage notifies change listeners, including GPU caches, so time
+// grows with the listener count.
+// Native call path: SkBitmap::extractSubset -> ~SkPixelRef -> callGenIDChangeListeners ->
+//   SkIDChangeListener::List::changed
+@ForceNativeThreadState
 private external fun _nExtractSubset(ptr: NativePointer, dstPtr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nReadPixels")
+// Needs ForceNativeThreadState: converts the whole pixel rectangle into the destination, so its time grows with the
+// image size.
+// Native call path: SkPixmap::readPixels -> SkConvertPixels
+@ForceNativeThreadState
 private external fun _nReadPixels(
     ptr: NativePointer,
     width: Int,
@@ -1229,10 +1328,21 @@ private external fun _nReadPixels(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nExtractAlpha")
+// Needs ForceNativeThreadState: converts every pixel to alpha and can run an optional mask filter, so its time grows
+// with the image size.
+// Native call path: SkBitmap::extractAlpha -> SkConvertPixels -> SkMaskFilter::filterMask
+@ForceNativeThreadState
 private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer, iPointResultIntArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nPeekPixels")
+// No ForceNativeThreadState: copies pixel layout information into a new object without accessing pixels, so it is short
+// and cannot block.
+// Native call path: SkBitmap::peekPixels
 private external fun _nPeekPixels(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeShader")
+// Needs ForceNativeThreadState: copies all the pixels of a mutable bitmap into a new image, so its time grows with the
+// bitmap size.
+// Native call path: SkImage_Raster::MakeFromBitmap -> SkData::MakeWithCopy
+@ForceNativeThreadState
 private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingModeValue1: Int, samplingModeValue2: Int, localMatrix: InteropPointer): NativePointer

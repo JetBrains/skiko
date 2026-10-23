@@ -734,6 +734,10 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
+// Needs ForceNativeThreadState: compiles a shader program the first time it is used, and other callers wait while that
+// one-time setup runs.
+// Native call path: SkBlenders::Arithmetic -> GetKnownRuntimeEffect
+@ForceNativeThreadState
 private external fun _nMakeArithmetic(
     k1: Float,
     k2: Float,
@@ -746,18 +750,37 @@ private external fun _nMakeArithmetic(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
+// No ForceNativeThreadState: allocates a filter that holds references to its two inputs, so it is short and cannot
+// block.
+// Native call path: SkImageFilters::Compose
 private external fun _nMakeCompose(outer: NativePointer, inner: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeDisplacementMap(
     xChan: Int,
     yChan: Int,
@@ -768,6 +791,10 @@ private external fun _nMakeDisplacementMap(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeDropShadow(
     dx: Float,
     dy: Float,
@@ -779,6 +806,10 @@ private external fun _nMakeDropShadow(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeDropShadowOnly(
     dx: Float,
     dy: Float,
@@ -790,6 +821,9 @@ private external fun _nMakeDropShadowOnly(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeImage")
+// No ForceNativeThreadState: allocates a filter that holds a reference to the image and two rectangles without reading
+// the image, so it is short and cannot block.
+// Native call path: SkImageFilters::Image
 private external fun _nMakeImage(
     image: NativePointer,
     l0: Float,
@@ -805,6 +839,8 @@ private external fun _nMakeImage(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
+// No ForceNativeThreadState: allocates a magnifier filter and an optional crop, so it is short and cannot block.
+// Native call path: SkImageFilters::Magnifier
 private external fun _nMakeMagnifier(
     l: Float,
     t: Float,
@@ -819,6 +855,10 @@ private external fun _nMakeMagnifier(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeMatrixConvolution(
     kernelW: Int,
     kernelH: Int,
@@ -834,27 +874,57 @@ private external fun _nMakeMatrixConvolution(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
+// No ForceNativeThreadState: checks that a matrix can be inverted and allocates a matrix transform filter, so it is
+// short and cannot block.
+// Native call path: SkImageFilters::MatrixTransform
 private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingModeVal1: Int, samplingModeVal2: Int, input: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
+// Needs ForceNativeThreadState: copies an array of filters of any length into the filter, so its time grows with the
+// number of filters.
+// Native call path: SkImageFilters::Merge -> SkImageFilter_Base
+@ForceNativeThreadState
 private external fun _nMakeMerge(filters: InteropPointer, filtersLength: Int, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeShader")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeShader(shader: NativePointer, dither: Boolean, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
+// No ForceNativeThreadState: reads the bounds of a picture and allocates a filter that holds a reference to it, so it
+// is short and cannot block.
+// Native call path: SkImageFilters::Picture
 private external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader")
+// Needs ForceNativeThreadState: searches the shader's child inputs one by one and copies them, so its time grows with
+// the number of children.
+// Native call path: SkImageFilters::RuntimeShader -> SkRuntimeEffect::findChild
+@ForceNativeThreadState
 private external fun _nMakeRuntimeShader(runtimeShaderBuilderPtr: NativePointer, childShaderName: InteropPointer, input: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray")
+// Needs ForceNativeThreadState: copies N input filters and their names, then checks each name against the others, so
+// its time grows with N squared, where N is the number of inputs.
+// Native call path: SkImageFilters::RuntimeShader
+@ForceNativeThreadState
 private external fun _nMakeRuntimeShaderFromArray(runtimeShaderBuilderPtr: NativePointer, childShaderNames: InteropPointer, inputs: InteropPointer, inputLength: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeTile(
     l0: Float,
     t0: Float,
@@ -868,12 +938,24 @@ private external fun _nMakeTile(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeDistantLitDiffuse(
     x: Float,
     y: Float,
@@ -886,6 +968,10 @@ private external fun _nMakeDistantLitDiffuse(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakePointLitDiffuse(
     x: Float,
     y: Float,
@@ -898,6 +984,10 @@ private external fun _nMakePointLitDiffuse(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeSpotLitDiffuse(
     x0: Float,
     y0: Float,
@@ -915,6 +1005,10 @@ private external fun _nMakeSpotLitDiffuse(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeDistantLitSpecular(
     x: Float,
     y: Float,
@@ -928,6 +1022,10 @@ private external fun _nMakeDistantLitSpecular(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakePointLitSpecular(
     x: Float,
     y: Float,
@@ -941,6 +1039,10 @@ private external fun _nMakePointLitSpecular(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
+// Needs ForceNativeThreadState: rejecting an inverted crop can free a filter and wait on a cache lock held while
+// another thread unmaps a file.
+// Native call path: SkImageFilters::Crop -> ~SkImageFilter_Base -> purgeByImageFilter
+@ForceNativeThreadState
 private external fun _nMakeSpotLitSpecular(
     x0: Float,
     y0: Float,

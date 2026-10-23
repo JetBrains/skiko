@@ -91,25 +91,51 @@ class ColorSpace : Managed {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of an unref function without calling it, so it is short and cannot
+// block.
+// Native call path: _nGetFinalizer
 private external fun ColorSpace_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__nConvert")
+// Needs ForceNativeThreadState: can spin waiting for another thread that is initializing the same color space.
+// Native call path: SkColorSpace::invTransferFn -> computeLazyDstFields -> SkOnce::operator()
+@ForceNativeThreadState
 private external fun _nConvert(fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
+// Needs ForceNativeThreadState: can wait for another thread that is still initializing the shared sRGB color space.
+// Native call path: SkColorSpace::MakeSRGB -> sk_srgb_singleton
+@ForceNativeThreadState
 private external fun _nMakeSRGB(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
+// No ForceNativeThreadState: hashes 16 floats and allocates a small color space object, so it is short and cannot
+// block.
+// Native call path: SkColorSpace::MakeRGB
 private external fun _nMakeDisplayP3(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
+// Needs ForceNativeThreadState: can wait for another thread that is still initializing the shared linear sRGB color
+// space.
+// Native call path: SkColorSpace::MakeSRGBLinear -> sk_srgb_linear_singleton
+@ForceNativeThreadState
 private external fun _nMakeSRGBLinear(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
+// No ForceNativeThreadState: compares 28 bytes of a stored gamma field with a fixed sRGB value, so it is short and
+// cannot block.
+// Native call path: SkColorSpace::gammaCloseToSRGB
 private external fun _nIsGammaCloseToSRGB(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
+// No ForceNativeThreadState: compares 28 bytes of a stored gamma field with a fixed linear value, so it is short and
+// cannot block.
+// Native call path: SkColorSpace::gammaIsLinear
 private external fun _nIsGammaLinear(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsSRGB")
+// Needs ForceNativeThreadState: can wait for another thread still initializing the shared sRGB color space, even for a
+// non-sRGB space.
+// Native call path: SkColorSpace::isSRGB -> sk_srgb_singleton
+@ForceNativeThreadState
 private external fun _nIsSRGB(ptr: NativePointer): Boolean

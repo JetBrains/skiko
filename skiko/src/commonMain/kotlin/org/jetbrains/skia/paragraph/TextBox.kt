@@ -59,10 +59,18 @@ class TextBox(val rect: Rect, direction: Direction) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArraySize")
+// No ForceNativeThreadState: returns the stored element count of the box list, so it is short and cannot block.
+// Native call path: vector<TextBox>::size
 private external fun TextBox_nGetArraySize(array: InteropPointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nDisposeArray")
+// No ForceNativeThreadState: frees a list of boxes that owns only plain rectangles and enums, so it is short and cannot
+// block.
+// Native call path: vector<TextBox>::~vector
 private external fun TextBox_nDisposeArray(array: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArrayElement")
+// No ForceNativeThreadState: copies one box's rectangle and direction into caller arrays, so it is short and cannot
+// block.
+// Native call path: vector<TextBox>::at
 private external fun TextBox_nGetArrayElement(array: InteropPointer, index: Int, rectArray: InteropPointer, directionArray: InteropPointer)

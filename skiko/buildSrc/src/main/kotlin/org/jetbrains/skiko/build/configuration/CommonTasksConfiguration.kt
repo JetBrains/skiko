@@ -3,9 +3,15 @@ package org.jetbrains.skiko.build.configuration
 import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.skiko.build.context.skiaVersion
 import org.jetbrains.skiko.build.context.supportAndroid
 import org.jetbrains.skiko.build.context.supportNativeIosArm64
@@ -22,6 +28,10 @@ import org.jetbrains.skiko.build.utils.OS
 import org.jetbrains.skiko.build.utils.SkiaBuildType
 import org.jetbrains.skiko.build.utils.SkikoProperties
 import org.jetbrains.skiko.build.utils.registerSkikoTask
+import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinNativeApiVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinNativeLanguageVersion
 import org.jetbrains.skiko.build.utils.toTitleCase
 
 private fun Project.appleToolchainOutputOrNull(vararg args: String): String? =
@@ -377,5 +387,30 @@ fun KotlinTarget.generateVersion(
     // Make IDEA run the generation during Gradle sync, so that the file resolves without building first
     project.tasks.matching { it.name == "prepareKotlinIdeaImport" }.configureEach {
         dependsOn(generateVersionTask)
+    }
+}
+
+fun Project.configureKotlinCompilerOptions() {
+    extensions.configure<KotlinMultiplatformExtension> {
+        compilerOptions {
+            languageVersion.set(skikoKotlinLanguageVersion)
+            apiVersion.set(skikoKotlinApiVersion)
+            freeCompilerArgs.add("-opt-in=org.jetbrains.skiko.InternalSkikoApi")
+        }
+    }
+    tasks.withType<KotlinJvmCompile>().configureEach {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+    }
+    // Skiko bindings use kotlin.native.SymbolName, which is internal to Kotlin/Native (KT-46649).
+    tasks.withType<KotlinNativeCompile>().configureEach {
+        compilerOptions.freeCompilerArgs.addAll(
+            "-opt-in=kotlinx.cinterop.ExperimentalForeignApi",
+            "-opt-in=kotlin.native.SymbolNameIsInternal",
+        )
+        compilerOptions.languageVersion.set(skikoKotlinNativeLanguageVersion)
+        compilerOptions.apiVersion.set(skikoKotlinNativeApiVersion)
+    }
+    tasks.withType<KotlinCompilationTask<*>>().configureEach {
+        compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }

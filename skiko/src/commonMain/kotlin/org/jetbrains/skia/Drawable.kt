@@ -135,33 +135,60 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
 internal expect fun Drawable.doInit(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot
+// block.
+// Native call path: _nGetFinalizer
 private external fun Drawable_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
+// No ForceNativeThreadState: creates a drawable with null callbacks and zeroes its generation id, so it is short and
+// cannot block.
+// Native call path: SkikoDrawable::SkikoDrawable -> SkDrawable::SkDrawable
 private external fun Drawable_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
+// No ForceNativeThreadState: takes the next value from a shared atomic counter, so it is short and cannot block.
+// Native call path: SkDrawable::getGenerationID -> next_generation_id
 private external fun Drawable_nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
+// Needs ForceNativeThreadState: calls back into Kotlin to draw, and the canvas can use the GPU.
+// Native call path: SkDrawable::draw -> SkikoDrawable::onDraw -> callVoidCallback
+@ForceNativeThreadState
 private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
+// Needs ForceNativeThreadState: calls back into Kotlin for bounds and drawing while recording a picture snapshot.
+// Native call path: SkDrawable::onMakePictureSnapshot -> getBounds -> onGetBounds
+@ForceNativeThreadState
 private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
+// No ForceNativeThreadState: resets a stored generation id field to zero, so it is short and cannot block.
+// Native call path: SkDrawable::notifyDrawingChanged
 private external fun _nNotifyDrawingChanged(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetBounds")
+// Needs ForceNativeThreadState: calls back into Kotlin to read the drawable's bounds.
+// Native call path: SkDrawable::getBounds -> SkikoDrawable::onGetBounds -> callVoidCallback
+@ForceNativeThreadState
 private external fun Drawable_nGetBounds(ptr: NativePointer, result: InteropPointer)
 
 // For Native/JS usage only
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
+// Needs ForceNativeThreadState: replacing a callback destroys the old callback and calls into Kotlin to dispose of it.
+// Native call path: KCallback::operator= -> ~KCallback -> disposeCallback
+@ForceNativeThreadState
 internal external fun Drawable_nInit(ptr: NativePointer, onGetBounds: InteropPointer, onDraw: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetOnDrawCanvas")
+// No ForceNativeThreadState: returns the stored pointer to the canvas used during the drawing callback, so it is short
+// and cannot block.
+// Native call path: SkikoDrawable::onDrawCanvas
 internal external fun _nGetOnDrawCanvas(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nSetBounds")
+// No ForceNativeThreadState: sets the four edges of the stored bounds rectangle, so it is short and cannot block.
+// Native call path: SkRect::setLTRB
 internal external fun _nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)

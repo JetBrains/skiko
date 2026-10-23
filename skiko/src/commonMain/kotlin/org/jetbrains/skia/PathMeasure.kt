@@ -205,30 +205,56 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
 }
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
+// No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 private external fun PathMeasure_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMake")
+// No ForceNativeThreadState: creates an empty measure with no contour and a null reference, so it is short and cannot
+// block.
+// Native call path: SkPathMeasure::SkPathMeasure
 private external fun PathMeasure_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMakePath")
+// Needs ForceNativeThreadState: walks and subdivides the first contour, so its time grows with the contour's drawing
+// commands and resulting segment count.
+// Native call path: SkPathMeasure::SkPathMeasure -> SkContourMeasureIter::next -> Impl::buildSegments
+@ForceNativeThreadState
 private external fun _nMakePath(pathPtr: NativePointer, forceClosed: Boolean, resScale: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nSetPath")
+// Needs ForceNativeThreadState: walks and subdivides the first contour, so its time grows with the contour's drawing
+// commands and resulting segment count.
+// Native call path: SkPathMeasure::setPath -> SkContourMeasureIter::next -> Impl::buildSegments
+@ForceNativeThreadState
 private external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, forceClosed: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetLength")
+// No ForceNativeThreadState: returns the length computed when the measure was made, so it is short and cannot block.
+// Native call path: SkPathMeasure::getLength
 private external fun _nGetLength(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetPosition")
+// Needs ForceNativeThreadState: searches the measured segments of the path, so its time grows with the path size.
+// Native call path: SkContourMeasure::getPosTan -> distanceToSegment -> SkTKSearch
+@ForceNativeThreadState
 private external fun _nGetPosition(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetTangent")
+// Needs ForceNativeThreadState: searches the measured segments of the path, so its time grows with the path size.
+// Native call path: SkContourMeasure::getPosTan -> distanceToSegment -> SkTKSearch
+@ForceNativeThreadState
 private external fun _nGetTangent(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetRSXform")
+// Needs ForceNativeThreadState: searches the measured segments of the path, so its time grows with the path size.
+// Native call path: SkContourMeasure::getPosTan -> distanceToSegment -> SkTKSearch
+@ForceNativeThreadState
 private external fun _nGetRSXform(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetMatrix")
+// Needs ForceNativeThreadState: searches the measured segments of the path, so its time grows with the path size.
+// Native call path: SkContourMeasure::getMatrix -> distanceToSegment -> SkTKSearch
+@ForceNativeThreadState
 private external fun _nGetMatrix(
     ptr: NativePointer,
     distance: Float,
@@ -238,6 +264,10 @@ private external fun _nGetMatrix(
 ): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetSegment")
+// Needs ForceNativeThreadState: visits each segment in the requested distance range, so its time grows with the number
+// of segments visited.
+// Native call path: SkContourMeasure::getSegment -> SkContourMeasure_segTo
+@ForceNativeThreadState
 private external fun _nGetSegment(
     ptr: NativePointer,
     startD: Float,
@@ -248,7 +278,13 @@ private external fun _nGetSegment(
 
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nIsClosed")
+// No ForceNativeThreadState: returns a closed flag stored when the measure was made, so it is short and cannot block.
+// Native call path: SkPathMeasure::isClosed
 private external fun _nIsClosed(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nNextContour")
+// Needs ForceNativeThreadState: walks and subdivides the next contour, so its time grows with the contour's drawing
+// commands and resulting segment count.
+// Native call path: SkPathMeasure::nextContour -> SkContourMeasureIter::next -> buildSegments
+@ForceNativeThreadState
 private external fun _nNextContour(ptr: NativePointer): Boolean

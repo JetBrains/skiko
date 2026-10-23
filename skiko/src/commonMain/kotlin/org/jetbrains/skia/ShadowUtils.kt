@@ -92,6 +92,10 @@ object ShadowUtils {
 
 
 @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nDrawShadow")
+// Needs ForceNativeThreadState: draws the shadow on a canvas that can be GPU-backed, which can call Metal, and
+// tessellating the path takes time that grows with its size.
+// Native call path: SkShadowUtils::DrawShadow
+@ForceNativeThreadState
 private external fun _nDrawShadow(
     canvasPtr: NativePointer,
     pathPtr: NativePointer,
@@ -109,7 +113,13 @@ private external fun _nDrawShadow(
 
 
 @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalAmbientColor")
+// No ForceNativeThreadState: does fixed-size color math on two colors with no allocation, so it is short and cannot
+// block.
+// Native call path: SkShadowUtils::ComputeTonalColors
 private external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalSpotColor")
+// No ForceNativeThreadState: does fixed-size color math on two colors with no allocation, so it is short and cannot
+// block.
+// Native call path: SkShadowUtils::ComputeTonalColors
 private external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int

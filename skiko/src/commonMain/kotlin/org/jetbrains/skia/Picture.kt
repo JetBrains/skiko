@@ -255,27 +255,50 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
+// Needs ForceNativeThreadState: parses picture data, loading its typefaces through CoreText and decoding its images, so
+// its time grows with the data size.
+// Native call path: SkPictureData::parseStream -> SkTypeface::MakeDeserialize -> SkTypeface_Mac::MakeFromStream
+@ForceNativeThreadState
 private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
+// No ForceNativeThreadState: returns the picture's stored cull rectangle, so it is short and cannot block.
+// Native call path: SkPicture::cullRect
 private external fun _nGetCullRect(ptr: NativePointer, ltrb: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
+// No ForceNativeThreadState: returns the picture's stored unique id, so it is short and cannot block.
+// Native call path: SkPicture::uniqueID
 private external fun _nGetUniqueId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
+// Needs ForceNativeThreadState: writes fonts through CoreText, and the output size grows with the number of recorded
+// drawing operations.
+// Native call path: SkPicture::serialize -> SkPictureData::WriteTypefaces -> SkTypeface::serialize -> SkTypeface_Mac
+@ForceNativeThreadState
 private external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
+// No ForceNativeThreadState: allocates an empty picture placeholder with no recorded drawing operations, so it is short
+// and cannot block.
+// Native call path: SkPicture::MakePlaceholder
 private external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
+// No ForceNativeThreadState: reads a stored drawing-operation count without walking the recorded operations, so it is
+// short and cannot block.
+// Native call path: SkPicture::approximateOpCount
 private external fun _nGetApproximateOpCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
+// No ForceNativeThreadState: adds up stored size values for the picture, so it is short and cannot block.
+// Native call path: SkPicture::approximateBytesUsed
 private external fun _nGetApproximateBytesUsed(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
+// No ForceNativeThreadState: wraps the picture in a lazy shader that holds a reference to it, so it is short and cannot
+// block.
+// Native call path: SkPicture::makeShader -> SkPictureShader::Make
 private external fun _nMakeShader(
     ptr: NativePointer,
     tmx: Int,
@@ -290,4 +313,8 @@ private external fun _nMakeShader(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
+// Needs ForceNativeThreadState: replays the recorded draw calls on a canvas that can be GPU-backed, and its abort check
+// calls back into Kotlin.
+// Native call path: SkPicture::playback -> SkRecordDraw -> KotlinAbortCallback::abort
+@ForceNativeThreadState
 private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, data: InteropPointer)

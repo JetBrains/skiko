@@ -1,6 +1,7 @@
 package org.jetbrains.skia.gpu.graphite
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
@@ -39,7 +40,13 @@ class Recorder internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
 }
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_Recorder__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteRecorder
 private external fun _nGetRecorderFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_Recorder__1nSnap")
+// Needs ForceNativeThreadState: finishes pending drawing work and prepares resources through Metal.
+// Native call path: Recorder::snap -> flushTrackedDevices -> prepareResources
+@ForceNativeThreadState
 private external fun _nSnap(recorderPtr: NativePointer): NativePointer

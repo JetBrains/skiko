@@ -131,6 +131,12 @@ val Project.skikoKotlinLanguageVersion: KotlinVersion
 val Project.skikoKotlinApiVersion: KotlinVersion
     get() = KotlinVersion.fromVersion(providers.gradleProperty(SkikoGradleProperties.KOTLIN_API_VERSION).get())
 
+val Project.skikoKotlinNativeLanguageVersion: KotlinVersion
+    get() = KotlinVersion.fromVersion(providers.gradleProperty(SkikoGradleProperties.KOTLIN_NATIVE_LANGUAGE_VERSION).get())
+
+val Project.skikoKotlinNativeApiVersion: KotlinVersion
+    get() = KotlinVersion.fromVersion(providers.gradleProperty(SkikoGradleProperties.KOTLIN_NATIVE_API_VERSION).get())
+
 class SkikoProperties(private val myProject: Project) {
     val isTeamcityCIBuild: Boolean
         get() = myProject.hasProperty("teamcity")
@@ -271,6 +277,8 @@ class SkikoProperties(private val myProject: Project) {
 object SkikoGradleProperties {
     const val KOTLIN_LANGUAGE_VERSION = "skiko.kotlin.language.version"
     const val KOTLIN_API_VERSION = "skiko.kotlin.api.version"
+    const val KOTLIN_NATIVE_LANGUAGE_VERSION = "skiko.kotlin.native.language.version"
+    const val KOTLIN_NATIVE_API_VERSION = "skiko.kotlin.native.api.version"
     const val AWT_ENABLED = "skiko.awt.enabled"
     const val WASM_ENABLED = "skiko.wasm.enabled"
     const val ANDROID_ENABLED = "skiko.android.enabled"

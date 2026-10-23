@@ -1,6 +1,7 @@
 package org.jetbrains.skia.gpu.graphite
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.InteropPointer
@@ -114,12 +115,19 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
 }
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteBackendTexture
 private external fun _nGetBackendTextureFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeMetal")
+// Needs ForceNativeThreadState: reads the sample count, pixel format and usage of a Metal texture through Objective-C.
+// Native call path: BackendTextures::MakeMetal -> TextureInfos::MakeMetal -> MtlTextureInfo::MtlTextureInfo
+@ForceNativeThreadState
 private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeVulkan")
+// No ForceNativeThreadState: returns 0 without touching its arguments, so it is short and cannot block.
 private external fun _nMakeVulkan(
     width: Int,
     height: Int,

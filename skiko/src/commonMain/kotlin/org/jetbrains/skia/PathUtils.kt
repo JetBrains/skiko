@@ -95,12 +95,20 @@ object PathUtils {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaint")
+// Needs ForceNativeThreadState: applies the paint's path effect and stroke to the path, so its time grows with the path
+// size.
+// Native call path: FillPathWithPaint -> SkStrokeRec::applyToPath -> SkStroke::strokePath
+@ForceNativeThreadState
 private external fun _nFillPathWithPaint(
     srcPtr: NativePointer,
     paintPtr: NativePointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintBuilder")
+// Needs ForceNativeThreadState: applies the paint's path effect and stroke to the path, so its time grows with the path
+// size.
+// Native call path: FillPathWithPaint -> SkStrokeRec::applyToPath -> SkStroke::strokePath
+@ForceNativeThreadState
 private external fun _nFillPathWithPaintBuilder(
     srcPtr: NativePointer,
     paintPtr: NativePointer,
@@ -108,6 +116,10 @@ private external fun _nFillPathWithPaintBuilder(
 ): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintMatrix")
+// Needs ForceNativeThreadState: applies the paint's path effect and stroke to the path, so its time grows with the path
+// size.
+// Native call path: FillPathWithPaint -> SkStrokeRec::applyToPath -> SkStroke::strokePath
+@ForceNativeThreadState
 private external fun _nFillPathWithPaintMatrix(
     srcPtr: NativePointer,
     paintPtr: NativePointer,
@@ -116,6 +128,10 @@ private external fun _nFillPathWithPaintMatrix(
 ): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaintCull")
+// Needs ForceNativeThreadState: applies the paint's path effect and stroke to the path, so its time grows with the path
+// size.
+// Native call path: FillPathWithPaint -> SkStrokeRec::applyToPath -> SkStroke::strokePath
+@ForceNativeThreadState
 private external fun _nFillPathWithPaintCull(
     srcPtr: NativePointer,
     paintPtr: NativePointer,

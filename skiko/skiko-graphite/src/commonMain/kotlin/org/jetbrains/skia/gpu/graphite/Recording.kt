@@ -16,4 +16,7 @@ class Recording internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 }
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_Recording__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteRecording
 private external fun _nGetRecordingFinalizer(): NativePointer

@@ -595,133 +595,255 @@ class Font : Managed {
 
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot
+// block.
+// Native call path: _nGetFinalizer
 private external fun Font_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeClone")
+// No ForceNativeThreadState: copies the font settings and adds one reference to its typeface, so it is short and cannot
+// block.
+// Native call path: SkFont::SkFont
 private external fun Font_nMakeClone(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nEquals")
+// No ForceNativeThreadState: compares the typeface pointer and scalar fields of two fonts, so it is short and cannot
+// block.
+// Native call path: SkFont::operator==
 private external fun Font_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSize")
+// No ForceNativeThreadState: returns a stored size field, so it is short and cannot block.
+// Native call path: SkFont::getSize
 private external fun Font_nGetSize(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeDefault")
+// Needs ForceNativeThreadState: can wait for another thread still initializing the shared empty typeface on first use.
+// Native call path: SkFont::SkFont -> SkTypeface::MakeEmpty -> SkEmptyTypeface::Make
+@ForceNativeThreadState
 private external fun _nMakeDefault(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypeface")
+// Needs ForceNativeThreadState: can wait for another thread still initializing the shared empty typeface on first use.
+// Native call path: SkFont::SkFont -> SkTypeface::MakeEmpty -> SkEmptyTypeface::Make
+@ForceNativeThreadState
 private external fun _nMakeTypeface(typefacePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSize")
+// Needs ForceNativeThreadState: can wait for another thread still initializing the shared empty typeface on first use.
+// Native call path: SkFont::SkFont -> SkTypeface::MakeEmpty -> SkEmptyTypeface::Make
+@ForceNativeThreadState
 private external fun _nMakeTypefaceSize(typefacePtr: NativePointer, size: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew")
+// Needs ForceNativeThreadState: can wait for another thread still initializing the shared empty typeface on first use.
+// Native call path: SkFont::SkFont -> SkTypeface::MakeEmpty -> SkEmptyTypeface::Make
+@ForceNativeThreadState
 private external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: NativePointer, size: Float, scaleX: Float, skewX: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsAutoHintingForced")
+// No ForceNativeThreadState: reads one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::isForceAutoHinting
 private external fun _nIsAutoHintingForced(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nAreBitmapsEmbedded")
+// No ForceNativeThreadState: reads one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::isEmbeddedBitmaps
 private external fun _nAreBitmapsEmbedded(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsSubpixel")
+// No ForceNativeThreadState: reads one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::isSubpixel
 private external fun _nIsSubpixel(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsLinearMetrics")
+// No ForceNativeThreadState: reads one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::isLinearMetrics
 private external fun _nIsLinearMetrics(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsEmboldened")
+// No ForceNativeThreadState: reads one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::isEmbolden
 private external fun _nIsEmboldened(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsBaselineSnapped")
+// No ForceNativeThreadState: reads one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::isBaselineSnap
 private external fun _nIsBaselineSnapped(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetAutoHintingForced")
+// No ForceNativeThreadState: sets one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::setForceAutoHinting -> set_clear_mask
 private external fun _nSetAutoHintingForced(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetBitmapsEmbedded")
+// No ForceNativeThreadState: sets one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::setEmbeddedBitmaps -> set_clear_mask
 private external fun _nSetBitmapsEmbedded(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSubpixel")
+// No ForceNativeThreadState: sets one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::setSubpixel -> set_clear_mask
 private external fun _nSetSubpixel(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetLinearMetrics")
+// No ForceNativeThreadState: sets one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::setLinearMetrics -> set_clear_mask
 private external fun _nSetLinearMetrics(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetEmboldened")
+// No ForceNativeThreadState: sets one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::setEmbolden -> set_clear_mask
 private external fun _nSetEmboldened(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetBaselineSnapped")
+// No ForceNativeThreadState: sets one flag bit of the font, so it is short and cannot block.
+// Native call path: SkFont::setBaselineSnap -> set_clear_mask
 private external fun _nSetBaselineSnapped(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetEdging")
+// No ForceNativeThreadState: returns a stored edging setting, so it is short and cannot block.
+// Native call path: SkFont::getEdging
 private external fun _nGetEdging(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetEdging")
+// No ForceNativeThreadState: stores the edging setting, so it is short and cannot block.
+// Native call path: SkFont::setEdging
 private external fun _nSetEdging(ptr: NativePointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetHinting")
+// No ForceNativeThreadState: returns a stored hinting setting, so it is short and cannot block.
+// Native call path: SkFont::getHinting
 private external fun _nGetHinting(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetHinting")
+// No ForceNativeThreadState: stores the hinting setting, so it is short and cannot block.
+// Native call path: SkFont::setHinting
 private external fun _nSetHinting(ptr: NativePointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypeface")
+// No ForceNativeThreadState: returns a new reference to the stored typeface without freeing anything, so it is short
+// and cannot block.
+// Native call path: SkFont::refTypeface -> sk_sp::release
 private external fun _nGetTypeface(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetScaleX")
+// No ForceNativeThreadState: returns the stored horizontal scale value, so it is short and cannot block.
+// Native call path: SkFont::getScaleX
 private external fun _nGetScaleX(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSkewX")
+// No ForceNativeThreadState: returns the stored skew value, so it is short and cannot block.
+// Native call path: SkFont::getSkewX
 private external fun _nGetSkewX(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetTypeface")
+// Needs ForceNativeThreadState: can drop the last reference to the old typeface, which releases a CoreText font.
+// Native call path: SkFont::setTypeface -> ~sk_sp<SkTypeface> -> ~SkTypeface_Mac -> CFRelease
+@ForceNativeThreadState
 private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSize")
+// No ForceNativeThreadState: stores a new text size after clamping it to a valid range, so it is short and cannot
+// block.
+// Native call path: SkFont::setSize
 private external fun _nSetSize(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetScaleX")
+// No ForceNativeThreadState: stores a new horizontal scale value, so it is short and cannot block.
+// Native call path: SkFont::setScaleX
 private external fun _nSetScaleX(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSkewX")
+// No ForceNativeThreadState: stores a new skew value, so it is short and cannot block.
+// Native call path: SkFont::setSkewX
 private external fun _nSetSkewX(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyph")
+// Needs ForceNativeThreadState: looks up the glyph id for one character through CoreText, the Apple font library.
+// Native call path: SkFont::unicharToGlyph -> SkTypeface_Mac::onCharsToGlyphs -> CTFontGetGlyphsForCharacters
+@ForceNativeThreadState
 private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyphs")
+// Needs ForceNativeThreadState: looks up glyph ids for a list of characters through CoreText, so its time grows with
+// the number of characters.
+// Native call path: SkFont::unicharsToGlyphs -> SkTypeface_Mac::onCharsToGlyphs -> CTFontGetGlyphsForCharacters
+@ForceNativeThreadState
 private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: InteropPointer, uniArrLen: Int, resultGlyphs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
+// Needs ForceNativeThreadState: counts the glyphs in a string by scanning all of its text, so its time grows with the
+// string length.
+// Native call path: SkFont::countText -> SkFontPriv::CountTextElements
+@ForceNativeThreadState
 private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: InteropPointer, len: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
+// Needs ForceNativeThreadState: maps text characters through CoreText and asks CoreText for glyph measurements missing
+// from the cache.
+// Native call path: SkFont::measureText -> SkAutoToGlyphs -> CTFontGetGlyphsForCharacters
+@ForceNativeThreadState
 private external fun _nMeasureText(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer, rect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureTextWidth")
+// Needs ForceNativeThreadState: maps text characters through CoreText and asks CoreText for glyph measurements missing
+// from the cache.
+// Native call path: SkFont::measureText -> SkAutoToGlyphs -> CTFontGetGlyphsForCharacters
+@ForceNativeThreadState
 private external fun _nMeasureTextWidth(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetWidths")
+// Needs ForceNativeThreadState: reads glyph advance widths and, for a glyph not measured yet, asks CoreText for its
+// metrics.
+// Native call path: SkFont::getWidths -> SkBulkGlyphMetrics -> SkScalerContext_Mac::generateMetrics
+@ForceNativeThreadState
 private external fun _nGetWidths(ptr: NativePointer, glyphs: InteropPointer, count: Int, width: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetBounds")
+// Needs ForceNativeThreadState: reads glyph bounding boxes and, for a glyph not measured yet, asks CoreText for its
+// metrics.
+// Native call path: SkFont::getBounds -> SkBulkGlyphMetrics -> SkScalerContext_Mac::generateMetrics
+@ForceNativeThreadState
 private external fun _nGetBounds(ptr: NativePointer, glyphs: InteropPointer, count: Int, paintPtr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPositions")
+// Needs ForceNativeThreadState: reads glyph positions and, for a glyph not measured yet, asks CoreText for its
+// advances.
+// Native call path: SkFont::getPos -> SkBulkGlyphMetrics -> SkScalerContext_Mac::generateMetrics
+@ForceNativeThreadState
 private external fun _nGetPositions(ptr: NativePointer, glyphs: InteropPointer, count: Int, x: Float, y: Float, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
+// Needs ForceNativeThreadState: reads glyph x positions and, for a glyph not measured yet, asks CoreText for its
+// advances.
+// Native call path: SkFont::getXPos -> SkBulkGlyphMetrics -> SkScalerContext_Mac::generateMetrics
+@ForceNativeThreadState
 private external fun _nGetXPositions(ptr: NativePointer, glyphs: InteropPointer, x: Float, count: Int, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPath")
+// Needs ForceNativeThreadState: builds the outline of a glyph, and if that outline is not built yet it asks CoreText to
+// create it.
+// Native call path: SkFont::getPath -> SkScalerContext_Mac::generatePath -> CTFontCreatePathForGlyph
+@ForceNativeThreadState
 private external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPaths")
+// Needs ForceNativeThreadState: builds glyph outlines for a list of glyphs, so its time grows with the number of
+// glyphs, and asks CoreText for outlines not built yet.
+// Native call path: SkFont::getPaths -> SkScalerContext_Mac::generatePath -> CTFontCreatePathForGlyph
+@ForceNativeThreadState
 private external fun _nGetPaths(ptr: NativePointer, glyphs: InteropPointer, count: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetMetrics")
+// Needs ForceNativeThreadState: may build a new glyph cache for the font, which asks CoreText for the font's metrics.
+// Native call path: SkFont::getMetrics -> SkScalerContext_Mac::generateFontMetrics
+@ForceNativeThreadState
 private external fun _nGetMetrics(ptr: NativePointer, metrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSpacing")
+// Needs ForceNativeThreadState: gets the line spacing from the font metrics, which may build a new glyph cache and asks
+// CoreText for the metrics.
+// Native call path: SkFont::getSpacing -> SkFont::getMetrics -> SkScalerContext_Mac::generateFontMetrics
+@ForceNativeThreadState
 private external fun _nGetSpacing(ptr: NativePointer): Float

@@ -130,43 +130,95 @@ class Graphics {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheLimit")
+// Needs ForceNativeThreadState: takes a font-cache lock that stays held while CoreText fonts are created, so it can
+// wait for another thread.
+// Native call path: SkStrikeCache::getCacheSizeLimit
+@ForceNativeThreadState
 private external fun _nGetFontCacheLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCacheLimit")
+// Needs ForceNativeThreadState: can free cached font data, which releases CoreText font objects.
+// Native call path: SkStrikeCache::setCacheSizeLimit -> internalPurge -> ~SkStrike -> ~SkScalerContext_Mac
+@ForceNativeThreadState
 private external fun _nSetFontCacheLimit(bytes: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheUsed")
+// Needs ForceNativeThreadState: takes a font-cache lock that stays held while CoreText fonts are created, so it can
+// wait for another thread.
+// Native call path: SkStrikeCache::getTotalMemoryUsed
+@ForceNativeThreadState
 private external fun _nGetFontCacheUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountLimit")
+// Needs ForceNativeThreadState: takes a font-cache lock that stays held while CoreText fonts are created, so it can
+// wait for another thread.
+// Native call path: SkStrikeCache::getCacheCountLimit
+@ForceNativeThreadState
 private external fun _nGetFontCacheCountLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCacheCountLimit")
+// Needs ForceNativeThreadState: can free cached font data, which releases CoreText font objects.
+// Native call path: SkStrikeCache::setCacheCountLimit -> internalPurge -> ~SkStrike -> ~SkScalerContext_Mac
+@ForceNativeThreadState
 private external fun _nSetFontCacheCountLimit(count: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountUsed")
+// Needs ForceNativeThreadState: takes a font-cache lock that stays held while CoreText fonts are created, so it can
+// wait for another thread.
+// Native call path: SkStrikeCache::getCacheCountUsed
+@ForceNativeThreadState
 private external fun _nGetFontCacheCountUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalByteLimit")
+// Needs ForceNativeThreadState: can wait on a cache lock held while another thread frees pictures and releases fonts
+// through CoreFoundation.
+// Native call path: SkResourceCache::getTotalByteLimit
+@ForceNativeThreadState
 private external fun _nGetResourceCacheTotalByteLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetResourceCacheTotalByteLimit")
+// Needs ForceNativeThreadState: takes a cache lock and can free cached pictures when the limit shrinks, and freeing one
+// can release a font.
+// Native call path: SkResourceCache::setTotalByteLimit -> purgeAsNeeded -> ~Rec -> ~SkPicture
+@ForceNativeThreadState
 private external fun _nSetResourceCacheTotalByteLimit(bytes: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheSingleAllocationByteLimit")
+// Needs ForceNativeThreadState: can wait on a cache lock held while another thread frees pictures and releases fonts
+// through CoreFoundation.
+// Native call path: SkResourceCache::getSingleAllocationByteLimit
+@ForceNativeThreadState
 private external fun _nGetResourceCacheSingleAllocationByteLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetResourceCacheSingleAllocationByteLimit")
+// Needs ForceNativeThreadState: can wait on a cache lock held while another thread frees pictures and releases fonts
+// through CoreFoundation.
+// Native call path: SkResourceCache::setSingleAllocationByteLimit
+@ForceNativeThreadState
 private external fun _nSetResourceCacheSingleAllocationByteLimit(bytes: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalBytesUsed")
+// Needs ForceNativeThreadState: can wait on a cache lock held while another thread frees pictures and releases fonts
+// through CoreFoundation.
+// Native call path: SkResourceCache::getTotalBytesUsed
+@ForceNativeThreadState
 private external fun _nGetResourceCacheTotalBytesUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeFontCache")
+// Needs ForceNativeThreadState: frees all cached font data, which releases CoreText font objects.
+// Native call path: SkStrikeCache::purgeAll -> ~SkScalerContext_Mac
+@ForceNativeThreadState
 private external fun _nPurgeFontCache()
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeResourceCache")
+// Needs ForceNativeThreadState: frees all cached pictures and their text, which can release a font, while holding the
+// cache lock.
+// Native call path: SkResourceCache::PurgeAll -> purgeAsNeeded -> ~Rec -> ~SkPicture -> ~SkTextBlob
+@ForceNativeThreadState
 private external fun _nPurgeResourceCache()
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeAllCaches")
+// Needs ForceNativeThreadState: frees all font caches and picture caches, which can release CoreText font objects.
+// Native call path: SkStrikeCache::purgeAll -> ~SkScalerContext_Mac
+@ForceNativeThreadState
 private external fun _nPurgeAllCaches()
