@@ -164,6 +164,36 @@ private fun Project.configureRuntimePublicationFamily(
         configureAwtRuntimeAllJarPublication(skiko, family, prefix, runtimeInputs, emptySourcesJar, emptyJavadocJar)
         configureAwtRuntimeJarPublication(skiko, family, prefix, emptyJavadocJar)
     }
+
+    // Keep the producer projects' publishing entry points after moving their publications here.
+    val publicationNames = runtimeInputs.keys.map { (os, arch) ->
+        "SkikoJvmRuntime${joinToTitleCamelCase(os.id, arch.id)}" to
+            "${toTitleCase(prefix)}JvmRuntime${joinToTitleCamelCase(os.id, arch.id)}"
+    } + if (supportAwt) listOf(
+        "AwtRuntimeAll" to "${toTitleCase(prefix)}AwtRuntimeAll",
+        "AwtRuntimeElements" to "${toTitleCase(prefix)}AwtRuntimeElements",
+    ) else emptyList()
+    val producerTasks = project(family.producerProjectPath).tasks
+    val runtimeTasks = tasks
+    val repositories = extensions.getByType<PublishingExtension>().repositories
+    publicationNames.forEach { (oldName, newName) ->
+        repositories.forEach { repository ->
+            val taskSuffix = "PublicationTo${repository.name}Repository"
+            val publish = producerTasks.register("publish${oldName}$taskSuffix") {
+                group = "publishing"
+                dependsOn(runtimeTasks.named("publish${newName}$taskSuffix"))
+            }
+            producerTasks.matching { it.name == "publishTo${repository.name}" }
+                .configureEach { dependsOn(publish) }
+            producerTasks.matching { it.name == "publish" }.configureEach { dependsOn(publish) }
+        }
+        val publishToMavenLocal = producerTasks.register("publish${oldName}PublicationToMavenLocal") {
+            group = "publishing"
+            dependsOn(runtimeTasks.named("publish${newName}PublicationToMavenLocal"))
+        }
+        producerTasks.matching { it.name == "publishToMavenLocal" }
+            .configureEach { dependsOn(publishToMavenLocal) }
+    }
 }
 
 private fun Project.configureAwtRuntimeAllJarPublication(
