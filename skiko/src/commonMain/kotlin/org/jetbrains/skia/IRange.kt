@@ -8,7 +8,7 @@ import org.jetbrains.skiko.internal.unpackInt1
 import org.jetbrains.skiko.internal.unpackInt2
 import kotlin.jvm.JvmInline
 
-inline fun IRange(x: Int, y: Int): IRange = IRange(packInts(x, y))
+inline fun IRange(start: Int, end: Int): IRange = IRange(packInts(start, end))
 @JvmInline
 value class IRange(val packedValue: Long) {
 
