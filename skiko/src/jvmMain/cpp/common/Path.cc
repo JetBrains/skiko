@@ -386,7 +386,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromRRe
   (JNIEnv* env, jclass jclass, jfloatArray radiiArray, jint radiiSize,
    jfloat left, jfloat top, jfloat right, jfloat bottom,
    jint direction, jint startIndex) {
-    SkRRect rrect = skija::RRect::toSkRRect(env, left, top, right, bottom, radiiArray);
+    SkRRect rrect = skija::RRect::toSkRRect(env, left, top, right, bottom, radiiArray, radiiSize);
     
     SkPath path = SkPath::RRect(
         rrect,

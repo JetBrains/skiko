@@ -708,11 +708,11 @@ namespace skija {
             env->DeleteGlobalRef(cls);
         }
 
-        SkRRect toSkRRect(JNIEnv* env, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii) {
+        SkRRect toSkRRect(JNIEnv* env, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint radiiSize) {
             SkRect rect {left, top, right, bottom};
             SkRRect rrect = SkRRect::MakeEmpty();
             jfloat* radii = env->GetFloatArrayElements(jradii, 0);
-            switch (env->GetArrayLength(jradii)) {
+            switch (radiiSize) {
                 case 1:
                     rrect.setRectXY(rect, radii[0], radii[0]);
                     break;

@@ -205,7 +205,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_Ren
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipRRect
   (JNIEnv *env, jclass jclass, jlong ptr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray radii, jint radiiSize, jint mode, jboolean antiAlias) {
     auto instance = reinterpret_cast<skiko::node::RenderNode *>(ptr);
-    instance->setClipRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, radii), static_cast<SkClipOp>(mode), antiAlias);
+    instance->setClipRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, radii, radiiSize), static_cast<SkClipOp>(mode), antiAlias);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nSetClipPath
