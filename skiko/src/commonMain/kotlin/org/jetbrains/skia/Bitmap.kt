@@ -1019,9 +1019,8 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     }
 
     /**
-     * Create a pixmap and copy buffer contents into it
-     *
-     * @return Pixamp with copied pixels, or null
+     * If pixel address is available, return [Pixmap].
+     * If pixel address is not available, return null.
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_peekPixels](https://fiddle.skia.org/c/@Bitmap_peekPixels)
      */
