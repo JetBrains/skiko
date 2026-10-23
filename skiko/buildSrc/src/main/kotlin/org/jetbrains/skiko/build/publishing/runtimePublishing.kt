@@ -46,6 +46,13 @@ private val desktopRuntimeTargets = listOf(
     OS.Windows to Arch.X64, OS.Windows to Arch.Arm64,
 )
 
+// Sign tasks write next to their input files, so each publication needs its own archive path.
+private fun Project.emptyPublicationJar(publicationName: String, artifactId: String, classifier: String): TaskProvider<Jar> =
+    tasks.register<Jar>("${publicationName}Empty${toTitleCase(classifier)}Jar") {
+        archiveBaseName.set(artifactId)
+        archiveClassifier.set(classifier)
+    }
+
 fun Project.declareJvmRuntimePublications(
     skiko: SkikoProperties,
     families: List<JvmRuntimePublicationFamily>,
@@ -101,14 +108,6 @@ private fun Project.configureRuntimePublicationFamily(
     val prefix = family.artifacts.artifactIdPrefix
         .split("-")
         .let { parts -> parts.first() + joinToTitleCamelCase(*parts.drop(1).toTypedArray()) }
-    val emptySourcesJar = tasks.register<Jar>("${prefix}EmptySourcesJar") {
-        archiveBaseName.set(family.artifacts.artifactIdPrefix)
-        archiveClassifier.set("sources")
-    }
-    val emptyJavadocJar = tasks.register<Jar>("${prefix}EmptyJavadocJar") {
-        archiveBaseName.set(family.artifacts.artifactIdPrefix)
-        archiveClassifier.set("javadoc")
-    }
     val runtimeInputs = family.targets.associateWith { (os, arch) ->
         configurations.create("${prefix}RuntimeInput${joinToTitleCamelCase(os.id, arch.id)}") {
             isCanBeConsumed = false
@@ -125,15 +124,19 @@ private fun Project.configureRuntimePublicationFamily(
     extensions.getByType<PublishingExtension>().publications {
         runtimeInputs.forEach { (target, input) ->
             val (os, arch) = target
-            create<MavenPublication>("${prefix}JvmRuntime${joinToTitleCamelCase(os.id, arch.id)}") {
+            val publicationName = "${prefix}JvmRuntime${joinToTitleCamelCase(os.id, arch.id)}"
+            val artifactId = family.artifacts.jvmRuntimeArtifactIdFor(os, arch)
+            val sourcesJar = emptyPublicationJar(publicationName, artifactId, "sources")
+            val javadocJar = emptyPublicationJar(publicationName, artifactId, "javadoc")
+            create<MavenPublication>(publicationName) {
                 groupId = SkikoArtifacts.DEFAULT_GROUP_ID
-                artifactId = family.artifacts.jvmRuntimeArtifactIdFor(os, arch)
+                this.artifactId = artifactId
                 version = skiko.deployVersion
                 artifact(layout.file(provider { input.singleFile })) {
                     builtBy(input)
                 }
-                artifact(emptySourcesJar)
-                artifact(emptyJavadocJar)
+                artifact(sourcesJar)
+                artifact(javadocJar)
                 pom {
                     name.set("${family.artifacts.displayName} JVM Runtime for ${os.name} ${arch.name}")
                     description.set(family.artifacts.pomDescription)
@@ -161,8 +164,8 @@ private fun Project.configureRuntimePublicationFamily(
     }
 
     if (supportAwt) {
-        configureAwtRuntimeAllJarPublication(skiko, family, prefix, runtimeInputs, emptySourcesJar, emptyJavadocJar)
-        configureAwtRuntimeJarPublication(skiko, family, prefix, emptyJavadocJar)
+        configureAwtRuntimeAllJarPublication(skiko, family, prefix, runtimeInputs)
+        configureAwtRuntimeJarPublication(skiko, family, prefix)
     }
 
     // Keep the producer projects' publishing entry points after moving their publications here.
@@ -201,8 +204,6 @@ private fun Project.configureAwtRuntimeAllJarPublication(
     family: JvmRuntimePublicationFamily,
     prefix: String,
     runtimeInputs: Map<Pair<OS, Arch>, Configuration>,
-    emptySourcesJar: TaskProvider<Jar>,
-    emptyJavadocJar: TaskProvider<Jar>,
 ) {
     val inputsDir = rootProject.layout.projectDirectory.dir(
         "dependencies/awtRuntimeAllInputs/${family.artifacts.artifactIdPrefix}"
@@ -231,15 +232,17 @@ private fun Project.configureAwtRuntimeAllJarPublication(
         }
     }
 
-    extensions.getByType<PublishingExtension>().publications.create<MavenPublication>(
-        "${prefix}AwtRuntimeAll"
-    ) {
+    val publicationName = "${prefix}AwtRuntimeAll"
+    val artifactId = family.artifacts.jvmRuntimeAllArtifactId
+    val sourcesJar = emptyPublicationJar(publicationName, artifactId, "sources")
+    val javadocJar = emptyPublicationJar(publicationName, artifactId, "javadoc")
+    extensions.getByType<PublishingExtension>().publications.create<MavenPublication>(publicationName) {
         groupId = SkikoArtifacts.DEFAULT_GROUP_ID
-        artifactId = family.artifacts.jvmRuntimeAllArtifactId
+        this.artifactId = artifactId
         version = skiko.deployVersion
         artifact(allJar)
-        artifact(emptySourcesJar)
-        artifact(emptyJavadocJar)
+        artifact(sourcesJar)
+        artifact(javadocJar)
         pom {
             name.set("Composition of all ${family.artifacts.displayName} AWT Runtimes")
             description.set(family.artifacts.pomDescription)
@@ -313,7 +316,6 @@ private fun Project.configureAwtRuntimeJarPublication(
     skiko: SkikoProperties,
     family: JvmRuntimePublicationFamily,
     prefix: String,
-    emptyJavadocJar: TaskProvider<Jar>,
 ) {
     val variants = desktopRuntimeTargets.map { (os, arch) ->
         configurations.create("${prefix}AwtRuntimeElements-${targetId(os, arch)}") {
@@ -376,14 +378,15 @@ private fun Project.configureAwtRuntimeJarPublication(
     }
 
     /* Create the actual publication for this */
-    extensions.getByType<PublishingExtension>().publications.create<MavenPublication>(
-        "${prefix}AwtRuntimeElements"
-    ) {
+    val publicationName = "${prefix}AwtRuntimeElements"
+    val artifactId = family.artifacts.jvmRuntimeArtifactId
+    val javadocJar = emptyPublicationJar(publicationName, artifactId, "javadoc")
+    extensions.getByType<PublishingExtension>().publications.create<MavenPublication>(publicationName) {
         from(component)
         groupId = SkikoArtifacts.DEFAULT_GROUP_ID
-        artifactId = family.artifacts.jvmRuntimeArtifactId
+        this.artifactId = artifactId
         version = skiko.deployVersion
-        artifact(emptyJavadocJar)
+        artifact(javadocJar)
         pom {
             name.set("${family.artifacts.displayName} JVM Runtime")
             description.set(family.artifacts.pomDescription)
