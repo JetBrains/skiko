@@ -166,6 +166,36 @@ class PathTest {
     }
 
     @Test
+    fun makeFromRRectWithOneRadiusTest() {
+        assertMakeFromRRect(RRect.makeLTRB(10f, 20f, 110f, 120f, 7f))
+    }
+
+    @Test
+    fun makeFromRRectWithTwoRadiiTest() {
+        assertMakeFromRRect(RRect.makeXYWH(10f, 20f, 100f, 100f, 7f, 13f))
+    }
+
+    @Test
+    fun makeFromRRectWithFourRadiiTest() {
+        assertMakeFromRRect(RRect.makeLTRB(10f, 20f, 110f, 120f, 5f, 10f, 15f, 20f))
+    }
+
+    @Test
+    fun makeFromRRectWithEightRadiiTest() {
+        assertMakeFromRRect(
+            RRect.makeComplexLTRB(10f, 20f, 110f, 120f, floatArrayOf(5f, 6f, 10f, 11f, 15f, 16f, 20f, 21f))
+        )
+    }
+
+    private fun assertMakeFromRRect(rrect: RRect) {
+        val expectedBounds = Rect(rrect.left, rrect.top, rrect.right, rrect.bottom)
+        val path = Path.RRect(rrect)
+        assertCloseEnough(expectedBounds, path.bounds)
+        assertEquals(rrect, path.isRRect)
+        assertEquals(PathBuilder().addRRect(rrect).detach(), path)
+    }
+
+    @Test
     fun polygonTest() {
         val pts = arrayOf(Point(0f, 0f), Point(10f, 0f), Point(10f, 10f), Point(0f, 10f))
         val pathClosed = Path.Polygon(pts, true)

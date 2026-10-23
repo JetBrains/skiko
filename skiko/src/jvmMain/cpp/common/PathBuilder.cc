@@ -171,7 +171,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathBuilderKt_PathBuil
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathBuilderKt_PathBuilder_1nAddRRect
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint radiiSize, jint dirInt, jint start) {
     SkPathBuilder* builder = reinterpret_cast<SkPathBuilder*>(static_cast<uintptr_t>(ptr));
-    SkRRect rrect = skija::RRect::toSkRRect(env, l, t, r, b, radii);
+    SkRRect rrect = skija::RRect::toSkRRect(env, l, t, r, b, radii, radiiSize);
     SkPathDirection dir = static_cast<SkPathDirection>(dirInt);
     builder->addRRect(rrect, dir, start);
 }

@@ -10,6 +10,14 @@ import kotlin.test.assertEquals
 class StrutStyleTests {
 
     @Test
+    fun topRatioRoundTrip() {
+        StrutStyle().use { strutStyle ->
+            strutStyle.topRatio = 0.25f
+            assertEquals(0.25f, strutStyle.topRatio)
+        }
+    }
+
+    @Test
     fun strutStyleTest() {
         StrutStyle().use { strutStyle ->
             assertEquals(FontStyle(FontWeight.NORMAL, FontWidth.NORMAL, FontSlant.UPRIGHT), strutStyle.fontStyle)

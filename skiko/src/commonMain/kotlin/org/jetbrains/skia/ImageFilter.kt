@@ -355,6 +355,27 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        /** Returns an image filter that draws [picture] into [target], replacing the filter input. */
+        fun makePicture(picture: Picture?, target: Rect): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                ImageFilter(
+                    _nMakePicture(
+                        getPtr(picture),
+                        target.left,
+                        target.top,
+                        target.right,
+                        target.bottom
+                    )
+                )
+            } finally {
+                reachabilityBarrier(picture)
+            }
+        }
+
+        /** Returns an image filter that draws [picture] over its cull rect, replacing the filter input. */
+        fun makePicture(picture: Picture): ImageFilter = makePicture(picture, picture.cullRect)
+
         fun makeMerge(filters: Array<ImageFilter?>, crop: IRect?): ImageFilter {
             return interopScope {
                 try {

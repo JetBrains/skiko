@@ -117,6 +117,7 @@ class ColorFilter : RefCnt {
         }
 
         val sRGBToLinearGamma = ColorFilter(_nGetSRGBToLinearGamma(), false)
+        val linearToSRGBGamma = ColorFilter(_nGetLinearToSRGBGamma(), false)
         val luma = ColorFilter(_nGetLuma(), false)
     }
 
