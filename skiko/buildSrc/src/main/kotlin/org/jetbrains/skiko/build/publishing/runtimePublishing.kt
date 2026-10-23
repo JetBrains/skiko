@@ -25,6 +25,9 @@ import org.gradle.nativeplatform.MachineArchitecture
 import org.gradle.nativeplatform.OperatingSystemFamily
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.skiko.build.context.supportAwt
+import org.jetbrains.skiko.build.dependencies.additionalRuntimeArchAttribute
+import org.jetbrains.skiko.build.dependencies.additionalRuntimeNameAttribute
+import org.jetbrains.skiko.build.dependencies.additionalRuntimeOsAttribute
 import org.jetbrains.skiko.build.utils.Arch
 import org.jetbrains.skiko.build.utils.OS
 import org.jetbrains.skiko.build.utils.SkikoArtifacts
@@ -38,12 +41,19 @@ data class JvmRuntimePublicationFamily(
     val artifacts: SkikoArtifacts,
     val targets: List<Pair<OS, Arch>>,
     val runtimeDependencies: List<SkikoArtifacts> = emptyList(),
+    val additionalRuntimes: List<Configuration> = emptyList(),
 )
 
 private val desktopRuntimeTargets = listOf(
     OS.MacOS to Arch.X64, OS.MacOS to Arch.Arm64,
     OS.Linux to Arch.X64, OS.Linux to Arch.Arm64,
     OS.Windows to Arch.X64, OS.Windows to Arch.Arm64,
+)
+
+private fun additionalRuntimeDetails(configuration: Configuration): Triple<String, OS, Arch> = Triple(
+    requireNotNull(configuration.attributes.getAttribute(additionalRuntimeNameAttribute)),
+    OS.valueOf(requireNotNull(configuration.attributes.getAttribute(additionalRuntimeOsAttribute))),
+    Arch.valueOf(requireNotNull(configuration.attributes.getAttribute(additionalRuntimeArchAttribute))),
 )
 
 // Sign tasks write next to their input files, so each publication needs its own archive path.
@@ -168,10 +178,18 @@ private fun Project.configureRuntimePublicationFamily(
         configureAwtRuntimeJarPublication(skiko, family, prefix)
     }
 
+    family.additionalRuntimes.forEach { runtime ->
+        configureAdditionalRuntimePublication(skiko, family, prefix, runtime)
+    }
+
     // Keep the producer projects' publishing entry points after moving their publications here.
     val publicationNames = runtimeInputs.keys.map { (os, arch) ->
         "SkikoJvmRuntime${joinToTitleCamelCase(os.id, arch.id)}" to
             "${toTitleCase(prefix)}JvmRuntime${joinToTitleCamelCase(os.id, arch.id)}"
+    } + family.additionalRuntimes.map { runtime ->
+        val (name, os, arch) = additionalRuntimeDetails(runtime)
+        val suffix = "${toTitleCase(name)}${joinToTitleCamelCase(os.id, arch.id)}"
+        "SkikoJvmRuntime$suffix" to "${toTitleCase(prefix)}JvmRuntime$suffix"
     } + if (supportAwt) listOf(
         "AwtRuntimeAll" to "${toTitleCase(prefix)}AwtRuntimeAll",
         "AwtRuntimeElements" to "${toTitleCase(prefix)}AwtRuntimeElements",
@@ -196,6 +214,53 @@ private fun Project.configureRuntimePublicationFamily(
         }
         producerTasks.matching { it.name == "publishToMavenLocal" }
             .configureEach { dependsOn(publishToMavenLocal) }
+    }
+
+    family.additionalRuntimes.forEach { runtime ->
+        val (name, os, arch) = additionalRuntimeDetails(runtime)
+        val suffix = joinToTitleCamelCase(os.id, arch.id)
+        val additionalSuffix = "${toTitleCase(name)}$suffix"
+        repositories.forEach { repository ->
+            val taskSuffix = "PublicationTo${repository.name}Repository"
+            runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}$taskSuffix").configure {
+                dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}$taskSuffix"))
+            }
+        }
+        runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}PublicationToMavenLocal").configure {
+            dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}PublicationToMavenLocal"))
+        }
+    }
+}
+
+private fun Project.configureAdditionalRuntimePublication(
+    skiko: SkikoProperties,
+    family: JvmRuntimePublicationFamily,
+    prefix: String,
+    runtime: Configuration,
+) {
+    val (runtimeName, os, arch) = additionalRuntimeDetails(runtime)
+    val suffix = joinToTitleCamelCase(os.id, arch.id)
+    val input = configurations.create("${prefix}${toTitleCase(runtimeName)}RuntimeInput$suffix") {
+        isCanBeConsumed = false
+        isCanBeResolved = true
+        dependencies.add(project.dependencies.project(family.producerProjectPath, runtime.name))
+    }
+    val publicationName = "${prefix}JvmRuntime${toTitleCase(runtimeName)}$suffix"
+    val artifactId = family.artifacts.jvmAdditionalRuntimeArtifactIdFor(runtimeName, os, arch)
+    val sourcesJar = emptyPublicationJar(publicationName, artifactId, "sources")
+    val javadocJar = emptyPublicationJar(publicationName, artifactId, "javadoc")
+    extensions.getByType<PublishingExtension>().publications.create<MavenPublication>(publicationName) {
+        groupId = SkikoArtifacts.DEFAULT_GROUP_ID
+        this.artifactId = artifactId
+        version = skiko.deployVersion
+        artifact(layout.file(provider { input.singleFile })) { builtBy(input) }
+        artifact(sourcesJar)
+        artifact(javadocJar)
+        pom {
+            name.set("${family.artifacts.displayName} ${toTitleCase(runtimeName)} Runtime for ${os.id} ${arch.id}")
+            description.set(family.artifacts.pomDescription)
+            configureSkikoPomMetadata()
+        }
     }
 }
 
