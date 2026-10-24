@@ -3,7 +3,9 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
+import kotlin.js.JsStatic
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmStatic
 
 /**
  *
@@ -58,8 +60,8 @@ value class Matrix44 internal constructor(val mat: FloatArray) {
     }
 
     companion object {
-        val IDENTITY = Matrix44(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f)
-
+        val IDENTITY: Matrix44
+            get() = Matrix44(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f)
         internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Matrix44 {
             val result = withResult(FloatArray(16), block)
             return Matrix44(result)
