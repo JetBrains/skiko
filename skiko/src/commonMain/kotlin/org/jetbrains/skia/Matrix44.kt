@@ -3,9 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
-import kotlin.js.JsStatic
 import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmStatic
 
 /**
  *
