@@ -58,8 +58,8 @@ value class Matrix44 internal constructor(val mat: FloatArray) {
     }
 
     companion object {
-        val IDENTITY = Matrix44(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f)
-
+        val IDENTITY: Matrix44
+            get() = Matrix44(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f)
         internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Matrix44 {
             val result = withResult(FloatArray(16), block)
             return Matrix44(result)

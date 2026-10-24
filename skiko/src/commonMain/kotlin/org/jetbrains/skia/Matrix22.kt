@@ -32,7 +32,8 @@ value class Matrix22 internal constructor(val mat: FloatArray) {
     }
 
     companion object {
-        val IDENTITY = Matrix22(1f, 0f, 0f, 1f)
+        val IDENTITY: Matrix22
+            get() = Matrix22(1f, 0f, 0f, 1f)
 
         internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Matrix22 {
             val result = withResult(FloatArray(4), block)
