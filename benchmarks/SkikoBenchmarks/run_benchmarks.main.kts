@@ -160,20 +160,26 @@ fun gradleArgsFor(version: String, extraArgs: Map<String, String>, platform: Pla
         mutableListOf("-Pskiko.version=$version")
     }
 
+    when (platform) {
+        Platform.WEB -> {
+            args += "-Pskiko.wasm.enabled=true"
+            args += "-Pskiko.native.enabled=false"
+        }
+        Platform.JVM -> {
+            args += "-Pskiko.wasm.enabled=false"
+            args += "-Pskiko.native.enabled=false"
+        }
+        Platform.MACOS -> {
+            args += "-Pskiko.wasm.enabled=false"
+            args += "-Pskiko.native.enabled=true"
+        }
+    }
+
     if (useCompositeBuild) {
         when (platform) {
-            Platform.WEB -> {
-                args += "-Pskiko.wasm.enabled=true"
-                args += "-Pskiko.awt.enabled=false"
-            }
-            Platform.JVM -> {
-                args += "-Pskiko.wasm.enabled=false"
-                args += "-Pskiko.awt.enabled=true"
-            }
+            Platform.WEB, Platform.JVM -> args += "-Pskiko.awt.enabled=true"
             Platform.MACOS -> {
-                args += "-Pskiko.wasm.enabled=false"
                 args += "-Pskiko.awt.enabled=true"
-                args += "-Pskiko.native.enabled=true"
                 args += "-Pskiko.native.mac.enabled=true"
             }
         }

@@ -25,6 +25,8 @@ val isExplicitCompositeBuild = extra.properties.getOrDefault("skiko.composite.bu
 val skikoVersion = providers.gradleProperty("skiko.version")
 val skikoVersionOrUnspecified = skikoVersion.orElse("unspecified")
 val isCompositeBuild = isExplicitCompositeBuild || !skikoVersion.isPresent
+val isWebTargetEnabled = providers.gradleProperty("skiko.wasm.enabled").orNull != "false"
+val isMacosTargetEnabled = providers.gradleProperty("skiko.native.enabled").orNull != "false"
 val runArguments: String? by project
 
 val hostOs = when {
@@ -172,17 +174,19 @@ gradle.taskGraph.whenReady {
         .get()
         .toBoolean()
 
-    tasks.named<KotlinWebpack>("wasmJsBrowserProductionRun") {
-        val args = appArgs
-            .mapIndexed { index, arg -> "arg$index=${arg.replace(" ", "%20")}" }
-            .joinToString("&")
-        val url = if (args.isBlank()) {
-            "http://localhost:8080"
-        } else {
-            "http://localhost:8080?$args"
-        }
+    if (isWebTargetEnabled) {
+        tasks.named<KotlinWebpack>("wasmJsBrowserProductionRun") {
+            val args = appArgs
+                .mapIndexed { index, arg -> "arg$index=${arg.replace(" ", "%20")}" }
+                .joinToString("&")
+            val url = if (args.isBlank()) {
+                "http://localhost:8080"
+            } else {
+                "http://localhost:8080?$args"
+            }
 
-        devServerProperty = devServerProperty.get().copy(open = if (openBrowser) url else false)
+            devServerProperty = devServerProperty.get().copy(open = if (openBrowser) url else false)
+        }
     }
 }
 
@@ -216,27 +220,31 @@ kotlin {
         }
     }
 
-    js(IR) {
-        browser {
-            commonWebpackConfig {
-                outputFileName = "skiko-benchmarks.js"
+    if (isWebTargetEnabled) {
+        js(IR) {
+            browser {
+                commonWebpackConfig {
+                    outputFileName = "skiko-benchmarks.js"
+                }
             }
+            binaries.executable()
         }
-        binaries.executable()
+
+        wasmJs {
+            browser {
+                commonWebpackConfig {
+                    outputFileName = "skiko-benchmarks.js"
+                }
+            }
+            binaries.executable()
+        }
     }
 
-    wasmJs {
-        browser {
-            commonWebpackConfig {
-                outputFileName = "skiko-benchmarks.js"
+    if (isMacosTargetEnabled) {
+        macosArm64 {
+            binaries.executable {
+                entryPoint = "org.jetbrains.skiko.benchmarks.main"
             }
-        }
-        binaries.executable()
-    }
-
-    macosArm64 {
-        binaries.executable {
-            entryPoint = "org.jetbrains.skiko.benchmarks.main"
         }
     }
 
@@ -255,20 +263,22 @@ kotlin {
             }
         }
 
-        val webMain by creating {
-            dependsOn(commonMain.get())
-            dependencies {
-                implementation(libs.browser)
+        if (isWebTargetEnabled) {
+            val webMain by creating {
+                dependsOn(commonMain.get())
+                dependencies {
+                    implementation(libs.browser)
+                }
+                resources.srcDirs(unpackedWasmRuntime)
             }
-            resources.srcDirs(unpackedWasmRuntime)
-        }
 
-        jsMain {
-            dependsOn(webMain)
-        }
+            jsMain {
+                dependsOn(webMain)
+            }
 
-        wasmJsMain {
-            dependsOn(webMain)
+            wasmJsMain {
+                dependsOn(webMain)
+            }
         }
     }
 }
@@ -303,16 +313,18 @@ tasks.register<JavaExec>("jvmBenchmark") {
     args(runArguments?.split(" ")?.filter { it.isNotBlank() }.orEmpty())
 }
 
-tasks.register<Exec>("macosBenchmark") {
-    group = "benchmark"
-    description = "Runs Skiko API benchmarks on the macOS Native target."
+if (isMacosTargetEnabled) {
+    tasks.register<Exec>("macosBenchmark") {
+        group = "benchmark"
+        description = "Runs Skiko API benchmarks on the macOS Native target."
 
-    val macosTarget = kotlin.targets.getByName("macosArm64") as KotlinNativeTarget
-    val releaseExecutable = macosTarget.binaries.getExecutable(NativeBuildType.RELEASE)
-    dependsOn("linkReleaseExecutableMacosArm64")
-    workingDir = projectDir
-    commandLine(releaseExecutable.outputFile.absolutePath)
-    args(runArguments?.split(" ")?.filter { it.isNotBlank() }.orEmpty())
+        val macosTarget = kotlin.targets.getByName("macosArm64") as KotlinNativeTarget
+        val releaseExecutable = macosTarget.binaries.getExecutable(NativeBuildType.RELEASE)
+        dependsOn("linkReleaseExecutableMacosArm64")
+        workingDir = projectDir
+        commandLine(releaseExecutable.outputFile.absolutePath)
+        args(runArguments?.split(" ")?.filter { it.isNotBlank() }.orEmpty())
+    }
 }
 
 tasks.register<JavaExec>("runBenchmarkServer") {
@@ -349,7 +361,7 @@ tasks.register("runBrowserAndSaveStats") {
         if (isCompositeBuild) {
             scriptArgs += "skiko.composite.build=1"
             scriptArgs += "skiko.wasm.enabled=true"
-            scriptArgs += "skiko.awt.enabled=false"
+            scriptArgs += "skiko.awt.enabled=true"
         }
         scriptArgs += runArguments?.split(" ")?.filter { it.isNotBlank() }.orEmpty()
 
