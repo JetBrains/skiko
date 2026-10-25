@@ -1,8 +1,10 @@
-@file:OptIn(ExperimentalForeignApi::class)
+@file:OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
 
 package org.jetbrains.skiko.benchmarks
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.ColorSpace
@@ -47,7 +49,7 @@ private class MetalBenchmarkSurfaceProvider : BenchmarkSurfaceProvider {
 
         val texture = device.newTextureWithDescriptor(descriptor) ?: error("Can't create MTLTexture")
 
-        return BackendRenderTarget.makeMetal(width, height, texture.objcPtr()).use { renderTarget ->
+        BackendRenderTarget.makeMetal(width, height, texture.objcPtr()).use { renderTarget ->
             val surface = Surface.makeFromBackendRenderTarget(
                 directContext,
                 renderTarget,
