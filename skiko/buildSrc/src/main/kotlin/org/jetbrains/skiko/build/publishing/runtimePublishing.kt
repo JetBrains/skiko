@@ -26,6 +26,7 @@ import org.gradle.nativeplatform.OperatingSystemFamily
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.skiko.build.context.supportAwt
 import org.jetbrains.skiko.build.dependencies.additionalRuntimeArchAttribute
+import org.jetbrains.skiko.build.dependencies.additionalRuntimeConfigurationPrefix
 import org.jetbrains.skiko.build.dependencies.additionalRuntimeNameAttribute
 import org.jetbrains.skiko.build.dependencies.additionalRuntimeOsAttribute
 import org.jetbrains.skiko.build.utils.Arch
@@ -41,7 +42,6 @@ data class JvmRuntimePublicationFamily(
     val artifacts: SkikoArtifacts,
     val targets: List<Pair<OS, Arch>>,
     val runtimeDependencies: List<SkikoArtifacts> = emptyList(),
-    val additionalRuntimes: List<Configuration> = emptyList(),
 )
 
 private val desktopRuntimeTargets = listOf(
@@ -178,18 +178,10 @@ private fun Project.configureRuntimePublicationFamily(
         configureAwtRuntimeJarPublication(skiko, family, prefix)
     }
 
-    family.additionalRuntimes.forEach { runtime ->
-        configureAdditionalRuntimePublication(skiko, family, prefix, runtime)
-    }
-
     // Keep the producer projects' publishing entry points after moving their publications here.
     val publicationNames = runtimeInputs.keys.map { (os, arch) ->
         "SkikoJvmRuntime${joinToTitleCamelCase(os.id, arch.id)}" to
             "${toTitleCase(prefix)}JvmRuntime${joinToTitleCamelCase(os.id, arch.id)}"
-    } + family.additionalRuntimes.map { runtime ->
-        val (name, os, arch) = additionalRuntimeDetails(runtime)
-        val suffix = "${toTitleCase(name)}${joinToTitleCamelCase(os.id, arch.id)}"
-        "SkikoJvmRuntime$suffix" to "${toTitleCase(prefix)}JvmRuntime$suffix"
     } + if (supportAwt) listOf(
         "AwtRuntimeAll" to "${toTitleCase(prefix)}AwtRuntimeAll",
         "AwtRuntimeElements" to "${toTitleCase(prefix)}AwtRuntimeElements",
@@ -197,7 +189,7 @@ private fun Project.configureRuntimePublicationFamily(
     val producerTasks = project(family.producerProjectPath).tasks
     val runtimeTasks = tasks
     val repositories = extensions.getByType<PublishingExtension>().repositories
-    publicationNames.forEach { (oldName, newName) ->
+    fun registerProducerPublishAlias(oldName: String, newName: String) {
         repositories.forEach { repository ->
             val taskSuffix = "PublicationTo${repository.name}Repository"
             val publish = producerTasks.register("publish${oldName}$taskSuffix") {
@@ -215,21 +207,33 @@ private fun Project.configureRuntimePublicationFamily(
         producerTasks.matching { it.name == "publishToMavenLocal" }
             .configureEach { dependsOn(publishToMavenLocal) }
     }
+    publicationNames.forEach { (oldName, newName) -> registerProducerPublishAlias(oldName, newName) }
 
-    family.additionalRuntimes.forEach { runtime ->
-        val (name, os, arch) = additionalRuntimeDetails(runtime)
-        val suffix = joinToTitleCamelCase(os.id, arch.id)
-        val additionalSuffix = "${toTitleCase(name)}$suffix"
-        repositories.forEach { repository ->
-            val taskSuffix = "PublicationTo${repository.name}Repository"
-            runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}$taskSuffix").configure {
-                dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}$taskSuffix"))
+    project(family.producerProjectPath).configurations
+        .matching { it.name.startsWith(additionalRuntimeConfigurationPrefix) }
+        .configureEach {
+            val runtime = this
+            // The producer sets the runtime attributes after the configuration is added, so read them later.
+            gradle.projectsEvaluated {
+                configureAdditionalRuntimePublication(skiko, family, prefix, runtime)
+                val (runtimeName, os, arch) = additionalRuntimeDetails(runtime)
+                val suffix = joinToTitleCamelCase(os.id, arch.id)
+                val additionalSuffix = "${toTitleCase(runtimeName)}$suffix"
+                registerProducerPublishAlias(
+                    "SkikoJvmRuntime$additionalSuffix",
+                    "${toTitleCase(prefix)}JvmRuntime$additionalSuffix",
+                )
+                repositories.forEach { repository ->
+                    val taskSuffix = "PublicationTo${repository.name}Repository"
+                    runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}$taskSuffix").configure {
+                        dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}$taskSuffix"))
+                    }
+                }
+                runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}PublicationToMavenLocal").configure {
+                    dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}PublicationToMavenLocal"))
+                }
             }
         }
-        runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}PublicationToMavenLocal").configure {
-            dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}PublicationToMavenLocal"))
-        }
-    }
 }
 
 private fun Project.configureAdditionalRuntimePublication(

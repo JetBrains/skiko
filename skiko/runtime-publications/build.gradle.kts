@@ -1,7 +1,6 @@
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.skiko.build.context.supportAndroid
 import org.jetbrains.skiko.build.context.supportAwt
-import org.jetbrains.skiko.build.dependencies.additionalRuntimeNameAttribute
 import org.jetbrains.skiko.build.publishing.JvmRuntimePublicationFamily
 import org.jetbrains.skiko.build.publishing.declareJvmRuntimePublications
 import org.jetbrains.skiko.build.utils.Arch
@@ -39,9 +38,6 @@ declareJvmRuntimePublications(
             producerProjectPath = ":",
             artifacts = coreArtifacts,
             targets = desktopTargets + androidTargets,
-            additionalRuntimes = rootProject.configurations.filter {
-                it.attributes.getAttribute(additionalRuntimeNameAttribute) != null
-            },
         ),
         JvmRuntimePublicationFamily(
             producerProjectPath = ":skiko-platform",
@@ -52,9 +48,6 @@ declareJvmRuntimePublications(
             ),
             targets = desktopTargets + androidTargets,
             runtimeDependencies = listOf(coreArtifacts),
-            additionalRuntimes = project(":skiko-platform").configurations.filter {
-                it.attributes.getAttribute(additionalRuntimeNameAttribute) != null
-            },
         ),
         JvmRuntimePublicationFamily(
             producerProjectPath = ":skiko-graphite",
