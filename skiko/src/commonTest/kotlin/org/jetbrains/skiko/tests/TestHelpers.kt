@@ -1,6 +1,6 @@
 package org.jetbrains.skiko.tests
 
-import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.*
 
 class TestHelpers {
