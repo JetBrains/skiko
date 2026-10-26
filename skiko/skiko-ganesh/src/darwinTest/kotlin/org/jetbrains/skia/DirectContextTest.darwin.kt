@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import kotlinx.cinterop.*
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.gpu.ganesh.makeRenderTarget
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 import platform.Metal.MTLCreateSystemDefaultDevice
