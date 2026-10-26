@@ -1,11 +1,13 @@
 package org.jetbrains.skia
 
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.svg.*
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.kotlinBackend
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class SvgTest {
     @Test
@@ -61,5 +63,43 @@ class SvgTest {
         val newLpx = lpx.withValue(321f)
         assertEquals(321f, newLpx.value)
         assertEquals(SVGLengthUnit.PX, newLpx.unit)
+    }
+
+    @Test
+    fun rootLengthsRoundTripValuesAndUnits() {
+        val xml = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10\" height=\"20\"/>"
+        Data.makeFromBytes(xml.encodeToByteArray()).use { data ->
+            SVGDOM(data).use { dom ->
+                val root = assertNotNull(dom.root)
+                root.use {
+                    val x = SVGLength(12f, SVGLengthUnit.PX)
+                    val y = SVGLength(23f, SVGLengthUnit.PERCENTAGE)
+                    val width = SVGLength(34f, SVGLengthUnit.PERCENTAGE)
+                    val height = SVGLength(45f, SVGLengthUnit.PX)
+                    root.x = x
+                    root.y = y
+                    root.width = width
+                    root.height = height
+                    assertEquals(x, root.x)
+                    assertEquals(y, root.y)
+                    assertEquals(width, root.width)
+                    assertEquals(height, root.height)
+                }
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun containerSizeRoundTrips() {
+        val xml = "<svg xmlns=\"http://www.w3.org/2000/svg\"/>"
+        Data.makeFromBytes(xml.encodeToByteArray()).use { data ->
+            SVGDOM(data).use { dom ->
+                dom.setContainerSize(123f, 45f)
+                assertEquals(Point(123f, 45f), dom.containerSize)
+                dom.setContainerSize(Point(67f, 89f))
+                assertEquals(Point(67f, 89f), dom.containerSize)
+            }
+        }
     }
 }

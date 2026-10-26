@@ -209,7 +209,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     var isApplyRoundingHackEnabled: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nGetApplyRoundingHack(_ptr).not().not()
+            _nGetApplyRoundingHack(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
