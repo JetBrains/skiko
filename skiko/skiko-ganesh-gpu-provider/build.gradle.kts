@@ -51,16 +51,6 @@ repositories {
     }
 }
 
-// skiko-ganesh has multiple publications, so this selects the proper publication and avoids the
-// ambiguity that prevents using a direct implementation() or api() project dependency.
-configurations.configureEach {
-    resolutionStrategy.dependencySubstitution {
-        substitute(module("${project.group}:skiko-ganesh"))
-            .using(project(":skiko-ganesh"))
-            .because("Use the local Ganesh project while building Skiko")
-    }
-}
-
 kotlin {
     compilerOptions {
         languageVersion.set(skikoKotlinLanguageVersion)
