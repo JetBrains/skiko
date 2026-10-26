@@ -23,6 +23,7 @@ interface AdditionalRuntimeLibrary {
 val additionalRuntimeNameAttribute: Attribute<String> = Attribute.of("org.jetbrains.skiko.additionalRuntime.name", String::class.java)
 val additionalRuntimeOsAttribute: Attribute<String> = Attribute.of("org.jetbrains.skiko.additionalRuntime.os", String::class.java)
 val additionalRuntimeArchAttribute: Attribute<String> = Attribute.of("org.jetbrains.skiko.additionalRuntime.arch", String::class.java)
+const val additionalRuntimeConfigurationPrefix = "jvmAdditionalRuntimeJarElements"
 
 fun Project.registerAdditionalRuntimeLibrary(
     targetOs: OS,
@@ -78,7 +79,7 @@ fun Project.registerAdditionalRuntimeLibrary(
         from(checksumTask)
     }
 
-    configurations.create("jvmAdditionalRuntimeJarElements$taskSuffix") {
+    configurations.create("$additionalRuntimeConfigurationPrefix$taskSuffix") {
         isCanBeConsumed = true
         isCanBeResolved = false
         attributes.attribute(additionalRuntimeNameAttribute, name)
