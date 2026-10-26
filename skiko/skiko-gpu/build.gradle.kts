@@ -3,7 +3,19 @@
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
-import tasks.configuration.*
+import org.jetbrains.skiko.build.configuration.configureSignAndPublishDependencies
+import org.jetbrains.skiko.build.context.SkikoModuleKind
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.skikoSourceSetHierarchyTemplate
+import org.jetbrains.skiko.build.context.supportNativeIosArm64
+import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeIosX64
+import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
+import org.jetbrains.skiko.build.publishing.declarePublications
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.SkikoProperties
+import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
 
 plugins {
     kotlin("multiplatform")
@@ -63,7 +75,7 @@ kotlin {
         implementation(kotlin("stdlib"))
         // Core has publications with different coordinates, so project api dependencies cannot be published.
         // Consumers must add core Skiko alongside skiko-gpu.
-        compileOnly(coreProject)
+        api(coreProject)
     }
     sourceSets.commonTest.dependencies {
         implementation(kotlin("test"))
