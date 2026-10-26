@@ -320,6 +320,43 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         }
     }
 
+    fun makeRawShader(localMatrix: Matrix33?): Shader {
+        return makeRawShader(FilterTileMode.CLAMP, FilterTileMode.CLAMP, SamplingMode.DEFAULT, localMatrix)
+    }
+
+    fun makeRawShader(
+        tmx: FilterTileMode,
+        tmy: FilterTileMode,
+        localMatrix: Matrix33?
+    ): Shader {
+        return makeRawShader(tmx, tmy, SamplingMode.DEFAULT, localMatrix)
+    }
+
+    fun makeRawShader(
+        tmx: FilterTileMode = FilterTileMode.CLAMP,
+        tmy: FilterTileMode = FilterTileMode.CLAMP,
+        sampling: SamplingMode = SamplingMode.DEFAULT,
+        localMatrix: Matrix33? = null
+    ): Shader {
+        return try {
+            Stats.onNativeCall()
+            Shader(
+                interopScope {
+                    Image_nMakeRawShader(
+                        _ptr,
+                        tmx.ordinal,
+                        tmy.ordinal,
+                        sampling._packedInt1(),
+                        sampling._packedInt2(),
+                        toInterop(localMatrix?.mat)
+                    )
+                }
+            )
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
     /**
      * If pixel address is available, return [Pixmap].
      * If pixel address is not available, return null.
@@ -467,6 +504,10 @@ private external fun Image_nGetImageInfo(ptr: NativePointer, imageInfo: InteropP
 // is short and cannot block.
 // Native call path: SkImage::makeShader -> SkImageShader::Make
 private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingModeVal1: Int, samplingModeVal2: Int, localMatrix: InteropPointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRawShader")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Image__1nMakeRawShader")
+private external fun Image_nMakeRawShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingModeVal1: Int, samplingModeVal2: Int, localMatrix: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
 // No ForceNativeThreadState: exposes the stored pixels of a raster image and reports failure for other kinds of image,
