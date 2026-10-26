@@ -11,8 +11,53 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.gradle.kotlin.dsl.withType
-import tasks.configuration.*
-import dsl.SkikoDependencyScope
+import org.jetbrains.skiko.build.configuration.SideWasmImportsGeneratorPlugin
+import org.jetbrains.skiko.build.configuration.configureIOSTestsWithMetal
+import org.jetbrains.skiko.build.configuration.configureNativeTarget
+import org.jetbrains.skiko.build.configuration.configureSignAndPublishDependencies
+import org.jetbrains.skiko.build.configuration.createSkikoJvmJarTask
+import org.jetbrains.skiko.build.configuration.declareWasmTasks
+import org.jetbrains.skiko.build.configuration.jvmLinkedLibraryFor
+import org.jetbrains.skiko.build.configuration.jvmRuntimeJarFor
+import org.jetbrains.skiko.build.configuration.nativeSymbolSourcesFor
+import org.jetbrains.skiko.build.configuration.provideJvmRequiredSymbols
+import org.jetbrains.skiko.build.configuration.provideWasmSideModules
+import org.jetbrains.skiko.build.configuration.provideWasmTestResources
+import org.jetbrains.skiko.build.configuration.setupImportsGeneratorPlugin
+import org.jetbrains.skiko.build.configuration.setupJvmTestTask
+import org.jetbrains.skiko.build.configuration.wasmTestResourcesFor
+import org.jetbrains.skiko.build.context.SkikoModuleKind
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.awtMainSourceSet
+import org.jetbrains.skiko.build.context.jvmMainSourceSet
+import org.jetbrains.skiko.build.context.jvmTestSourceSet
+import org.jetbrains.skiko.build.context.skikoSourceSetHierarchyTemplate
+import org.jetbrains.skiko.build.context.supportAndroid
+import org.jetbrains.skiko.build.context.supportAnyNative
+import org.jetbrains.skiko.build.context.supportAwt
+import org.jetbrains.skiko.build.context.supportNativeIosArm64
+import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeIosX64
+import org.jetbrains.skiko.build.context.supportNativeLinux
+import org.jetbrains.skiko.build.context.supportNativeMac
+import org.jetbrains.skiko.build.context.supportNativeTvosArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosX64
+import org.jetbrains.skiko.build.context.supportWeb
+import org.jetbrains.skiko.build.context.wasmJsTest
+import org.jetbrains.skiko.build.context.webMainSourceSet
+import org.jetbrains.skiko.build.context.webTestSourceSet
+import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
+import org.jetbrains.skiko.build.dependencies.SkikoDependencyScope
+import org.jetbrains.skiko.build.publishing.declarePublications
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.SkikoProperties
+import org.jetbrains.skiko.build.utils.hostOs
+import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
+import org.jetbrains.skiko.build.utils.wasmImports
 
 plugins {
     kotlin("multiplatform")
@@ -229,7 +274,7 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         implementation(kotlin("stdlib"))
-        compileOnly(coreProject)
+        api(coreProject)
     }
     sourceSets.commonTest.dependencies {
         implementation(kotlin("test"))
