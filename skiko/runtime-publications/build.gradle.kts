@@ -34,6 +34,11 @@ val androidTargets = if (supportAndroid) {
 }
 val coreArtifacts = SkikoArtifacts()
 val platformProject = project(":skiko-platform")
+val ganeshArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-ganesh",
+    displayName = "Skiko Ganesh",
+    pomDescription = "Kotlin Skia Ganesh bindings",
+)
 
 declareJvmRuntimePublications(
     skiko,
@@ -53,6 +58,12 @@ declareJvmRuntimePublications(
                 displayName = "Skiko Platform",
                 pomDescription = "Kotlin Skia platform layer",
             ),
+            targets = desktopTargets + androidTargets,
+            runtimeDependencies = listOf(coreArtifacts, ganeshArtifacts),
+        ),
+        JvmRuntimePublicationFamily(
+            producerProjectPath = ":skiko-ganesh",
+            artifacts = ganeshArtifacts,
             targets = desktopTargets + androidTargets,
             runtimeDependencies = listOf(coreArtifacts),
             additionalRuntimes = platformProject.configurations.filter {
