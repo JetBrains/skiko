@@ -52,6 +52,8 @@ import org.jetbrains.skiko.build.utils.SkikoProperties
 import org.jetbrains.skiko.build.utils.hostOs
 import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
 import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinNativeApiVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinNativeLanguageVersion
 
 plugins {
     kotlin("multiplatform")
@@ -396,6 +398,8 @@ if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
 
 tasks.withType<KotlinNativeCompile>().configureEach {
     compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
+    compilerOptions.languageVersion.set(skikoKotlinNativeLanguageVersion)
+    compilerOptions.apiVersion.set(skikoKotlinNativeApiVersion)
 }
 
 tasks.withType<KotlinCompilationTask<*>>().configureEach {
