@@ -40,7 +40,9 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
-    implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
+    implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version") {
+        exclude(group = "org.jetbrains.skiko", module = "skiko-ganesh-awt")
+    }
     implementation("org.jetbrains.skiko:skiko-ganesh-awt-runtime-$target:$version")
     implementation("org.jetbrains.skiko:skiko-platform-awt-runtime-$target:$version")
     implementation("org.jetbrains.runtime:jbr-api:1.5.0")
@@ -59,6 +61,10 @@ configurations.configureEach {
 
 application {
     mainClass.set("SkiaAwtSample.AppKt")
+}
+
+tasks.named<Sync>("installDist") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 val additionalArguments = mutableMapOf<String, String>()
