@@ -54,4 +54,3 @@ expect annotation class ExternalSymbolName(val name: String)
 @OptionalExpectation
 @Target(AnnotationTarget.FUNCTION)
 expect annotation class ForceNativeThreadState()
-
