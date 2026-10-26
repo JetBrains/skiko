@@ -51,16 +51,6 @@ repositories {
     }
 }
 
-// skiko-graphite has multiple publications, so this selects the proper publication and avoids the
-// ambiguity that prevents using a direct implementation() or api() project dependency.
-configurations.configureEach {
-    resolutionStrategy.dependencySubstitution {
-        substitute(module("${project.group}:skiko-graphite"))
-            .using(project(":skiko-graphite"))
-            .because("Use the local Graphite project while building Skiko")
-    }
-}
-
 kotlin {
     compilerOptions {
         languageVersion.set(skikoKotlinLanguageVersion)
