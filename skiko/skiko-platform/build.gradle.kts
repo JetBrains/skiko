@@ -11,8 +11,47 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.gradle.kotlin.dsl.withType
 import org.gradle.kotlin.dsl.named
-import tasks.configuration.*
-import dsl.SkikoDependencyScope
+import org.jetbrains.skiko.build.configuration.configureIOSTestsWithMetal
+import org.jetbrains.skiko.build.configuration.configureSignAndPublishDependencies
+import org.jetbrains.skiko.build.configuration.createSkikoJvmJarTask
+import org.jetbrains.skiko.build.configuration.jvmLinkedLibraryFor
+import org.jetbrains.skiko.build.configuration.jvmRuntimeJarFor
+import org.jetbrains.skiko.build.configuration.provideJvmRequiredSymbols
+import org.jetbrains.skiko.build.configuration.setupJvmTestTask
+import org.jetbrains.skiko.build.configuration.wasmTestResourcesFor
+import org.jetbrains.skiko.build.context.SkikoModuleKind
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.androidMainSourceSet
+import org.jetbrains.skiko.build.context.awtMainSourceSet
+import org.jetbrains.skiko.build.context.jvmMainSourceSet
+import org.jetbrains.skiko.build.context.jvmTestSourceSet
+import org.jetbrains.skiko.build.context.skikoSourceSetHierarchyTemplate
+import org.jetbrains.skiko.build.context.supportAndroid
+import org.jetbrains.skiko.build.context.supportAnyNative
+import org.jetbrains.skiko.build.context.supportAwt
+import org.jetbrains.skiko.build.context.supportNativeIosArm64
+import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeIosX64
+import org.jetbrains.skiko.build.context.supportNativeLinux
+import org.jetbrains.skiko.build.context.supportNativeMac
+import org.jetbrains.skiko.build.context.supportNativeTvosArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosX64
+import org.jetbrains.skiko.build.context.supportWeb
+import org.jetbrains.skiko.build.context.wasmJsTest
+import org.jetbrains.skiko.build.context.webMainSourceSet
+import org.jetbrains.skiko.build.context.webTestSourceSet
+import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
+import org.jetbrains.skiko.build.dependencies.SkikoDependencyScope
+import org.jetbrains.skiko.build.dependencies.registerAdditionalLibraries
+import org.jetbrains.skiko.build.publishing.declarePublications
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.SkikoProperties
+import org.jetbrains.skiko.build.utils.hostOs
+import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
+import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
 
 plugins {
     kotlin("multiplatform")
@@ -220,7 +259,7 @@ if (supportWeb) {
             - implementation("org.jetbrains.skiko:skiko-x")
             - implementation("org.jetbrains.skiko:skiko-platform-x")
          */
-        compileOnly(project(":"))
+        api(project(":"))
     }
 
     sourceSets.commonTest.dependencies {
@@ -345,10 +384,6 @@ if (supportAwt) {
 }
 
 skikoPlatformProjectContext.declarePublications()
-
-skikoPlatformProjectContext.additionalRuntimeLibraries.forEach {
-    it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))
-}
 
 val mavenCentral = MavenCentralProperties(project)
 if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {

@@ -44,6 +44,19 @@ declareJvmRuntimePublications(
             },
         ),
         JvmRuntimePublicationFamily(
+            producerProjectPath = ":skiko-platform",
+            artifacts = SkikoArtifacts(
+                artifactIdPrefix = "skiko-platform",
+                displayName = "Skiko Platform",
+                pomDescription = "Kotlin Skia platform layer",
+            ),
+            targets = desktopTargets + androidTargets,
+            runtimeDependencies = listOf(coreArtifacts),
+            additionalRuntimes = project(":skiko-platform").configurations.filter {
+                it.attributes.getAttribute(additionalRuntimeNameAttribute) != null
+            },
+        ),
+        JvmRuntimePublicationFamily(
             producerProjectPath = ":skiko-graphite",
             artifacts = SkikoArtifacts(
                 artifactIdPrefix = "skiko-graphite",
