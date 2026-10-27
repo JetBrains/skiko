@@ -25,7 +25,9 @@ import org.gradle.nativeplatform.MachineArchitecture
 import org.gradle.nativeplatform.OperatingSystemFamily
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.skiko.build.context.supportAwt
-import org.jetbrains.skiko.build.dependencies.additionalRuntimeConfigurationPrefix
+import org.jetbrains.skiko.build.dependencies.additionalRuntimeArchAttribute
+import org.jetbrains.skiko.build.dependencies.additionalRuntimeNameAttribute
+import org.jetbrains.skiko.build.dependencies.additionalRuntimeOsAttribute
 import org.jetbrains.skiko.build.utils.Arch
 import org.jetbrains.skiko.build.utils.OS
 import org.jetbrains.skiko.build.utils.SkikoArtifacts
@@ -39,6 +41,7 @@ data class JvmRuntimePublicationFamily(
     val artifacts: SkikoArtifacts,
     val targets: List<Pair<OS, Arch>>,
     val runtimeDependencies: List<SkikoArtifacts> = emptyList(),
+    val additionalRuntimes: List<Configuration> = emptyList(),
 )
 
 private val desktopRuntimeTargets = listOf(
@@ -47,18 +50,11 @@ private val desktopRuntimeTargets = listOf(
     OS.Windows to Arch.X64, OS.Windows to Arch.Arm64,
 )
 
-private fun additionalRuntimeDetails(configuration: Configuration): Triple<String, OS, Arch> {
-    // Gradle notifies configuration listeners before the producer's configuration action sets attributes.
-    val name = configuration.name.removePrefix(additionalRuntimeConfigurationPrefix)
-    val target = OS.entries.flatMap { os -> Arch.entries.map { arch -> os to arch } }
-        .firstOrNull { (os, arch) -> name.endsWith(joinToTitleCamelCase(os.id, arch.id)) }
-        ?: error("Unknown additional runtime target: ${configuration.name}")
-    val (os, arch) = target
-    val runtimeName = name.removeSuffix(joinToTitleCamelCase(os.id, arch.id))
-        .replaceFirstChar { it.lowercase() }
-    require(runtimeName.isNotEmpty()) { "Missing additional runtime name: ${configuration.name}" }
-    return Triple(runtimeName, os, arch)
-}
+private fun additionalRuntimeDetails(configuration: Configuration): Triple<String, OS, Arch> = Triple(
+    requireNotNull(configuration.attributes.getAttribute(additionalRuntimeNameAttribute)),
+    OS.valueOf(requireNotNull(configuration.attributes.getAttribute(additionalRuntimeOsAttribute))),
+    Arch.valueOf(requireNotNull(configuration.attributes.getAttribute(additionalRuntimeArchAttribute))),
+)
 
 // Sign tasks write next to their input files, so each publication needs its own archive path.
 private fun Project.emptyPublicationJar(publicationName: String, artifactId: String, classifier: String): TaskProvider<Jar> =
@@ -182,10 +178,18 @@ private fun Project.configureRuntimePublicationFamily(
         configureAwtRuntimeJarPublication(skiko, family, prefix)
     }
 
+    family.additionalRuntimes.forEach { runtime ->
+        configureAdditionalRuntimePublication(skiko, family, prefix, runtime)
+    }
+
     // Keep the producer projects' publishing entry points after moving their publications here.
     val publicationNames = runtimeInputs.keys.map { (os, arch) ->
         "SkikoJvmRuntime${joinToTitleCamelCase(os.id, arch.id)}" to
             "${toTitleCase(prefix)}JvmRuntime${joinToTitleCamelCase(os.id, arch.id)}"
+    } + family.additionalRuntimes.map { runtime ->
+        val (name, os, arch) = additionalRuntimeDetails(runtime)
+        val suffix = "${toTitleCase(name)}${joinToTitleCamelCase(os.id, arch.id)}"
+        "SkikoJvmRuntime$suffix" to "${toTitleCase(prefix)}JvmRuntime$suffix"
     } + if (supportAwt) listOf(
         "AwtRuntimeAll" to "${toTitleCase(prefix)}AwtRuntimeAll",
         "AwtRuntimeElements" to "${toTitleCase(prefix)}AwtRuntimeElements",
@@ -193,7 +197,7 @@ private fun Project.configureRuntimePublicationFamily(
     val producerTasks = project(family.producerProjectPath).tasks
     val runtimeTasks = tasks
     val repositories = extensions.getByType<PublishingExtension>().repositories
-    fun registerProducerPublishAlias(oldName: String, newName: String) {
+    publicationNames.forEach { (oldName, newName) ->
         repositories.forEach { repository ->
             val taskSuffix = "PublicationTo${repository.name}Repository"
             val publish = producerTasks.register("publish${oldName}$taskSuffix") {
@@ -211,30 +215,21 @@ private fun Project.configureRuntimePublicationFamily(
         producerTasks.matching { it.name == "publishToMavenLocal" }
             .configureEach { dependsOn(publishToMavenLocal) }
     }
-    publicationNames.forEach { (oldName, newName) -> registerProducerPublishAlias(oldName, newName) }
 
-    project(family.producerProjectPath).configurations
-        .matching { it.name.startsWith(additionalRuntimeConfigurationPrefix) }
-        .configureEach {
-            val runtime = this
-            configureAdditionalRuntimePublication(skiko, family, prefix, runtime)
-            val (runtimeName, os, arch) = additionalRuntimeDetails(runtime)
-            val suffix = joinToTitleCamelCase(os.id, arch.id)
-            val additionalSuffix = "${toTitleCase(runtimeName)}$suffix"
-            registerProducerPublishAlias(
-                "SkikoJvmRuntime$additionalSuffix",
-                "${toTitleCase(prefix)}JvmRuntime$additionalSuffix",
-            )
-            repositories.forEach { repository ->
-                val taskSuffix = "PublicationTo${repository.name}Repository"
-                runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}$taskSuffix").configure {
-                    dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}$taskSuffix"))
-                }
-            }
-            runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}PublicationToMavenLocal").configure {
-                dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}PublicationToMavenLocal"))
+    family.additionalRuntimes.forEach { runtime ->
+        val (name, os, arch) = additionalRuntimeDetails(runtime)
+        val suffix = joinToTitleCamelCase(os.id, arch.id)
+        val additionalSuffix = "${toTitleCase(name)}$suffix"
+        repositories.forEach { repository ->
+            val taskSuffix = "PublicationTo${repository.name}Repository"
+            runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}$taskSuffix").configure {
+                dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}$taskSuffix"))
             }
         }
+        runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${suffix}PublicationToMavenLocal").configure {
+            dependsOn(runtimeTasks.named("publish${toTitleCase(prefix)}JvmRuntime${additionalSuffix}PublicationToMavenLocal"))
+        }
+    }
 }
 
 private fun Project.configureAdditionalRuntimePublication(
