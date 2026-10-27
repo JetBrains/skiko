@@ -2,11 +2,13 @@
 
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.skiko.build.configuration.configureIOSTestsWithMetal
+import org.jetbrains.skiko.build.configuration.configureKotlinCompilerOptions
 import org.jetbrains.skiko.build.configuration.configureSignAndPublishDependencies
 import org.jetbrains.skiko.build.context.SkikoModuleKind
 import org.jetbrains.skiko.build.context.SkikoProjectContext
 import org.jetbrains.skiko.build.context.skikoSourceSetHierarchyTemplate
+import org.jetbrains.skiko.build.context.supportAnyNativeIos
 import org.jetbrains.skiko.build.context.supportNativeIosArm64
 import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
 import org.jetbrains.skiko.build.context.supportNativeIosX64
@@ -14,8 +16,6 @@ import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
 import org.jetbrains.skiko.build.publishing.declarePublications
 import org.jetbrains.skiko.build.utils.SkikoArtifacts
 import org.jetbrains.skiko.build.utils.SkikoProperties
-import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
-import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
 
 plugins {
     kotlin("multiplatform")
@@ -52,13 +52,6 @@ repositories {
 }
 
 kotlin {
-    compilerOptions {
-        languageVersion.set(skikoKotlinLanguageVersion)
-        apiVersion.set(skikoKotlinApiVersion)
-        freeCompilerArgs.add("-opt-in=org.jetbrains.skiko.InternalSkikoApi")
-        freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
-    }
-
     applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
 
     if (supportNativeIosArm64) {
@@ -73,13 +66,15 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         implementation(kotlin("stdlib"))
-        // Core has publications with different coordinates, so project api dependencies cannot be published.
-        // Consumers must add core Skiko alongside skiko-gpu.
         api(coreProject)
     }
     sourceSets.commonTest.dependencies {
         implementation(kotlin("test"))
         implementation(coreProject)
+    }
+
+    if (supportAnyNativeIos) {
+        configureIOSTestsWithMetal(project)
     }
 }
 
@@ -94,6 +89,4 @@ if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
     configureSignAndPublishDependencies()
 }
 
-tasks.withType<KotlinCompilationTask<*>>().configureEach {
-    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
-}
+configureKotlinCompilerOptions()
