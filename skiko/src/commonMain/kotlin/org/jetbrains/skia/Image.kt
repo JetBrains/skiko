@@ -608,6 +608,10 @@ private external fun _nEncodeToData(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToJpegData")
+// Needs ForceNativeThreadState: compresses the whole image as JPEG, so its time grows with the image size,
+// and a lazily loaded image is decoded first.
+// Native call path: SkJpegEncoder::Encode
+@ForceNativeThreadState
 private external fun _nEncodeToJpegData(
     ptr: NativePointer,
     quality: Int,
@@ -618,6 +622,10 @@ private external fun _nEncodeToJpegData(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToPngData")
+// Needs ForceNativeThreadState: compresses the whole image as PNG, so its time grows with the image size,
+// and a lazily loaded image is decoded first.
+// Native call path: SkPngEncoder::Encode
+@ForceNativeThreadState
 private external fun _nEncodeToPngData(
     ptr: NativePointer,
     compressionLevel: Int,
@@ -627,6 +635,10 @@ private external fun _nEncodeToPngData(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToWebpData")
+// Needs ForceNativeThreadState: compresses the whole image as WebP, so its time grows with the image size,
+// and a lazily loaded image is decoded first.
+// Native call path: SkWebpEncoder::Encode
+@ForceNativeThreadState
 private external fun _nEncodeToWebpData(
     ptr: NativePointer,
     quality: Int,
