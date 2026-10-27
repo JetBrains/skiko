@@ -1,6 +1,14 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.encode.JpegAlphaOption
+import org.jetbrains.skia.encode.JpegDownSample
+import org.jetbrains.skia.encode.JpegEncoderOptions
+import org.jetbrains.skia.encode.PngEncoderOptions
+import org.jetbrains.skia.encode.PngFilterFlag
+import org.jetbrains.skia.encode.WebpCompression
+import org.jetbrains.skia.encode.WebpEncoderOptions
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.util.assertContentSame
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -180,6 +188,65 @@ class ImageTest {
         val pixels = image.peekPixels()!!.buffer.bytes
 
         assertContentEquals(bytes, pixels)
+    }
+
+    @Test
+    fun canEncodeToJpeg() = runTest {
+        imageUnderTest { image ->
+            val options = JpegEncoderOptions(
+                quality = 80,
+                downSample = JpegDownSample.K444,
+                alphaOption = JpegAlphaOption.BLEND_ON_BLACK,
+                xmpMetadata = Data.makeFromBytes("<x:xmpmeta />".encodeToByteArray()),
+                origin = EncodedOrigin.RIGHT_TOP,
+            )
+            val data = image.encodeToData(options)
+            val codec = Codec.makeFromData(data)
+
+            assertNotNull(data)
+
+            assertEquals(EncodedImageFormat.JPEG, codec.encodedImageFormat)
+            assertEquals(EncodedOrigin.RIGHT_TOP, codec.encodedOrigin)
+            assertTrue(data.bytes.decodeToString().contains("<x:xmpmeta />"))
+        }
+    }
+
+    @Test
+    fun canEncodeToPng() = runTest {
+        imageUnderTest { image ->
+            val options = PngEncoderOptions(
+                compressionLevel = 9,
+                filterFlags = PngFilterFlag.SUB or PngFilterFlag.UP,
+                comments = mapOf("Title" to "Comment"),
+            )
+            val data = image.encodeToData(options)
+            val codec = Codec.makeFromData(data)
+
+            assertNotNull(data)
+            assertEquals(EncodedImageFormat.PNG, codec.encodedImageFormat)
+
+            val decoded = Image.makeFromEncoded(data.bytes)
+
+            assertEquals(100, decoded.width)
+            assertEquals(100, decoded.height)
+            assertTrue(data.bytes.decodeToString().contains("Title\u0000Comment"))
+        }
+    }
+
+    @Test
+    fun canEncodeToWebp() = runTest {
+        imageUnderTest { image ->
+            val options = WebpEncoderOptions(quality = 50, compression = WebpCompression.LOSSLESS)
+            val data = image.encodeToData(options)
+            val codec = Codec.makeFromData(data)
+
+            assertNotNull(data)
+            assertEquals(EncodedImageFormat.WEBP, codec.encodedImageFormat)
+
+            val decoded = Image.makeFromEncoded(data.bytes)
+
+            assertContentSame(image, decoded, 0.0)
+        }
     }
 
     private fun <T> imageUnderTest(block: (Image) -> T): T {
