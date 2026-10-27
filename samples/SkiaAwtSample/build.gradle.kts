@@ -50,6 +50,12 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
 
+configurations.configureEach {
+    // This sample exercises Maven Local publications even when launched from the root composite build.
+    // Project substitution would mix the local core AWT jar with the published skiko-awt jar.
+    resolutionStrategy.useGlobalDependencySubstitutionRules = false
+}
+
 application {
     mainClass.set("SkiaAwtSample.AppKt")
 }
