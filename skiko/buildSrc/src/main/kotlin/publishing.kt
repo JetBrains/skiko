@@ -449,8 +449,9 @@ private fun SkikoPublishingContext.configureWebPublication() {
 }
 
 private fun SkikoPublishingContext.configureNativeWasmPublication() {
+    if (!project.tasks.names.contains("skikoWasiJar")) return
     kotlin.targets.withType(KotlinJsIrTarget::class.java).all {
-        val skikoWasmRuntimeConfig = project.configurations.create("skikoWasmRuntimeElementsFor${toTitleCase(name)}") {
+        val skikoWasiRuntimeConfig = project.configurations.create("skikoWasiRuntimeElementsFor${toTitleCase(name)}") {
             isCanBeConsumed = true
             isCanBeResolved = false
             attributes {
@@ -460,13 +461,13 @@ private fun SkikoPublishingContext.configureNativeWasmPublication() {
                 runtimeConf.attributes.keySet().forEach {
                     attribute(it as Attribute<Any>, runtimeConf.attributes.getAttribute(it) as Any)
                 }
-                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
+                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-wasi-runtime"))
             }
             outgoing.artifact(project.tasks.named("skikoWasiJar")) {
                 classifier = "skiko-runtime"
             }
         }
-        addVariantToKotlinTarget(this, skikoWasmRuntimeConfig)
+        addVariantToKotlinTarget(this, skikoWasiRuntimeConfig)
     }
 }
 

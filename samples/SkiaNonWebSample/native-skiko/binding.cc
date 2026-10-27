@@ -399,8 +399,23 @@ napi_value CreateWindow(napi_env env, napi_callback_info info) {
     return Undefined(env);
 }
 
-napi_value PollEvents(napi_env env, napi_callback_info) {
+napi_value PollEvents(napi_env env, napi_callback_info info) {
     if (presentationWindow == nullptr) return ToBool(env, false);
+
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+
+    napi_value eventCallback = nullptr;
+    if (argc >= 1) {
+        napi_valuetype argType;
+        if (napi_typeof(env, args[0], &argType) == napi_ok && argType == napi_function) {
+            eventCallback = args[0];
+        }
+    }
+
+    napi_value global;
+    napi_get_global(env, &global);
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -409,6 +424,57 @@ napi_value PollEvents(napi_env env, napi_callback_info) {
              event.window.windowID == SDL_GetWindowID(presentationWindow) &&
              event.window.event == SDL_WINDOWEVENT_CLOSE)) {
             presentationOpen = false;
+        } else if (eventCallback != nullptr) {
+            if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
+                // 1: Press, 2: Release
+                uint32_t type = (event.type == SDL_MOUSEBUTTONDOWN) ? 1 : 2;
+                int32_t x = event.button.x;
+                int32_t y = event.button.y;
+                uint32_t button = event.button.button; // 1: Left, 2: Middle, 3: Right
+
+                napi_value jsArgs[4];
+                napi_create_uint32(env, type, &jsArgs[0]);
+                napi_create_int32(env, x, &jsArgs[1]);
+                napi_create_int32(env, y, &jsArgs[2]);
+                napi_create_uint32(env, button, &jsArgs[3]);
+
+                napi_call_function(env, global, eventCallback, 4, jsArgs, nullptr);
+            } else if (event.type == SDL_MOUSEMOTION) {
+                // 3: Move
+                uint32_t type = 3;
+                int32_t x = event.motion.x;
+                int32_t y = event.motion.y;
+                uint32_t buttons = event.motion.state;
+
+                napi_value jsArgs[4];
+                napi_create_uint32(env, type, &jsArgs[0]);
+                napi_create_int32(env, x, &jsArgs[1]);
+                napi_create_int32(env, y, &jsArgs[2]);
+                napi_create_uint32(env, buttons, &jsArgs[3]);
+
+                napi_call_function(env, global, eventCallback, 4, jsArgs, nullptr);
+            } else if (event.type == SDL_MOUSEWHEEL) {
+                // 6: Scroll
+                uint32_t type = 6;
+                int32_t mouseX = 0, mouseY = 0;
+                SDL_GetMouseState(&mouseX, &mouseY);
+                double scrollDeltaX = static_cast<double>(event.wheel.x);
+                double scrollDeltaY = static_cast<double>(event.wheel.y);
+                if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED) {
+                    scrollDeltaX = -scrollDeltaX;
+                    scrollDeltaY = -scrollDeltaY;
+                }
+
+                napi_value jsArgs[6];
+                napi_create_uint32(env, type, &jsArgs[0]);
+                napi_create_int32(env, mouseX, &jsArgs[1]);
+                napi_create_int32(env, mouseY, &jsArgs[2]);
+                napi_create_uint32(env, 0, &jsArgs[3]);
+                napi_create_double(env, scrollDeltaX, &jsArgs[4]);
+                napi_create_double(env, scrollDeltaY, &jsArgs[5]);
+
+                napi_call_function(env, global, eventCallback, 6, jsArgs, nullptr);
+            }
         }
     }
     return ToBool(env, presentationOpen);
@@ -435,17 +501,15 @@ napi_value Present(napi_env env, napi_callback_info info) {
     napi_value args[3];
     size_t argc = 3;
     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    if (argc != 3 || presentationWindow == nullptr || !presentationOpen) {
+    if (argc == 0 || presentationWindow == nullptr || !presentationOpen) {
         return Undefined(env);
     }
 
-    const std::array<uint32_t, 3> contextIds = {
-        U32(env, args[0]), U32(env, args[1]), U32(env, args[2])};
-    constexpr std::array<CanvasLayout, 3> layouts = {{
-        {0, 0, 300, 300},
-        {306, 0, 300, 300},
-        {0, 306, 606, 400},
-    }};
+    std::vector<uint32_t> contextIds;
+    contextIds.reserve(argc);
+    for (size_t i = 0; i < argc; ++i) {
+        contextIds.push_back(U32(env, args[i]));
+    }
 
     // Submit every producer context before consuming its shared texture.
     for (uint32_t contextId : contextIds) {
@@ -465,8 +529,6 @@ napi_value Present(napi_env env, napi_callback_info info) {
     int pixelWidth = 0;
     int pixelHeight = 0;
     SDL_GL_GetDrawableSize(presentationWindow, &pixelWidth, &pixelHeight);
-    const double scaleX = static_cast<double>(pixelWidth) / 606.0;
-    const double scaleY = static_cast<double>(pixelHeight) / 706.0;
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glViewport(0, 0, pixelWidth, pixelHeight);
@@ -479,24 +541,17 @@ napi_value Present(napi_env env, napi_callback_info info) {
     glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    for (size_t index = 0; index < contextIds.size(); ++index) {
-        const auto found = renderTargets.find(contextIds[index]);
-        if (found == renderTargets.end()) continue;
-        const RenderTarget& target = found->second;
-        const CanvasLayout& layout = layouts[index];
-        const int x = static_cast<int>(layout.x * scaleX);
-        const int top = static_cast<int>(layout.y * scaleY);
-        const int width = static_cast<int>(layout.width * scaleX);
-        const int height = static_cast<int>(layout.height * scaleY);
-        const int bottom = pixelHeight - top - height;
-        const int borderX = std::max(1, static_cast<int>(scaleX));
-        const int borderY = std::max(1, static_cast<int>(scaleY));
+    // Collect active producer contexts
+    std::vector<std::pair<size_t, uint32_t>> activeContexts;
+    for (size_t i = 0; i < contextIds.size(); ++i) {
+        if (contextIds[i] != 0 && renderTargets.find(contextIds[i]) != renderTargets.end()) {
+            activeContexts.emplace_back(i, contextIds[i]);
+        }
+    }
 
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glScissor(x, bottom, width, height);
-        glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT);
-
+    if (activeContexts.size() == 1) {
+        // Single active canvas: blit directly to the entire SDL window without borders or offsets
+        const RenderTarget& target = renderTargets.find(activeContexts[0].second)->second;
         glBindFramebuffer(GL_READ_FRAMEBUFFER, presentationReadFramebuffer);
         glFramebufferTexture2D(
             GL_READ_FRAMEBUFFER,
@@ -504,29 +559,81 @@ napi_value Present(napi_env env, napi_callback_info info) {
             GL_TEXTURE_2D,
             target.color,
             0);
-        if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) !=
-            GL_FRAMEBUFFER_COMPLETE) {
+        if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             Throw(env, "Shared canvas framebuffer is incomplete");
             return nullptr;
         }
 
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glScissor(
-            x + borderX,
-            bottom + borderY,
-            width - 2 * borderX,
-            height - 2 * borderY);
+        glScissor(0, 0, pixelWidth, pixelHeight);
         glBlitFramebuffer(
             0,
             0,
             target.width,
             target.height,
-            x + borderX,
-            bottom + borderY,
-            x + width - borderX,
-            bottom + height - borderY,
+            0,
+            0,
+            pixelWidth,
+            pixelHeight,
             GL_COLOR_BUFFER_BIT,
             GL_LINEAR);
+    } else if (!activeContexts.empty()) {
+        // Multi-canvas showcase grid (SkiaNonWebSample)
+        constexpr std::array<CanvasLayout, 3> layouts = {{
+            {0, 0, 300, 300},
+            {306, 0, 300, 300},
+            {0, 306, 606, 400},
+        }};
+        const double scaleX = static_cast<double>(pixelWidth) / 606.0;
+        const double scaleY = static_cast<double>(pixelHeight) / 706.0;
+
+        for (const auto& [index, contextId] : activeContexts) {
+            if (index >= layouts.size()) continue;
+            const RenderTarget& target = renderTargets.find(contextId)->second;
+            const CanvasLayout& layout = layouts[index];
+            const int x = static_cast<int>(layout.x * scaleX);
+            const int top = static_cast<int>(layout.y * scaleY);
+            const int width = static_cast<int>(layout.width * scaleX);
+            const int height = static_cast<int>(layout.height * scaleY);
+            const int bottom = pixelHeight - top - height;
+            const int borderX = std::max(1, static_cast<int>(scaleX));
+            const int borderY = std::max(1, static_cast<int>(scaleY));
+
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            glScissor(x, bottom, width, height);
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, presentationReadFramebuffer);
+            glFramebufferTexture2D(
+                GL_READ_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0,
+                GL_TEXTURE_2D,
+                target.color,
+                0);
+            if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+                Throw(env, "Shared canvas framebuffer is incomplete");
+                return nullptr;
+            }
+
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            glScissor(
+                x + borderX,
+                bottom + borderY,
+                width - 2 * borderX,
+                height - 2 * borderY);
+            glBlitFramebuffer(
+                0,
+                0,
+                target.width,
+                target.height,
+                x + borderX,
+                bottom + borderY,
+                x + width - borderX,
+                bottom + height - borderY,
+                GL_COLOR_BUFFER_BIT,
+                GL_LINEAR);
+        }
     }
 
     glDisable(GL_SCISSOR_TEST);
