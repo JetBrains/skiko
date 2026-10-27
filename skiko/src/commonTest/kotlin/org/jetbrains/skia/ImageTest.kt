@@ -1,5 +1,12 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.encode.JpegAlphaOption
+import org.jetbrains.skia.encode.JpegDownSample
+import org.jetbrains.skia.encode.JpegEncoderOptions
+import org.jetbrains.skia.encode.PngEncoderOptions
+import org.jetbrains.skia.encode.PngFilterFlag
+import org.jetbrains.skia.encode.WebpCompression
+import org.jetbrains.skia.encode.WebpEncoderOptions
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.util.assertContentSame
 import org.jetbrains.skiko.tests.runTest

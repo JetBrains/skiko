@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.encode.JpegEncoderOptions
+import org.jetbrains.skia.encode.PngEncoderOptions
+import org.jetbrains.skia.encode.WebpEncoderOptions
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 

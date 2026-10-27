@@ -1,7 +1,7 @@
-package org.jetbrains.skia
+package org.jetbrains.skia.encode
 
 /**
- * Options to encode [Image] to [Data] as WebP format.
+ * Options to encode [Image][org.jetbrains.skia.Image] to [Data][org.jetbrains.skia.Data] as WebP format.
  */
 class WebpEncoderOptions(
     /**

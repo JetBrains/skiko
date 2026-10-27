@@ -1,7 +1,10 @@
-package org.jetbrains.skia
+package org.jetbrains.skia.encode
+
+import org.jetbrains.skia.Data
+import org.jetbrains.skia.EncodedOrigin
 
 /**
- * Options to encode [Image] to [Data] as JPEG format.
+ * Options to encode [Image][org.jetbrains.skia.Image] to [Data] as JPEG format.
  */
 class JpegEncoderOptions(
     /**
@@ -11,7 +14,8 @@ class JpegEncoderOptions(
     /**
      * Downsampling factor for the U and V (chroma) components.
      *
-     * This is ignored if the image is [ColorType.GRAY_8], since grayscale images are not encoded as YUV.
+     * This is ignored if the image is [ColorType.GRAY_8][org.jetbrains.skia.ColorType.GRAY_8]
+     * since grayscale images are not encoded as YUV.
      */
     val downSample: JpegDownSample = JpegDownSample.K420,
     /**

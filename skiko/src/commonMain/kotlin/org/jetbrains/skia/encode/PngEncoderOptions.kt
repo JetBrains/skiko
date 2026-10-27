@@ -1,7 +1,7 @@
-package org.jetbrains.skia
+package org.jetbrains.skia.encode
 
 /**
- * Options to encode [Image] to [Data] as PNG format.
+ * Options to encode [Image][org.jetbrains.skia.Image] to [Data][org.jetbrains.skia.Data] as PNG format.
  */
 class PngEncoderOptions(
     /**

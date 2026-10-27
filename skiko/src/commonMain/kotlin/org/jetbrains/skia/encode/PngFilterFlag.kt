@@ -1,4 +1,4 @@
-package org.jetbrains.skia
+package org.jetbrains.skia.encode
 
 import kotlin.jvm.JvmInline
 
