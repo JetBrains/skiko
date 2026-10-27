@@ -60,15 +60,15 @@ declareJvmRuntimePublications(
             ),
             targets = desktopTargets + androidTargets,
             runtimeDependencies = listOf(coreArtifacts, ganeshArtifacts),
+            additionalRuntimes = platformProject.configurations.filter {
+                it.attributes.getAttribute(additionalRuntimeNameAttribute) != null
+            },
         ),
         JvmRuntimePublicationFamily(
             producerProjectPath = ":skiko-ganesh",
             artifacts = ganeshArtifacts,
             targets = desktopTargets + androidTargets,
             runtimeDependencies = listOf(coreArtifacts),
-            additionalRuntimes = platformProject.configurations.filter {
-                it.attributes.getAttribute(additionalRuntimeNameAttribute) != null
-            },
         ),
         JvmRuntimePublicationFamily(
             producerProjectPath = ":skiko-graphite",
