@@ -1,5 +1,6 @@
 #include <iostream>
 #include "SkShaper.h"
+#include "ShaperWithFontMgr.hh"
 #include "SkShaper_harfbuzz.h"
 #include "SkUnicode.h"
 #include "src/core/SkUTF.h"
@@ -14,7 +15,7 @@
 #include "SkShaper_coretext.h"
 #endif
 
-static void deleteShaper(SkShaper* instance) {
+static void deleteShaper(skiko::ShaperWithFontMgr* instance) {
     // std::cout << "Deleting [SkShaper " << instance << "]" << std::endl;
     delete instance;
 }
@@ -25,19 +26,19 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nGetFinalizer() {
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakePrimitive
   () {
-    return reinterpret_cast<KNativePointer>(SkShapers::Primitive::PrimitiveText().release());
+    return reinterpret_cast<KNativePointer>(skiko::ShaperWithFontMgr::make(SkShapers::Primitive::PrimitiveText()));
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShaperDrivenWrapper
   (KNativePointer fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>((fontMgrPtr));
-    return reinterpret_cast<KNativePointer>(SkShaper::MakeShaperDrivenWrapper(sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<KNativePointer>(skiko::ShaperWithFontMgr::make(SkShaper::MakeShaperDrivenWrapper(sk_ref_sp(fontMgr))));
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWrap
   (KNativePointer fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>((fontMgrPtr));
-    return reinterpret_cast<KNativePointer>(SkShaper::MakeShapeThenWrap(sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<KNativePointer>(skiko::ShaperWithFontMgr::make(SkShaper::MakeShapeThenWrap(sk_ref_sp(fontMgr))));
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder
@@ -45,12 +46,12 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWra
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>((fontMgrPtr));
     // TODO: consider if we need/want to use ICU4X or Libgrapheme (skuincode/include has those implementations too)
     sk_sp<SkUnicode> unicode = SkUnicodes::ICU::Make();
-    return reinterpret_cast<KNativePointer>(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<KNativePointer>(skiko::ShaperWithFontMgr::make(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr))));
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeCoreText() {
     #ifdef SK_SHAPER_CORETEXT_AVAILABLE
-         return reinterpret_cast<KNativePointer>(SkShapers::CT::CoreText().release());
+         return reinterpret_cast<KNativePointer>(skiko::ShaperWithFontMgr::make(SkShapers::CT::CoreText()));
     #else
         return nullptr;
     #endif
@@ -59,13 +60,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeCoreText() {
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMake
   (KNativePointer fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>((fontMgrPtr));
-    return reinterpret_cast<KNativePointer>(SkShaper::Make(sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<KNativePointer>(skiko::ShaperWithFontMgr::make(SkShaper::Make(sk_ref_sp(fontMgr))));
 }
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
   (KNativePointer ptr, KNativePointer textPtr, KNativePointer fontPtr, KInt optsFeaturesLen, KInt* optsFeatures, KInt optsBooleanProps, KFloat width, KFloat offsetX, KFloat offsetY) {
-    SkShaper* instance = reinterpret_cast<SkShaper*>(ptr);
+    auto* holder = reinterpret_cast<skiko::ShaperWithFontMgr*>(ptr);
+    SkShaper* instance = holder->shaper();
     SkString& text = *(reinterpret_cast<SkString*>(textPtr));
 
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
@@ -92,7 +94,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgrSkikoDefault(),
+        holder->defaultFontMgr(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation
@@ -107,7 +109,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
   (KNativePointer ptr, KNativePointer textManagedStringPtr, KNativePointer fontPtr, KInt optsFeaturesLen, KInt* optsFeatures, KInt optsBooleanProps) {
-    SkShaper* instance = reinterpret_cast<SkShaper*>(ptr);
+    auto* holder = reinterpret_cast<skiko::ShaperWithFontMgr*>(ptr);
+    SkShaper* instance = holder->shaper();
 
     SkString& text = *(reinterpret_cast<SkString*>(textManagedStringPtr));
     SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
@@ -139,7 +142,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgrSkikoDefault(),
+        holder->defaultFontMgr(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation);
@@ -152,7 +155,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
 SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper__1nShape
   (KNativePointer ptr, KNativePointer textPtr, KInteropPointer fontRunIterObj, KInteropPointer bidiRunIterObj, KInteropPointer scriptRunIterObj, KInteropPointer languageRunIterObj, KInt optsFeaturesLen, KInt* optsFeatures, KInt optsBooleanProps, KFloat width, KInteropPointer runHandlerObj)
 {
-    auto* instance = reinterpret_cast<SkShaper*>(ptr);
+    auto* holder = reinterpret_cast<skiko::ShaperWithFontMgr*>(ptr);
+    SkShaper* instance = holder->shaper();
 
     SkString& text = *(reinterpret_cast<SkString*>(textPtr));
     if (text.size() == 0) {
