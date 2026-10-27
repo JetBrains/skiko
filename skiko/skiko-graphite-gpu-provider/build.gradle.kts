@@ -2,8 +2,8 @@
 
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.skiko.build.configuration.configureKotlinCompilerOptions
 import org.jetbrains.skiko.build.configuration.configureSignAndPublishDependencies
 import org.jetbrains.skiko.build.context.SkikoModuleKind
 import org.jetbrains.skiko.build.context.SkikoProjectContext
@@ -15,8 +15,6 @@ import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
 import org.jetbrains.skiko.build.publishing.declarePublications
 import org.jetbrains.skiko.build.utils.SkikoArtifacts
 import org.jetbrains.skiko.build.utils.SkikoProperties
-import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
-import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
 
 plugins {
     kotlin("multiplatform")
@@ -52,13 +50,6 @@ repositories {
 }
 
 kotlin {
-    compilerOptions {
-        languageVersion.set(skikoKotlinLanguageVersion)
-        apiVersion.set(skikoKotlinApiVersion)
-        freeCompilerArgs.add("-opt-in=org.jetbrains.skiko.InternalSkikoApi")
-        freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
-    }
-
     applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
 
     if (supportNativeIosArm64) {
@@ -90,12 +81,10 @@ if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
     configureSignAndPublishDependencies()
 }
 
+configureKotlinCompilerOptions()
+
 tasks.withType<KotlinNativeCompile>().configureEach {
     if (name.startsWith("compileKotlinIos")) {
         compilerOptions.moduleName.set("${project.group}:skiko-gpu-provider")
     }
-}
-
-tasks.withType<KotlinCompilationTask<*>>().configureEach {
-    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
 }
