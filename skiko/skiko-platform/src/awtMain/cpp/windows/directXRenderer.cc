@@ -17,9 +17,6 @@
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>
 
-// Set in JNI_OnLoad (jvmMain/cpp/common/impl/Library.cc).
-extern "C" JavaVM *jvm;
-
 const int BuffersCount = 2;
 const D3D_FEATURE_LEVEL minSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
 const D3D_FEATURE_LEVEL featureLevels[] = {
@@ -136,6 +133,7 @@ private:
 // composites a frame we haven't painted yet.
 
 struct LiveResizeState {
+    JavaVM *vm = nullptr;
     WNDPROC originalProc = nullptr;
     WNDPROC originalContentProc = nullptr;
     HWND frameHwnd = nullptr;
@@ -184,17 +182,21 @@ static LRESULT forwardToOriginal(WNDPROC original, HWND hWnd, UINT msg, WPARAM w
                     : DefWindowProcW(hWnd, msg, wParam, lParam);
 }
 
-static JNIEnv *getJniEnv() {
-    if (!jvm) return nullptr;
+static JNIEnv *getJniEnv(LiveResizeState *s) {
+    if (!s->vm) return nullptr;
     JNIEnv *env = nullptr;
-    if (jvm->GetEnv((void **)&env, JNI_VERSION_1_6) == JNI_EDETACHED)
-        jvm->AttachCurrentThread((void **)&env, nullptr);
+    const jint status = s->vm->GetEnv((void **)&env, JNI_VERSION_1_6);
+    if (status == JNI_EDETACHED) {
+        if (s->vm->AttachCurrentThread((void **)&env, nullptr) != JNI_OK) return nullptr;
+    } else if (status != JNI_OK) {
+        return nullptr;
+    }
     return env;
 }
 
 static void javaOnLiveResizeStarted(LiveResizeState *s) {
     if (!s->renderer) return;
-    JNIEnv *env = getJniEnv();
+    JNIEnv *env = getJniEnv(s);
     if (!env) return;
     static jmethodID mid = nullptr;
     if (!mid) {
@@ -208,7 +210,7 @@ static void javaOnLiveResizeStarted(LiveResizeState *s) {
 
 static void javaOnLiveResizeEnded(LiveResizeState *s) {
     if (!s->renderer) return;
-    JNIEnv *env = getJniEnv();
+    JNIEnv *env = getJniEnv(s);
     if (!env) return;
     static jmethodID mid = nullptr;
     if (!mid) {
@@ -222,7 +224,7 @@ static void javaOnLiveResizeEnded(LiveResizeState *s) {
 
 static void javaDrawFrameWhileLiveResizing(LiveResizeState *s, bool isResizeFrame) {
     if (!s->renderer) return;
-    JNIEnv *env = getJniEnv();
+    JNIEnv *env = getJniEnv(s);
     if (!env) return;
     static jmethodID mid = nullptr;
     if (!mid) {
@@ -613,6 +615,10 @@ extern "C"
         if (liveResizeStateFor(top)) return 0; // a second install would capture our own proc and recurse forever
 
         LiveResizeState *state = new LiveResizeState();
+        if (env->GetJavaVM(&state->vm) != JNI_OK) {
+            delete state;
+            return 0;
+        }
         state->frameHwnd = top;
         state->contentHwnd = fromJavaPointer<HWND>(contentPtr);
         state->renderer = env->NewGlobalRef(renderer);
