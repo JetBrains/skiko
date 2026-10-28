@@ -60,8 +60,9 @@ val hostArch = when (System.getProperty("os.arch")) {
 }
 
 val hostAwtRuntimeArtifact = "org.jetbrains.skiko:skiko-awt-runtime-$hostOs-$hostArch:${skikoVersionOrUnspecified.get()}"
+val hostPlatformAwtRuntimeArtifact = "org.jetbrains.skiko:skiko-platform-awt-runtime-$hostOs-$hostArch:${skikoVersionOrUnspecified.get()}"
 val localAwtRuntimeJar = if (isCompositeBuild) {
-    gradle.includedBuild("skiko").projectDir.resolve("build/libs/skiko-runtime-for-tests.jar")
+    gradle.includedBuild("skiko").projectDir.resolve("skiko-platform/build/libs/skiko-runtime-for-tests.jar")
 } else {
     null
 }
@@ -272,10 +273,12 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
+                implementation(libs.skiko.platform)
                 if (isCompositeBuild) {
                     runtimeOnly(files(localAwtRuntimeJar!!))
                 } else {
                     implementation(hostAwtRuntimeArtifact)
+                    implementation(hostPlatformAwtRuntimeArtifact)
                 }
             }
         }
@@ -319,10 +322,10 @@ tasks.register<JavaExec>("jvmBenchmark") {
     val mainCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn(mainCompilation.compileTaskProvider)
     if (isCompositeBuild) {
-        dependsOn(gradle.includedBuild("skiko").task(":skikoJvmJarForTests"))
+        dependsOn(gradle.includedBuild("skiko").task(":skiko-platform:skikoJvmJarForTests"))
         systemProperty(
             "skiko.library.path",
-            gradle.includedBuild("skiko").projectDir.resolve("build/skiko-runtime-for-tests").absolutePath
+            gradle.includedBuild("skiko").projectDir.resolve("skiko-platform/build/skiko-runtime-for-tests").absolutePath
         )
     }
     classpath = files(mainCompilation.output.allOutputs, mainCompilation.runtimeDependencyFiles)
