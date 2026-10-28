@@ -1,6 +1,6 @@
 package org.jetbrains.skiko.swing
 
-import org.jetbrains.skiko.Library
+import org.jetbrains.skiko.PlatformLibrary
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 import java.awt.GraphicsConfiguration
@@ -50,7 +50,7 @@ class SkikoFramePacingServiceTest {
     fun `subscription receives ticks at roughly the display rate`() {
         val service = headfulService()
         val displayId = paceableDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
 
         val ticks = AtomicLong()
         val first = CountDownLatch(1)
@@ -79,7 +79,7 @@ class SkikoFramePacingServiceTest {
     fun `closing the subscription stops the ticks`() {
         val service = headfulService()
         val displayId = paceableDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
 
         val ticks = AtomicLong()
         val subscription = service.subscribe(displayId) { _, _ -> ticks.incrementAndGet() }
@@ -107,7 +107,7 @@ class SkikoFramePacingServiceTest {
     fun `a throwing listener is dropped and does not starve its sibling`() {
         val service = headfulService()
         val displayId = paceableDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
 
         val throwCount = AtomicLong()
         val siblingTicks = CountDownLatch(10)
@@ -141,7 +141,7 @@ class SkikoFramePacingServiceTest {
     fun `two subscriptions share one clock and survive each other`() {
         val service = headfulService()
         val displayId = paceableDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
 
         val firstTicks = AtomicLong()
         val secondTicks = AtomicLong()
@@ -190,7 +190,7 @@ class SkikoFramePacingServiceTest {
         assumeTrue(System.getProperty("os.version").substringBefore('.').toInt() >= 14)
         val service = headfulService()
         val displayId = defaultDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
 
         // The probe must accept the default display, so the clock created for it is the
         // CADisplayLink one.
@@ -205,7 +205,7 @@ class SkikoFramePacingServiceTest {
         assumeTrue(hostOs == OS.Windows)
         val service = headfulService()
         val displayId = defaultDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
 
         // Windows has no stand-in clock: a desktop session gets the DXGI vblank or nothing, so
         // ticks arriving here prove the vblank path itself.
@@ -223,7 +223,7 @@ class SkikoFramePacingServiceTest {
     fun `native drm vblank clock is available on Linux`() {
         assumeTrue(hostOs == OS.Linux)
         headfulService()
-        Library.load()
+        PlatformLibrary.load()
 
         // The exploration's point on Linux is kernel-vblank ticks: a real seat with DRM device access must
         // get them, not the timer. But a headful X11 session is not proof of one — CI's xvfb desktop runs
@@ -241,7 +241,7 @@ class SkikoFramePacingServiceTest {
     fun `the clock is recreated after the last subscription closes`() {
         val service = headfulService()
         val displayId = paceableDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
 
         val firstTicks = AtomicLong()
         val first = service.subscribe(displayId) { _, _ -> firstTicks.incrementAndGet() }
@@ -311,7 +311,7 @@ class SkikoFramePacingServiceTest {
     fun `an available native backend is used instead of the timer`() {
         val service = headfulService()
         val displayId = defaultDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
         assumeTrue(nativeBackendAvailable(displayId))
 
         // The probe passing is not the same thing as the platform branch being wired to it: an
@@ -333,7 +333,7 @@ class SkikoFramePacingServiceTest {
     fun `forceTimer overrides an available native backend`() {
         val service = headfulService()
         val displayId = defaultDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
 
         val clock = assertNotNull(
             SkikoFramePacingService.createClock(displayId, PLAUSIBLE_PERIOD_NANOS, forceTimer = true)
@@ -345,7 +345,7 @@ class SkikoFramePacingServiceTest {
     fun `an unknown refresh rate disables the timer and the Linux clock, not the per-display sources`() {
         val service = headfulService()
         val displayId = defaultDisplayId(service)
-        Library.load()
+        PlatformLibrary.load()
 
         // The timer needs a cadence, and the Linux clock matches its CRTC on the period; with no
         // reported rate neither can be right, so the display is not paced. CADisplayLink and
