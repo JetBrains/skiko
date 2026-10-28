@@ -4,7 +4,7 @@ import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.ExperimentalSkikoApi
-import org.jetbrains.skiko.Library
+import org.jetbrains.skiko.PlatformLibrary
 import org.jetbrains.skiko.RenderException
 
 /**
@@ -62,7 +62,7 @@ class MetalOffscreenContext : AutoCloseable {
 
     private companion object {
         init {
-            Library.load()
+            PlatformLibrary.load()
         }
     }
 }
