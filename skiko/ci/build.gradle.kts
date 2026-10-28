@@ -36,8 +36,6 @@ val skikoArtifactIds: List<String> =
         skikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
         skikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
         skikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
-        skikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.X64),
-        skikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.Arm64),
         skikoArtifacts.jsArtifactId,
         skikoArtifacts.wasmArtifactId,
         skikoArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
