@@ -162,7 +162,7 @@ object SkikoProperties {
      * Other OSes are not supported yet.
      *
      * If it is enabled, make sure that either:
-     * - `org.jetbrains.skiko:skiko-awt-runtime-angle-$target:$version` added as a dependency
+     * - `org.jetbrains.skiko:skiko-platform-awt-runtime-angle-$target:$version` added as a dependency
      * - The `skiko.library.path` property is defined and the directory has libEGL, libGLESv2 from
      *   https://github.com/JetBrains/angle-pack/releases
      */
