@@ -26,6 +26,9 @@ class LibraryLoader internal constructor(
      */
     private val lockFile: LockFile,
 
+    /** Class whose class loader contains the native library resources. */
+    private val cls: Class<*> = Library::class.java,
+
     /**
      * Additional code that is called after successfully loading
      */
@@ -35,11 +38,13 @@ class LibraryLoader internal constructor(
         name: String,
         additionalFile: String? = null,
         init: () -> Unit = {},
+        cls: Class<*> = Library::class.java,
     ) : this(
         name = name,
         additionalFile = additionalFile,
         lockFile = LockFile.skiko,
         init = init,
+        cls = cls,
     )
 
     // A native library cannot be loaded in several classloaders, so we have to clone
@@ -64,7 +69,7 @@ class LibraryLoader internal constructor(
     }
 
     private fun getModuleResourceAsStream(resourceName: String) =
-        Library::class.java.classLoader.getResourceAsStream(resourceName)
+        cls.classLoader.getResourceAsStream(resourceName)
 
     private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
         val file = File(dest, resourceName)

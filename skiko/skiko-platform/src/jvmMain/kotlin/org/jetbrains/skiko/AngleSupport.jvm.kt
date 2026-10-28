@@ -8,6 +8,7 @@ private var loader = LibraryLoader(
     libEGLName,
     // libGLESv2 is not loaded explicitly in Skiko, it is loaded by libEGL
     additionalFile = System.mapLibraryName("libGLESv2"),
+    cls = PlatformLibrary::class.java,
     init = {
         PlatformLibrary.load()
         if (!initAngleLibraryWindows(libEGLName)) {
