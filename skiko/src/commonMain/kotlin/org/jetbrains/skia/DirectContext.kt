@@ -88,7 +88,7 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
                 memoryAllocator
             )
             if (ptr == NullPointer) throw RenderException("Can't create Vulkan DirectContext")
-            return DirectContext(ptr)
+             DirectContext(ptr)
         }
 
         init {

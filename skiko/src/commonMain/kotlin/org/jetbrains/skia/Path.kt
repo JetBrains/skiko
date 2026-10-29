@@ -33,7 +33,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             if (result == NullPointer) {
                 throw IllegalArgumentException("Failed to parse SVG Path string: $svg")
             } else {
-                return Path(result)
+                Path(result)
             }
         }
 
@@ -392,7 +392,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             if (result == NullPointer) {
                 throw IllegalArgumentException("Failed to parse serialized Path")
             } else {
-                return Path(result)
+                Path(result)
             }
         }
 

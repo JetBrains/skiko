@@ -32,9 +32,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             p1: Point,
             gradient: Gradient,
             localMatrix: Matrix33? = null
-        ): Shader {
-            return makeLinearGradient(p0.x, p0.y, p1.x, p1.y, gradient, localMatrix)
-        }
+        ): Shader = makeLinearGradient(p0.x, p0.y, p1.x, p1.y, gradient, localMatrix)
 
         @JvmStatic
         fun makeLinearGradient(

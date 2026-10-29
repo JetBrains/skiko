@@ -26,15 +26,13 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param bbh optional acceleration structure
      * @return the canvas.
      */
-    fun beginRecording(bounds: Rect, bbh: BBHFactory? = null): Canvas {
-        return beginRecording(
-            bounds.left,
-            bounds.top,
-            bounds.right,
-            bounds.bottom,
-            bbh
-        )
-    }
+    fun beginRecording(bounds: Rect, bbh: BBHFactory? = null): Canvas = beginRecording(
+        bounds.left,
+        bounds.top,
+        bounds.right,
+        bounds.bottom,
+        bbh
+    )
 
     /**
      * Returns the canvas that records the drawing commands.
@@ -96,14 +94,12 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * and subsequent culling operations.
      * @return the picture containing the recorded content.
      */
-    fun finishRecordingAsPicture(cull: Rect): Picture {
-        return finishRecordingAsPicture(
-            cull.left,
-            cull.top,
-            cull.right,
-            cull.bottom
-        )
-    }
+    fun finishRecordingAsPicture(cull: Rect): Picture = finishRecordingAsPicture(
+        cull.left,
+        cull.top,
+        cull.right,
+        cull.bottom
+    )
 
     /**
      * Finalizes the recording of the drawing commands and creates an immutable picture object

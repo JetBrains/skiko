@@ -13,7 +13,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             interopScope {
                 val ptr = _nMakeFromString(toInterop(data))
                 require(ptr != NullPointer) { "Failed to create Animation from string=\"$data\"" }
-                return Animation(ptr)
+                Animation(ptr)
             }
         }
 

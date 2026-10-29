@@ -111,9 +111,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @return  true if drawing has no effect
      */
-    fun drawsNothing(): Boolean {
-        return isEmpty || isNull
-    }
+    fun drawsNothing(): Boolean = isEmpty || isNull
 
     /**
      * Returns row bytes, the interval from one pixel row to the next. Row bytes
