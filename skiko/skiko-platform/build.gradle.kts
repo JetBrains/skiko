@@ -42,6 +42,7 @@ import org.jetbrains.skiko.build.context.wasmJsTest
 import org.jetbrains.skiko.build.context.webMainSourceSet
 import org.jetbrains.skiko.build.context.webTestSourceSet
 import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
+import org.jetbrains.skiko.build.cpp.LinkSkikoTask
 import org.jetbrains.skiko.build.dependencies.SkikoDependencyScope
 import org.jetbrains.skiko.build.dependencies.registerAdditionalLibraries
 import org.jetbrains.skiko.build.publishing.declarePublications
@@ -50,6 +51,7 @@ import org.jetbrains.skiko.build.utils.OS
 import org.jetbrains.skiko.build.utils.SkikoArtifacts
 import org.jetbrains.skiko.build.utils.SkikoProperties
 import org.jetbrains.skiko.build.utils.hostOs
+import org.jetbrains.skiko.build.utils.joinToTitleCamelCase
 import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
 import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
 import org.jetbrains.skiko.build.utils.skikoKotlinNativeApiVersion
@@ -88,7 +90,6 @@ val platformDependencies: SkikoDependencyScope.() -> Unit = {
         }
         jvm {
             windows {
-                dynamicSystemLibs("OpenGL32", "d3d12", "dxgi")
                 compilerFlags("-DSK_DIRECT3D", "-DSK_ANGLE")
             }
             macos {
@@ -383,6 +384,20 @@ if (supportAwt) {
         macosX64CoreLinkedLibrary?.let { files(it) },
         coreJvmRuntimeJar
     )
+    if (targetOs == OS.Windows) {
+        val ganeshJvmLinkedLibrary = skikoPlatformProjectContext.jvmLinkedLibraryFor(
+            targetOs, targetArch, configurationNamePrefix = "ganeshJvmLinkedLibrary"
+        ).also {
+            dependencies.add(it.name, ganeshProject)
+        }
+        val targetSuffix = joinToTitleCamelCase(targetOs.id, targetArch.id)
+        tasks.named<LinkSkikoTask>("linkJvmBindings$targetSuffix") {
+            dependsOn(ganeshJvmLinkedLibrary)
+            libFiles += files(provider {
+                ganeshJvmLinkedLibrary.files.map { it.resolve("skiko-ganesh-${targetOs.id}-${targetArch.id}.lib") }
+            })
+        }
+    }
     skikoPlatformProjectContext.provideJvmRequiredSymbols(targetOs, targetArch)
     if (targetOs == OS.MacOS && targetArch == Arch.Arm64) {
         skikoPlatformProjectContext.provideJvmRequiredSymbols(OS.MacOS, Arch.X64)

@@ -10,7 +10,7 @@
 
 extern "C"
 {
-    HRESULT D3D12CreateDevice(
+    __declspec(dllexport) HRESULT D3D12CreateDevice(
         IUnknown *pAdapter,
         D3D_FEATURE_LEVEL MinimumFeatureLevel,
         REFIID riid,
@@ -58,7 +58,7 @@ extern "C"
         return impl(pRootSignature, Version, ppBlob, ppErrorBlob);
     }
 
-    HRESULT CreateDXGIFactory1(
+    __declspec(dllexport) HRESULT CreateDXGIFactory1(
         REFIID riid,
         void **ppFactory)
     {
@@ -78,7 +78,7 @@ extern "C"
         return impl(riid, ppFactory);
     }
 
-    HRESULT CreateDXGIFactory2(
+    __declspec(dllexport) HRESULT CreateDXGIFactory2(
         UINT Flags,
         REFIID riid,
         void **ppFactory)
