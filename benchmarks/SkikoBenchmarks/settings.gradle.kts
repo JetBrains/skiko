@@ -23,6 +23,7 @@ dependencyResolutionManagement {
             version("kotlinxBrowser", "0.5.0")
 
             library("skiko", "org.jetbrains.skiko", "skiko").versionRef("skiko")
+            library("skiko-platform", "org.jetbrains.skiko", "skiko-platform").versionRef("skiko")
             library("skiko-js-wasm-runtime", "org.jetbrains.skiko", "skiko-js-wasm-runtime").versionRef("skiko")
             library("skiko-wasm-js", "org.jetbrains.skiko", "skiko-wasm-js").versionRef("skiko")
             library("browser", "org.jetbrains.kotlinx", "kotlinx-browser").versionRef("kotlinxBrowser")
@@ -39,6 +40,7 @@ if (useIncludedSkiko) {
     includeBuild("../../skiko") {
         dependencySubstitution {
             substitute(module("org.jetbrains.skiko:skiko")).using(project(":"))
+            substitute(module("org.jetbrains.skiko:skiko-platform")).using(project(":skiko-platform"))
         }
     }
 }

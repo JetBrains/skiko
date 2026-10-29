@@ -6,7 +6,7 @@ import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostId
 import org.jetbrains.skiko.hostOs
 
-private val graphiteLoader = LibraryLoader("skiko-graphite-$hostId")
+private val graphiteLoader = LibraryLoader("skiko-graphite-$hostId", cls = GraphiteLibrary::class.java)
 
 private external fun loadVulkanLibrary()
 

@@ -120,7 +120,8 @@ internal fun patchWebGlContext(canvas: HTMLCanvasElement): Unit = js("""{
 )
 private external fun contextAttributesWithDefaults(attr: EmscriptenWebGLContextAttributes?): EmscriptenWebGLContextAttributes
 
-internal fun createWebGLContext(
+@InternalSkikoApi
+fun createWebGLContext(
     canvas: HTMLCanvasElement,
     attr: EmscriptenWebGLContextAttributes? = null
 ): NativePointer {

@@ -10,8 +10,6 @@ object Library {
         additionalFile = if (hostOs.isWindows) "icudtl.dat" else null,
         lockFile = LockFile.skiko,
         init = {
-            Setup.init()
-
             try {
                 // Init code executed after library was loaded.
                 org.jetbrains.skia.impl.Library._nAfterLoad()
