@@ -5,7 +5,6 @@ package org.jetbrains.skia.gpu
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
-import org.jetbrains.skia.gpu.graphite.BackendTexture
 import org.jetbrains.skia.gpu.graphite.GraphiteContext
 import org.jetbrains.skia.gpu.graphite.Recorder
 import org.jetbrains.skia.gpu.graphite.wrapBackendTexture
@@ -37,19 +36,10 @@ internal class GraphiteGpuContextBackend private constructor(
         colorSpace: ColorSpace?,
         surfaceProps: SurfaceProps?,
     ): Surface? {
-        val backendTexture = when (texture) {
-            is MetalGpuTexture -> BackendTexture.makeMetal(
-                texture.width,
-                texture.height,
-                texture.texturePtr,
-            )
-
-        }
-        val surface = Surface.wrapBackendTexture(recorder, backendTexture, colorSpace, surfaceProps)
-        if (surface == null) {
-            backendTexture.close()
-        }
-        return surface
+        require(texture is GraphiteGpuTexture) { "Texture was not created by the Graphite provider" }
+        val backendTexture = texture.backendTexture
+        check(!backendTexture.isClosed) { "GPU texture is closed" }
+        return Surface.wrapBackendTexture(recorder, backendTexture, colorSpace, surfaceProps)
     }
 
     override fun submit(syncCpu: Boolean) {

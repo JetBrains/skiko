@@ -1,6 +1,7 @@
 // Keep the API in this file in sync with skiko-graphite-gpu-provider's entrypoint.kt.
 package org.jetbrains.skia.gpu
 
+import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.Logger
@@ -10,3 +11,7 @@ fun makeMetalContext(devicePtr: NativePointer, queuePtr: NativePointer): GpuCont
     Logger.info { "Metal backend: Ganesh" }
     return GpuContext(GaneshGpuContextBackend.makeMetal(devicePtr, queuePtr))
 }
+
+@ExperimentalSkikoApi
+fun makeMetalTexture(width: Int, height: Int, texturePtr: NativePointer): GpuTexture =
+    GaneshGpuTexture(width, height, BackendRenderTarget.makeMetal(width, height, texturePtr))

@@ -9,7 +9,6 @@ package org.jetbrains.skia.gpu
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
-import org.jetbrains.skia.impl.Native
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -32,7 +31,7 @@ class GpuContextTest {
         context.close()
 
         assertFailsWith<IllegalStateException> {
-            context.makeSurface(MetalGpuTexture(1, 1, Native.NullPointer))
+            context.makeSurface(FakeGpuTexture())
         }
     }
 
@@ -44,6 +43,12 @@ class GpuContextTest {
         context.submit()
 
         assertEquals(1, backend.submitCount)
+    }
+
+    private class FakeGpuTexture : GpuTexture {
+        override val width = 1
+        override val height = 1
+        override fun close() = Unit
     }
 
     private class FakeGpuContextBackend : GpuContextBackend {
