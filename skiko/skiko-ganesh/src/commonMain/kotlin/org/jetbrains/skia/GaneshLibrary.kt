@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
-internal expect object GaneshLibrary {
+import org.jetbrains.skiko.InternalSkikoApi
+
+@InternalSkikoApi
+expect object GaneshLibrary {
     fun load()
 }

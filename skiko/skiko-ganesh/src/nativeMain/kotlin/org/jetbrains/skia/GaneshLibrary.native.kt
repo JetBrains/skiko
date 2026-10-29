@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
-internal actual object GaneshLibrary {
+import org.jetbrains.skiko.InternalSkikoApi
+
+@InternalSkikoApi
+actual object GaneshLibrary {
     actual fun load() = Unit
 }

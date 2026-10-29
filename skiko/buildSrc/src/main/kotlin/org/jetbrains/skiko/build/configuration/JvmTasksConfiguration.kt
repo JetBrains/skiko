@@ -83,8 +83,9 @@ private fun Project.configureTargetJvmAttributes(
 fun SkikoProjectContext.jvmLinkedLibraryFor(
     targetOs: OS,
     targetArch: Arch,
+    configurationNamePrefix: String = "jvmLinkedLibrary",
 ): Configuration = with(project) {
-    configurations.create("jvmLinkedLibrary${joinToTitleCamelCase(targetOs.id, targetArch.id)}") {
+    configurations.create("$configurationNamePrefix${joinToTitleCamelCase(targetOs.id, targetArch.id)}") {
         isCanBeConsumed = false
         isCanBeResolved = true
 
@@ -750,9 +751,7 @@ fun SkikoProjectContext.createSkikoJvmJarTask(
     val objcCompile = if (os == OS.MacOS) createObjcCompileTask(os, arch, skiaBindingsDir) else null
     val linkBindings =
         createLinkJvmBindings(os, arch, skiaBindingsDir, compileBindings, objcCompile, coreLinkedLibraryDirs)
-    if (kind == SkikoModuleKind.CORE) {
-        configureJvmLinkedLibraryElements(os, arch, linkBindings)
-    }
+    configureJvmLinkedLibraryElements(os, arch, linkBindings)
     if (os.isMacOs) {
         createDownloadCodeSignClientDarwinTask(os, hostArch)
     }
@@ -776,9 +775,7 @@ fun SkikoProjectContext.createSkikoJvmJarTask(
         val objcCompile2 = createObjcCompileTask(os, altArch, skiaBindingsDir2)
         val linkBindings2 =
             createLinkJvmBindings(os, altArch, skiaBindingsDir2, compileBindings2, objcCompile2, macosX64CoreLinkedLibraryDirs)
-        if (kind == SkikoModuleKind.CORE) {
-            configureJvmLinkedLibraryElements(os, altArch, linkBindings2)
-        }
+        configureJvmLinkedLibraryElements(os, altArch, linkBindings2)
         val maybeSign2 = maybeSignOrSealTask(os, altArch, linkBindings2)
         val nativeLib2 = maybeSign2.map { it.outputFiles.get().single { f -> f.name.endsWith(os.dynamicLibExt) } }
         val createChecksums2 = createChecksumsTask(os, altArch, nativeLib2)
