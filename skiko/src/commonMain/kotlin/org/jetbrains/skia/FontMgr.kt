@@ -185,7 +185,7 @@ open class FontMgr : RefCnt {
     internal constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, allowClose)
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamiliesCount")
 // Needs ForceNativeThreadState: calls into the DirectWrite font library, whose code cannot be shown to avoid blocking
 // or long work.
@@ -259,3 +259,4 @@ private external fun _nDefault(): NativePointer
 // Native call path: SkFontMgr_Mac::onLegacyMakeTypeface -> create_from_name -> CTFontCreateWithFontDescriptor
 @ForceNativeThreadState
 private external fun _nLegacyMakeTypeface(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer
+// </editor-fold>

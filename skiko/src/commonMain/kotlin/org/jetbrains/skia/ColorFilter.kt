@@ -126,7 +126,7 @@ class ColorFilter : RefCnt {
     internal constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, allowClose)
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeComposed")
 // No ForceNativeThreadState: allocates a small filter that holds two references to existing filters, so it is short and
 // cannot block.
@@ -212,3 +212,4 @@ private external fun _nMakeTableARGB(
     g: InteropPointer,
     b: InteropPointer,
 ): NativePointer
+// </editor-fold>

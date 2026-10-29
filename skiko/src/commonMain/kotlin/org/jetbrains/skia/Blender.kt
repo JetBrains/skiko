@@ -44,6 +44,7 @@ class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Blender__1nMakeArithmetic")
 // Needs ForceNativeThreadState: may compile a shader program on first use, and that setup can wait for another thread.
 // Native call path: SkBlenders::Arithmetic -> GetKnownRuntimeEffect -> SkRuntimeEffect::MakeForBlender
@@ -62,3 +63,4 @@ private external fun _nMakeArithmetic(
 // Native call path: SkBlender::Mode -> GetBlendModeSingleton
 @ForceNativeThreadState
 private external fun _nMakeMode(mode: Int): NativePointer
+// </editor-fold>

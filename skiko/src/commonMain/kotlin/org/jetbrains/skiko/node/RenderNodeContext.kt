@@ -60,6 +60,7 @@ class RenderNodeContext internal constructor(ptr: NativePointer, managed: Boolea
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake")
 // No ForceNativeThreadState: allocates a small ref-counted context holding plain numbers and two flags, so it is short
 // and cannot block.
@@ -70,3 +71,4 @@ private external fun RenderNodeContext_nMake(measureDrawBounds: Boolean, snapsho
 // No ForceNativeThreadState: copies six numbers into stored values, so it is short and cannot block.
 // Native call path: RenderNodeContext::setLightingInfo
 private external fun RenderNodeContext_nSetLightingInfo(ptr: NativePointer, centerX: Float, centerY: Float, centerZ: Float, radius: Float, ambientShadowAlpha: Float, spotShadowAlpha: Float)
+// </editor-fold>

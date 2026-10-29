@@ -754,6 +754,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
 // Needs ForceNativeThreadState: compiles a shader program the first time it is used, and other callers wait while that
 // one-time setup runs.
@@ -1080,3 +1081,4 @@ private external fun _nMakeSpotLitSpecular(
     input: NativePointer,
     crop: InteropPointer
 ): NativePointer
+// </editor-fold>

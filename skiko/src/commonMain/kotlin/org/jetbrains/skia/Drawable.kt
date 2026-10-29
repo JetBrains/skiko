@@ -134,6 +134,7 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
 
 internal expect fun Drawable.doInit(ptr: NativePointer)
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot
 // block.
@@ -192,3 +193,4 @@ internal external fun _nGetOnDrawCanvas(ptr: NativePointer): NativePointer
 // No ForceNativeThreadState: sets the four edges of the stored bounds rectangle, so it is short and cannot block.
 // Native call path: SkRect::setLTRB
 internal external fun _nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)
+// </editor-fold>

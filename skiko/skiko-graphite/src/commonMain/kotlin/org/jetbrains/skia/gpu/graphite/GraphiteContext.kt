@@ -169,6 +169,7 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -217,3 +218,4 @@ private external fun _nInsertRecording(
 // Native call path: Context::submit -> QueueManager::submitToGpu -> MtlCommandBuffer::commit
 @ForceNativeThreadState
 private external fun _nSubmit(contextPtr: NativePointer, syncCpu: Boolean)
+// </editor-fold>

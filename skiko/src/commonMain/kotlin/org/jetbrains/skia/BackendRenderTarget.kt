@@ -109,6 +109,7 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -155,3 +156,4 @@ private external fun _nMakeVulkan(
     sampleCnt: Int,
     levelCnt: Int
 ): NativePointer
+// </editor-fold>

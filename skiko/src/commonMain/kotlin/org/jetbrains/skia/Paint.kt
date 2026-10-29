@@ -589,6 +589,7 @@ class Paint : Managed {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of the paint cleanup function without running it, so it is short and
 // cannot block.
@@ -805,3 +806,4 @@ private external fun _nSetBlender(ptr: NativePointer, blenderPtr: NativePointer)
 // Native call path: SkPaint::nothingToDraw -> SkComposeColorFilter::onIsAlphaUnchanged
 @ForceNativeThreadState
 private external fun _nHasNothingToDraw(ptr: NativePointer): Boolean
+// </editor-fold>
