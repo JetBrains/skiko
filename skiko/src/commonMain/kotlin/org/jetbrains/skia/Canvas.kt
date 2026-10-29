@@ -381,6 +381,152 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         this
     }
 
+    /**
+     * Draw the entire bitmap at (left, top), without allocating a temporary Image.
+     * Matches Android Canvas.drawBitmap(Bitmap, left, top, paint).
+     */
+    fun drawBitmap(bitmap: Bitmap, left: Float, top: Float): Canvas {
+        return drawBitmapRect(
+            bitmap = bitmap,
+            srcLeft = 0f,
+            srcTop = 0f,
+            srcRight = bitmap.width.toFloat(),
+            srcBottom = bitmap.height.toFloat(),
+            dstLeft = left,
+            dstTop = top,
+            dstRight = left + bitmap.width.toFloat(),
+            dstBottom = top + bitmap.height.toFloat(),
+            samplingMode = SamplingMode.DEFAULT,
+            paint = null,
+            strict = true
+        )
+    }
+
+    /**
+     * Draw the entire bitmap at (left, top) with an optional paint.
+     */
+    fun drawBitmap(bitmap: Bitmap, left: Float, top: Float, paint: Paint?): Canvas {
+        return drawBitmapRect(
+            bitmap = bitmap,
+            srcLeft = 0f,
+            srcTop = 0f,
+            srcRight = bitmap.width.toFloat(),
+            srcBottom = bitmap.height.toFloat(),
+            dstLeft = left,
+            dstTop = top,
+            dstRight = left + bitmap.width.toFloat(),
+            dstBottom = top + bitmap.height.toFloat(),
+            samplingMode = SamplingMode.DEFAULT,
+            paint = paint,
+            strict = true
+        )
+    }
+
+    /**
+     * Draw a subset of the bitmap into a destination rectangle.
+     * Matches Android Canvas.drawBitmap(Bitmap, src, dst, paint).
+     */
+    fun drawBitmapRect(bitmap: Bitmap, src: Rect, dst: Rect): Canvas {
+        return drawBitmapRect(
+            bitmap = bitmap,
+            srcLeft = src.left,
+            srcTop = src.top,
+            srcRight = src.right,
+            srcBottom = src.bottom,
+            dstLeft = dst.left,
+            dstTop = dst.top,
+            dstRight = dst.right,
+            dstBottom = dst.bottom,
+            samplingMode = SamplingMode.DEFAULT,
+            paint = null,
+            strict = true
+        )
+    }
+
+    /**
+     * Draw a subset of the bitmap into a destination rectangle with an optional paint.
+     */
+    fun drawBitmapRect(bitmap: Bitmap, src: Rect, dst: Rect, paint: Paint?): Canvas {
+        return drawBitmapRect(
+            bitmap = bitmap,
+            srcLeft = src.left,
+            srcTop = src.top,
+            srcRight = src.right,
+            srcBottom = src.bottom,
+            dstLeft = dst.left,
+            dstTop = dst.top,
+            dstRight = dst.right,
+            dstBottom = dst.bottom,
+            samplingMode = SamplingMode.DEFAULT,
+            paint = paint,
+            strict = true
+        )
+    }
+
+    /**
+     * Draw a subset of the bitmap into a destination rectangle with sampling mode and strictness.
+     */
+    fun drawBitmapRect(
+        bitmap: Bitmap,
+        src: Rect,
+        dst: Rect,
+        samplingMode: SamplingMode,
+        paint: Paint?,
+        strict: Boolean
+    ): Canvas {
+        return drawBitmapRect(
+            bitmap = bitmap,
+            srcLeft = src.left,
+            srcTop = src.top,
+            srcRight = src.right,
+            srcBottom = src.bottom,
+            dstLeft = dst.left,
+            dstTop = dst.top,
+            dstRight = dst.right,
+            dstBottom = dst.bottom,
+            samplingMode = samplingMode,
+            paint = paint,
+            strict = strict
+        )
+    }
+
+    /**
+     * Draw a subset of the bitmap into a destination rectangle with all parameters.
+     * This is the core primitive that avoids allocating a Kotlin Image wrapper.
+     */
+    fun drawBitmapRect(
+        bitmap: Bitmap,
+        srcLeft: Float,
+        srcTop: Float,
+        srcRight: Float,
+        srcBottom: Float,
+        dstLeft: Float,
+        dstTop: Float,
+        dstRight: Float,
+        dstBottom: Float,
+        samplingMode: SamplingMode,
+        paint: Paint?,
+        strict: Boolean
+    ): Canvas = nativeCall(bitmap, paint) { bitmap, paint ->
+        _nDrawBitmapRect(
+            _ptr,
+            bitmap._ptr,
+            srcLeft,
+            srcTop,
+            srcRight,
+            srcBottom,
+            dstLeft,
+            dstTop,
+            dstRight,
+            dstBottom,
+            samplingMode._packedInt1(),
+            samplingMode._packedInt2(),
+            paint.pointerOrNullPointer,
+            strict
+        )
+        this
+    }
+
     fun drawImage(image: Image, left: Float, top: Float): Canvas {
         return drawImageRect(
             image = image,
@@ -1504,8 +1650,26 @@ private external fun _nDrawDRRect(
 @ForceNativeThreadState
 private external fun _nDrawPath(ptr: NativePointer, nativePath: NativePointer, paintPtr: NativePointer)
 
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawBitmapRect")
 // Needs ForceNativeThreadState: drawing the bitmap can upload it to a GPU texture through Metal.
 // Native call path: SkImages::RasterFromBitmap -> SkCanvas::drawImageRect
+@ForceNativeThreadState
+private external fun _nDrawBitmapRect(
+    ptr: NativePointer,
+    nativeBitmap: NativePointer,
+    sl: Float,
+    st: Float,
+    sr: Float,
+    sb: Float,
+    dl: Float,
+    dt: Float,
+    dr: Float,
+    db: Float,
+    samplingModeVal1: Int,
+    samplingModeVal2: Int,
+    paintPtr: NativePointer,
+    strict: Boolean
+)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageRect")
 // Needs ForceNativeThreadState: drawing the image can upload it to a GPU texture through Metal.
