@@ -2,7 +2,6 @@
 
 package org.jetbrains.skia.gpu
 
-import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
@@ -27,15 +26,10 @@ internal class GaneshGpuContextBackend private constructor(
         colorSpace: ColorSpace?,
         surfaceProps: SurfaceProps?,
     ): Surface? {
-        val renderTarget = when (texture) {
-            is MetalGpuTexture -> BackendRenderTarget.makeMetal(
-                texture.width,
-                texture.height,
-                texture.texturePtr,
-            )
-
-        }
-        val surface = Surface.makeFromBackendRenderTarget(
+        require(texture is GaneshGpuTexture) { "Texture was not created by the Ganesh provider" }
+        val renderTarget = texture.renderTarget
+        check(!renderTarget.isClosed) { "GPU texture is closed" }
+        return Surface.makeFromBackendRenderTarget(
             context,
             renderTarget,
             SurfaceOrigin.TOP_LEFT,
@@ -43,10 +37,6 @@ internal class GaneshGpuContextBackend private constructor(
             colorSpace,
             surfaceProps,
         )
-        if (surface == null) {
-            renderTarget.close()
-        }
-        return surface
     }
 
     override fun submit(syncCpu: Boolean) = context.flush().submit(syncCpu)
