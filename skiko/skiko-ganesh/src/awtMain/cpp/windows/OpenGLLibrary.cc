@@ -30,25 +30,25 @@ extern "C" {
         return glGetString(name);
     }
 
-    HGLRC WINAPI wglCreateContext(HDC hDc) {
+    __declspec(dllexport) HGLRC WINAPI wglCreateContext(HDC hDc) {
         typedef HGLRC (WINAPI * PROC_wglCreateContext) (HDC hDc);
         static auto wglCreateContext = (PROC_wglCreateContext) GetProcAddress(OpenGL32Library, "wglCreateContext");
         return wglCreateContext(hDc);
     }
 
-    BOOL WINAPI wglDeleteContext(HGLRC oldContext) {
+    __declspec(dllexport) BOOL WINAPI wglDeleteContext(HGLRC oldContext) {
         typedef BOOL (WINAPI * PROC_wglDeleteContext) (HGLRC oldContext);
         static auto wglDeleteContext = (PROC_wglDeleteContext) GetProcAddress(OpenGL32Library, "wglDeleteContext");
         return wglDeleteContext(oldContext);
     }
 
-    PROC WINAPI wglGetProcAddress(LPCSTR lpszProc) {
+    __declspec(dllexport) PROC WINAPI wglGetProcAddress(LPCSTR lpszProc) {
         typedef PROC (WINAPI * PROC_wglGetProcAddress) (LPCSTR lpszProc);
         static auto wglGetProcAddress = (PROC_wglGetProcAddress) GetProcAddress(OpenGL32Library, "wglGetProcAddress");
         return wglGetProcAddress(lpszProc);
     }
 
-    BOOL WINAPI wglMakeCurrent(HDC hDc, HGLRC newContext) {
+    __declspec(dllexport) BOOL WINAPI wglMakeCurrent(HDC hDc, HGLRC newContext) {
         typedef BOOL (WINAPI * PROC_wglMakeCurrent) (HDC hDc, HGLRC newContext);
         static auto wglMakeCurrent = (PROC_wglMakeCurrent) GetProcAddress(OpenGL32Library, "wglMakeCurrent");
         return wglMakeCurrent(hDc, newContext);
