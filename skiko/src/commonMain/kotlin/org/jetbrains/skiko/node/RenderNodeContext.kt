@@ -42,22 +42,18 @@ class RenderNodeContext internal constructor(ptr: NativePointer, managed: Boolea
         radius: Float = 0f,
         ambientShadowAlpha: Float = 0f,
         spotShadowAlpha: Float = 0f
-    ) {
-        try {
-            Stats.onNativeCall()
-            RenderNodeContext_nSetLightingInfo(
-                ptr = _ptr,
-                centerX = centerX,
-                centerY = centerY,
-                centerZ = centerZ,
-                radius = radius,
-                ambientShadowAlpha = ambientShadowAlpha,
-                spotShadowAlpha = spotShadowAlpha
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+    ) = nativeCall {
+        RenderNodeContext_nSetLightingInfo(
+            ptr = _ptr,
+            centerX = centerX,
+            centerY = centerY,
+            centerZ = centerZ,
+            radius = radius,
+            ambientShadowAlpha = ambientShadowAlpha,
+            spotShadowAlpha = spotShadowAlpha
+        )
     }
+
 }
 
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeContextKt_RenderNodeContext_1nMake")

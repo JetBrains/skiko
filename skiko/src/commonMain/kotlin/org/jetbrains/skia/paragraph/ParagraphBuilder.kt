@@ -15,45 +15,29 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     }
 
     private var _text: ManagedString? = null
-    fun pushStyle(style: TextStyle?): ParagraphBuilder {
-        return try {
-            Stats.onNativeCall()
-            _nPushStyle(_ptr, getPtr(style))
-            this
-        } finally {
-            reachabilityBarrier(style)
-        }
+    fun pushStyle(style: TextStyle?): ParagraphBuilder = nativeCall(style) { style ->
+        _nPushStyle(_ptr, style.pointerOrNullPointer)
+        this
     }
 
-    fun popStyle(): ParagraphBuilder {
-        Stats.onNativeCall()
-        try {
-            _nPopStyle(_ptr, NullPointer)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun popStyle(): ParagraphBuilder = nativeCall {
+        _nPopStyle(_ptr, NullPointer)
+        this
     }
 
-    fun addText(text: String): ParagraphBuilder {
-        Stats.onNativeCall()
-        try {
-            interopScope {
-                _nAddText(_ptr, toInterop(text))
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun addText(text: String): ParagraphBuilder = nativeCall {
+        interopScope {
+            _nAddText(_ptr, toInterop(text))
         }
         if (_text == null) _text = ManagedString(text) else _text!!.append(text)
-        return this
+        this
     }
 
     fun addPlaceholder(style: PlaceholderStyle): ParagraphBuilder {
         check(!style.width.isNaN())
         check(!style.height.isNaN())
         check(!style.baseline.isNaN())
-        try {
-            Stats.onNativeCall()
+        return nativeCall {
             _nAddPlaceholder(
                 _ptr,
                 style.width,
@@ -62,21 +46,14 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
                 style.baselineMode.ordinal,
                 style.baseline
             )
-        } finally {
-            reachabilityBarrier(this)
+            this
         }
-        return this
     }
 
-    fun build(): Paragraph {
-        return try {
-            Stats.onNativeCall()
-            val paragraph = Paragraph(_nBuild(_ptr), _text)
-            _text = null
-            paragraph
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun build(): Paragraph = nativeCall {
+        val paragraph = Paragraph(_nBuild(_ptr), _text)
+        _text = null
+        paragraph
     }
 
     internal object _FinalizerHolder {
@@ -87,16 +64,11 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
 private fun makeParagraphBuilder(
     style: ParagraphStyle?,
     fc: FontCollection?
-): NativePointer {
-    Stats.onNativeCall()
-    return try {
-        _nMake(getPtr(style), getPtr(fc))
-    } finally {
-        reachabilityBarrier(style)
-        reachabilityBarrier(fc)
-    }
+): NativePointer = nativeCallFromStatic(style, fc) { style, fc ->
+    _nMake(style.pointerOrNullPointer, fc.pointerOrNullPointer)
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of the delete function without calling it, so it is short and cannot
 // block.
@@ -150,3 +122,4 @@ private external fun _nAddPlaceholder(
 // Native call path: ParagraphBuilderImpl::Build -> make_unique<ParagraphImpl>
 @ForceNativeThreadState
 private external fun _nBuild(ptr: NativePointer): NativePointer
+// </editor-fold>

@@ -9,6 +9,7 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.ExperimentalSkikoApi
+import kotlin.jvm.JvmStatic
 
 /**
  * Represents a backend-specific texture that can be used by Graphite.
@@ -28,6 +29,7 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
          * @param texturePtr native pointer to the Metal texture to wrap.
          * @return a backend texture wrapping the supplied Metal texture.
          */
+        @JvmStatic
         fun makeMetal(width: Int, height: Int, texturePtr: NativePointer): BackendTexture {
             requireMetalSupport()
             require(texturePtr != NullPointer) { "Metal texture pointer is null" }
@@ -44,6 +46,7 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
          * The image memory is assumed to be managed by the client (or by the driver, as is the case
          * for swapchain images), so no allocation info is passed to Skia.
          */
+        @JvmStatic
         fun makeVulkan(
             width: Int,
             height: Int,
@@ -76,6 +79,7 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
          * The image memory is assumed to be managed by the client (or by the driver, as is the case
          * for swapchain images), so no allocation info is passed to Skia.
          */
+        @JvmStatic
         fun makeVulkan(
             width: Int,
             height: Int,

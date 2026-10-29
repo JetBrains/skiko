@@ -4,13 +4,13 @@ import org.jetbrains.skia.FourByteTag
 
 class ScriptRun(internal val end: Int, internal val scriptTag: Int) {
 
-    constructor(end: Int, script: String) : this(end, FourByteTag.Companion.fromString(script)) {}
+    constructor(end: Int, script: String) : this(end, FourByteTag.fromString(script).tag) {}
 
     /**
      * Should be iso15924 codes.
      */
     val script: String
-        get() = FourByteTag.toString(scriptTag)
+        get() = FourByteTag.toString(FourByteTag(scriptTag))
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true

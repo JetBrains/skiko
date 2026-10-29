@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import kotlin.jvm.JvmStatic
 import kotlin.math.round
 
 class Color4f constructor(val r: Float, val g: Float, val b: Float, val a: Float = 1.0f) {
@@ -73,6 +74,7 @@ class Color4f constructor(val r: Float, val g: Float, val b: Float, val a: Float
     }
 
     companion object {
+        @JvmStatic
         fun flattenArray(colors: Array<Color4f>): FloatArray {
             val arr = FloatArray(colors.size * 4)
             for (i in colors.indices) {

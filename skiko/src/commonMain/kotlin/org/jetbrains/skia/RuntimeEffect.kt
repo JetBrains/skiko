@@ -2,26 +2,27 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
-        fun makeForShader(sksl: String): RuntimeEffect {
-            Stats.onNativeCall()
-            return interopScope {
+        @JvmStatic
+        fun makeForShader(sksl: String): RuntimeEffect = nativeCallFromStatic {
+            interopScope {
                 makeFromResultPtr(_nMakeForShader(toInterop(sksl)))
             }
         }
 
-        fun makeForColorFilter(sksl: String): RuntimeEffect {
-            Stats.onNativeCall()
-            return interopScope {
+        @JvmStatic
+        fun makeForColorFilter(sksl: String): RuntimeEffect = nativeCallFromStatic {
+            interopScope {
                 makeFromResultPtr(_nMakeForColorFilter(toInterop(sksl)))
             }
         }
 
-        fun makeForBlender(sksl: String): RuntimeEffect {
-            Stats.onNativeCall()
-            return interopScope {
+        @JvmStatic
+        fun makeForBlender(sksl: String): RuntimeEffect = nativeCallFromStatic {
+            interopScope {
                 makeFromResultPtr(_nMakeForBlender(toInterop(sksl)))
             }
         }
@@ -32,39 +33,37 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 
     fun makeShader(
-        uniforms: Data?, children: Array<Shader?>?, localMatrix: Matrix33?
-    ): Shader {
-        Stats.onNativeCall()
+        uniforms: Data?,
+        children: Array<Shader?>?,
+        localMatrix: Matrix33?
+    ): Shader = nativeCall(uniforms, children) { uniforms, children ->
         val childCount = children?.size ?: 0
         val childrenPtrs = NativePointerArray(childCount)
-        for (i in 0 until childCount) childrenPtrs[i] = getPtr(children!![i])
-        val matrix = localMatrix?.mat
-        return try {
-            interopScope {
-                Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), childCount, toInterop(matrix)))
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(uniforms)
-            reachabilityBarrier(children)
+        for (i in 0 until childCount) childrenPtrs[i] = children!![i].pointerOrNullPointer
+        interopScope {
+            Shader(
+                _nMakeShader(
+                    _ptr,
+                    uniforms.pointerOrNullPointer,
+                    toInterop(childrenPtrs),
+                    childCount,
+                    toInterop(localMatrix?.mat)
+                )
+            )
         }
     }
 
-    fun makeBlender(uniforms: Data?): Blender {
-        Stats.onNativeCall()
-        return try {
-            interopScope {
-                Blender(_nMakeBlender(_ptr, getPtr(uniforms)))
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(uniforms)
+    fun makeBlender(uniforms: Data?): Blender = nativeCall(uniforms) { uniforms ->
+        interopScope {
+            Blender(_nMakeBlender(_ptr, uniforms.pointerOrNullPointer))
         }
     }
+
 }
 
 internal expect fun RuntimeEffect.Companion.makeFromResultPtr(ptr: NativePointer): RuntimeEffect
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
 // Needs ForceNativeThreadState: loops over the caller's child shaders and checks each one, so its time grows with the
 // number of children.
@@ -123,3 +122,4 @@ internal external fun Result_nGetError(ptr: NativePointer): NativePointer
 // cannot block.
 // Native call path: Result::~Result -> SkString::~SkString
 internal external fun Result_nDestroy(ptr: NativePointer)
+// </editor-fold>

@@ -53,7 +53,7 @@ enum class EncodedOrigin {
      */
     fun toMatrix(w: Int, h: Int): Matrix33 {
         return when (this) {
-            TOP_LEFT -> Matrix33.Companion.IDENTITY
+            TOP_LEFT -> Matrix33.IDENTITY
             TOP_RIGHT -> Matrix33(-1f, 0f, w.toFloat(), 0f, 1f, 0f, 0f, 0f, 1f)
             BOTTOM_RIGHT -> Matrix33(-1f, 0f, w.toFloat(), 0f, -1f, h.toFloat(), 0f, 0f, 1f)
             BOTTOM_LEFT -> Matrix33(1f, 0f, 0f, 0f, -1f, h.toFloat(), 0f, 0f, 1f)

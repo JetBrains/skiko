@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skiko.InternalSkikoApi
+import kotlin.jvm.JvmStatic
 
 /**
  * Data holds an immutable data buffer.
@@ -16,6 +17,7 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
     private var underlyingMemoryOwner: Managed? = null
 
     companion object {
+        @JvmStatic
         fun makeFromBytes(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size): Data {
             Stats.onNativeCall()
             return Data(
@@ -32,6 +34,7 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
          * @param underlyingMemoryOwner - is stored in Data instance to prevent underlying memory getting cleaned by GC in cases when
          * [underlyingMemoryOwner] doesn't have any other references.
          */
+        @JvmStatic
         fun makeWithoutCopy(memoryAddr: NativePointer, length: Int, underlyingMemoryOwner: Managed): Data {
             Stats.onNativeCall()
             return Data(
@@ -47,11 +50,13 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
          * Returns a new empty dataref (or a reference to a shared empty dataref).
          * New or shared, the caller must see that [.close] is eventually called.
          */
+        @JvmStatic
         fun makeEmpty(): Data {
             Stats.onNativeCall()
             return Data(_nMakeEmpty())
         }
 
+        @JvmStatic
         fun makeUninitialized(length: Int): Data {
             Stats.onNativeCall()
             return Data(_nMakeUninitialized(length))
@@ -63,26 +68,16 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 
     val size: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nSize(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nSize(_ptr) }
     val bytes: ByteArray
         get() = getBytes(0, size)
 
-    fun getBytes(offset: Int, length: Int): ByteArray {
-        return try {
-            Stats.onNativeCall()
-            check(_nSize(_ptr) >= offset + length) {
-                "Data=${_ptr}: Can't getBytes with offset=$offset and length=$length"
-            }
-            withResult(ByteArray(length)) {
-                _nBytes(_ptr, offset, length, it)
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun getBytes(offset: Int, length: Int): ByteArray = nativeCall {
+        check(_nSize(_ptr) >= offset + length) {
+            "Data=${_ptr}: Can't getBytes with offset=$offset and length=$length"
+        }
+        withResult(ByteArray(length)) {
+            _nBytes(_ptr, offset, length, it)
         }
     }
 
@@ -95,46 +90,21 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * Returns true if these two objects have the same length and contents,
      * effectively returning 0 == memcmp(...)
      */
-    override fun nativeEquals(other: Native?): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nEquals(_ptr, getPtr(other))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
-        }
+    override fun nativeEquals(other: Native?): Boolean = nativeCall(other) { other ->
+        _nEquals(_ptr, other.pointerOrNullPointer)
     }
 
     /**
      * Create a new dataref using a subset of the data in the specified
      * src dataref.
      */
-    fun makeSubset(offset: Int, length: Int): Data {
-        return try {
-            Stats.onNativeCall()
-            Data(_nMakeSubset(_ptr, offset, length))
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun makeSubset(offset: Int, length: Int): Data = nativeCall {
+        Data(_nMakeSubset(_ptr, offset, length))
     }
 
-    fun makeCopy(): Data {
-        return try {
-            Stats.onNativeCall()
-            Data(_nMakeSubset(_ptr, 0, size))
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun makeCopy(): Data = nativeCall { Data(_nMakeSubset(_ptr, 0, size)) }
 
-    fun writableData(): NativePointer {
-        return try {
-            Stats.onNativeCall()
-            _nWritableData(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun writableData(): NativePointer = nativeCall { _nWritableData(_ptr) }
 
     private object _FinalizerHolder {
         val PTR = Data_nGetFinalizer()

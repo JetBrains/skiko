@@ -1,10 +1,8 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.nativeCallFromStatic
 
 object ShadowUtils {
     /**
@@ -35,30 +33,24 @@ object ShadowUtils {
         spotColor: Int,
         transparentOccluder: Boolean,
         geometricOnly: Boolean
-    ) {
-        Stats.onNativeCall()
+    ) = nativeCallFromStatic(canvas, path) { canvas, path ->
         var flags = 0
         if (transparentOccluder) flags = flags or 1
         if (geometricOnly) flags = flags or 2
-        try {
-            _nDrawShadow(
-                getPtr(canvas),
-                getPtr(path),
-                zPlaneParams.x,
-                zPlaneParams.y,
-                zPlaneParams.z,
-                lightPos.x,
-                lightPos.y,
-                lightPos.z,
-                lightRadius,
-                ambientColor,
-                spotColor,
-                flags
-            )
-        } finally {
-            reachabilityBarrier(canvas)
-            reachabilityBarrier(path)
-        }
+        _nDrawShadow(
+            canvas._ptr,
+            path._ptr,
+            zPlaneParams.x,
+            zPlaneParams.y,
+            zPlaneParams.z,
+            lightPos.x,
+            lightPos.y,
+            lightPos.z,
+            lightRadius,
+            ambientColor,
+            spotColor,
+            flags
+        )
     }
 
     /**
@@ -68,9 +60,8 @@ object ShadowUtils {
      * @param spotColor      Original spot color
      * @return               Modified ambient color
      */
-    fun computeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int {
-        Stats.onNativeCall()
-        return _nComputeTonalAmbientColor(ambientColor, spotColor)
+    fun computeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int = nativeCallFromStatic {
+        _nComputeTonalAmbientColor(ambientColor, spotColor)
     }
 
     /**
@@ -80,9 +71,8 @@ object ShadowUtils {
      * @param spotColor      Original spot color
      * @return               Modified spot color
      */
-    fun computeTonalSpotColor(ambientColor: Int, spotColor: Int): Int {
-        Stats.onNativeCall()
-        return _nComputeTonalSpotColor(ambientColor, spotColor)
+    fun computeTonalSpotColor(ambientColor: Int, spotColor: Int): Int = nativeCallFromStatic {
+        _nComputeTonalSpotColor(ambientColor, spotColor)
     }
 
     init {
@@ -90,7 +80,7 @@ object ShadowUtils {
     }
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nDrawShadow")
 // Needs ForceNativeThreadState: draws the shadow on a canvas that can be GPU-backed, which can call Metal, and
 // tessellating the path takes time that grows with its size.
@@ -123,3 +113,4 @@ private external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: In
 // block.
 // Native call path: SkShadowUtils::ComputeTonalColors
 private external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int
+// </editor-fold>

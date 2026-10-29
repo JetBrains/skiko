@@ -23,7 +23,7 @@ class RunInfo(
      * WARN does not work in Shaper.makeCoreText https://bugs.chromium.org/p/skia/issues/detail?id=10899
      */
     val advance: Point
-        get() = org.jetbrains.skia.Point(advanceX, advanceY)
+        get() = Point(advanceX, advanceY)
 
     /**
      * WARN does not work in Shaper.makeCoreText https://bugs.chromium.org/p/skia/issues/detail?id=10899

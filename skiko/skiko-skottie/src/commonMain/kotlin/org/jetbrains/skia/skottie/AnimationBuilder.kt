@@ -5,9 +5,11 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.impl.*
+import kotlin.jvm.JvmStatic
 
 class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
+        @JvmStatic
         internal fun _flagsToInt(vararg builderFlags: AnimationBuilderFlag): Int {
             var flags = 0
             for (flag in builderFlags) flags = flags or flag._flag
@@ -24,65 +26,46 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     }
 
     constructor() : this(*emptyArray<AnimationBuilderFlag>()) {}
-    constructor(vararg builderFlags: AnimationBuilderFlag) : this(AnimationBuilder_nMake(_flagsToInt(*builderFlags))) {
-        Stats.onNativeCall()
-    }
+    constructor(vararg builderFlags: AnimationBuilderFlag) : this(nativeCallFromStatic { AnimationBuilder_nMake(_flagsToInt(*builderFlags)) })
 
     /**
      *
      * Specify a font manager for loading animation fonts.
      */
-    fun setFontManager(fontMgr: FontMgr?): AnimationBuilder {
-        return try {
-            Stats.onNativeCall()
-            _nSetFontManager(nativePtr, getPtr(fontMgr))
+    fun setFontManager(fontMgr: FontMgr?): AnimationBuilder =
+        nativeCall(fontMgr) { fontMgr ->
+            _nSetFontManager(nativePtr, fontMgr.pointerOrNullPointer)
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(fontMgr)
         }
-    }
 
     /**
      *
      * Register a [Logger] with this builder.
      */
-    fun setLogger(logger: Logger?): AnimationBuilder {
-        return try {
-            Stats.onNativeCall()
-            _nSetLogger(nativePtr, getPtr(logger))
+    fun setLogger(logger: Logger?): AnimationBuilder =
+        nativeCall(logger) { logger ->
+            _nSetLogger(nativePtr, logger.pointerOrNullPointer)
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(logger)
         }
-    }
 
-    fun buildFromString(data: String): Animation {
-        return try {
-            Stats.onNativeCall()
-            val ptr = interopScope { _nBuildFromString(nativePtr, toInterop(data)) }
-            require(ptr != NullPointer) { "Failed to create Animation from string: \"$data\"" }
-            Animation(ptr)
-        } finally {
-            reachabilityBarrier(this)
+    fun buildFromString(data: String): Animation =
+        nativeCall {
+            interopScope {
+                val ptr = _nBuildFromString(nativePtr, toInterop(data))
+                require(ptr != NullPointer) { "Failed to create Animation from string: \"$data\"" }
+                Animation(ptr)
+            }
         }
-    }
 
-    fun buildFromData(data: Data): Animation {
-        return try {
-            Stats.onNativeCall()
-            val ptr =
-                _nBuildFromData(nativePtr, getPtr(data))
+    fun buildFromData(data: Data): Animation =
+        nativeCall(data) { data ->
+            val ptr = _nBuildFromData(nativePtr, data.pointerOrNullPointer)
             require(ptr != NullPointer) { "Failed to create Animation from data" }
             Animation(ptr)
-        } finally {
-            reachabilityBarrier(data)
-            reachabilityBarrier(this)
         }
-    }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -127,3 +110,4 @@ internal external fun _nBuildFromFile(ptr: NativePointer, path: InteropPointer):
 // Native call path: Builder::make -> SkData::MakeFromStream -> Builder::make
 @ForceNativeThreadState
 private external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer
+// </editor-fold>

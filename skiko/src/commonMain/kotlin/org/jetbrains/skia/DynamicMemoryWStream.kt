@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.nativeCall
 import org.jetbrains.skia.impl.reachabilityBarrier
 
 class DynamicMemoryWStream() : WStream(DynamicMemoryWStream_nMake(), _FinalizerHolder.PTR) {
@@ -25,18 +26,15 @@ class DynamicMemoryWStream() : WStream(DynamicMemoryWStream_nMake(), _FinalizerH
             "byteArray is not properly allocated. Use bytesWritten"
         }
 
-        try {
-            Stats.onNativeCall()
+        return nativeCall {
             interopScope {
                 val byteArrayHandle = toInteropForResult(buffer)
                 val successfulRead = _nRead(_ptr, byteArrayHandle, offset, size)
                 if (successfulRead) {
                     byteArrayHandle.fromInterop(buffer)
                 }
-                return successfulRead
+                 successfulRead
             }
-        } finally {
-            reachabilityBarrier(this)
         }
     }
 

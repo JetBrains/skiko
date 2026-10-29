@@ -25,16 +25,16 @@ internal actual fun Shaper.doShape(
             @Suppress("CAST_NEVER_SUCCEEDS")
             Shaper_nShape(
                 _ptr,
-                getPtr(textUtf8),
-                getPtr(managedFontIter) as InteropPointer,
-                getPtr(managedBidiIter) as InteropPointer,
-                getPtr(managedScriptIter) as InteropPointer,
-                getPtr(managedLangIter) as InteropPointer,
+                textUtf8.pointerOrNullPointer,
+                managedFontIter.pointerOrNullPointer as InteropPointer,
+                managedBidiIter.pointerOrNullPointer as InteropPointer,
+                managedScriptIter.pointerOrNullPointer as InteropPointer,
+                managedLangIter.pointerOrNullPointer as InteropPointer,
                 optsFeaturesLen = opts.features?.size ?: 0,
                 optsFeaturesIntArray = arrayOfFontFeaturesToInterop(opts.features),
                 optsBooleanProps = opts._booleanPropsToInt(),
                 width = width,
-                runHandler = getPtr(managedRunHandler) as InteropPointer
+                runHandler = managedRunHandler.pointerOrNullPointer as InteropPointer
             )
         }
     } finally {
@@ -43,6 +43,7 @@ internal actual fun Shaper.doShape(
         reachabilityBarrier(managedScriptIter)
         reachabilityBarrier(managedLangIter)
         reachabilityBarrier(managedRunHandler)
+        reachabilityBarrier(this)
         reachabilityBarrier(textUtf8)
     }
 }
@@ -82,23 +83,23 @@ sealed class RunIteratorBase(type: Int, ptr: NativePointer) : Managed(ptr, _Fina
 
     companion object {
         fun fromIterator(iterator: Iterator<BidiRun?>, text: ManagedString): RunIteratorBase =
-            IteratorBasedBidiRunIterator(RunIterator_nCreateRunIterator(BIDI_RUN_ITERATOR_TYPE, getPtr(text)), iterator)
+            IteratorBasedBidiRunIterator(RunIterator_nCreateRunIterator(BIDI_RUN_ITERATOR_TYPE, text.pointerOrNullPointer), iterator)
 
         fun fromIterator(iterator: Iterator<FontRun?>, text: ManagedString): RunIteratorBase =
-            IteratorBasedFontRunIterator(RunIterator_nCreateRunIterator(FONT_RUN_ITERATOR_TYPE, getPtr(text)), iterator)
+            IteratorBasedFontRunIterator(RunIterator_nCreateRunIterator(FONT_RUN_ITERATOR_TYPE, text.pointerOrNullPointer), iterator)
 
         fun fromIterator(iterator: Iterator<ScriptRun?>, text: ManagedString): RunIteratorBase =
-            IteratorBasedScriptRunIterator(RunIterator_nCreateRunIterator(SCRIPT_RUN_ITERATOR_TYPE, getPtr(text)), iterator)
+            IteratorBasedScriptRunIterator(RunIterator_nCreateRunIterator(SCRIPT_RUN_ITERATOR_TYPE, text.pointerOrNullPointer), iterator)
 
         fun fromIterator(iterator: Iterator<LanguageRun?>, text: ManagedString): RunIteratorBase =
-            IteratorBasedLanguageRunIterator(RunIterator_nCreateRunIterator(LANGUAGE_RUN_ITERATOR_TYPE, getPtr(text)), iterator)
+            IteratorBasedLanguageRunIterator(RunIterator_nCreateRunIterator(LANGUAGE_RUN_ITERATOR_TYPE, text.pointerOrNullPointer), iterator)
     }
 }
 
 private sealed class FontRunIterator(ptr: NativePointer): RunIteratorBase(FONT_RUN_ITERATOR_TYPE, ptr) {
     abstract fun currentFont(): FontRun?
 
-    override fun InteropScope.getOnCurrentCallback() = virtualNativePointer { getPtr(currentFont()?.font) }
+    override fun InteropScope.getOnCurrentCallback() = virtualNativePointer { currentFont()?.font?.pointerOrNullPointer ?: NullPointer }
 }
 
 private sealed class BiDiRunIterator(ptr: NativePointer): RunIteratorBase(BIDI_RUN_ITERATOR_TYPE, ptr) {
@@ -237,4 +238,3 @@ private class RunHandlerImpl(val runHandler: RunHandler) : Managed(RunHandler_nC
         val PTR = RunHandler_nGetFinalizer()
     }
 }
-

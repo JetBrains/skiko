@@ -23,38 +23,33 @@ class InvalidationController internal constructor(ptr: NativePointer) : Managed(
 
     constructor() : this(InvalidationController_nMake()) {}
 
-    fun invalidate(left: Float, top: Float, right: Float, bottom: Float, matrix: Matrix33?): InvalidationController {
-        Stats.onNativeCall()
-        interopScope {
-            val mat = matrix?.mat ?: Matrix33.IDENTITY.mat
-            InvalidationController_nInvalidate(
-                nativePtr,
-                left,
-                top,
-                right,
-                bottom,
-                toInterop(mat)
-            )
+    fun invalidate(left: Float, top: Float, right: Float, bottom: Float, matrix: Matrix33?): InvalidationController =
+        nativeCall {
+            interopScope {
+                val mat = matrix?.mat ?: Matrix33.IDENTITY.mat
+                InvalidationController_nInvalidate(
+                    nativePtr,
+                    left,
+                    top,
+                    right,
+                    bottom,
+                    toInterop(mat)
+                )
+            }
+            this
         }
-        return this
-    }
 
     val bounds: Rect
-        get() = try {
-            Stats.onNativeCall()
-            Rect.fromInteropPointer { InvalidationController_nGetBounds(nativePtr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Rect.fromInteropPointer { InvalidationController_nGetBounds(nativePtr, it) } }
 
-    fun reset(): InvalidationController {
-        Stats.onNativeCall()
-
+    fun reset(): InvalidationController = nativeCall {
         InvalidationController_nReset(nativePtr)
-        return this
+        this
     }
+
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -85,3 +80,4 @@ private external fun InvalidationController_nGetBounds(ptr: NativePointer, resul
 // Native call path: InvalidationController::reset -> std::vector::clear
 @ForceNativeThreadState
 private external fun InvalidationController_nReset(ptr: NativePointer)
+// </editor-fold>

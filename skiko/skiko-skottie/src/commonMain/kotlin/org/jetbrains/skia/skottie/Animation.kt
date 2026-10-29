@@ -4,27 +4,24 @@ import org.jetbrains.skia.sksg.InvalidationController
 import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
+import kotlin.jvm.JvmStatic
 
 class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        fun makeFromString(data: String): Animation {
-            Stats.onNativeCall()
+        @JvmStatic
+        fun makeFromString(data: String): Animation = nativeCallFromStatic {
             interopScope {
                 val ptr = _nMakeFromString(toInterop(data))
                 require(ptr != NullPointer) { "Failed to create Animation from string=\"$data\"" }
-                return Animation(ptr)
+                Animation(ptr)
             }
         }
 
-        fun makeFromData(data: Data): Animation {
-            Stats.onNativeCall()
-            val ptr = try {
-                _nMakeFromData(getPtr(data))
-            } finally {
-                reachabilityBarrier(data)
-            }
+        @JvmStatic
+        fun makeFromData(data: Data): Animation = nativeCallFromStatic(data) { data ->
+            val ptr = _nMakeFromData(data.pointerOrNullPointer)
             require(ptr != NullPointer) { "Failed to create Animation from data." }
-            return Animation(ptr)
+            Animation(ptr)
         }
 
         init {
@@ -117,18 +114,13 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @param renderFlags  render flags
      * @return             this
      */
-    fun render(canvas: Canvas, left: Float, top: Float, right: Float, bottom: Float, vararg renderFlags: RenderFlag): Animation {
-        return try {
-            Stats.onNativeCall()
+    fun render(canvas: Canvas, left: Float, top: Float, right: Float, bottom: Float, vararg renderFlags: RenderFlag): Animation =
+        nativeCall(canvas) { canvas ->
             var flags = 0
             for (flag in renderFlags) flags = flags or flag._flag
-            _nRender(nativePtr, getPtr(canvas), left, top, right, bottom, flags)
+            _nRender(nativePtr, canvas.nativePtr, left, top, right, bottom, flags)
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(canvas)
         }
-    }
 
     /**
      *
@@ -149,16 +141,11 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @param ic  invalidation controller (dirty region tracking)
      * @return    this
      */
-    fun seek(t: Float, ic: InvalidationController?): Animation {
-        return try {
-            Stats.onNativeCall()
-            _nSeek(nativePtr, t, getPtr(ic))
+    fun seek(t: Float, ic: InvalidationController?): Animation =
+        nativeCall(ic) { ic ->
+            _nSeek(nativePtr, t, ic.pointerOrNullPointer)
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(ic)
         }
-    }
 
     /**
      *
@@ -189,16 +176,11 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @param ic  invalidation controller (dirty region tracking)
      * @return    this
      */
-    fun seekFrame(t: Float, ic: InvalidationController?): Animation {
-        return try {
-            Stats.onNativeCall()
-            _nSeekFrame(nativePtr, t, getPtr(ic))
+    fun seekFrame(t: Float, ic: InvalidationController?): Animation =
+        nativeCall(ic) { ic ->
+            _nSeekFrame(nativePtr, t, ic.pointerOrNullPointer)
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(ic)
         }
-    }
 
     /**
      *
@@ -221,73 +203,43 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
      * @param ic  invalidation controller (dirty region tracking)
      * @return    this
      */
-    fun seekFrameTime(t: Float, ic: InvalidationController?): Animation {
-        return try {
-            Stats.onNativeCall()
-            _nSeekFrameTime(nativePtr, t, getPtr(ic))
+    fun seekFrameTime(t: Float, ic: InvalidationController?): Animation =
+        nativeCall(ic) { ic ->
+            _nSeekFrameTime(nativePtr, t, ic.pointerOrNullPointer)
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(ic)
         }
-    }
 
     /**
      * @return  the animation duration in seconds
      */
     val duration: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetDuration(nativePtr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetDuration(nativePtr) }
 
     /**
      * @return  the animation frame rate (frames / second)
      */
     val fPS: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetFPS(nativePtr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetFPS(nativePtr) }
 
     /**
      * @return  Animation in point, in frame index units
      */
     val inPoint: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetInPoint(nativePtr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetInPoint(nativePtr) }
 
     /**
      * @return  Animation out point, in frame index units
      */
     val outPoint: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetOutPoint(nativePtr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetOutPoint(nativePtr) }
     val version: String
-        get() = try {
-            Stats.onNativeCall()
-            withStringReferenceResult { _nGetVersion(nativePtr) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { withStringReferenceResult { _nGetVersion(nativePtr) } }
 
     private var _size: Point? = null
     val size: Point
         get() {
             if (_size == null) {
-                _size = Point.fromInteropPointer { _nGetSize(nativePtr, it) }
+                _size = nativeCall { Point.fromInteropPointer { _nGetSize(nativePtr, it) } }
             }
             return _size!!
         }
@@ -297,7 +249,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         get() = size.y
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -390,3 +342,4 @@ private external fun _nGetVersion(ptr: NativePointer): NativePointer
 // No ForceNativeThreadState: returns the stored size, which is written as two floats, so it is short and cannot block.
 // Native call path: Animation::size -> Point::copyToInterop
 private external fun _nGetSize(ptr: NativePointer, dst: InteropPointer)
+// </editor-fold>

@@ -7,14 +7,8 @@ private fun makePath(
     path: Path?,
     forceClosed: Boolean,
     resScale: Float
-): NativePointer {
-    Stats.onNativeCall()
-    return try {
-        _nMakePath(getPtr(path), forceClosed, resScale)
-    } finally {
-        Stats.onNativeCall()
-        reachabilityBarrier(path)
-    }
+): NativePointer = nativeCallFromStatic(path) { path ->
+    _nMakePath(path.pointerOrNullPointer, forceClosed, resScale)
 }
 
 class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
@@ -52,15 +46,9 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * Reset the pathmeasure with the specified path. The parts of the path that are needed
      * are copied, so the client is free to modify/delete the path after this call.
      */
-    fun setPath(path: Path?, forceClosed: Boolean): PathMeasure {
-        return try {
-            Stats.onNativeCall()
-            _nSetPath(_ptr, getPtr(path), forceClosed)
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(path)
-        }
+    fun setPath(path: Path?, forceClosed: Boolean): PathMeasure = nativeCall(path) { path ->
+        _nSetPath(_ptr, path.pointerOrNullPointer, forceClosed)
+        this
     }
 
     /**
@@ -68,12 +56,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * is associated (e.g. resetPath(null))
      */
     val length: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetLength(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall(this) { _nGetLength(_ptr) }
 
     /**
      * Pins distance to 0 &lt;= distance &lt;= getLength(), and then computes
@@ -81,14 +64,9 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      *
      * @return  null if there is no path, or a zero-length path was specified.
      */
-    fun getPosition(distance: Float): Point? {
-        return try {
-            Stats.onNativeCall()
-            withNullableResult(FloatArray(2)) { _nGetPosition(_ptr, distance, it) }?.let { points ->
-                Point(points[0], points[1])
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun getPosition(distance: Float): Point? = nativeCall {
+        withNullableResult(FloatArray(2)) { _nGetPosition(_ptr, distance, it) }?.let { points ->
+            Point(points[0], points[1])
         }
     }
 
@@ -98,14 +76,9 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      *
      * @return  null if there is no path, or a zero-length path was specified.
      */
-    fun getTangent(distance: Float): Point? {
-        return try {
-            Stats.onNativeCall()
-            withNullableResult(FloatArray(2)) { _nGetTangent(_ptr, distance, it) }?.let { points ->
-                Point(points[0], points[1])
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun getTangent(distance: Float): Point? = nativeCall {
+        withNullableResult(FloatArray(2)) { _nGetTangent(_ptr, distance, it) }?.let { points ->
+            Point(points[0], points[1])
         }
     }
 
@@ -115,21 +88,16 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      *
      * @return  null if there is no path, or a zero-length path was specified.
      */
-    fun getRSXform(distance: Float): RSXform? {
-        return try {
-            Stats.onNativeCall()
-            withNullableResult(FloatArray(4)) {
-                _nGetRSXform(_ptr, distance, it)
-            }?.let { data ->
-                RSXform(
-                    data[0],
-                    data[1],
-                    data[2],
-                    data[3]
-                )
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun getRSXform(distance: Float): RSXform? = nativeCall {
+        withNullableResult(FloatArray(4)) {
+            _nGetRSXform(_ptr, distance, it)
+        }?.let { data ->
+            RSXform(
+                data[0],
+                data[1],
+                data[2],
+                data[3]
+            )
         }
     }
 
@@ -139,16 +107,11 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      *
      * @return  null if there is no path, or a zero-length path was specified.
      */
-    fun getMatrix(distance: Float, getPosition: Boolean, getTangent: Boolean): Matrix33? {
-        return try {
-            Stats.onNativeCall()
-            withNullableResult(FloatArray(9)) {
-                _nGetMatrix(_ptr, distance, getPosition, getTangent, it)
-            }?.let { data ->
-                Matrix33(data)
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun getMatrix(distance: Float, getPosition: Boolean, getTangent: Boolean): Matrix33? = nativeCall {
+        withNullableResult(FloatArray(9)) {
+            _nGetMatrix(_ptr, distance, getPosition, getTangent, it)
+        }?.let { data ->
+            Matrix33(data)
         }
     }
 
@@ -159,51 +122,35 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * then return false (and leave [dst] untouched).
      * Begin the segment with a moveTo if startWithMoveTo is true
      */
-    fun getSegment(startD: Float, endD: Float, dst: PathBuilder, startWithMoveTo: Boolean): Boolean {
-        return try {
-            Stats.onNativeCall()
+    fun getSegment(startD: Float, endD: Float, dst: PathBuilder, startWithMoveTo: Boolean): Boolean =
+        nativeCall(dst) { dst ->
             _nGetSegment(
                 _ptr,
                 startD,
                 endD,
-                getPtr(dst),
+                dst._ptr,
                 startWithMoveTo
             )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(dst)
         }
-    }
 
     /**
      * @return  true if the current contour is closed.
      */
     override val isClosed: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsClosed(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsClosed(_ptr) }
 
     /**
      * Move to the next contour in the path. Return true if one exists, or false if
      * we're done with the path.
      */
-    fun nextContour(): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nNextContour(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun nextContour(): Boolean = nativeCall { _nNextContour(_ptr) }
 
     internal object _FinalizerHolder {
         val PTR = PathMeasure_nGetFinalizer()
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 private external fun PathMeasure_nGetFinalizer(): NativePointer
@@ -288,3 +235,4 @@ private external fun _nIsClosed(ptr: NativePointer): Boolean
 // Native call path: SkPathMeasure::nextContour -> SkContourMeasureIter::next -> buildSegments
 @ForceNativeThreadState
 private external fun _nNextContour(ptr: NativePointer): Boolean
+// </editor-fold>

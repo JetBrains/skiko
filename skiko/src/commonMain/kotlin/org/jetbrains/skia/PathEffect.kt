@@ -2,67 +2,60 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
-        fun makePath1D(path: Path, advance: Float, phase: Float, style: Style): PathEffect {
-            return try {
-                Stats.onNativeCall()
-                PathEffect(
-                    _nMakePath1D(
-                        getPtr(path),
-                        advance,
-                        phase,
-                        style.ordinal
+        @JvmStatic
+        fun makePath1D(path: Path, advance: Float, phase: Float, style: Style): PathEffect = nativeCallFromStatic(path) { path ->
+            PathEffect(
+                _nMakePath1D(
+                    path._ptr,
+                    advance,
+                    phase,
+                    style.ordinal
+                )
+            )
+        }
+
+        @JvmStatic
+        fun makePath2D(matrix: Matrix33, path: Path): PathEffect = nativeCallFromStatic(path) { path ->
+            PathEffect(
+                interopScope {
+                    _nMakePath2D(
+                        toInterop(matrix.mat),
+                        path._ptr
                     )
-                )
-            } finally {
-                reachabilityBarrier(path)
-            }
+                }
+            )
         }
 
-        fun makePath2D(matrix: Matrix33, path: Path): PathEffect {
-            return try {
-                Stats.onNativeCall()
-                PathEffect(
-                    interopScope {
-                        _nMakePath2D(
-                            toInterop(matrix.mat),
-                            getPtr(path)
-                        )
-                    }
-                )
-            } finally {
-                reachabilityBarrier(path)
-            }
-        }
-
-        fun makeLine2D(width: Float, matrix: Matrix33): PathEffect {
-            Stats.onNativeCall()
-            return PathEffect(
+        @JvmStatic
+        fun makeLine2D(width: Float, matrix: Matrix33): PathEffect = nativeCallFromStatic {
+            PathEffect(
                 interopScope {
                     _nMakeLine2D(width, toInterop(matrix.mat))
                 }
             )
         }
 
-        fun makeCorner(radius: Float): PathEffect {
-            Stats.onNativeCall()
-            return PathEffect(_nMakeCorner(radius))
+        @JvmStatic
+        fun makeCorner(radius: Float): PathEffect = nativeCallFromStatic {
+            PathEffect(_nMakeCorner(radius))
         }
 
-        fun makeDash(intervals: FloatArray, phase: Float): PathEffect {
-            Stats.onNativeCall()
-            return PathEffect(
+        @JvmStatic
+        fun makeDash(intervals: FloatArray, phase: Float): PathEffect = nativeCallFromStatic {
+            PathEffect(
                 interopScope {
                     _nMakeDash(toInterop(intervals), intervals.size, phase)
                 }
             )
         }
 
-        fun makeDiscrete(segLength: Float, dev: Float, seed: Int): PathEffect {
-            Stats.onNativeCall()
-            return PathEffect(_nMakeDiscrete(segLength, dev, seed))
+        @JvmStatic
+        fun makeDiscrete(segLength: Float, dev: Float, seed: Int): PathEffect = nativeCallFromStatic {
+            PathEffect(_nMakeDiscrete(segLength, dev, seed))
         }
 
         init {
@@ -81,27 +74,16 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         MORPH;
     }
 
-    fun makeSum(second: PathEffect?): PathEffect {
-        return try {
-            Stats.onNativeCall()
-            PathEffect(_nMakeSum(_ptr, getPtr(second)))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(second)
-        }
+    fun makeSum(second: PathEffect?): PathEffect = nativeCall(second) { second ->
+        PathEffect(_nMakeSum(_ptr, second.pointerOrNullPointer))
     }
 
-    fun makeCompose(inner: PathEffect?): PathEffect {
-        return try {
-            Stats.onNativeCall()
-            PathEffect(PathEffect_nMakeCompose(_ptr, getPtr(inner)))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(inner)
-        }
+    fun makeCompose(inner: PathEffect?): PathEffect = nativeCall(inner) { inner ->
+        PathEffect(PathEffect_nMakeCompose(_ptr, inner.pointerOrNullPointer))
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeCompose")
 // No ForceNativeThreadState: holds references to two other path effects and cannot own typefaces or GPU objects, so it
 // is short and cannot block.
@@ -148,3 +130,4 @@ private external fun _nMakeDash(intervals: InteropPointer, count: Int, phase: Fl
 // cannot block.
 // Native call path: SkDiscretePathEffect::Make
 private external fun _nMakeDiscrete(segLength: Float, dev: Float, seed: Int): NativePointer
+// </editor-fold>

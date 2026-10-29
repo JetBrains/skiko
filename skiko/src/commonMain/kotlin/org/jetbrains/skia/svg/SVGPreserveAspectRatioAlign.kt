@@ -1,5 +1,6 @@
 package org.jetbrains.skia.svg
 
+import kotlin.jvm.JvmStatic
 enum class SVGPreserveAspectRatioAlign constructor(internal val _value: Int) {
     // These values are chosen such that bits [0,1] encode X alignment, and
     // bits [2,3] encode Y alignment.
@@ -15,6 +16,7 @@ enum class SVGPreserveAspectRatioAlign constructor(internal val _value: Int) {
     NONE(0x10);
 
     companion object {
+        @JvmStatic
         internal fun valueOf(value: Int): SVGPreserveAspectRatioAlign {
             return when (value) {
                 0x00 -> XMIN_YMIN

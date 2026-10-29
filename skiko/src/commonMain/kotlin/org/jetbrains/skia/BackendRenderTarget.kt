@@ -7,6 +7,7 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.loadOpenGLLibrary
+import kotlin.jvm.JvmStatic
 
 class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -17,6 +18,7 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
          *
          * @throws RenderException if returned nullptr
          */
+        @JvmStatic
         fun makeGL(
             width: Int,
             height: Int,
@@ -31,6 +33,7 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
             return BackendRenderTarget(ptr)
         }
 
+        @JvmStatic
         fun makeMetal(width: Int, height: Int, texturePtr: NativePointer): BackendRenderTarget {
             Stats.onNativeCall()
             return BackendRenderTarget(_nMakeMetal(width, height, texturePtr))
@@ -49,6 +52,7 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
          * @param sampleCnt     samples count for texture resource
          * @param levelCnt      sampling quality level for texture resource
          */
+        @JvmStatic
         fun makeDirect3D(
             width: Int,
             height: Int,
@@ -66,6 +70,7 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
          *
          * Caller must keep the underlying VkImage valid for the lifetime of the resulting backend render target.
          */
+        @JvmStatic
         fun makeVulkan(
             width: Int,
             height: Int,

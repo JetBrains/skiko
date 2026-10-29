@@ -3,7 +3,7 @@ package org.jetbrains.skia.impl
 import kotlin.concurrent.AtomicLong
 
 actual object Stats {
-    val enabled = false
+    const val enabled = false
     val nativeCalls = AtomicLong(0)
     val allocated = AtomicLong(0)
 

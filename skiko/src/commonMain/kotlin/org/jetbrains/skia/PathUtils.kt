@@ -1,9 +1,10 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.nativeCallFromStatic
 
 object PathUtils {
 
@@ -22,22 +23,21 @@ object PathUtils {
      * @param matrix    matrix to take into acount for increased precision (if it scales up).
      * @return          true if the result can be filled, or false if it is a hairline (to be stroked).
      */
-    fun fillPathWithPaint(src: Path, paint: Paint, dst: PathBuilder, cull: Rect?, matrix: Matrix33): Boolean {
-        return try {
-            Stats.onNativeCall()
+    fun fillPathWithPaint(src: Path, paint: Paint, dst: PathBuilder, cull: Rect?, matrix: Matrix33): Boolean =
+        nativeCallFromStatic(src, paint, dst, matrix) { src, paint, dst, matrix ->
             interopScope {
                 if (cull == null) {
                     _nFillPathWithPaintMatrix(
-                        getPtr(src),
-                        getPtr(paint),
-                        getPtr(dst),
+                        src._ptr,
+                        paint._ptr,
+                        dst._ptr,
                         toInterop(matrix.mat)
                     )
                 } else {
                     _nFillPathWithPaintCull(
-                        getPtr(src),
-                        getPtr(paint),
-                        getPtr(dst),
+                        src._ptr,
+                        paint._ptr,
+                        dst._ptr,
                         cull.left,
                         cull.top,
                         cull.right,
@@ -46,13 +46,7 @@ object PathUtils {
                     )
                 }
             }
-        } finally {
-            reachabilityBarrier(matrix)
-            reachabilityBarrier(src)
-            reachabilityBarrier(paint)
-            reachabilityBarrier(dst)
         }
-    }
 
     /**
      * Returns the filled equivalent of the stroked path.
@@ -60,14 +54,8 @@ object PathUtils {
      * @param src   SkPath read to create a filled version
      * @param paint uses settings for stroke cap, width, miter, join, and patheffect.
      */
-    fun fillPathWithPaint(src: Path, paint: Paint): Path {
-        return try {
-            Stats.onNativeCall()
-            Path(_nFillPathWithPaint(getPtr(src), getPtr(paint)))
-        } finally {
-            reachabilityBarrier(src)
-            reachabilityBarrier(paint)
-        }
+    fun fillPathWithPaint(src: Path, paint: Paint): Path = nativeCallFromStatic(src, paint) { src, paint ->
+        Path(_nFillPathWithPaint(src._ptr, paint._ptr))
     }
 
     /**
@@ -78,22 +66,17 @@ object PathUtils {
      * @param dst   results are written to this builder.
      * @return      true if the result can be filled, or false if it is a hairline (to be stroked).
      */
-    fun fillPathWithPaint(src: Path, paint: Paint, dst: PathBuilder): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nFillPathWithPaintBuilder(getPtr(src), getPtr(paint), getPtr(dst))
-        } finally {
-            reachabilityBarrier(src)
-            reachabilityBarrier(paint)
-            reachabilityBarrier(dst)
+    fun fillPathWithPaint(src: Path, paint: Paint, dst: PathBuilder): Boolean =
+        nativeCallFromStatic(src, paint, dst) { src, paint, dst ->
+            _nFillPathWithPaintBuilder(src._ptr, paint._ptr, dst._ptr)
         }
-    }
 
     init {
         staticLoad()
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaint")
 // Needs ForceNativeThreadState: applies the paint's path effect and stroke to the path, so its time grows with the path
 // size.
@@ -142,3 +125,4 @@ private external fun _nFillPathWithPaintCull(
     bottom: Float,
     matrix: InteropPointer
 ): Boolean
+// </editor-fold>

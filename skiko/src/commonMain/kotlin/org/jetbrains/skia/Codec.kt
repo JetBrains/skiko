@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
@@ -9,18 +10,14 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
          * If this data represents an encoded image that we know how to decode,
          * return an Codec that can decode it. Otherwise throws IllegalArgumentException.
          */
-        fun makeFromData(data: Data?): Codec {
-            return try {
-                Stats.onNativeCall()
-                val ptr =
-                    _nMakeFromData(getPtr(data))
-                require(ptr != NullPointer) { "Unsupported format" }
-                Codec(ptr)
-            } finally {
-                reachabilityBarrier(data)
-            }
+        @JvmStatic
+        fun makeFromData(data: Data?): Codec = nativeCallFromStatic(data) { data ->
+            val ptr = _nMakeFromData(data.pointerOrNullPointer)
+            require(ptr != NullPointer) { "Unsupported format" }
+            Codec(ptr)
         }
 
+        @JvmStatic
         internal fun _validateResult(result: Int) {
             when (result) {
                 1 -> throw IllegalArgumentException("Incomplete input: A partial image was generated.")
@@ -55,26 +52,11 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
         }
 
     val size: IPoint
-        get() = try {
-            Stats.onNativeCall()
-            IPoint(_nGetSizeWidth(_ptr), _nGetSizeHeight(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { IPoint(_nGetSizeWidth(_ptr), _nGetSizeHeight(_ptr)) }
     val encodedOrigin: EncodedOrigin
-        get() = try {
-            Stats.onNativeCall()
-            EncodedOrigin.entries[_nGetEncodedOrigin(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { EncodedOrigin.entries[_nGetEncodedOrigin(_ptr)] }
     val encodedImageFormat: EncodedImageFormat
-        get() = try {
-            Stats.onNativeCall()
-            EncodedImageFormat.entries[_nGetEncodedImageFormat(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { EncodedImageFormat.entries[_nGetEncodedImageFormat(_ptr)] }
 
     /**
      *
@@ -128,22 +110,16 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
      * @param bitmap      the description of the format (config, size) expected by the caller
      * @return            this
      */
-    fun readPixels(bitmap: Bitmap?): Codec {
-        return try {
-            Stats.onNativeCall()
-            _validateResult(
-                Codec_nReadPixels(
-                    _ptr,
-                    getPtr(bitmap),
-                    0,
-                    -1
-                )
+    fun readPixels(bitmap: Bitmap?): Codec = nativeCall(bitmap) { bitmap ->
+        _validateResult(
+            Codec_nReadPixels(
+                _ptr,
+                bitmap.pointerOrNullPointer,
+                0,
+                -1
             )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(bitmap)
-        }
+        )
+        this
     }
 
     /**
@@ -186,22 +162,16 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
      * @param frame       index of the frame in multi-frame image to decode
      * @return            this
      */
-    fun readPixels(bitmap: Bitmap?, frame: Int): Codec {
-        return try {
-            Stats.onNativeCall()
-            _validateResult(
-                Codec_nReadPixels(
-                    _ptr,
-                    getPtr(bitmap),
-                    frame,
-                    -1
-                )
+    fun readPixels(bitmap: Bitmap?, frame: Int): Codec = nativeCall(bitmap) {bitmap ->
+        _validateResult(
+            Codec_nReadPixels(
+                _ptr,
+                bitmap.pointerOrNullPointer,
+                frame,
+                -1
             )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(bitmap)
-        }
+        )
+        this
     }
 
     /**
@@ -245,22 +215,16 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
      * @param priorFrame  index of the frame already in bitmap, might be used to optimize retrieving current frame
      * @return            this
      */
-    fun readPixels(bitmap: Bitmap?, frame: Int, priorFrame: Int): Codec {
-        return try {
-            Stats.onNativeCall()
-            _validateResult(
-                Codec_nReadPixels(
-                    _ptr,
-                    getPtr(bitmap),
-                    frame,
-                    priorFrame
-                )
+    fun readPixels(bitmap: Bitmap?, frame: Int, priorFrame: Int): Codec = nativeCall(bitmap) { bitmap ->
+        _validateResult(
+            Codec_nReadPixels(
+                _ptr,
+                bitmap.pointerOrNullPointer,
+                frame,
+                priorFrame
             )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(bitmap)
-        }
+        )
+        this
     }
 
     /**
@@ -271,12 +235,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
      * May require reading through the stream.
      */
     val frameCount: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetFrameCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetFrameCount(_ptr) }
 
     /**
      *
@@ -287,13 +246,8 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
      * so it should be called after getFrameCount() to parse any frames that
      * have not already been parsed.
      */
-    fun getFrameInfo(frame: Int): AnimationFrameInfo {
-        return try {
-            Stats.onNativeCall()
-            AnimationFrameInfo.fromInteropPointer { _nGetFrameInfo(_ptr, frame, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun getFrameInfo(frame: Int): AnimationFrameInfo = nativeCall {
+        AnimationFrameInfo.fromInteropPointer { _nGetFrameInfo(_ptr, frame, it) }
     }
 
     /**
@@ -311,8 +265,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
      * For still (non-animated) image codecs, this will return an empty array.
      */
     val framesInfo: Array<AnimationFrameInfo>
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val buffer = _nGetFramesInfo(_ptr)
             val size = FramesInfo_nGetSize(buffer)
             if (size > 0) {
@@ -324,8 +277,6 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
             }.also {
                 FramesInfo_nDelete(buffer)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -348,18 +299,14 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
      * For still (non-animated) image codecs, this will return 0.
      */
     val repetitionCount: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetRepetitionCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetRepetitionCount(_ptr) }
 
     internal object _FinalizerHolder {
         val PTR = Codec_nGetFinalizer()
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot
 // block.
@@ -449,3 +396,4 @@ private external fun FramesInfo_nGetSize(ptr: NativePointer): Int
 // Native call path: AnimationFrameInfo::copyToInterop -> copyToInteropAtIndex
 @ForceNativeThreadState
 private external fun FramesInfo_nGetInfos(ptr: NativePointer, result: InteropPointer)
+// </editor-fold>

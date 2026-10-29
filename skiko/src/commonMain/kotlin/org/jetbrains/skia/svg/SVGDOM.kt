@@ -6,14 +6,8 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.*
 
-private fun makeSVGDOM(data: Data): NativePointer {
-    Stats.onNativeCall()
-    return try {
-        SVGDOM_nMakeFromData(getPtr(data))
-    } finally {
-        reachabilityBarrier(data)
-    }
-}
+private fun makeSVGDOM(data: Data): NativePointer =
+    nativeCallFromStatic(data) { data -> SVGDOM_nMakeFromData(data.pointerOrNullPointer) }
 
 class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -25,12 +19,9 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     constructor(data: Data) : this(makeSVGDOM(data))
 
     val root: SVGSVG?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = SVGDOM_nGetRoot(_ptr)
             if (ptr == NullPointer) null else SVGSVG(ptr)
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -38,35 +29,20 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      */
     @get:Deprecated("")
     val containerSize: Point
-        get() = try {
-            Point.fromInteropPointer { SVGDOM_nGetContainerSize(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Point.fromInteropPointer { SVGDOM_nGetContainerSize(_ptr, it) } }
 
-    fun setContainerSize(width: Float, height: Float) {
-        Stats.onNativeCall()
-        SVGDOM_nSetContainerSize(_ptr, width, height)
-    }
+    fun setContainerSize(width: Float, height: Float) =
+        nativeCall { SVGDOM_nSetContainerSize(_ptr, width, height) }
 
-    fun setContainerSize(size: Point) {
-        Stats.onNativeCall()
-        SVGDOM_nSetContainerSize(_ptr, size.x, size.y)
-    }
+    fun setContainerSize(size: Point) =
+        nativeCall { SVGDOM_nSetContainerSize(_ptr, size.x, size.y) }
 
     // sk_sp<SkSVGNode>* findNodeById(const char* id);
-    fun render(canvas: Canvas): SVGDOM {
-        return try {
-            Stats.onNativeCall()
-            SVGDOM_nRender(_ptr, getPtr(canvas))
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(canvas)
-        }
-    }
+    fun render(canvas: Canvas): SVGDOM =
+        nativeCall(canvas) { canvas -> SVGDOM_nRender(_ptr, canvas.pointerOrNullPointer); this }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
 // Needs ForceNativeThreadState: parses the whole XML document and builds its node tree, so its time grows with the data
 // size.
@@ -95,3 +71,4 @@ private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, 
 // Native call path: SkSVGDOM::render
 @ForceNativeThreadState
 private external fun SVGDOM_nRender(ptr: NativePointer, canvasPtr: NativePointer)
+// </editor-fold>

@@ -35,23 +35,14 @@ abstract class PaintFilterCanvas(private val canvas: Canvas, unrollDrawable: Boo
      * @param unrollDrawable if needed to filter nested drawable content using this canvas (for drawables there is no paint to filter)
      */
     init {
-        Stats.onNativeCall()
-        try {
-            doInit(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        nativeCall { doInit(_ptr) }
     }
 }
 
-private fun makePaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean): NativePointer {
-    Stats.onNativeCall()
-    return try {
-        PaintFilterCanvas_nMake(getPtr(canvas), unrollDrawable)
-    } finally {
-        reachabilityBarrier(canvas)
+private fun makePaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean): NativePointer =
+    nativeCallFromStatic(canvas) { canvas ->
+        PaintFilterCanvas_nMake(canvas._ptr, unrollDrawable)
     }
-}
 
 internal expect fun PaintFilterCanvas.doInit(ptr: NativePointer)
 

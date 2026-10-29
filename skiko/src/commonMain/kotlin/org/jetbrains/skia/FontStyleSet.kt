@@ -5,71 +5,39 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.nativeCall
+import org.jetbrains.skia.impl.nativeCallFromStatic
 import org.jetbrains.skia.impl.withStringResult
+import kotlin.jvm.JvmStatic
 
 class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
-        fun makeEmpty(): FontStyleSet {
-            Stats.onNativeCall()
-            return FontStyleSet(FontStyleSet_nMakeEmpty())
-        }
+        @JvmStatic
+        fun makeEmpty(): FontStyleSet = nativeCallFromStatic { FontStyleSet(FontStyleSet_nMakeEmpty()) }
 
         init {
             staticLoad()
         }
     }
 
-    fun count(): Int {
-        return try {
-            Stats.onNativeCall()
-            _nCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun count(): Int = nativeCall { _nCount(_ptr) }
+
+    fun getStyle(index: Int): FontStyle = nativeCall { FontStyle(_nGetStyle(_ptr, index)) }
+
+    fun getStyleName(index: Int): String = nativeCall { withStringResult { _nGetStyleName(_ptr, index) } }
+
+    fun getTypeface(index: Int): Typeface? = nativeCall {
+        val ptr = _nGetTypeface(_ptr, index)
+        if (ptr == NullPointer) null else Typeface(ptr)
     }
 
-    fun getStyle(index: Int): FontStyle {
-        return try {
-            Stats.onNativeCall()
-            FontStyle(_nGetStyle(_ptr, index))
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
-
-    fun getStyleName(index: Int): String {
-        return try {
-            Stats.onNativeCall()
-            withStringResult {
-                _nGetStyleName(_ptr, index)
-            }
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
-
-    fun getTypeface(index: Int): Typeface? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nGetTypeface(_ptr, index)
-            if (ptr == NullPointer) null else Typeface(ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
-
-    fun matchStyle(style: FontStyle): Typeface? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nMatchStyle(_ptr, style._value)
-            if (ptr == NullPointer) null else Typeface(ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun matchStyle(style: FontStyle): Typeface? = nativeCall {
+        val ptr = _nMatchStyle(_ptr, style._value)
+        if (ptr == NullPointer) null else Typeface(ptr)
     }
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
 // No ForceNativeThreadState: allocates an empty style set that owns no fonts, so it is short and cannot block.
 // Native call path: SkFontStyleSet::CreateEmpty
@@ -107,3 +75,4 @@ private external fun _nGetTypeface(ptr: NativePointer, index: Int): NativePointe
 //   CTFontCreateWithFontDescriptor
 @ForceNativeThreadState
 private external fun _nMatchStyle(ptr: NativePointer, style: Int): NativePointer
+// </editor-fold>

@@ -3,9 +3,11 @@ package org.jetbrains.skia.svg
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
+import kotlin.jvm.JvmStatic
 
 class SVGLength(val value: Float, val unit: SVGLengthUnit) {
     companion object {
+        @JvmStatic
         internal fun fromInterop(block: InteropScope.(InteropPointer) -> Unit)
             = withResult(IntArray(2), block).let {
                 SVGLength(Float.fromBits(it[0]), it[1])

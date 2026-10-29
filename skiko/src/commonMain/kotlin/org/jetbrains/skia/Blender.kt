@@ -5,6 +5,8 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.nativeCallFromStatic
+import kotlin.jvm.JvmStatic
 
 /**
  * Blender represents a custom blend function in the Skia pipeline.  A blender combines a source
@@ -16,20 +18,20 @@ class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             staticLoad()
         }
 
-        fun makeMode(mode: BlendMode): Blender {
-            Stats.onNativeCall()
-            return Blender(_nMakeMode(mode.ordinal))
+        @JvmStatic
+        fun makeMode(mode: BlendMode): Blender = nativeCallFromStatic {
+            Blender(_nMakeMode(mode.ordinal))
         }
 
+        @JvmStatic
         fun makeArithmetic(
             k1: Float,
             k2: Float,
             k3: Float,
             k4: Float,
             enforcePMColor: Boolean,
-        ): Blender {
-            Stats.onNativeCall()
-            return interopScope {
+        ): Blender = nativeCallFromStatic {
+            interopScope {
                 Blender(
                     _nMakeArithmetic(
                         k1,
@@ -44,6 +46,7 @@ class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Blender__1nMakeArithmetic")
 // Needs ForceNativeThreadState: may compile a shader program on first use, and that setup can wait for another thread.
 // Native call path: SkBlenders::Arithmetic -> GetKnownRuntimeEffect -> SkRuntimeEffect::MakeForBlender
@@ -62,3 +65,4 @@ private external fun _nMakeArithmetic(
 // Native call path: SkBlender::Mode -> GetBlendModeSingleton
 @ForceNativeThreadState
 private external fun _nMakeMode(mode: Int): NativePointer
+// </editor-fold>

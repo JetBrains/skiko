@@ -4,6 +4,7 @@ import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmStatic
 
 /**
  * 2x2 matrix.
@@ -34,6 +35,7 @@ value class Matrix22 internal constructor(val mat: FloatArray) {
     companion object {
         val IDENTITY = Matrix22(1f, 0f, 0f, 1f)
 
+        @JvmStatic
         internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Matrix22 {
             val result = withResult(FloatArray(4), block)
             return Matrix22(result)

@@ -28,7 +28,7 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
         }
     }
 
-    constructor(context: RenderNodeContext) : this(RenderNode_nMake(getPtr(context))) {
+    constructor(context: RenderNodeContext) : this(RenderNode_nMake(context._ptr)) {
         Stats.onNativeCall()
     }
 
@@ -41,63 +41,34 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
      * This does not affect shadow opacity: shadows are still modulated by [alpha].
      */
     var layerPaint: Paint?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = RenderNode_nGetLayerPaint(_ptr)
             if (ptr == NullPointer) null else Paint(ptr, false)
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetLayerPaint(_ptr, getPtr(value))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(value)
+        set(value) = nativeCall(value) { value ->
+            RenderNode_nSetLayerPaint(_ptr, value.pointerOrNullPointer)
         }
 
 
     var bounds: Rect
-        get() = try {
-            Stats.onNativeCall()
-            Rect.fromInteropPointer { RenderNode_nGetBounds(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Rect.fromInteropPointer { RenderNode_nGetBounds(_ptr, it) } }
         set(value) = setNodeBounds(value.left, value.top, value.right, value.bottom)
 
     /**
      * Sets the bounds for this RenderNode internally and can be used to avoid Rect object creation.
      */
-    fun setNodeBounds(left: Float, top: Float, right: Float, bottom: Float) {
-        try {
-            Stats.onNativeCall()
-            RenderNode_nSetBounds(_ptr, left, top, right, bottom)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun setNodeBounds(left: Float, top: Float, right: Float, bottom: Float) = nativeCall {
+        RenderNode_nSetBounds(_ptr, left, top, right, bottom)
     }
 
     var pivot: Point
-        get() = try {
-            Stats.onNativeCall()
-            Point.fromInteropPointer { RenderNode_nGetPivot(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Point.fromInteropPointer { RenderNode_nGetPivot(_ptr, it) } }
         set(value) = setNodePivot(value.x, value.y)
 
     /**
      * Sets the pivot point for this RenderNode internally and can be used to avoid Point object creation.
      */
-    fun setNodePivot(x: Float, y: Float) {
-        try {
-            Stats.onNativeCall()
-            RenderNode_nSetPivot(_ptr, x, y)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun setNodePivot(x: Float, y: Float) = nativeCall { RenderNode_nSetPivot(_ptr, x, y) }
 
     /**
      * Alpha multiplier for this RenderNode.
@@ -108,172 +79,52 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
      * Shadow opacity is always modulated by this alpha, regardless of [layerPaint].
      */
     var alpha: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetAlpha(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetAlpha(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetAlpha(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetAlpha(_ptr, value) }
 
     var scaleX: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetScaleX(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetScaleX(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetScaleX(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetScaleX(_ptr, value) }
 
     var scaleY: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetScaleY(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetScaleY(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetScaleY(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetScaleY(_ptr, value) }
 
     var translationX: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetTranslationX(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetTranslationX(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetTranslationX(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetTranslationX(_ptr, value) }
 
     var translationY: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetTranslationY(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetTranslationY(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetTranslationY(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetTranslationY(_ptr, value) }
 
     var shadowElevation: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetShadowElevation(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetShadowElevation(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetShadowElevation(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetShadowElevation(_ptr, value) }
 
     var ambientShadowColor: Int
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetAmbientShadowColor(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetAmbientShadowColor(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetAmbientShadowColor(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetAmbientShadowColor(_ptr, value) }
 
     var spotShadowColor: Int
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetSpotShadowColor(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetSpotShadowColor(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetSpotShadowColor(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetSpotShadowColor(_ptr, value) }
 
     var rotationX: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetRotationX(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetRotationX(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetRotationX(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetRotationX(_ptr, value) }
 
     var rotationY: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetRotationY(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetRotationY(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetRotationY(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetRotationY(_ptr, value) }
 
     var rotationZ: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetRotationZ(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetRotationZ(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetRotationZ(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetRotationZ(_ptr, value) }
 
     var cameraDistance: Float
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetCameraDistance(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetCameraDistance(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetCameraDistance(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetCameraDistance(_ptr, value) }
 
     fun setClipRect(r: Rect, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
         setClipRect(r.left, r.top, r.right, r.bottom, mode, antiAlias)
@@ -313,64 +164,31 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
         }
     }
 
-    fun setClipPath(p: Path?, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) {
-        try {
-            Stats.onNativeCall()
-            RenderNode_nSetClipPath(
-                ptr = _ptr,
-                pathPtr = getPtr(p),
-                mode = mode.ordinal,
-                antiAlias = antiAlias
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(p)
-        }
+    fun setClipPath(p: Path?, mode: ClipMode = ClipMode.INTERSECT, antiAlias: Boolean = false) = nativeCall(p) { p ->
+        RenderNode_nSetClipPath(
+            ptr = _ptr,
+            pathPtr = p.pointerOrNullPointer,
+            mode = mode.ordinal,
+            antiAlias = antiAlias
+        )
     }
 
     var clip: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            RenderNode_nGetClip(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            RenderNode_nSetClip(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RenderNode_nGetClip(_ptr) }
+        set(value) = nativeCall { RenderNode_nSetClip(_ptr, value) }
 
-    fun beginRecording(): Canvas {
-        return try {
-            Stats.onNativeCall()
-            Canvas(
-                ptr = RenderNode_nBeginRecording(_ptr),
-                managed = false,
-                _owner = this
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun beginRecording(): Canvas = nativeCall {
+        Canvas(
+            ptr = RenderNode_nBeginRecording(_ptr),
+            managed = false,
+            _owner = this
+        )
     }
 
-    fun endRecording() {
-        try {
-            Stats.onNativeCall()
-            RenderNode_nEndRecording(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun endRecording() = nativeCall { RenderNode_nEndRecording(_ptr) }
 
-    fun drawInto(canvas: Canvas) {
-        try {
-            Stats.onNativeCall()
-            RenderNode_nDrawInto(_ptr, getPtr(canvas))
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun drawInto(canvas: Canvas) = nativeCall(canvas) { canvas ->
+        RenderNode_nDrawInto(_ptr, canvas._ptr)
     }
 }
 

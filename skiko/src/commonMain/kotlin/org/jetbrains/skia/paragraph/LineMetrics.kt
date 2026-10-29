@@ -171,6 +171,7 @@ class LineMetrics(
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArraySize")
 // No ForceNativeThreadState: returns the number of stored line metrics, so it is short and cannot block.
 // Native call path: std::vector::size
@@ -189,3 +190,4 @@ private external fun LineMetrics_nDisposeArray(array: InteropPointer)
 // Native call path: LineMetrics::LineMetrics
 @ForceNativeThreadState
 private external fun LineMetrics_nGetArrayElement(array: InteropPointer, index: Int, intArgs: InteropPointer, doubleArgs: InteropPointer)
+// </editor-fold>

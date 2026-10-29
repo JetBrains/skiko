@@ -3,8 +3,9 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skiko.internal.unpackTo
+import kotlin.jvm.JvmStatic
 
-class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt) {
+class FontFeature(val _tag: FourByteTag, val value: Int, val start: UInt, val end: UInt) {
 
     constructor(feature: String, value: Int, start: UInt, end: UInt) : this(
         FourByteTag.fromString(feature),
@@ -63,7 +64,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
     }
 
     internal fun toInteropIntArray(): IntArray {
-        return intArrayOf(_tag, value, start.toInt(), end.toInt())
+        return intArrayOf(_tag.tag, value, start.toInt(), end.toInt())
     }
 
     internal fun InteropScope.toInterop(): InteropPointer {
@@ -89,6 +90,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
         private const val endIx = 4
         private const val valueIx = 5
 
+        @JvmStatic
         fun parseOne(s: String): FontFeature {
             val m = _featurePattern.matcher(s)
             require(m.matches()) { "Can’t parse FontFeature: $s" }
@@ -108,6 +110,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
          *
          * If [str] is invalid, throws IllegalArgumentException
          */
+        @JvmStatic
         fun parse(str: String): Array<FontFeature> {
             return _splitPattern.split(str).map { s -> parseOne(s) }.toTypedArray()
         }
@@ -123,6 +126,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
          *
          * If [str] in invalid format, FontFeature won't be in the result
          */
+        @JvmStatic
         fun parseW3(str: String): Array<FontFeature> =
             str
                 .splitToSequence(",")
@@ -143,7 +147,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
             val ints = IntArray(4 * (fontFeatures?.size ?: 0))
 
             fontFeatures?.unpackTo(ints) { feature , arr, index ->
-                arr[index] = feature._tag
+                arr[index] = feature._tag.tag
                 arr[index + 1] = feature.value
                 arr[index + 2] = feature.start.toInt()
                 arr[index + 3] = feature.end.toInt()
@@ -158,13 +162,14 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
          * This function can be used to convert IntArray to FontFeatures.
          * Every FontFeature is represented by 2 ints (_tag, value)
          */
+        @JvmStatic
         internal fun fromInteropEncodedBy2Ints(fontFeatures: IntArray): Array<FontFeature> {
             val featuresCount = fontFeatures.size / 2
 
             return Array(featuresCount) {
                 val j = it * 2
                 FontFeature(
-                    fontFeatures[j], fontFeatures[j + 1],
+                    FourByteTag(fontFeatures[j]), fontFeatures[j + 1],
                     GLOBAL_START, GLOBAL_END
                 )
             }

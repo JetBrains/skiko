@@ -6,16 +6,13 @@ import org.jetbrains.skia.impl.ArrayInteropDecoder
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.interopScope
 
-class TextBox(val rect: Rect, direction: Direction) {
-    val _direction: Direction
+class TextBox(val rect: Rect, val direction: Direction) {
+
 
     constructor(l: Float, t: Float, r: Float, b: Float, direction: Int) : this(
         Rect.makeLTRB(l, t, r, b),
         Direction.entries[direction]
     )
-
-    val direction: Direction
-        get() = _direction
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
@@ -36,10 +33,6 @@ class TextBox(val rect: Rect, direction: Direction) {
         return "TextBox(_rect=$rect, _direction=$direction)"
     }
 
-    init {
-        _direction = direction
-    }
-
     internal companion object : ArrayInteropDecoder<TextBox> {
         override fun getArrayElement(array: InteropPointer, index: Int): TextBox {
             val rect = FloatArray(4)
@@ -58,6 +51,7 @@ class TextBox(val rect: Rect, direction: Direction) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArraySize")
 // No ForceNativeThreadState: returns the stored element count of the box list, so it is short and cannot block.
 // Native call path: vector<TextBox>::size
@@ -74,3 +68,4 @@ private external fun TextBox_nDisposeArray(array: InteropPointer)
 // block.
 // Native call path: vector<TextBox>::at
 private external fun TextBox_nGetArrayElement(array: InteropPointer, index: Int, rectArray: InteropPointer, directionArray: InteropPointer)
+// </editor-fold>

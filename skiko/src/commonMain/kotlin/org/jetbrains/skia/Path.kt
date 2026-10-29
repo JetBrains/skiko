@@ -2,6 +2,8 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
+import kotlin.jvm.JvmStatic
 import kotlin.math.min
 
 /**
@@ -22,8 +24,8 @@ import kotlin.math.min
  */
 class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
     companion object {
-        fun makeFromSVGString(svg: String): Path  {
-            Stats.onNativeCall()
+        @JvmStatic
+        fun makeFromSVGString(svg: String): Path  = nativeCallFromStatic {
             val result = interopScope {
                 _nMakeFromSVGString(toInterop(svg))
             }
@@ -31,7 +33,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             if (result == NullPointer) {
                 throw IllegalArgumentException("Failed to parse SVG Path string: $svg")
             } else {
-                return Path(result)
+                Path(result)
             }
         }
 
@@ -61,21 +63,21 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param isVolatile whether the path is volatile
          * @return           new Path constructed from the provided data
          */
+        @JvmStatic
         fun Raw(
             pts: Array<Point>,
             verbs: Array<PathVerb>,
             conicWeights: FloatArray = FloatArray(0),
             fillType: PathFillMode = PathFillMode.WINDING,
             isVolatile: Boolean = false
-        ): Path {
-            Stats.onNativeCall()
+        ): Path = nativeCallFromStatic {
             val ptsFlat = FloatArray(pts.size * 2)
             for (i in pts.indices) {
                 ptsFlat[i * 2] = pts[i].x
                 ptsFlat[i * 2 + 1] = pts[i].y
             }
             val verbsBytes = ByteArray(verbs.size) { verbs[it].ordinal.toByte() }
-            return interopScope {
+            interopScope {
                 val result = _nMakeFromRaw(
                     toInterop(ptsFlat), pts.size,
                     toInterop(verbsBytes), verbs.size,
@@ -96,16 +98,16 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param startIndex starting corner index (0-3)
          * @return           new rectangular Path
          */
+        @JvmStatic
         fun Rect(
             rect: Rect,
             fillType: PathFillMode = PathFillMode.WINDING,
             direction: PathDirection = PathDirection.CLOCKWISE,
             startIndex: Int = 0
-        ): Path {
-            Stats.onNativeCall()
+        ): Path = nativeCallFromStatic {
             val result = _nMakeFromRect(rect.left, rect.top, rect.right, rect.bottom, fillType.ordinal, direction.ordinal, startIndex)
             require(result != NullPointer) { "Failed to create Path from rectangle" }
-            return Path(result)
+            Path(result)
         }
 
         /**
@@ -116,15 +118,15 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param startIndex starting point index
          * @return           new oval Path
          */
+        @JvmStatic
         fun Oval(
             rect: Rect,
             direction: PathDirection = PathDirection.CLOCKWISE,
             startIndex: Int = 1
-        ): Path {
-            Stats.onNativeCall()
+        ): Path = nativeCallFromStatic {
             val result = _nMakeFromOval(rect.left, rect.top, rect.right, rect.bottom, direction.ordinal, startIndex)
             require(result != NullPointer) { "Failed to create Path from oval" }
-            return Path(result)
+            Path(result)
         }
 
         /**
@@ -136,16 +138,16 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param direction  direction to wind the circle
          * @return           new circular Path
          */
+        @JvmStatic
         fun Circle(
             centerX: Float,
             centerY: Float,
             radius: Float,
             direction: PathDirection = PathDirection.CLOCKWISE
-        ): Path {
-            Stats.onNativeCall()
+        ): Path = nativeCallFromStatic {
             val result = _nMakeFromCircle(centerX, centerY, radius, direction.ordinal)
             require(result != NullPointer) { "Failed to create Path from circle" }
-            return Path(result)
+            Path(result)
         }
 
         /**
@@ -156,13 +158,13 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param startIndex starting point index
          * @return           new rounded rectangle Path
          */
+        @JvmStatic
         fun RRect(
             rrect: RRect,
             direction: PathDirection = PathDirection.CLOCKWISE,
             startIndex: Int = if (direction == PathDirection.CLOCKWISE) 6 else 7
-        ): Path {
-            Stats.onNativeCall()
-            return interopScope {
+        ): Path = nativeCallFromStatic {
+            interopScope {
                 val result = _nMakeFromRRect(toInterop(rrect.radii), rrect.radii.size, rrect.left, rrect.top, rrect.right, rrect.bottom, direction.ordinal, startIndex)
                 require(result != NullPointer) { "Failed to create Path from rounded rectangle" }
                 Path(result)
@@ -178,16 +180,16 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param direction  direction to wind the rounded rectangle
          * @return           new rounded rectangle Path
          */
+        @JvmStatic
         fun RRect(
             bounds: Rect,
             rx: Float,
             ry: Float,
             direction: PathDirection = PathDirection.CLOCKWISE
-        ): Path {
-            Stats.onNativeCall()
+        ): Path = nativeCallFromStatic {
             val result = _nMakeFromRRectXY(bounds.left, bounds.top, bounds.right, bounds.bottom, rx, ry, direction.ordinal)
             require(result != NullPointer) { "Failed to create Path from rounded rectangle" }
-            return Path(result)
+            Path(result)
         }
 
         /**
@@ -199,19 +201,19 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param isVolatile whether the path is volatile
          * @return           new polygon Path
          */
+        @JvmStatic
         fun Polygon(
             pts: Array<Point>,
             isClosed: Boolean,
             fillType: PathFillMode = PathFillMode.WINDING,
             isVolatile: Boolean = false
-        ): Path {
-            Stats.onNativeCall()
+        ): Path = nativeCallFromStatic {
             val ptsFlat = FloatArray(pts.size * 2)
             for (i in pts.indices) {
                 ptsFlat[i * 2] = pts[i].x
                 ptsFlat[i * 2 + 1] = pts[i].y
             }
-            return interopScope {
+            interopScope {
                 val result = _nMakeFromPolygon(toInterop(ptsFlat), pts.size, isClosed, fillType.ordinal, isVolatile)
                 require(result != NullPointer) { "Failed to create Path from polygon" }
                 Path(result)
@@ -225,6 +227,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param p1 end point
          * @return   new line Path
          */
+        @JvmStatic
         fun Line(p0: Point, p1: Point): Path {
             return Polygon(arrayOf(p0, p1), false)
         }
@@ -248,9 +251,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          *
          * @see [https://fiddle.skia.org/c/@Path_IsLineDegenerate](https://fiddle.skia.org/c/@Path_IsLineDegenerate)
          */
-        fun isLineDegenerate(p1: Point, p2: Point, exact: Boolean): Boolean {
-            Stats.onNativeCall()
-            return _nIsLineDegenerate(p1.x, p1.y, p2.x, p2.y, exact)
+        @JvmStatic
+        fun isLineDegenerate(p1: Point, p2: Point, exact: Boolean): Boolean = nativeCallFromStatic {
+            _nIsLineDegenerate(p1.x, p1.y, p2.x, p2.y, exact)
         }
 
         /**
@@ -268,9 +271,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * if false, returns true if p1, p2, and p3 are equal or nearly equal
          * @return       true if quad is degenerate; its length is effectively zero
          */
-        fun isQuadDegenerate(p1: Point, p2: Point, p3: Point, exact: Boolean): Boolean {
-            Stats.onNativeCall()
-            return _nIsQuadDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, exact)
+        @JvmStatic
+        fun isQuadDegenerate(p1: Point, p2: Point, p3: Point, exact: Boolean): Boolean = nativeCallFromStatic {
+            _nIsQuadDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, exact)
         }
 
         /**
@@ -289,9 +292,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * if false, returns true if p1, p2, p3, and p4 are equal or nearly equal
          * @return       true if cubic is degenerate; its length is effectively zero
          */
-        fun isCubicDegenerate(p1: Point, p2: Point, p3: Point, p4: Point, exact: Boolean): Boolean {
-            Stats.onNativeCall()
-            return _nIsCubicDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y, exact)
+        @JvmStatic
+        fun isCubicDegenerate(p1: Point, p2: Point, p3: Point, p4: Point, exact: Boolean): Boolean = nativeCallFromStatic {
+            _nIsCubicDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y, exact)
         }
 
         /**
@@ -331,14 +334,14 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param pow2  quad count, as power of two, normally 0 to 5 (1 to 32 quad curves)
          * @return      number of quad curves written to pts
          */
-        fun convertConicToQuads(p0: Point, p1: Point, p2: Point, w: Float, pow2: Int): Array<Point> {
-            Stats.onNativeCall()
+        @JvmStatic
+        fun convertConicToQuads(p0: Point, p1: Point, p2: Point, w: Float, pow2: Int): Array<Point> = nativeCallFromStatic {
             val maxResultPointCount = (1 + 2 * (1 shl pow2)) // See Skia docs
             var pointCount = 0
             val coords = withResult(FloatArray(maxResultPointCount * 2)) {
                 pointCount = _nConvertConicToQuads(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, w, pow2, it)
             }
-            return Array(pointCount) { Point(coords[2 * it], coords[2 * it + 1]) }
+            Array(pointCount) { Point(coords[2 * it], coords[2 * it + 1]) }
         }
 
         /**
@@ -355,19 +358,14 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param op  The operator to apply.
          * @return    Path if operation was able to produce a result, null otherwise
          */
-        fun makeCombining(one: Path, two: Path, op: PathOp): Path? {
-            return try {
-                Stats.onNativeCall()
-                val ptr = _nMakeCombining(
-                    getPtr(one),
-                    getPtr(two),
-                    op.ordinal
-                )
-                if (ptr == NullPointer) null else Path(ptr)
-            } finally {
-                reachabilityBarrier(one)
-                reachabilityBarrier(two)
-            }
+        @JvmStatic
+        fun makeCombining(one: Path, two: Path, op: PathOp): Path? = nativeCallFromStatic(one, two) { one, two ->
+            val ptr = _nMakeCombining(
+                one._ptr,
+                two._ptr,
+                op.ordinal
+            )
+            if (ptr == NullPointer) null else Path(ptr)
         }
 
         /**
@@ -385,8 +383,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          *
          * @see [https://fiddle.skia.org/c/@Path_readFromMemory](https://fiddle.skia.org/c/@Path_readFromMemory)
          */
-        fun makeFromBytes(data: ByteArray): Path {
-            Stats.onNativeCall()
+        @JvmStatic
+        fun makeFromBytes(data: ByteArray): Path = nativeCallFromStatic {
             val result = interopScope {
                 _nMakeFromBytes(toInterop(data), data.size)
             }
@@ -394,7 +392,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             if (result == NullPointer) {
                 throw IllegalArgumentException("Failed to parse serialized Path")
             } else {
-                return Path(result)
+                Path(result)
             }
         }
 
@@ -422,13 +420,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @param other  Path to compare
      * @return   true if this and Path are equivalent
      */
-    override fun nativeEquals(other: Native?): Boolean {
-        return try {
-            Path_nEquals(_ptr, getPtr(other))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
-        }
+    override fun nativeEquals(other: Native?): Boolean = nativeCall(other) { other ->
+        Path_nEquals(_ptr, other.pointerOrNullPointer)
     }
 
     /**
@@ -444,17 +437,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_isInterpolatable](https://fiddle.skia.org/c/@Path_isInterpolatable)
      */
-    fun isInterpolatable(compare: Path?): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nIsInterpolatable(
-                _ptr,
-                getPtr(compare)
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(compare)
-        }
+    fun isInterpolatable(compare: Path?): Boolean = nativeCall(compare) { compare ->
+        _nIsInterpolatable(_ptr, compare.pointerOrNullPointer)
     }
 
     /**
@@ -482,20 +466,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_interpolate](https://fiddle.skia.org/c/@Path_interpolate)
      */
-    fun makeLerp(ending: Path?, weight: Float): Path {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nMakeLerp(
-                _ptr,
-                getPtr(ending),
-                weight
-            )
-            require(ptr != NullPointer) { "Point array is not the same size as ending Point array" }
-            Path(ptr)
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(ending)
-        }
+    fun makeLerp(ending: Path?, weight: Float): Path = nativeCall(ending) { ending ->
+        val ptr = _nMakeLerp(_ptr, ending.pointerOrNullPointer, weight)
+        require(ptr != NullPointer) { "Point array is not the same size as ending Point array" }
+        Path(ptr)
     }
 
     /**
@@ -505,18 +479,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @return  this path's [PathFillMode]
      */
     var fillMode: PathFillMode
-        get() = try {
-            Stats.onNativeCall()
-            PathFillMode.entries[_nGetFillMode(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetFillMode(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { PathFillMode.entries[_nGetFillMode(_ptr)] }
+        set(value) = nativeCall { _nSetFillMode(_ptr, value.ordinal) }
 
     /**
      * Returns true if the path is convex. If necessary, it will first compute the convexity.
@@ -524,12 +488,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @return  true or false
      */
     val isConvex: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsConvex(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsConvex(_ptr) }
 
     /**
      * Returns oval bounds if this path is recognized as an oval or circle.
@@ -539,12 +498,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_isOval](https://fiddle.skia.org/c/@Path_isOval)
      */
     val isOval: Rect?
-        get() = try {
-            Stats.onNativeCall()
-            Rect.fromInteropPointerNullable { _nIsOval(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Rect.fromInteropPointerNullable { _nIsOval(_ptr, it) } }
 
     /**
      * Returns rect bounds if this path is recognized as a rectangle.
@@ -554,12 +508,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_isRect](https://fiddle.skia.org/c/@Path_isRect)
      */
     val isRect: Rect?
-        get() = try {
-            Stats.onNativeCall()
-            Rect.fromInteropPointerNullable { _nIsRect(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Rect.fromInteropPointerNullable { _nIsRect(_ptr, it) } }
 
     /**
      * Returns [RRect] if this path is recognized as an oval, circle or RRect.
@@ -569,12 +518,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_isRRect](https://fiddle.skia.org/c/@Path_isRRect)
      */
     val isRRect: RRect?
-        get() = try {
-            Stats.onNativeCall()
-            RRect.fromInteropPointerNullable { _nIsRRect(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { RRect.fromInteropPointerNullable { _nIsRRect(_ptr, it) } }
 
 
     /**
@@ -586,12 +530,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @return  true if the path contains no Verb array
      */
     val isEmpty: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsEmpty(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsEmpty(_ptr) }
 
     /**
      * Returns if contour is closed.
@@ -604,12 +543,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_isLastContourClosed](https://fiddle.skia.org/c/@Path_isLastContourClosed)
      */
     val isLastContourClosed: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsLastContourClosed(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsLastContourClosed(_ptr) }
 
     /**
      * Returns true for finite Point array values between negative Float.MIN_VALUE and
@@ -619,12 +553,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @return  true if all Point values are finite
      */
     val isFinite: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsFinite(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsFinite(_ptr) }
 
     /**
      *
@@ -649,18 +578,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @return  true if caller will alter Path after drawing
      */
     var isVolatile: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            Path_nIsVolatile(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            Path_nSetVolatile(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Path_nIsVolatile(_ptr) }
+        set(value) = nativeCall { Path_nSetVolatile(_ptr, value) }
     
     /**
      *
@@ -683,10 +602,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @param isVolatile  true if caller will alter Path after drawing
      * @return            this
      */
-    fun setVolatile(isVolatile: Boolean): Path {
-        Stats.onNativeCall()
+    fun setVolatile(isVolatile: Boolean): Path = nativeCall {
         Path_nSetVolatile(_ptr, isVolatile)
-        return this
+        this
     }
 
     /**
@@ -699,8 +617,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_isLine](https://fiddle.skia.org/c/@Path_isLine)
      */
     val asLine: Array<Point>?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             // HACK Use a temporary Rect as a buffer to store two points
             val rectBuffer = Rect.fromInteropPointerNullable { _nMaybeGetAsLine(_ptr, it) }
             rectBuffer?.run {
@@ -709,8 +626,6 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
                     Point(right, bottom)
                 )
             }
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -722,12 +637,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_countPoints](https://fiddle.skia.org/c/@Path_countPoints)
      */
     val pointsCount: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetPointsCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetPointsCount(_ptr) }
 
     /**
      *
@@ -742,13 +652,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_getPoint](https://fiddle.skia.org/c/@Path_getPoint)
      */
-    fun getPoint(index: Int): Point {
-        return try {
-            Stats.onNativeCall()
-            Point.fromInteropPointer { _nGetPoint(_ptr, index, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun getPoint(index: Int): Point = nativeCall {
+        Point.fromInteropPointer { _nGetPoint(_ptr, index, it) }
     }
 
     /**
@@ -780,26 +685,21 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_getPoints](https://fiddle.skia.org/c/@Path_getPoints)
      */
-    fun getPoints(points: Array<Point?>?, max: Int): Int {
-        return try {
-            require(if (points == null) max == 0 else max >= 0)
-            Stats.onNativeCall()
-            if (points == null) {
-                interopScope {
-                    _nGetPoints(_ptr, toInterop(null as FloatArray?), max)
-                }
-            } else {
-                var result = 0
-                val coords = withResult(FloatArray(max * 2)) {
-                    result = _nGetPoints(_ptr, it, max)
-                }
-                for (i in 0 until min(max, result)) {
-                    points[i] = Point(coords[2 * i], coords[2 * i + 1])
-                }
-                result
+    fun getPoints(points: Array<Point?>?, max: Int): Int = nativeCall {
+        require(if (points == null) max == 0 else max >= 0)
+        if (points == null) {
+            interopScope {
+                _nGetPoints(_ptr, toInterop(null as FloatArray?), max)
             }
-        } finally {
-            reachabilityBarrier(this)
+        } else {
+            var result = 0
+            val coords = withResult(FloatArray(max * 2)) {
+                result = _nGetPoints(_ptr, it, max)
+            }
+            for (i in 0 until min(max, result)) {
+                points[i] = Point(coords[2 * i], coords[2 * i + 1])
+            }
+            result
         }
     }
 
@@ -811,11 +711,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_getLastPt](https://fiddle.skia.org/c/@Path_getLastPt)
      */
     val lastPt: Point?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             Point.fromNullableInteropPointer { _nGetLastPt(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -827,12 +724,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://fiddle.skia.org/c/@Path_countVerbs](https://fiddle.skia.org/c/@Path_countVerbs)
      */
     val verbsCount: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nCountVerbs(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nCountVerbs(_ptr) }
     /**
      * Returns all verbs in Path.
      *
@@ -856,22 +748,16 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_getVerbs](https://fiddle.skia.org/c/@Path_getVerbs)
      */
-    fun getVerbs(verbs: Array<PathVerb?>?, max: Int): Int {
-        return try {
-            require(if (verbs == null) max == 0 else true)
-            Stats.onNativeCall()
-            val out = if (verbs == null) null else ByteArray(max)
-            val count = interopScope {
-                val ptr = toInterop(out)
-                _nGetVerbs(_ptr, ptr, max).also {
-                    out?.let { ptr.fromInterop(it) }
-                }
+    fun getVerbs(verbs: Array<PathVerb?>?, max: Int): Int = nativeCall {
+        val out = if (verbs == null) null else ByteArray(max)
+        val count = interopScope {
+            val ptr = toInterop(out)
+            _nGetVerbs(_ptr, ptr, max).also {
+                out?.let { ptr.fromInterop(it) }
             }
-            if (verbs != null) for (i in 0 until minOf(count, max)) verbs[i] = PathVerb.entries[out!![i].toInt()]
-            count
-        } finally {
-            reachabilityBarrier(this)
         }
+        if (verbs != null) for (i in 0 until minOf(count, max)) verbs[i] = PathVerb.entries[out!![i].toInt()]
+        count
     }
 
     /**
@@ -880,12 +766,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @return  approximate size in bytes
      */
     val approximateBytesUsed: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nApproximateBytesUsed(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nApproximateBytesUsed(_ptr) }
 
     /**
      *
@@ -898,15 +779,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_swap](https://fiddle.skia.org/c/@Path_swap)
      */
-    fun swap(other: Path?): Path {
-        return try {
-            Stats.onNativeCall()
-            Path_nSwap(_ptr, getPtr(other))
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
-        }
+    fun swap(other: Path?): Path = nativeCall(other) { other ->
+        Path_nSwap(_ptr, other.pointerOrNullPointer)
+        this
     }
 
     // TODO: Remove in CMP 1.14.
@@ -933,12 +808,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @return  bounds of all Point in Point array
      */
     val bounds: Rect
-        get() = try {
-            Stats.onNativeCall()
-            Rect.fromInteropPointer { _nGetBounds(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Rect.fromInteropPointer { _nGetBounds(_ptr, it) } }
 
     /**
      * Returns minimum and maximum axes values of the lines and curves in Path.
@@ -958,14 +828,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_computeTightBounds](https://fiddle.skia.org/c/@Path_computeTightBounds)
      */
-    fun computeTightBounds(): Rect {
-        return try {
-            Stats.onNativeCall()
-            Rect.fromInteropPointer { _nComputeTightBounds(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun computeTightBounds(): Rect = nativeCall { Rect.fromInteropPointer { _nComputeTightBounds(_ptr, it) } }
 
     /**
      *
@@ -983,19 +846,14 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_conservativelyContainsRect](https://fiddle.skia.org/c/@Path_conservativelyContainsRect)
      */
-    fun conservativelyContainsRect(rect: Rect): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nConservativelyContainsRect(
-                _ptr,
-                rect.left,
-                rect.top,
-                rect.right,
-                rect.bottom
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun conservativelyContainsRect(rect: Rect): Boolean = nativeCall {
+        _nConservativelyContainsRect(
+            _ptr,
+            rect.left,
+            rect.top,
+            rect.right,
+            rect.bottom
+        )
     }
 
     /**
@@ -1020,12 +878,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see PathSegmentMask.CUBIC
      */
     val segmentMasks: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetSegmentMasks(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetSegmentMasks(_ptr) }
 
     override fun iterator(): PathSegmentIterator {
         return iterator(false)
@@ -1045,14 +898,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_contains](https://fiddle.skia.org/c/@Path_contains)
      */
-    fun contains(x: Float, y: Float): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nContains(_ptr, x, y)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun contains(x: Float, y: Float): Boolean = nativeCall { _nContains(_ptr, x, y) }
 
     /**
      * Returns true if the point is contained by Path, taking into
@@ -1077,10 +923,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_dump_2](https://fiddle.skia.org/c/@Path_dump_2)
      */
-    fun dump(): Path {
-        Stats.onNativeCall()
+    fun dump(): Path = nativeCall {
         _nDump(_ptr)
-        return this
+        this
     }
 
     /**
@@ -1095,10 +940,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_dumpHex](https://fiddle.skia.org/c/@Path_dumpHex)
      */
-    fun dumpHex(): Path {
-        Stats.onNativeCall()
+    fun dumpHex(): Path = nativeCall {
         _nDumpHex(_ptr)
-        return this
+        this
     }
 
     /**
@@ -1114,18 +958,13 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_writeToMemory](https://fiddle.skia.org/c/@Path_writeToMemory)
      */
-    fun serializeToBytes(): ByteArray {
-        return try {
-            Stats.onNativeCall()
-            val size = interopScope { _nSerializeToBytes(_ptr, toInterop(null as ByteArray?)) }
-            if (size == -1) {
-                throw Error("Path is too big")
-            }
-            withResult(ByteArray(size)) {
-                _nSerializeToBytes(_ptr, it)
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun serializeToBytes(): ByteArray = nativeCall {
+        val size = interopScope { _nSerializeToBytes(_ptr, toInterop(null as ByteArray?)) }
+        if (size == -1) {
+            throw Error("Path is too big")
+        }
+        withResult(ByteArray(size)) {
+            _nSerializeToBytes(_ptr, it)
         }
     }
 
@@ -1148,12 +987,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @see [https://bugs.chromium.org/p/skia/issues/detail?id=1762](https://bugs.chromium.org/p/skia/issues/detail?id=1762)
      */
     val generationId: Int
-        get() = try {
-            Stats.onNativeCall()
-            Path_nGetGenerationId(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Path_nGetGenerationId(_ptr) }
 
     /**
      * Returns if Path data is consistent. Corrupt Path data is detected if
@@ -1163,14 +997,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @return  true if Path data is consistent
      */
     val isValid: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsValid(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsValid(_ptr) }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 internal external fun Path_nGetFinalizer(): NativePointer
@@ -1510,3 +1340,4 @@ private external fun _nMakeFromBytes(data: InteropPointer, size: Int): NativePoi
 // Native call path: SkPath::isValid -> SkPath::isFinite -> SkPath::PeekErrorSingleton
 @ForceNativeThreadState
 private external fun _nIsValid(ptr: NativePointer): Boolean
+// </editor-fold>

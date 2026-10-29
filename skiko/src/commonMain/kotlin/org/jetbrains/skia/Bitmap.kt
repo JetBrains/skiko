@@ -2,10 +2,13 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
+import kotlin.jvm.JvmStatic
 import kotlin.math.min
 
 class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
+        @JvmStatic
         fun makeFromImage(image: Image): Bitmap {
             val bitmap = Bitmap()
             bitmap.allocPixels(image.imageInfo)
@@ -15,6 +18,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             }
         }
 
+        @JvmStatic
         fun makeFromImage(image: Image, context: DirectContext): Bitmap {
             val bitmap = Bitmap()
             bitmap.allocPixels(image.imageInfo)
@@ -52,13 +56,8 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_copy_const_SkBitmap](https://fiddle.skia.org/c/@Bitmap_copy_const_SkBitmap)
      */
-    fun makeClone(): Bitmap {
-        return try {
-            Stats.onNativeCall()
-            Bitmap(_nMakeClone(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun makeClone(): Bitmap = nativeCall {
+        Bitmap(_nMakeClone(_ptr))
     }
 
     /**
@@ -68,15 +67,9 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_swap](https://fiddle.skia.org/c/@Bitmap_swap)
      */
-    fun swap(other: Bitmap) {
-        Stats.onNativeCall()
-        try {
-            _nSwap(_ptr, getPtr(other))
-            _imageInfo = null
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
-        }
+    fun swap(other: Bitmap) = nativeCall(other) { other ->
+        _nSwap(_ptr, other._ptr)
+        _imageInfo = null
     }
 
     override val imageInfo: ImageInfo
@@ -99,12 +92,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @return  maximum pixels per row
      */
     val rowBytesAsPixels: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetRowBytesAsPixels(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetRowBytesAsPixels(_ptr) }
 
     /**
      * Returns true if PixelRef is null.
@@ -115,12 +103,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @return  true if no PixelRef is associated
      */
     val isNull: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsNull(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsNull(_ptr) }
 
     /**
      * Returns true if width or height are zero, or if PixelRef is null.
@@ -128,9 +111,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @return  true if drawing has no effect
      */
-    fun drawsNothing(): Boolean {
-        return isEmpty || isNull
-    }
+    fun drawsNothing(): Boolean = isEmpty || isNull
 
     /**
      * Returns row bytes, the interval from one pixel row to the next. Row bytes
@@ -142,12 +123,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @return  byte length of pixel row
      */
     val rowBytes: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetRowBytes(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetRowBytes(_ptr) }
 
     /**
      *
@@ -186,14 +162,9 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_setAlphaType](https://fiddle.skia.org/c/@Bitmap_setAlphaType)
      */
-    fun setAlphaType(alphaType: ColorAlphaType): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _imageInfo = null
-            _nSetAlphaType(_ptr, alphaType.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun setAlphaType(alphaType: ColorAlphaType): Boolean = nativeCall {
+        _imageInfo = null
+        _nSetAlphaType(_ptr, alphaType.ordinal)
     }
 
     /**
@@ -204,14 +175,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @return  size in bytes of image buffer
      */
-    fun computeByteSize(): Int {
-        return try {
-            Stats.onNativeCall()
-            _nComputeByteSize(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun computeByteSize(): Int = nativeCall { _nComputeByteSize(_ptr) }
 
     /**
      *
@@ -225,12 +189,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @see [https://fiddle.skia.org/c/@Bitmap_isImmutable](https://fiddle.skia.org/c/@Bitmap_isImmutable)
      */
     val isImmutable: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsImmutable(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsImmutable(_ptr) }
 
     /**
      *
@@ -291,14 +250,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @return    true if all pixels have opaque values or ColorType is opaque
      */
-    fun computeIsOpaque(): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nComputeIsOpaque(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun computeIsOpaque(): Boolean = nativeCall { _nComputeIsOpaque(_ptr) }
 
     /**
      * Returns IRect { 0, 0, width(), height() }.
@@ -386,24 +338,19 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_setInfo](https://fiddle.skia.org/c/@Bitmap_setInfo)
      */
-    fun setImageInfo(imageInfo: ImageInfo, rowBytes: Int): Boolean {
-        return try {
+    fun setImageInfo(imageInfo: ImageInfo, rowBytes: Int): Boolean =
+        nativeCall(imageInfo.colorInfo.colorSpace) { colorSpace ->
             _imageInfo = null
-            Stats.onNativeCall()
             _nSetImageInfo(
                 _ptr,
                 imageInfo.width,
                 imageInfo.height,
                 imageInfo.colorInfo.colorType.ordinal,
                 imageInfo.colorInfo.alphaType.ordinal,
-                getPtr(imageInfo.colorInfo.colorSpace),
+                colorSpace.pointerOrNullPointer,
                 rowBytes
             )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(imageInfo.colorInfo.colorSpace)
         }
-    }
 
     /**
      *
@@ -424,24 +371,19 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @param zeroPixels  whether pixels should be zeroed
      * @return            true if pixels allocation is successful
      */
-    fun allocPixelsFlags(imageInfo: ImageInfo, zeroPixels: Boolean): Boolean {
-        return try {
+    fun allocPixelsFlags(imageInfo: ImageInfo, zeroPixels: Boolean): Boolean =
+        nativeCall(imageInfo.colorInfo.colorSpace) { colorSpace ->
             _imageInfo = null
-            Stats.onNativeCall()
             _nAllocPixelsFlags(
                 _ptr,
                 imageInfo.width,
                 imageInfo.height,
                 imageInfo.colorInfo.colorType.ordinal,
                 imageInfo.colorInfo.alphaType.ordinal,
-                getPtr(imageInfo.colorInfo.colorSpace),
+                colorSpace.pointerOrNullPointer,
                 if (zeroPixels) 1 else 0
             )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(imageInfo.colorInfo.colorSpace)
         }
-    }
 
     /**
      *
@@ -463,23 +405,17 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @param rowBytes  size of pixel row or larger; may be zero
      * @return          true if pixel storage is allocated
      */
-    fun allocPixels(info: ImageInfo, rowBytes: Int): Boolean {
-        return try {
-            _imageInfo = null
-            Stats.onNativeCall()
-            _nAllocPixelsRowBytes(
-                _ptr,
-                info.width,
-                info.height,
-                info.colorInfo.colorType.ordinal,
-                info.colorInfo.alphaType.ordinal,
-                getPtr(info.colorInfo.colorSpace),
-                rowBytes
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(info.colorInfo.colorSpace)
-        }
+    fun allocPixels(info: ImageInfo, rowBytes: Int): Boolean = nativeCall(info.colorInfo.colorSpace) { colorSpace ->
+        _imageInfo = null
+        _nAllocPixelsRowBytes(
+            _ptr,
+            info.width,
+            info.height,
+            info.colorInfo.colorType.ordinal,
+            info.colorInfo.alphaType.ordinal,
+            colorSpace.pointerOrNullPointer,
+            rowBytes
+        )
     }
 
     /**
@@ -570,26 +506,20 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         info: ImageInfo,
         pixels: ByteArray?,
         rowBytes: Int
-    ): Boolean {
-        return try {
-            _imageInfo = null
-            Stats.onNativeCall()
-            interopScope {
-                _nInstallPixels(
-                    _ptr,
-                    info.width,
-                    info.height,
-                    info.colorInfo.colorType.ordinal,
-                    info.colorInfo.alphaType.ordinal,
-                    getPtr(info.colorInfo.colorSpace),
-                    toInterop(pixels),
-                    rowBytes,
-                    pixels?.size ?: 0
-                )
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(info.colorInfo.colorSpace)
+    ): Boolean = nativeCall(info.colorInfo.colorSpace) { colorSpace ->
+        _imageInfo = null
+        interopScope {
+            _nInstallPixels(
+                _ptr,
+                info.width,
+                info.height,
+                info.colorInfo.colorType.ordinal,
+                info.colorInfo.alphaType.ordinal,
+                colorSpace.pointerOrNullPointer,
+                toInterop(pixels),
+                rowBytes,
+                pixels?.size ?: 0
+            )
         }
     }
 
@@ -603,14 +533,9 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @return  true if the allocation succeeds
      */
-    fun allocPixels(): Boolean {
-        return try {
-            _imageInfo = null
-            Stats.onNativeCall()
-            _nAllocPixels(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun allocPixels(): Boolean = nativeCall {
+        _imageInfo = null
+        _nAllocPixels(_ptr)
     }
 
     /**
@@ -622,12 +547,9 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @return  SkPixelRef, or null
      */
     val pixelRef: PixelRef?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val res = _nGetPixelRef(_ptr)
             if (res == NullPointer) null else PixelRef(res)
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -648,13 +570,10 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @see [https://fiddle.skia.org/c/@Bitmap_pixelRefOrigin](https://fiddle.skia.org/c/@Bitmap_pixelRefOrigin)
      */
     val pixelRefOrigin: IPoint
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val resX = _nGetPixelRefOriginX(_ptr)
             val resY = _nGetPixelRefOriginY(_ptr)
             IPoint(resX, resY)
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -676,21 +595,15 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_setPixelRef](https://fiddle.skia.org/c/@Bitmap_setPixelRef)
      */
-    fun setPixelRef(pixelRef: PixelRef?, dx: Int, dy: Int): Bitmap {
-        return try {
-            _imageInfo = null
-            Stats.onNativeCall()
-            _nSetPixelRef(
-                _ptr,
-                getPtr(pixelRef),
-                dx,
-                dy
-            )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(pixelRef)
-        }
+    fun setPixelRef(pixelRef: PixelRef?, dx: Int, dy: Int): Bitmap = nativeCall(pixelRef) {pixelRef ->
+        _imageInfo = null
+        _nSetPixelRef(
+            _ptr,
+            pixelRef.pointerOrNullPointer,
+            dx,
+            dy
+        )
+        this
     }
 
     /**
@@ -699,12 +612,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @return  true if getPixels() is not null
      */
     val isReadyToDraw: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsReadyToDraw(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsReadyToDraw(_ptr) }
 
     /**
      *
@@ -720,12 +628,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @see [https://fiddle.skia.org/c/@Bitmap_getGenerationID](https://fiddle.skia.org/c/@Bitmap_getGenerationID)
      */
     val generationId: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetGenerationId(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetGenerationId(_ptr) }
 
     /**
      *
@@ -806,14 +709,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @param y  row index, zero or greater, and less than getHeight()
      * @return   pixel converted to unpremultiplied color
      */
-    fun getColor(x: Int, y: Int): Int {
-        return try {
-            Stats.onNativeCall()
-            Bitmap_nGetColor(_ptr, x, y)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getColor(x: Int, y: Int): Int = nativeCall { Bitmap_nGetColor(_ptr, x, y) }
 
     /**
      *
@@ -825,14 +721,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @param y  row index, zero or greater, and less than getHeight()
      * @return   alpha converted to normalized float
      */
-    fun getAlphaf(x: Int, y: Int): Float {
-        return try {
-            Stats.onNativeCall()
-            _nGetAlphaf(_ptr, x, y)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getAlphaf(x: Int, y: Int): Float = nativeCall { _nGetAlphaf(_ptr, x, y) }
 
     /**
      *
@@ -861,21 +750,15 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_extractSubset](https://fiddle.skia.org/c/@Bitmap_extractSubset)
      */
-    fun extractSubset(dst: Bitmap, subset: IRect): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nExtractSubset(
-                _ptr,
-                getPtr(dst),
-                subset.left,
-                subset.top,
-                subset.right,
-                subset.bottom
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(dst)
-        }
+    fun extractSubset(dst: Bitmap, subset: IRect): Boolean = nativeCall(dst) { dst ->
+        _nExtractSubset(
+            _ptr,
+            dst._ptr,
+            subset.left,
+            subset.top,
+            subset.right,
+            subset.bottom
+        )
     }
 
     /**
@@ -939,8 +822,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         check(byteArray.size == getReadPixelsArraySize(dstInfo, dstRowBytes, srcY)) {
             "byteArray is not properly allocated. Use readPixelsArraySize"
         }
-        try {
-            Stats.onNativeCall()
+        return nativeCall(dstInfo.colorInfo.colorSpace) { colorSpace ->
             interopScope {
                 val byteArrayHandle = toInteropForResult(byteArray)
                 val successfulRead = _nReadPixels(
@@ -949,7 +831,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                     dstInfo.height,
                     dstInfo.colorInfo.colorType.ordinal,
                     dstInfo.colorInfo.alphaType.ordinal,
-                    getPtr(dstInfo.colorInfo.colorSpace),
+                    colorSpace.pointerOrNullPointer,
                     dstRowBytes,
                     srcX,
                     srcY,
@@ -958,11 +840,8 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                 if (successfulRead) {
                     byteArrayHandle.fromInterop(byteArray)
                 }
-                return successfulRead
+                successfulRead
             }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(dstInfo.colorInfo.colorSpace)
         }
     }
 
@@ -998,23 +877,16 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @param paint holds optional MaskFilter; may be null
      * @return      null if alpha layer was not constructed in dst PixelRef, IPoint otherwise
      */
-    fun extractAlpha(dst: Bitmap, paint: Paint?): IPoint? {
-        return try {
-            Stats.onNativeCall()
-            withNullableResult(IntArray(2)) {
-                _nExtractAlpha(
-                    ptr = _ptr,
-                    dstPtr = getPtr(dst),
-                    paintPtr = getPtr(paint),
-                    iPointResultIntArray = it
-                )
-            }?.let {
-                IPoint(x = it[0], y = it[1])
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(dst)
-            reachabilityBarrier(paint)
+    fun extractAlpha(dst: Bitmap, paint: Paint?): IPoint? = nativeCall(dst, paint) { dst, paint ->
+        withNullableResult(IntArray(2)) {
+            _nExtractAlpha(
+                ptr = _ptr,
+                dstPtr = dst._ptr,
+                paintPtr = paint.pointerOrNullPointer,
+                iPointResultIntArray = it
+            )
+        }?.let {
+            IPoint(x = it[0], y = it[1])
         }
     }
 
@@ -1025,18 +897,9 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_peekPixels](https://fiddle.skia.org/c/@Bitmap_peekPixels)
      */
-    fun peekPixels(): Pixmap? {
-        return try {
-            Stats.onNativeCall()
-            val res = _nPeekPixels(_ptr)
-            if (res == NullPointer) {
-                null
-            } else {
-                Pixmap(res, true)
-            }
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun peekPixels(): Pixmap? = nativeCall {
+        val res = _nPeekPixels(_ptr)
+        if (res == NullPointer) null else Pixmap(res, true)
     }
 
     fun makeShader(localMatrix: Matrix33?): Shader {
@@ -1056,24 +919,19 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         tmy: FilterTileMode = FilterTileMode.CLAMP,
         sampling: SamplingMode = SamplingMode.DEFAULT,
         localMatrix: Matrix33? = null
-    ): Shader {
-        return try {
-            Stats.onNativeCall()
-            Shader(
-                interopScope {
-                    _nMakeShader(
-                        _ptr,
-                        tmx.ordinal,
-                        tmy.ordinal,
-                        sampling._packedInt1(),
-                        sampling._packedInt2(),
-                        toInterop(localMatrix?.mat)
-                    )
-                }
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+    ): Shader = nativeCall {
+        Shader(
+            interopScope {
+                _nMakeShader(
+                    _ptr,
+                    tmx.ordinal,
+                    tmy.ordinal,
+                    sampling._packedInt1(),
+                    sampling._packedInt2(),
+                    toInterop(localMatrix?.mat)
+                )
+            }
+        )
     }
 
     private object _FinalizerHolder {

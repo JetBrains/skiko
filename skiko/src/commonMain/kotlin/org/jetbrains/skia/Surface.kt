@@ -3,9 +3,11 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skiko.InternalSkikoApi
+import kotlin.jvm.JvmStatic
 
 class Surface : RefCnt {
     companion object {
+        @JvmStatic
         fun makeRasterDirect(pixmap: Pixmap): Surface {
             return makeRasterDirect(pixmap, null)
         }
@@ -37,6 +39,7 @@ class Surface : RefCnt {
          * @param rowBytes      memory address of destination native pixels buffer
          * @return              created Surface
          */
+        @JvmStatic
         fun makeRasterDirect(
             imageInfo: ImageInfo,
             pixelsPtr: NativePointer,
@@ -45,24 +48,20 @@ class Surface : RefCnt {
             return makeRasterDirect(imageInfo, pixelsPtr, rowBytes, null)
         }
 
+        @JvmStatic
         fun makeRasterDirect(
             pixmap: Pixmap,
             surfaceProps: SurfaceProps?
-        ): Surface {
-            return try {
-                Stats.onNativeCall()
-                val ptr = interopScope {
-                    _nMakeRasterDirectWithPixmap(
-                        getPtr(pixmap), toInterop(surfaceProps?.packToIntArray())
-                    )
-                }
-                require(ptr != NullPointer) {
-                    "Failed Surface.makeRasterDirect($pixmap, $surfaceProps)"
-                }
-                Surface(ptr)
-            } finally {
-                reachabilityBarrier(pixmap)
+        ): Surface = nativeCallFromStatic(pixmap) { pixmap ->
+            val ptr = interopScope {
+                _nMakeRasterDirectWithPixmap(
+                    pixmap._ptr, toInterop(surfaceProps?.packToIntArray())
+                )
             }
+            require(ptr != NullPointer) {
+                "Failed Surface.makeRasterDirect($pixmap, $surfaceProps)"
+            }
+            Surface(ptr)
         }
 
         /**
@@ -94,33 +93,29 @@ class Surface : RefCnt {
          * may be null
          * @return              created Surface
          */
+        @JvmStatic
         fun makeRasterDirect(
             imageInfo: ImageInfo,
             pixelsPtr: NativePointer,
             rowBytes: Int,
             surfaceProps: SurfaceProps?
-        ): Surface {
-            return try {
-                Stats.onNativeCall()
-                val ptr = interopScope {
-                    _nMakeRasterDirect(
-                        imageInfo.width,
-                        imageInfo.height,
-                        imageInfo.colorInfo.colorType.ordinal,
-                        imageInfo.colorInfo.alphaType.ordinal,
-                        getPtr(imageInfo.colorInfo.colorSpace),
-                        pixelsPtr,
-                        rowBytes,
-                        toInterop(surfaceProps?.packToIntArray())
-                    )
-                }
-                require(ptr != NullPointer) {
-                    "Failed Surface.makeRasterDirect($imageInfo, $pixelsPtr, $rowBytes, $surfaceProps)"
-                }
-                Surface(ptr)
-            } finally {
-                reachabilityBarrier(imageInfo.colorInfo.colorSpace)
+        ): Surface = nativeCallFromStatic(imageInfo.colorInfo.colorSpace) { colorSpace ->
+            val ptr = interopScope {
+                _nMakeRasterDirect(
+                    imageInfo.width,
+                    imageInfo.height,
+                    imageInfo.colorInfo.colorType.ordinal,
+                    imageInfo.colorInfo.alphaType.ordinal,
+                    colorSpace.pointerOrNullPointer,
+                    pixelsPtr,
+                    rowBytes,
+                    toInterop(surfaceProps?.packToIntArray())
+                )
             }
+            require(ptr != NullPointer) {
+                "Failed Surface.makeRasterDirect($imageInfo, $pixelsPtr, $rowBytes, $surfaceProps)"
+            }
+            Surface(ptr)
         }
 
         /**
@@ -139,6 +134,7 @@ class Surface : RefCnt {
          * of raster surface; width and height must be greater than zero
          * @return              new Surface
          */
+        @JvmStatic
         fun makeRaster(imageInfo: ImageInfo): Surface {
             return makeRaster(imageInfo, imageInfo.minRowBytes, null)
         }
@@ -165,6 +161,7 @@ class Surface : RefCnt {
          * @param rowBytes      interval from one Surface row to the next; may be zero
          * @return              new Surface
          */
+        @JvmStatic
         fun makeRaster(
             imageInfo: ImageInfo,
             rowBytes: Int
@@ -196,31 +193,27 @@ class Surface : RefCnt {
          * may be null
          * @return              new Surface
          */
+        @JvmStatic
         fun makeRaster(
             imageInfo: ImageInfo,
             rowBytes: Int,
             surfaceProps: SurfaceProps?
-        ): Surface {
-            return try {
-                Stats.onNativeCall()
-                val ptr = interopScope {
-                    _nMakeRaster(
-                        imageInfo.width,
-                        imageInfo.height,
-                        imageInfo.colorInfo.colorType.ordinal,
-                        imageInfo.colorInfo.alphaType.ordinal,
-                        getPtr(imageInfo.colorInfo.colorSpace),
-                        rowBytes,
-                        toInterop(surfaceProps?.packToIntArray())
-                    )
-                }
-                require(ptr != NullPointer) {
-                    "Failed Surface.makeRaster($imageInfo, $rowBytes, $surfaceProps)"
-                }
-                Surface(ptr)
-            } finally {
-                reachabilityBarrier(imageInfo.colorInfo.colorSpace)
+        ): Surface = nativeCallFromStatic(imageInfo.colorInfo.colorSpace) { colorSpace ->
+            val ptr = interopScope {
+                _nMakeRaster(
+                    imageInfo.width,
+                    imageInfo.height,
+                    imageInfo.colorInfo.colorType.ordinal,
+                    imageInfo.colorInfo.alphaType.ordinal,
+                    colorSpace.pointerOrNullPointer,
+                    rowBytes,
+                    toInterop(surfaceProps?.packToIntArray())
+                )
             }
+            require(ptr != NullPointer) {
+                "Failed Surface.makeRaster($imageInfo, $rowBytes, $surfaceProps)"
+            }
+            Surface(ptr)
         }
         /**
          *
@@ -274,28 +267,21 @@ class Surface : RefCnt {
             colorFormat: SurfaceColorFormat,
             colorSpace: ColorSpace?,
             surfaceProps: SurfaceProps? = null
-        ): Surface? {
-            return try {
-                Stats.onNativeCall()
-                val ptr = interopScope {
-                    _nMakeFromBackendRenderTarget(
-                        getPtr(context),
-                        getPtr(rt),
-                        origin.ordinal,
-                        colorFormat.ordinal,
-                        getPtr(colorSpace),
-                        toInterop(surfaceProps?.packToIntArray())
-                    )
-                }
-                if (ptr == NullPointer)
-                    null
-                else
-                    Surface(ptr, context, rt)
-            } finally {
-                reachabilityBarrier(context)
-                reachabilityBarrier(rt)
-                reachabilityBarrier(colorSpace)
+        ): Surface? = nativeCallFromStatic(context, rt, colorSpace) { context, rt, colorSpace ->
+            val ptr = interopScope {
+                _nMakeFromBackendRenderTarget(
+                    context.pointerOrNullPointer,
+                    rt.pointerOrNullPointer,
+                    origin.ordinal,
+                    colorFormat.ordinal,
+                    colorSpace.pointerOrNullPointer,
+                    toInterop(surfaceProps?.packToIntArray())
+                )
             }
+            if (ptr == NullPointer)
+                null
+            else
+                Surface(ptr, context, rt)
         }
 
         fun makeFromMTKView(
@@ -306,28 +292,22 @@ class Surface : RefCnt {
             colorFormat: SurfaceColorFormat,
             colorSpace: ColorSpace?,
             surfaceProps: SurfaceProps?
-        ): Surface {
-            return try {
-                Stats.onNativeCall()
-                val ptr = interopScope {
-                    _nMakeFromMTKView(
-                        getPtr(context),
-                        mtkViewPtr,
-                        origin.ordinal,
-                        sampleCount,
-                        colorFormat.ordinal,
-                        getPtr(colorSpace),
-                        toInterop(surfaceProps?.packToIntArray())
-                    )
-                }
-                require(ptr != NullPointer) {
-                    "Failed Surface.makeFromMTKView($context, $mtkViewPtr $origin, $colorFormat, $surfaceProps)"
-                }
-                Surface(ptr, context)
-            } finally {
-                reachabilityBarrier(context)
-                reachabilityBarrier(colorSpace)
+        ): Surface = nativeCallFromStatic(context, colorSpace) { context, colorSpace ->
+            val ptr = interopScope {
+                _nMakeFromMTKView(
+                    context.pointerOrNullPointer,
+                    mtkViewPtr,
+                    origin.ordinal,
+                    sampleCount,
+                    colorFormat.ordinal,
+                    colorSpace.pointerOrNullPointer,
+                    toInterop(surfaceProps?.packToIntArray())
+                )
             }
+            require(ptr != NullPointer) {
+                "Failed Surface.makeFromMTKView($context, $mtkViewPtr $origin, $colorFormat, $surfaceProps)"
+            }
+            Surface(ptr, context)
         }
 
         /**
@@ -353,11 +333,10 @@ class Surface : RefCnt {
          * @return Surface if all parameters are valid; otherwise, null
          * @see [https://fiddle.skia.org/c/@Surface_MakeRasterN32Premul](https://fiddle.skia.org/c/@Surface_MakeRasterN32Premul)
          */
-        fun makeRasterN32Premul(width: Int, height: Int): Surface {
-            Stats.onNativeCall()
+        fun makeRasterN32Premul(width: Int, height: Int): Surface = nativeCallFromStatic {
             val ptr = _nMakeRasterN32Premul(width, height)
             require(ptr != NullPointer) { "Failed Surface.makeRasterN32Premul($width, $height)" }
-            return Surface(ptr)
+            Surface(ptr)
         }
 
         /**
@@ -490,32 +469,26 @@ class Surface : RefCnt {
             origin: SurfaceOrigin,
             surfaceProps: SurfaceProps?,
             shouldCreateWithMips: Boolean
-        ): Surface {
-            return try {
-                Stats.onNativeCall()
-                val ptr = interopScope {
-                    _nMakeRenderTarget(
-                        getPtr(context),
-                        budgeted,
-                        imageInfo.width,
-                        imageInfo.height,
-                        imageInfo.colorInfo.colorType.ordinal,
-                        imageInfo.colorInfo.alphaType.ordinal,
-                        getPtr(imageInfo.colorInfo.colorSpace),
-                        sampleCount,
-                        origin.ordinal,
-                        toInterop(surfaceProps?.packToIntArray()),
-                        shouldCreateWithMips
-                    )
-                }
-                require(ptr != NullPointer) {
-                    "Failed Surface.makeRenderTarget($context, $budgeted, $imageInfo, $sampleCount, $origin, $surfaceProps, $shouldCreateWithMips)"
-                }
-                Surface(ptr, context)
-            } finally {
-                reachabilityBarrier(context)
-                reachabilityBarrier(imageInfo.colorInfo.colorSpace)
+        ): Surface = nativeCallFromStatic(context, imageInfo.colorInfo.colorSpace) { context, colorSpace ->
+            val ptr = interopScope {
+                _nMakeRenderTarget(
+                    context.pointerOrNullPointer,
+                    budgeted,
+                    imageInfo.width,
+                    imageInfo.height,
+                    imageInfo.colorInfo.colorType.ordinal,
+                    imageInfo.colorInfo.alphaType.ordinal,
+                    colorSpace.pointerOrNullPointer,
+                    sampleCount,
+                    origin.ordinal,
+                    toInterop(surfaceProps?.packToIntArray()),
+                    shouldCreateWithMips
+                )
             }
+            require(ptr != NullPointer) {
+                "Failed Surface.makeRenderTarget($context, $budgeted, $imageInfo, $sampleCount, $origin, $surfaceProps, $shouldCreateWithMips)"
+            }
+            Surface(ptr, context)
         }
 
         /**
@@ -528,11 +501,10 @@ class Surface : RefCnt {
          *
          * @see [https://fiddle.skia.org/c/@Surface_MakeNull](https://fiddle.skia.org/c/@Surface_MakeNull)
          */
-        fun makeNull(width: Int, height: Int): Surface {
-            Stats.onNativeCall()
+        fun makeNull(width: Int, height: Int): Surface = nativeCallFromStatic {
             val ptr = _nMakeNull(width, height)
             require(ptr != NullPointer) { "Failed Surface.makeNull($width, $height)" }
-            return Surface(ptr)
+            Surface(ptr)
         }
 
         init {
@@ -552,12 +524,7 @@ class Surface : RefCnt {
      * @see [https://fiddle.skia.org/c/@Surface_width](https://fiddle.skia.org/c/@Surface_width)
      */
     val width: Int
-        get() = try {
-            Stats.onNativeCall()
-            Surface_nGetWidth(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Surface_nGetWidth(_ptr) }
 
     /**
      *
@@ -567,12 +534,7 @@ class Surface : RefCnt {
      * @see [https://fiddle.skia.org/c/@Surface_height](https://fiddle.skia.org/c/@Surface_height)
      */
     val height: Int
-        get() = try {
-            Stats.onNativeCall()
-            Surface_nGetHeight(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Surface_nGetHeight(_ptr) }
 
     /**
      *
@@ -581,13 +543,11 @@ class Surface : RefCnt {
      * @return ImageInfo describing the surface.
      */
     val imageInfo: ImageInfo
-        get() = try {
+        get() = nativeCall {
             ImageInfo.createUsing(
                 _ptr = _ptr,
                 _nGetImageInfo = ::Surface_nGetImageInfo
             )
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -601,12 +561,7 @@ class Surface : RefCnt {
      * @return unique content identifier
      */
     val generationId: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGenerationId(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGenerationId(_ptr) }
 
     /**
      *
@@ -617,13 +572,8 @@ class Surface : RefCnt {
      *
      * @see [https://fiddle.skia.org/c/@Surface_notifyContentWillChange](https://fiddle.skia.org/c/@Surface_notifyContentWillChange)
      */
-    fun notifyContentWillChange(mode: ContentChangeMode) {
-        try {
-            Stats.onNativeCall()
-            _nNotifyContentWillChange(_ptr, mode.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun notifyContentWillChange(mode: ContentChangeMode) = nativeCall {
+        _nNotifyContentWillChange(_ptr, mode.ordinal)
     }
 
     /**
@@ -635,12 +585,9 @@ class Surface : RefCnt {
      * @return the recording context, if available; null otherwise
      */
     val recordingContext: DirectContext?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = _nGetSurfaceRecordingContext(_ptr)
             if (ptr == NullPointer) null else DirectContext(ptr, managed = false)
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -654,12 +601,9 @@ class Surface : RefCnt {
      * @return Canvas for Surface
      */
     val canvas: Canvas
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = _nGetCanvas(_ptr)
             if (ptr == NullPointer) throw IllegalArgumentException() else Canvas(ptr, false, this)
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -677,22 +621,16 @@ class Surface : RefCnt {
      * @return compatible SkSurface or null
      * @see [https://fiddle.skia.org/c/@Surface_makeSurface](https://fiddle.skia.org/c/@Surface_makeSurface)
      */
-    fun makeSurface(imageInfo: ImageInfo): Surface? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nMakeSurfaceI(
-                _ptr,
-                imageInfo.width,
-                imageInfo.height,
-                imageInfo.colorInfo.colorType.ordinal,
-                imageInfo.colorInfo.alphaType.ordinal,
-                getPtr(imageInfo.colorInfo.colorSpace)
-            )
-            Surface(ptr)
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(imageInfo.colorInfo.colorSpace)
-        }
+    fun makeSurface(imageInfo: ImageInfo): Surface? = nativeCall(imageInfo.colorInfo.colorSpace) { colorSpace ->
+        val ptr = _nMakeSurfaceI(
+            _ptr,
+            imageInfo.width,
+            imageInfo.height,
+            imageInfo.colorInfo.colorType.ordinal,
+            imageInfo.colorInfo.alphaType.ordinal,
+            colorSpace.pointerOrNullPointer
+        )
+        Surface(ptr)
     }
 
     /**
@@ -711,14 +649,9 @@ class Surface : RefCnt {
      * @param height pixel row count; must be greater than zero
      * @return compatible SkSurface or null
      */
-    fun makeSurface(width: Int, height: Int): Surface? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nMakeSurface(_ptr, width, height)
-            Surface(ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun makeSurface(width: Int, height: Int): Surface? = nativeCall {
+        val ptr = _nMakeSurface(_ptr, width, height)
+        Surface(ptr)
     }
 
     /**
@@ -732,14 +665,7 @@ class Surface : RefCnt {
      * @return Image initialized with Surface contents
      * @see [https://fiddle.skia.org/c/@Surface_makeImageSnapshot](https://fiddle.skia.org/c/@Surface_makeImageSnapshot)
      */
-    fun makeImageSnapshot(): Image {
-        return try {
-            Stats.onNativeCall()
-            Image(_nMakeImageSnapshot(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun makeImageSnapshot(): Image = nativeCall { Image(_nMakeImageSnapshot(_ptr)) }
 
     /**
      *
@@ -779,21 +705,16 @@ class Surface : RefCnt {
      * @return Image initialized with Surface contents or null
      * @see [https://fiddle.skia.org/c/@Surface_makeImageSnapshot_2](https://fiddle.skia.org/c/@Surface_makeImageSnapshot_2)
      */
-    fun makeImageSnapshot(left: Int, top: Int, right: Int, bottom: Int): Image? {
-        return try {
-            Stats.onNativeCall()
-            Image(
-                _nMakeImageSnapshotR(
-                    _ptr,
-                    left,
-                    top,
-                    right,
-                    bottom
-                )
+    fun makeImageSnapshot(left: Int, top: Int, right: Int, bottom: Int): Image? = nativeCall {
+        Image(
+            _nMakeImageSnapshotR(
+                _ptr,
+                left,
+                top,
+                right,
+                bottom
             )
-        } finally {
-            reachabilityBarrier(this)
-        }
+        )
     }
 
     /**
@@ -827,43 +748,24 @@ class Surface : RefCnt {
      * @param paint  Paint containing BlendMode, ColorFilter, ImageFilter, and so on; or null
      * @see [https://fiddle.skia.org/c/@Surface_draw](https://fiddle.skia.org/c/@Surface_draw)
      */
-    fun draw(canvas: Canvas?, x: Int, y: Int, samplingMode: SamplingMode, paint: Paint?) {
-        try {
-            Stats.onNativeCall()
-            _nDraw(_ptr, getPtr(canvas), x.toFloat(), y.toFloat(), samplingMode._packedInt1(), samplingMode._packedInt2(), getPtr(paint))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(canvas)
-            reachabilityBarrier(paint)
-        }
+    fun draw(canvas: Canvas?, x: Int, y: Int, samplingMode: SamplingMode, paint: Paint?) = nativeCall(canvas, paint) { canvas, paint ->
+        _nDraw(_ptr, canvas.pointerOrNullPointer, x.toFloat(), y.toFloat(), samplingMode._packedInt1(), samplingMode._packedInt2(), paint.pointerOrNullPointer)
     }
 
-    fun peekPixels(pixmap: Pixmap): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nPeekPixels(
-                _ptr,
-                getPtr(pixmap)
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(pixmap)
-        }
+    fun peekPixels(pixmap: Pixmap): Boolean = nativeCall(pixmap) { pixmap ->
+        _nPeekPixels(
+            _ptr,
+            pixmap.pointerOrNullPointer
+        )
     }
 
-    fun readPixels(pixmap: Pixmap?, srcX: Int, srcY: Int): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nReadPixelsToPixmap(
-                _ptr,
-                getPtr(pixmap),
-                srcX,
-                srcY
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(pixmap)
-        }
+    fun readPixels(pixmap: Pixmap?, srcX: Int, srcY: Int): Boolean = nativeCall(pixmap) { pixmap ->
+        _nReadPixelsToPixmap(
+            _ptr,
+            pixmap.pointerOrNullPointer,
+            srcX,
+            srcY
+        )
     }
 
     /**
@@ -906,29 +808,17 @@ class Surface : RefCnt {
      * @return        true if pixels were copied
      * @see [https://fiddle.skia.org/c/@Surface_readPixels_3](https://fiddle.skia.org/c/@Surface_readPixels_3)
      */
-    fun readPixels(bitmap: Bitmap?, srcX: Int, srcY: Int): Boolean {
-        return try {
-            Stats.onNativeCall()
-            Surface_nReadPixels(
-                _ptr,
-                getPtr(bitmap),
-                srcX,
-                srcY
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(bitmap)
-        }
+    fun readPixels(bitmap: Bitmap?, srcX: Int, srcY: Int): Boolean = nativeCall(bitmap) { bitmap ->
+        Surface_nReadPixels(
+            _ptr,
+            bitmap.pointerOrNullPointer,
+            srcX,
+            srcY
+        )
     }
 
-    fun writePixels(pixmap: Pixmap?, x: Int, y: Int) {
-        try {
-            Stats.onNativeCall()
-            _nWritePixelsFromPixmap(_ptr, getPtr(pixmap), x, y)
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(pixmap)
-        }
+    fun writePixels(pixmap: Pixmap?, x: Int, y: Int) = nativeCall(pixmap) { pixmap ->
+        _nWritePixelsFromPixmap(_ptr, pixmap.pointerOrNullPointer, x, y)
     }
 
     /**
@@ -948,14 +838,8 @@ class Surface : RefCnt {
      * @param y      y-axis position relative to Surface to begin copy; may be negative
      * @see [https://fiddle.skia.org/c/@Surface_writePixels_2](https://fiddle.skia.org/c/@Surface_writePixels_2)
      */
-    fun writePixels(bitmap: Bitmap?, x: Int, y: Int) {
-        try {
-            Stats.onNativeCall()
-            Surface_nWritePixels(_ptr, getPtr(bitmap), x, y)
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(bitmap)
-        }
+    fun writePixels(bitmap: Bitmap?, x: Int, y: Int) = nativeCall(bitmap) { bitmap ->
+        Surface_nWritePixels(_ptr, bitmap.pointerOrNullPointer, x, y)
     }
 
     /**
@@ -1002,12 +886,7 @@ class Surface : RefCnt {
      * Ensures that all previous owner's actions are complete.
      */
     val isUnique: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nUnique(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nUnique(_ptr) }
 
     @InternalSkikoApi
     constructor(ptr: NativePointer) : super(ptr) {
@@ -1031,6 +910,7 @@ class Surface : RefCnt {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetWidth")
 // No ForceNativeThreadState: returns the stored surface width, so it is short and cannot block.
 // Native call path: SkSurface::width
@@ -1258,3 +1138,4 @@ private external fun _nWritePixelsFromPixmap(ptr: NativePointer, pixmapPtr: Nati
 // No ForceNativeThreadState: reads a reference count with one atomic load, so it is short and cannot block.
 // Native call path: SkRefCnt::unique
 private external fun _nUnique(ptr: NativePointer): Boolean
+// </editor-fold>

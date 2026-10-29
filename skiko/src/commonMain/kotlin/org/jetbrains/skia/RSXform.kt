@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import kotlin.jvm.JvmStatic
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -49,6 +50,7 @@ class RSXform(
          *
          * Note: the anchor point is not normalized (e.g. 0...1) but is in pixels of the src image.
          */
+        @JvmStatic
         fun makeFromRadians(scale: Float, radians: Float, tx: Float, ty: Float, ax: Float, ay: Float): RSXform {
             val s = sin(radians.toDouble()).toFloat() * scale
             val c = cos(radians.toDouble()).toFloat() * scale

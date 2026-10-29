@@ -2,12 +2,11 @@ package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.nativeCall
+import org.jetbrains.skia.impl.pointerOrNullPointer
 
 class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePointer) : Native(ptr) {
     companion object {
@@ -17,90 +16,48 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
     }
 
     fun abandon() {
-        try {
-            _validate()
-            Stats.onNativeCall()
-            _nAbandon(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        nativeCall { _validate(); _nAbandon(_ptr) }
     }
 
     fun reset() {
-        try {
-            _validate()
-            Stats.onNativeCall()
-            _nReset(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        nativeCall { _validate(); _nReset(_ptr) }
     }
 
-    fun updateParagraph(paragraph: Paragraph?): Boolean {
-        return try {
+    fun updateParagraph(paragraph: Paragraph?): Boolean =
+        nativeCall(paragraph) { paragraph ->
             _validate()
-            Stats.onNativeCall()
-            _nUpdateParagraph(_ptr, getPtr(paragraph))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(paragraph)
+            _nUpdateParagraph(_ptr, paragraph.pointerOrNullPointer)
         }
-    }
 
-    fun findParagraph(paragraph: Paragraph?): Boolean {
-        return try {
+    fun findParagraph(paragraph: Paragraph?): Boolean =
+        nativeCall(paragraph) { paragraph ->
             _validate()
-            Stats.onNativeCall()
-            _nFindParagraph(_ptr, getPtr(paragraph))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(paragraph)
+            _nFindParagraph(_ptr, paragraph.pointerOrNullPointer)
         }
-    }
 
     fun printStatistics() {
-        try {
-            _validate()
-            Stats.onNativeCall()
-            _nPrintStatistics(_ptr, NullPointer)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        nativeCall { _validate(); _nPrintStatistics(_ptr, NullPointer) }
     }
 
     fun setEnabled(value: Boolean) {
-        try {
-            _validate()
-            Stats.onNativeCall()
-            _nSetEnabled(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        nativeCall { _validate(); _nSetEnabled(_ptr, value) }
     }
 
     val count: Int
-        get() = try {
-            _validate()
-            Stats.onNativeCall()
-            _nGetCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _validate(); _nGetCount(_ptr) }
 
     internal val _owner: FontCollection
-    internal fun _validate() {
-        try {
-            check(getPtr(_owner) != NullPointer) { "ParagraphCache needs owning FontCollection to be alive" }
-        } finally {
-            reachabilityBarrier(_owner)
+    internal fun _validate() =
+        nativeCall(_owner) { owner ->
+            check(owner.pointerOrNullPointer != NullPointer) { "ParagraphCache needs owning FontCollection to be alive" }
         }
-    }
 
     init {
         _owner = owner
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nAbandon")
 // Needs ForceNativeThreadState: clears the cache while holding its mutex, and freeing cached runs can drop the last
 // reference to a font typeface.
@@ -145,3 +102,4 @@ private external fun _nSetEnabled(ptr: NativePointer, value: Boolean)
 // No ForceNativeThreadState: returns the stored number of cache entries, so it is short and cannot block.
 // Native call path: ParagraphCache::count
 private external fun _nGetCount(ptr: NativePointer): Int
+// </editor-fold>

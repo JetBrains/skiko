@@ -3,6 +3,8 @@ package org.jetbrains.skia.icu
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.nativeCallFromStatic
+import kotlin.jvm.JvmStatic
 
 /**
  * CharDirection represents Bidi_Class Unicode character property.
@@ -45,10 +47,8 @@ object CharDirection {
      * Returns the bidirectional category value for the code point.
      * Same as java.lang.Character.getDirectionality()
      */
-    fun of(codePoint: Int): Int {
-        Stats.onNativeCall()
-        return _nCharDirection(codePoint)
-    }
+    @JvmStatic
+    fun of(codePoint: Int): Int = nativeCallFromStatic { _nCharDirection(codePoint) }
 }
 
 /**
@@ -179,12 +179,13 @@ object CharProperties {
      * @param codePoint The codepoint.
      * @param property A binary property; one of the constants defined in [CharProperties].
      */
-    fun codePointHasBinaryProperty(codePoint: Int, property: Int): Boolean {
-        Stats.onNativeCall()
-        return _nCodePointHasBinaryProperty(codePoint, property)
+    @JvmStatic
+    fun codePointHasBinaryProperty(codePoint: Int, property: Int): Boolean = nativeCallFromStatic {
+        _nCodePointHasBinaryProperty(codePoint, property)
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCharDirection")
 // No ForceNativeThreadState: looks up a character's direction in a built-in table, with no lazy setup or lock, so it is
 // short and cannot block.
@@ -197,4 +198,5 @@ private external fun _nCharDirection(codePoint: Int): Int
 // Native call path: u_hasBinaryProperty -> Normalizer2Factory::getNFCImpl -> umtx_initOnce
 @ForceNativeThreadState
 private external fun _nCodePointHasBinaryProperty(codePoint: Int, property: Int): Boolean
+// </editor-fold>
 

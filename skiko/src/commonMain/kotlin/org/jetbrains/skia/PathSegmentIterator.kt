@@ -1,26 +1,24 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.withResult
+import kotlin.jvm.JvmStatic
 
 class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePointer) :
     Managed(ptr, PathSegmentIterator_nGetFinalizer()),
     MutableIterator<PathSegment?> {
     companion object {
-        fun make(path: Path?, forceClose: Boolean): PathSegmentIterator {
-            return try {
-                val i = PathSegmentIterator(path, _nMake(getPtr(path), forceClose))
-                i._nextSegment = i.nextSegment()
-                i
-            } finally {
-                reachabilityBarrier(path)
-            }
+        @JvmStatic
+        fun make(path: Path?, forceClose: Boolean): PathSegmentIterator = nativeCallFromStatic(path) { path ->
+            val i = PathSegmentIterator(
+                path,
+                _nMake(
+                    path.pointerOrNullPointer,
+                    forceClose
+                )
+            )
+            i._nextSegment = i.nextSegment()
+            i
         }
 
         init {
@@ -29,15 +27,11 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     }
 
     var _nextSegment: PathSegment? = null
-    override fun next(): PathSegment? {
-        return try {
-            if (_nextSegment?.verb == PathVerb.DONE) throw NoSuchElementException()
-            val res = _nextSegment
-            _nextSegment = nextSegment()
-            res
-        } finally {
-            reachabilityBarrier(this)
-        }
+    override fun next(): PathSegment? = nativeCall {
+        if (_nextSegment?.verb == PathVerb.DONE) throw NoSuchElementException()
+        val res = _nextSegment
+        _nextSegment = nextSegment()
+        res
     }
 
     override fun hasNext(): Boolean {
@@ -125,6 +119,7 @@ private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 private external fun PathSegmentIterator_nGetFinalizer(): NativePointer
@@ -141,3 +136,4 @@ private external fun PathSegmentIterator_nNext(ptr: NativePointer, points: Inter
 // and cannot block.
 // Native call path: SkPath::Iter::Iter
 private external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer
+// </editor-fold>

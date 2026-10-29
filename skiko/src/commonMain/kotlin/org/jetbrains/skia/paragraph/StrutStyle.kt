@@ -4,13 +4,13 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.nativeCall
+import org.jetbrains.skia.impl.pointerOrNullPointer
 import org.jetbrains.skia.impl.withResult
 import org.jetbrains.skia.impl.withStringResult
 
@@ -25,199 +25,112 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         Stats.onNativeCall()
     }
 
-    override fun nativeEquals(other: Native?): Boolean {
-        return try {
-            Stats.onNativeCall()
-            StrutStyle_nEquals(_ptr, getPtr(other))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
-        }
-    }
+    override fun nativeEquals(other: Native?): Boolean =
+        nativeCall(other) { other -> StrutStyle_nEquals(_ptr, other.pointerOrNullPointer) }
 
     val fontFamilies: Array<String>
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             arrayDecoderScope({ArrayDecoder(_nGetFontFamilies(_ptr), ManagedString_nGetFinalizer())}) { arrayDecoder ->
                 (0 until arrayDecoder.size).map {  i -> withStringResult(arrayDecoder.release(i)) }.toTypedArray()
             }
-        } finally {
-            reachabilityBarrier(this)
         }
 
-    fun setFontFamilies(families: Array<String>): StrutStyle {
-        try {
-            Stats.onNativeCall()
-            interopScope {
-                StrutStyle_nSetFontFamilies(_ptr, toInterop(families), families.size)
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun setFontFamilies(families: Array<String>): StrutStyle = nativeCall {
+        interopScope {
+            StrutStyle_nSetFontFamilies(_ptr, toInterop(families), families.size)
         }
-        return this
+        this
     }
 
+
     var fontStyle: FontStyle
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val fontStyleData = withResult(IntArray(3)) {
                 _nGetFontStyle(_ptr, it)
             }
             FontStyle(FontWeight(fontStyleData[0]), FontWidth(fontStyleData[1]), FontSlant.entries[fontStyleData[2]])
-        } finally {
-            reachabilityBarrier(this)
         }
         set(value) {
             setFontStyle(value)
         }
     
-    fun setFontStyle(style: FontStyle): StrutStyle {
-        try {
-            Stats.onNativeCall()
-            _nSetFontStyle(_ptr, style._value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun setFontStyle(style: FontStyle): StrutStyle = nativeCall {
+        _nSetFontStyle(_ptr, style._value)
+        this
     }
 
     var fontSize: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetFontSize(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetFontSize(_ptr) }
         set(value) {
             setFontSize(value)
         }
 
-    fun setFontSize(value: Float): StrutStyle {
+    fun setFontSize(value: Float): StrutStyle = nativeCall {
         check(!value.isNaN())
-        try {
-            Stats.onNativeCall()
-            _nSetFontSize(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+        _nSetFontSize(_ptr, value)
+        this
     }
 
     var height: Float
-        get() = try {
-            Stats.onNativeCall()
-            StrutStyle_nGetHeight(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { StrutStyle_nGetHeight(_ptr) }
         set(value) {
             setHeight(value)
         }
     
-    fun setHeight(value: Float): StrutStyle {
+    fun setHeight(value: Float): StrutStyle = nativeCall {
         check(!value.isNaN())
-        try {
-            Stats.onNativeCall()
-            StrutStyle_nSetHeight(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+        StrutStyle_nSetHeight(_ptr, value)
+        this
     }
 
     var leading: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetLeading(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetLeading(_ptr) }
         set(value) {
             setLeading(value)
         }
     
-    fun setLeading(value: Float): StrutStyle {
+    fun setLeading(value: Float): StrutStyle = nativeCall {
         check(!value.isNaN())
-        try {
-            Stats.onNativeCall()
-            _nSetLeading(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+        _nSetLeading(_ptr, value)
+        this
     }
 
     var isEnabled: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsEnabled(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsEnabled(_ptr) }
         set(value) {
             setEnabled(value)
         }
     
-    fun setEnabled(value: Boolean): StrutStyle {
-        try {
-            Stats.onNativeCall()
-            StrutStyle_nSetEnabled(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun setEnabled(value: Boolean): StrutStyle = nativeCall {
+        StrutStyle_nSetEnabled(_ptr, value)
+        this
     }
 
     var isHeightForced: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsHeightForced(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsHeightForced(_ptr) }
         set(value) {
             setHeightForced(value)
         }
     
-    fun setHeightForced(value: Boolean): StrutStyle {
-        try {
-            Stats.onNativeCall()
-            _nSetHeightForced(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun setHeightForced(value: Boolean): StrutStyle = nativeCall {
+        _nSetHeightForced(_ptr, value)
+        this
     }
 
     var isHeightOverridden: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsHeightOverridden(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsHeightOverridden(_ptr) }
         set(value) {
             setHeightOverridden(value)
         }
     
-    fun setHeightOverridden(value: Boolean): StrutStyle {
-        try {
-            Stats.onNativeCall()
-            _nSetHeightOverridden(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun setHeightOverridden(value: Boolean): StrutStyle = nativeCall {
+        _nSetHeightOverridden(_ptr, value)
+        this
     }
 
     @Deprecated("Replaced by topRatio")
     var isHalfLeading: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsHalfLeading(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsHalfLeading(_ptr) }
         set(value) {
             @Suppress("DEPRECATION")
             setHalfLeading(value)
@@ -225,37 +138,22 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
 
     // Same as topRatio = halfLeading ? 0.5f : -1.0f
     @Deprecated("Replaced by topRatio")
-    fun setHalfLeading(value: Boolean): StrutStyle {
-        try {
-            Stats.onNativeCall()
-            _nSetHalfLeading(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun setHalfLeading(value: Boolean): StrutStyle = nativeCall {
+        _nSetHalfLeading(_ptr, value)
+        this
     }
 
     // [0..1]: the ratio of ascent to ascent+descent
     // -1: proportional to the ascent/descent
     var topRatio: Float
-        get() = try {
-            Stats.onNativeCall()
-            StrutStyle_nGetTopRatio(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { StrutStyle_nGetTopRatio(_ptr) }
         set(value) {
             setTopRatio(value)
         }
 
-    fun setTopRatio(topRatio: Float): StrutStyle {
-        try {
-            Stats.onNativeCall()
-            StrutStyle_nSetTopRatio(_ptr, topRatio)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun setTopRatio(topRatio: Float): StrutStyle = nativeCall {
+        StrutStyle_nSetTopRatio(_ptr, topRatio)
+        this
     }
 
     private object _FinalizerHolder {
@@ -263,7 +161,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
     }
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of the delete function without calling it, so it is short and cannot
 // block.
@@ -386,3 +284,4 @@ private external fun StrutStyle_nGetTopRatio(ptr: NativePointer): Float
 // No ForceNativeThreadState: stores a top ratio in the strut style, so it is short and cannot block.
 // Native call path: StrutStyle::setTopRatio
 private external fun StrutStyle_nSetTopRatio(ptr: NativePointer, value: Float)
+// </editor-fold>
