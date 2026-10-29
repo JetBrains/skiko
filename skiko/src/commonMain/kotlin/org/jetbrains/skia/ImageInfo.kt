@@ -6,6 +6,7 @@ import org.jetbrains.skia.impl.NativePointerArray
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.withResult
+import kotlin.jvm.JvmStatic
 
 /**
  *
@@ -232,6 +233,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.N32]
          */
+        @JvmStatic
         fun makeN32(width: Int, height: Int, alphaType: ColorAlphaType): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.N32, alphaType, null), width, height)
         }
@@ -239,6 +241,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.N32]
          */
+        @JvmStatic
         fun makeN32(width: Int, height: Int, alphaType: ColorAlphaType, colorSpace: ColorSpace?): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.N32, alphaType, colorSpace), width, height)
         }
@@ -248,6 +251,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
          *
          * @see [https://fiddle.skia.org/c/@ImageInfo_MakeS32](https://fiddle.skia.org/c/@ImageInfo_MakeS32)
          */
+        @JvmStatic
         fun makeS32(width: Int, height: Int, alphaType: ColorAlphaType): ImageInfo {
             return ImageInfo(
                 ColorInfo(ColorType.N32, alphaType, ColorSpace.sRGB),
@@ -259,6 +263,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.N32] and [ColorAlphaType.PREMUL]
          */
+        @JvmStatic
         fun makeN32Premul(width: Int, height: Int): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.N32, ColorAlphaType.PREMUL, null), width, height)
         }
@@ -266,6 +271,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.N32] and [ColorAlphaType.PREMUL]
          */
+        @JvmStatic
         fun makeN32Premul(width: Int, height: Int, colorSpace: ColorSpace?): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.N32, ColorAlphaType.PREMUL, colorSpace), width, height)
         }
@@ -273,6 +279,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.ALPHA_8] and [ColorAlphaType.PREMUL]
          */
+        @JvmStatic
         fun makeA8(width: Int, height: Int): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.ALPHA_8, ColorAlphaType.PREMUL, null), width, height)
         }
@@ -280,10 +287,12 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.UNKNOWN] and [ColorAlphaType.UNKNOWN]
          */
+        @JvmStatic
         fun makeUnknown(width: Int, height: Int): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.UNKNOWN, ColorAlphaType.UNKNOWN, null), width, height)
         }
 
+        @JvmStatic
         internal fun createUsing(
             _ptr: NativePointer,
             _nGetImageInfo: (_ptr: NativePointer, intArrayPointer: InteropPointer, nativePointerArrayPtr: InteropPointer) -> Unit

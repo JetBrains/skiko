@@ -7,6 +7,7 @@ import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.withResult
+import kotlin.jvm.JvmStatic
 
 /**
  *
@@ -257,6 +258,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         /**
          * Returns a new BreakIterator instance for character breaks for the default locale.
          */
+        @JvmStatic
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
             return BreakIterator(withErrorGuard("Failed to create character iterator") { _nMake(0, toInterop(locale), it)  }) // UBRK_CHARACTER
@@ -267,6 +269,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         /**
          * Returns a new BreakIterator instance for word breaks for the default locale.
          */
+        @JvmStatic
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
             return BreakIterator(withErrorGuard("Failed to create word iterator") { _nMake(1, toInterop(locale), it) }) // UBRK_WORD
@@ -277,6 +280,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         /**
          * Returns a new BreakIterator instance for line breaks for the default locale.
          */
+        @JvmStatic
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
             return BreakIterator(withErrorGuard("Failed to create line iterator")  { _nMake(2, toInterop(locale), it) }) // UBRK_LINE
@@ -287,6 +291,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         /**
          * Returns a new BreakIterator instance for sentence breaks for the default locale.
          */
+        @JvmStatic
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
             return BreakIterator(withErrorGuard("Failed to create sentence iterator")  {

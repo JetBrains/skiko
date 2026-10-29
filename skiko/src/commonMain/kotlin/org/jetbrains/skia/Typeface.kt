@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skiko.internal.unpackTo
+import kotlin.jvm.JvmStatic
 
 class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -10,6 +11,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             staticLoad()
         }
 
+        @JvmStatic
         fun makeEmpty(): Typeface {
             Stats.onNativeCall()
             return Typeface(_nMakeEmptyTypeface())

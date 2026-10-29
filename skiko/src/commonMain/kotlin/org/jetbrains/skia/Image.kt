@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInfo {
     companion object {
@@ -26,6 +27,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          *
          * @see [https://fiddle.skia.org/c/@Image_MakeRasterCopy](https://fiddle.skia.org/c/@Image_MakeRasterCopy)
          */
+        @JvmStatic
         fun makeRaster(imageInfo: ImageInfo, bytes: ByteArray, rowBytes: Int): Image {
             return try {
                 Stats.onNativeCall()
@@ -66,6 +68,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          * @param rowBytes   how many bytes in a row
          * @return           Image
          */
+        @JvmStatic
         fun makeRaster(imageInfo: ImageInfo, data: Data, rowBytes: Int): Image {
             return try {
                 Stats.onNativeCall()
@@ -107,6 +110,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          *
          * @see [https://fiddle.skia.org/c/@Image_MakeFromBitmap](https://fiddle.skia.org/c/@Image_MakeFromBitmap)
          */
+        @JvmStatic
         fun makeFromBitmap(bitmap: Bitmap): Image {
             return try {
                 Stats.onNativeCall()
@@ -118,6 +122,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             }
         }
 
+        @JvmStatic
         fun makeFromPixmap(pixmap: Pixmap): Image {
             return try {
                 Stats.onNativeCall()
@@ -129,6 +134,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             }
         }
 
+        @JvmStatic
         fun makeFromEncoded(bytes: ByteArray): Image {
             Stats.onNativeCall()
             val ptr = interopScope {
@@ -153,6 +159,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          *
          * @throws RuntimeException - if nullPtr is returned.
          */
+        @JvmStatic
         fun adoptTextureFrom(
             context: DirectContext,
             backendTexture: BackendTexture,
@@ -192,6 +199,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          *
          * @throws RuntimeException - if nullPtr is returned.
          */
+        @JvmStatic
         fun adoptTextureFrom(
             context: DirectContext,
             backendTexture: BackendTexture,

@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withNullableResult
 import org.jetbrains.skia.impl.withResult
 import org.jetbrains.skiko.InternalSkikoApi
+import kotlin.jvm.JvmStatic
 
 class Point(val x: Float, val y: Float) {
 
@@ -48,6 +49,7 @@ class Point(val x: Float, val y: Float) {
 
     companion object {
         val ZERO = Point(0f, 0f)
+        @JvmStatic
         fun flattenArray(pts: Array<Point>?): FloatArray? {
             if (pts == null) return null
             val arr = FloatArray(pts.size * 2)
@@ -58,6 +60,7 @@ class Point(val x: Float, val y: Float) {
             return arr
         }
 
+        @JvmStatic
         fun fromArray(pts: FloatArray?): Array<Point?>? {
             if (pts == null) return null
             require(pts.size % 2 == 0) { "Expected " + pts.size + " % 2 == 0" }
@@ -67,12 +70,14 @@ class Point(val x: Float, val y: Float) {
         }
 
         @InternalSkikoApi
+        @JvmStatic
         fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Point {
             val result = withResult(FloatArray(2), block)
             return Point(result[0], result[1])
         }
 
         @InternalSkikoApi
+        @JvmStatic
         fun fromNullableInteropPointer(block: InteropScope.(InteropPointer) -> Boolean): Point? {
             val result = withNullableResult(FloatArray(2), block) ?: return null
             return Point(result[0], result[1])

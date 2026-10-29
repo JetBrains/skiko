@@ -2,9 +2,11 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
+        @JvmStatic
         fun makePath1D(path: Path, advance: Float, phase: Float, style: Style): PathEffect {
             return try {
                 Stats.onNativeCall()
@@ -21,6 +23,7 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makePath2D(matrix: Matrix33, path: Path): PathEffect {
             return try {
                 Stats.onNativeCall()
@@ -37,6 +40,7 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeLine2D(width: Float, matrix: Matrix33): PathEffect {
             Stats.onNativeCall()
             return PathEffect(
@@ -46,11 +50,13 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             )
         }
 
+        @JvmStatic
         fun makeCorner(radius: Float): PathEffect {
             Stats.onNativeCall()
             return PathEffect(_nMakeCorner(radius))
         }
 
+        @JvmStatic
         fun makeDash(intervals: FloatArray, phase: Float): PathEffect {
             Stats.onNativeCall()
             return PathEffect(
@@ -60,6 +66,7 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             )
         }
 
+        @JvmStatic
         fun makeDiscrete(segLength: Float, dev: Float, seed: Int): PathEffect {
             Stats.onNativeCall()
             return PathEffect(_nMakeDiscrete(segLength, dev, seed))

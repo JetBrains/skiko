@@ -16,6 +16,7 @@ private val skottieLoader = LibraryLoader(
 )
 
 internal actual object SkottieLibrary {
+    @JvmStatic
     actual fun load() {
         Library.load()
         skottieLoader.loadOnce()

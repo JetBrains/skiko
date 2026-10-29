@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skiko.internal.unpackTo
+import kotlin.jvm.JvmStatic
 
 class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt) {
 
@@ -89,6 +90,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
         private const val endIx = 4
         private const val valueIx = 5
 
+        @JvmStatic
         fun parseOne(s: String): FontFeature {
             val m = _featurePattern.matcher(s)
             require(m.matches()) { "Can’t parse FontFeature: $s" }
@@ -108,6 +110,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
          *
          * If [str] is invalid, throws IllegalArgumentException
          */
+        @JvmStatic
         fun parse(str: String): Array<FontFeature> {
             return _splitPattern.split(str).map { s -> parseOne(s) }.toTypedArray()
         }
@@ -123,6 +126,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
          *
          * If [str] in invalid format, FontFeature won't be in the result
          */
+        @JvmStatic
         fun parseW3(str: String): Array<FontFeature> =
             str
                 .splitToSequence(",")
@@ -158,6 +162,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
          * This function can be used to convert IntArray to FontFeatures.
          * Every FontFeature is represented by 2 ints (_tag, value)
          */
+        @JvmStatic
         internal fun fromInteropEncodedBy2Ints(fontFeatures: IntArray): Array<FontFeature> {
             val featuresCount = fontFeatures.size / 2
 

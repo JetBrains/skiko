@@ -6,9 +6,11 @@ import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.loadOpenGLLibrary
+import kotlin.jvm.JvmStatic
 
 class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     companion object {
+        @JvmStatic
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
             loadOpenGLLibrary()
@@ -17,6 +19,7 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
             return DirectContext(ptr)
         }
 
+        @JvmStatic
         fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeMetal(devicePtr, queuePtr))
@@ -35,6 +38,7 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
          * is created with provided device in devicePtr with
          * type D3D12_COMMAND_LIST_TYPE_DIRECT; must be not zero
          */
+        @JvmStatic
         fun makeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
@@ -55,6 +59,7 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
          *                        Skia's built-in allocator
          */
         @ExperimentalSkikoApi
+        @JvmStatic
         fun makeVulkan(
             instancePtr: NativePointer,
             physicalDevicePtr: NativePointer,

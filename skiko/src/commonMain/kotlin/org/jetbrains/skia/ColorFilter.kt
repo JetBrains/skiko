@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.*
+import kotlin.jvm.JvmStatic
 
 /**
  *  ColorFilters are optional objects in the drawing pipeline. When present in
@@ -13,6 +14,7 @@ import org.jetbrains.skia.impl.*
  */
 class ColorFilter : RefCnt {
     companion object {
+        @JvmStatic
         fun makeComposed(outer: ColorFilter?, inner: ColorFilter?): ColorFilter {
             return try {
                 Stats.onNativeCall()
@@ -36,12 +38,14 @@ class ColorFilter : RefCnt {
          * [BlendMode.SRC_ATOP], [BlendMode.XOR] or [BlendMode.DARKEN], and an opaque [color] with
          * [BlendMode.DST_IN].
          */
+        @JvmStatic
         fun makeBlend(color: Int, mode: BlendMode): ColorFilter? {
             Stats.onNativeCall()
             val ptr = _nMakeBlend(color, mode.ordinal)
             return if (ptr == NullPointer) null else ColorFilter(ptr)
         }
 
+        @JvmStatic
         fun makeMatrix(matrix: ColorMatrix): ColorFilter {
             Stats.onNativeCall()
             return ColorFilter(
@@ -51,6 +55,7 @@ class ColorFilter : RefCnt {
             )
         }
 
+        @JvmStatic
         fun makeHSLAMatrix(matrix: ColorMatrix): ColorFilter {
             Stats.onNativeCall()
             return ColorFilter(
@@ -60,6 +65,7 @@ class ColorFilter : RefCnt {
             )
         }
 
+        @JvmStatic
         fun makeLerp(dst: ColorFilter?, src: ColorFilter?, t: Float): ColorFilter {
             return try {
                 ColorFilter(
@@ -75,14 +81,17 @@ class ColorFilter : RefCnt {
             }
         }
 
+        @JvmStatic
         fun makeLighting(colorMul: Int, colorAdd: Int): ColorFilter {
             return ColorFilter(_nMakeLighting(colorMul, colorAdd))
         }
 
+        @JvmStatic
         fun makeHighContrast(grayscale: Boolean, mode: InversionMode, contrast: Float): ColorFilter {
             return ColorFilter(_nMakeHighContrast(grayscale, mode.ordinal, contrast))
         }
 
+        @JvmStatic
         fun makeTable(table: ByteArray): ColorFilter {
             require(table.size == 256) { "Expected 256 elements, got " + table.size }
             return ColorFilter(
@@ -92,6 +101,7 @@ class ColorFilter : RefCnt {
             )
         }
 
+        @JvmStatic
         fun makeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): ColorFilter {
             require(a == null || a.size == 256) { "Expected 256 elements in a[], got " + a!!.size }
             require(r == null || r.size == 256) { "Expected 256 elements in r[], got " + r!!.size }
@@ -107,6 +117,7 @@ class ColorFilter : RefCnt {
             }
         }
 
+        @JvmStatic
         fun makeOverdraw(colors: IntArray): ColorFilter {
             require(colors.size == 6) { "Expected 6 elements, got " + colors.size }
             return ColorFilter(_nMakeOverdraw(colors[0], colors[1], colors[2], colors[3], colors[4], colors[5]))

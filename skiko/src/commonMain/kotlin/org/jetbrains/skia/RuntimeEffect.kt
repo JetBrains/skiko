@@ -2,9 +2,11 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
+        @JvmStatic
         fun makeForShader(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
             return interopScope {
@@ -12,6 +14,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeForColorFilter(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
             return interopScope {
@@ -19,6 +22,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeForBlender(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
             return interopScope {

@@ -3,9 +3,11 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skiko.InternalSkikoApi
+import kotlin.jvm.JvmStatic
 
 class Surface : RefCnt {
     companion object {
+        @JvmStatic
         fun makeRasterDirect(pixmap: Pixmap): Surface {
             return makeRasterDirect(pixmap, null)
         }
@@ -37,6 +39,7 @@ class Surface : RefCnt {
          * @param rowBytes      memory address of destination native pixels buffer
          * @return              created Surface
          */
+        @JvmStatic
         fun makeRasterDirect(
             imageInfo: ImageInfo,
             pixelsPtr: NativePointer,
@@ -45,6 +48,7 @@ class Surface : RefCnt {
             return makeRasterDirect(imageInfo, pixelsPtr, rowBytes, null)
         }
 
+        @JvmStatic
         fun makeRasterDirect(
             pixmap: Pixmap,
             surfaceProps: SurfaceProps?
@@ -94,6 +98,7 @@ class Surface : RefCnt {
          * may be null
          * @return              created Surface
          */
+        @JvmStatic
         fun makeRasterDirect(
             imageInfo: ImageInfo,
             pixelsPtr: NativePointer,
@@ -139,6 +144,7 @@ class Surface : RefCnt {
          * of raster surface; width and height must be greater than zero
          * @return              new Surface
          */
+        @JvmStatic
         fun makeRaster(imageInfo: ImageInfo): Surface {
             return makeRaster(imageInfo, imageInfo.minRowBytes, null)
         }
@@ -165,6 +171,7 @@ class Surface : RefCnt {
          * @param rowBytes      interval from one Surface row to the next; may be zero
          * @return              new Surface
          */
+        @JvmStatic
         fun makeRaster(
             imageInfo: ImageInfo,
             rowBytes: Int
@@ -196,6 +203,7 @@ class Surface : RefCnt {
          * may be null
          * @return              new Surface
          */
+        @JvmStatic
         fun makeRaster(
             imageInfo: ImageInfo,
             rowBytes: Int,

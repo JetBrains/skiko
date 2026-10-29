@@ -100,22 +100,27 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
             return RRect(l, t, r, b, radii)
         }
 
+        @JvmStatic
         fun makeOvalLTRB(l: Float, t: Float, r: Float, b: Float): RRect {
             return RRect(l, t, r, b, floatArrayOf(abs(r - l) / 2.0f, abs(b - t) / 2.0f))
         }
 
+        @JvmStatic
         fun makePillLTRB(l: Float, t: Float, r: Float, b: Float): RRect {
             return RRect(l, t, r, b, floatArrayOf(minOf(abs(r - l), abs(t - b)) / 2.0f))
         }
 
+        @JvmStatic
         fun makeXYWH(l: Float, t: Float, w: Float, h: Float, radius: Float): RRect {
             return RRect(l, t, l + w, t + h, floatArrayOf(radius))
         }
 
+        @JvmStatic
         fun makeXYWH(l: Float, t: Float, w: Float, h: Float, xRad: Float, yRad: Float): RRect {
             return RRect(l, t, l + w, t + h, floatArrayOf(xRad, yRad))
         }
 
+        @JvmStatic
         fun makeXYWH(
             l: Float,
             t: Float,
@@ -129,6 +134,7 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
             return RRect(l, t, l + w, t + h, floatArrayOf(tlRad, trRad, brRad, blRad))
         }
 
+        @JvmStatic
         fun makeNinePatchXYWH(
             l: Float,
             t: Float,
@@ -142,23 +148,28 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
             return RRect(l, t, l + w, t + h, floatArrayOf(lRad, tRad, rRad, tRad, rRad, bRad, lRad, bRad))
         }
 
+        @JvmStatic
         fun makeComplexXYWH(l: Float, t: Float, w: Float, h: Float, radii: FloatArray): RRect {
             return RRect(l, t, l + w, t + h, radii)
         }
 
+        @JvmStatic
         fun makeOvalXYWH(l: Float, t: Float, w: Float, h: Float): RRect {
             return RRect(l, t, l + w, t + h, floatArrayOf(w / 2.0f, h / 2.0f))
         }
 
+        @JvmStatic
         fun makePillXYWH(l: Float, t: Float, w: Float, h: Float): RRect {
             return RRect(l, t, l + w, t + h, floatArrayOf(minOf(w, h) / 2.0f))
         }
 
+        @JvmStatic
         internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): RRect {
             val result = withResult(FloatArray(12 /* 4 dimensions + 4 radii * 2 */), block)
             return RRect(result[0], result[1], result[2], result[3], result.copyOfRange(4, 12))
         }
 
+        @JvmStatic
         internal fun fromInteropPointerNullable(block: (InteropPointer) -> Boolean): RRect? {
             var result = true
             val rect = fromInteropPointer { result = block(it) }

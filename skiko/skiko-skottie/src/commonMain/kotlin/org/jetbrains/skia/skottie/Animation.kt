@@ -4,11 +4,12 @@ import org.jetbrains.skia.sksg.InvalidationController
 import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
+import kotlin.jvm.JvmStatic
 
 class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        fun makeFromString(data: String): Animation {
-            Stats.onNativeCall()
+        @JvmStatic
+        fun makeFromString(data: String): Animation = nativeCallFromStatic {
             interopScope {
                 val ptr = _nMakeFromString(toInterop(data))
                 require(ptr != NullPointer) { "Failed to create Animation from string=\"$data\"" }
@@ -16,13 +17,9 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             }
         }
 
-        fun makeFromData(data: Data): Animation {
-            Stats.onNativeCall()
-            val ptr = try {
-                _nMakeFromData(getPtr(data))
-            } finally {
-                reachabilityBarrier(data)
-            }
+        @JvmStatic
+        fun makeFromData(data: Data): Animation = nativeCallFromStatic(data) { data ->
+            val ptr = _nMakeFromData(data.pointerOrNullPointer)
             require(ptr != NullPointer) { "Failed to create Animation from data." }
             return Animation(ptr)
         }

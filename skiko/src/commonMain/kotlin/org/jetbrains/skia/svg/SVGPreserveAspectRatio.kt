@@ -3,6 +3,7 @@ package org.jetbrains.skia.svg
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
+import kotlin.jvm.JvmStatic
 
 class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPreserveAspectRatioScale) {
     internal val _align: SVGPreserveAspectRatioAlign
@@ -10,6 +11,7 @@ class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPrese
     internal val _scale: SVGPreserveAspectRatioScale
 
     companion object {
+        @JvmStatic
         internal fun fromInterop(block: InteropScope.(InteropPointer) -> Unit) =
             withResult(IntArray(2), block).let {
                 SVGPreserveAspectRatio(it[0], it[1])

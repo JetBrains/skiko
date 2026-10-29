@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Stats
+import kotlin.jvm.JvmStatic
 
 class Graphics {
     companion object {
@@ -101,6 +102,7 @@ class Graphics {
          * It does not change the limit, but will cause subsequent font measures and draws to be recreated,
          * since they will no longer be in the cache.
          */
+        @JvmStatic
         fun purgeFontCache() {
             Stats.onNativeCall()
             _nPurgeFontCache()
@@ -111,6 +113,7 @@ class Graphics {
          *
          * It does not change the limit.
          */
+        @JvmStatic
         fun purgeResourceCache() {
             Stats.onNativeCall()
             _nPurgeResourceCache()
@@ -122,6 +125,7 @@ class Graphics {
          *
          *  If there are caches associated with GPU context, those will not be affected by this call.
          */
+        @JvmStatic
         fun purgeAllCaches() {
             Stats.onNativeCall()
             _nPurgeAllCaches()

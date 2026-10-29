@@ -3,9 +3,11 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import kotlin.math.min
+import kotlin.jvm.JvmStatic
 
 class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
+        @JvmStatic
         fun makeFromImage(image: Image): Bitmap {
             val bitmap = Bitmap()
             bitmap.allocPixels(image.imageInfo)
@@ -15,6 +17,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             }
         }
 
+        @JvmStatic
         fun makeFromImage(image: Image, context: DirectContext): Bitmap {
             val bitmap = Bitmap()
             bitmap.allocPixels(image.imageInfo)

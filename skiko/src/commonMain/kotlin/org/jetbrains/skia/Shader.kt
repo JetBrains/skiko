@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 /**
  *  Shaders specify the source color(s) for what is being drawn. If a paint
@@ -25,6 +26,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          * @param gradient Description of the colors and interpolation method
          * @param localMatrix Optional local matrix, may be null
          */
+        @JvmStatic
         fun makeLinearGradient(
             p0: Point,
             p1: Point,
@@ -34,6 +36,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return makeLinearGradient(p0.x, p0.y, p1.x, p1.y, gradient, localMatrix)
         }
 
+        @JvmStatic
         fun makeLinearGradient(
             x0: Float,
             y0: Float,
@@ -77,6 +80,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          * @param gradient Description of the colors and interpolation method
          * @param localMatrix Optional local matrix, may be null
          */
+        @JvmStatic
         fun makeRadialGradient(
             center: Point,
             radius: Float,
@@ -86,6 +90,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return makeRadialGradient(center.x, center.y, radius, gradient, localMatrix)
         }
 
+        @JvmStatic
         fun makeRadialGradient(
             x: Float,
             y: Float,
@@ -132,6 +137,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          * @param gradient     Description of the colors and interpolation method
          * @param localMatrix  Optional local matrix, may be null
          */
+        @JvmStatic
         fun makeTwoPointConicalGradient(
             start: Point,
             startRadius: Float,
@@ -152,6 +158,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             )
         }
 
+        @JvmStatic
         fun makeTwoPointConicalGradient(
             x0: Float,
             y0: Float,
@@ -205,6 +212,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          * @param gradient    Description of the colors and interpolation method
          * @param localMatrix Optional local matrix, may be null
          */
+        @JvmStatic
         fun makeSweepGradient(
             center: Point,
             gradient: Gradient,
@@ -213,6 +221,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return makeSweepGradient(center.x, center.y, gradient, localMatrix)
         }
 
+        @JvmStatic
         fun makeSweepGradient(
             x: Float,
             y: Float,
@@ -237,6 +246,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          * @param gradient    Description of the colors and interpolation method
          * @param localMatrix Optional local matrix, may be null
          */
+        @JvmStatic
         fun makeSweepGradient(
             center: Point,
             startAngle: Float,
@@ -247,6 +257,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return makeSweepGradient(center.x, center.y, startAngle, endAngle, gradient, localMatrix)
         }
 
+        @JvmStatic
         fun makeSweepGradient(
             x: Float,
             y: Float,
@@ -283,16 +294,19 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeEmpty(): Shader {
             Stats.onNativeCall()
             return Shader(Shader_nMakeEmpty())
         }
 
+        @JvmStatic
         fun makeColor(color: Int): Shader {
             Stats.onNativeCall()
             return Shader(_nMakeColor(color))
         }
 
+        @JvmStatic
         fun makeColor(color: Color4f, space: ColorSpace?): Shader {
             return try {
                 Stats.onNativeCall()
@@ -310,6 +324,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeBlend(mode: BlendMode, dst: Shader?, src: Shader?): Shader {
             return try {
                 Stats.onNativeCall()
@@ -326,6 +341,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeFractalNoise(
             baseFrequencyX: Float,
             baseFrequencyY: Float,
@@ -345,6 +361,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeTurbulence(
             baseFrequencyX: Float,
             baseFrequencyY: Float,

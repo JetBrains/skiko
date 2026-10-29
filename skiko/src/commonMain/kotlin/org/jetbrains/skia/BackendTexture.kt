@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -17,6 +18,7 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
          *
          * @see glTextureParametersModified
          */
+        @JvmStatic
         fun makeGL(
             width: Int,
             height: Int,

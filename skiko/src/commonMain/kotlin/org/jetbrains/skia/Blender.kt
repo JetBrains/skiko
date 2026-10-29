@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.interopScope
+import kotlin.jvm.JvmStatic
 
 /**
  * Blender represents a custom blend function in the Skia pipeline.  A blender combines a source
@@ -16,11 +17,13 @@ class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             staticLoad()
         }
 
+        @JvmStatic
         fun makeMode(mode: BlendMode): Blender {
             Stats.onNativeCall()
             return Blender(_nMakeMode(mode.ordinal))
         }
 
+        @JvmStatic
         fun makeArithmetic(
             k1: Float,
             k2: Float,

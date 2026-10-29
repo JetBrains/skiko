@@ -3,6 +3,7 @@ package org.jetbrains.skia.icu
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Stats
+import kotlin.jvm.JvmStatic
 
 /**
  * CharDirection represents Bidi_Class Unicode character property.
@@ -45,6 +46,7 @@ object CharDirection {
      * Returns the bidirectional category value for the code point.
      * Same as java.lang.Character.getDirectionality()
      */
+    @JvmStatic
     fun of(codePoint: Int): Int {
         Stats.onNativeCall()
         return _nCharDirection(codePoint)
@@ -179,6 +181,7 @@ object CharProperties {
      * @param codePoint The codepoint.
      * @param property A binary property; one of the constants defined in [CharProperties].
      */
+    @JvmStatic
     fun codePointHasBinaryProperty(codePoint: Int, property: Int): Boolean {
         Stats.onNativeCall()
         return _nCodePointHasBinaryProperty(codePoint, property)

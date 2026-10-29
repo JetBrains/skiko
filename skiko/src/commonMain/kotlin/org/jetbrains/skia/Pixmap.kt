@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skiko.maybeSynchronized
+import kotlin.jvm.JvmStatic
 
 class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
@@ -288,10 +289,12 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     }
 
     companion object {
+        @JvmStatic
         fun make(info: ImageInfo, buffer: Data, rowBytes: Int): Pixmap {
             return make(info, buffer.writableData(), rowBytes, underlyingMemoryOwner = buffer)
         }
 
+        @JvmStatic
         fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int, underlyingMemoryOwner: Managed? = null): Pixmap {
             return try {
                 val ptr = Pixmap_nMake(

@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.*
+import kotlin.jvm.JvmStatic
 
 /**
  *  Base class for image filters. If one is installed in the paint, then all drawing occurs as
@@ -19,6 +20,7 @@ import org.jetbrains.skia.impl.*
 class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
 
+        @JvmStatic
         fun makeArithmetic(
             k1: Float,
             k2: Float,
@@ -51,6 +53,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -70,6 +73,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeBlur(
             sigmaX: Float,
             sigmaY: Float,
@@ -95,6 +99,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -112,6 +117,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeCompose(outer: ImageFilter?, inner: ImageFilter?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -126,6 +132,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeDisplacementMap(
             x: ColorChannel,
             y: ColorChannel,
@@ -154,6 +161,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeDropShadow(
             dx: Float,
             dy: Float,
@@ -183,6 +191,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeDropShadowOnly(
             dx: Float,
             dy: Float,
@@ -212,6 +221,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeImage(image: Image): ImageFilter {
             return makeImage(
                 image,
@@ -227,6 +237,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             )
         }
 
+        @JvmStatic
         fun makeImage(image: Image?, src: Rect, dst: Rect, mode: SamplingMode): ImageFilter {
             return makeImage(
                 image,
@@ -242,6 +253,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             )
         }
 
+        @JvmStatic
         fun makeImage(
             image: Image?,
             srcLeft: Float,
@@ -276,6 +288,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeMagnifier(r: Rect, zoomAmount: Float, inset: Float, samplingMode: SamplingMode, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -300,6 +313,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeMatrixConvolution(
             kernelW: Int,
             kernelH: Int,
@@ -337,6 +351,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeMatrixTransform(matrix: Matrix33, mode: SamplingMode, input: ImageFilter?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -356,6 +371,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         /** Returns an image filter that draws [picture] into [target], replacing the filter input. */
+        @JvmStatic
         fun makePicture(picture: Picture?, target: Rect): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -374,8 +390,10 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         /** Returns an image filter that draws [picture] over its cull rect, replacing the filter input. */
+        @JvmStatic
         fun makePicture(picture: Picture): ImageFilter = makePicture(picture, picture.cullRect)
 
+        @JvmStatic
         fun makeMerge(filters: Array<ImageFilter?>, crop: IRect?): ImageFilter {
             return interopScope {
                 try {
@@ -395,6 +413,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeOffset(dx: Float, dy: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -412,6 +431,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeShader(shader: Shader, dither: Boolean = false, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -429,6 +449,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeRuntimeShader(runtimeShaderBuilder: RuntimeShaderBuilder, shaderName: String, input: ImageFilter?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -448,6 +469,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
 
+        @JvmStatic
         fun makeRuntimeShader(runtimeShaderBuilder: RuntimeShaderBuilder, shaderNames: Array<String>, inputs: Array<ImageFilter?>): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -470,6 +492,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeTile(src: Rect, dst: Rect, input: ImageFilter?): ImageFilter {
             return makeTile(
                 src.left,
@@ -484,6 +507,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             )
         }
 
+        @JvmStatic
         fun makeTile(
             srcLeft: Float,
             srcTop: Float,
@@ -515,6 +539,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeDilate(rx: Float, ry: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -533,6 +558,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeErode(rx: Float, ry: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -550,6 +576,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeDistantLitDiffuse(
             x: Float,
             y: Float,
@@ -579,6 +606,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makePointLitDiffuse(
             x: Float,
             y: Float,
@@ -608,6 +636,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeSpotLitDiffuse(
             x0: Float,
             y0: Float,
@@ -645,6 +674,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeDistantLitSpecular(
             x: Float,
             y: Float,
@@ -678,6 +708,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makePointLitSpecular(
             x: Float,
             y: Float,
@@ -709,6 +740,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeSpotLitSpecular(
             x0: Float,
             y0: Float,

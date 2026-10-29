@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skiko.InternalSkikoApi
+import kotlin.jvm.JvmStatic
 
 /**
  * Data holds an immutable data buffer.
@@ -16,6 +17,7 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
     private var underlyingMemoryOwner: Managed? = null
 
     companion object {
+        @JvmStatic
         fun makeFromBytes(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size): Data {
             Stats.onNativeCall()
             return Data(
@@ -32,6 +34,7 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
          * @param underlyingMemoryOwner - is stored in Data instance to prevent underlying memory getting cleaned by GC in cases when
          * [underlyingMemoryOwner] doesn't have any other references.
          */
+        @JvmStatic
         fun makeWithoutCopy(memoryAddr: NativePointer, length: Int, underlyingMemoryOwner: Managed): Data {
             Stats.onNativeCall()
             return Data(
@@ -47,11 +50,13 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
          * Returns a new empty dataref (or a reference to a shared empty dataref).
          * New or shared, the caller must see that [.close] is eventually called.
          */
+        @JvmStatic
         fun makeEmpty(): Data {
             Stats.onNativeCall()
             return Data(_nMakeEmpty())
         }
 
+        @JvmStatic
         fun makeUninitialized(length: Int): Data {
             Stats.onNativeCall()
             return Data(_nMakeUninitialized(length))

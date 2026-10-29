@@ -6,6 +6,7 @@ import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.ExperimentalSkikoApi
+import kotlin.jvm.JvmStatic
 
 /**
  * Represents a backend-specific semaphore that Graphite can use for synchronization.
@@ -26,6 +27,7 @@ class BackendSemaphore internal constructor(ptr: NativePointer) : Managed(ptr, _
          * @param semaphorePtr native pointer (`VkSemaphore`) to wrap.
          * @return a backend semaphore wrapping the Vulkan semaphore.
          */
+        @JvmStatic
         fun makeVulkan(semaphorePtr: NativePointer): BackendSemaphore {
             requireVulkanSupport()
             require(semaphorePtr != NullPointer) { "Vulkan semaphore pointer is null" }

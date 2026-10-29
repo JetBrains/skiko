@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
+import kotlin.jvm.JvmStatic
 
 /**
  * Information about individual frames in a multi-framed image.
@@ -73,6 +74,7 @@ class AnimationFrameInfo(
     companion object {
         private const val REPR_SIZE = 11
 
+        @JvmStatic
         private fun fromIntArray(repr: IntArray, index: Int = 0): AnimationFrameInfo {
             val offset = index * REPR_SIZE
             return AnimationFrameInfo(
@@ -87,10 +89,12 @@ class AnimationFrameInfo(
             )
         }
 
+        @JvmStatic
         internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): AnimationFrameInfo {
             return fromIntArray(withResult(IntArray(REPR_SIZE), block))
         }
 
+        @JvmStatic
         internal fun fromInteropArrayPointer(size: Int, block: InteropScope.(InteropPointer) -> Unit): Array<AnimationFrameInfo> {
             val repr = withResult(IntArray(REPR_SIZE * size), block)
             return Array(size) { fromIntArray(repr, it) }

@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import kotlin.math.min
+import kotlin.jvm.JvmStatic
 
 /**
  * Path contain geometry. Path may be empty, or contain one or more verbs that
@@ -22,6 +23,7 @@ import kotlin.math.min
  */
 class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
     companion object {
+        @JvmStatic
         fun makeFromSVGString(svg: String): Path  {
             Stats.onNativeCall()
             val result = interopScope {
@@ -61,6 +63,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param isVolatile whether the path is volatile
          * @return           new Path constructed from the provided data
          */
+        @JvmStatic
         fun Raw(
             pts: Array<Point>,
             verbs: Array<PathVerb>,
@@ -96,6 +99,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param startIndex starting corner index (0-3)
          * @return           new rectangular Path
          */
+        @JvmStatic
         fun Rect(
             rect: Rect,
             fillType: PathFillMode = PathFillMode.WINDING,
@@ -116,6 +120,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param startIndex starting point index
          * @return           new oval Path
          */
+        @JvmStatic
         fun Oval(
             rect: Rect,
             direction: PathDirection = PathDirection.CLOCKWISE,
@@ -136,6 +141,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param direction  direction to wind the circle
          * @return           new circular Path
          */
+        @JvmStatic
         fun Circle(
             centerX: Float,
             centerY: Float,
@@ -156,6 +162,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param startIndex starting point index
          * @return           new rounded rectangle Path
          */
+        @JvmStatic
         fun RRect(
             rrect: RRect,
             direction: PathDirection = PathDirection.CLOCKWISE,
@@ -178,6 +185,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param direction  direction to wind the rounded rectangle
          * @return           new rounded rectangle Path
          */
+        @JvmStatic
         fun RRect(
             bounds: Rect,
             rx: Float,
@@ -199,6 +207,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param isVolatile whether the path is volatile
          * @return           new polygon Path
          */
+        @JvmStatic
         fun Polygon(
             pts: Array<Point>,
             isClosed: Boolean,
@@ -225,6 +234,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param p1 end point
          * @return   new line Path
          */
+        @JvmStatic
         fun Line(p0: Point, p1: Point): Path {
             return Polygon(arrayOf(p0, p1), false)
         }
@@ -248,6 +258,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          *
          * @see [https://fiddle.skia.org/c/@Path_IsLineDegenerate](https://fiddle.skia.org/c/@Path_IsLineDegenerate)
          */
+        @JvmStatic
         fun isLineDegenerate(p1: Point, p2: Point, exact: Boolean): Boolean {
             Stats.onNativeCall()
             return _nIsLineDegenerate(p1.x, p1.y, p2.x, p2.y, exact)
@@ -268,6 +279,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * if false, returns true if p1, p2, and p3 are equal or nearly equal
          * @return       true if quad is degenerate; its length is effectively zero
          */
+        @JvmStatic
         fun isQuadDegenerate(p1: Point, p2: Point, p3: Point, exact: Boolean): Boolean {
             Stats.onNativeCall()
             return _nIsQuadDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, exact)
@@ -289,6 +301,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * if false, returns true if p1, p2, p3, and p4 are equal or nearly equal
          * @return       true if cubic is degenerate; its length is effectively zero
          */
+        @JvmStatic
         fun isCubicDegenerate(p1: Point, p2: Point, p3: Point, p4: Point, exact: Boolean): Boolean {
             Stats.onNativeCall()
             return _nIsCubicDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y, exact)
@@ -331,6 +344,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param pow2  quad count, as power of two, normally 0 to 5 (1 to 32 quad curves)
          * @return      number of quad curves written to pts
          */
+        @JvmStatic
         fun convertConicToQuads(p0: Point, p1: Point, p2: Point, w: Float, pow2: Int): Array<Point> {
             Stats.onNativeCall()
             val maxResultPointCount = (1 + 2 * (1 shl pow2)) // See Skia docs
@@ -355,6 +369,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param op  The operator to apply.
          * @return    Path if operation was able to produce a result, null otherwise
          */
+        @JvmStatic
         fun makeCombining(one: Path, two: Path, op: PathOp): Path? {
             return try {
                 Stats.onNativeCall()
@@ -385,6 +400,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          *
          * @see [https://fiddle.skia.org/c/@Path_readFromMemory](https://fiddle.skia.org/c/@Path_readFromMemory)
          */
+        @JvmStatic
         fun makeFromBytes(data: ByteArray): Path {
             Stats.onNativeCall()
             val result = interopScope {

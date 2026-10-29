@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
@@ -9,6 +10,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
          * If this data represents an encoded image that we know how to decode,
          * return an Codec that can decode it. Otherwise throws IllegalArgumentException.
          */
+        @JvmStatic
         fun makeFromData(data: Data?): Codec {
             return try {
                 Stats.onNativeCall()
@@ -21,6 +23,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
             }
         }
 
+        @JvmStatic
         internal fun _validateResult(result: Int) {
             when (result) {
                 1 -> throw IllegalArgumentException("Incomplete input: A partial image was generated.")

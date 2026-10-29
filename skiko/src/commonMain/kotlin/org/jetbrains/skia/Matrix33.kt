@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmStatic
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -147,6 +148,7 @@ value class Matrix33 internal constructor(val mat: FloatArray) {
          * @param dy  vertical translation
          * @return    Matrix33 with translation
          */
+        @JvmStatic
         fun makeTranslate(dx: Float, dy: Float): Matrix33 {
             return Matrix33(1f, 0f, dx, 0f, 1f, dy, 0f, 0f, 1f)
         }
@@ -164,6 +166,7 @@ value class Matrix33 internal constructor(val mat: FloatArray) {
          * @param s  scale factor
          * @return   Matrix33 with scale
          */
+        @JvmStatic
         fun makeScale(s: Float): Matrix33 {
             return makeScale(s, s)
         }
@@ -182,6 +185,7 @@ value class Matrix33 internal constructor(val mat: FloatArray) {
          * @param sy vertical scale factor
          * @return   Matrix33 with scale
          */
+        @JvmStatic
         fun makeScale(sx: Float, sy: Float): Matrix33 {
             return Matrix33(sx, 0f, 0f, 0f, sy, 0f, 0f, 0f, 1f)
         }
@@ -192,6 +196,7 @@ value class Matrix33 internal constructor(val mat: FloatArray) {
          * @param deg  rotation angle in degrees (positive rotates clockwise)
          * @return     Matrix33 with rotation
          */
+        @JvmStatic
         fun makeRotate(deg: Float): Matrix33 {
             val rad = deg.toRadians()
             var sin = sin(rad)
@@ -219,6 +224,7 @@ value class Matrix33 internal constructor(val mat: FloatArray) {
          * @param pivot  pivot point
          * @return       Matrix33 with rotation
          */
+        @JvmStatic
         fun makeRotate(deg: Float, pivot: Point): Matrix33 {
             return makeRotate(deg, pivot.x, pivot.y)
         }
@@ -231,6 +237,7 @@ value class Matrix33 internal constructor(val mat: FloatArray) {
          * @param pivoty  y-coord of pivot
          * @return        Matrix33 with rotation
          */
+        @JvmStatic
         fun makeRotate(deg: Float, pivotx: Float, pivoty: Float): Matrix33 {
             val rad = deg.toRadians()
             var sin = sin(rad)
@@ -265,6 +272,7 @@ value class Matrix33 internal constructor(val mat: FloatArray) {
          * @param sy vertical skew factor
          * @return   Matrix33 with skew
          */
+        @JvmStatic
         fun makeSkew(sx: Float, sy: Float): Matrix33 {
             return Matrix33(1f, sx, 0f, sy, 1f, 0f, 0f, 0f, 1f)
         }

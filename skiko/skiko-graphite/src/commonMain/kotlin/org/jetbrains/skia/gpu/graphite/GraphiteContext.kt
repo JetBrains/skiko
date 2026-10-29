@@ -11,6 +11,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skiko.ExperimentalSkikoApi
+import kotlin.jvm.JvmStatic
 
 /**
  * The main entry point for Graphite, responsible for managing and coordinating GPU resources.
@@ -29,6 +30,7 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
          * @param queuePtr native pointer to the Metal command queue.
          * @return a Graphite context backed by Metal.
          */
+        @JvmStatic
         fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): GraphiteContext {
             requireMetalSupport()
             require(devicePtr != NullPointer) { "Metal device pointer is null" }
@@ -53,6 +55,7 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
          * @param maxApiVersion highest Vulkan API version (`VK_MAKE_API_VERSION`) Skia may use.
          * @return a Graphite context backed by Vulkan.
          */
+        @JvmStatic
         fun makeVulkan(
             instancePtr: NativePointer,
             physicalDevicePtr: NativePointer,

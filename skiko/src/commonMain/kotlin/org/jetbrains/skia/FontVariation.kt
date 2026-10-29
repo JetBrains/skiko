@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import kotlin.jvm.JvmStatic
 class FontVariation(val _tag: Int, val value: Float) {
 
     constructor(feature: String, value: Float) : this(FourByteTag.fromString(feature), value) {}
@@ -38,6 +39,7 @@ class FontVariation(val _tag: Int, val value: Float) {
         private const val tagIx = 1
         private const val valueIx = 2
 
+        @JvmStatic
         fun parseOne(s: String): FontVariation {
             val m = _variationPattern.matcher(s)
             require(m.matches()) { "Can’t parse FontVariation: $s" }
@@ -46,6 +48,7 @@ class FontVariation(val _tag: Int, val value: Float) {
             return FontVariation(tag, value)
         }
 
+        @JvmStatic
         fun parse(str: String): Array<FontVariation> {
             return _splitPattern.split(str).map { s -> parseOne(s) }.toTypedArray()
         }

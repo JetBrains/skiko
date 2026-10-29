@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import kotlin.jvm.JvmStatic
 enum class GraphicsApi {
     UNKNOWN,
 
@@ -27,6 +28,7 @@ enum class GpuPriority(val value: String) {
     Auto("auto"), Integrated("integrated"), Discrete("discrete");
 
     companion object {
+        @JvmStatic
         fun parseOrNull(value: String): GpuPriority? = GpuPriority.entries.find { it.value == value }
     }
 }

@@ -2,13 +2,16 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.shaper.*
+import kotlin.jvm.JvmStatic
 
 class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
+        @JvmStatic
         fun make(text: String?, font: Font?): TextLine {
             return make(text, font, ShapingOptions.DEFAULT)
         }
 
+        @JvmStatic
         fun make(text: String?, font: Font?, opts: ShapingOptions?): TextLine {
             return Shaper.makeShapeDontWrapOrReorder().use { shaper -> shaper.shapeLine(text, font, opts!!) }
         }

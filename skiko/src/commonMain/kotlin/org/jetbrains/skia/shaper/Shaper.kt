@@ -4,6 +4,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.FontFeature.Companion.arrayOfFontFeaturesToInterop
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 /**
  * Shapes text using HarfBuzz and places the shaped text into a
@@ -11,15 +12,18 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  */
 class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
+        @JvmStatic
         fun makePrimitive(): Shaper {
             Stats.onNativeCall()
             return Shaper(_nMakePrimitive())
         }
 
+        @JvmStatic
         fun makeShaperDrivenWrapper(): Shaper {
             return makeShaperDrivenWrapper(null)
         }
 
+        @JvmStatic
         fun makeShaperDrivenWrapper(fontMgr: FontMgr?): Shaper {
             return try {
                 Stats.onNativeCall()
@@ -29,10 +33,12 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             }
         }
 
+        @JvmStatic
         fun makeShapeThenWrap(): Shaper {
             return makeShapeThenWrap(null)
         }
 
+        @JvmStatic
         fun makeShapeThenWrap(fontMgr: FontMgr?): Shaper {
             return try {
                 Stats.onNativeCall()
@@ -42,10 +48,12 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             }
         }
 
+        @JvmStatic
         fun makeShapeDontWrapOrReorder(): Shaper {
             return makeShapeDontWrapOrReorder(null)
         }
 
+        @JvmStatic
         fun makeShapeDontWrapOrReorder(fontMgr: FontMgr?): Shaper {
             return try {
                 Stats.onNativeCall()
@@ -64,6 +72,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
          *
          * @return  Shaper on macOS, throws UnsupportedOperationException elsewhere
          */
+        @JvmStatic
         fun makeCoreText(): Shaper {
             Stats.onNativeCall()
             val ptr = _nMakeCoreText()
@@ -71,10 +80,12 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             return Shaper(ptr)
         }
 
+        @JvmStatic
         fun make(): Shaper {
             return make(null)
         }
 
+        @JvmStatic
         fun make(fontMgr: FontMgr?): Shaper {
             return try {
                 Stats.onNativeCall()

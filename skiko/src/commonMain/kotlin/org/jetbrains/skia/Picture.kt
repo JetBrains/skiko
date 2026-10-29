@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     companion object {
@@ -10,6 +11,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
          * if successful; otherwise, returns null. Fails if data does not permit
          * constructing valid Picture.
          */
+        @JvmStatic
         fun makeFromData(data: Data?): Picture? {
             return try {
                 Stats.onNativeCall()
@@ -35,6 +37,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
          *
          * @see [https://fiddle.skia.org/c/@Picture_MakePlaceholder](https://fiddle.skia.org/c/@Picture_MakePlaceholder)
          */
+        @JvmStatic
         fun makePlaceholder(cull: Rect): Picture {
             return makePlaceholder(cull.left, cull.top, cull.right, cull.bottom)
         }
@@ -57,6 +60,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
          *
          * @see [https://fiddle.skia.org/c/@Picture_MakePlaceholder](https://fiddle.skia.org/c/@Picture_MakePlaceholder)
          */
+        @JvmStatic
         fun makePlaceholder(left: Float, top: Float, right: Float, bottom: Float): Picture {
             Stats.onNativeCall()
             return Picture(_nMakePlaceholder(left, top, right, bottom))

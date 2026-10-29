@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<TextBlob.TextBlobIter.Run> {
     companion object {
@@ -15,6 +16,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
          * @param font    Font used for this run
          * @return        new TextBlob or null
          */
+        @JvmStatic
         fun makeFromPosH(glyphs: ShortArray, xpos: FloatArray, ypos: Float, font: Font?): TextBlob? {
             return try {
                 require(glyphs.size == xpos.size) { "glyphs.length " + glyphs.size + " != xpos.length " + xpos.size }
@@ -43,6 +45,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
          * @param font    Font used for this run
          * @return        new TextBlob or null
          */
+        @JvmStatic
         fun makeFromPos(glyphs: ShortArray, pos: Array<Point>, font: Font?): TextBlob? {
             return try {
                 require(glyphs.size == pos.size) { "glyphs.length " + glyphs.size + " != pos.length " + pos.size }
@@ -62,6 +65,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             }
         }
 
+        @JvmStatic
         fun makeFromRSXform(glyphs: ShortArray, xform: Array<RSXform>, font: Font?): TextBlob? {
             return try {
                 require(glyphs.size == xform.size) { "glyphs.length " + glyphs.size + " != xform.length " + xform.size }
@@ -87,6 +91,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             }
         }
 
+        @JvmStatic
         fun makeFromData(data: Data?): TextBlob? {
             return try {
                 Stats.onNativeCall()

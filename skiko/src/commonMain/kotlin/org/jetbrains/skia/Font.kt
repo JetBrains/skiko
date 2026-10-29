@@ -11,9 +11,11 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.withResult
+import kotlin.jvm.JvmStatic
 
 class Font : Managed {
     companion object {
+        @JvmStatic
         internal fun makeClone(ptr: NativePointer): Font {
             Stats.onNativeCall()
             return Font(Font_nMakeClone(ptr))

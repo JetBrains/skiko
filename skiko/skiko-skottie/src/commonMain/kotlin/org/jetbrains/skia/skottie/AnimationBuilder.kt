@@ -5,9 +5,11 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.impl.*
+import kotlin.jvm.JvmStatic
 
 class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
+        @JvmStatic
         internal fun _flagsToInt(vararg builderFlags: AnimationBuilderFlag): Int {
             var flags = 0
             for (flag in builderFlags) flags = flags or flag._flag

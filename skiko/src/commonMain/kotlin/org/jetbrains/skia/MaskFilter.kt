@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.jvm.JvmStatic
 
 /**
  * MaskFilter is the base class for object that perform transformations on
@@ -21,11 +22,13 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          *  @param respectCTM if `true` the blur's sigma is modified by the CTM.
          *  @return The new blur [MaskFilter]
          */
+        @JvmStatic
         fun makeBlur(mode: FilterBlurMode, sigma: Float, respectCTM: Boolean = true): MaskFilter {
             Stats.onNativeCall()
             return MaskFilter(_nMakeBlur(mode.ordinal, sigma, respectCTM))
         }
 
+        @JvmStatic
         fun makeShader(s: Shader?): MaskFilter {
             return try {
                 Stats.onNativeCall()
@@ -35,6 +38,7 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        @JvmStatic
         fun makeTable(table: ByteArray): MaskFilter {
             require(table.size == 256) { "Expected 256 elements, got " + table.size }
 
@@ -46,21 +50,25 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             )
         }
 
+        @JvmStatic
         fun makeGamma(gamma: Float): MaskFilter {
             Stats.onNativeCall()
             return MaskFilter(_nMakeGamma(gamma))
         }
 
+        @JvmStatic
         fun makeClip(min: Int, max: Int): MaskFilter {
             Stats.onNativeCall()
             return MaskFilter(_nMakeClip(min.toByte(), max.toByte()))
         }
 
         // If radius > 0, return the corresponding sigma, else return 0
+        @JvmStatic
         fun convertRadiusToSigma(radius: Float) =
             if (radius > 0) kBLUR_SIGMA_SCALE * radius + 0.5f else 0.0f
 
         // If sigma > 0.5, return the corresponding radius, else return 0
+        @JvmStatic
         fun convertSigmaToRadius(sigma: Float) =
             if (sigma > 0.5f) (sigma - 0.5f) / kBLUR_SIGMA_SCALE else 0.0f
     }

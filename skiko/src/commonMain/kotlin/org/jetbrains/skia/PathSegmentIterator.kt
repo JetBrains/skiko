@@ -8,11 +8,13 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.withResult
+import kotlin.jvm.JvmStatic
 
 class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePointer) :
     Managed(ptr, PathSegmentIterator_nGetFinalizer()),
     MutableIterator<PathSegment?> {
     companion object {
+        @JvmStatic
         fun make(path: Path?, forceClose: Boolean): PathSegmentIterator {
             return try {
                 val i = PathSegmentIterator(path, _nMake(getPtr(path), forceClose))
