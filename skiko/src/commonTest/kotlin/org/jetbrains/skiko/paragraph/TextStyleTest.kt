@@ -137,13 +137,16 @@ class TextStyleTest {
                 }
             }
         }
-
+        val style1 = TextStyle()
+        val style2 = TextStyle()
+        style1.color = -0x33cd00
+        style2.color = -0xff33cd
         assertFalse(
-            TextStyle().setColor(-0x33cd00).equals(TextStyleAttribute.ALL_ATTRIBUTES, TextStyle().setColor(-0xff33cd))
+            style1.equals(TextStyleAttribute.ALL_ATTRIBUTES, style2)
         )
 
         assertTrue(
-            TextStyle().setColor(-0x33cd00).equals(TextStyleAttribute.BACKGROUND, TextStyle().setColor(-0xff33cd))
+            style1.equals(TextStyleAttribute.BACKGROUND, style2)
         )
 
         TextStyle().use { ts1 ->
@@ -165,9 +168,9 @@ class TextStyleTest {
             textStyle.addFontFeature(FontFeature("FONT", true))
             textStyle.addFontFeatures(arrayOf(FontFeature("TONF", true), FontFeature("IDDI", false)))
             assertContentEquals(arrayOf(
-                FontFeature(84, 1, 0u, 4294967295u),
-                FontFeature(70, 1, 0u, 4294967295u),
-                FontFeature(73, 0, 0u, 4294967295u),
+                FontFeature(FourByteTag(84), 1, 0u, 4294967295u),
+                FontFeature(FourByteTag(70), 1, 0u, 4294967295u),
+                FontFeature(FourByteTag(73), 0, 0u, 4294967295u),
             ),  textStyle.fontFeatures)
 
             textStyle.clearFontFeatures()

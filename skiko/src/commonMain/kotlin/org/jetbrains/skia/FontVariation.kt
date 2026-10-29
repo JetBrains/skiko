@@ -1,7 +1,7 @@
 package org.jetbrains.skia
 
 import kotlin.jvm.JvmStatic
-class FontVariation(val _tag: Int, val value: Float) {
+class FontVariation(val _tag: FourByteTag, val value: Float) {
 
     constructor(feature: String, value: Float) : this(FourByteTag.fromString(feature), value) {}
 
@@ -22,7 +22,7 @@ class FontVariation(val _tag: Int, val value: Float) {
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + _tag
+        result = result * PRIME + _tag.tag
         result = result * PRIME + value.toBits()
         return result
     }

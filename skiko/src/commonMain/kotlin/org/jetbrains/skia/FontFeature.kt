@@ -5,7 +5,7 @@ import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skiko.internal.unpackTo
 import kotlin.jvm.JvmStatic
 
-class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt) {
+class FontFeature(val _tag: FourByteTag, val value: Int, val start: UInt, val end: UInt) {
 
     constructor(feature: String, value: Int, start: UInt, end: UInt) : this(
         FourByteTag.fromString(feature),
@@ -64,7 +64,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
     }
 
     internal fun toInteropIntArray(): IntArray {
-        return intArrayOf(_tag, value, start.toInt(), end.toInt())
+        return intArrayOf(_tag.tag, value, start.toInt(), end.toInt())
     }
 
     internal fun InteropScope.toInterop(): InteropPointer {
@@ -147,7 +147,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
             val ints = IntArray(4 * (fontFeatures?.size ?: 0))
 
             fontFeatures?.unpackTo(ints) { feature , arr, index ->
-                arr[index] = feature._tag
+                arr[index] = feature._tag.tag
                 arr[index + 1] = feature.value
                 arr[index + 2] = feature.start.toInt()
                 arr[index + 3] = feature.end.toInt()
@@ -169,7 +169,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
             return Array(featuresCount) {
                 val j = it * 2
                 FontFeature(
-                    fontFeatures[j], fontFeatures[j + 1],
+                    FourByteTag(fontFeatures[j]), fontFeatures[j + 1],
                     GLOBAL_START, GLOBAL_END
                 )
             }

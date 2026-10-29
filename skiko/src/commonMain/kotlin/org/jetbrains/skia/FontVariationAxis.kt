@@ -1,7 +1,7 @@
 package org.jetbrains.skia
 
 class FontVariationAxis(
-    val _tag: Int,
+    val _tag: FourByteTag,
     val minValue: Float,
     val defaultValue: Float,
     val maxValue: Float,

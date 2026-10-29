@@ -54,7 +54,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 }
                 (0 until count).map { i ->
                     val j = 2 * i
-                    FontVariation(variationsData[j], Float.fromBits(variationsData[j + 1]))
+                    FontVariation(FourByteTag(variationsData[j]), Float.fromBits(variationsData[j + 1]))
                 }.toTypedArray()
             } else null
         }
@@ -75,7 +75,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 (0 until axisCount).map { i ->
                     val j = 5 * i
                     FontVariationAxis(
-                        axisData[j],
+                        FourByteTag(axisData[j]),
                         Float.fromBits(axisData[j + 1]),
                         Float.fromBits(axisData[j + 2]),
                         Float.fromBits(axisData[j + 3]),
@@ -128,7 +128,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return nativeCall {
             val variationsCount = variations.size * 2
             val variationsData = variations.unpackTo(IntArray(variationsCount)) { variation, arr, idx ->
-                arr[idx] = variation._tag
+                arr[idx] = variation._tag.tag
                 arr[idx + 1] = variation.value.toRawBits()
                 //Stepping 2 places for the next variation
                 idx + 2
@@ -192,7 +192,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                     _nGetTableTags(_ptr, it, count)
                 }
                 Array(count) {
-                    FourByteTag.toString(tags[it])
+                    FourByteTag.toString(FourByteTag(tags[it]))
                 }
             } else emptyArray()
         }

@@ -22,7 +22,8 @@ class TextBlobBuilderRunHandler internal constructor(
         }
     }
 
-    internal val _text: ManagedString?
+    // TODO [pavel.sergeev] what `manageText` == false is actually mean?
+    internal val _text: ManagedString? = if (manageText) text else null
 
     constructor(text: String?) : this(ManagedString(text), true, 0f, 0f)
     constructor(text: String?, offset: Point) : this(ManagedString(text), true, offset.x, offset.y)

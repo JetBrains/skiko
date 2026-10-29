@@ -28,8 +28,33 @@ internal fun CharSequence.codePointsAt(index: Int) = sequence {
     }
 }
 
+/**
+ * Decodes all code points into an [IntArray] in a single pass with no boxing or intermediate collections.
+ */
 internal val CharSequence.codePointsAsIntArray: IntArray
-    get() = codePoints.toList().toIntArray()
+    get() {
+        val len = length
+        if (len == 0) return IntArray(0)
+        // Upper bound: every char is a separate BMP code point.
+        // If surrogate pairs exist, we shrink via copyOf.
+        val buffer = IntArray(len)
+        var count = 0
+        var i = 0
+        while (i < len) {
+            val high = this[i]
+            i++
+            if (high.isHighSurrogate() && i < len) {
+                val low = this[i]
+                if (low.isLowSurrogate()) {
+                    i++
+                    buffer[count++] = toCodePoint(high, low)
+                    continue
+                }
+            }
+            buffer[count++] = high.code
+        }
+        return if (count == len) buffer else buffer.copyOf(count)
+    }
 
 /**
  * Returns the character (Unicode code point) at the specified index.
