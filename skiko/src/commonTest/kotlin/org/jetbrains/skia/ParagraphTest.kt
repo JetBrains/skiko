@@ -12,11 +12,46 @@ import org.jetbrains.skiko.tests.runTest
 import kotlin.test.*
 
 class ParagraphTest {
+    @Test
+    fun paintRendersTextIntoRasterCanvas() = runTest {
+        fontCollection().use { collection ->
+            ParagraphStyle().use { paragraphStyle ->
+                TextStyle().use { textStyle ->
+                    textStyle.fontFamilies = arrayOf("Inter")
+                    textStyle.fontSize = 32f
+                    textStyle.color = Color.RED
+                    paragraphStyle.textStyle = textStyle
+                }
+                ParagraphBuilder(paragraphStyle, collection).use { builder ->
+                    builder.addText("Hello").build()
+                }.use { paragraph ->
+                    paragraph.layout(160f)
+                    Bitmap().use { bitmap ->
+                        assertTrue(bitmap.allocPixels(ImageInfo.makeN32Premul(180, 80)))
+                        Canvas(bitmap).use { canvas ->
+                            canvas.clear(Color.WHITE)
+                            assertSame(paragraph, paragraph.paint(canvas, 12f, 8f))
+                        }
+                        assertEquals(Color.WHITE, bitmap.getColor(0, 0))
+                        assertTrue((8 until 80).any { y ->
+                            (12 until 180).any { x -> bitmap.getColor(x, y) == Color.RED }
+                        }, "Painting the paragraph should produce red text pixels")
+                    }
+                }
+            }
+        }
+    }
+
     private val fontCollection = suspend {
-        FontCollection().setDefaultFontManager(TypefaceFontProvider().apply {
-            registerTypeface(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), "Inter")
-            registerTypeface(Typeface.makeFromResource("./fonts/JetBrainsMono_2_304/JetBrainsMono-Regular.ttf"), "JetBrains Mono")
-        })
+        TypefaceFontProvider().use { manager ->
+            Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf").use { typeface ->
+                manager.registerTypeface(typeface, "Inter")
+            }
+            Typeface.makeFromResource("./fonts/JetBrainsMono_2_304/JetBrainsMono-Regular.ttf").use { typeface ->
+                manager.registerTypeface(typeface, "JetBrains Mono")
+            }
+            FontCollection().setDefaultFontManager(manager)
+        }
     }
     private val style = ParagraphStyle().apply {
         height = 40.0f

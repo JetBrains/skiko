@@ -222,6 +222,20 @@ jobs:
             :linkDebugExecutableIosSimulatorArm64 \
             :linkDebugExecutableIosX64
 
+      - shell: bash
+        name: 'Run Skiko macOS Native Benchmarks'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skiko-benchmarks-gradle
+        run: |
+          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts macos version=0.0.0-SNAPSHOT
+
+      - uses: actions/upload-artifact@v4
+        name: 'Upload Skiko macOS Native Benchmark Reports'
+        if: always()
+        with:
+          name: skiko-macos-native-benchmark-reports
+          path: benchmarks/SkikoBenchmarks/build/benchmarks/archive
+
   Windows:
     name: 'Windows Publish Dry Run'
     runs-on: windows-2022

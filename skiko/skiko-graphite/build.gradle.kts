@@ -150,16 +150,7 @@ kotlin.run {
 
     sourceSets.commonMain.dependencies {
         implementation(kotlin("stdlib"))
-        /*
-        We use compileOnly here because the root project publishes multiple artifacts
-        which makes api/implementation(project(":")) fail during publishing.
-        This avoids Gradle's multi-publication ambiguity but skiko core is NOT added
-        as a transitive dependency of skiko-graphite, and it will NOT appear in the published POM
-        consumers MUST explicitly depend on both:
-            - implementation("org.jetbrains.skiko:skiko-x")
-            - implementation("org.jetbrains.skiko:skiko-graphite-x")
-         */
-        compileOnly(coreProject)
+        api(project(":"))
     }
 
     sourceSets.commonTest.dependencies {

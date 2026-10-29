@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrAnnotationImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
+import org.jetbrains.kotlin.ir.types.isBoolean
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.getAnnotation
@@ -26,6 +27,9 @@ internal class ImportGeneratorTransformer(
 
     private val exportSymbols = mutableListOf<String>()
     fun getExportSymbols(): List<String> = exportSymbols
+
+    private val booleanExportSymbols = mutableSetOf<String>()
+    fun getBooleanExportSymbols(): Set<String> = booleanExportSymbols
 
     @Suppress("UNCHECKED_CAST")
     private fun IrAnnotation.getStringValue(value: String): String =
@@ -102,6 +106,9 @@ internal class ImportGeneratorTransformer(
             addWasmImportAnnotation(name)
 
             exportSymbols.add(name)
+            if (returnType.isBoolean()) {
+                booleanExportSymbols.add(name)
+            }
         }
     }
 }

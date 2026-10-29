@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.tests.*
@@ -9,6 +10,32 @@ private fun BreakIterator.asSequence() = generateSequence { next().let { n -> if
 
 
 class BreakIteratorTests {
+    @Test
+    @SkipJsTarget
+    @SkipWasmTarget
+    fun wordBoundaryNavigation() {
+        if (hostOs == OS.Ios || hostOs == OS.Tvos)
+            return
+
+        BreakIterator.makeWordInstance("en-US").use { boundary ->
+            boundary.setText("Hello world!")
+            assertEquals(0, boundary.current())
+            assertEquals(5, boundary.following(1))
+            assertEquals(5, boundary.current())
+            assertEquals(0, boundary.previous())
+            assertEquals(BreakIterator.DONE, boundary.previous())
+            assertEquals(0, boundary.current())
+
+            assertEquals(6, boundary.preceding(10))
+            assertEquals(6, boundary.current())
+            assertTrue(boundary.isBoundary(6))
+            assertFalse(boundary.isBoundary(7))
+            assertTrue(boundary.isBoundary(0))
+            assertTrue(boundary.isBoundary(12))
+            assertEquals(BreakIterator.DONE, boundary.following(12))
+            assertEquals(BreakIterator.DONE, boundary.preceding(0))
+        }
+    }
 
     @Test
     @SkipJsTarget

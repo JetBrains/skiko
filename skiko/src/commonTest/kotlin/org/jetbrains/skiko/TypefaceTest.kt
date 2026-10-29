@@ -1,12 +1,21 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.*
 
 class TypefaceTest {
+    @Test
+    fun tableSizeDistinguishesPresentAndMissingTables() = runTest {
+        Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf").use { typeface ->
+            assertNotEquals(Native.NullPointer, typeface.getTableSize("head"))
+            assertEquals(Native.NullPointer, typeface.getTableSize("ZZZZ"))
+        }
+    }
 
     @Test
     fun typefaceTest() = runTest {
