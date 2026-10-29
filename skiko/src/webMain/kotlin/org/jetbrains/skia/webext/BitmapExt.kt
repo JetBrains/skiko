@@ -3,12 +3,7 @@ package org.jetbrains.skia.webext
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ImageInfo
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.interopScope
-import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.*
 import org.khronos.webgl.ArrayBuffer
 
 /**
@@ -28,9 +23,8 @@ suspend fun Bitmap.installPixelsFromArrayBuffer(
 ): Boolean {
     val pixelsPtr = copyBufferToSkiko(pixelsArrayBuffer)
     if (pixelsPtr == Native.NullPointer) return false
-    return try {
+    return nativeCall(info.colorInfo.colorSpace) { colorSpace ->
         _imageInfo = null
-        Stats.onNativeCall()
         interopScope {
             _nInstallPixelsFromPointer(
                 _ptr,
@@ -38,16 +32,13 @@ suspend fun Bitmap.installPixelsFromArrayBuffer(
                 info.height,
                 info.colorInfo.colorType.ordinal,
                 info.colorInfo.alphaType.ordinal,
-                getPtr(info.colorInfo.colorSpace),
+                colorSpace.pointerOrNullPointer,
                 pixelsPtr,
                 rowBytes
             )
 
         }
-     } finally {
-        reachabilityBarrier(this)
-        reachabilityBarrier(info.colorInfo.colorSpace)
-     }
+    }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nInstallPixelsFromPointer")

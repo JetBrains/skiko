@@ -2,7 +2,6 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
-import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.withResult
 import org.jetbrains.skiko.InternalSkikoApi
 import kotlin.jvm.JvmStatic

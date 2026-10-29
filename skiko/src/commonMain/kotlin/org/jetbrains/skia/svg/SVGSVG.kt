@@ -13,105 +13,32 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     }
 
     var x: SVGLength
-        get() = try {
-            Stats.onNativeCall()
-            SVGLength.fromInterop { SVGSVG_nGetX(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            SVGSVG_nSetX(_ptr, value.value, value.unit.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { SVGLength.fromInterop { SVGSVG_nGetX(_ptr, it) } }
+        set(value) = nativeCall { SVGSVG_nSetX(_ptr, value.value, value.unit.ordinal) }
 
     var y: SVGLength
-        get() = try {
-            Stats.onNativeCall()
-            SVGLength.fromInterop { SVGSVG_nGetY(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) {
-            setY(value)
-        }
-
-    fun setY(length: SVGLength): SVGSVG {
-        return try {
-            Stats.onNativeCall()
-            SVGSVG_nSetY(_ptr, length.value, length.unit.ordinal)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+        get() = nativeCall { SVGLength.fromInterop { SVGSVG_nGetY(_ptr, it) } }
+        set(value) = nativeCall { SVGSVG_nSetY(_ptr, value.value, value.unit.ordinal) }
 
     var width: SVGLength
-        get() = try {
-            Stats.onNativeCall()
-            SVGLength.fromInterop { SVGSVG_nGetWidth(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            SVGSVG_nSetWidth(_ptr, value.value, value.unit.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { SVGLength.fromInterop { SVGSVG_nGetWidth(_ptr, it) } }
+        set(value) = nativeCall { SVGSVG_nSetWidth(_ptr, value.value, value.unit.ordinal) }
 
     var height: SVGLength
-        get() = try {
-            Stats.onNativeCall()
-            SVGLength.fromInterop { SVGSVG_nGetHeight(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            SVGSVG_nSetHeight(_ptr, value.value, value.unit.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { SVGLength.fromInterop { SVGSVG_nGetHeight(_ptr, it) } }
+        set(value) = nativeCall { SVGSVG_nSetHeight(_ptr, value.value, value.unit.ordinal) }
 
 
     var preserveAspectRatio: SVGPreserveAspectRatio
-        get() = try {
-            Stats.onNativeCall()
-            SVGPreserveAspectRatio.fromInterop { SVGSVG_nGetPreserveAspectRatio(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            SVGSVG_nSetPreserveAspectRatio(_ptr, value._align._value, value._scale.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { SVGPreserveAspectRatio.fromInterop { SVGSVG_nGetPreserveAspectRatio(_ptr, it) } }
+        set(value) = nativeCall { SVGSVG_nSetPreserveAspectRatio(_ptr, value.align._value, value.scale.ordinal) }
 
     var viewBox: Rect?
-        get() = try {
-            Stats.onNativeCall()
-            Rect.fromInteropPointerNullable { SVGSVG_nGetViewBox(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            SVGSVG_nSetViewBox(_ptr, value!!.left, value.top, value.right, value.bottom)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Rect.fromInteropPointerNullable { SVGSVG_nGetViewBox(_ptr, it) } }
+        set(value) = nativeCall { SVGSVG_nSetViewBox(_ptr, value!!.left, value.top, value.right, value.bottom) }
 
-    fun getIntrinsicSize(lc: SVGLengthContext): Point {
-        return try {
-            Stats.onNativeCall()
-            Point.fromInteropPointer { SVGSVG_nGetIntrinsicSize(_ptr, lc.width, lc.height, lc.dpi, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getIntrinsicSize(lc: SVGLengthContext): Point =
+        nativeCall { Point.fromInteropPointer { SVGSVG_nGetIntrinsicSize(_ptr, lc.width, lc.height, lc.dpi, it) } }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetX")

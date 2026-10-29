@@ -2,10 +2,7 @@ package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.FontFeature.Companion.arrayOfFontFeaturesToInterop
 import org.jetbrains.skia.ManagedString
-import org.jetbrains.skia.impl.InteropPointer
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.interopScope
-import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.*
 
 internal actual fun Shaper.doShape(
     textUtf8: ManagedString,
@@ -17,11 +14,11 @@ internal actual fun Shaper.doShape(
     width: Float,
     runHandler: RunHandler
 ) {
-    try {
+    nativeCall(textUtf8) { textUtf8 ->
         interopScope {
             Shaper_nShape(
                 _ptr,
-                getPtr(textUtf8),
+                textUtf8.pointerOrNullPointer,
                 fontIter as InteropPointer,
                 bidiIter as InteropPointer,
                 scriptIter as InteropPointer,
@@ -33,8 +30,5 @@ internal actual fun Shaper.doShape(
                 runHandler = runHandler as InteropPointer
             )
         }
-    } finally {
-        reachabilityBarrier(this)
-        reachabilityBarrier(textUtf8)
     }
 }

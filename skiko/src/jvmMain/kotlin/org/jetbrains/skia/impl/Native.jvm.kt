@@ -48,7 +48,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 }
 
 @InternalSkikoApi
-actual fun reachabilityBarrier(obj: Any?) {
+actual inline fun reachabilityBarrier(obj: Any?) {
     Reference.reachabilityFence(obj)
 }
 
