@@ -28,25 +28,20 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          * @see [https://fiddle.skia.org/c/@Image_MakeRasterCopy](https://fiddle.skia.org/c/@Image_MakeRasterCopy)
          */
         @JvmStatic
-        fun makeRaster(imageInfo: ImageInfo, bytes: ByteArray, rowBytes: Int): Image {
-            return try {
-                Stats.onNativeCall()
-                val ptr = interopScope {
-                    _nMakeRaster(
-                        imageInfo.width,
-                        imageInfo.height,
-                        imageInfo.colorInfo.colorType.ordinal,
-                        imageInfo.colorInfo.alphaType.ordinal,
-                        getPtr(imageInfo.colorInfo.colorSpace),
-                        toInterop(bytes),
-                        rowBytes
-                    )
-                }
-                if (ptr == NullPointer) throw RuntimeException("Failed to makeRaster $imageInfo $bytes $rowBytes")
-                Image(ptr)
-            } finally {
-                reachabilityBarrier(imageInfo.colorInfo.colorSpace)
+        fun makeRaster(imageInfo: ImageInfo, bytes: ByteArray, rowBytes: Int): Image = nativeCall(imageInfo.colorInfo.colorSpace){ colorSpace ->
+            val ptr = interopScope {
+                _nMakeRaster(
+                    imageInfo.width,
+                    imageInfo.height,
+                    imageInfo.colorInfo.colorType.ordinal,
+                    imageInfo.colorInfo.alphaType.ordinal,
+                    colorSpace.pointerOrNullPointer,
+                    toInterop(bytes),
+                    rowBytes
+                )
             }
+            if (ptr == NullPointer) throw RuntimeException("Failed to makeRaster $imageInfo $bytes $rowBytes")
+            Image(ptr)
         }
 
         /**
@@ -69,25 +64,20 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          * @return           Image
          */
         @JvmStatic
-        fun makeRaster(imageInfo: ImageInfo, data: Data, rowBytes: Int): Image {
-            return try {
-                Stats.onNativeCall()
+        fun makeRaster(imageInfo: ImageInfo, data: Data, rowBytes: Int): Image =
+            nativeCallFromStatic(imageInfo.colorInfo.colorSpace, data) { colorSpace, data ->
                 val ptr = _nMakeRasterData(
                     imageInfo.width,
                     imageInfo.height,
                     imageInfo.colorInfo.colorType.ordinal,
                     imageInfo.colorInfo.alphaType.ordinal,
-                    getPtr(imageInfo.colorInfo.colorSpace),
-                    getPtr(data),
+                    colorSpace.pointerOrNullPointer,
+                    data.pointerOrNullPointer,
                     rowBytes
                 )
                 if (ptr == NullPointer) throw RuntimeException("Failed to makeRaster $imageInfo $data $rowBytes")
                 Image(ptr)
-            } finally {
-                reachabilityBarrier(imageInfo.colorInfo.colorSpace)
-                reachabilityBarrier(data)
             }
-        }
 
         /**
          *
@@ -111,37 +101,28 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          * @see [https://fiddle.skia.org/c/@Image_MakeFromBitmap](https://fiddle.skia.org/c/@Image_MakeFromBitmap)
          */
         @JvmStatic
-        fun makeFromBitmap(bitmap: Bitmap): Image {
-            return try {
-                Stats.onNativeCall()
-                val ptr = _nMakeFromBitmap(getPtr(bitmap))
+        fun makeFromBitmap(bitmap: Bitmap): Image =
+            nativeCallFromStatic(bitmap) { bitmap ->
+                val ptr = _nMakeFromBitmap(bitmap.pointerOrNullPointer)
                 if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromBitmap $bitmap")
                 Image(ptr)
-            } finally {
-                reachabilityBarrier(bitmap)
             }
-        }
 
         @JvmStatic
-        fun makeFromPixmap(pixmap: Pixmap): Image {
-            return try {
-                Stats.onNativeCall()
-                val ptr = _nMakeFromPixmap(getPtr(pixmap))
+        fun makeFromPixmap(pixmap: Pixmap): Image =
+            nativeCallFromStatic(pixmap) { pixmap ->
+                val ptr = _nMakeFromPixmap(pixmap.pointerOrNullPointer)
                 if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromRaster $pixmap")
                 Image(ptr)
-            } finally {
-                reachabilityBarrier(pixmap)
             }
-        }
 
         @JvmStatic
-        fun makeFromEncoded(bytes: ByteArray): Image {
-            Stats.onNativeCall()
+        fun makeFromEncoded(bytes: ByteArray): Image = nativeCallFromStatic {
             val ptr = interopScope {
                 _nMakeFromEncoded(toInterop(bytes), bytes.size)
             }
             require(ptr != NullPointer) { "Failed to Image::makeFromEncoded" }
-            return Image(ptr)
+            Image(ptr)
         }
 
         /**
@@ -165,22 +146,15 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             backendTexture: BackendTexture,
             origin: SurfaceOrigin,
             colorType: ColorType,
-        ): Image {
-            return try {
-                Stats.onNativeCall()
-                val ptr = _nAdoptTextureFrom(
-                    getPtr(context),
-                    getPtr(backendTexture),
-                    origin.ordinal,
-                    colorType.ordinal
-                )
-                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromTexture")
-                Image(ptr)
-            }
-            finally {
-                reachabilityBarrier(context)
-                reachabilityBarrier(backendTexture)
-            }
+        ): Image = nativeCallFromStatic(context, backendTexture) { context, backendTexture ->
+            val ptr = _nAdoptTextureFrom(
+                context.pointerOrNullPointer,
+                backendTexture.pointerOrNullPointer,
+                origin.ordinal,
+                colorType.ordinal
+            )
+            if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromTexture")
+            Image(ptr)
         }
 
         /**
@@ -206,23 +180,16 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             origin: SurfaceOrigin,
             colorType: ColorType,
             alphaType: ColorAlphaType,
-        ): Image {
-            return try {
-                Stats.onNativeCall()
-                val ptr = _nAdoptTextureFromAlphaType(
-                    getPtr(context),
-                    getPtr(backendTexture),
-                    origin.ordinal,
-                    colorType.ordinal,
-                    alphaType.ordinal,
-                )
-                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromTexture")
-                Image(ptr)
-            }
-            finally {
-                reachabilityBarrier(context)
-                reachabilityBarrier(backendTexture)
-            }
+        ): Image = nativeCallFromStatic(context, backendTexture) { context, backendTexture ->
+            val ptr = _nAdoptTextureFromAlphaType(
+                context.pointerOrNullPointer,
+                backendTexture.pointerOrNullPointer,
+                origin.ordinal,
+                colorType.ordinal,
+                alphaType.ordinal,
+            )
+            if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromTexture")
+            Image(ptr)
         }
 
         init {
@@ -281,14 +248,9 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         format: EncodedImageFormat = EncodedImageFormat.PNG,
         quality: Int = 100,
         pngCompressionLevel: Int = 6
-    ): Data? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nEncodeToData(_ptr, format.ordinal, quality, pngCompressionLevel)
-            if (ptr == NullPointer) null else org.jetbrains.skia.Data(ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    ): Data? = nativeCall {
+        val ptr = _nEncodeToData(_ptr, format.ordinal, quality, pngCompressionLevel)
+        if (ptr == NullPointer) null else Data(ptr)
     }
 
     fun makeShader(localMatrix: Matrix33?): Shader {
@@ -308,24 +270,19 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         tmy: FilterTileMode = FilterTileMode.CLAMP,
         sampling: SamplingMode = SamplingMode.DEFAULT,
         localMatrix: Matrix33? = null
-    ): Shader {
-        return try {
-            Stats.onNativeCall()
-            Shader(
-                interopScope {
-                    Image_nMakeShader(
-                        _ptr,
-                        tmx.ordinal,
-                        tmy.ordinal,
-                        sampling._packedInt1(),
-                        sampling._packedInt2(),
-                        toInterop(localMatrix?.mat)
-                    )
-                }
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+    ): Shader = nativeCall {
+        Shader(
+            interopScope {
+                Image_nMakeShader(
+                    _ptr,
+                    tmx.ordinal,
+                    tmy.ordinal,
+                    sampling._packedInt1(),
+                    sampling._packedInt2(),
+                    toInterop(localMatrix?.mat)
+                )
+            }
+        )
     }
 
     /**
@@ -334,30 +291,16 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
      *
      * @see [https://fiddle.skia.org/c/@Image_peekPixels](https://fiddle.skia.org/c/@Image_peekPixels)
      */
-    fun peekPixels(): Pixmap? {
-        return try {
-            Stats.onNativeCall()
-            Image_nPeekPixels(_ptr).takeIf {
-                it != NullPointer
-            }?.let {
-                Pixmap(it, true)
-            }
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun peekPixels(): Pixmap? = nativeCall {
+        val ptr = Image_nPeekPixels(_ptr)
+        if (ptr == NullPointer) null else Pixmap(ptr, true)
     }
 
-    fun peekPixels(pixmap: Pixmap?): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nPeekPixelsToPixmap(
-                _ptr,
-                getPtr(pixmap)
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(pixmap)
-        }
+    fun peekPixels(pixmap: Pixmap?): Boolean = nativeCall(pixmap) { pixmap ->
+        _nPeekPixelsToPixmap(
+            _ptr,
+            pixmap.pointerOrNullPointer
+        )
     }
 
     fun readPixels(dst: Bitmap): Boolean {
@@ -416,51 +359,36 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
      * @param cache   whether the pixels should be cached locally
      * @return        true if pixels are copied to dstPixels
      */
-    fun readPixels(context: DirectContext?, dst: Bitmap, srcX: Int, srcY: Int, cache: Boolean): Boolean {
-        return try {
+    fun readPixels(context: DirectContext?, dst: Bitmap, srcX: Int, srcY: Int, cache: Boolean): Boolean =
+        nativeCall(context, dst) { context, dst ->
             _nReadPixelsBitmap(
                 _ptr,
-                getPtr(context),
-                getPtr(dst),
+                context.pointerOrNullPointer,
+                dst._ptr,
                 srcX,
                 srcY,
                 cache
             )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(context)
-            reachabilityBarrier(dst)
         }
+
+    fun readPixels(dst: Pixmap, srcX: Int, srcY: Int, cache: Boolean): Boolean = nativeCall(dst) { dst ->
+        _nReadPixelsPixmap(
+            _ptr,
+            dst._ptr,
+            srcX,
+            srcY,
+            cache
+        )
     }
 
-    fun readPixels(dst: Pixmap, srcX: Int, srcY: Int, cache: Boolean): Boolean {
-        return try {
-            _nReadPixelsPixmap(
-                _ptr,
-                getPtr(dst),
-                srcX,
-                srcY,
-                cache
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(dst)
-        }
-    }
-
-    fun scalePixels(dst: Pixmap, samplingMode: SamplingMode, cache: Boolean): Boolean {
-        return try {
-            _nScalePixels(
-                _ptr,
-                getPtr(dst),
-                samplingMode._packedInt1(),
-                samplingMode._packedInt2(),
-                cache
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(dst)
-        }
+    fun scalePixels(dst: Pixmap, samplingMode: SamplingMode, cache: Boolean): Boolean = nativeCall(dst) { dst ->
+        _nScalePixels(
+            _ptr,
+            dst._ptr,
+            samplingMode._packedInt1(),
+            samplingMode._packedInt2(),
+            cache
+        )
     }
 }
 

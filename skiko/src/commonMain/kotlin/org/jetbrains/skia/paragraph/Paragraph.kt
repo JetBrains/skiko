@@ -21,80 +21,32 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
     }
 
     val maxWidth: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetMaxWidth(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetMaxWidth(_ptr) }
     val height: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetHeight(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetHeight(_ptr) }
     val minIntrinsicWidth: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetMinIntrinsicWidth(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetMinIntrinsicWidth(_ptr) }
     val maxIntrinsicWidth: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetMaxIntrinsicWidth(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetMaxIntrinsicWidth(_ptr) }
     val alphabeticBaseline: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetAlphabeticBaseline(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetAlphabeticBaseline(_ptr) }
     val ideographicBaseline: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetIdeographicBaseline(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetIdeographicBaseline(_ptr) }
     val longestLine: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetLongestLine(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetLongestLine(_ptr) }
 
-    fun didExceedMaxLines(): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nDidExceedMaxLines(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun didExceedMaxLines(): Boolean = nativeCall { _nDidExceedMaxLines(_ptr) }
 
-    fun layout(width: Float): Paragraph {
-        Stats.onNativeCall()
+    fun layout(width: Float): Paragraph = nativeCall {
         _nLayout(_ptr, width)
-        return this
+        this
     }
 
-    fun paint(canvas: Canvas?, x: Float, y: Float): Paragraph {
-        return try {
-            Stats.onNativeCall()
-            _nPaint(_ptr, getPtr(canvas), x, y)
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(canvas)
-        }
+    fun paint(canvas: Canvas?, x: Float, y: Float): Paragraph = nativeCall(canvas) { canvas ->
+        _nPaint(_ptr, canvas.pointerOrNullPointer, x, y)
+        this
     }
+
 
     /**
      * Returns a vector of bounding boxes that enclose all text between
@@ -105,114 +57,72 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
         end: Int,
         rectHeightMode: RectHeightMode,
         rectWidthMode: RectWidthMode
-    ): Array<TextBox> {
-        return try {
-            Stats.onNativeCall()
-            interopScope {
-                _nGetRectsForRange(_ptr, start, end, rectHeightMode.ordinal, rectWidthMode.ordinal).fromInterop(TextBox)
-            }
-        } finally {
-            reachabilityBarrier(this)
+    ): Array<TextBox> = nativeCall {
+        interopScope {
+            _nGetRectsForRange(_ptr, start, end, rectHeightMode.ordinal, rectWidthMode.ordinal).fromInterop(TextBox)
         }
     }
 
     val rectsForPlaceholders: Array<TextBox>
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             interopScope {
                 _nGetRectsForPlaceholders(_ptr).fromInterop(TextBox)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
 
-    fun getGlyphPositionAtCoordinate(dx: Float, dy: Float): PositionWithAffinity {
-        return try {
-            Stats.onNativeCall()
-            val res = _nGetGlyphPositionAtCoordinate(_ptr, dx, dy)
-            if (res >= 0) PositionWithAffinity(res, Affinity.DOWNSTREAM) else PositionWithAffinity(
-                -res - 1,
-                Affinity.UPSTREAM
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun getGlyphPositionAtCoordinate(dx: Float, dy: Float): PositionWithAffinity = nativeCall {
+        val res = _nGetGlyphPositionAtCoordinate(_ptr, dx, dy)
+        if (res >= 0) PositionWithAffinity(res, Affinity.DOWNSTREAM) else PositionWithAffinity(
+            -res - 1,
+            Affinity.UPSTREAM
+        )
     }
 
 
 
-    fun getWordBoundary(offset: Int): IRange {
-        return try {
-            Stats.onNativeCall()
-            IRange.fromInteropPointer { _nGetWordBoundary(_ptr, offset, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun getWordBoundary(offset: Int): IRange = nativeCall {
+        IRange.fromInteropPointer { _nGetWordBoundary(_ptr, offset, it) }
     }
 
     private fun toIRange(p: Long) = IRange((p ushr 32).toInt(), (p and -1).toInt())
 
     val lineMetrics: Array<LineMetrics>
-        get() = try {
-            if (_text == null) {
-                arrayOf<LineMetrics>()
-            } else {
-                Stats.onNativeCall()
+        get() = if (_text == null) {
+            arrayOf<LineMetrics>()
+        } else {
+            nativeCall(_text) { text ->
                 interopScope {
-                    _nGetLineMetrics(_ptr, getPtr(_text)).fromInterop(LineMetrics)
+                    _nGetLineMetrics(_ptr, text.pointerOrNullPointer).fromInterop(LineMetrics)
                 }
             }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(_text)
         }
     val lineNumber: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetLineNumber(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetLineNumber(_ptr) }
 
-    fun markDirty(): Paragraph {
-        Stats.onNativeCall()
+    fun markDirty(): Paragraph = nativeCall {
         _nMarkDirty(_ptr)
-        return this
+        this
     }
 
     val unresolvedGlyphsCount: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetUnresolvedGlyphsCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetUnresolvedGlyphsCount(_ptr) }
 
     val unresolvedCodepointsCount: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetUnresolvedCodepointsCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetUnresolvedCodepointsCount(_ptr) }
 
     val unresolvedCodepoints: IntArray
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val count = _nGetUnresolvedCodepointsCount(_ptr)
             val result = IntArray(count)
             if (count > 0) {
                 withResult(result) { _nGetUnresolvedCodepoints(_ptr, it) }
             }
             result
-        } finally {
-            reachabilityBarrier(this)
         }
 
-    fun updateAlignment(alignment: Alignment): Paragraph {
-        Stats.onNativeCall()
+    fun updateAlignment(alignment: Alignment): Paragraph = nativeCall {
         _nUpdateAlignment(_ptr, alignment.ordinal)
-        return this
+        this
     }
 
     // public Paragraph updateText(int from, String text) {
@@ -228,22 +138,18 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
      * see: https://github.com/JetBrains/skia/blob/51072f3e6d263eeffed4c3038655ab1bf9cf8439/modules/skparagraph/src/ParagraphImpl.cpp#L1069
      */
     fun updateFontSize(from: Int, to: Int, size: Float): Paragraph {
-        return try {
-            if (_text != null) {
-                Stats.onNativeCall()
+        if (_text != null) {
+            nativeCall(_text) { text ->
                 _nUpdateFontSize(
                     _ptr,
                     from,
                     to,
                     size,
-                    getPtr(_text)
+                    text.pointerOrNullPointer
                 )
             }
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(_text)
         }
+        return this
     }
 
     /**
@@ -251,23 +157,18 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
      * and change applies to the whole paragraph text
      */
     fun updateForegroundPaint(from: Int, to: Int, paint: Paint): Paragraph {
-        return try {
-            if (_text != null) {
-                Stats.onNativeCall()
+        if (_text != null) {
+            nativeCall(paint, _text) { paint, text ->
                 _nUpdateForegroundPaint(
                     _ptr,
                     from,
                     to,
-                    getPtr(paint),
-                    getPtr(_text)
+                    paint.pointerOrNullPointer,
+                    text.pointerOrNullPointer
                 )
             }
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(paint)
-            reachabilityBarrier(_text)
         }
+        return this
     }
 
     /**
@@ -275,33 +176,21 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
      * and change applies to the whole paragraph text
      */
     fun updateBackgroundPaint(from: Int, to: Int, paint: Paint): Paragraph {
-        return try {
-            if (_text != null) {
-                Stats.onNativeCall()
+        if (_text != null) {
+            nativeCall(paint, _text) { paint, text ->
                 _nUpdateBackgroundPaint(
                     _ptr,
                     from,
                     to,
-                    getPtr(paint),
-                    getPtr(_text)
+                    paint.pointerOrNullPointer,
+                    text.pointerOrNullPointer
                 )
             }
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(paint)
-            reachabilityBarrier(_text)
         }
+        return this
     }
 
-    fun getText(): String {
-        return try {
-            return _text.toString()
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(_text)
-        }
-    }
+    fun getText(): String = nativeCall(_text) { it.toString() }
 
     private object _FinalizerHolder {
         val PTR = Paragraph_nGetFinalizer()

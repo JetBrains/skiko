@@ -46,31 +46,18 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
      * (i.e. the saveLevel() on the canvas will match what it was when draw() was called,
      * and the current matrix and clip settings will not be changed.
      */
-    fun draw(canvas: Canvas?, matrix: Matrix33?): Drawable {
-        return try {
-            Stats.onNativeCall()
-            interopScope {
-                _nDraw(
-                    _ptr,
-                    getPtr(canvas),
-                    toInterop(matrix?.mat)
-                )
-            }
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(canvas)
+    fun draw(canvas: Canvas?, matrix: Matrix33?): Drawable = nativeCall(canvas) { canvas ->
+        interopScope {
+            _nDraw(
+                _ptr,
+                canvas.pointerOrNullPointer,
+                toInterop(matrix?.mat)
+            )
         }
+        this
     }
 
-    fun makePictureSnapshot(): Picture {
-        return try {
-            Stats.onNativeCall()
-            Picture(_nMakePictureSnapshot(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun makePictureSnapshot(): Picture = nativeCall { Picture(_nMakePictureSnapshot(_ptr)) }
 
     /**
      *
@@ -82,12 +69,7 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
      * a new value will be returned the next time it is called.
      */
     val generationId: Int
-        get() = try {
-            Stats.onNativeCall()
-            Drawable_nGetGenerationId(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Drawable_nGetGenerationId(_ptr) }
 
     /**
      * Return the (conservative) bounds of what the drawable will draw. If the drawable can

@@ -4,9 +4,6 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.impl.*
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.interopScope
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 class TypefaceFontProviderWithFallback private constructor(
     ptr: NativePointer,
@@ -20,22 +17,17 @@ class TypefaceFontProviderWithFallback private constructor(
         }
     }
 
-    override fun registerTypeface(typeface: Typeface?, alias: String?): TypefaceFontProviderWithFallback {
-        return try {
-            Stats.onNativeCall()
+    override fun registerTypeface(typeface: Typeface?, alias: String?): TypefaceFontProviderWithFallback =
+        nativeCall(typeface) { typeface ->
             interopScope {
                 _nRegisterTypefaceForFallback(
                     _ptr,
-                    getPtr(typeface),
+                    typeface.pointerOrNullPointer,
                     toInterop(alias)
                 )
             }
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(typeface)
         }
-    }
 
     init {
         Stats.onNativeCall()

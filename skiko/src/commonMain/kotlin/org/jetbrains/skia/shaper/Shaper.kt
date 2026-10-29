@@ -13,24 +13,14 @@ import kotlin.jvm.JvmStatic
 class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic
-        fun makePrimitive(): Shaper {
-            Stats.onNativeCall()
-            return Shaper(_nMakePrimitive())
-        }
+        fun makePrimitive(): Shaper = nativeCallFromStatic { Shaper(_nMakePrimitive()) }
 
         @JvmStatic
-        fun makeShaperDrivenWrapper(): Shaper {
-            return makeShaperDrivenWrapper(null)
-        }
+        fun makeShaperDrivenWrapper(): Shaper = makeShaperDrivenWrapper(null)
 
         @JvmStatic
-        fun makeShaperDrivenWrapper(fontMgr: FontMgr?): Shaper {
-            return try {
-                Stats.onNativeCall()
-                Shaper(_nMakeShaperDrivenWrapper(getPtr(fontMgr)))
-            } finally {
-                reachabilityBarrier(fontMgr)
-            }
+        fun makeShaperDrivenWrapper(fontMgr: FontMgr?): Shaper = nativeCallFromStatic(fontMgr) { fontMgr ->
+            Shaper(_nMakeShaperDrivenWrapper(fontMgr.pointerOrNullPointer))
         }
 
         @JvmStatic
@@ -39,13 +29,8 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         }
 
         @JvmStatic
-        fun makeShapeThenWrap(fontMgr: FontMgr?): Shaper {
-            return try {
-                Stats.onNativeCall()
-                Shaper(_nMakeShapeThenWrap(getPtr(fontMgr)))
-            } finally {
-                reachabilityBarrier(fontMgr)
-            }
+        fun makeShapeThenWrap(fontMgr: FontMgr?): Shaper = nativeCallFromStatic(fontMgr) { fontMgr ->
+            Shaper(_nMakeShapeThenWrap(fontMgr.pointerOrNullPointer))
         }
 
         @JvmStatic
@@ -54,13 +39,8 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         }
 
         @JvmStatic
-        fun makeShapeDontWrapOrReorder(fontMgr: FontMgr?): Shaper {
-            return try {
-                Stats.onNativeCall()
-                Shaper(_nMakeShapeDontWrapOrReorder(getPtr(fontMgr)))
-            } finally {
-                reachabilityBarrier(fontMgr)
-            }
+        fun makeShapeDontWrapOrReorder(fontMgr: FontMgr?): Shaper = nativeCallFromStatic(fontMgr) { fontMgr ->
+            Shaper(_nMakeShapeDontWrapOrReorder(fontMgr.pointerOrNullPointer))
         }
 
         /**
@@ -72,6 +52,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
          *
          * @return  Shaper on macOS, throws UnsupportedOperationException elsewhere
          */
+
         @JvmStatic
         fun makeCoreText(): Shaper {
             Stats.onNativeCall()
@@ -81,18 +62,11 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         }
 
         @JvmStatic
-        fun make(): Shaper {
-            return make(null)
-        }
+        fun make(): Shaper = make(null)
 
         @JvmStatic
-        fun make(fontMgr: FontMgr?): Shaper {
-            return try {
-                Stats.onNativeCall()
-                Shaper(Shaper_nMake(getPtr(fontMgr)))
-            } finally {
-                reachabilityBarrier(fontMgr)
-            }
+        fun make(fontMgr: FontMgr?): Shaper = nativeCallFromStatic(fontMgr) { fontMgr ->
+            Shaper(Shaper_nMake(fontMgr.pointerOrNullPointer))
         }
 
         init {
@@ -113,14 +87,13 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     }
 
     fun shape(text: String, font: Font, opts: ShapingOptions, width: Float, offset: Point): TextBlob? {
-        return try {
-            Stats.onNativeCall()
+        return nativeCall(font) { font ->
             val ptr = ManagedString(text).use { managedString ->
                 interopScope {
                     _nShapeBlob(
                         _ptr,
                         managedString._ptr,
-                        getPtr(font),
+                        font.pointerOrNullPointer,
                         optsFeaturesLen = opts.features?.size ?: 0,
                         optsFeaturesIntArray = arrayOfFontFeaturesToInterop(opts.features),
                         optsBooleanProps = opts._booleanPropsToInt(),
@@ -131,9 +104,6 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                 }
             }
             if (NullPointer == ptr) null else TextBlob(ptr)
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(font)
         }
     }
 
@@ -194,21 +164,19 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         opts: ShapingOptions,
         width: Float,
         runHandler: RunHandler
-    ): Shaper {
-        Stats.onNativeCall()
+    ): Shaper = nativeCall(textUtf8) { textUtf8 ->
         doShape(textUtf8, fontIter, bidiIter, scriptIter, langIter, opts, width, runHandler)
-        return this
+        this
     }
 
     fun shapeLine(text: String?, font: Font?, opts: ShapingOptions): TextLine {
-        return try {
-            Stats.onNativeCall()
+        return nativeCall(font) { font ->
             ManagedString(text).use { managedString ->
                 interopScope {
                     val linePtr = _nShapeLine(
                         _ptr,
                         managedString._ptr,
-                        getPtr(font),
+                        font.pointerOrNullPointer,
                         optsFeaturesLen = opts.features?.size ?: 0,
                         optsFeatures = arrayOfFontFeaturesToInterop(opts.features),
                         optsBooleanProps = opts._booleanPropsToInt()
@@ -216,11 +184,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                     require(linePtr != NullPointer) { "Shape line: $text returned nullptr" }
                     TextLine(linePtr)
                 }
-
             }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(font)
         }
     }
 

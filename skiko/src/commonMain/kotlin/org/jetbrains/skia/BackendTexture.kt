@@ -47,13 +47,8 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
     /**
      * Call this to indicate to DirectContext that the texture parameters have been modified in the GL context externally
      */
-    fun glTextureParametersModified() {
-        return try {
-            Stats.onNativeCall()
-            _nGLTextureParametersModified(getPtr(this))
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun glTextureParametersModified() = nativeCall {
+        _nGLTextureParametersModified(_ptr)
     }
 
     private object _FinalizerHolder {

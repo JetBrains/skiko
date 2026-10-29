@@ -20,8 +20,8 @@ class ColorFilter : RefCnt {
                 Stats.onNativeCall()
                 ColorFilter(
                     _nMakeComposed(
-                        getPtr(outer),
-                        getPtr(inner)
+                        outer.pointerOrNullPointer,
+                        inner.pointerOrNullPointer
                     )
                 )
             } finally {
@@ -71,8 +71,8 @@ class ColorFilter : RefCnt {
                 ColorFilter(
                     _nMakeLerp(
                         t,
-                        getPtr(dst),
-                        getPtr(src)
+                        dst.pointerOrNullPointer,
+                        src.pointerOrNullPointer
                     )
                 )
             } finally {

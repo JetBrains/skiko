@@ -16,44 +16,35 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
         Stats.onNativeCall()
     }
 
-    override fun toString(): String {
-        return try {
-            Stats.onNativeCall()
-            val size = _nStringSize(_ptr)
-            withResult(ByteArray(size)) {
-                _nStringData(_ptr, it, size)
-            }.decodeToString()
-        } finally {
-            reachabilityBarrier(this)
-        }
+    override fun toString(): String = nativeCall {
+        val size = _nStringSize(_ptr)
+        withResult(ByteArray(size)) {
+            _nStringData(_ptr, it, size)
+        }.decodeToString()
     }
 
-    fun insert(offset: Int, s: String): ManagedString {
-        Stats.onNativeCall()
+    fun insert(offset: Int, s: String): ManagedString = nativeCall {
         interopScope {
             _nInsert(_ptr, offset, toInterop(s))
         }
-        return this
+        this
     }
 
-    fun append(s: String): ManagedString {
-        Stats.onNativeCall()
+    fun append(s: String): ManagedString = nativeCall {
         interopScope {
             _nAppend(_ptr, toInterop(s))
         }
-        return this
+        this
     }
 
-    fun remove(from: Int): ManagedString {
-        Stats.onNativeCall()
+    fun remove(from: Int): ManagedString = nativeCall {
         _nRemoveSuffix(_ptr, from)
-        return this
+        this
     }
 
-    fun remove(from: Int, length: Int): ManagedString {
-        Stats.onNativeCall()
+    fun remove(from: Int, length: Int): ManagedString = nativeCall {
         _nRemove(_ptr, from, length)
-        return this
+        this
     }
 
     internal object _FinalizerHolder {

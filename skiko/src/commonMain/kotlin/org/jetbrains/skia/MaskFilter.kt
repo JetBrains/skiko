@@ -23,27 +23,19 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          *  @return The new blur [MaskFilter]
          */
         @JvmStatic
-        fun makeBlur(mode: FilterBlurMode, sigma: Float, respectCTM: Boolean = true): MaskFilter {
-            Stats.onNativeCall()
-            return MaskFilter(_nMakeBlur(mode.ordinal, sigma, respectCTM))
+        fun makeBlur(mode: FilterBlurMode, sigma: Float, respectCTM: Boolean = true): MaskFilter = nativeCallFromStatic {
+            MaskFilter(_nMakeBlur(mode.ordinal, sigma, respectCTM))
         }
 
         @JvmStatic
-        fun makeShader(s: Shader?): MaskFilter {
-            return try {
-                Stats.onNativeCall()
-                MaskFilter(_nMakeShader(getPtr(s)))
-            } finally {
-                reachabilityBarrier(s)
-            }
+        fun makeShader(s: Shader?): MaskFilter = nativeCallFromStatic(s) { s ->
+            MaskFilter(_nMakeShader(s.pointerOrNullPointer))
         }
 
         @JvmStatic
-        fun makeTable(table: ByteArray): MaskFilter {
+        fun makeTable(table: ByteArray): MaskFilter = nativeCallFromStatic {
             require(table.size == 256) { "Expected 256 elements, got " + table.size }
-
-            Stats.onNativeCall()
-            return MaskFilter(
+            MaskFilter(
                 interopScope {
                     MaskFilter_nMakeTable(toInterop(table))
                 }
@@ -51,15 +43,13 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         @JvmStatic
-        fun makeGamma(gamma: Float): MaskFilter {
-            Stats.onNativeCall()
-            return MaskFilter(_nMakeGamma(gamma))
+        fun makeGamma(gamma: Float): MaskFilter = nativeCallFromStatic {
+            MaskFilter(_nMakeGamma(gamma))
         }
 
         @JvmStatic
-        fun makeClip(min: Int, max: Int): MaskFilter {
-            Stats.onNativeCall()
-            return MaskFilter(_nMakeClip(min.toByte(), max.toByte()))
+        fun makeClip(min: Int, max: Int): MaskFilter = nativeCallFromStatic {
+            MaskFilter(_nMakeClip(min.toByte(), max.toByte()))
         }
 
         // If radius > 0, return the corresponding sigma, else return 0

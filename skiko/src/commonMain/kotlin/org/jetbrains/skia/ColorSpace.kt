@@ -17,23 +17,22 @@ class ColorSpace : Managed {
 
 
     fun convert(toColor: ColorSpace?, color: Color4f): Color4f {
-        var to = toColor
-        to = to ?: sRGB
-        return try {
-            Color4f(withResult(FloatArray(4)) {
+        val toColorSpace = toColor ?: sRGB
+
+        return nativeCall(toColorSpace) { toColorSpace ->
+            Color4f(
+                withResult(FloatArray(4)) {
                     _nConvert(
                         _ptr,
-                        getPtr(to),
+                        toColorSpace._ptr,
                         color.r,
                         color.g,
                         color.b,
                         color.a,
                         it
                     )
-            })
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(to)
+                }
+            )
         }
     }
 
@@ -45,23 +44,13 @@ class ColorSpace : Managed {
      * @return  true if the color space gamma is near enough to be approximated as sRGB
      */
     val isGammaCloseToSRGB: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsGammaCloseToSRGB(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsGammaCloseToSRGB(_ptr) }
 
     /**
      * @return  true if the color space gamma is linear
      */
     val isGammaLinear: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsGammaLinear(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsGammaLinear(_ptr) }
 
     /**
      *
@@ -78,12 +67,7 @@ class ColorSpace : Managed {
      * function checks for logical equality.
      */
     val isSRGB: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsSRGB(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsSRGB(_ptr) }
 
     private object _FinalizerHolder {
         val PTR = ColorSpace_nGetFinalizer()

@@ -2,11 +2,10 @@ package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.nativeCallFromStatic
+import org.jetbrains.skia.impl.pointerOrNullPointer
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 object SVGCanvas {
     /**
@@ -43,18 +42,15 @@ object SVGCanvas {
      * @return                    new Canvas
      */
     fun make(left: Float, top: Float, right: Float, bottom: Float, out: WStream, convertTextToPaths: Boolean, prettyXML: Boolean): Canvas {
-        Stats.onNativeCall()
-        val ptr = try {
+        val ptr = nativeCallFromStatic(out) { out ->
             _nMake(
                 left,
                 top,
                 right,
                 bottom,
-                getPtr(out),
+                out.pointerOrNullPointer,
                 0 or (if (convertTextToPaths) 1 else 0) or if (prettyXML) 0 else 2
             )
-        } finally {
-            reachabilityBarrier(out)
         }
         return Canvas(ptr, true, out)
     }

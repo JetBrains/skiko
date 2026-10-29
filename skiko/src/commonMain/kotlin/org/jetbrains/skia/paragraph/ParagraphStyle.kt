@@ -6,9 +6,7 @@ import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.FontEdging
 import org.jetbrains.skia.FontHinting
 import org.jetbrains.skia.impl.*
-import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.withResult
 import org.jetbrains.skia.impl.withStringResult
 
@@ -19,15 +17,8 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    override fun nativeEquals(other: Native?): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nEquals(_ptr, getPtr(other))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
-        }
-    }
+    override fun nativeEquals(other: Native?): Boolean =
+        nativeCall(other) { other -> _nEquals(_ptr, other.pointerOrNullPointer) }
 
     /**
      * Controls whether tab characters are replaced with spaces in text layout.
@@ -37,157 +28,58 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
      * With this property we can make web behave similarly, by setting true.
      */
     var replaceTabCharacters: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nGetReplaceTabCharacters(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetReplaceTabCharacters(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetReplaceTabCharacters(_ptr) }
+        set(value) = nativeCall { _nSetReplaceTabCharacters(_ptr, value) }
 
     var strutStyle: StrutStyle
-        get() = try {
-            Stats.onNativeCall()
-            StrutStyle(_nGetStrutStyle(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetStrutStyle(_ptr, getPtr(value))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(value)
-        }
+        get() = nativeCall { StrutStyle(_nGetStrutStyle(_ptr)) }
+        set(value) = nativeCall(value) { value -> _nSetStrutStyle(_ptr, value.pointerOrNullPointer) }
 
     var textStyle: TextStyle
-        get() = try {
-            Stats.onNativeCall()
-            TextStyle(_nGetTextStyle(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetTextStyle(_ptr, getPtr(value))
-        } finally {
-            reachabilityBarrier(value)
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { TextStyle(_nGetTextStyle(_ptr)) }
+        set(value) = nativeCall(value) { value -> _nSetTextStyle(_ptr, value.pointerOrNullPointer) }
 
     var direction: Direction
-        get() = try {
-            Stats.onNativeCall()
-            Direction.entries[_nGetDirection(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetDirection(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Direction.entries[_nGetDirection(_ptr)] }
+        set(value) = nativeCall { _nSetDirection(_ptr, value.ordinal) }
 
 
     var alignment: Alignment
-        get() = try {
-            Stats.onNativeCall()
-            Alignment.entries[_nGetAlignment(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetAlignment(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Alignment.entries[_nGetAlignment(_ptr)] }
+        set(value) = nativeCall { _nSetAlignment(_ptr, value.ordinal) }
 
     var maxLinesCount: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetMaxLinesCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetMaxLinesCount(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetMaxLinesCount(_ptr) }
+        set(value) = nativeCall { _nSetMaxLinesCount(_ptr, value) }
 
     var ellipsis: String?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ellipsis = _nGetEllipsis(_ptr)
             if (ellipsis == NullPointer) null else withStringResult { ellipsis }
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) = try {
-            Stats.onNativeCall()
+        set(value) = nativeCall {
             interopScope {
                 _nSetEllipsis(_ptr, toInterop(value))
             }
-        } finally {
-            reachabilityBarrier(this)
         }
 
     var height: Float
-        get() = try {
-            Stats.onNativeCall()
-            ParagraphStyle_nGetHeight(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetHeight(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { ParagraphStyle_nGetHeight(_ptr) }
+        set(value) = nativeCall { _nSetHeight(_ptr, value) }
 
 
     var heightMode: HeightMode
-        get() = try {
-            Stats.onNativeCall()
-            HeightMode.entries[_nGetHeightMode(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetHeightMode(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { HeightMode.entries[_nGetHeightMode(_ptr)] }
+        set(value) = nativeCall { _nSetHeightMode(_ptr, value.ordinal) }
 
     val effectiveAlignment: Alignment
-        get() = try {
-            Stats.onNativeCall()
-            Alignment.entries[_nGetEffectiveAlignment(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Alignment.entries[_nGetEffectiveAlignment(_ptr)] }
 
     val isHintingEnabled: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsHintingEnabled(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsHintingEnabled(_ptr) }
 
     fun disableHinting(): ParagraphStyle {
-        Stats.onNativeCall()
-        _nDisableHinting(_ptr)
+        nativeCall { _nDisableHinting(_ptr) }
         return this
     }
 
@@ -207,35 +99,17 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         }
 
     var isApplyRoundingHackEnabled: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nGetApplyRoundingHack(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetApplyRoundingHack(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetApplyRoundingHack(_ptr) }
+        set(value) = nativeCall { _nSetApplyRoundingHack(_ptr, value) }
 
     var textIndent: TextIndent
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val indents = withResult(FloatArray(2)) {
                 _nGetTextIndent(_ptr, it)
             }
             TextIndent(indents[0], indents[1])
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetTextIndent(_ptr, value.firstLine, value.restLine)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        set(value) = nativeCall { _nSetTextIndent(_ptr, value.firstLine, value.restLine) }
 
     internal object _FinalizerHolder {
         val PTR = ParagraphStyle_nGetFinalizer()

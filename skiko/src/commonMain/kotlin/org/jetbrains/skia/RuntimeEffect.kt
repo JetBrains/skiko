@@ -7,25 +7,22 @@ import kotlin.jvm.JvmStatic
 class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         @JvmStatic
-        fun makeForShader(sksl: String): RuntimeEffect {
-            Stats.onNativeCall()
-            return interopScope {
+        fun makeForShader(sksl: String): RuntimeEffect = nativeCallFromStatic {
+            interopScope {
                 makeFromResultPtr(_nMakeForShader(toInterop(sksl)))
             }
         }
 
         @JvmStatic
-        fun makeForColorFilter(sksl: String): RuntimeEffect {
-            Stats.onNativeCall()
-            return interopScope {
+        fun makeForColorFilter(sksl: String): RuntimeEffect = nativeCallFromStatic {
+            interopScope {
                 makeFromResultPtr(_nMakeForColorFilter(toInterop(sksl)))
             }
         }
 
         @JvmStatic
-        fun makeForBlender(sksl: String): RuntimeEffect {
-            Stats.onNativeCall()
-            return interopScope {
+        fun makeForBlender(sksl: String): RuntimeEffect = nativeCallFromStatic {
+            interopScope {
                 makeFromResultPtr(_nMakeForBlender(toInterop(sksl)))
             }
         }
@@ -36,35 +33,32 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 
     fun makeShader(
-        uniforms: Data?, children: Array<Shader?>?, localMatrix: Matrix33?
-    ): Shader {
-        Stats.onNativeCall()
+        uniforms: Data?,
+        children: Array<Shader?>?,
+        localMatrix: Matrix33?
+    ): Shader = nativeCall(uniforms, children) { uniforms, children ->
         val childCount = children?.size ?: 0
         val childrenPtrs = NativePointerArray(childCount)
-        for (i in 0 until childCount) childrenPtrs[i] = getPtr(children!![i])
-        val matrix = localMatrix?.mat
-        return try {
-            interopScope {
-                Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), childCount, toInterop(matrix)))
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(uniforms)
-            reachabilityBarrier(children)
+        for (i in 0 until childCount) childrenPtrs[i] = children!![i].pointerOrNullPointer
+        interopScope {
+            Shader(
+                _nMakeShader(
+                    _ptr,
+                    uniforms.pointerOrNullPointer,
+                    toInterop(childrenPtrs),
+                    childCount,
+                    toInterop(localMatrix?.mat)
+                )
+            )
         }
     }
 
-    fun makeBlender(uniforms: Data?): Blender {
-        Stats.onNativeCall()
-        return try {
-            interopScope {
-                Blender(_nMakeBlender(_ptr, getPtr(uniforms)))
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(uniforms)
+    fun makeBlender(uniforms: Data?): Blender = nativeCall(uniforms) { uniforms ->
+        interopScope {
+            Blender(_nMakeBlender(_ptr, uniforms.pointerOrNullPointer))
         }
     }
+
 }
 
 internal expect fun RuntimeEffect.Companion.makeFromResultPtr(ptr: NativePointer): RuntimeEffect

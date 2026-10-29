@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.nativeCall
 
 class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -14,33 +15,13 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 
     val width: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetWidth(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetWidth(_ptr) }
     val height: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetHeight(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetHeight(_ptr) }
     val rowBytes: Int
-        get() = try {
-            Stats.onNativeCall()
-            PixelRef_nGetRowBytes(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { PixelRef_nGetRowBytes(_ptr) }
     val pixels: NativePointer
-        get() = try {
-            Stats.onNativeCall()
-            PixelRef_nGetPixels(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { PixelRef_nGetPixels(_ptr) }
 
     /**
      * Returns a non-zero, unique value corresponding to the pixels in this
@@ -48,22 +29,16 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      * called), a different generation ID will be returned.
      */
     val generationId: Int
-        get() = try {
-            Stats.onNativeCall()
-            PixelRef_nGetGenerationId(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { PixelRef_nGetGenerationId(_ptr) }
 
     /**
      * Call this if you have changed the contents of the pixels. This will in-
      * turn cause a different generation ID value to be returned from
      * getGenerationID().
      */
-    fun notifyPixelsChanged(): PixelRef {
-        Stats.onNativeCall()
+    fun notifyPixelsChanged(): PixelRef = nativeCall {
         PixelRef_nNotifyPixelsChanged(_ptr)
-        return this
+        this
     }
 
     /**
@@ -71,22 +46,16 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      * contents of its pixels will not change for the lifetime of the pixelref.
      */
     val isImmutable: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            PixelRef_nIsImmutable(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { PixelRef_nIsImmutable(_ptr) }
 
     /**
      * Marks this pixelref is immutable, meaning that the contents of its
      * pixels will not change for the lifetime of the pixelref. This state can
      * be set on a pixelref, but it cannot be cleared once it is set.
      */
-    fun setImmutable(): PixelRef {
-        Stats.onNativeCall()
+    fun setImmutable(): PixelRef = nativeCall {
         PixelRef_nSetImmutable(_ptr)
-        return this
+        this
     }
 }
 

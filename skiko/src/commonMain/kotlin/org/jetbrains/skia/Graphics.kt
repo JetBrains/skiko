@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.nativeCallFromStatic
 import kotlin.jvm.JvmStatic
 
 class Graphics {
@@ -14,45 +15,27 @@ class Graphics {
          * The max number of bytes that should be used by the font cache.
          */
         var fontCacheLimit: Int
-            get() {
-                Stats.onNativeCall()
-                return _nGetFontCacheLimit()
-            }
-            set(value) {
-                Stats.onNativeCall()
-                _nSetFontCacheLimit(value)
-            }
+            get() = nativeCallFromStatic { _nGetFontCacheLimit() }
+            set(value) = nativeCallFromStatic { _nSetFontCacheLimit(value) }
 
         /**
          * The number of bytes currently used by the font cache.
          */
         val fontCacheUsed: Int
-            get() {
-                Stats.onNativeCall()
-                return _nGetFontCacheUsed()
-            }
+            get() = nativeCallFromStatic { _nGetFontCacheUsed() }
 
         /**
          * The max number of entries in the font cache.
          */
         var fontCacheCountLimit: Int
-            get() {
-                Stats.onNativeCall()
-                return _nGetFontCacheCountLimit()
-            }
-            set(value) {
-                Stats.onNativeCall()
-                _nSetFontCacheCountLimit(value)
-            }
+            get() = nativeCallFromStatic { _nGetFontCacheCountLimit() }
+            set(value) = nativeCallFromStatic { _nSetFontCacheCountLimit(value) }
 
         /**
          * The number of entries currently in the font cache.
          */
         val fontCacheCountUsed: Int
-            get() {
-                Stats.onNativeCall()
-                return _nGetFontCacheCountUsed()
-            }
+            get() = nativeCallFromStatic { _nGetFontCacheCountUsed() }
 
         /**
          *  The memory usage limit in bytes for the resource cache, used for temporary bitmaps and other resources.
@@ -60,14 +43,8 @@ class Graphics {
          *  Entries are purged from the cache when the memory useage exceeds this limit.
          */
         var resourceCacheTotalLimit: Int
-            get() {
-                Stats.onNativeCall()
-                return _nGetResourceCacheTotalByteLimit()
-            }
-            set(value) {
-                Stats.onNativeCall()
-                _nSetResourceCacheTotalByteLimit(value)
-            }
+            get() = nativeCallFromStatic { _nGetResourceCacheTotalByteLimit() }
+            set(value) = nativeCallFromStatic { _nSetResourceCacheTotalByteLimit(value) }
 
         /**
          *  When the cachable entry is very large (e.g. a large scaled bitmap), adding it to the cache
@@ -78,23 +55,14 @@ class Graphics {
          *  Zero is the default value, meaning we always attempt to cache entries.
          */
         var resourceCacheSingleAllocationByteLimit: Int
-            get() {
-                Stats.onNativeCall()
-                return _nGetResourceCacheSingleAllocationByteLimit()
-            }
-            set(value) {
-                Stats.onNativeCall()
-                _nSetResourceCacheSingleAllocationByteLimit(value)
-            }
+            get() = nativeCallFromStatic { _nGetResourceCacheSingleAllocationByteLimit() }
+            set(value) = nativeCallFromStatic { _nSetResourceCacheSingleAllocationByteLimit(value) }
 
         /**
          * The memory in bytes used for temporary images and other resources.
          */
         val resourceCacheTotalUsed: Int
-            get() {
-                Stats.onNativeCall()
-                return _nGetResourceCacheTotalBytesUsed()
-            }
+            get() = nativeCallFromStatic { _nGetResourceCacheTotalBytesUsed() }
 
         /**
          * For debugging purposes, this will attempt to purge the font cache.
@@ -103,10 +71,7 @@ class Graphics {
          * since they will no longer be in the cache.
          */
         @JvmStatic
-        fun purgeFontCache() {
-            Stats.onNativeCall()
-            _nPurgeFontCache()
-        }
+        fun purgeFontCache() = nativeCallFromStatic { _nPurgeFontCache() }
 
         /**
          * For debugging purposes, this will attempt to purge the resource cache.
@@ -114,10 +79,7 @@ class Graphics {
          * It does not change the limit.
          */
         @JvmStatic
-        fun purgeResourceCache() {
-            Stats.onNativeCall()
-            _nPurgeResourceCache()
-        }
+        fun purgeResourceCache() = nativeCallFromStatic { _nPurgeResourceCache() }
 
         /**
          *  Free as much globally cached memory as possible. This will purge all private caches in Skia,
@@ -126,10 +88,7 @@ class Graphics {
          *  If there are caches associated with GPU context, those will not be affected by this call.
          */
         @JvmStatic
-        fun purgeAllCaches() {
-            Stats.onNativeCall()
-            _nPurgeAllCaches()
-        }
+        fun purgeAllCaches() = nativeCallFromStatic { _nPurgeAllCaches() }
     }
 }
 

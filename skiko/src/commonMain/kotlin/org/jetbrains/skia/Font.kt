@@ -2,24 +2,12 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.InteropPointer
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.interopScope
-import org.jetbrains.skia.impl.withResult
 import kotlin.jvm.JvmStatic
 
 class Font : Managed {
     companion object {
         @JvmStatic
-        internal fun makeClone(ptr: NativePointer): Font {
-            Stats.onNativeCall()
-            return Font(Font_nMakeClone(ptr))
-        }
+        internal fun makeClone(ptr: NativePointer): Font = nativeCallFromStatic { Font(Font_nMakeClone(ptr)) }
 
         init {
             staticLoad()
@@ -42,7 +30,7 @@ class Font : Managed {
      *
      * @param typeface  typeface and style used to draw and measure text. Pass null for default
      */
-    constructor(typeface: Typeface?) : this(_nMakeTypeface(getPtr(typeface))) {
+    constructor(typeface: Typeface?) : this(_nMakeTypeface(typeface.pointerOrNullPointer)) {
         Stats.onNativeCall()
         reachabilityBarrier(typeface)
     }
@@ -51,7 +39,7 @@ class Font : Managed {
      * @param typeface  typeface and style used to draw and measure text. Pass null for default
      * @param size      typographic size of the text
      */
-    constructor(typeface: Typeface?, size: Float) : this(_nMakeTypefaceSize(getPtr(typeface), size)) {
+    constructor(typeface: Typeface?, size: Float) : this(_nMakeTypefaceSize(typeface.pointerOrNullPointer, size)) {
         Stats.onNativeCall()
         reachabilityBarrier(typeface)
     }
@@ -68,7 +56,7 @@ class Font : Managed {
      */
     constructor(typeface: Typeface?, size: Float, scaleX: Float, skewX: Float) : this(
         _nMakeTypefaceSizeScaleSkew(
-            getPtr(typeface), size, scaleX, skewX
+            typeface.pointerOrNullPointer, size, scaleX, skewX
         )
     ) {
         Stats.onNativeCall()
@@ -79,13 +67,8 @@ class Font : Managed {
      * Compares fonts, and returns true if they are equivalent.
      * May return false if Typeface has identical contents but different pointers.
      */
-    override fun nativeEquals(other: Native?): Boolean {
-        return try {
-            Font_nEquals(_ptr, getPtr(other))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
-        }
+    override fun nativeEquals(other: Native?): Boolean = nativeCall(other) { other ->
+        Font_nEquals(_ptr, other.pointerOrNullPointer)
     }
 
     /**
@@ -95,59 +78,25 @@ class Font : Managed {
      * @return  true if all glyphs are hinted
      */
     var isAutoHintingForced: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsAutoHintingForced(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetAutoHintingForced(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsAutoHintingForced(_ptr) }
+        set(value) = nativeCall { _nSetAutoHintingForced(_ptr, value) }
 
     /**
      * @return  true if font engine may return glyphs from font bitmaps instead of from outlines
      */
-    fun areBitmapsEmbedded(): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nAreBitmapsEmbedded(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun areBitmapsEmbedded(): Boolean = nativeCall { _nAreBitmapsEmbedded(_ptr) }
 
     /**
      * If true, requests, but does not require, to use bitmaps in fonts instead of outlines.
      */
-    fun setBitmapsEmbedded(value: Boolean) {
-        try {
-            Stats.onNativeCall()
-            _nSetBitmapsEmbedded(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun setBitmapsEmbedded(value: Boolean) = nativeCall { _nSetBitmapsEmbedded(_ptr, value) }
 
     /**
      * @return  true if glyphs may be drawn at sub-pixel offsets
      */
     var isSubpixel: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsSubpixel(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetSubpixel(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get () = nativeCall { _nIsSubpixel(_ptr) }
+        set(value) = nativeCall { _nSetSubpixel(_ptr, value) }
 
     /**
      * Returns true if font and glyph metrics are requested to be linearly scalable.
@@ -155,20 +104,8 @@ class Font : Managed {
      * @return  true if font and glyph metrics are requested to be linearly scalable.
      */
     var isLinearMetrics: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsLinearMetrics(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetLinearMetrics(_ptr, value)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get () = nativeCall { _nIsLinearMetrics(_ptr) }
+        set(value) = nativeCall { _nSetLinearMetrics(_ptr, value) }
 
     /**
      * Returns true if bold is approximated by increasing the stroke width when creating glyph
@@ -177,18 +114,8 @@ class Font : Managed {
      * @return  true if bold is approximated through stroke width
      */
     var isEmboldened: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsEmboldened(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetEmboldened(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsEmboldened(_ptr) }
+        set(value) = nativeCall { _nSetEmboldened(_ptr, value) }
 
     /**
      * Returns true if baselines will be snapped to pixel positions when the current transformation
@@ -197,52 +124,22 @@ class Font : Managed {
      * @return  true if baselines may be snapped to pixels
      */
     var isBaselineSnapped: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsBaselineSnapped(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetBaselineSnapped(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get () = nativeCall { _nIsBaselineSnapped(_ptr) }
+        set(value) = nativeCall { _nSetBaselineSnapped(_ptr, value) }
 
     /**
      * Whether edge pixels draw opaque or with partial transparency.
      */
     var edging: FontEdging
-        get() = try {
-            Stats.onNativeCall()
-            FontEdging.entries[_nGetEdging(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetEdging(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { FontEdging.entries[_nGetEdging(_ptr)] }
+        set(value) = nativeCall { _nSetEdging(_ptr, value.ordinal) }
 
     /**
      * @return  level of glyph outline adjustment
      */
     var hinting: FontHinting
-        get() = try {
-            Stats.onNativeCall()
-            FontHinting.entries[_nGetHinting(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetHinting(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { FontHinting.entries[_nGetHinting(_ptr)] }
+        set(value) = nativeCall { _nSetHinting(_ptr, value.ordinal) }
 
     /**
      * Returns a font with the same attributes of this font, but with the specified size.
@@ -255,81 +152,39 @@ class Font : Managed {
      * @return [Typeface] if set, or null
      */
     val typeface: Typeface?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = _nGetTypeface(_ptr)
             if (ptr == NullPointer) null else Typeface(ptr)
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
      * @return  text size in points
      */
     var size: Float
-        get() = try {
-            Stats.onNativeCall()
-            Font_nGetSize(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetSize(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get () = nativeCall { Font_nGetSize(_ptr) }
+        set(value) = nativeCall { _nSetSize(_ptr, value) }
 
 
     /**
      * @return  text scale on x-axis. Default value is 1
      */
     var scaleX: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetScaleX(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetScaleX(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetScaleX(_ptr) }
+        set(value) = nativeCall { _nSetScaleX(_ptr, value) }
 
     /**
      * @return  text skew on x-axis. Default value is 0
      */
     var skewX: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetSkewX(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetSkewX(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetSkewX(_ptr) }
+        set(value) = nativeCall { _nSetSkewX(_ptr, value) }
 
     /**
      * Sets Typeface to typeface. Pass null to use the default typeface.
      */
-    fun setTypeface(typeface: Typeface?): Font {
-        return try {
-            Stats.onNativeCall()
-            _nSetTypeface(
-                _ptr,
-                getPtr(typeface)
-            )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(typeface)
-        }
+    fun setTypeface(typeface: Typeface?): Font = nativeCall(typeface) { typeface ->
+        _nSetTypeface(_ptr, typeface.pointerOrNullPointer)
+        this
     }
 
     /**
@@ -346,43 +201,26 @@ class Font : Managed {
      *
      * @return  the corresponding glyph IDs for each character.
      */
-    fun getUTF32Glyphs(uni: IntArray?): ShortArray {
-        return try {
-            Stats.onNativeCall()
-            if (uni == null) {
-                shortArrayOf()
-            } else {
-                withResult(ShortArray(uni.size)) {
-                    _nGetUTF32Glyphs(_ptr, toInterop(uni), uni.size, it)
-                }
+    fun getUTF32Glyphs(uni: IntArray?): ShortArray = nativeCall {
+        if (uni == null) {
+            shortArrayOf()
+        } else {
+            withResult(ShortArray(uni.size)) {
+                _nGetUTF32Glyphs(_ptr, toInterop(uni), uni.size, it)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
     }
 
     /**
      * @return  the glyph that corresponds to the specified unicode code-point (in UTF32 encoding). If the unichar is not supported, returns 0
      */
-    fun getUTF32Glyph(unichar: Int): Short {
-        return try {
-            Stats.onNativeCall()
-            _nGetUTF32Glyph(_ptr, unichar)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getUTF32Glyph(unichar: Int): Short = nativeCall { _nGetUTF32Glyph(_ptr, unichar) }
 
     /**
      * @return  number of glyphs represented by text
      */
-    fun getStringGlyphsCount(s: String?): Int {
-        return try {
-            Stats.onNativeCall()
-            interopScope { _nGetStringGlyphsCount(_ptr, toInterop(s), s?.length ?: 0) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun getStringGlyphsCount(s: String?): Int = nativeCall {
+        interopScope { _nGetStringGlyphsCount(_ptr, toInterop(s), s?.length ?: 0) }
     }
     /**
      * @param p  stroke width or PathEffect may modify the advance with
@@ -391,56 +229,35 @@ class Font : Managed {
     /**
      * @return  the bounding box of text
      */
-    fun measureText(s: String?, p: Paint? = null): Rect {
-        return try {
-            Stats.onNativeCall()
-            Rect.fromInteropPointer() {
-                _nMeasureText(_ptr, toInterop(s), s?.length ?: 0, getPtr(p), it)
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(p)
+    fun measureText(s: String?, p: Paint? = null): Rect = nativeCall(p) { p ->
+        Rect.fromInteropPointer() {
+            _nMeasureText(_ptr, toInterop(s), s?.length ?: 0, p.pointerOrNullPointer, it)
         }
     }
 
-    fun measureTextWidth(s: String?): Float {
-        Stats.onNativeCall()
-        return measureTextWidth(s, null)
-    }
+    fun measureTextWidth(s: String?): Float = measureTextWidth(s, null)
 
-    fun measureTextWidth(s: String?, p: Paint?): Float {
-        return try {
-            Stats.onNativeCall()
-            interopScope {
-                _nMeasureTextWidth(
-                    _ptr,
-                    toInterop(s),
-                    s?.length ?: 0,
-                    getPtr(p)
-                )
-            }
-
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(p)
+    fun measureTextWidth(s: String?, p: Paint?): Float = nativeCall(p) { p ->
+        interopScope {
+            _nMeasureTextWidth(
+                _ptr,
+                toInterop(s),
+                s?.length ?: 0,
+                p.pointerOrNullPointer
+            )
         }
     }
 
     /**
      * Retrieves the advances for each glyph
      */
-    fun getWidths(glyphs: ShortArray?): FloatArray {
-        return try {
-            Stats.onNativeCall()
-            if (glyphs == null) {
-                return floatArrayOf()
-            } else {
-                withResult(FloatArray(glyphs.size)) {
-                    _nGetWidths(_ptr, toInterop(glyphs), glyphs.size, it)
-                }
+    fun getWidths(glyphs: ShortArray?): FloatArray = nativeCall {
+        if (glyphs == null) {
+            floatArrayOf()
+        } else {
+            withResult(FloatArray(glyphs.size)) {
+                _nGetWidths(_ptr, toInterop(glyphs), glyphs.size, it)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
     }
 
@@ -454,26 +271,19 @@ class Font : Managed {
     /**
      * Retrieves the bounds for each glyph
      */
-    fun getBounds(glyphs: ShortArray?, p: Paint?): Array<Rect> {
-        return try {
-            Stats.onNativeCall()
-
-            if (glyphs == null) {
-                emptyArray()
-            } else {
-                Rect.fromInteropPointer(glyphs.size * 4) {
-                    _nGetBounds(
-                        _ptr,
-                        toInterop(glyphs),
-                        glyphs.size,
-                        getPtr(p),
-                        it
-                    )
-                }
+    fun getBounds(glyphs: ShortArray?, p: Paint?): Array<Rect> = nativeCall(p) { p ->
+        if (glyphs == null) {
+            emptyArray()
+        } else {
+            Rect.fromInteropPointer(glyphs.size * 4) {
+                _nGetBounds(
+                    _ptr,
+                    toInterop(glyphs),
+                    glyphs.size,
+                    p.pointerOrNullPointer,
+                    it
+                )
             }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(p)
         }
     }
 
@@ -487,21 +297,16 @@ class Font : Managed {
     /**
      * Retrieves the positions for each glyph, beginning at the specified origin.
      */
-    fun getPositions(glyphs: ShortArray?, offset: Point): Array<Point> {
-        return try {
-            Stats.onNativeCall()
-            if (glyphs == null) {
-                emptyArray()
-            } else {
-                val positionsData = withResult(FloatArray(glyphs.size * 2)) {
-                    _nGetPositions(_ptr, toInterop(glyphs), glyphs.size, offset.x, offset.y, it)
-                }
-                (0 until glyphs.size).map { i ->
-                    Point(positionsData[2*i], positionsData[2*i + 1])
-                }.toTypedArray()
+    fun getPositions(glyphs: ShortArray?, offset: Point): Array<Point> = nativeCall {
+        if (glyphs == null) {
+            emptyArray()
+        } else {
+            val positionsData = withResult(FloatArray(glyphs.size * 2)) {
+                _nGetPositions(_ptr, toInterop(glyphs), glyphs.size, offset.x, offset.y, it)
             }
-        } finally {
-            reachabilityBarrier(this)
+            glyphs.indices.map { i ->
+                Point(positionsData[2*i], positionsData[2*i + 1])
+            }.toTypedArray()
         }
     }
 
@@ -515,18 +320,13 @@ class Font : Managed {
     /**
      * Retrieves the x-positions for each glyph, beginning at the specified origin.
      */
-    fun getXPositions(glyphs: ShortArray?, offset: Float): FloatArray {
-        return try {
-            Stats.onNativeCall()
-            if (glyphs == null) {
-                floatArrayOf()
-            } else {
-                withResult(FloatArray(glyphs.size)) {
-                    _nGetXPositions(_ptr, toInterop(glyphs), offset, glyphs.size, it)
-                }
+    fun getXPositions(glyphs: ShortArray?, offset: Float): FloatArray = nativeCall {
+        if (glyphs == null) {
+            floatArrayOf()
+        } else {
+            withResult(FloatArray(glyphs.size)) {
+                _nGetXPositions(_ptr, toInterop(glyphs), offset, glyphs.size, it)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
     }
 
@@ -534,33 +334,23 @@ class Font : Managed {
      * If the glyph has an outline, returns it. The glyph outline may be empty.
      * Degenerate contours in the glyph outline will be skipped. If glyph is described by a bitmap, returns null.
      */
-    fun getPath(glyph: Short): Path? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nGetPath(_ptr, glyph)
-            if (ptr == NullPointer) null else Path(ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun getPath(glyph: Short): Path? = nativeCall {
+        val ptr = _nGetPath(_ptr, glyph)
+        if (ptr == NullPointer) null else Path(ptr)
     }
 
     /**
      * Return glyph outlines, some of which might be null.
      */
-    fun getPaths(glyphs: ShortArray?): Array<Path> {
-        return try {
-            Stats.onNativeCall()
-            arrayDecoderScope({
-                ArrayDecoder(
-                    interopScope { _nGetPaths(_ptr, toInterop(glyphs), glyphs?.size ?: 0) }, Path_nGetFinalizer()
-                )
-            }) { arrayDecoder ->
-                (0 until arrayDecoder.size).map { i->
-                    Path(arrayDecoder.release(i))
-                }.toTypedArray()
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun getPaths(glyphs: ShortArray?): Array<Path> = nativeCall {
+        arrayDecoderScope({
+            ArrayDecoder(
+                interopScope { _nGetPaths(_ptr, toInterop(glyphs), glyphs?.size ?: 0) }, Path_nGetFinalizer()
+            )
+        }) { arrayDecoder ->
+            (0 until arrayDecoder.size).map { i->
+                Path(arrayDecoder.release(i))
+            }.toTypedArray()
         }
     }
 
@@ -569,32 +359,19 @@ class Font : Managed {
      * dimensions required by text scale, text skew, fake bold, style stroke, and [PathEffect].
      */
     val metrics: FontMetrics
-        get() = try {
-            Stats.onNativeCall()
-            FontMetrics.fromInteropPointer {
-                _nGetMetrics(_ptr, it)
-            }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { FontMetrics.fromInteropPointer { _nGetMetrics(_ptr, it) } }
 
     /**
      * Returns the recommended spacing between lines: the sum of metrics descent, ascent, and leading.
      * Result is scaled by text size but does not take into account dimensions required by stroking and SkPathEffect.
      */
     val spacing: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetSpacing(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetSpacing(_ptr) }
 
     private object _FinalizerHolder {
         val PTR = Font_nGetFinalizer()
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot

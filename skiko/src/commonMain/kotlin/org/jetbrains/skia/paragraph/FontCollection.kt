@@ -5,6 +5,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 
 class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -18,140 +19,80 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 
     val fontManagersCount: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetFontManagersCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetFontManagersCount(_ptr) }
 
-    fun setAssetFontManager(fontMgr: FontMgr?): FontCollection {
-        return try {
-            Stats.onNativeCall()
-            _nSetAssetFontManager(_ptr, getPtr(fontMgr), NullPointer)
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(fontMgr)
-        }
+    fun setAssetFontManager(fontMgr: FontMgr?): FontCollection = nativeCall(fontMgr) {fontMgr ->
+        _nSetAssetFontManager(_ptr, fontMgr.pointerOrNullPointer, NullPointer)
+        this
     }
 
-    fun setDynamicFontManager(fontMgr: FontMgr?): FontCollection {
-        return try {
-            Stats.onNativeCall()
-            _nSetDynamicFontManager(
-                _ptr,
-                getPtr(fontMgr),
-                NullPointer
-            )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(fontMgr)
-        }
+    fun setDynamicFontManager(fontMgr: FontMgr?): FontCollection = nativeCall(fontMgr) {fontMgr ->
+        _nSetDynamicFontManager(_ptr, fontMgr.pointerOrNullPointer, NullPointer)
+        this
     }
 
-    fun setTestFontManager(fontMgr: FontMgr?): FontCollection {
-        return try {
-            Stats.onNativeCall()
-            _nSetTestFontManager(_ptr, getPtr(fontMgr), NullPointer)
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(fontMgr)
-        }
+    fun setTestFontManager(fontMgr: FontMgr?): FontCollection = nativeCall(fontMgr) {fontMgr ->
+        _nSetTestFontManager(_ptr, fontMgr.pointerOrNullPointer, NullPointer)
+        this
     }
 
     fun setDefaultFontManager(fontMgr: FontMgr?): FontCollection {
         return setDefaultFontManager(fontMgr, null)
     }
 
-    fun setDefaultFontManager(fontMgr: FontMgr?, defaultFamilyName: String?): FontCollection {
-        return try {
-            Stats.onNativeCall()
-            interopScope {
-                _nSetDefaultFontManager(
-                    _ptr,
-                    getPtr(fontMgr),
-                    toInterop(defaultFamilyName)
-                )
-            }
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(fontMgr)
+    fun setDefaultFontManager(fontMgr: FontMgr?, defaultFamilyName: String?): FontCollection = nativeCall(fontMgr) {fontMgr ->
+        interopScope {
+            _nSetDefaultFontManager(
+                _ptr,
+                fontMgr.pointerOrNullPointer,
+                toInterop(defaultFamilyName)
+            )
         }
+        this
     }
 
     val fallbackManager: FontMgr?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = _nGetFallbackManager(_ptr)
             if (ptr == NullPointer) null else FontMgr(ptr)
-        } finally {
-            reachabilityBarrier(this)
         }
 
-    fun findTypefaces(familyNames: Array<String>?, style: FontStyle): Array<Typeface?> {
-        return try {
-            Stats.onNativeCall()
-            arrayDecoderScope({  ArrayDecoder(interopScope {
-                _nFindTypefaces(_ptr, toInterop(familyNames), familyNames?.size ?: 0, style._value)
-            }, RefCnt_nGetFinalizer()) }) { arrayDecoder ->
-                (0 until arrayDecoder.size).map { i ->
-                    Typeface(arrayDecoder.release(i))
-                }.toTypedArray()
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(familyNames)
+    fun findTypefaces(familyNames: Array<String>?, style: FontStyle): Array<Typeface?> = nativeCall {
+        arrayDecoderScope({  ArrayDecoder(interopScope {
+            _nFindTypefaces(_ptr, toInterop(familyNames), familyNames?.size ?: 0, style._value)
+        }, RefCnt_nGetFinalizer()) }) { arrayDecoder ->
+            (0 until arrayDecoder.size).map { i ->
+                Typeface(arrayDecoder.release(i))
+            }.toTypedArray()
         }
     }
 
-    fun defaultFallback(unicode: Int, familyNames: Array<String>?, style: FontStyle, locale: String?): Typeface? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = interopScope {
-                _nDefaultFallbackChar(
-                    _ptr,
-                    unicode,
-                    toInterop(familyNames),
-                    familyNames?.size ?: 0,
-                    style._value,
-                    toInterop(locale)
-                )
-            }
-            if (ptr == NullPointer) null else Typeface(ptr)
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(familyNames)
-            reachabilityBarrier(locale)
+    fun defaultFallback(unicode: Int, familyNames: Array<String>?, style: FontStyle, locale: String?): Typeface? = nativeCall {
+        val ptr = interopScope {
+            _nDefaultFallbackChar(
+                _ptr,
+                unicode,
+                toInterop(familyNames),
+                familyNames?.size ?: 0,
+                style._value,
+                toInterop(locale)
+            )
         }
+        if (ptr == NullPointer) null else Typeface(ptr)
     }
 
-    fun defaultFallback(): Typeface? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nDefaultFallback(_ptr)
-            if (ptr == NullPointer) null else Typeface(ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun defaultFallback(): Typeface? = nativeCall {
+        val ptr = _nDefaultFallback(_ptr)
+        if (ptr == NullPointer) null else Typeface(ptr)
     }
 
-    fun setEnableFallback(value: Boolean): FontCollection {
-        Stats.onNativeCall()
+    fun setEnableFallback(value: Boolean): FontCollection = nativeCall {
         _nSetEnableFallback(_ptr, value)
-        return this
+        this
     }
 
     val paragraphCache: ParagraphCache
-        get() = try {
-            Stats.onNativeCall()
-            ParagraphCache(this, _nGetParagraphCache(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { ParagraphCache(this, _nGetParagraphCache(_ptr)) }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nMake")

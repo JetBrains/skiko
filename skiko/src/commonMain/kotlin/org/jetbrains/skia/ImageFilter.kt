@@ -30,46 +30,35 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             bg: ImageFilter?,
             fg: ImageFilter?,
             crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeArithmetic(
-                            k1,
-                            k2,
-                            k3,
-                            k4,
-                            enforcePMColor,
-                            getPtr(bg),
-                            getPtr(fg),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(bg, fg) { bg, fg ->
+            interopScope {
+                ImageFilter(
+                    _nMakeArithmetic(
+                        k1,
+                        k2,
+                        k3,
+                        k4,
+                        enforcePMColor,
+                        bg.pointerOrNullPointer,
+                        fg.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(bg)
-                reachabilityBarrier(fg)
+                )
             }
+
         }
 
         @JvmStatic
-        fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IRect?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeBlend(
-                            blendMode.ordinal,
-                            getPtr(bg),
-                            getPtr(fg),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IRect?): ImageFilter = nativeCallFromStatic(bg, fg) { bg, fg ->
+            interopScope {
+                ImageFilter(
+                    _nMakeBlend(
+                        blendMode.ordinal,
+                        bg.pointerOrNullPointer,
+                        fg.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(bg)
-                reachabilityBarrier(fg)
+                )
             }
         }
 
@@ -80,56 +69,39 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             mode: FilterTileMode,
             input: ImageFilter? = null,
             crop: IRect? = null
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeBlur(
-                            sigmaX,
-                            sigmaY,
-                            mode.ordinal,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
-                    )
-                }
-            } finally {
-                reachabilityBarrier(input)
-            }
-        }
-
-        @JvmStatic
-        fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IRect?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeColorFilter(
-                            getPtr(f), getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
-                    )
-                }
-            } finally {
-                reachabilityBarrier(f)
-                reachabilityBarrier(input)
-            }
-        }
-
-        @JvmStatic
-        fun makeCompose(outer: ImageFilter?, inner: ImageFilter?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
                 ImageFilter(
-                    _nMakeCompose(
-                        getPtr(outer), getPtr(inner)
+                    _nMakeBlur(
+                        sigmaX,
+                        sigmaY,
+                        mode.ordinal,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
                 )
-            } finally {
-                reachabilityBarrier(outer)
-                reachabilityBarrier(inner)
             }
+        }
+
+        @JvmStatic
+        fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IRect?): ImageFilter = nativeCallFromStatic(f, input) { f, input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeColorFilter(
+                        f.pointerOrNullPointer, input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
+                    )
+                )
+            }
+        }
+
+        @JvmStatic
+        fun makeCompose(outer: ImageFilter?, inner: ImageFilter?): ImageFilter = nativeCallFromStatic(outer, inner) { outer, inner ->
+            ImageFilter(
+                _nMakeCompose(
+                    outer.pointerOrNullPointer, inner.pointerOrNullPointer
+                )
+            )
         }
 
         @JvmStatic
@@ -140,24 +112,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             displacement: ImageFilter?,
             color: ImageFilter?,
             crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeDisplacementMap(
-                            x.ordinal,
-                            y.ordinal,
-                            scale,
-                            getPtr(displacement),
-                            getPtr(color),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(displacement, color) { displacement, color ->
+            interopScope {
+                ImageFilter(
+                    _nMakeDisplacementMap(
+                        x.ordinal,
+                        y.ordinal,
+                        scale,
+                        displacement.pointerOrNullPointer,
+                        color.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(displacement)
-                reachabilityBarrier(color)
+                )
             }
         }
 
@@ -170,24 +136,19 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             color: Int,
             input: ImageFilter? = null,
             crop: IRect? = null
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeDropShadow(
-                            dx,
-                            dy,
-                            sigmaX,
-                            sigmaY,
-                            color,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeDropShadow(
+                        dx,
+                        dy,
+                        sigmaX,
+                        sigmaY,
+                        color,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
@@ -200,24 +161,19 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             color: Int,
             input: ImageFilter? = null,
             crop: IRect? = null
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeDropShadowOnly(
-                            dx,
-                            dy,
-                            sigmaX,
-                            sigmaY,
-                            color,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeDropShadowOnly(
+                        dx,
+                        dy,
+                        sigmaX,
+                        sigmaY,
+                        color,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
@@ -265,51 +221,41 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             dstRight: Float,
             dstBottom: Float,
             mode: SamplingMode
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeImage(
-                        getPtr(image),
-                        srcLeft,
-                        srcTop,
-                        srcRight,
-                        srcBottom,
-                        dstLeft,
-                        dstTop,
-                        dstRight,
-                        dstBottom,
-                        mode._packedInt1(),
-                        mode._packedInt2()
-                    )
+        ): ImageFilter = nativeCallFromStatic(image) { image ->
+            ImageFilter(
+                _nMakeImage(
+                    image.pointerOrNullPointer,
+                    srcLeft,
+                    srcTop,
+                    srcRight,
+                    srcBottom,
+                    dstLeft,
+                    dstTop,
+                    dstRight,
+                    dstBottom,
+                    mode._packedInt1(),
+                    mode._packedInt2()
                 )
-            } finally {
-                reachabilityBarrier(image)
-            }
+            )
         }
 
         @JvmStatic
-        fun makeMagnifier(r: Rect, zoomAmount: Float, inset: Float, samplingMode: SamplingMode, input: ImageFilter?, crop: IRect?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeMagnifier(
-                            r.left,
-                            r.top,
-                            r.right,
-                            r.bottom,
-                            zoomAmount,
-                            inset,
-                            samplingMode._packedInt1(),
-                            samplingMode._packedInt2(),
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        fun makeMagnifier(r: Rect, zoomAmount: Float, inset: Float, samplingMode: SamplingMode, input: ImageFilter?, crop: IRect?): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeMagnifier(
+                        r.left,
+                        r.top,
+                        r.right,
+                        r.bottom,
+                        zoomAmount,
+                        inset,
+                        samplingMode._packedInt1(),
+                        samplingMode._packedInt2(),
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
@@ -326,67 +272,52 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             convolveAlpha: Boolean,
             input: ImageFilter?,
             crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                ImageFilter(
-                    interopScope {
-                        _nMakeMatrixConvolution(
-                            kernelW,
-                            kernelH,
-                            toInterop(kernel),
-                            gain,
-                            bias,
-                            offsetX,
-                            offsetY,
-                            tileMode.ordinal,
-                            convolveAlpha,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
-                    }
-                )
-            } finally {
-                reachabilityBarrier(input)
-            }
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            ImageFilter(
+                interopScope {
+                    _nMakeMatrixConvolution(
+                        kernelW,
+                        kernelH,
+                        toInterop(kernel),
+                        gain,
+                        bias,
+                        offsetX,
+                        offsetY,
+                        tileMode.ordinal,
+                        convolveAlpha,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
+                    )
+                }
+            )
         }
 
         @JvmStatic
-        fun makeMatrixTransform(matrix: Matrix33, mode: SamplingMode, input: ImageFilter?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                ImageFilter(
-                    interopScope {
-                        _nMakeMatrixTransform(
-                            toInterop(matrix.mat),
-                            mode._packedInt1(),
-                            mode._packedInt2(),
-                            getPtr(input)
-                        )
-                    }
-                )
-            } finally {
-                reachabilityBarrier(input)
-            }
+        fun makeMatrixTransform(matrix: Matrix33, mode: SamplingMode, input: ImageFilter?): ImageFilter = nativeCallFromStatic(input) { input ->
+            ImageFilter(
+                interopScope {
+                    _nMakeMatrixTransform(
+                        toInterop(matrix.mat),
+                        mode._packedInt1(),
+                        mode._packedInt2(),
+                        input.pointerOrNullPointer
+                    )
+                }
+            )
         }
 
         /** Returns an image filter that draws [picture] into [target], replacing the filter input. */
         @JvmStatic
-        fun makePicture(picture: Picture?, target: Rect): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                ImageFilter(
-                    _nMakePicture(
-                        getPtr(picture),
-                        target.left,
-                        target.top,
-                        target.right,
-                        target.bottom
-                    )
+        fun makePicture(picture: Picture?, target: Rect): ImageFilter = nativeCallFromStatic(picture) { picture ->
+            ImageFilter(
+                _nMakePicture(
+                    picture.pointerOrNullPointer,
+                    target.left,
+                    target.top,
+                    target.right,
+                    target.bottom
                 )
-            } finally {
-                reachabilityBarrier(picture)
-            }
+            )
         }
 
         /** Returns an image filter that draws [picture] over its cull rect, replacing the filter input. */
@@ -394,101 +325,73 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makePicture(picture: Picture): ImageFilter = makePicture(picture, picture.cullRect)
 
         @JvmStatic
-        fun makeMerge(filters: Array<ImageFilter?>, crop: IRect?): ImageFilter {
-            return interopScope {
-                try {
-                    Stats.onNativeCall()
-                    val filterPtrs = NativePointerArray(filters.size)
-                    for (i in filters.indices) filterPtrs[i] = getPtr(filters[i])
-                    ImageFilter(
-                        _nMakeMerge(
-                            filters = toInterop(filterPtrs),
-                            filtersLength = filters.size,
-                            crop = toInterop(crop?.serializeToIntArray())
-                        )
+        fun makeMerge(filters: Array<ImageFilter?>, crop: IRect?): ImageFilter = nativeCallFromStatic(filters) { filters ->
+            interopScope {
+                val filterPtrs = NativePointerArray(filters.size)
+                for (i in filters.indices) filterPtrs[i] = filters[i].pointerOrNullPointer
+                ImageFilter(
+                    _nMakeMerge(
+                        filters = toInterop(filterPtrs),
+                        filtersLength = filters.size,
+                        crop = toInterop(crop?.serializeToIntArray())
                     )
-                } finally {
-                    reachabilityBarrier(filters)
-                }
+                )
             }
         }
 
         @JvmStatic
-        fun makeOffset(dx: Float, dy: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeOffset(
-                            dx, dy,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        fun makeOffset(dx: Float, dy: Float, input: ImageFilter?, crop: IRect?): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeOffset(
+                        dx, dy,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
         @JvmStatic
-        fun makeShader(shader: Shader, dither: Boolean = false, crop: IRect?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeShader(
-                            shader = getPtr(shader),
-                            dither = dither,
-                            crop = toInterop(crop?.serializeToIntArray())
-                        )
+        fun makeShader(shader: Shader, dither: Boolean = false, crop: IRect?): ImageFilter = nativeCallFromStatic(shader) { shader ->
+            interopScope {
+                ImageFilter(
+                    _nMakeShader(
+                        shader = shader.pointerOrNullPointer,
+                        dither = dither,
+                        crop = toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(shader)
+                )
             }
         }
 
         @JvmStatic
-        fun makeRuntimeShader(runtimeShaderBuilder: RuntimeShaderBuilder, shaderName: String, input: ImageFilter?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeRuntimeShader(
-                            runtimeShaderBuilderPtr = getPtr(runtimeShaderBuilder),
-                            childShaderName = toInterop(shaderName),
-                            input = getPtr(input)
-                        )
+        fun makeRuntimeShader(runtimeShaderBuilder: RuntimeShaderBuilder, shaderName: String, input: ImageFilter?): ImageFilter = nativeCallFromStatic(runtimeShaderBuilder, input) { runtimeShaderBuilder, input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeRuntimeShader(
+                        runtimeShaderBuilderPtr = runtimeShaderBuilder.pointerOrNullPointer,
+                        childShaderName = toInterop(shaderName),
+                        input = input.pointerOrNullPointer
                     )
-                }
-            } finally {
-                reachabilityBarrier(runtimeShaderBuilder)
-                reachabilityBarrier(input)
+                )
             }
         }
 
-
         @JvmStatic
-        fun makeRuntimeShader(runtimeShaderBuilder: RuntimeShaderBuilder, shaderNames: Array<String>, inputs: Array<ImageFilter?>): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                require(shaderNames.size == inputs.size)
-                interopScope {
-                    val inputPtrs = NativePointerArray(inputs.size)
-                    for (i in inputs.indices) inputPtrs[i] = getPtr(inputs[i])
-                    ImageFilter(
-                        _nMakeRuntimeShaderFromArray(
-                            runtimeShaderBuilderPtr = getPtr(runtimeShaderBuilder),
-                            childShaderNames = toInterop(shaderNames),
-                            inputs = toInterop(inputPtrs),
-                            inputLength = inputPtrs.size
-                        )
+        fun makeRuntimeShader(runtimeShaderBuilder: RuntimeShaderBuilder, shaderNames: Array<String>, inputs: Array<ImageFilter?>): ImageFilter = nativeCallFromStatic(runtimeShaderBuilder, inputs) { runtimeShaderBuilder, inputs ->
+            require(shaderNames.size == inputs.size)
+            interopScope {
+                val inputPtrs = NativePointerArray(inputs.size)
+                for (i in inputs.indices) inputPtrs[i] = inputs[i].pointerOrNullPointer
+                ImageFilter(
+                    _nMakeRuntimeShaderFromArray(
+                        runtimeShaderBuilderPtr = runtimeShaderBuilder.pointerOrNullPointer,
+                        childShaderNames = toInterop(shaderNames),
+                        inputs = toInterop(inputPtrs),
+                        inputLength = inputPtrs.size
                     )
-                }
-            } finally {
-                reachabilityBarrier(runtimeShaderBuilder)
-                reachabilityBarrier(inputs)
+                )
             }
         }
 
@@ -518,61 +421,46 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             dstRight: Float,
             dstBottom: Float,
             input: ImageFilter?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            ImageFilter(
+                _nMakeTile(
+                    srcLeft,
+                    srcTop,
+                    srcRight,
+                    srcBottom,
+                    dstLeft,
+                    dstTop,
+                    dstRight,
+                    dstBottom,
+                    input.pointerOrNullPointer
+                )
+            )
+        }
+
+        @JvmStatic
+        fun makeDilate(rx: Float, ry: Float, input: ImageFilter?, crop: IRect?): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
                 ImageFilter(
-                    _nMakeTile(
-                        srcLeft,
-                        srcTop,
-                        srcRight,
-                        srcBottom,
-                        dstLeft,
-                        dstTop,
-                        dstRight,
-                        dstBottom,
-                        getPtr(input)
+                    _nMakeDilate(
+                        rx,
+                        ry,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
                 )
-            } finally {
-                reachabilityBarrier(input)
             }
         }
 
         @JvmStatic
-        fun makeDilate(rx: Float, ry: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeDilate(
-                            rx,
-                            ry,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        fun makeErode(rx: Float, ry: Float, input: ImageFilter?, crop: IRect?): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeErode(
+                        rx, ry,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
-            }
-        }
-
-        @JvmStatic
-        fun makeErode(rx: Float, ry: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeErode(
-                            rx, ry,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
-                    )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
@@ -586,23 +474,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             kd: Float,
             input: ImageFilter?,
             crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeDistantLitDiffuse(
-                            x, y, z,
-                            lightColor,
-                            surfaceScale,
-                            kd,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeDistantLitDiffuse(
+                        x, y, z,
+                        lightColor,
+                        surfaceScale,
+                        kd,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
@@ -616,23 +499,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             kd: Float,
             input: ImageFilter?,
             crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakePointLitDiffuse(
-                            x, y, z,
-                            lightColor,
-                            surfaceScale,
-                            kd,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakePointLitDiffuse(
+                        x, y, z,
+                        lightColor,
+                        surfaceScale,
+                        kd,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
@@ -651,26 +529,21 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             kd: Float,
             input: ImageFilter?,
             crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeSpotLitDiffuse(
-                            x0, y0, z0,
-                            x1, y1, z1,
-                            falloffExponent,
-                            cutoffAngle,
-                            lightColor,
-                            surfaceScale,
-                            kd,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeSpotLitDiffuse(
+                        x0, y0, z0,
+                        x1, y1, z1,
+                        falloffExponent,
+                        cutoffAngle,
+                        lightColor,
+                        surfaceScale,
+                        kd,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
@@ -685,26 +558,21 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             shininess: Float,
             input: ImageFilter?,
             crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeDistantLitSpecular(
-                            x,
-                            y,
-                            z,
-                            lightColor,
-                            surfaceScale,
-                            ks,
-                            shininess,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeDistantLitSpecular(
+                        x,
+                        y,
+                        z,
+                        lightColor,
+                        surfaceScale,
+                        ks,
+                        shininess,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
@@ -719,24 +587,19 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             shininess: Float,
             input: ImageFilter?,
             crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakePointLitSpecular(
-                            x, y, z,
-                            lightColor,
-                            surfaceScale,
-                            ks,
-                            shininess,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakePointLitSpecular(
+                        x, y, z,
+                        lightColor,
+                        surfaceScale,
+                        ks,
+                        shininess,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 
@@ -756,27 +619,22 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             shininess: Float,
             input: ImageFilter?,
             crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeSpotLitSpecular(
-                            x0, y0, z0,
-                            x1, y1, z1,
-                            falloffExponent,
-                            cutoffAngle,
-                            lightColor,
-                            surfaceScale,
-                            ks,
-                            shininess,
-                            getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
+        ): ImageFilter = nativeCallFromStatic(input) { input ->
+            interopScope {
+                ImageFilter(
+                    _nMakeSpotLitSpecular(
+                        x0, y0, z0,
+                        x1, y1, z1,
+                        falloffExponent,
+                        cutoffAngle,
+                        lightColor,
+                        surfaceScale,
+                        ks,
+                        shininess,
+                        input.pointerOrNullPointer,
+                        toInterop(crop?.serializeToIntArray())
                     )
-                }
-            } finally {
-                reachabilityBarrier(input)
+                )
             }
         }
 

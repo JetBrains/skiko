@@ -3,6 +3,7 @@ package org.jetbrains.skia.icu
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.nativeCallFromStatic
 import kotlin.jvm.JvmStatic
 
 /**
@@ -47,10 +48,7 @@ object CharDirection {
      * Same as java.lang.Character.getDirectionality()
      */
     @JvmStatic
-    fun of(codePoint: Int): Int {
-        Stats.onNativeCall()
-        return _nCharDirection(codePoint)
-    }
+    fun of(codePoint: Int): Int = nativeCallFromStatic { _nCharDirection(codePoint) }
 }
 
 /**
@@ -182,9 +180,8 @@ object CharProperties {
      * @param property A binary property; one of the constants defined in [CharProperties].
      */
     @JvmStatic
-    fun codePointHasBinaryProperty(codePoint: Int, property: Int): Boolean {
-        Stats.onNativeCall()
-        return _nCodePointHasBinaryProperty(codePoint, property)
+    fun codePointHasBinaryProperty(codePoint: Int, property: Int): Boolean = nativeCallFromStatic {
+        _nCodePointHasBinaryProperty(codePoint, property)
     }
 }
 

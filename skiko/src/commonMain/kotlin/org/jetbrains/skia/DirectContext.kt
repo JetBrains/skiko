@@ -11,18 +11,16 @@ import kotlin.jvm.JvmStatic
 class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = true) : RefCnt(ptr, managed) {
     companion object {
         @JvmStatic
-        fun makeGL(): DirectContext {
-            Stats.onNativeCall()
+        fun makeGL(): DirectContext = nativeCallFromStatic {
             loadOpenGLLibrary()
             val ptr = _nMakeGL()
             if (ptr == NullPointer) throw RenderException("Can't create OpenGL DirectContext")
-            return DirectContext(ptr)
+            DirectContext(ptr)
         }
 
         @JvmStatic
-        fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
-            Stats.onNativeCall()
-            return DirectContext(_nMakeMetal(devicePtr, queuePtr))
+        fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): DirectContext = nativeCallFromStatic {
+            DirectContext(_nMakeMetal(devicePtr, queuePtr))
         }
 
         /**
@@ -39,9 +37,8 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
          * type D3D12_COMMAND_LIST_TYPE_DIRECT; must be not zero
          */
         @JvmStatic
-        fun makeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
-            Stats.onNativeCall()
-            return DirectContext(_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
+        fun makeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): DirectContext = nativeCallFromStatic {
+            DirectContext(_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
         }
 
         /**
@@ -70,7 +67,7 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
             deviceProcAddr: NativePointer,
             apiVersion: Int,
             memoryAllocator: VulkanMemoryAllocator? = null
-        ): DirectContext {
+        ): DirectContext = nativeCallFromStatic {
             require(instancePtr != NullPointer) { "instancePtr must not be null" }
             require(physicalDevicePtr != NullPointer) { "physicalDevicePtr must not be null" }
             require(devicePtr != NullPointer) { "devicePtr must not be null" }
@@ -79,7 +76,6 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
             require(instanceProcAddr != NullPointer) { "instanceProcAddr must not be null" }
             require(deviceProcAddr != NullPointer) { "deviceProcAddr must not be null" }
 
-            Stats.onNativeCall()
             val ptr = nMakeVulkanImpl(
                 instancePtr,
                 physicalDevicePtr,
@@ -100,36 +96,31 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
         }
     }
 
-    fun flush(): DirectContext {
-        Stats.onNativeCall()
+    fun flush(): DirectContext = nativeCall {
         DirectContext_nFlushDefault(_ptr)
-        return this
+        this
     }
 
-    fun flush(surface: Surface): DirectContext {
-        Stats.onNativeCall()
+    fun flush(surface: Surface): DirectContext = nativeCall(surface) { surface ->
         DirectContext_nFlush(_ptr, surface._ptr)
-        return this
+        this
     }
 
-    fun resetAll(): DirectContext {
-        Stats.onNativeCall()
+    fun resetAll(): DirectContext = nativeCall {
         _nReset(_ptr, -1)
-        return this
+        this
     }
 
-    fun resetGLAll(): DirectContext {
-        Stats.onNativeCall()
+    fun resetGLAll(): DirectContext = nativeCall {
         _nReset(_ptr, 0xffff)
-        return this
+        this
     }
 
-    fun resetGL(vararg states: GLBackendState): DirectContext {
-        Stats.onNativeCall()
+    fun resetGL(vararg states: GLBackendState): DirectContext = nativeCall {
         var flags = 0
         for (state in states) flags = flags or state._bit
         _nReset(_ptr, flags)
-        return this
+        this
     }
 
     /**
@@ -142,19 +133,10 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
      *
      * @param syncCpu flag to sync cpu and gpu work submission
      */
-    fun submit(syncCpu: Boolean) {
-        Stats.onNativeCall()
-        _nSubmit(_ptr, syncCpu)
-    }
+    fun submit(syncCpu: Boolean) = nativeCall { _nSubmit(_ptr, syncCpu) }
 
-    fun flushAndSubmit(surface: Surface, syncCpu: Boolean = false) {
-        try {
-            Stats.onNativeCall()
-            _nFlushAndSubmit(_ptr, surface._ptr, syncCpu)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun flushAndSubmit(surface: Surface, syncCpu: Boolean = false) =
+        nativeCall(surface) { surface -> _nFlushAndSubmit(_ptr, surface._ptr, syncCpu) }
 
     /**
      *
@@ -176,36 +158,16 @@ class DirectContext internal constructor(ptr: NativePointer, managed: Boolean = 
      * we can continue to delete any outstanding GrBackendTextures/RenderTargets which must be
      * cleaned up even in a device lost state.
      */
-    fun abandon() {
-        try {
-            Stats.onNativeCall()
-            _nAbandon(_ptr, 0)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun abandon() = nativeCall { _nAbandon(_ptr, 0) }
 
     /**
      * GPU resource cache limit. If the cache currently exceeds this limit,
      * it will be purged (LRU) to keep the cache within the limit.
      */
     var resourceCacheLimit: Long
-        get() {
-            try {
-                Stats.onNativeCall()
-                return DirectContext_nGetResourceCacheLimit(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
-        set(value) {
-            try {
-                Stats.onNativeCall()
-                DirectContext_nSetResourceCacheLimit(_ptr, value)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { DirectContext_nGetResourceCacheLimit(_ptr) }
+        set(value) = nativeCall { DirectContext_nSetResourceCacheLimit(_ptr, value) }
+
 }
 
 fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {

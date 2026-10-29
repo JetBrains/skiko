@@ -3,6 +3,8 @@ package org.jetbrains.skia.paragraph
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.nativeCall
+import org.jetbrains.skia.impl.pointerOrNullPointer
 
 class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -15,177 +17,79 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         Stats.onNativeCall()
     }
 
-    override fun nativeEquals(other: Native?): Boolean {
-        return try {
-            Stats.onNativeCall()
-            TextStyle_nEquals(
-                _ptr,
-                getPtr(other)
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
-        }
-    }
+    override fun nativeEquals(other: Native?): Boolean =
+        nativeCall(other) { other -> TextStyle_nEquals(_ptr, other.pointerOrNullPointer) }
 
-    fun equals(attribute: TextStyleAttribute, other: TextStyle?): Boolean {
-        return try {
-            Stats.onNativeCall()
+    fun equals(attribute: TextStyleAttribute, other: TextStyle?): Boolean =
+        nativeCall(other) { other ->
             _nAttributeEquals(
                 _ptr,
                 attribute.ordinal,
-                getPtr(other)
+                other.pointerOrNullPointer
             )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
         }
-    }
 
     var color: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetColor(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) {
-            setColor(value)
-        }
-
-    fun setColor(color: Int): TextStyle {
-        try {
-            Stats.onNativeCall()
-            _nSetColor(_ptr, color)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
+        get() = nativeCall { _nGetColor(_ptr) }
+        set(value) = nativeCall { _nSetColor(_ptr, value) }
 
     var foreground: Paint?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = _nGetForeground(_ptr)
             if (ptr == NullPointer) null else Paint(ptr, true)
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) {
-            setForeground(value)
-        }
-
-    fun setForeground(paint: Paint?): TextStyle {
-        return try {
-            Stats.onNativeCall()
+        set(value) = nativeCall(value) { paint ->
             _nSetForeground(
                 _ptr,
-                getPtr(paint)
+                paint.pointerOrNullPointer
             )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(paint)
         }
-    }
 
     var background: Paint?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = _nGetBackground(_ptr)
             if (ptr == NullPointer) null else Paint(ptr, true)
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) {
-            setBackground(value)
-        }
-
-    fun setBackground(paint: Paint?): TextStyle {
-        return try {
-            Stats.onNativeCall()
+        set(value) = nativeCall(value) { paint ->
             _nSetBackground(
                 _ptr,
-                getPtr(paint)
+                paint.pointerOrNullPointer
             )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(paint)
         }
-    }
 
     var decorationStyle: DecorationStyle
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             DecorationStyle.fromInteropPointer {
                 _nGetDecorationStyle(_ptr, it)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) {
-            setDecorationStyle(value)
-        }
-
-    fun setDecorationStyle(d: DecorationStyle): TextStyle {
-        try {
-            Stats.onNativeCall()
+        set(value) = nativeCall {
             _nSetDecorationStyle(
                 _ptr,
-                d._underline,
-                d._overline,
-                d._lineThrough,
-                d._gaps,
-                d.color,
-                d._lineStyle.ordinal,
-                d.thicknessMultiplier
+                value._underline,
+                value._overline,
+                value._lineThrough,
+                value._gaps,
+                value.color,
+                value._lineStyle.ordinal,
+                value.thicknessMultiplier
             )
-        } finally {
-            reachabilityBarrier(this)
         }
-        return this
-    }
 
     var fontStyle: FontStyle
-        get() = try {
-            Stats.onNativeCall()
-            FontStyle(TextStyle_nGetFontStyle(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) {
-            setFontStyle(value)
-        }
-
-    fun setFontStyle(s: FontStyle): TextStyle {
-        try {
-            Stats.onNativeCall()
-            TextStyle_nSetFontStyle(_ptr, s._value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
+        get() = nativeCall { FontStyle(TextStyle_nGetFontStyle(_ptr)) }
+        set(value) = nativeCall { TextStyle_nSetFontStyle(_ptr, value._value) }
 
     val shadows: Array<Shadow>
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             Shadow.fromInteropPointer(_nGetShadowsCount(_ptr)) {
                 _nGetShadows(_ptr, it)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
 
-    fun addShadow(s: Shadow): TextStyle {
-        try {
-            Stats.onNativeCall()
-            _nAddShadow(_ptr, s.color, s.offsetX, s.offsetY, s.blurSigma)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun addShadow(s: Shadow): TextStyle = nativeCall {
+        _nAddShadow(_ptr, s.color, s.offsetX, s.offsetY, s.blurSigma)
+        this
     }
 
     fun addShadows(shadows: Array<Shadow>): TextStyle {
@@ -193,19 +97,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
-    fun clearShadows(): TextStyle {
-        try {
-            Stats.onNativeCall()
-            _nClearShadows(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun clearShadows(): TextStyle = nativeCall {
+        _nClearShadows(_ptr)
+        this
     }
 
     val fontFeatures: Array<FontFeature>
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val size = _nGetFontFeaturesSize(_ptr)
             withResult(IntArray(size * 2)) {
                 Stats.onNativeCall()
@@ -213,20 +111,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             }.let {
                 FontFeature.fromInteropEncodedBy2Ints(it)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
 
-    fun addFontFeature(f: FontFeature): TextStyle {
-        try {
-            Stats.onNativeCall()
-            interopScope {
-                _nAddFontFeature(_ptr, toInterop(f.tag), f.value)
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun addFontFeature(f: FontFeature): TextStyle = nativeCall {
+        interopScope {
+            _nAddFontFeature(_ptr, toInterop(f.tag), f.value)
         }
-        return this
+        this
     }
 
     fun addFontFeatures(FontFeatures: Array<FontFeature>): TextStyle {
@@ -234,46 +125,23 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
-    fun clearFontFeatures(): TextStyle {
-        try {
-            Stats.onNativeCall()
-            _nClearFontFeatures(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
+    fun clearFontFeatures(): TextStyle = nativeCall {
+        _nClearFontFeatures(_ptr)
+        this
     }
 
     var fontSize: Float
-        get() = try {
-            Stats.onNativeCall()
-            TextStyle_nGetFontSize(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { TextStyle_nGetFontSize(_ptr) }
         set(value) {
-            setFontSize(value)
+            check(!value.isNaN())
+            nativeCall { TextStyle_nSetFontSize(_ptr, value) }
         }
-
-    fun setFontSize(size: Float): TextStyle {
-        check(!size.isNaN())
-        try {
-            Stats.onNativeCall()
-            TextStyle_nSetFontSize(_ptr, size)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
 
     var fontFamilies: Array<String>
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             arrayDecoderScope({ ArrayDecoder(TextStyle_nGetFontFamilies(_ptr), ManagedString_nGetFinalizer()) }) { arrayDecoder ->
                 (0 until arrayDecoder.size).map { i -> withStringResult(arrayDecoder.release(i)) }
             }.toTypedArray()
-        } finally {
-            reachabilityBarrier(this)
         }
         set(value) {
             setFontFamilies(value)
@@ -283,301 +151,110 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return setFontFamilies(arrayOf(family))
     }
 
-    fun setFontFamilies(families: Array<String>?): TextStyle {
-        Stats.onNativeCall()
+    fun setFontFamilies(families: Array<String>?): TextStyle = nativeCall {
         interopScope {
             _nSetFontFamilies(_ptr, toInterop(families), families?.size ?: 0)
         }
-        return this
+        this
     }
+
 
     var height: Float?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val height = TextStyle_nGetHeight(_ptr)
             if (height.isNaN()) null else height
-        } finally {
-            reachabilityBarrier(this)
         }
         set(value) {
-            setHeight(value)
-        }
-
-    fun setHeight(height: Float?): TextStyle {
-        if (height == null) {
-            try {
-                Stats.onNativeCall()
-                TextStyle_nSetHeight(_ptr, false, 0f)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        } else {
-            check(!height.isNaN())
-            try {
-                Stats.onNativeCall()
-                TextStyle_nSetHeight(_ptr, true, height)
-            } finally {
-                reachabilityBarrier(this)
+            if (value == null) {
+                nativeCall { TextStyle_nSetHeight(_ptr, false, 0f) }
+            } else {
+                check(!value.isNaN())
+                nativeCall { TextStyle_nSetHeight(_ptr, true, value) }
             }
         }
-        return this
-    }
 
     @Deprecated("Replaced by topRatio")
     var isHalfLeading: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            TextStyle_nGetHalfLeading(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { TextStyle_nGetHalfLeading(_ptr) }
         set(value) {
             @Suppress("DEPRECATION")
-            setHalfLeading(value)
+            nativeCall { TextStyle_nSetHalfLeading(_ptr, value) }
         }
-
-    // Same as topRatio = halfLeading ? 0.5f : -1.0f
-    @Deprecated("Replaced by topRatio")
-    fun setHalfLeading(value: Boolean): TextStyle {
-        try {
-            Stats.onNativeCall()
-            TextStyle_nSetHalfLeading(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
 
     // [0..1]: the ratio of ascent to ascent+descent
     // -1: proportional to the ascent/descent
     var topRatio: Float
-        get() = try {
-            Stats.onNativeCall()
-            TextStyle_nGetTopRatio(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) {
-            setTopRatio(value)
-        }
-
-    fun setTopRatio(topRatio: Float): TextStyle {
-        try {
-            Stats.onNativeCall()
-            TextStyle_nSetTopRatio(_ptr, topRatio)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
+        get() = nativeCall { TextStyle_nGetTopRatio(_ptr) }
+        set(value) = nativeCall { TextStyle_nSetTopRatio(_ptr, value) }
 
     var letterSpacing: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetLetterSpacing(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetLetterSpacing(_ptr) }
         set(value) {
-            setLetterSpacing(value)
+            check(!value.isNaN())
+            nativeCall { _nSetLetterSpacing(_ptr, value) }
         }
-
-    fun setLetterSpacing(letterSpacing: Float): TextStyle {
-        check(!letterSpacing.isNaN())
-        try {
-            Stats.onNativeCall()
-            _nSetLetterSpacing(_ptr, letterSpacing)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
 
     var baselineShift: Float
-        get() = try {
-            Stats.onNativeCall()
-            TextStyle_nGetBaselineShift(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { TextStyle_nGetBaselineShift(_ptr) }
         set(value) {
-            setBaselineShift(value)
+            check(!value.isNaN())
+            nativeCall { TextStyle_nSetBaselineShift(_ptr, value) }
         }
-
-    fun setBaselineShift(baselineShift: Float): TextStyle {
-        check(!baselineShift.isNaN())
-        try {
-            Stats.onNativeCall()
-            TextStyle_nSetBaselineShift(_ptr, baselineShift)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
 
     var wordSpacing: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetWordSpacing(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetWordSpacing(_ptr) }
         set(value) {
-            setWordSpacing(value)
+            check(!value.isNaN())
+            nativeCall { _nSetWordSpacing(_ptr, value) }
         }
-
-    fun setWordSpacing(wordSpacing: Float): TextStyle {
-        check(!wordSpacing.isNaN())
-        try {
-            Stats.onNativeCall()
-            _nSetWordSpacing(_ptr, wordSpacing)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
 
     var typeface: Typeface?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = _nGetTypeface(_ptr)
             if (ptr == NullPointer) null else Typeface(ptr)
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) {
-            setTypeface(value)
-        }
-
-    fun setTypeface(typeface: Typeface?): TextStyle {
-        return try {
-            Stats.onNativeCall()
-            _nSetTypeface(
-                _ptr,
-                getPtr(typeface)
-            )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(typeface)
-        }
-    }
+        set(value) = nativeCall(value) { typeface -> _nSetTypeface(_ptr, typeface.pointerOrNullPointer) }
 
     var locale: String
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             withStringResult {
                 _nGetLocale(_ptr)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) {
-            setLocale(value)
-        }
-
-    fun setLocale(locale: String?): TextStyle {
-        try {
-            Stats.onNativeCall()
+        set(value) = nativeCall {
             interopScope {
-                _nSetLocale(_ptr, toInterop(locale))
+                _nSetLocale(_ptr, toInterop(value))
             }
-        } finally {
-            reachabilityBarrier(this)
         }
-        return this
-    }
 
     var baselineMode: BaselineMode
-        get() = try {
-            Stats.onNativeCall()
-            BaselineMode.entries[_nGetBaselineMode(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) {
-            setBaselineMode(value)
-        }
-
-    fun setBaselineMode(baseline: BaselineMode): TextStyle {
-        try {
-            Stats.onNativeCall()
-            _nSetBaselineMode(_ptr, baseline.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
+        get() = nativeCall { BaselineMode.entries[_nGetBaselineMode(_ptr)] }
+        set(value) = nativeCall { _nSetBaselineMode(_ptr, value.ordinal) }
 
     val fontMetrics: FontMetrics
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             FontMetrics.fromInteropPointer {
                 _nGetFontMetrics(_ptr, it)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
 
     val isPlaceholder: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsPlaceholder(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsPlaceholder(_ptr) }
 
-    fun setPlaceholder(): TextStyle {
-        try {
-            Stats.onNativeCall()
-            _nSetPlaceholder(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        return this
-    }
+    fun setPlaceholder(): TextStyle =
+        nativeCall { _nSetPlaceholder(_ptr); this }
 
     var fontEdging: FontEdging
-        get() = try {
-            Stats.onNativeCall()
-            FontEdging.entries[_nGetFontEdging(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetFontEdging(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { FontEdging.entries[_nGetFontEdging(_ptr)] }
+        set(value) = nativeCall { _nSetFontEdging(_ptr, value.ordinal) }
 
     var subpixel: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nGetSubpixel(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetSubpixel(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetSubpixel(_ptr) }
+        set(value) = nativeCall { _nSetSubpixel(_ptr, value) }
 
     var fontHinting: FontHinting
-        get() = try {
-            Stats.onNativeCall()
-            FontHinting.entries[_nGetFontHinting(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetFontHinting(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { FontHinting.entries[_nGetFontHinting(_ptr)] }
+        set(value) = nativeCall { _nSetFontHinting(_ptr, value.ordinal) }
 
     internal object _FinalizerHolder {
         val PTR = TextStyle_nGetFinalizer()

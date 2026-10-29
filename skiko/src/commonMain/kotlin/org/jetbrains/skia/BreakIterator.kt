@@ -319,14 +319,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * has been reached, it returns the first or last text boundary depending
      * on which one is reached.
      */
-    fun current(): Int {
-        return try {
-            Stats.onNativeCall()
-            _nCurrent(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun current(): Int = nativeCall { _nCurrent(_ptr) }
 
     /**
      * Returns the boundary following the current boundary. If the current
@@ -335,14 +328,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * iterator's current position is set to the boundary following the current
      * boundary.
      */
-    operator fun next(): Int {
-        return try {
-            Stats.onNativeCall()
-            _nNext(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    operator fun next(): Int = nativeCall { _nNext(_ptr) }
 
     /**
      * Advances the iterator either forward or backward the specified number of steps.
@@ -379,38 +365,17 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * iterator's current position is set to the boundary following the current
      * boundary.
      */
-    fun previous(): Int {
-        return try {
-            Stats.onNativeCall()
-            _nPrevious(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun previous(): Int = nativeCall { _nPrevious(_ptr) }
 
     /**
      * Returns the first boundary. The iterator's current position is set to the first text boundary.
      */
-    fun first(): Int {
-        return try {
-            Stats.onNativeCall()
-            _nFirst(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun first(): Int = nativeCall { _nFirst(_ptr) }
 
     /**
      * Returns the last boundary. The iterator's current position is set to the last text boundary.
      */
-    fun last(): Int {
-        return try {
-            Stats.onNativeCall()
-            _nLast(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun last(): Int = nativeCall { _nLast(_ptr) }
 
     /**
      * Returns the last boundary preceding the specified character offset.
@@ -420,14 +385,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * returned boundary. The value returned is always less than the offset or
      * the value [BreakIterator.DONE].
      */
-    fun preceding(offset: Int): Int {
-        return try {
-            Stats.onNativeCall()
-            _nPreceding(_ptr, offset)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun preceding(offset: Int): Int = nativeCall { _nPreceding(_ptr, offset) }
 
     /**
      * Returns the first boundary following the specified character offset.
@@ -437,26 +395,12 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * returned boundary. The value returned is always greater than the offset or
      * the value [BreakIterator.DONE].
      */
-    fun following(offset: Int): Int {
-        return try {
-            Stats.onNativeCall()
-            _nFollowing(_ptr, offset)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun following(offset: Int): Int = nativeCall { _nFollowing(_ptr, offset) }
 
     /**
      * Returns true if the specified character offset is a text boundary.
      */
-    fun isBoundary(offset: Int): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nIsBoundary(_ptr, offset)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun isBoundary(offset: Int): Boolean = nativeCall { _nIsBoundary(_ptr, offset) }
 
     /**
      * For rule-based BreakIterators, return the status tag from the
@@ -471,12 +415,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * at the current iteration position.
      */
     val ruleStatus: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetRuleStatus(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetRuleStatus(_ptr) }
 
     /**
      * For RuleBasedBreakIterators, get the status (tag) values from the break rule(s)
@@ -489,35 +428,27 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * @return  an array with the status values.
      */
     val ruleStatuses: IntArray
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val arrayLen = _nGetRuleStatusesLen(_ptr)
             withResult(IntArray(arrayLen)) { result ->
                 _nGetRuleStatuses(_ptr, result, arrayLen)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
      * Set a new text string to be scanned. The current scan position is reset to [].
      */
-    fun setText(text: String?) {
-        try {
-            Stats.onNativeCall()
-            _text?.close()
-            _text = U16String(withErrorGuard("Failed to setText") {
-                _nSetText(
-                    _ptr,
-                    toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }),
-                    text?.length ?: 0,
-                    it
-                )
-            })
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(_text)
+    fun setText(text: String?) = nativeCall(_text) { _text ->
+        _text?.close()
+        val ptr = withErrorGuard("Failed to setText") {
+            _nSetText(
+                _ptr,
+                toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }),
+                text?.length ?: 0,
+                it
+            )
         }
+        this@BreakIterator._text = U16String(ptr)
     }
 
     private object _FinalizerHolder {

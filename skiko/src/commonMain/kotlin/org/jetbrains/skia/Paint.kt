@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import kotlin.math.round
 
 class Paint : Managed {
@@ -40,22 +41,10 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_copy_const_SkPaint](https://fiddle.skia.org/c/@Paint_copy_const_SkPaint)
      */
-    fun makeClone(): Paint {
-        return try {
-            Stats.onNativeCall()
-            Paint(Paint_nMakeClone(_ptr), true)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun makeClone(): Paint = nativeCall { Paint(Paint_nMakeClone(_ptr), true) }
 
-    override fun nativeEquals(other: Native?): Boolean {
-        return try {
-            Paint_nEquals(_ptr, getPtr(other))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(other)
-        }
+    override fun nativeEquals(other: Native?): Boolean = nativeCall(other) { other ->
+        Paint_nEquals(_ptr, other.pointerOrNullPointer)
     }
 
     /**
@@ -64,10 +53,9 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_reset](https://fiddle.skia.org/c/@Paint_reset)
      */
-    fun reset(): Paint {
-        Stats.onNativeCall()
+    fun reset(): Paint = nativeCall {
         Paint_nReset(_ptr)
-        return this
+        this
     }
 
     /**
@@ -78,18 +66,8 @@ class Paint : Managed {
      * @return  antialiasing state
      */
     var isAntiAlias: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsAntiAlias(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetAntiAlias(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsAntiAlias(_ptr) }
+        set(value) = nativeCall { _nSetAntiAlias(_ptr, value) }
 
     /**
      * Requests, but does not require, to distribute color error.
@@ -97,18 +75,8 @@ class Paint : Managed {
      * @return  true if color error may be distributed to smooth color transition.
      */
     var isDither: Boolean
-        get() = try {
-            Stats.onNativeCall()
-            _nIsDither(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value)  = try {
-            Stats.onNativeCall()
-            _nSetDither(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nIsDither(_ptr) }
+        set(value)  = nativeCall { _nSetDither(_ptr, value) }
 
     /**
      * Sets whether the geometry is filled, stroked, or filled and stroked.
@@ -120,18 +88,8 @@ class Paint : Managed {
      * @return  whether the geometry is filled, stroked, or filled and stroked.
      */
     var mode: PaintMode
-        get() = try {
-            Stats.onNativeCall()
-            PaintMode.entries[_nGetMode(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetMode(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { PaintMode.entries[_nGetMode(_ptr)] }
+        set(value) = nativeCall { _nSetMode(_ptr, value.ordinal) }
 
     /**
      * Set paint's mode to STROKE if true, or FILL if false.
@@ -157,18 +115,8 @@ class Paint : Managed {
      * @return  unpremultiplied ARGB
      */
     var color: Int
-        get() = try {
-            Stats.onNativeCall()
-            Paint_nGetColor(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetColor(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Paint_nGetColor(_ptr) }
+        set(value) = nativeCall { _nSetColor(_ptr, value) }
 
     /**
      * Sets alpha and RGB used when stroking and filling. The color is four floating
@@ -180,13 +128,10 @@ class Paint : Managed {
      * @return  unpremultiplied RGBA
      */
     var color4f: Color4f
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             Color4f(withResult(FloatArray(4)) {
                 _nGetColor4f(_ptr, it)
             })
-        } finally {
-            reachabilityBarrier(this)
         }
         set(value) {
             setColor4f(value, null)
@@ -202,22 +147,16 @@ class Paint : Managed {
      * @param colorSpace  SkColorSpace describing the encoding of color
      * @return            this
      */
-    fun setColor4f(color: Color4f, colorSpace: ColorSpace?): Paint {
-        return try {
-            Stats.onNativeCall()
-            _nSetColor4f(
-                _ptr,
-                color.r,
-                color.g,
-                color.b,
-                color.a,
-                getPtr(colorSpace)
-            )
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(colorSpace)
-        }
+    fun setColor4f(color: Color4f, colorSpace: ColorSpace?): Paint = nativeCall(colorSpace) { colorSpace ->
+        _nSetColor4f(
+            _ptr,
+            color.r,
+            color.g,
+            color.b,
+            color.a,
+            colorSpace.pointerOrNullPointer
+        )
+        this
     }
 
     /**
@@ -265,10 +204,9 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setARGB](https://fiddle.skia.org/c/@Paint_setARGB)
      */
-    fun setARGB(a: Int, r: Int, g: Int, b: Int): Paint {
-        Stats.onNativeCall()
+    fun setARGB(a: Int, r: Int, g: Int, b: Int): Paint = nativeCall {
         _nSetColor4f(_ptr, r / 255f, g / 255f, b / 255f, a / 255f, NullPointer)
-        return this
+        this
     }
 
     /**
@@ -286,18 +224,8 @@ class Paint : Managed {
      * @return  zero for hairline, greater than zero for pen thickness
      */
     var strokeWidth: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetStrokeWidth(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetStrokeWidth(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetStrokeWidth(_ptr) }
+        set(value) = nativeCall { _nSetStrokeWidth(_ptr, value) }
 
 
     /**
@@ -312,18 +240,8 @@ class Paint : Managed {
      * @return  zero and greater miter limit
      */
     var strokeMiter: Float
-        get() = try {
-            Stats.onNativeCall()
-            _nGetStrokeMiter(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetStrokeMiter(_ptr, value)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetStrokeMiter(_ptr) }
+        set(value) = nativeCall { _nSetStrokeMiter(_ptr, value) }
 
 
     /**
@@ -336,18 +254,8 @@ class Paint : Managed {
      * @return  the geometry drawn at the beginning and end of strokes.
      */
     var strokeCap: PaintStrokeCap
-        get() = try {
-            Stats.onNativeCall()
-            PaintStrokeCap.entries[_nGetStrokeCap(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetStrokeCap(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { PaintStrokeCap.entries[_nGetStrokeCap(_ptr)] }
+        set(value) = nativeCall { _nSetStrokeCap(_ptr, value.ordinal) }
 
     /**
      * Sets the geometry drawn at the corners of strokes.
@@ -357,18 +265,8 @@ class Paint : Managed {
      * @return  the geometry drawn at the corners of strokes.
      */
     var strokeJoin: PaintStrokeJoin
-        get() = try {
-            Stats.onNativeCall()
-            PaintStrokeJoin.entries[_nGetStrokeJoin(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetStrokeJoin(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { PaintStrokeJoin.entries[_nGetStrokeJoin(_ptr)] }
+        set(value) = nativeCall { _nSetStrokeJoin(_ptr, value.ordinal) }
 
     /**
      * @param shader  how geometry is filled with color; if null, color is used instead
@@ -381,19 +279,12 @@ class Paint : Managed {
      * @see [https://fiddle.skia.org/c/@Paint_refShader](https://fiddle.skia.org/c/@Paint_refShader)
      */
     var shader: Shader?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val shaderPtr = _nGetShader(_ptr)
             if (shaderPtr == NullPointer) null else Shader(shaderPtr)
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetShader(_ptr, getPtr(value))
-        } finally {
-            reachabilityBarrier(value)
-            reachabilityBarrier(this)
+        set(value) = nativeCall(value) { value ->
+            _nSetShader(_ptr, value.pointerOrNullPointer)
         }
 
     /**
@@ -407,22 +298,12 @@ class Paint : Managed {
      * @see [https://fiddle.skia.org/c/@Paint_refColorFilter](https://fiddle.skia.org/c/@Paint_refColorFilter)
      */
     var colorFilter: ColorFilter?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val colorFilterPtr = _nGetColorFilter(_ptr)
             if (colorFilterPtr == NullPointer) null else ColorFilter(colorFilterPtr)
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetColorFilter(
-                _ptr,
-                getPtr(value)
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(value)
+        set(value) = nativeCall(value) { value ->
+            _nSetColorFilter(_ptr, value.pointerOrNullPointer)
         }
 
     /**
@@ -434,18 +315,8 @@ class Paint : Managed {
      * @return  mode used to combine source color with destination color
      */
     var blendMode: BlendMode
-        get() = try {
-            Stats.onNativeCall()
-            BlendMode.entries[_nGetBlendMode(_ptr)]
-        } finally {
-            reachabilityBarrier(this)
-        }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetBlendMode(_ptr, value.ordinal)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { BlendMode.entries[_nGetBlendMode(_ptr)] }
+        set(value) = nativeCall { _nSetBlendMode(_ptr, value.ordinal) }
 
     /**
      * Returns the user-supplied blend function, if one has been set.
@@ -461,19 +332,12 @@ class Paint : Managed {
      * @return  the [Blender] assigned to this paint, otherwise null
      */
     var blender: Blender?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val blenderPtr = _nGetBlender(_ptr)
             if (blenderPtr == NullPointer) null else Blender(blenderPtr)
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetBlender(_ptr, getPtr(value))
-        } finally {
-            reachabilityBarrier(value)
-            reachabilityBarrier(this)
+        set(value) = nativeCall(value) { value ->
+            _nSetBlender(_ptr, value.pointerOrNullPointer)
         }
 
     /**
@@ -493,19 +357,12 @@ class Paint : Managed {
      * @see [https://fiddle.skia.org/c/@Paint_refPathEffect](https://fiddle.skia.org/c/@Paint_refPathEffect)
      */
     var pathEffect: PathEffect?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val pathEffectPtr = _nGetPathEffect(_ptr)
             if (pathEffectPtr == NullPointer) null else PathEffect(pathEffectPtr)
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetPathEffect(_ptr, getPtr(value))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(value)
+        set(value) = nativeCall(value) { value ->
+            _nSetPathEffect(_ptr, value.pointerOrNullPointer)
         }
 
     /**
@@ -519,22 +376,12 @@ class Paint : Managed {
      * @see [https://fiddle.skia.org/c/@Paint_refMaskFilter](https://fiddle.skia.org/c/@Paint_refMaskFilter)
      */
     var maskFilter: MaskFilter?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val maskFilterPtr = _nGetMaskFilter(_ptr)
             if (maskFilterPtr == NullPointer) null else MaskFilter(maskFilterPtr)
-        } finally {
-            reachabilityBarrier(this)
         }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetMaskFilter(
-                _ptr,
-                getPtr(value)
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(value)
+        set(value) = nativeCall(value) { value ->
+            _nSetMaskFilter(_ptr, value.pointerOrNullPointer)
         }
 
     /**
@@ -548,22 +395,12 @@ class Paint : Managed {
      * @see [https://fiddle.skia.org/c/@Paint_refImageFilter](https://fiddle.skia.org/c/@Paint_refImageFilter)
      */
     var imageFilter: ImageFilter?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val imageFilterPtr = _nGetImageFilter(_ptr)
-            if (imageFilterPtr == NullPointer) null else org.jetbrains.skia.ImageFilter(imageFilterPtr)
-        } finally {
-            reachabilityBarrier(this)
+            if (imageFilterPtr == NullPointer) null else ImageFilter(imageFilterPtr)
         }
-        set(value) = try {
-            Stats.onNativeCall()
-            _nSetImageFilter(
-                _ptr,
-                getPtr(value)
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(value)
+        set(value) = nativeCall(value) { value ->
+            _nSetImageFilter(_ptr, value.pointerOrNullPointer)
         }
 
     /**
@@ -579,14 +416,7 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_nothingToDraw](https://fiddle.skia.org/c/@Paint_nothingToDraw)
      */
-    fun hasNothingToDraw(): Boolean {
-        return try {
-            Stats.onNativeCall()
-            _nHasNothingToDraw(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun hasNothingToDraw(): Boolean = nativeCall { _nHasNothingToDraw(_ptr) }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFinalizer")

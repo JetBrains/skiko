@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.shaper.*
 import kotlin.jvm.JvmStatic
 
@@ -29,169 +30,83 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
      * distance to reserve above baseline, typically negative
      */
     val ascent: Float
-        get() {
-            Stats.onNativeCall()
-            return try {
-                _nGetAscent(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { _nGetAscent(_ptr) }
 
     /**
      * height of an upper-case letter, zero if unknown, typically negative
      */
     val capHeight: Float
-        get() {
-            Stats.onNativeCall()
-            return try {
-                _nGetCapHeight(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { _nGetCapHeight(_ptr) }
 
     /**
      * height of lower-case 'x', zero if unknown, typically negative
      */
     val xHeight: Float
-        get() {
-            Stats.onNativeCall()
-            return try {
-                _nGetXHeight(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { _nGetXHeight(_ptr) }
 
     /**
      * distance to reserve below baseline, typically positive
      */
     val descent: Float
-        get() {
-            Stats.onNativeCall()
-            return try {
-                _nGetDescent(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { _nGetDescent(_ptr) }
 
     /**
      * distance to add between lines, typically positive or zero
      */
     val leading: Float
-        get() {
-            Stats.onNativeCall()
-            return try {
-                _nGetLeading(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { _nGetLeading(_ptr) }
 
     val width: Float
-        get() {
-            Stats.onNativeCall()
-            return try {
-                TextLine_nGetWidth(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { TextLine_nGetWidth(_ptr) }
 
     val height: Float
-        get() {
-            Stats.onNativeCall()
-            return try {
-                TextLine_nGetHeight(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { TextLine_nGetHeight(_ptr) }
 
     val textBlob: TextBlob?
-        get() {
-            Stats.onNativeCall()
-            return try {
-                val res = _nGetTextBlob(_ptr)
-                if (res == NullPointer) null else TextBlob(res)
-            } finally {
-                reachabilityBarrier(this)
-            }
+        get() = nativeCall {
+            val res = _nGetTextBlob(_ptr)
+            if (res == NullPointer) null else TextBlob(res)
         }
 
     val glyphs: ShortArray
-        get() {
-            Stats.onNativeCall()
-            return try {
-                val length = glyphsLength
-                withResult(ShortArray(length)) {
-                    TextLine_nGetGlyphs(_ptr, it, length)
-                }
-            } finally {
-                reachabilityBarrier(this)
+        get() = nativeCall {
+            val length = glyphsLength
+            withResult(ShortArray(length)) {
+                TextLine_nGetGlyphs(_ptr, it, length)
             }
         }
 
     internal val glyphsLength: Int
-        get() {
-            Stats.onNativeCall()
-            return try {
-                TextLine_nGetGlyphsLength(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { TextLine_nGetGlyphsLength(_ptr) }
 
     /**
      * @return  [x0, y0, x1, y1, ...]
      */
     val positions: FloatArray
-        get() {
-            Stats.onNativeCall()
-            return try {
-                withResult(FloatArray(glyphsLength * 2)) {
-                    TextLine_nGetPositions(_ptr, it)
-                }
-            } finally {
-                reachabilityBarrier(this)
+        get() = nativeCall {
+            withResult(FloatArray(glyphsLength * 2)) {
+                TextLine_nGetPositions(_ptr, it)
             }
         }
 
-    internal val runPositions: FloatArray?
-        get() {
-            Stats.onNativeCall()
-            return try {
-                withResult(FloatArray(_nGetRunPositionsCount(_ptr))) {
-                    _nGetRunPositions(_ptr, it)
-                }
-            } finally {
-                reachabilityBarrier(this)
+    internal val runPositions: FloatArray
+        get() = nativeCall {
+            withResult(FloatArray(_nGetRunPositionsCount(_ptr))) {
+                _nGetRunPositions(_ptr, it)
             }
         }
 
-    internal val breakPositions: FloatArray?
-        get() {
-            Stats.onNativeCall()
-            return try {
-                withResult(FloatArray(_nGetBreakPositionsCount(_ptr))) {
-                    _nGetBreakPositions(_ptr, it)
-                }
-            } finally {
-                reachabilityBarrier(this)
+    internal val breakPositions: FloatArray
+        get() = nativeCall {
+            withResult(FloatArray(_nGetBreakPositionsCount(_ptr))) {
+                _nGetBreakPositions(_ptr, it)
             }
         }
 
     internal val breakOffsets: IntArray
-        get() {
-            Stats.onNativeCall()
-            return try {
-                withResult(IntArray(_nGetBreakOffsetsCount(_ptr))) {
-                    _nGetBreakOffsets(_ptr, it)
-                }
-            } finally {
-                reachabilityBarrier(this)
+        get() = nativeCall {
+            withResult(IntArray(_nGetBreakOffsetsCount(_ptr))) {
+                _nGetBreakOffsets(_ptr, it)
             }
         }
 
@@ -199,40 +114,19 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
      * @param x  coordinate in px
      * @return   UTF-16 offset of glyph
      */
-    fun getOffsetAtCoord(x: Float): Int {
-        return try {
-            Stats.onNativeCall()
-            _nGetOffsetAtCoord(_ptr, x)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getOffsetAtCoord(x: Float): Int = nativeCall { _nGetOffsetAtCoord(_ptr, x) }
 
     /**
      * @param x  coordinate in px
      * @return   UTF-16 offset of glyph strictly left of coord
      */
-    fun getLeftOffsetAtCoord(x: Float): Int {
-        return try {
-            Stats.onNativeCall()
-            _nGetLeftOffsetAtCoord(_ptr, x)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getLeftOffsetAtCoord(x: Float): Int = nativeCall { _nGetLeftOffsetAtCoord(_ptr, x) }
 
     /**
      * @param offset  UTF-16 character offset
      * @return        glyph coordinate
      */
-    fun getCoordAtOffset(offset: Int): Float {
-        return try {
-            Stats.onNativeCall()
-            _nGetCoordAtOffset(_ptr, offset)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getCoordAtOffset(offset: Int): Float = nativeCall { _nGetCoordAtOffset(_ptr, offset) }
 
     /**
      *
@@ -245,7 +139,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
      * @param upperBound upper line parallel to the advance
      * @return           intersections; may be null
      */
-    fun getIntercepts(lowerBound: Float, upperBound: Float): FloatArray? {
+    fun getIntercepts(lowerBound: Float, upperBound: Float): FloatArray {
         return getIntercepts(lowerBound, upperBound, null)
     }
 
@@ -261,16 +155,10 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
      * @param paint      specifies stroking, PathEffect that affects the result; may be null
      * @return           intersections; may be null
      */
-    fun getIntercepts(lowerBound: Float, upperBound: Float, paint: Paint?): FloatArray? {
-        try {
-            textBlob!!.use { blob -> return blob.getIntercepts(lowerBound, upperBound, paint) }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(paint)
-        }
+    fun getIntercepts(lowerBound: Float, upperBound: Float, paint: Paint?): FloatArray = nativeCall {
+        textBlob!!.use { blob -> blob.getIntercepts(lowerBound, upperBound, paint) }
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot

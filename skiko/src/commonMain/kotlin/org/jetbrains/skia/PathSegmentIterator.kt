@@ -1,13 +1,7 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.withResult
 import kotlin.jvm.JvmStatic
 
 class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePointer) :
@@ -15,14 +9,16 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     MutableIterator<PathSegment?> {
     companion object {
         @JvmStatic
-        fun make(path: Path?, forceClose: Boolean): PathSegmentIterator {
-            return try {
-                val i = PathSegmentIterator(path, _nMake(getPtr(path), forceClose))
-                i._nextSegment = i.nextSegment()
-                i
-            } finally {
-                reachabilityBarrier(path)
-            }
+        fun make(path: Path?, forceClose: Boolean): PathSegmentIterator = nativeCallFromStatic(path) { path ->
+            val i = PathSegmentIterator(
+                path,
+                _nMake(
+                    path.pointerOrNullPointer,
+                    forceClose
+                )
+            )
+            i._nextSegment = i.nextSegment()
+            i
         }
 
         init {
@@ -31,15 +27,11 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     }
 
     var _nextSegment: PathSegment? = null
-    override fun next(): PathSegment? {
-        return try {
-            if (_nextSegment?.verb == PathVerb.DONE) throw NoSuchElementException()
-            val res = _nextSegment
-            _nextSegment = nextSegment()
-            res
-        } finally {
-            reachabilityBarrier(this)
-        }
+    override fun next(): PathSegment? = nativeCall {
+        if (_nextSegment?.verb == PathVerb.DONE) throw NoSuchElementException()
+        val res = _nextSegment
+        _nextSegment = nextSegment()
+        res
     }
 
     override fun hasNext(): Boolean {

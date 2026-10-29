@@ -24,8 +24,102 @@ expect abstract class Native(ptr: NativePointer) {
 @InternalSkikoApi
 expect fun reachabilityBarrier(obj: Any?)
 
+
+/**
+ * Use only when [Native] is null. If not, use [Native._ptr] for less overhead.
+ */
 @InternalSkikoApi
-fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
+val Native?.pointerOrNullPointer: NativePointer
+    get() = this?._ptr ?: Native.NullPointer
+
+/**
+ * Make a native call with the own class it is called from.
+ */
+@InternalSkikoApi
+inline fun <T, R> T.nativeCall(crossinline nativeCall: T.() -> R): R =
+    try {
+        Stats.onNativeCall()
+        nativeCall()
+    } finally {
+        reachabilityBarrier(this)
+    }
+
+/**
+ * Make a native call with the own class it is called from and an additional object.
+ */
+@InternalSkikoApi
+inline fun <T, O, R> T.nativeCall(obj : O, crossinline nativeCall: T.(O) -> R): R =
+    try {
+        Stats.onNativeCall()
+        nativeCall(obj)
+    } finally {
+        reachabilityBarrier(this)
+        reachabilityBarrier(obj)
+    }
+
+/**
+ * Make a native call with the own class it is called from and two additional objects.
+ */
+@InternalSkikoApi
+inline fun <T, O1, O2, R> T.nativeCall(obj1 : O1, obj2 : O2, crossinline nativeCall: T.(O1, O2) -> R): R =
+    try {
+        Stats.onNativeCall()
+        nativeCall(obj1, obj2)
+    } finally {
+        reachabilityBarrier(this)
+        reachabilityBarrier(obj1)
+        reachabilityBarrier(obj2)
+    }
+
+
+@InternalSkikoApi
+inline fun <R> nativeCallFromStatic(crossinline nativeCall: () -> R): R =
+    run {
+        Stats.onNativeCall()
+        nativeCall()
+    }
+
+@InternalSkikoApi
+inline fun <O, R> nativeCallFromStatic(obj : O, crossinline nativeCall:(O) -> R): R =
+    try {
+        Stats.onNativeCall()
+        nativeCall(obj)
+    } finally {
+        reachabilityBarrier(obj)
+    }
+
+@InternalSkikoApi
+inline fun <O1, O2, R> nativeCallFromStatic(obj1 : O1, obj2 : O2, crossinline nativeCall: (O1, O2) -> R): R =
+    try {
+        Stats.onNativeCall()
+        nativeCall(obj1, obj2)
+    } finally {
+        reachabilityBarrier(obj1)
+        reachabilityBarrier(obj2)
+    }
+
+@InternalSkikoApi
+inline fun <O1, O2, O3, R> nativeCallFromStatic(obj1 : O1, obj2 : O2, obj3 : O3, crossinline nativeCall: (O1, O2, O3) -> R): R =
+    try {
+        Stats.onNativeCall()
+        nativeCall(obj1, obj2, obj3)
+    } finally {
+        reachabilityBarrier(obj1)
+        reachabilityBarrier(obj2)
+        reachabilityBarrier(obj3)
+    }
+
+@InternalSkikoApi
+inline fun <O1, O2, O3, O4, R> nativeCallFromStatic(obj1 : O1, obj2 : O2, obj3 : O3, obj4 : O4, crossinline nativeCall: (O1, O2, O3, O4) -> R): R =
+    try {
+        Stats.onNativeCall()
+        nativeCall(obj1, obj2, obj3, obj4)
+    } finally {
+        reachabilityBarrier(obj1)
+        reachabilityBarrier(obj2)
+        reachabilityBarrier(obj3)
+        reachabilityBarrier(obj4)
+    }
 
 @InternalSkikoApi
 expect class InteropScope() {

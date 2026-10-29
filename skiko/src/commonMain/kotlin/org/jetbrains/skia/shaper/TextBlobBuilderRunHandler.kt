@@ -1,14 +1,10 @@
 package org.jetbrains.skia.shaper
 
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ForceNativeThreadState
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class TextBlobBuilderRunHandler internal constructor(
     text: ManagedString?,
@@ -16,7 +12,9 @@ class TextBlobBuilderRunHandler internal constructor(
     offsetX: Float,
     offsetY: Float
 ) : Managed(
-    TextBlobBuilderRunHandler_nMake(getPtr(text), offsetX, offsetY), _FinalizerHolder.PTR
+    nativeCallFromStatic(text) { text ->
+        TextBlobBuilderRunHandler_nMake(text.pointerOrNullPointer, offsetX, offsetY)
+    }, _FinalizerHolder.PTR
 ), RunHandler {
     companion object {
         init {
@@ -58,24 +56,13 @@ class TextBlobBuilderRunHandler internal constructor(
         throw UnsupportedOperationException("commitLine")
     }
 
-    fun makeBlob(): TextBlob? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nMakeBlob(_ptr)
-            if (NullPointer == ptr) null else TextBlob(ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun makeBlob(): TextBlob? = nativeCall {
+        val ptr = _nMakeBlob(_ptr)
+        if (NullPointer == ptr) null else TextBlob(ptr)
     }
 
     internal object _FinalizerHolder {
         val PTR = TextBlobBuilderRunHandler_nGetFinalizer()
-    }
-
-    init {
-        // TODO [pavel.sergeev] what `manageText` == false is actually mean?
-        _text = if (manageText) text else null
-        reachabilityBarrier(text)
     }
 }
 

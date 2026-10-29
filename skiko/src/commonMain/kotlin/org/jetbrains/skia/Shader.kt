@@ -44,33 +44,26 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             y1: Float,
             gradient: Gradient,
             localMatrix: Matrix33? = null
-        ): Shader {
-            return try {
-                Stats.onNativeCall()
-                Shader(
-                    interopScope {
-                        _nMakeLinearGradient(
-                            x0,
-                            y0,
-                            x1,
-                            y1,
-                            toInterop(Color4f.flattenArray(gradient.colors.colors)),
-                            getPtr(gradient.colors.colorSpace),
-                            toInterop(gradient.colors.positions),
-                            gradient.colors.colors.size,
-                            gradient.colors.tileMode.ordinal,
-                            gradient.interpolation.inPremul.ordinal,
-                            gradient.interpolation.colorSpace.ordinal,
-                            gradient.interpolation.hueMethod.ordinal,
-                            toInterop(localMatrix?.mat)
-                        )
-                    }
-                )
-            } finally {
-                reachabilityBarrier(gradient)
-                reachabilityBarrier(gradient.colors.colorSpace)
-                reachabilityBarrier(localMatrix)
-            }
+        ): Shader = nativeCallFromStatic(gradient.colors.colorSpace) { colorSpace ->
+            Shader(
+                interopScope {
+                    _nMakeLinearGradient(
+                        x0,
+                        y0,
+                        x1,
+                        y1,
+                        toInterop(Color4f.flattenArray(gradient.colors.colors)),
+                        colorSpace.pointerOrNullPointer,
+                        toInterop(gradient.colors.positions),
+                        gradient.colors.colors.size,
+                        gradient.colors.tileMode.ordinal,
+                        gradient.interpolation.inPremul.ordinal,
+                        gradient.interpolation.colorSpace.ordinal,
+                        gradient.interpolation.hueMethod.ordinal,
+                        toInterop(localMatrix?.mat)
+                    )
+                }
+            )
         }
 
         /**
@@ -97,32 +90,25 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             radius: Float,
             gradient: Gradient,
             localMatrix: Matrix33? = null
-        ): Shader {
-            return try {
-                Stats.onNativeCall()
-                Shader(
-                    interopScope {
-                        _nMakeRadialGradient(
-                            x,
-                            y,
-                            radius,
-                            toInterop(Color4f.flattenArray(gradient.colors.colors)),
-                            getPtr(gradient.colors.colorSpace),
-                            toInterop(gradient.colors.positions),
-                            gradient.colors.colors.size,
-                            gradient.colors.tileMode.ordinal,
-                            gradient.interpolation.inPremul.ordinal,
-                            gradient.interpolation.colorSpace.ordinal,
-                            gradient.interpolation.hueMethod.ordinal,
-                            toInterop(localMatrix?.mat)
-                        )
-                    }
-                )
-            } finally {
-                reachabilityBarrier(gradient)
-                reachabilityBarrier(gradient.colors.colorSpace)
-                reachabilityBarrier(localMatrix)
-            }
+        ): Shader = nativeCallFromStatic(gradient.colors.colorSpace) { colorSpace ->
+            Shader(
+                interopScope {
+                    _nMakeRadialGradient(
+                        x,
+                        y,
+                        radius,
+                        toInterop(Color4f.flattenArray(gradient.colors.colors)),
+                        colorSpace.pointerOrNullPointer,
+                        toInterop(gradient.colors.positions),
+                        gradient.colors.colors.size,
+                        gradient.colors.tileMode.ordinal,
+                        gradient.interpolation.inPremul.ordinal,
+                        gradient.interpolation.colorSpace.ordinal,
+                        gradient.interpolation.hueMethod.ordinal,
+                        toInterop(localMatrix?.mat)
+                    )
+                }
+            )
         }
 
         /**
@@ -168,35 +154,28 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             endRadius: Float,
             gradient: Gradient,
             localMatrix: Matrix33? = null
-        ): Shader {
-            return try {
-                Stats.onNativeCall()
-                Shader(
-                    interopScope {
-                        _nMakeTwoPointConicalGradient(
-                            x0,
-                            y0,
-                            startRadius,
-                            x1,
-                            y1,
-                            endRadius,
-                            toInterop(Color4f.flattenArray(gradient.colors.colors)),
-                            getPtr(gradient.colors.colorSpace),
-                            toInterop(gradient.colors.positions),
-                            gradient.colors.colors.size,
-                            gradient.colors.tileMode.ordinal,
-                            gradient.interpolation.inPremul.ordinal,
-                            gradient.interpolation.colorSpace.ordinal,
-                            gradient.interpolation.hueMethod.ordinal,
-                            toInterop(localMatrix?.mat)
-                        )
-                    }
-                )
-            } finally {
-                reachabilityBarrier(gradient)
-                reachabilityBarrier(gradient.colors.colorSpace)
-                reachabilityBarrier(localMatrix)
-            }
+        ): Shader = nativeCallFromStatic(gradient.colors.colorSpace) { colorSpace ->
+            Shader(
+                interopScope {
+                    _nMakeTwoPointConicalGradient(
+                        x0,
+                        y0,
+                        startRadius,
+                        x1,
+                        y1,
+                        endRadius,
+                        toInterop(Color4f.flattenArray(gradient.colors.colors)),
+                        colorSpace.pointerOrNullPointer,
+                        toInterop(gradient.colors.positions),
+                        gradient.colors.colors.size,
+                        gradient.colors.tileMode.ordinal,
+                        gradient.interpolation.inPremul.ordinal,
+                        gradient.interpolation.colorSpace.ordinal,
+                        gradient.interpolation.hueMethod.ordinal,
+                        toInterop(localMatrix?.mat)
+                    )
+                }
+            )
         }
 
         /**
@@ -265,80 +244,56 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             endAngle: Float,
             gradient: Gradient,
             localMatrix: Matrix33? = null
-        ): Shader {
-            return try {
-                Stats.onNativeCall()
-                Shader(
-                    interopScope {
-                        _nMakeSweepGradient(
-                            x,
-                            y,
-                            startAngle,
-                            endAngle,
-                            toInterop(Color4f.flattenArray(gradient.colors.colors)),
-                            getPtr(gradient.colors.colorSpace),
-                            toInterop(gradient.colors.positions),
-                            gradient.colors.colors.size,
-                            gradient.colors.tileMode.ordinal,
-                            gradient.interpolation.inPremul.ordinal,
-                            gradient.interpolation.colorSpace.ordinal,
-                            gradient.interpolation.hueMethod.ordinal,
-                            toInterop(localMatrix?.mat)
-                        )
-                    }
-                )
-            } finally {
-                reachabilityBarrier(gradient)
-                reachabilityBarrier(gradient.colors.colorSpace)
-                reachabilityBarrier(localMatrix)
-            }
-        }
-
-        @JvmStatic
-        fun makeEmpty(): Shader {
-            Stats.onNativeCall()
-            return Shader(Shader_nMakeEmpty())
-        }
-
-        @JvmStatic
-        fun makeColor(color: Int): Shader {
-            Stats.onNativeCall()
-            return Shader(_nMakeColor(color))
-        }
-
-        @JvmStatic
-        fun makeColor(color: Color4f, space: ColorSpace?): Shader {
-            return try {
-                Stats.onNativeCall()
-                Shader(
-                    _nMakeColorCS(
-                        color.r,
-                        color.g,
-                        color.b,
-                        color.a,
-                        getPtr(space)
+        ): Shader = nativeCallFromStatic(gradient.colors.colorSpace) { colorSpace ->
+            Shader(
+                interopScope {
+                    _nMakeSweepGradient(
+                        x,
+                        y,
+                        startAngle,
+                        endAngle,
+                        toInterop(Color4f.flattenArray(gradient.colors.colors)),
+                        colorSpace.pointerOrNullPointer,
+                        toInterop(gradient.colors.positions),
+                        gradient.colors.colors.size,
+                        gradient.colors.tileMode.ordinal,
+                        gradient.interpolation.inPremul.ordinal,
+                        gradient.interpolation.colorSpace.ordinal,
+                        gradient.interpolation.hueMethod.ordinal,
+                        toInterop(localMatrix?.mat)
                     )
-                )
-            } finally {
-                reachabilityBarrier(space)
-            }
+                }
+            )
         }
 
         @JvmStatic
-        fun makeBlend(mode: BlendMode, dst: Shader?, src: Shader?): Shader {
-            return try {
-                Stats.onNativeCall()
-                Shader(
-                    _nMakeBlend(
-                        mode.ordinal,
-                        getPtr(dst),
-                        getPtr(src)
-                    )
+        fun makeEmpty(): Shader = nativeCallFromStatic { Shader(Shader_nMakeEmpty()) }
+
+        @JvmStatic
+        fun makeColor(color: Int): Shader = nativeCallFromStatic { Shader(_nMakeColor(color)) }
+
+        @JvmStatic
+        fun makeColor(color: Color4f, space: ColorSpace?): Shader = nativeCallFromStatic(space) { space ->
+            Shader(
+                _nMakeColorCS(
+                    color.r,
+                    color.g,
+                    color.b,
+                    color.a,
+                    space.pointerOrNullPointer
                 )
-            } finally {
-                reachabilityBarrier(dst)
-                reachabilityBarrier(src)
-            }
+            )
+        }
+
+        @JvmStatic
+        fun makeBlend(mode: BlendMode, dst: Shader?, src: Shader?): Shader = nativeCallFromStatic(dst, src) { dst, src ->
+            Shader(
+                _nMakeBlend(
+                    mode.ordinal,
+                    dst.pointerOrNullPointer,
+                    src.pointerOrNullPointer
+                )
+            )
         }
 
         @JvmStatic
@@ -348,17 +303,12 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             numOctaves: Int,
             seed: Float,
             tileSize: ISize = ISize.makeEmpty()
-        ): Shader {
-            return try {
-                Stats.onNativeCall()
-                Shader(
-                    interopScope {
-                        _nMakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, tileSize.width, tileSize.height)
-                    }
-                )
-            } finally {
-                reachabilityBarrier(this)
-            }
+        ): Shader = nativeCallFromStatic {
+            Shader(
+                interopScope {
+                    _nMakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, tileSize.width, tileSize.height)
+                }
+            )
         }
 
         @JvmStatic
@@ -368,17 +318,12 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             numOctaves: Int,
             seed: Float,
             tileSize: ISize = ISize.makeEmpty()
-        ): Shader {
-            return try {
-                Stats.onNativeCall()
-                Shader(
-                    interopScope {
-                        _nMakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, tileSize.width, tileSize.height)
-                    }
-                )
-            } finally {
-                reachabilityBarrier(this)
-            }
+        ): Shader = nativeCallFromStatic {
+            Shader(
+                interopScope {
+                    _nMakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, tileSize.width, tileSize.height)
+                }
+            )
         }
     }
 
@@ -386,31 +331,20 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      *  Return a shader that will apply the specified localMatrix to this shader.
      *  The specified matrix will be applied before any matrix associated with this shader.
      */
-    fun makeWithLocalMatrix(localMatrix: Matrix33): Shader {
-        return try {
-            Stats.onNativeCall()
-            Shader(
-                interopScope {
-                    _nMakeWithLocalMatrix(_ptr, toInterop(localMatrix.mat))
-                })
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(localMatrix)
-        }
+    fun makeWithLocalMatrix(localMatrix: Matrix33): Shader = nativeCall {
+        Shader(
+            interopScope {
+                _nMakeWithLocalMatrix(_ptr, toInterop(localMatrix.mat))
+            }
+        )
     }
 
     /**
      *  Create a new shader that produces the same colors as invoking this shader and then applying
      *  the colorfilter.
      */
-    fun makeWithColorFilter(filter: ColorFilter?): Shader {
-        return try {
-            Stats.onNativeCall()
-            Shader(_nMakeWithColorFilter(_ptr, getPtr(filter)))
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(filter)
-        }
+    fun makeWithColorFilter(filter: ColorFilter?): Shader = nativeCall(filter) { filter ->
+        Shader(_nMakeWithColorFilter(_ptr, filter.pointerOrNullPointer))
     }
 }
 

@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skiko.maybeSynchronized
 import kotlin.jvm.JvmStatic
 
@@ -13,268 +14,159 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
      */
     private var underlyingMemoryOwner: Managed? = null
 
-    private var _imageInfo: ImageInfo ? = null
+    private var _imageInfo: ImageInfo? = null
     private val _imageInfoLock = Unit
 
     constructor() : this(_nMakeNull(), true) {
         Stats.onNativeCall()
     }
 
-    fun reset() {
-        Stats.onNativeCall()
+    fun reset() = nativeCall {
         maybeSynchronized(_imageInfoLock) {
             _imageInfo = null
             Pixmap_nReset(_ptr)
         }
         underlyingMemoryOwner = null
-        reachabilityBarrier(this)
     }
 
-    fun reset(info: ImageInfo, addr: NativePointer, rowBytes: Int, underlyingMemoryOwner: Managed? = null) {
-        Stats.onNativeCall()
-        maybeSynchronized(_imageInfoLock) {
-            _imageInfo = null
-            _nResetWithInfo(
-                _ptr,
-                info.width, info.height,
-                info.colorInfo.colorType.ordinal,
-                info.colorInfo.alphaType.ordinal,
-                getPtr(info.colorInfo.colorSpace), addr, rowBytes
-            )
+    fun reset(info: ImageInfo, addr: NativePointer, rowBytes: Int, underlyingMemoryOwner: Managed? = null) =
+        nativeCall(info.colorInfo.colorSpace) { colorSpace ->
+            maybeSynchronized(_imageInfoLock) {
+                _imageInfo = null
+                _nResetWithInfo(
+                    _ptr,
+                    info.width, info.height,
+                    info.colorInfo.colorType.ordinal,
+                    info.colorInfo.alphaType.ordinal,
+                    colorSpace.pointerOrNullPointer,
+                    addr,
+                    rowBytes
+                )
+            }
+            this.underlyingMemoryOwner = underlyingMemoryOwner
         }
-        this.underlyingMemoryOwner = underlyingMemoryOwner
-        reachabilityBarrier(this)
-        reachabilityBarrier(info.colorInfo.colorSpace)
-    }
 
-    fun reset(info: ImageInfo, buffer: Data, rowBytes: Int) {
+    fun reset(info: ImageInfo, buffer: Data, rowBytes: Int) =
         reset(info = info, addr = buffer.writableData(), rowBytes = rowBytes, underlyingMemoryOwner = buffer)
-    }
 
-    fun setColorSpace(colorSpace: ColorSpace?) {
-        Stats.onNativeCall()
+    fun setColorSpace(colorSpace: ColorSpace?) = nativeCall(colorSpace) { colorSpace ->
         maybeSynchronized(_imageInfoLock) {
             _imageInfo = null
-            _nSetColorSpace(_ptr, getPtr(colorSpace))
-        }
-        reachabilityBarrier(this)
-        reachabilityBarrier(colorSpace)
-    }
-
-    fun extractSubset(subsetPtr: NativePointer, area: IRect): Boolean {
-        return try {
-            Pixmap_nExtractSubset(
-                _ptr,
-                subsetPtr,
-                area.left,
-                area.top,
-                area.right,
-                area.bottom
-            )
-        } finally {
-            reachabilityBarrier(this)
+            _nSetColorSpace(_ptr, colorSpace.pointerOrNullPointer)
         }
     }
 
-    fun extractSubset(subset: Pixmap, area: IRect): Boolean {
-        return extractSubset(subset._ptr, area)
+    fun extractSubset(subsetPtr: NativePointer, area: IRect): Boolean = nativeCall {
+        Pixmap_nExtractSubset(
+            _ptr,
+            subsetPtr,
+            area.left,
+            area.top,
+            area.right,
+            area.bottom
+        )
     }
+
+    fun extractSubset(subset: Pixmap, area: IRect): Boolean = extractSubset(subset._ptr, area)
 
     val info: ImageInfo
-        get() {
-            Stats.onNativeCall()
-            return try {
-                maybeSynchronized(_imageInfoLock) {
-                    if (_imageInfo == null) {
-                        _imageInfo = ImageInfo.createUsing(
-                            _ptr = _ptr,
-                            _nGetImageInfo = ::_nGetInfo
-                        )
-                    }
-                    _imageInfo!!
+        get() = nativeCall {
+            maybeSynchronized(_imageInfoLock) {
+                if (_imageInfo == null) {
+                    _imageInfo = ImageInfo.createUsing(
+                        _ptr = _ptr,
+                        _nGetImageInfo = ::_nGetInfo
+                    )
                 }
-            } finally {
-                reachabilityBarrier(this)
+                _imageInfo!!
             }
         }
     val rowBytes: Int
-        get() {
-            Stats.onNativeCall()
-            return try {
-                Pixmap_nGetRowBytes(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { Pixmap_nGetRowBytes(_ptr) }
     val addr: NativePointer
-        get() {
-            Stats.onNativeCall()
-            return try {
-                _nGetAddr(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { _nGetAddr(_ptr) }
     val rowBytesAsPixels: Int
-        get() {
-            Stats.onNativeCall()
-            return try {
-                Pixmap_nGetRowBytesAsPixels(_ptr)
-            } finally {
-                reachabilityBarrier(this)
-            }
-        }
+        get() = nativeCall { Pixmap_nGetRowBytesAsPixels(_ptr) }
 
-    fun computeByteSize(): Int {
-        Stats.onNativeCall()
-        return try {
-            Pixmap_nComputeByteSize(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun computeByteSize(): Int = nativeCall { Pixmap_nComputeByteSize(_ptr) }
 
-    fun computeIsOpaque(): Boolean {
-        Stats.onNativeCall()
-        return try {
-            Pixmap_nComputeIsOpaque(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun computeIsOpaque(): Boolean = nativeCall { Pixmap_nComputeIsOpaque(_ptr) }
 
-    fun getColor(x: Int, y: Int): Int {
-        Stats.onNativeCall()
-        return try {
-            Pixmap_nGetColor(_ptr, x, y)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getColor(x: Int, y: Int): Int = nativeCall { Pixmap_nGetColor(_ptr, x, y) }
 
-    fun getAlphaF(x: Int, y: Int): Float {
-        Stats.onNativeCall()
-        return try {
-            _nGetAlphaF(_ptr, x, y)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getAlphaF(x: Int, y: Int): Float = nativeCall { _nGetAlphaF(_ptr, x, y) }
 
-    fun getAddr(x: Int, y: Int): NativePointer {
-        Stats.onNativeCall()
-        return try {
-            _nGetAddrAt(_ptr, x, y)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun getAddr(x: Int, y: Int): NativePointer = nativeCall { _nGetAddrAt(_ptr, x, y) }
 
-    fun readPixels(info: ImageInfo, addr: NativePointer, rowBytes: Int): Boolean {
-        Stats.onNativeCall()
-        return try {
+    fun readPixels(info: ImageInfo, addr: NativePointer, rowBytes: Int): Boolean =
+        nativeCall(info.colorInfo.colorSpace) { colorSpace ->
             _nReadPixels(
                 _ptr,
                 info.width, info.height,
                 info.colorInfo.colorType.ordinal,
                 info.colorInfo.alphaType.ordinal,
-                getPtr(info.colorInfo.colorSpace), addr, rowBytes
+                colorSpace.pointerOrNullPointer,
+                addr,
+                rowBytes
             )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(info.colorInfo.colorSpace)
         }
-    }
 
-    fun readPixels(info: ImageInfo, addr: NativePointer, rowBytes: Int, srcX: Int, srcY: Int): Boolean {
-        Stats.onNativeCall()
-        return try {
+    fun readPixels(info: ImageInfo, addr: NativePointer, rowBytes: Int, srcX: Int, srcY: Int): Boolean =
+        nativeCall(info.colorInfo.colorSpace) { colorSpace ->
             _nReadPixelsFromPoint(
                 _ptr,
                 info.width, info.height,
                 info.colorInfo.colorType.ordinal,
                 info.colorInfo.alphaType.ordinal,
-                getPtr(info.colorInfo.colorSpace), addr, rowBytes,
+                colorSpace.pointerOrNullPointer,
+                addr,
+                rowBytes,
                 srcX, srcY
             )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(info.colorInfo.colorSpace)
         }
-    }
 
-    fun readPixels(pixmap: Pixmap?): Boolean {
-        Stats.onNativeCall()
-        return try {
-            maybeSynchronized(_imageInfoLock) {
-                _imageInfo = null
-                _nReadPixelsToPixmap(
-                    _ptr,
-                    getPtr(pixmap)
-                )
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(pixmap)
-        }
-    }
-
-    fun readPixels(pixmap: Pixmap, srcX: Int, srcY: Int): Boolean {
-        Stats.onNativeCall()
-        return try {
-            maybeSynchronized(pixmap._imageInfoLock) {
-                pixmap._imageInfo = null
-                _nReadPixelsToPixmapFromPoint(
-                    _ptr,
-                    getPtr(pixmap),
-                    srcX,
-                    srcY
-                )
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(pixmap)
-        }
-    }
-
-    fun scalePixels(dstPixmap: Pixmap?, samplingMode: SamplingMode): Boolean {
-        Stats.onNativeCall()
-        return try {
-            _nScalePixels(
+    fun readPixels(pixmap: Pixmap?): Boolean = nativeCall(pixmap) { pixmap ->
+        maybeSynchronized(_imageInfoLock) {
+            _imageInfo = null
+            _nReadPixelsToPixmap(
                 _ptr,
-                getPtr(dstPixmap),
-                samplingMode._packedInt1(),
-                samplingMode._packedInt2()
+                pixmap.pointerOrNullPointer
             )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(dstPixmap)
         }
     }
 
-    fun erase(color: Int): Boolean {
-        Stats.onNativeCall()
-        return try {
-            _nErase(_ptr, color)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
-
-    fun erase(color: Int, subset: IRect): Boolean {
-        Stats.onNativeCall()
-        return try {
-            _nEraseSubset(
+    fun readPixels(pixmap: Pixmap, srcX: Int, srcY: Int): Boolean = nativeCall(pixmap) { pixmap ->
+        maybeSynchronized(pixmap._imageInfoLock) {
+            pixmap._imageInfo = null
+            _nReadPixelsToPixmapFromPoint(
                 _ptr,
-                color,
-                subset.left,
-                subset.top,
-                subset.right,
-                subset.bottom
+                pixmap._ptr,
+                srcX,
+                srcY
             )
-        } finally {
-            reachabilityBarrier(this)
         }
+    }
+
+    fun scalePixels(dstPixmap: Pixmap?, samplingMode: SamplingMode): Boolean = nativeCall(dstPixmap) { dstPixmap ->
+        _nScalePixels(
+            _ptr,
+            dstPixmap.pointerOrNullPointer,
+            samplingMode._packedInt1(),
+            samplingMode._packedInt2()
+        )
+    }
+
+    fun erase(color: Int): Boolean = nativeCall { _nErase(_ptr, color) }
+
+    fun erase(color: Int, subset: IRect): Boolean = nativeCall {
+        _nEraseSubset(
+            _ptr,
+            color,
+            subset.left,
+            subset.top,
+            subset.right,
+            subset.bottom
+        )
     }
 
     val buffer: Data
@@ -295,25 +187,23 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         }
 
         @JvmStatic
-        fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int, underlyingMemoryOwner: Managed? = null): Pixmap {
-            return try {
+        fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int, underlyingMemoryOwner: Managed? = null): Pixmap =
+            nativeCallFromStatic(info.colorInfo.colorSpace) { colorSpace ->
                 val ptr = Pixmap_nMake(
                     info.width, info.height,
                     info.colorInfo.colorType.ordinal,
                     info.colorInfo.alphaType.ordinal,
-                    getPtr(info.colorInfo.colorSpace), addr, rowBytes
+                    colorSpace.pointerOrNullPointer,
+                    addr,
+                    rowBytes
                 )
                 require(ptr != NullPointer) { "Failed to create Pixmap." }
                 Pixmap(ptr, true).also {
                     it.underlyingMemoryOwner = underlyingMemoryOwner
                 }
-            } finally {
-                reachabilityBarrier(info.colorInfo.colorSpace)
             }
-        }
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of the deletion function, so it is short and cannot block.

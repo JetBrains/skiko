@@ -12,14 +12,9 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
          * constructing valid Picture.
          */
         @JvmStatic
-        fun makeFromData(data: Data?): Picture? {
-            return try {
-                Stats.onNativeCall()
-                val ptr = Picture_nMakeFromData(getPtr(data))
-                if (ptr == NullPointer) null else Picture(ptr)
-            } finally {
-                reachabilityBarrier(data)
-            }
+        fun makeFromData(data: Data?): Picture? = nativeCallFromStatic(data) { data ->
+            val ptr = Picture_nMakeFromData(data.pointerOrNullPointer)
+            if (ptr == NullPointer) null else Picture(ptr)
         }
 
         /**
@@ -61,9 +56,8 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
          * @see [https://fiddle.skia.org/c/@Picture_MakePlaceholder](https://fiddle.skia.org/c/@Picture_MakePlaceholder)
          */
         @JvmStatic
-        fun makePlaceholder(left: Float, top: Float, right: Float, bottom: Float): Picture {
-            Stats.onNativeCall()
-            return Picture(_nMakePlaceholder(left, top, right, bottom))
+        fun makePlaceholder(left: Float, top: Float, right: Float, bottom: Float): Picture = nativeCallFromStatic {
+            Picture(_nMakePlaceholder(left, top, right, bottom))
         }
 
         init {
@@ -99,17 +93,11 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
      *
      * @see [https://fiddle.skia.org/c/@Picture_playback](https://fiddle.skia.org/c/@Picture_playback)
      */
-    fun playback(canvas: Canvas?, abort: (() -> Boolean)? = null): Picture {
-        return try {
-            Stats.onNativeCall()
-            interopScope {
-                _nPlayback(_ptr, getPtr(canvas), booleanCallback(abort))
-            }
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(canvas)
+    fun playback(canvas: Canvas?, abort: (() -> Boolean)? = null): Picture = nativeCall(canvas) { canvas ->
+        interopScope {
+            _nPlayback(_ptr, canvas.pointerOrNullPointer, booleanCallback(abort))
         }
+        this
     }
 
     /**
@@ -126,12 +114,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
      * @see [https://fiddle.skia.org/c/@Picture_cullRect](https://fiddle.skia.org/c/@Picture_cullRect)
      */
     val cullRect: Rect
-        get() = try {
-            Stats.onNativeCall()
-            Rect.fromInteropPointer { _nGetCullRect(_ptr, it) }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { Rect.fromInteropPointer { _nGetCullRect(_ptr, it) } }
 
     /**
      * Returns a non-zero value unique among Picture in Skia process.
@@ -139,26 +122,14 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
      * @return  identifier for Picture
      */
     val uniqueId: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetUniqueId(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetUniqueId(_ptr) }
 
     /**
      * @return  storage containing Data describing Picture.
      *
      * @see [https://fiddle.skia.org/c/@Picture_serialize](https://fiddle.skia.org/c/@Picture_serialize)
      */
-    fun serializeToData(): Data {
-        return try {
-            Stats.onNativeCall()
-            Data(_nSerializeToData(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun serializeToData(): Data = nativeCall { Data(_nSerializeToData(_ptr)) }
 
     /**
      * Returns the approximate number of operations in SkPicture. Returned value
@@ -171,12 +142,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
      * @see [https://fiddle.skia.org/c/@Picture_approximateOpCount](https://fiddle.skia.org/c/@Picture_approximateOpCount)
      */
     val approximateOpCount: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetApproximateOpCount(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        get() = nativeCall { _nGetApproximateOpCount(_ptr) }
 
     /**
      * Returns the approximate byte size of Picture. Does not include large objects
@@ -186,13 +152,8 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
      *
      * @see [https://fiddle.skia.org/c/@Picture_approximateBytesUsed](https://fiddle.skia.org/c/@Picture_approximateBytesUsed)
      */
-    val approximateBytesUsed: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetApproximateBytesUsed(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    val approximateBytesUsed: Int = nativeCall { _nGetApproximateBytesUsed(_ptr) }
+
     /**
      * Return a new shader that will draw with this picture.
      *
@@ -232,29 +193,23 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
         mode: FilterMode,
         localMatrix: Matrix33? = null,
         tileRect: Rect? = null
-    ): Shader {
-        return try {
-            Stats.onNativeCall()
-            val arr = localMatrix?.mat
-            Shader(
-                interopScope {
-                    _nMakeShader(
-                        _ptr,
-                        tmx.ordinal,
-                        tmy.ordinal,
-                        mode.ordinal,
-                        toInterop(arr),
-                        tileRect != null,
-                        tileRect?.left ?: 0f,
-                        tileRect?.top ?: 0f,
-                        tileRect?.right ?: 0f,
-                        tileRect?.bottom ?: 0f
-                    )
-                }
-            )
-        } finally {
-            reachabilityBarrier(this)
-        }
+    ): Shader = nativeCall {
+        Shader(
+            interopScope {
+                _nMakeShader(
+                    _ptr,
+                    tmx.ordinal,
+                    tmy.ordinal,
+                    mode.ordinal,
+                    toInterop(localMatrix?.mat),
+                    tileRect != null,
+                    tileRect?.left ?: 0f,
+                    tileRect?.top ?: 0f,
+                    tileRect?.right ?: 0f,
+                    tileRect?.bottom ?: 0f
+                )
+            }
+        )
     }
 }
 

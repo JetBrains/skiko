@@ -42,7 +42,7 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param path the path to copy into this builder
      */
     constructor(path: Path) : this(
-        PathBuilder_nMakeFromPath(getPtr(path)).also {
+        PathBuilder_nMakeFromPath(path._ptr).also {
             reachabilityBarrier(path)
         }
     )
@@ -53,14 +53,7 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * 
      * @return a new immutable Path
      */
-    fun snapshot(): Path {
-        return try {
-            Stats.onNativeCall()
-            Path(PathBuilder_nSnapshot(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun snapshot(): Path = nativeCall { Path(PathBuilder_nSnapshot(_ptr)) }
 
     /**
      * Returns an immutable Path representing the current state of this builder.
@@ -68,14 +61,7 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * 
      * @return a new immutable Path
      */
-    fun detach(): Path {
-        return try {
-            Stats.onNativeCall()
-            Path(PathBuilder_nDetach(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun detach(): Path = nativeCall { Path(PathBuilder_nDetach(_ptr)) }
 
     /**
      * Sets the fill type for paths created from this builder.
@@ -83,14 +69,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param fillType the fill type to set
      * @return this builder for chaining
      */
-    fun setFillType(fillType: PathFillMode): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nSetFillType(_ptr, fillType.ordinal)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun setFillType(fillType: PathFillMode): PathBuilder = nativeCall {
+        PathBuilder_nSetFillType(_ptr, fillType.ordinal)
+        this
     }
 
     /**
@@ -99,14 +80,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * 
      * @return this builder for chaining
      */
-    fun reset(): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nReset(_ptr)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun reset(): PathBuilder = nativeCall {
+        PathBuilder_nReset(_ptr)
+        this
     }
 
     /**
@@ -116,14 +92,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param extraPtCount number of additional points to reserve
      * @return this builder for chaining
      */
-    fun incReserve(extraPtCount: Int): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nIncReserve(_ptr, extraPtCount)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun incReserve(extraPtCount: Int): PathBuilder = nativeCall {
+        PathBuilder_nIncReserve(_ptr, extraPtCount)
+        this
     }
 
     /**
@@ -133,14 +104,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param y y-axis value of contour start
      * @return this builder for chaining
      */
-    fun moveTo(x: Float, y: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nMoveTo(_ptr, x, y)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun moveTo(x: Float, y: Float): PathBuilder = nativeCall {
+        PathBuilder_nMoveTo(_ptr, x, y)
+        this
     }
 
     /**
@@ -162,14 +128,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param dy offset from last point to contour start on y-axis
      * @return this builder for chaining
      */
-    fun rMoveTo(dx: Float, dy: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nRMoveTo(_ptr, dx, dy)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun rMoveTo(dx: Float, dy: Float): PathBuilder = nativeCall {
+        PathBuilder_nRMoveTo(_ptr, dx, dy)
+        this
     }
 
     /**
@@ -180,14 +141,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param y end of added line on y-axis
      * @return this builder for chaining
      */
-    fun lineTo(x: Float, y: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nLineTo(_ptr, x, y)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun lineTo(x: Float, y: Float): PathBuilder = nativeCall {
+        PathBuilder_nLineTo(_ptr, x, y)
+        this
     }
 
     /**
@@ -209,14 +165,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param dy offset from last point to line end on y-axis
      * @return this builder for chaining
      */
-    fun rLineTo(dx: Float, dy: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nRLineTo(_ptr, dx, dy)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun rLineTo(dx: Float, dy: Float): PathBuilder = nativeCall {
+        PathBuilder_nRLineTo(_ptr, dx, dy)
+        this
     }
 
     /**
@@ -228,14 +179,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param y2 end point of quad on y-axis
      * @return this builder for chaining
      */
-    fun quadTo(x1: Float, y1: Float, x2: Float, y2: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nQuadTo(_ptr, x1, y1, x2, y2)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun quadTo(x1: Float, y1: Float, x2: Float, y2: Float): PathBuilder = nativeCall {
+        PathBuilder_nQuadTo(_ptr, x1, y1, x2, y2)
+        this
     }
 
     /**
@@ -260,14 +206,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param dy2 offset from last point to quad end on y-axis
      * @return this builder for chaining
      */
-    fun rQuadTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nRQuadTo(_ptr, dx1, dy1, dx2, dy2)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun rQuadTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float): PathBuilder = nativeCall {
+        PathBuilder_nRQuadTo(_ptr, dx1, dy1, dx2, dy2)
+        this
     }
 
     /**
@@ -280,14 +221,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param w weight of added conic
      * @return this builder for chaining
      */
-    fun conicTo(x1: Float, y1: Float, x2: Float, y2: Float, w: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nConicTo(_ptr, x1, y1, x2, y2, w)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun conicTo(x1: Float, y1: Float, x2: Float, y2: Float, w: Float): PathBuilder = nativeCall {
+        PathBuilder_nConicTo(_ptr, x1, y1, x2, y2, w)
+        this
     }
 
     /**
@@ -314,14 +250,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param w weight of added conic
      * @return this builder for chaining
      */
-    fun rConicTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nRConicTo(_ptr, dx1, dy1, dx2, dy2, w)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun rConicTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float): PathBuilder = nativeCall {
+        PathBuilder_nRConicTo(_ptr, dx1, dy1, dx2, dy2, w)
+        this
     }
 
     /**
@@ -335,14 +266,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param y3 end point of cubic on y-axis
      * @return this builder for chaining
      */
-    fun cubicTo(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nCubicTo(_ptr, x1, y1, x2, y2, x3, y3)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun cubicTo(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float): PathBuilder = nativeCall {
+        PathBuilder_nCubicTo(_ptr, x1, y1, x2, y2, x3, y3)
+        this
     }
 
     /**
@@ -368,14 +294,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param dy3 offset from last point to cubic end on y-axis
      * @return this builder for chaining
      */
-    fun rCubicTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nRCubicTo(_ptr, dx1, dy1, dx2, dy2, dx3, dy3)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun rCubicTo(dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float): PathBuilder = nativeCall {
+        PathBuilder_nRCubicTo(_ptr, dx1, dy1, dx2, dy2, dx3, dy3)
+        this
     }
 
     /**
@@ -403,14 +324,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param forceMoveTo true to start a new contour with arc
      * @return this builder for chaining
      */
-    fun arcTo(left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float, forceMoveTo: Boolean): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nArcTo(_ptr, left, top, right, bottom, startAngle, sweepAngle, forceMoveTo)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun arcTo(left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float, forceMoveTo: Boolean): PathBuilder = nativeCall {
+        PathBuilder_nArcTo(_ptr, left, top, right, bottom, startAngle, sweepAngle, forceMoveTo)
+        this
     }
 
     /**
@@ -424,14 +340,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param radius distance from arc to circle center
      * @return this builder for chaining
      */
-    fun tangentArcTo(x1: Float, y1: Float, x2: Float, y2: Float, radius: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nTangentArcTo(_ptr, x1, y1, x2, y2, radius)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun tangentArcTo(x1: Float, y1: Float, x2: Float, y2: Float, radius: Float): PathBuilder = nativeCall {
+        PathBuilder_nTangentArcTo(_ptr, x1, y1, x2, y2, radius)
+        this
     }
 
     /**
@@ -467,14 +378,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
         direction: PathDirection,
         x: Float,
         y: Float
-    ): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nEllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, x, y)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    ): PathBuilder = nativeCall {
+        PathBuilder_nEllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, x, y)
+        this
     }
 
     /**
@@ -511,14 +417,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
         direction: PathDirection,
         dx: Float,
         dy: Float
-    ): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nREllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, dx, dy)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    ): PathBuilder = nativeCall {
+        PathBuilder_nREllipticalArcTo(_ptr, rx, ry, xAxisRotate, arc.ordinal, direction.ordinal, dx, dy)
+        this
     }
 
     /**
@@ -526,14 +427,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * 
      * @return this builder for chaining
      */
-    fun closePath(): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nClosePath(_ptr)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun closePath(): PathBuilder = nativeCall {
+        PathBuilder_nClosePath(_ptr)
+        this
     }
 
     /**
@@ -559,14 +455,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param start initial corner: 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left
      * @return this builder for chaining
      */
-    fun addRect(left: Float, top: Float, right: Float, bottom: Float, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 0): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nAddRect(_ptr, left, top, right, bottom, dir.ordinal, start)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun addRect(left: Float, top: Float, right: Float, bottom: Float, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 0): PathBuilder = nativeCall {
+        PathBuilder_nAddRect(_ptr, left, top, right, bottom, dir.ordinal, start)
+        this
     }
 
     /**
@@ -592,14 +483,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param start index of initial point: 0=top, 1=right, 2=bottom, 3=left
      * @return this builder for chaining
      */
-    fun addOval(left: Float, top: Float, right: Float, bottom: Float, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 1): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nAddOval(_ptr, left, top, right, bottom, dir.ordinal, start)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun addOval(left: Float, top: Float, right: Float, bottom: Float, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 1): PathBuilder = nativeCall {
+        PathBuilder_nAddOval(_ptr, left, top, right, bottom, dir.ordinal, start)
+        this
     }
 
     /**
@@ -611,14 +497,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param dir direction to wind circle
      * @return this builder for chaining
      */
-    fun addCircle(x: Float, y: Float, radius: Float, dir: PathDirection = PathDirection.CLOCKWISE): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nAddCircle(_ptr, x, y, radius, dir.ordinal)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun addCircle(x: Float, y: Float, radius: Float, dir: PathDirection = PathDirection.CLOCKWISE): PathBuilder = nativeCall {
+        PathBuilder_nAddCircle(_ptr, x, y, radius, dir.ordinal)
+        this
     }
 
     /**
@@ -644,14 +525,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param sweepAngle sweep, in degrees. Positive is clockwise
      * @return this builder for chaining
      */
-    fun addArc(left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nAddArc(_ptr, left, top, right, bottom, startAngle, sweepAngle)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun addArc(left: Float, top: Float, right: Float, bottom: Float, startAngle: Float, sweepAngle: Float): PathBuilder = nativeCall {
+        PathBuilder_nAddArc(_ptr, left, top, right, bottom, startAngle, sweepAngle)
+        this
     }
 
     /**
@@ -678,16 +554,11 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param start index of initial point
      * @return this builder for chaining
      */
-    fun addRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 6): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            interopScope {
-                PathBuilder_nAddRRect(_ptr, left, top, right, bottom, toInterop(radii), radii.size, dir.ordinal, start)
-            }
-            this
-        } finally {
-            reachabilityBarrier(this)
+    fun addRRect(left: Float, top: Float, right: Float, bottom: Float, radii: FloatArray, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 6): PathBuilder = nativeCall {
+        interopScope {
+            PathBuilder_nAddRRect(_ptr, left, top, right, bottom, toInterop(radii), radii.size, dir.ordinal, start)
         }
+        this
     }
 
     /**
@@ -713,16 +584,11 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param close true to add line connecting contour end and start
      * @return this builder for chaining
      */
-    fun addPoly(coords: FloatArray, close: Boolean): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            interopScope {
-                PathBuilder_nAddPoly(_ptr, toInterop(coords), coords.size / 2, close)
-            }
-            this
-        } finally {
-            reachabilityBarrier(this)
+    fun addPoly(coords: FloatArray, close: Boolean): PathBuilder = nativeCall {
+        interopScope {
+            PathBuilder_nAddPoly(_ptr, toInterop(coords), coords.size / 2, close)
         }
+        this
     }
 
     /**
@@ -732,14 +598,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param mode how to append the path (APPEND or EXTEND)
      * @return this builder for chaining
      */
-    fun addPath(src: Path, mode: PathAddMode = PathAddMode.APPEND): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nAddPath(_ptr, getPtr(src), mode.ordinal)
-            this
-        } finally {
-            reachabilityBarrier(src)
-        }
+    fun addPath(src: Path, mode: PathAddMode = PathAddMode.APPEND): PathBuilder = nativeCall(src) { src ->
+        PathBuilder_nAddPath(_ptr, src._ptr, mode.ordinal)
+        this
     }
 
     /**
@@ -751,14 +612,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param mode how to append the path (APPEND or EXTEND)
      * @return this builder for chaining
      */
-    fun addPath(src: Path, dx: Float, dy: Float, mode: PathAddMode = PathAddMode.APPEND): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nAddPathOffset(_ptr, getPtr(src), dx, dy, mode.ordinal)
-            this
-        } finally {
-            reachabilityBarrier(src)
-        }
+    fun addPath(src: Path, dx: Float, dy: Float, mode: PathAddMode = PathAddMode.APPEND): PathBuilder = nativeCall(src) { src ->
+        PathBuilder_nAddPathOffset(_ptr, src._ptr, dx, dy, mode.ordinal)
+        this
     }
 
     /**
@@ -769,17 +625,11 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param mode how to append the path (APPEND or EXTEND)
      * @return this builder for chaining
      */
-    fun addPath(src: Path, matrix: Matrix33, mode: PathAddMode = PathAddMode.APPEND): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            interopScope {
-                PathBuilder_nAddPathTransform(_ptr, getPtr(src), toInterop(matrix.mat), mode.ordinal)
-            }
-            this
-        } finally {
-            reachabilityBarrier(src)
-            reachabilityBarrier(matrix)
+    fun addPath(src: Path, matrix: Matrix33, mode: PathAddMode = PathAddMode.APPEND): PathBuilder = nativeCall(src) { src ->
+        interopScope {
+            PathBuilder_nAddPathTransform(_ptr, src._ptr, toInterop(matrix.mat), mode.ordinal)
         }
+        this
     }
 
     /**
@@ -789,14 +639,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param dy offset on y-axis
      * @return this builder for chaining
      */
-    fun offset(dx: Float, dy: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nOffset(_ptr, dx, dy)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun offset(dx: Float, dy: Float): PathBuilder = nativeCall {
+        PathBuilder_nOffset(_ptr, dx, dy)
+        this
     }
 
     /**
@@ -805,17 +650,11 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param matrix transform to apply
      * @return this builder for chaining
      */
-    fun transform(matrix: Matrix33): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            interopScope {
-                PathBuilder_nTransform(_ptr, toInterop(matrix.mat))
-            }
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(matrix)
+    fun transform(matrix: Matrix33): PathBuilder = nativeCall {
+        interopScope {
+            PathBuilder_nTransform(_ptr, toInterop(matrix.mat))
         }
+        this
     }
 
     /**
@@ -825,14 +664,9 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
      * @param y y-coordinate
      * @return this builder for chaining
      */
-    fun setLastPt(x: Float, y: Float): PathBuilder {
-        return try {
-            Stats.onNativeCall()
-            PathBuilder_nSetLastPt(_ptr, x, y)
-            this
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun setLastPt(x: Float, y: Float): PathBuilder = nativeCall {
+        PathBuilder_nSetLastPt(_ptr, x, y)
+        this
     }
 }
 

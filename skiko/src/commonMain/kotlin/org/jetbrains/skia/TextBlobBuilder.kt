@@ -33,14 +33,9 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      *
      * @see [https://fiddle.skia.org/c/@TextBlobBuilder_make](https://fiddle.skia.org/c/@TextBlobBuilder_make)
      */
-    fun build(): TextBlob? {
-        return try {
-            Stats.onNativeCall()
-            val ptr = _nBuild(_ptr)
-            if (ptr == NullPointer) null else TextBlob(ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
+    fun build(): TextBlob? = nativeCall {
+        val ptr = _nBuild(_ptr)
+        if (ptr == NullPointer) null else TextBlob(ptr)
     }
 
     /**
@@ -75,13 +70,12 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param bounds  optional run bounding box
      * @return        this
      */
-    fun appendRun(font: Font?, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?): TextBlobBuilder {
-        return try {
-            Stats.onNativeCall()
+    fun appendRun(font: Font?, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?): TextBlobBuilder =
+        nativeCall(font) { font ->
             interopScope {
                 _nAppendRun(
                     _ptr,
-                    getPtr(font),
+                    font.pointerOrNullPointer,
                     toInterop(glyphs),
                     glyphs?.size ?: 0,
                     x,
@@ -90,11 +84,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                 )
             }
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(font)
         }
-    }
 
     /**
      *
@@ -128,26 +118,20 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         xs: FloatArray,
         y: Float,
         bounds: Rect? = null
-    ): TextBlobBuilder {
-        return try {
-            require(glyphs.size == xs.size) { "glyphs.length " + glyphs.size + " != xs.length " + xs.size }
-            Stats.onNativeCall()
-            interopScope {
-                _nAppendRunPosH(
-                    _ptr,
-                    getPtr(font),
-                    toInterop(glyphs),
-                    glyphs.size,
-                    toInterop(xs),
-                    y,
-                    toInterop(bounds?.serializeToFloatArray())
-                )
-            }
-            this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(font)
+    ): TextBlobBuilder = nativeCall(font) { font ->
+        require(glyphs.size == xs.size) { "glyphs.length " + glyphs.size + " != xs.length " + xs.size }
+        interopScope {
+            _nAppendRunPosH(
+                _ptr,
+                font.pointerOrNullPointer,
+                toInterop(glyphs),
+                glyphs.size,
+                toInterop(xs),
+                y,
+                toInterop(bounds?.serializeToFloatArray())
+            )
         }
+        this
     }
 
     /**
@@ -174,19 +158,18 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param pos     positions of glyphs within the blob
      * @return        this
      */
-   fun appendRunPos(font: Font?, glyphs: ShortArray, pos: Array<Point>, bounds: Rect? = null): TextBlobBuilder {
-        return try {
+    fun appendRunPos(font: Font?, glyphs: ShortArray, pos: Array<Point>, bounds: Rect? = null): TextBlobBuilder =
+        nativeCall(font) { font ->
             require(glyphs.size == pos.size) { "glyphs.length " + glyphs.size + " != pos.length " + pos.size }
             val floatPos = FloatArray(pos.size * 2)
             for (i in pos.indices) {
                 floatPos[i * 2] = pos[i].x
                 floatPos[i * 2 + 1] = pos[i].y
             }
-            Stats.onNativeCall()
             interopScope {
                 _nAppendRunPos(
                     _ptr,
-                    getPtr(font),
+                    font.pointerOrNullPointer,
                     toInterop(glyphs),
                     glyphs.size,
                     toInterop(floatPos),
@@ -194,14 +177,10 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                 )
             }
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(font)
         }
-    }
 
-    fun appendRunRSXform(font: Font?, glyphs: ShortArray, xform: Array<RSXform>): TextBlobBuilder {
-        return try {
+    fun appendRunRSXform(font: Font?, glyphs: ShortArray, xform: Array<RSXform>): TextBlobBuilder =
+        nativeCall(font) { font ->
             require(glyphs.size == xform.size) { "glyphs.length " + glyphs.size + " != xform.length " + xform.size }
             val floatXform = FloatArray(xform.size * 4)
             for (i in xform.indices) {
@@ -210,28 +189,22 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                 floatXform[i * 4 + 2] = xform[i].tx
                 floatXform[i * 4 + 3] = xform[i].ty
             }
-            Stats.onNativeCall()
             interopScope {
                 _nAppendRunRSXform(
                     _ptr,
-                    getPtr(font),
+                    font.pointerOrNullPointer,
                     toInterop(glyphs),
                     glyphs.size,
                     toInterop(floatXform)
                 )
             }
             this
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(font)
         }
-    }
 
     private object _FinalizerHolder {
         val PTR = TextBlobBuilder_nGetFinalizer()
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot
