@@ -4,7 +4,7 @@
 #if defined(SK_METAL)
 #include "include/gpu/graphite/mtl/MtlGraphiteTypes_cpp.h"
 #endif
-#if defined(SK_VULKAN) && (defined(_WIN32) || defined(__linux__))
+#if defined(SK_VULKAN)
 #include "include/gpu/graphite/vk/VulkanGraphiteTypes.h"
 #include "VulkanUtils.hh"
 #endif
@@ -41,7 +41,7 @@ Java_org_jetbrains_skia_gpu_graphite_BackendTextureKt__1nMakeVulkan(
         jint imageLayout,
         jint queueFamilyIndex,
         jlong imagePtr) {
-#if defined(SK_VULKAN) && (defined(_WIN32) || defined(__linux__))
+#if defined(SK_VULKAN)
     auto textureInfo = skikoVulkanTextureInfoFromIntArray(env, textureInfoValues);
     auto texture = skgpu::graphite::BackendTextures::MakeVulkan(
             SkISize::Make(width, height),

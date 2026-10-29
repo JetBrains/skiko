@@ -42,6 +42,7 @@ import org.jetbrains.skiko.build.context.wasmJsTest
 import org.jetbrains.skiko.build.context.webMainSourceSet
 import org.jetbrains.skiko.build.context.webTestSourceSet
 import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
+import org.jetbrains.skiko.build.cpp.LinkSkikoTask
 import org.jetbrains.skiko.build.dependencies.SkikoDependencyScope
 import org.jetbrains.skiko.build.dependencies.registerAdditionalLibraries
 import org.jetbrains.skiko.build.publishing.declarePublications
@@ -50,6 +51,7 @@ import org.jetbrains.skiko.build.utils.OS
 import org.jetbrains.skiko.build.utils.SkikoArtifacts
 import org.jetbrains.skiko.build.utils.SkikoProperties
 import org.jetbrains.skiko.build.utils.hostOs
+import org.jetbrains.skiko.build.utils.joinToTitleCamelCase
 import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
 import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
 import org.jetbrains.skiko.build.utils.skikoKotlinNativeApiVersion
@@ -78,13 +80,21 @@ val buildType = skiko.buildType
 val targetOs = hostOs
 val targetArch = skiko.targetArch
 val coreProject = project(":")
+val ganeshProject = project(":skiko-ganesh")
 
 val platformDependencies: SkikoDependencyScope.() -> Unit = {
     dependsOnCore()
     targets {
+        all {
+            compilerFlags("-DSK_SUPPORT_GPU=1", "-DSK_GANESH", "-DSK_GL")
+        }
         jvm {
+            windows {
+                compilerFlags("-DSK_DIRECT3D", "-DSK_ANGLE")
+            }
             macos {
                 linkFlags("-lobjc")
+                compilerFlags("-DSK_METAL")
                 frameworks(
                     "AppKit",
                     "CoreFoundation",
@@ -253,12 +263,14 @@ if (supportWeb) {
         implementation(kotlin("stdlib"))
         implementation(libs.coroutines.core)
         api(project(":"))
+        api(project(":skiko-ganesh"))
     }
 
     sourceSets.commonTest.dependencies {
         implementation(kotlin("test"))
         implementation(kotlin("test-annotations-common"))
         implementation(project(":"))
+        implementation(project(":skiko-ganesh"))
         implementation(project(":test-utils"))
     }
 
@@ -301,6 +313,7 @@ if (supportWeb) {
     skikoPlatformProjectContext.webTestSourceSet?.apply {
         val coreWasmTestResources = skikoPlatformProjectContext.wasmTestResourcesFor().also {
             dependencies.add(it.name, coreProject)
+            dependencies.add(it.name, ganeshProject)
         }
         resources.srcDirs(
             coreWasmTestResources,
@@ -361,6 +374,7 @@ if (supportAwt) {
     }
     val coreJvmRuntimeJar = skikoPlatformProjectContext.jvmRuntimeJarFor(targetOs, targetArch).also {
         dependencies.add(it.name, coreProject)
+        dependencies.add(it.name, ganeshProject)
     }
     skikoPlatformProjectContext.setupJvmTestTask(
         skikoPlatformAwtJarForTests,
@@ -370,6 +384,20 @@ if (supportAwt) {
         macosX64CoreLinkedLibrary?.let { files(it) },
         coreJvmRuntimeJar
     )
+    if (targetOs == OS.Windows) {
+        val ganeshJvmLinkedLibrary = skikoPlatformProjectContext.jvmLinkedLibraryFor(
+            targetOs, targetArch, configurationNamePrefix = "ganeshJvmLinkedLibrary"
+        ).also {
+            dependencies.add(it.name, ganeshProject)
+        }
+        val targetSuffix = joinToTitleCamelCase(targetOs.id, targetArch.id)
+        tasks.named<LinkSkikoTask>("linkJvmBindings$targetSuffix") {
+            dependsOn(ganeshJvmLinkedLibrary)
+            libFiles += files(provider {
+                ganeshJvmLinkedLibrary.files.map { it.resolve("skiko-ganesh-${targetOs.id}-${targetArch.id}.lib") }
+            })
+        }
+    }
     skikoPlatformProjectContext.provideJvmRequiredSymbols(targetOs, targetArch)
     if (targetOs == OS.MacOS && targetArch == Arch.Arm64) {
         skikoPlatformProjectContext.provideJvmRequiredSymbols(OS.MacOS, Arch.X64)

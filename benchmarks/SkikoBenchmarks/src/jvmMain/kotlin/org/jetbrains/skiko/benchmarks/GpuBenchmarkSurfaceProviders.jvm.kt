@@ -6,6 +6,7 @@ import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skia.SurfaceProps
+import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.OS

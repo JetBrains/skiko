@@ -4,6 +4,8 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
+import org.jetbrains.skia.gpu.ganesh.flushAndSubmit
+import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
 import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.internal.fastForEach
 import platform.Foundation.NSNotificationCenter

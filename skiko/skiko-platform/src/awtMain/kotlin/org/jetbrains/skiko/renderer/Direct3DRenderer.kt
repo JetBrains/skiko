@@ -2,6 +2,8 @@ package org.jetbrains.skiko.renderer
 
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
+import org.jetbrains.skia.gpu.ganesh.flushAndSubmit
+import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.graphicapi.DxgiFormat
 

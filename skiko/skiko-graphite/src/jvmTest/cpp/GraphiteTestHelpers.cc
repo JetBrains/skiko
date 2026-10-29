@@ -1,6 +1,6 @@
 #include <jni.h>
 
-#if defined(SK_VULKAN) && (defined(_WIN32) || defined(__linux__))
+#if defined(SK_VULKAN)
 #include "include/third_party/vulkan/vulkan/vulkan_core.h"
 #include "VulkanLibrary.hh"
 #include <vector>

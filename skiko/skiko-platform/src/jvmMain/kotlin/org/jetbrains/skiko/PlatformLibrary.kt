@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skia.GaneshLibrary
+
 private val platformLoader = LibraryLoader(
     name = "skiko-platform-$hostId",
     init = { Setup.init() },
@@ -8,7 +10,7 @@ private val platformLoader = LibraryLoader(
 
 internal object PlatformLibrary {
     fun load() {
-        Library.load()
+        GaneshLibrary.load()
         platformLoader.loadOnce()
     }
 }

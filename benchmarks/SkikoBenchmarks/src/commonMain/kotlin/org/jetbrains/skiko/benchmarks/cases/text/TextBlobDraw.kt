@@ -4,6 +4,7 @@ import org.jetbrains.skia.Font
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.TextBlob
+import org.jetbrains.skia.gpu.ganesh.flushAndSubmit
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.benchmarks.BenchmarkSurfaceProvider
 import org.jetbrains.skiko.benchmarks.BenchmarkCase

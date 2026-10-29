@@ -7,6 +7,8 @@ import org.jetbrains.skia.Image
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PaintMode
 import org.jetbrains.skia.Surface
+import org.jetbrains.skia.gpu.ganesh.flushAndSubmit
+import org.jetbrains.skia.gpu.ganesh.recordingContext
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.benchmarks.BenchmarkSurfaceProvider
 import org.jetbrains.skiko.benchmarks.BenchmarkCase
