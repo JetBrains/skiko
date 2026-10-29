@@ -261,6 +261,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of the delete function without calling it, so it is short and cannot
 // block.
@@ -571,3 +572,4 @@ private external fun _nGetFontHinting(ptr: NativePointer): Int
 // No ForceNativeThreadState: only stores an enum, so it is short and cannot block.
 // Native call path: TextStyle::setFontHinting
 private external fun _nSetFontHinting(ptr: NativePointer, fontHinting: Int)
+// </editor-fold>

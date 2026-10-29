@@ -205,6 +205,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of the deletion function, so it is short and cannot block.
 // Native call path: deletePixmap
@@ -395,3 +396,4 @@ private external fun _nEraseSubset(
     r: Int,
     b: Int
 ): Boolean // TODO float erase methods not included
+// </editor-fold>

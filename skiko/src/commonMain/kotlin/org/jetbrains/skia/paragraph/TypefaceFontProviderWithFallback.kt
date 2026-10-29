@@ -34,6 +34,7 @@ class TypefaceFontProviderWithFallback private constructor(
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProviderWithFallback__1nMakeAsFallbackProvider")
 // No ForceNativeThreadState: creates empty maps and an empty typeface list, so it is short and cannot block.
 // Native call path: TypefaceFontProviderWithFallback::TypefaceFontProviderWithFallback
@@ -49,3 +50,4 @@ private external fun _nRegisterTypefaceForFallback(
     typefacePtr: NativePointer,
     alias: InteropPointer
 ): Int
+// </editor-fold>

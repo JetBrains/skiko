@@ -277,6 +277,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     override fun toString() = "Typeface(familyName='$familyName', fontStyle=$fontStyle, uniqueId=$uniqueId)"
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
 // No ForceNativeThreadState: returns the stored unique id, so it is short and cannot block.
 // Native call path: SkTypeface::uniqueID
@@ -436,3 +437,4 @@ private external fun _nGetFamilyNames(ptr: NativePointer): NativePointer
 // Native call path: SkTypeface::getFamilyName -> SkTypeface_Mac::onGetFamilyName -> CTFontCopyFamilyName
 @ForceNativeThreadState
 private external fun _nGetFamilyName(ptr: NativePointer): NativePointer
+// </editor-fold>

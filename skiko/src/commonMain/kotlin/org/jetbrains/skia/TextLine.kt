@@ -160,6 +160,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot
 // block.
@@ -287,3 +288,4 @@ private external fun _nGetLeftOffsetAtCoord(ptr: NativePointer, x: Float): Int
 // Native call path: TextLine::fRuns
 @ForceNativeThreadState
 private external fun _nGetCoordAtOffset(ptr: NativePointer, offset: Int): Float
+// </editor-fold>

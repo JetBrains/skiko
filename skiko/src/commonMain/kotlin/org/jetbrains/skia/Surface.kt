@@ -910,6 +910,7 @@ class Surface : RefCnt {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetWidth")
 // No ForceNativeThreadState: returns the stored surface width, so it is short and cannot block.
 // Native call path: SkSurface::width
@@ -1137,3 +1138,4 @@ private external fun _nWritePixelsFromPixmap(ptr: NativePointer, pixmapPtr: Nati
 // No ForceNativeThreadState: reads a reference count with one atomic load, so it is short and cannot block.
 // Native call path: SkRefCnt::unique
 private external fun _nUnique(ptr: NativePointer): Boolean
+// </editor-fold>

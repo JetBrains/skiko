@@ -52,6 +52,7 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a cleanup function without running it, so it is short and cannot
 // block.
@@ -103,3 +104,4 @@ private external fun _nRemoveSuffix(ptr: NativePointer, from: Int)
 // Native call path: UtfIndicesConverter::from16To8 -> SkString::remove
 @ForceNativeThreadState
 private external fun _nRemove(ptr: NativePointer, from: Int, length: Int)
+// </editor-fold>

@@ -213,6 +213,7 @@ class Picture internal constructor(ptr: NativePointer, managed: Boolean = true) 
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
 // Needs ForceNativeThreadState: parses picture data, loading its typefaces through CoreText and decoding its images, so
 // its time grows with the data size.
@@ -277,3 +278,4 @@ private external fun _nMakeShader(
 // Native call path: SkPicture::playback -> SkRecordDraw -> KotlinAbortCallback::abort
 @ForceNativeThreadState
 private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, data: InteropPointer)
+// </editor-fold>

@@ -57,6 +57,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nAbandon")
 // Needs ForceNativeThreadState: clears the cache while holding its mutex, and freeing cached runs can drop the last
 // reference to a font typeface.
@@ -101,3 +102,4 @@ private external fun _nSetEnabled(ptr: NativePointer, value: Boolean)
 // No ForceNativeThreadState: returns the stored number of cache entries, so it is short and cannot block.
 // Native call path: ParagraphCache::count
 private external fun _nGetCount(ptr: NativePointer): Int
+// </editor-fold>

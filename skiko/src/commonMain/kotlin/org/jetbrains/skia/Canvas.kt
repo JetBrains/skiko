@@ -1380,6 +1380,16 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 }
 
+internal inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
+    val restoreCount = save()
+    try {
+        block()
+    } finally {
+        restoreToCount(restoreCount)
+    }
+}
+
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -1831,12 +1841,4 @@ private external fun _nRestore(ptr: NativePointer)
 // Native call path: SkCanvas::restoreToCount -> SkCanvas::restore -> internalRestore
 @ForceNativeThreadState
 private external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)
-
-internal inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
-    val restoreCount = save()
-    try {
-        block()
-    } finally {
-        restoreToCount(restoreCount)
-    }
-}
+// </editor-fold>

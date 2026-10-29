@@ -670,6 +670,7 @@ class PathBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PathBuilder__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 private external fun PathBuilder_nGetFinalizer(): NativePointer
@@ -908,3 +909,4 @@ private external fun PathBuilder_nOffset(ptr: NativePointer, dx: Float, dy: Floa
 // Native call path: SkPathBuilder::transform -> SkMatrix::mapPoints
 @ForceNativeThreadState
 private external fun PathBuilder_nTransform(ptr: NativePointer, matrix: InteropPointer)
+// </editor-fold>

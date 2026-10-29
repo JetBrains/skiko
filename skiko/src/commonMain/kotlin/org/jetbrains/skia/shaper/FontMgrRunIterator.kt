@@ -47,6 +47,7 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
 // Needs ForceNativeThreadState: with no font manager given, it builds the default one, which calls CoreText to create
 // the font collection.
@@ -60,3 +61,4 @@ private external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, font
 // short and cannot block.
 // Native call path: FontRunIterator::currentFont
 private external fun _nGetCurrentFont(ptr: NativePointer): NativePointer
+// </editor-fold>

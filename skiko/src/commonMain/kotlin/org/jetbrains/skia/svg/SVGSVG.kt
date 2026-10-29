@@ -41,6 +41,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
         nativeCall { Point.fromInteropPointer { SVGSVG_nGetIntrinsicSize(_ptr, lc.width, lc.height, lc.dpi, it) } }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetX")
 // No ForceNativeThreadState: returns a stored length and copies two ints out, so it is short and cannot block.
 // Native call path: SkSVGSVG::getX
@@ -106,3 +107,4 @@ private external fun SVGSVG_nSetPreserveAspectRatio(ptr: NativePointer, align: I
 // No ForceNativeThreadState: assigns a small value into a stored field, so it is short and cannot block.
 // Native call path: SkSVGSVG::setViewBox
 private external fun SVGSVG_nSetViewBox(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float)
+// </editor-fold>

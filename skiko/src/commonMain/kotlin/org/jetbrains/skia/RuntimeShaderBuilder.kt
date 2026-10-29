@@ -116,6 +116,7 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeFromRuntimeEffect")
 // Needs ForceNativeThreadState: zero-fills storage for the shader program's uniform values and creates its child list;
 // work grows with the declared uniform storage and child count.
@@ -232,3 +233,4 @@ private external fun _nChildColorFilter(builderPtr: NativePointer, uniformName: 
 // Native call path: SkRuntimeEffectBuilder::makeShader -> verify_child_effects
 @ForceNativeThreadState
 private external fun _nMakeShader(builderPtr: NativePointer, localMatrix: InteropPointer): NativePointer
+// </editor-fold>

@@ -295,6 +295,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
 
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot
 // block.
@@ -459,3 +460,4 @@ private external fun Iter_nGetGlyphCount(ptr: NativePointer): Int
 // Native call path: TextBlobIter::writeGlyphs -> memcpy
 @ForceNativeThreadState
 private external fun Iter_nGetGlyphs(ptr: NativePointer, glyphs: InteropPointer, max: Int): Int
+// </editor-fold>

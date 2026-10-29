@@ -120,6 +120,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of the delete function without calling it, so it is short and cannot
 // block.
@@ -275,3 +276,4 @@ private external fun _nGetReplaceTabCharacters(ptr: NativePointer): Boolean
 // No ForceNativeThreadState: stores an on or off flag in the style, so it is short and cannot block.
 // Native call path: ParagraphStyle::setReplaceTabCharacters
 private external fun _nSetReplaceTabCharacters(ptr: NativePointer, value: Boolean)
+// </editor-fold>

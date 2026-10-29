@@ -160,6 +160,7 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
 }
 
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nMake")
 // No ForceNativeThreadState: creates a new empty recorder that has nothing recorded yet, so it is short and cannot
 // block.
@@ -218,4 +219,4 @@ private external fun _nFinishRecordingAsPictureWithCull(
 // Native call path: finishRecordingAsDrawable -> SkRecordOptimize
 @ForceNativeThreadState
 private external fun _nFinishRecordingAsDrawable(ptr: NativePointer): NativePointer
-
+// </editor-fold>

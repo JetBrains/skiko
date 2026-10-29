@@ -185,6 +185,7 @@ object CharProperties {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_icu_Unicode__1nCharDirection")
 // No ForceNativeThreadState: looks up a character's direction in a built-in table, with no lazy setup or lock, so it is
 // short and cannot block.
@@ -197,4 +198,5 @@ private external fun _nCharDirection(codePoint: Int): Int
 // Native call path: u_hasBinaryProperty -> Normalizer2Factory::getNFCImpl -> umtx_initOnce
 @ForceNativeThreadState
 private external fun _nCodePointHasBinaryProperty(codePoint: Int, property: Int): Boolean
+// </editor-fold>
 

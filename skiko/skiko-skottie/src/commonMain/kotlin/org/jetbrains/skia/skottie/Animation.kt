@@ -249,7 +249,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         get() = size.y
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -342,3 +342,4 @@ private external fun _nGetVersion(ptr: NativePointer): NativePointer
 // No ForceNativeThreadState: returns the stored size, which is written as two floats, so it is short and cannot block.
 // Native call path: Animation::size -> Point::copyToInterop
 private external fun _nGetSize(ptr: NativePointer, dst: InteropPointer)
+// </editor-fold>

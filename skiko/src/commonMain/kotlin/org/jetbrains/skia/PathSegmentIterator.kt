@@ -119,6 +119,7 @@ private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 private external fun PathSegmentIterator_nGetFinalizer(): NativePointer
@@ -135,3 +136,4 @@ private external fun PathSegmentIterator_nNext(ptr: NativePointer, points: Inter
 // and cannot block.
 // Native call path: SkPath::Iter::Iter
 private external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer
+// </editor-fold>

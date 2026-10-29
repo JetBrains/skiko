@@ -92,6 +92,7 @@ class Graphics {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheLimit")
 // Needs ForceNativeThreadState: takes a font-cache lock that stays held while CoreText fonts are created, so it can
 // wait for another thread.
@@ -185,3 +186,4 @@ private external fun _nPurgeResourceCache()
 // Native call path: SkStrikeCache::purgeAll -> ~SkScalerContext_Mac
 @ForceNativeThreadState
 private external fun _nPurgeAllCaches()
+// </editor-fold>

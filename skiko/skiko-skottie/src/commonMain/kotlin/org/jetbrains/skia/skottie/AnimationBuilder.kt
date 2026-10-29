@@ -65,6 +65,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
         }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -109,3 +110,4 @@ internal external fun _nBuildFromFile(ptr: NativePointer, path: InteropPointer):
 // Native call path: Builder::make -> SkData::MakeFromStream -> Builder::make
 @ForceNativeThreadState
 private external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer
+// </editor-fold>

@@ -373,6 +373,7 @@ class Font : Managed {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot
 // block.
@@ -626,3 +627,4 @@ private external fun _nGetMetrics(ptr: NativePointer, metrics: InteropPointer)
 // Native call path: SkFont::getSpacing -> SkFont::getMetrics -> SkScalerContext_Mac::generateFontMetrics
 @ForceNativeThreadState
 private external fun _nGetSpacing(ptr: NativePointer): Float
+// </editor-fold>

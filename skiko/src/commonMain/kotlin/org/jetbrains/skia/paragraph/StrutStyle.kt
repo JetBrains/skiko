@@ -161,7 +161,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
     }
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of the delete function without calling it, so it is short and cannot
 // block.
@@ -284,3 +284,4 @@ private external fun StrutStyle_nGetTopRatio(ptr: NativePointer): Float
 // No ForceNativeThreadState: stores a top ratio in the strut style, so it is short and cannot block.
 // Native call path: StrutStyle::setTopRatio
 private external fun StrutStyle_nSetTopRatio(ptr: NativePointer, value: Float)
+// </editor-fold>

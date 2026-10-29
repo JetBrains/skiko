@@ -69,6 +69,7 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 // "high quality" mode, in SkBlurMask::Blur() (1 / sqrt(3)).
 private const val kBLUR_SIGMA_SCALE = 0.57735f
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeTable")
 // No ForceNativeThreadState: copies a fixed 256-entry table into a new filter object, so it is short and cannot block.
 // Native call path: SkTableMaskFilter::Create
@@ -97,3 +98,4 @@ private external fun _nMakeGamma(gamma: Float): NativePointer
 // cannot block.
 // Native call path: SkTableMaskFilter::CreateClip
 private external fun _nMakeClip(min: Byte, max: Byte): NativePointer
+// </editor-fold>

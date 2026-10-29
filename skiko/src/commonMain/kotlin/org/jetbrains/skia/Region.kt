@@ -258,6 +258,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Region__1nMake")
 // No ForceNativeThreadState: creates an empty region that stores empty bounds and a shared empty run head, so it is
 // short and cannot block.
@@ -462,3 +463,4 @@ private external fun Region_nOpRegionRegion(
     regionPtrB: NativePointer,
     op: Int
 ): Boolean
+// </editor-fold>

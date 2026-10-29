@@ -66,6 +66,7 @@ class TextBlobBuilderRunHandler internal constructor(
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_shaper_TextBlobBuilderRunHandler__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 // Native call path: deleteTextBlobBuilderRunHandler
@@ -82,3 +83,4 @@ private external fun TextBlobBuilderRunHandler_nMake(textPtr: NativePointer, off
 // Native call path: SkTextBlobBuilder::make -> updateDeferredBounds -> TightRunBounds -> SkFont::getBounds
 @ForceNativeThreadState
 private external fun _nMakeBlob(ptr: NativePointer): NativePointer
+// </editor-fold>

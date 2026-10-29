@@ -472,6 +472,7 @@ private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer)
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -561,3 +562,4 @@ private external fun _nGetRuleStatuses(ptr: NativePointer, result: InteropPointe
 // Native call path: std::vector::vector -> ubrk_setText -> RuleBasedBreakIterator::first
 @ForceNativeThreadState
 private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int, errorCode: InteropPointer): NativePointer
+// </editor-fold>

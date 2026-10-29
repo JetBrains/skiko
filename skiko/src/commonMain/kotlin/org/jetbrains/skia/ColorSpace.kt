@@ -74,6 +74,7 @@ class ColorSpace : Managed {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of an unref function without calling it, so it is short and cannot
 // block.
@@ -123,3 +124,4 @@ private external fun _nIsGammaLinear(ptr: NativePointer): Boolean
 // Native call path: SkColorSpace::isSRGB -> sk_srgb_singleton
 @ForceNativeThreadState
 private external fun _nIsSRGB(ptr: NativePointer): Boolean
+// </editor-fold>

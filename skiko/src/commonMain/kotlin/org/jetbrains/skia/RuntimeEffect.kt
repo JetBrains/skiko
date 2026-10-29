@@ -63,6 +63,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
 internal expect fun RuntimeEffect.Companion.makeFromResultPtr(ptr: NativePointer): RuntimeEffect
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
 // Needs ForceNativeThreadState: loops over the caller's child shaders and checks each one, so its time grows with the
 // number of children.
@@ -121,3 +122,4 @@ internal external fun Result_nGetError(ptr: NativePointer): NativePointer
 // cannot block.
 // Native call path: Result::~Result -> SkString::~SkString
 internal external fun Result_nDestroy(ptr: NativePointer)
+// </editor-fold>

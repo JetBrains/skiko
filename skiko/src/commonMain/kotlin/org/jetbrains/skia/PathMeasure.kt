@@ -150,6 +150,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 private external fun PathMeasure_nGetFinalizer(): NativePointer
@@ -234,3 +235,4 @@ private external fun _nIsClosed(ptr: NativePointer): Boolean
 // Native call path: SkPathMeasure::nextContour -> SkContourMeasureIter::next -> buildSegments
 @ForceNativeThreadState
 private external fun _nNextContour(ptr: NativePointer): Boolean
+// </editor-fold>

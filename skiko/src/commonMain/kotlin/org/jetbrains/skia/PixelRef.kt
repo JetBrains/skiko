@@ -59,6 +59,7 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetPixels")
 // No ForceNativeThreadState: returns the stored pixel address, so it is short and cannot block.
 // Native call path: SkPixelRef::pixels
@@ -101,3 +102,4 @@ private external fun _nGetWidth(ptr: NativePointer): Int
 // No ForceNativeThreadState: returns the stored height, so it is short and cannot block.
 // Native call path: SkPixelRef::height
 private external fun _nGetHeight(ptr: NativePointer): Int
+// </editor-fold>

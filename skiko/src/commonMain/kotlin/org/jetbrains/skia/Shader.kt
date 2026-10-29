@@ -348,6 +348,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
 // No ForceNativeThreadState: allocates an empty shader that has no fields or references, so it is short and cannot
 // block.
@@ -499,3 +500,4 @@ private external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, color
 // Native call path: SkShaders::Blend -> SkShaders::Color -> sk_srgb_singleton
 @ForceNativeThreadState
 private external fun _nMakeBlend(blendMode: Int, dst: NativePointer, src: NativePointer): NativePointer
+// </editor-fold>

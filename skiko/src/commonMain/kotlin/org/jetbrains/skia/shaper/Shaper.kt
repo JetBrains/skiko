@@ -208,7 +208,7 @@ internal expect fun Shaper.doShape(
     runHandler: RunHandler
 )
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 // Native call path: deleteShaper
@@ -378,3 +378,4 @@ internal external fun RunHandler_nSetOffset(ptr: NativePointer, x: Float, y: Flo
 // cannot block.
 // Native call path: SkikoRunHandler::runInfo
 internal external fun RunHandler_nGetRunInfo(ptr: NativePointer, result: InteropPointer): NativePointer
+// </editor-fold>

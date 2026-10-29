@@ -37,6 +37,7 @@ class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
 // No ForceNativeThreadState: allocates an empty style set that owns no fonts, so it is short and cannot block.
 // Native call path: SkFontStyleSet::CreateEmpty
@@ -74,3 +75,4 @@ private external fun _nGetTypeface(ptr: NativePointer, index: Int): NativePointe
 //   CTFontCreateWithFontDescriptor
 @ForceNativeThreadState
 private external fun _nMatchStyle(ptr: NativePointer, style: Int): NativePointer
+// </editor-fold>

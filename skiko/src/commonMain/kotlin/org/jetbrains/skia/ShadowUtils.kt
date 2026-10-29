@@ -80,7 +80,7 @@ object ShadowUtils {
     }
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nDrawShadow")
 // Needs ForceNativeThreadState: draws the shadow on a canvas that can be GPU-backed, which can call Metal, and
 // tessellating the path takes time that grows with its size.
@@ -113,3 +113,4 @@ private external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: In
 // block.
 // Native call path: SkShadowUtils::ComputeTonalColors
 private external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int
+// </editor-fold>

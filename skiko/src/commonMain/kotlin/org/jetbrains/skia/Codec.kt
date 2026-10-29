@@ -306,6 +306,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot
 // block.
@@ -395,3 +396,4 @@ private external fun FramesInfo_nGetSize(ptr: NativePointer): Int
 // Native call path: AnimationFrameInfo::copyToInterop -> copyToInteropAtIndex
 @ForceNativeThreadState
 private external fun FramesInfo_nGetInfos(ptr: NativePointer, result: InteropPointer)
+// </editor-fold>

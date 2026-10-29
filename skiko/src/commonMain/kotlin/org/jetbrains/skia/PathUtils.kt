@@ -76,6 +76,7 @@ object PathUtils {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PathUtils__1nFillPathWithPaint")
 // Needs ForceNativeThreadState: applies the paint's path effect and stroke to the path, so its time grows with the path
 // size.
@@ -124,3 +125,4 @@ private external fun _nFillPathWithPaintCull(
     bottom: Float,
     matrix: InteropPointer
 ): Boolean
+// </editor-fold>

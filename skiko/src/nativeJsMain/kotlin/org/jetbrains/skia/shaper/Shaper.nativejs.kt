@@ -238,4 +238,3 @@ private class RunHandlerImpl(val runHandler: RunHandler) : Managed(RunHandler_nC
         val PTR = RunHandler_nGetFinalizer()
     }
 }
-
