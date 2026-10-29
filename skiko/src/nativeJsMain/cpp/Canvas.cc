@@ -4,6 +4,7 @@
 #include "SkRRect.h"
 #include "SkTextBlob.h"
 #include "SkVertices.h"
+#include "SkImage.h"
 #include "hb.h"
 #include "common.h"
 
@@ -103,6 +104,20 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPath
     SkPath* path = reinterpret_cast<SkPath*>((pathPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
     canvas->drawPath(*path, *paint);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawBitmapRect
+  (KNativePointer canvasPtr, KNativePointer bitmapPtr, KFloat sl, KFloat st, KFloat sr, KFloat sb, KFloat dl, KFloat dt, KFloat dr, KFloat db, KInt samplingModeVal1, KInt samplingModeVal2, KNativePointer paintPtr, KBoolean strict) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
+    SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
+    SkRect src {sl, st, sr, sb};
+    SkRect dst {dl, dt, dr, db};
+    SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
+    SkCanvas::SrcRectConstraint constraint = strict ? SkCanvas::SrcRectConstraint::kStrict_SrcRectConstraint : SkCanvas::SrcRectConstraint::kFast_SrcRectConstraint;
+    // SkImages::RasterFromBitmap shares pixels when the bitmap is immutable (no copy).
+    // For mutable bitmaps, Skia makes a copy — same behavior as Android's drawBitmap.
+    sk_sp<SkImage> image = SkImages::RasterFromBitmap(*bitmap);
+    canvas->drawImageRect(image.get(), src, dst, skija::SamplingMode::unpackFrom2Ints(samplingModeVal1, samplingModeVal2), paint, constraint);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawImageRect
