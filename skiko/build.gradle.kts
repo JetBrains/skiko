@@ -547,10 +547,6 @@ project.tasks.withType<KotlinJsCompile>().configureEach {
     ))
 }
 
-skikoProjectContext.additionalRuntimeLibraries.forEach {
-    it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))
-}
-
 // Local Skia build tasks
 tasks.register<BuildLocalSkiaTask>("prepareLocalSkiaBuild") {
     group = "skia"

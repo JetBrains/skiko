@@ -621,8 +621,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val isFinite: Boolean
         get() = try {
             Stats.onNativeCall()
-            // TODO For some reason this method returns 0 instead of false in JS target, investigate
-            !!_nIsFinite(_ptr)
+            _nIsFinite(_ptr)
         } finally {
             reachabilityBarrier(this)
         }

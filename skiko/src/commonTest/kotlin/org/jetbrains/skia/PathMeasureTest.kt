@@ -3,6 +3,8 @@ package org.jetbrains.skia
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.tests.runTest
@@ -107,6 +109,52 @@ class PathMeasureTest {
                     )
                     measure.setPath(path2, false)
                     assertCloseEnough(14.142136f, measure.length)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun emptyMeasureCanBeAssignedAndReset() = runTest {
+        PathMeasure().use { measure ->
+            assertEquals(0f, measure.length)
+            assertFalse(measure.isClosed)
+            assertNull(measure.getMatrix(0f, getPosition = true, getTangent = true))
+            assertFalse(measure.nextContour())
+
+            Path.Line(Point(0f, 0f), Point(30f, 0f)).use { path ->
+                measure.setPath(path, false)
+                assertEquals(30f, measure.length)
+                assertFalse(measure.isClosed)
+                assertCloseEnough(
+                    Matrix33.makeTranslate(12f, 0f),
+                    measure.getMatrix(12f, getPosition = true, getTangent = true)!!
+                )
+                measure.setPath(path, true)
+                assertTrue(measure.isClosed)
+                assertEquals(60f, measure.length)
+            }
+            measure.setPath(null, false)
+            assertEquals(0f, measure.length)
+            assertFalse(measure.isClosed)
+            assertNull(measure.getMatrix(0f, getPosition = true, getTangent = false))
+        }
+    }
+
+    @Test
+    fun advancesBetweenOpenAndClosedContours() = runTest {
+        PathBuilder().use { builder ->
+            builder.moveTo(0f, 0f).lineTo(20f, 0f)
+                .moveTo(10f, 10f).lineTo(13f, 10f).lineTo(13f, 14f).closePath()
+            builder.detach().use { path ->
+                PathMeasure(path, false).use { measure ->
+                    assertEquals(20f, measure.length)
+                    assertFalse(measure.isClosed)
+                    assertTrue(measure.nextContour())
+                    assertEquals(12f, measure.length)
+                    assertTrue(measure.isClosed)
+                    assertCloseEnough(Point(10f, 10f), measure.getPosition(0f)!!)
+                    assertFalse(measure.nextContour())
                 }
             }
         }
