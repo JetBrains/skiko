@@ -131,7 +131,8 @@ value class Matrix33 internal constructor(val mat: FloatArray) {
          * | 0 0 1 |
         `</pre> *
          */
-        val IDENTITY = makeTranslate(0f, 0f)
+        val IDENTITY: Matrix33
+            get() = makeTranslate(0f, 0f)
 
         /**
          *
