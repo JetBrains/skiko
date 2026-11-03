@@ -6,12 +6,14 @@
 #include "SkStream.h"
 #include "SkSVGDOM.h"
 #include "SkSVGSVG.h"
+#include "modules/skresources/include/SkResources.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nMakeFromData
   (JNIEnv* env, jclass jclass, jlong dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     SkMemoryStream stream(sk_ref_sp(data));
-    // No font manager: <text> that needs a font is not drawn. Callers that need text use Builder.
+    // No font manager and no resource provider: <text> that needs a font, and <image>, are not drawn.
+    // Callers that need either use Builder.
     sk_sp<SkSVGDOM> instance = SkSVGDOM::MakeFromStream(stream);
     return reinterpret_cast<jlong>(instance.release());
 }
@@ -62,6 +64,12 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1n
   (JNIEnv* env, jclass jclass, jlong ptr, jlong fontMgrPtr) {
     SkSVGDOM::Builder* instance = reinterpret_cast<SkSVGDOM::Builder*>(static_cast<uintptr_t>(ptr));
     instance->setFontManager(sk_ref_sp(reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr))));
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nBuilderSetResourceProvider
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong resourceProviderPtr) {
+    SkSVGDOM::Builder* instance = reinterpret_cast<SkSVGDOM::Builder*>(static_cast<uintptr_t>(ptr));
+    instance->setResourceProvider(sk_ref_sp(reinterpret_cast<skresources::ResourceProvider*>(static_cast<uintptr_t>(resourceProviderPtr))));
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nBuilderBuildFromData
