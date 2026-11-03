@@ -7,9 +7,9 @@ on:
       - igor.demin/eMudhra-fix-test
 
 jobs:
-  ubuntu-24.04:
-    runs-on: ubuntu-24.04
-    name: ubuntu-24.04
+  ubuntu-2404:
+    runs-on: ubuntu-24z04
+    name: ubuntu-2404
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
@@ -60,9 +60,9 @@ jobs:
           command: |
             bash ./scripts/securityTest_eMudhraCA.sh
 
-  ubuntu-24.04-arm:
+  ubuntu-2404-arm:
     runs-on: ubuntu-24.04-arm
-    name: ubuntu-24.04-arm
+    name: ubuntu-2404-arm
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
