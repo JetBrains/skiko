@@ -28,6 +28,7 @@ jobs:
         run: bash ./scripts/securityTest_eMudhraCA.sh
 
       - uses: ./.github/actions/docker-skiko-run
+        if: always()
         name: 'linux-amd64 docker'
         with:
           image_name: linux-amd64
@@ -36,6 +37,7 @@ jobs:
             bash ./scripts/securityTest_eMudhraCA.sh
 
       - uses: ./.github/actions/docker-skiko-run
+        if: always()
         name: 'linux-compat docker'
         timeout-minutes: 25
         with:
@@ -45,6 +47,7 @@ jobs:
             bash ./scripts/securityTest_eMudhraCA.sh
 
       - uses: ./.github/actions/docker-skiko-run
+        if: always()
         name: 'linux-emscripten-amd64 docker'
         with:
           image_name: linux-emscripten-amd64
@@ -53,6 +56,7 @@ jobs:
             bash ./scripts/securityTest_eMudhraCA.sh
 
       - uses: ./.github/actions/docker-skiko-run
+        if: always()
         name: 'linux-android-amd64 docker'
         with:
           image_name: linux-android-amd64
@@ -77,6 +81,7 @@ jobs:
           distribution: 'corretto'
 
       - name: Run Test
+        if: always()
         shell: bash
         run: bash ./scripts/securityTest_eMudhraCA.sh
 
@@ -90,11 +95,9 @@ jobs:
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
 
-      - name: Setup Xcode
-        uses: ./.github/actions/setup-xcode
-
       - name: Run Test
         shell: bash
+        if: always()
         run: bash ./scripts/securityTest_eMudhraCA.sh
 
 
@@ -108,11 +111,9 @@ jobs:
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
 
-      - name: Setup Xcode
-        uses: ./.github/actions/setup-xcode
-
       - name: Run Test
         shell: bash
+        if: always()
         run: bash ./scripts/securityTest_eMudhraCA.sh
 
   windows:
@@ -137,9 +138,11 @@ jobs:
 
       - name: Run Test
         shell: bash
+        if: always()
         run: bash ./scripts/securityTest_eMudhraCA.sh
 
       - uses: ./.github/actions/docker-skiko-run
+        if: always()
         name: 'windows-amd64 docker'
         timeout-minutes: 25
         with:
