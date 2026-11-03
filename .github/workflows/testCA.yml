@@ -1,0 +1,149 @@
+name: Certificate Tests
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - igor.demin/eMudhra-fix-test
+
+jobs:
+  ubuntu-24.04:
+    runs-on: ubuntu-24.04
+    name: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Run Test
+        shell: bash
+        run: bash ./scripts/securityTest_eMudhraCA.sh
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'linux-amd64 docker'
+        with:
+          image_name: linux-amd64
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'linux-compat docker'
+        timeout-minutes: 25
+        with:
+          image_name: linux-compat
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'linux-emscripten-amd64 docker'
+        with:
+          image_name: linux-emscripten-amd64
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'linux-android-amd64 docker'
+        with:
+          image_name: linux-android-amd64
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
+
+  ubuntu-24.04-arm:
+    runs-on: ubuntu-24.04-arm
+    name: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Run Test
+        shell: bash
+        run: bash ./scripts/securityTest_eMudhraCA.sh
+
+  macos-15:
+    runs-on: macos-15
+    name: macos-15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+
+      - name: Setup Xcode
+        uses: ./.github/actions/setup-xcode
+
+      - name: Run Test
+        shell: bash
+        run: bash ./scripts/securityTest_eMudhraCA.sh
+
+
+  macos-latest:
+    runs-on: macos-latest
+    name: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+
+      - name: Setup Xcode
+        uses: ./.github/actions/setup-xcode
+
+      - name: Run Test
+        shell: bash
+        run: bash ./scripts/securityTest_eMudhraCA.sh
+
+  windows:
+    runs-on: windows-2022
+    name: 'Windows'
+    steps:
+      - uses: actions/checkout@v4
+        name: 'Check out code'
+
+      - uses: microsoft/setup-msbuild@v1
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - name: Run Test
+        shell: bash
+        run: bash ./scripts/securityTest_eMudhraCA.sh
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'windows-amd64 docker'
+        timeout-minutes: 25
+        with:
+          image_name: windows-amd64
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
