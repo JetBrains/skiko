@@ -141,12 +141,26 @@ jobs:
         if: always()
         run: bash ./scripts/securityTest_eMudhraCA.sh
 
-      - uses: ./.github/actions/docker-skiko-run
+      - name: 'Build Windows Docker image'
+        id: windows_docker_build
         if: always()
-        name: 'windows-amd64 docker'
+        timeout-minutes: 90
+        shell: pwsh
+        working-directory: ./skiko/docker/windows
+        env:
+          DOCKER_BUILDKIT: '0'
+        run: |
+          docker build --memory 2G -t skiko-certificate-test:windows .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: 'Run Windows Docker certificate test'
+        if: always() && steps.windows_docker_build.outcome == 'success'
         timeout-minutes: 25
-        with:
-          image_name: windows-amd64
-          virtual-display: true
-          command: |
-            bash ./scripts/securityTest_eMudhraCA.sh
+        shell: pwsh
+        run: |
+          docker run --rm `
+            --mount "type=bind,source=$env:GITHUB_WORKSPACE,target=C:\workspace" `
+            --workdir C:\workspace `
+            --entrypoint C:\Git\bin\bash.exe `
+            skiko-certificate-test:windows ./scripts/securityTest_eMudhraCA.sh
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
