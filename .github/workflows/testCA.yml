@@ -1,5 +1,4 @@
 name: Certificate Tests
-
 on:
   workflow_dispatch:
   pull_request:
@@ -7,12 +6,9 @@ on:
     branches:
       - igor.demin/eMudhra-fix-test
 
-env:
-  IMAGE_TAG: master # Set to an existing published image tag
-
 jobs:
   ubuntu-2404:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24z04
     name: ubuntu-2404
     steps:
       - uses: actions/checkout@v4
@@ -31,36 +27,42 @@ jobs:
         shell: bash
         run: bash ./scripts/securityTest_eMudhraCA.sh
 
-      - name: Test existing Linux Docker images
+      - uses: ./.github/actions/docker-skiko-run
         if: always()
-        shell: bash
-        run: |
-          failed=0
+        name: 'linux-amd64 docker'
+        with:
+          image_name: linux-amd64
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
 
-          for name in \
-            linux-amd64 \
-            linux-compat \
-            linux-emscripten-amd64 \
-            linux-android-amd64
-          do
-            image="ghcr.io/${GITHUB_REPOSITORY,,}/${name}:${IMAGE_TAG}"
-            echo "::group::${name}"
+      - uses: ./.github/actions/docker-skiko-run
+        if: always()
+        name: 'linux-compat docker'
+        timeout-minutes: 25
+        with:
+          image_name: linux-compat
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
 
-            if docker pull "$image"; then
-              docker run --rm \
-                --mount "type=bind,source=${GITHUB_WORKSPACE},target=/workspace" \
-                --workdir /workspace \
-                "$image" \
-                bash ./scripts/securityTest_eMudhraCA.sh \
-                || failed=1
-            else
-              failed=1
-            fi
+      - uses: ./.github/actions/docker-skiko-run
+        if: always()
+        name: 'linux-emscripten-amd64 docker'
+        with:
+          image_name: linux-emscripten-amd64
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
 
-            echo "::endgroup::"
-          done
-
-          exit "$failed"
+      - uses: ./.github/actions/docker-skiko-run
+        if: always()
+        name: 'linux-android-amd64 docker'
+        with:
+          image_name: linux-android-amd64
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
 
   ubuntu-2404-arm:
     runs-on: ubuntu-24.04-arm
@@ -94,9 +96,10 @@ jobs:
         uses: ./.github/actions/setup-prerequisites
 
       - name: Run Test
-        if: always()
         shell: bash
+        if: always()
         run: bash ./scripts/securityTest_eMudhraCA.sh
+
 
   macos-latest:
     runs-on: macos-latest
@@ -109,13 +112,13 @@ jobs:
         uses: ./.github/actions/setup-prerequisites
 
       - name: Run Test
-        if: always()
         shell: bash
+        if: always()
         run: bash ./scripts/securityTest_eMudhraCA.sh
 
   windows:
     runs-on: windows-2022
-    name: Windows
+    name: 'Windows'
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
@@ -134,24 +137,16 @@ jobs:
         name: 'Setup Prerequisites'
 
       - name: Run Test
-        if: always()
         shell: bash
+        if: always()
         run: bash ./scripts/securityTest_eMudhraCA.sh
 
-      - name: 'windows-amd64 docker'
+      - uses: ./.github/actions/docker-skiko-run
         if: always()
+        name: 'windows-amd64 docker'
         timeout-minutes: 25
-        shell: pwsh
-        run: |
-          $repository = $env:GITHUB_REPOSITORY.ToLowerInvariant()
-          $image = "ghcr.io/${repository}/windows-amd64:$($env:IMAGE_TAG)"
-
-          docker pull $image
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-          docker run --rm `
-            --mount "type=bind,source=$env:GITHUB_WORKSPACE,target=C:\workspace" `
-            --workdir C:\workspace `
-            --entrypoint 'C:\Git\bin\bash.exe' `
-            $image --noprofile --norc -c 'bash ./scripts/securityTest_eMudhraCA.sh'
-          exit $LASTEXITCODE
+        with:
+          image_name: windows-amd64
+          virtual-display: true
+          command: |
+            bash ./scripts/securityTest_eMudhraCA.sh
