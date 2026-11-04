@@ -1,3 +1,4 @@
+FROM node:24.22.1-bookworm-slim AS node
 FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -16,6 +17,11 @@ ENV PATH=$EMSDK_DIR/upstream/emscripten:$PATH
 RUN git clone https://github.com/emscripten-core/emsdk.git $EMSDK_DIR && \
     $EMSDK_DIR/emsdk install $EMSDK_VER && \
     $EMSDK_DIR/emsdk activate $EMSDK_VER
+
+# Use different Node to fix eMudhra certificate issue (https://youtrack.jetbrains.com/issue/CMP-11011)
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+ENV EM_NODE_JS=/usr/local/bin/node
+RUN rm -rf "$EMSDK_DIR/node" && node --version
 
 # Use UTF-8 by default
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
