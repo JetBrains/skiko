@@ -276,12 +276,14 @@ for python_bin in python3 python; do
   fi
 done
 
+# Git Bash may not provide /dev/fd for process substitution.
+# Use a temporary file so the loop still runs in the current shell.
+{ command -v node || true; find /usr/emsdk -type f -name node -executable 2>/dev/null; } | sort -u >"$tmp/nodes"
+
 while IFS= read -r node_bin; do
   startup_check "$node_bin" "$node_bin" --version || continue
   check "$node_bin" "$control" node_check
-done < <(
-  { command -v node || true; find /usr/emsdk -type f -name node -executable 2>/dev/null; } | sort -u
-)
+done <"$tmp/nodes"
 
 # Discover standard installations, JAVA_HOME, and java on PATH.
 {
