@@ -6,8 +6,8 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2022
 # Restore the default Windows shell for correct batch processing.
 SHELL ["cmd", "/S", "/C"]
 
-# Download BuildTools installer: 17.14.44.
-ADD https://download.visualstudio.microsoft.com/download/pr/6bd63d7f-1818-4e03-a552-9feb11496c19/5dc747350fb0589f908915c7b5fa52ec22d22b37ae2e5f4964d83519667498b2/vs_BuildTools.exe C:\Temp\vs_buildtools.exe
+# Download BuildTools installer
+ADD https://aka.ms/vs/17/release/vs_buildtools.exe C:\Temp\vs_buildtools.exe
 
 # Download channel for fixed install.
 ADD https://aka.ms/vs/17/release/channel C:\Temp\VisualStudio.chman
@@ -31,7 +31,7 @@ RUN `
 
 RUN setx /M SKIKO_VSBT_PATH "C:\BuildTools"
 
-ADD https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.5/LLVM-23.1.5-win64.exe C:\Temp\llvm.exe
+ADD https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/LLVM-20.1.7-win64.exe C:\Temp\llvm.exe
 RUN powershell Start-Process -Wait C:\Temp\llvm.exe -ArgumentList /S
 RUN setx /M PATH "C:\Program Files\LLVM\bin;%PATH%"
 
