@@ -7,6 +7,31 @@ on:
       - igor.demin/eMudhra-fix-test
 
 jobs:
+  ubuntu-2404-with-node:
+    runs-on: ubuntu-24.04
+    name: ubuntu-2404
+    steps:
+      - uses: actions/checkout@v4
+        name: 'Check out code'
+
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - uses: actions/setup-node@v4
+        name: 'Setup Node.js'
+        with:
+          node-version: 22
+
+      - name: Run Test
+        shell: bash
+        run: bash ./scripts/securityTest_eMudhraCA.sh
+
   ubuntu-2404:
     runs-on: ubuntu-24.04
     name: ubuntu-2404
