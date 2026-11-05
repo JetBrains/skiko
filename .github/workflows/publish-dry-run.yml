@@ -64,21 +64,26 @@ jobs:
           node-version: 22
 
       - shell: bash
-        name: 'Get Skiko Version'
+        name: 'Compile Web Sample'
         run: |
-          version=$(./gradlew -p skiko --no-daemon -q properties | sed -n 's/^version: //p')
-          test -n "$version"
-          echo "SKIKO_VERSION=$version" >> "$GITHUB_ENV"
+          ./gradlew -p samples/SkiaWebSample --no-daemon --stacktrace \
+            jsBrowserDevelopmentWebpack wasmJsBrowserDevelopmentWebpack
 
       - shell: bash
-        name: 'Compile Web Samples and JS Benchmark'
+        name: 'Compile Multiplatform Web Sample'
         run: |
-          for project in samples/SkiaWebSample samples/SkiaMultiplatformSample; do
-            ./gradlew -p "$project" --no-daemon --stacktrace \
-              -Pskiko.version="$SKIKO_VERSION" jsBrowserDevelopmentWebpack wasmJsBrowserDevelopmentWebpack
-          done
-          ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
-            -Pskiko.version="$SKIKO_VERSION" jsBrowserDevelopmentWebpack
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+            jsBrowserDevelopmentWebpack wasmJsBrowserDevelopmentWebpack
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Compile JS Benchmark'
+        with:
+          image_name: linux-emscripten-amd64
+          command: |
+            ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+              -Pskiko.wasm.enabled=true \
+              -Pskiko.emsdk.dir="\$EMSDK_DIR" \
+              jsBrowserDevelopmentWebpack
 
       - shell: bash
         name: 'Setup Playwright'
@@ -102,7 +107,7 @@ jobs:
           NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
           PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
         run: |
-          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web version="$SKIKO_VERSION"
+          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web version=0.0.0-SNAPSHOT
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Skiko Web Benchmark Reports'
@@ -117,12 +122,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
-
-      - uses: actions/setup-java@v4
-        name: 'Setup JDK 21'
-        with:
-          java-version: '21'
-          distribution: 'corretto'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
@@ -166,15 +165,21 @@ jobs:
             ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
               :runAwt --args=--exit-after-ms=5000
 
-      - shell: bash
-        name: 'Compile Multiplatform Sample and JVM Benchmark'
-        run: |
-          version=$(./gradlew -p skiko --no-daemon -q properties | sed -n 's/^version: //p')
-          test -n "$version"
-          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-            -Pskiko.version="$version" compileKotlinAwt
-          ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
-            -Pskiko.version="$version" -Pskiko.wasm.enabled=false compileKotlinJvm
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Compile Multiplatform JVM Sample'
+        with:
+          image_name: linux-compat
+          command: |
+            ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+              compileKotlinAwt
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Compile JVM Benchmark'
+        with:
+          image_name: linux-compat
+          command: |
+            ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+              -Pskiko.wasm.enabled=false compileKotlinJvm
 
   LinuxArm:
     name: 'Linux arm64 Publish Dry Run'
@@ -258,11 +263,7 @@ jobs:
       - shell: bash
         name: 'Compile Multiplatform Sample Apple Targets'
         run: |
-          version=$(./gradlew -p skiko --no-daemon -q properties | sed -n 's/^version: //p')
-          test -n "$version"
-          echo "SKIKO_VERSION=$version" >> "$GITHUB_ENV"
           ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-            -Pskiko.version="$version" \
             compileKotlinMacosArm64 compileKotlinMacosX64 compileKotlinIosSimulatorArm64 \
             compileKotlinTvosArm64 compileKotlinTvosSimulatorArm64 compileKotlinTvosX64
 
@@ -271,7 +272,7 @@ jobs:
         env:
           GRADLE_USER_HOME: ${{ runner.temp }}/skiko-benchmarks-gradle
         run: |
-          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts macos version="$SKIKO_VERSION"
+          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts macos version=0.0.0-SNAPSHOT
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Skiko macOS Native Benchmark Reports'
