@@ -13,4 +13,12 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("../../dependencies.toml"))
+        }
+    }
+}
+
 rootProject.name = "SkikoExtensionsSample"
