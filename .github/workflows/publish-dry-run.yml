@@ -4,6 +4,35 @@ on:
   workflow_call: # Allow being called by other workflows
 
 jobs:
+  changes:
+    name: 'Detect Sample and Benchmark Changes'
+    runs-on: ubuntu-24.04
+    outputs:
+      compilation: ${{ steps.filter.outputs.compilation }}
+    steps:
+      - uses: actions/checkout@v4
+        name: 'Check out code'
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ github.event.pull_request.base.sha || github.event.before || 'master' }}
+          filters: |
+            compilation:
+              - 'samples/**'
+              - 'benchmarks/**'
+              - 'skiko/**'
+              - 'dependencies.toml'
+              - 'gradle.properties'
+              - 'settings.gradle.kts'
+              - 'gradlew'
+              - 'gradlew.bat'
+              - 'gradle/**'
+              - '.github/actions/**'
+              - '.github/workflows/publish-dry-run.yml'
+              - '.github/workflows/pull-request.yml'
+              - '.github/workflows/post-merge.yml'
+
   Android:
     name: 'Android Publish Dry Run'
     runs-on: ubuntu-24.04
@@ -35,6 +64,7 @@ jobs:
   Web:
     name: 'Web Publish Dry Run'
     runs-on: ubuntu-24.04
+    needs: changes
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
@@ -60,6 +90,7 @@ jobs:
 
       - shell: bash
         name: 'Compile Web Samples and Benchmarks'
+        if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.compilation == 'true'
         run: |
           for project in samples/SkiaWebSample samples/SkiaMultiplatformSample samples/SkikoExtensionsSample benchmarks/SkikoBenchmarks; do
             ./gradlew -p "$project" --no-daemon --stacktrace \
@@ -106,6 +137,7 @@ jobs:
   Linux:
     name: 'Linux x64 Publish Dry Run'
     runs-on: ubuntu-24.04
+    needs: changes
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
@@ -145,6 +177,7 @@ jobs:
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Compile JVM Samples and Benchmarks'
+        if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.compilation == 'true'
         with:
           image_name: linux-compat
           command: |
@@ -190,6 +223,7 @@ jobs:
   macOS:
     name: 'macOS Publish Dry Run'
     runs-on: macos-15
+    needs: changes
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
@@ -247,6 +281,7 @@ jobs:
 
       - shell: bash
         name: 'Compile Multiplatform Sample Apple Targets'
+        if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.compilation == 'true'
         run: |
           ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
             -Pskiko.version=0.0.0-SNAPSHOT \
@@ -256,6 +291,7 @@ jobs:
 
       - shell: bash
         name: 'Compile macOS Benchmarks'
+        if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.compilation == 'true'
         run: |
           ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
             -Pskiko.version=0.0.0-SNAPSHOT -Pskiko.wasm.enabled=false \
