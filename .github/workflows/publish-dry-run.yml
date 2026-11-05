@@ -64,26 +64,28 @@ jobs:
           node-version: 22
 
       - shell: bash
-        name: 'Compile Web Sample'
+        name: 'Check Skia Web Sample'
         run: |
           ./gradlew -p samples/SkiaWebSample --no-daemon --stacktrace \
-            jsBrowserDevelopmentWebpack wasmJsBrowserDevelopmentWebpack
+            :jsBrowserDevelopmentWebpack \
+            :wasmJsBrowserDevelopmentWebpack
 
       - shell: bash
-        name: 'Compile Multiplatform Web Sample'
+        name: 'Check Skia Multiplatform Web Sample'
         run: |
           ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-            jsBrowserDevelopmentWebpack wasmJsBrowserDevelopmentWebpack
+            :jsBrowserDevelopmentWebpack \
+            :wasmJsBrowserDevelopmentWebpack
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Compile JS Benchmark'
+        name: 'Check Skiko JS Benchmarks'
         with:
           image_name: linux-emscripten-amd64
           command: |
             ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
               -Pskiko.wasm.enabled=true \
               -Pskiko.emsdk.dir="\$EMSDK_DIR" \
-              jsBrowserDevelopmentWebpack
+              :jsBrowserDevelopmentWebpack
 
       - shell: bash
         name: 'Setup Playwright'
@@ -166,20 +168,21 @@ jobs:
               :runAwt --args=--exit-after-ms=5000
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Compile Multiplatform JVM Sample'
+        name: 'Check Skia Multiplatform Sample'
         with:
           image_name: linux-compat
           command: |
             ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-              compileKotlinAwt
+              :compileKotlinAwt
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Compile JVM Benchmark'
+        name: 'Check Skiko JVM Benchmarks'
         with:
           image_name: linux-compat
           command: |
             ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
-              -Pskiko.wasm.enabled=false compileKotlinJvm
+              -Pskiko.wasm.enabled=false \
+              :compileKotlinJvm
 
   LinuxArm:
     name: 'Linux arm64 Publish Dry Run'
@@ -261,11 +264,15 @@ jobs:
             :linkDebugExecutableIosX64
 
       - shell: bash
-        name: 'Compile Multiplatform Sample Apple Targets'
+        name: 'Check Skia Multiplatform Apple Native Sample'
         run: |
           ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-            compileKotlinMacosArm64 compileKotlinMacosX64 compileKotlinIosSimulatorArm64 \
-            compileKotlinTvosArm64 compileKotlinTvosSimulatorArm64 compileKotlinTvosX64
+            :compileKotlinMacosArm64 \
+            :compileKotlinMacosX64 \
+            :compileKotlinIosSimulatorArm64 \
+            :compileKotlinTvosArm64 \
+            :compileKotlinTvosSimulatorArm64 \
+            :compileKotlinTvosX64
 
       - shell: bash
         name: 'Run Skiko macOS Native Benchmarks'
