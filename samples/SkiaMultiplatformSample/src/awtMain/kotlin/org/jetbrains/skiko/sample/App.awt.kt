@@ -4,9 +4,11 @@ import org.jetbrains.skiko.*
 import org.jetbrains.skiko.windows.*
 import java.awt.Dimension
 import javax.swing.*
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     val skiaLayer = SkiaLayer()
+    val exitAfterMillis = exitAfterMillis(args)
     parseArgs(args)
     val app = run {
         //EmojiStory()
@@ -23,6 +25,15 @@ fun main(args: Array<String>) {
         window.pack()
         window.isVisible = true
         createWindowsJumpList()
+        if (exitAfterMillis != null) {
+            Timer(exitAfterMillis) {
+                window.dispose()
+                exitProcess(0)
+            }.apply {
+                isRepeats = false
+                start()
+            }
+        }
     }
 }
 
@@ -85,7 +96,7 @@ private fun parseArgs(args: Array<String>) {
         when (arg) {
             "--user-task-1" -> println("User Task 1 in the Jump List was clicked!")
             "path\\to\\recent\\item\\1" -> println("Recent Item 1 in the Jump List was clicked!")
-            else -> println("Unknown argument: ($arg)")
+            else -> if (!arg.startsWith("--exit-after-ms=")) println("Unknown argument: ($arg)")
         }
     }
 }

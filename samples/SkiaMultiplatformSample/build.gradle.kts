@@ -287,7 +287,9 @@ if (hostOs == "macos") {
         argumentProviders.add {
             val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
             println("Run $out")
-            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+            val executable = out.single { it.name.endsWith(".kexe") }.absolutePath
+            val exitArg = providers.gradleProperty("sample.exitAfterMs").orNull?.let { "--exit-after-ms=$it" }
+            listOf(listOfNotNull(executable, exitArg).joinToString(" ") { "'${it.replace("'", "'\\''")}'" })
         }
     }
 }

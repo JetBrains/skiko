@@ -179,9 +179,10 @@ jobs:
         name: 'Check Skia Multiplatform Sample'
         with:
           image_name: linux-compat
+          virtual-display: true
           command: |
             ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-              :compileKotlinAwt
+              :runAwt --args=--exit-after-ms=5000
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Check Skiko JVM Benchmarks'
@@ -260,6 +261,12 @@ jobs:
             :runAwt --args=--exit-after-ms=5000
 
       - shell: bash
+        name: 'Check Skia Multiplatform Sample'
+        run: |
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+            :runAwt --args=--exit-after-ms=5000
+
+      - shell: bash
         name: 'Check Skiko Extensions Apple Native Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
@@ -275,12 +282,14 @@ jobs:
         name: 'Check Skia Multiplatform Apple Native Sample'
         run: |
           ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-            :compileKotlinMacosArm64 \
-            :compileKotlinMacosX64 \
-            :compileKotlinIosSimulatorArm64 \
-            :compileKotlinTvosArm64 \
-            :compileKotlinTvosSimulatorArm64 \
-            :compileKotlinTvosX64
+            -Psample.exitAfterMs=5000 \
+            :runNative \
+            :linkDebugExecutableMacosArm64 \
+            :linkDebugExecutableMacosX64 \
+            :linkDebugExecutableIosSimulatorArm64 \
+            :linkDebugExecutableTvosArm64 \
+            :linkDebugExecutableTvosSimulatorArm64 \
+            :linkDebugExecutableTvosX64
 
       - shell: bash
         name: 'Run Skiko macOS Native Benchmarks'
@@ -344,4 +353,10 @@ jobs:
         name: 'Check Skiko Extensions Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+            :runAwt --args=--exit-after-ms=5000
+
+      - shell: bash
+        name: 'Check Skia Multiplatform Sample'
+        run: |
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
