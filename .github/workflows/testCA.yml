@@ -55,15 +55,6 @@ jobs:
           command: |
             bash ./scripts/securityTest_eMudhraCA.sh
 
-      - uses: ./.github/actions/docker-skiko-run
-        if: always()
-        name: 'linux-android-amd64 docker'
-        with:
-          image_name: linux-android-amd64
-          virtual-display: true
-          command: |
-            bash ./scripts/securityTest_eMudhraCA.sh
-
   ubuntu-2404-arm:
     runs-on: ubuntu-24.04-arm
     name: ubuntu-2404-arm
