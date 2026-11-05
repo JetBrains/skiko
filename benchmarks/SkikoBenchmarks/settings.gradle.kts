@@ -16,11 +16,11 @@ pluginManagement {
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            from(files("../../dependencies.toml"))
             val skikoVersion = providers.gradleProperty("skiko.version").orNull
                 ?: "unspecified"
 
             version("skiko", skikoVersion)
+            version("kotlinxBrowser", "0.5.0")
 
             library("skiko", "org.jetbrains.skiko", "skiko").versionRef("skiko")
             library("skiko-js-wasm-runtime", "org.jetbrains.skiko", "skiko-js-wasm-runtime").versionRef("skiko")

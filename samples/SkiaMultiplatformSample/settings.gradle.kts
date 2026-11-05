@@ -20,7 +20,6 @@ pluginManagement {
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            from(files("../../dependencies.toml"))
             version("skiko", providers.gradleProperty("skiko.version").get())
             library("skiko", "org.jetbrains.skiko", "skiko").versionRef("skiko")
 
