@@ -40,7 +40,6 @@ benchmarks/SkikoBenchmarks/build/benchmarks/archive/web/<skiko-version>_run1/ski
 
 Use any resolvable Skiko Maven version. The version is required; the benchmark
 project intentionally has no default Skiko artifact version.
-Add `js=true` to also run the JavaScript benchmark; its results are archived under `web-js`.
 
 You can also run the Gradle convenience task:
 

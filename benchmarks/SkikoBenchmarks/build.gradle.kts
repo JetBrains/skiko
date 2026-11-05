@@ -192,19 +192,16 @@ gradle.taskGraph.whenReady {
         .toBoolean()
 
     if (isWebTargetEnabled) {
-        val args = appArgs
-            .mapIndexed { index, arg -> "arg$index=${arg.replace(" ", "%20")}" }
-            .joinToString("&")
-        val url = if (args.isBlank()) {
-            "http://localhost:8080"
-        } else {
-            "http://localhost:8080?$args"
-        }
-
-        tasks.named<KotlinWebpack>("jsBrowserProductionRun") {
-            devServerProperty = devServerProperty.get().copy(open = if (openBrowser) url else false)
-        }
         tasks.named<KotlinWebpack>("wasmJsBrowserProductionRun") {
+            val args = appArgs
+                .mapIndexed { index, arg -> "arg$index=${arg.replace(" ", "%20")}" }
+                .joinToString("&")
+            val url = if (args.isBlank()) {
+                "http://localhost:8080"
+            } else {
+                "http://localhost:8080?$args"
+            }
+
             devServerProperty = devServerProperty.get().copy(open = if (openBrowser) url else false)
         }
     }
@@ -214,8 +211,6 @@ val Task.requiresSkikoVersion: Boolean
     get() = name in setOf(
         "jvmBenchmark",
         "macosBenchmark",
-        "jsBrowserProductionRun",
-        "jsBrowserDevelopmentRun",
         "wasmJsBrowserProductionRun",
         "wasmJsBrowserDevelopmentRun",
         "runBrowserAndSaveStats",
@@ -227,8 +222,6 @@ val String.referencesSkikoBenchmarkTask: Boolean
         return taskName in setOf(
             "jvmBenchmark",
             "macosBenchmark",
-            "jsBrowserProductionRun",
-            "jsBrowserDevelopmentRun",
             "wasmJsBrowserProductionRun",
             "wasmJsBrowserDevelopmentRun",
             "runBrowserAndSaveStats",

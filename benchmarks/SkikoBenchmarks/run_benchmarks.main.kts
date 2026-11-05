@@ -35,11 +35,10 @@ val gradlew = repoRoot.resolve("gradlew")
 
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
-        println("Usage: ./run_benchmarks.main.kts <platform> version=<version> [runs=1] [js=true] [benchmarks=<name1,name2,...>] [modes=SIMPLE|STARTUP] [any other gradle args]")
+        println("Usage: ./run_benchmarks.main.kts <platform> version=<version> [runs=1] [benchmarks=<name1,name2,...>] [modes=SIMPLE|STARTUP] [any other gradle args]")
         println("Platforms: ${Platform.entries.joinToString { it.platformName }}")
         println("Arguments:")
         println("  runs=<number> (default: 1)")
-        println("  js=true (also run the JavaScript web benchmark)")
         println("  version=<skiko-version> (required)")
         println("  benchmarks=<name1,name2,...>")
         println("  modes=SIMPLE,STARTUP (default: SIMPLE)")
@@ -54,7 +53,6 @@ fun main(args: Array<String>) {
     }.toMutableMap()
 
     val runs = argMap.remove("runs")?.toIntOrNull() ?: 1
-    val runJs = argMap.remove("js") == "true"
     val version = argMap.remove("version")
         ?.takeIf { it.isNotBlank() }
         ?: throw IllegalArgumentException("Missing required argument: version=<skiko-version>")
@@ -82,11 +80,6 @@ fun main(args: Array<String>) {
         cleanJsonReports()
         executeBenchmarks(version, runNumber, platform, argMap)
         collectResults(platform.platformName, version, runNumber)
-        if (platform == Platform.WEB && runJs) {
-            cleanJsonReports()
-            executeBenchmarks(version, runNumber, platform, argMap, webJs = true)
-            collectResults("web-js", version, runNumber)
-        }
     }
 }
 
@@ -94,8 +87,7 @@ fun executeBenchmarks(
     version: String,
     runIndex: Int,
     platform: Platform,
-    extraArgs: Map<String, String>,
-    webJs: Boolean = false
+    extraArgs: Map<String, String>
 ) {
     val gradleArgs = gradleArgsFor(version, extraArgs, platform)
     val runArgs = mutableListOf(
@@ -130,7 +122,7 @@ fun executeBenchmarks(
                 val browserUrl = browserUrlFor(runArgs)
                 val browserIsOpenedByPlaywright = canOpenWithPlaywright()
                 executeGradleBenchmark(
-                    task = if (webJs) "jsBrowserProductionRun" else "wasmJsBrowserProductionRun",
+                    task = "wasmJsBrowserProductionRun",
                     runArgs = runArgs,
                     isServerStopped = benchmarkServer::isStopped,
                     extraGradleArgs = gradleArgs + "-Pskiko.benchmark.openBrowser=${!browserIsOpenedByPlaywright}",
