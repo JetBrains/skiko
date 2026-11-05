@@ -64,30 +64,6 @@ jobs:
           node-version: 22
 
       - shell: bash
-        name: 'Check Skia Web Sample'
-        run: |
-          ./gradlew -p samples/SkiaWebSample --no-daemon --stacktrace \
-            :jsBrowserDevelopmentWebpack \
-            :wasmJsBrowserDevelopmentWebpack
-
-      - shell: bash
-        name: 'Check Skia Multiplatform Web Sample'
-        run: |
-          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-            :jsBrowserDevelopmentWebpack \
-            :wasmJsBrowserDevelopmentWebpack
-
-      - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Skiko JS Benchmarks'
-        with:
-          image_name: linux-emscripten-amd64
-          command: |
-            ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
-              -Pskiko.wasm.enabled=true \
-              -Pskiko.emsdk.dir="\$EMSDK_DIR" \
-              :jsBrowserDevelopmentWebpack
-
-      - shell: bash
         name: 'Setup Playwright'
         run: |
           npm install --prefix "${RUNNER_TEMP}/skiko-playwright" @playwright/test@1.56.1
@@ -101,6 +77,38 @@ jobs:
           PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
         run: |
           bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
+
+      - shell: bash
+        name: 'Check Skia Web Sample'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skia-web-gradle
+          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
+          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+          SAMPLE_DIR: ${{ github.workspace }}/samples/SkiaWebSample
+          SAMPLE_READY_SELECTOR: '#description:not(:empty)'
+        run: |
+          bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
+
+      - shell: bash
+        name: 'Check Skia Multiplatform Web Sample'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skia-multiplatform-gradle
+          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
+          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+          SAMPLE_DIR: ${{ github.workspace }}/samples/SkiaMultiplatformSample
+          SAMPLE_READY_SELECTOR: "#SkikoTarget[tabindex='0']"
+        run: |
+          bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Check Skiko JS Benchmarks'
+        with:
+          image_name: linux-emscripten-amd64
+          command: |
+            ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+              -Pskiko.wasm.enabled=true \
+              -Pskiko.emsdk.dir="\$EMSDK_DIR" \
+              :jsBrowserDevelopmentWebpack
 
       - shell: bash
         name: 'Run Skiko Web Benchmarks'
