@@ -23,15 +23,6 @@ jobs:
               -Pskiko.android.enabled=true \
               publishToMavenLocal
 
-      - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Android Sample'
-        with:
-          image_name: linux-compat
-          working_directory: samples/SkiaAndroidSample
-          command: |
-            ./gradlew --no-daemon --stacktrace \
-              packageRelease
-
   Web:
     name: 'Web Publish Dry Run'
     runs-on: ubuntu-24.04
@@ -57,42 +48,6 @@ jobs:
               -Pskiko.wasm.enabled=true \
               -Pskiko.emsdk.dir="\$EMSDK_DIR" \
               publishToMavenLocal
-
-      - uses: actions/setup-node@v4
-        name: 'Setup Node.js'
-        with:
-          node-version: 22
-
-      - shell: bash
-        name: 'Setup Playwright'
-        run: |
-          npm install --prefix "${RUNNER_TEMP}/skiko-playwright" @playwright/test@1.56.1
-          "${RUNNER_TEMP}/skiko-playwright/node_modules/.bin/playwright" install --with-deps chromium
-
-      - shell: bash
-        name: 'Check Skiko Extensions Web Sample'
-        env:
-          GRADLE_USER_HOME: ${{ runner.temp }}/skiko-extensions-gradle
-          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
-          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
-        run: |
-          bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
-
-      - shell: bash
-        name: 'Run Skiko Web Benchmarks'
-        env:
-          GRADLE_USER_HOME: ${{ runner.temp }}/skiko-benchmarks-gradle
-          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
-          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
-        run: |
-          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web version=0.0.0-SNAPSHOT
-
-      - uses: actions/upload-artifact@v4
-        name: 'Upload Skiko Web Benchmark Reports'
-        if: always()
-        with:
-          name: skiko-web-benchmark-reports
-          path: benchmarks/SkikoBenchmarks/build/benchmarks/archive
 
   Linux:
     name: 'Linux x64 Publish Dry Run'
@@ -125,23 +80,6 @@ jobs:
               -Pskiko.awt.enabled=false \
               publishLinuxArm64PublicationToMavenLocal \
               publishLinuxX64PublicationToMavenLocal
-
-      - uses: ./.github/actions/docker-skiko-run
-        name: 'Check AWT Sample'
-        with:
-          image_name: linux-compat
-          command: |
-            ./gradlew --no-daemon --stacktrace \
-              :SkiaAwtSample:installDist
-
-      - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Skiko Extensions Sample'
-        with:
-          image_name: linux-compat
-          virtual-display: true
-          command: |
-            ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
-              :runAwt --args=--exit-after-ms=5000
 
   LinuxArm:
     name: 'Linux arm64 Publish Dry Run'
@@ -198,44 +136,6 @@ jobs:
             -Pskiko.arch=x64 \
             publishSkikoJvmRuntimeMacosX64PublicationToMavenLocal
 
-      - shell: bash
-        name: 'Check AWT Sample'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            :SkiaAwtSample:installDist
-
-      - shell: bash
-        name: 'Check Skiko Extensions Sample'
-        run: |
-          ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
-            :runAwt --args=--exit-after-ms=5000
-
-      - shell: bash
-        name: 'Check Skiko Extensions Apple Native Sample'
-        run: |
-          ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
-            -Psample.exitAfterMs=5000 \
-            :runNative \
-            :linkDebugExecutableMacosArm64 \
-            :linkDebugExecutableMacosX64 \
-            :linkDebugExecutableIosArm64 \
-            :linkDebugExecutableIosSimulatorArm64 \
-            :linkDebugExecutableIosX64
-
-      - shell: bash
-        name: 'Run Skiko macOS Native Benchmarks'
-        env:
-          GRADLE_USER_HOME: ${{ runner.temp }}/skiko-benchmarks-gradle
-        run: |
-          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts macos version=0.0.0-SNAPSHOT
-
-      - uses: actions/upload-artifact@v4
-        name: 'Upload Skiko macOS Native Benchmark Reports'
-        if: always()
-        with:
-          name: skiko-macos-native-benchmark-reports
-          path: benchmarks/SkikoBenchmarks/build/benchmarks/archive
-
   Windows:
     name: 'Windows Publish Dry Run'
     runs-on: windows-2022
@@ -273,15 +173,3 @@ jobs:
             -Pskiko.awt.enabled=true \
             -Pskiko.arch=arm64 \
             publishSkikoJvmRuntimeWindowsArm64PublicationToMavenLocal
-
-      - shell: bash
-        name: 'Check AWT Sample'
-        run: |
-          ./gradlew --no-daemon --stacktrace \
-            :SkiaAwtSample:installDist
-
-      - shell: bash
-        name: 'Check Skiko Extensions Sample'
-        run: |
-          ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
-            :runAwt --args=--exit-after-ms=5000

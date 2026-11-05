@@ -1,17 +1,139 @@
-name: Compile Benchmarks
+name: Benchmarks
 
 on:
-  workflow_dispatch:
-  pull_request:
-    paths:
-      - 'benchmarks/**'
-  push:
-    branches: [master, 'release/*']
-    paths:
-      - 'benchmarks/**'
+  workflow_call:
 
 jobs:
-  compile:
-    uses: ./.github/workflows/compile-examples.yml
-    with:
-      project: benchmarks
+  web:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        name: 'Check out code'
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+      - shell: bash
+        name: 'Get Skiko Version'
+        run: |
+          version=$(./gradlew -p skiko --no-daemon -q properties | sed -n 's/^version: //p')
+          test -n "$version"
+          echo "SKIKO_VERSION=$version" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Publish Skiko to Maven Local'
+        with:
+          image_name: linux-emscripten-amd64
+          command: |
+            ./gradlew -p skiko --no-daemon --stacktrace \
+              -Pskiko.wasm.enabled=true -Pskiko.emsdk.dir="\$EMSDK_DIR" \
+              publishToMavenLocal
+      - shell: bash
+        name: 'Compile Web Benchmarks'
+        run: |
+          ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+            -Pskiko.version="$SKIKO_VERSION" compileKotlinJs compileKotlinWasmJs
+      - uses: actions/setup-node@v4
+        name: 'Setup Node.js'
+        with:
+          node-version: 22
+
+      - shell: bash
+        name: 'Setup Playwright'
+        run: |
+          npm install --prefix "${RUNNER_TEMP}/skiko-playwright" @playwright/test@1.56.1
+          "${RUNNER_TEMP}/skiko-playwright/node_modules/.bin/playwright" install --with-deps chromium
+      - shell: bash
+        name: 'Run Skiko Web Benchmarks'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skiko-benchmarks-gradle
+          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
+          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+        run: ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web version="$SKIKO_VERSION"
+
+      - uses: actions/upload-artifact@v4
+        name: 'Upload Skiko Web Benchmark Reports'
+        if: always()
+        with:
+          name: skiko-web-benchmark-reports
+          path: benchmarks/SkikoBenchmarks/build/benchmarks/archive
+
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        name: 'Check out code'
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+      - shell: bash
+        name: 'Get Skiko Version'
+        run: |
+          version=$(./gradlew -p skiko --no-daemon -q properties | sed -n 's/^version: //p')
+          test -n "$version"
+          echo "SKIKO_VERSION=$version" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Publish Skiko to Maven Local'
+        with:
+          image_name: linux-compat
+          command: |
+            ./gradlew -p skiko --no-daemon --stacktrace \
+              -Pskiko.awt.enabled=true \
+              publishToMavenLocal
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Compile JVM Benchmarks'
+        with:
+          image_name: linux-compat
+          command: |
+            ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+              -Pskiko.version=${{ env.SKIKO_VERSION }} -Pskiko.wasm.enabled=false \
+              compileKotlinJvm compileBenchmarkServerKotlinJvm
+
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        name: 'Check out code'
+      - uses: actions/setup-java@v4
+        name: 'Setup JDK 21'
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+      - uses: ./.github/actions/setup-prerequisites
+        name: 'Setup Prerequisites'
+      - shell: bash
+        name: 'Get Skiko Version'
+        run: |
+          version=$(./gradlew -p skiko --no-daemon -q properties | sed -n 's/^version: //p')
+          test -n "$version"
+          echo "SKIKO_VERSION=$version" >> "$GITHUB_ENV"
+      - shell: bash
+        name: 'Publish Skiko to Maven Local'
+        run: |
+          ./gradlew -p skiko --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true -Pskiko.awt.enabled=true -Pskiko.arch=arm64 \
+            publishToMavenLocal
+      - shell: bash
+        name: 'Compile macOS Benchmarks'
+        run: |
+          ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+            -Pskiko.version="$SKIKO_VERSION" -Pskiko.wasm.enabled=false compileKotlinMacosArm64
+
+      - shell: bash
+        name: 'Run Skiko macOS Native Benchmarks'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skiko-benchmarks-gradle
+        run: ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts macos version="$SKIKO_VERSION"
+
+      - uses: actions/upload-artifact@v4
+        name: 'Upload Skiko macOS Native Benchmark Reports'
+        if: always()
+        with:
+          name: skiko-macos-native-benchmark-reports
+          path: benchmarks/SkikoBenchmarks/build/benchmarks/archive

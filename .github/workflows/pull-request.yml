@@ -22,6 +22,14 @@ jobs:
     name: 'Skiko Publish (Dry Run)'
     uses: ./.github/workflows/publish-dry-run.yml
 
+  samples:
+    name: 'Samples'
+    uses: ./.github/workflows/samples.yml
+
+  benchmarks:
+    name: 'Benchmarks'
+    uses: ./.github/workflows/benchmarks.yml
+
   docs-publish:
     name: 'Documentation Publish (Dry Run)'
     uses: ./.github/workflows/docs.yml
