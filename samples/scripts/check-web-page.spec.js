@@ -43,7 +43,7 @@ test("Skiko sample starts in browser", async ({ page }) => {
   expect(response, "No navigation response").not.toBeNull();
   expect(response.ok(), `Page returned HTTP ${response.status()}`).toBeTruthy();
 
-  await page.waitForSelector(process.env.SAMPLE_READY_SELECTOR || "#SkikoTarget[data-skiko-ready='true']");
+  await page.waitForSelector("[data-skiko-ready='true']");
   await page.waitForTimeout(500);
 
   expect(failures, `Runtime failures detected:\n${failures.join("\n\n")}`).toEqual([]);

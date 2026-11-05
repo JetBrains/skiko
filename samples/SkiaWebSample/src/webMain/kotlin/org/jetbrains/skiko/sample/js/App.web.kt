@@ -57,4 +57,5 @@ internal fun runApp() {
         skiaLayer.attachTo(canvas)
         skiaLayer.needRedraw()
     }
+    document.getElementById("c1")?.setAttribute("data-skiko-ready", "true")
 }

@@ -93,10 +93,11 @@ private fun createWindowsJumpList() {
 // passed to the JumpListItem's constructor
 private fun parseArgs(args: Array<String>) {
     for(arg in args) {
-        when (arg) {
-            "--user-task-1" -> println("User Task 1 in the Jump List was clicked!")
-            "path\\to\\recent\\item\\1" -> println("Recent Item 1 in the Jump List was clicked!")
-            else -> if (!arg.startsWith("--exit-after-ms=")) println("Unknown argument: ($arg)")
+        when {
+            arg.startsWith("--exit-after-ms=") -> Unit
+            arg == "--user-task-1" -> println("User Task 1 in the Jump List was clicked!")
+            arg == "path\\to\\recent\\item\\1" -> println("Recent Item 1 in the Jump List was clicked!")
+            else -> println("Unknown argument: ($arg)")
         }
     }
 }

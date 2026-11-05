@@ -75,8 +75,9 @@ jobs:
           GRADLE_USER_HOME: ${{ runner.temp }}/skiko-extensions-gradle
           NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
           PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+          SAMPLE_DIR: ${{ github.workspace }}/samples/SkikoExtensionsSample
         run: |
-          bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
+          bash samples/scripts/check-web-sample.sh
 
       - shell: bash
         name: 'Check Skia Web Sample'
@@ -85,9 +86,8 @@ jobs:
           NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
           PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
           SAMPLE_DIR: ${{ github.workspace }}/samples/SkiaWebSample
-          SAMPLE_READY_SELECTOR: '#description:not(:empty)'
         run: |
-          bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
+          bash samples/scripts/check-web-sample.sh
 
       - shell: bash
         name: 'Check Skia Multiplatform Web Sample'
@@ -96,19 +96,8 @@ jobs:
           NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
           PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
           SAMPLE_DIR: ${{ github.workspace }}/samples/SkiaMultiplatformSample
-          SAMPLE_READY_SELECTOR: "#SkikoTarget[tabindex='0']"
         run: |
-          bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
-
-      - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Skiko JS Benchmarks'
-        with:
-          image_name: linux-emscripten-amd64
-          command: |
-            ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
-              -Pskiko.wasm.enabled=true \
-              -Pskiko.emsdk.dir="\$EMSDK_DIR" \
-              :jsBrowserDevelopmentWebpack
+          bash samples/scripts/check-web-sample.sh
 
       - shell: bash
         name: 'Run Skiko Web Benchmarks'
@@ -117,7 +106,7 @@ jobs:
           NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
           PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
         run: |
-          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web version=0.0.0-SNAPSHOT
+          ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web version=0.0.0-SNAPSHOT js=true
 
       - uses: actions/upload-artifact@v4
         name: 'Upload Skiko Web Benchmark Reports'
@@ -185,13 +174,15 @@ jobs:
               :runAwt --args=--exit-after-ms=5000
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Skiko JVM Benchmarks'
+        name: 'Run Skiko JVM Benchmarks'
         with:
           image_name: linux-compat
+          virtual-display: true
           command: |
             ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+              -Pskiko.composite.build=1 \
               -Pskiko.wasm.enabled=false \
-              :compileKotlinJvm
+              :jvmBenchmark
 
   LinuxArm:
     name: 'Linux arm64 Publish Dry Run'
