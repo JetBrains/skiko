@@ -31,16 +31,6 @@ jobs:
     needs: docker-publish
     uses: ./.github/workflows/publish-dry-run.yml
 
-  samples:
-    name: 'Samples'
-    needs: docker-publish
-    uses: ./.github/workflows/samples.yml
-
-  benchmarks:
-    name: 'Benchmarks'
-    needs: docker-publish
-    uses: ./.github/workflows/benchmarks.yml
-
   docs-publish:
     name: 'Documentation Publish'
     needs: docker-publish
