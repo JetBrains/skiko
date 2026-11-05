@@ -4,35 +4,6 @@ on:
   workflow_call: # Allow being called by other workflows
 
 jobs:
-  changes:
-    name: 'Detect Sample and Benchmark Changes'
-    runs-on: ubuntu-24.04
-    outputs:
-      compilation: ${{ steps.filter.outputs.compilation }}
-    steps:
-      - uses: actions/checkout@v4
-        name: 'Check out code'
-
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          base: ${{ github.event.pull_request.base.sha || github.event.before || 'master' }}
-          filters: |
-            compilation:
-              - 'samples/**'
-              - 'benchmarks/**'
-              - 'skiko/**'
-              - 'dependencies.toml'
-              - 'gradle.properties'
-              - 'settings.gradle.kts'
-              - 'gradlew'
-              - 'gradlew.bat'
-              - 'gradle/**'
-              - '.github/actions/**'
-              - '.github/workflows/publish-dry-run.yml'
-              - '.github/workflows/pull-request.yml'
-              - '.github/workflows/post-merge.yml'
-
   Android:
     name: 'Android Publish Dry Run'
     runs-on: ubuntu-24.04
@@ -64,7 +35,6 @@ jobs:
   Web:
     name: 'Web Publish Dry Run'
     runs-on: ubuntu-24.04
-    needs: changes
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
@@ -87,16 +57,6 @@ jobs:
               -Pskiko.wasm.enabled=true \
               -Pskiko.emsdk.dir="\$EMSDK_DIR" \
               publishToMavenLocal
-
-      - shell: bash
-        name: 'Compile Web Samples and Benchmarks'
-        if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.compilation == 'true'
-        run: |
-          for project in samples/SkiaWebSample samples/SkiaMultiplatformSample samples/SkikoExtensionsSample benchmarks/SkikoBenchmarks; do
-            ./gradlew -p "$project" --no-daemon --stacktrace \
-              -Pskiko.version=0.0.0-SNAPSHOT \
-              compileKotlinJs compileKotlinWasmJs
-          done
 
       - uses: actions/setup-node@v4
         name: 'Setup Node.js'
@@ -137,7 +97,6 @@ jobs:
   Linux:
     name: 'Linux x64 Publish Dry Run'
     runs-on: ubuntu-24.04
-    needs: changes
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
@@ -176,21 +135,6 @@ jobs:
               :SkiaAwtSample:installDist
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Compile JVM Samples and Benchmarks'
-        if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.compilation == 'true'
-        with:
-          image_name: linux-compat
-          command: |
-            set -e
-            ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-              -Pskiko.version=0.0.0-SNAPSHOT compileKotlinAwt
-            ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
-              -Pskiko.version=0.0.0-SNAPSHOT compileKotlinAwt
-            ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
-              -Pskiko.version=0.0.0-SNAPSHOT -Pskiko.wasm.enabled=false \
-              compileKotlinJvm compileBenchmarkServerKotlinJvm
-
-      - uses: ./.github/actions/docker-skiko-run
         name: 'Check Skiko Extensions Sample'
         with:
           image_name: linux-compat
@@ -223,7 +167,6 @@ jobs:
   macOS:
     name: 'macOS Publish Dry Run'
     runs-on: macos-15
-    needs: changes
     steps:
       - uses: actions/checkout@v4
         name: 'Check out code'
@@ -278,24 +221,6 @@ jobs:
             :linkDebugExecutableIosArm64 \
             :linkDebugExecutableIosSimulatorArm64 \
             :linkDebugExecutableIosX64
-
-      - shell: bash
-        name: 'Compile Multiplatform Sample Apple Targets'
-        if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.compilation == 'true'
-        run: |
-          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
-            -Pskiko.version=0.0.0-SNAPSHOT \
-            compileKotlinMacosArm64 compileKotlinMacosX64 \
-            compileKotlinIosSimulatorArm64 \
-            compileKotlinTvosArm64 compileKotlinTvosSimulatorArm64 compileKotlinTvosX64
-
-      - shell: bash
-        name: 'Compile macOS Benchmarks'
-        if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.compilation == 'true'
-        run: |
-          ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
-            -Pskiko.version=0.0.0-SNAPSHOT -Pskiko.wasm.enabled=false \
-            compileKotlinMacosArm64
 
       - shell: bash
         name: 'Run Skiko macOS Native Benchmarks'

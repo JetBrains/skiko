@@ -1,0 +1,17 @@
+name: Compile Benchmarks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'benchmarks/**'
+  push:
+    branches: [master, 'release/*']
+    paths:
+      - 'benchmarks/**'
+
+jobs:
+  compile:
+    uses: ./.github/workflows/compile-examples.yml
+    with:
+      project: benchmarks

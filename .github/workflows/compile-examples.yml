@@ -1,0 +1,100 @@
+name: Compile Samples and Benchmarks
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        required: true
+        type: string
+
+jobs:
+  web:
+    name: 'Compile JS and Wasm'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-prerequisites
+      - name: 'Build Web Image'
+        run: docker build -t skiko-web skiko/docker/linux-emscripten-amd64
+      - name: 'Publish Skiko and Compile'
+        env:
+          PROJECT: ${{ inputs.project }}
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace \
+            -e PROJECT skiko-web bash -ec '
+              ./gradlew -p skiko --no-daemon --stacktrace \
+                -Pskiko.wasm.enabled=true -Pskiko.emsdk.dir="$EMSDK_DIR" publishToMavenLocal
+              if [ "$PROJECT" = samples ]; then
+                for project in samples/SkiaWebSample samples/SkiaMultiplatformSample samples/SkikoExtensionsSample; do
+                  ./gradlew -p "$project" --no-daemon --stacktrace \
+                    -Pskiko.version=0.0.0-SNAPSHOT compileKotlinJs compileKotlinWasmJs
+                done
+              else
+                ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+                  -Pskiko.version=0.0.0-SNAPSHOT compileKotlinJs compileKotlinWasmJs
+              fi
+            '
+
+  linux:
+    name: 'Compile JVM and Android'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-prerequisites
+      - name: 'Build Linux Image'
+        run: docker build --build-arg TARGETARCH=amd64 -t skiko-linux skiko/docker/linux-compat
+      - name: 'Publish Skiko and Compile'
+        env:
+          PROJECT: ${{ inputs.project }}
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace \
+            -e PROJECT skiko-linux bash -ec '
+              if [ "$PROJECT" = samples ]; then
+                ./gradlew -p skiko --no-daemon --stacktrace \
+                  -Pskiko.android.enabled=true publishToMavenLocal
+                ./gradlew -p samples/SkiaAndroidSample --no-daemon --stacktrace packageRelease
+                ./gradlew -p samples/SkiaAwtSample --no-daemon --stacktrace compileKotlin
+                for project in samples/SkiaMultiplatformSample samples/SkikoExtensionsSample; do
+                  ./gradlew -p "$project" --no-daemon --stacktrace \
+                    -Pskiko.version=0.0.0-SNAPSHOT compileKotlinAwt
+                done
+              else
+                ./gradlew -p skiko --no-daemon --stacktrace publishToMavenLocal
+                ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+                  -Pskiko.version=0.0.0-SNAPSHOT -Pskiko.wasm.enabled=false \
+                  compileKotlinJvm compileBenchmarkServerKotlinJvm
+              fi
+            '
+
+  macos:
+    name: 'Compile Apple Targets'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+      - uses: ./.github/actions/setup-prerequisites
+      - name: 'Publish Skiko'
+        run: |
+          ./gradlew -p skiko --no-daemon --stacktrace \
+            -Pskiko.native.enabled=true -Pskiko.awt.enabled=true \
+            -Pskiko.arch=arm64 publishToMavenLocal
+      - name: 'Compile Apple Targets'
+        env:
+          PROJECT: ${{ inputs.project }}
+        run: |
+          if [ "$PROJECT" = samples ]; then
+            ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+              -Pskiko.version=0.0.0-SNAPSHOT \
+              compileKotlinMacosArm64 compileKotlinMacosX64 compileKotlinIosSimulatorArm64 \
+              compileKotlinTvosArm64 compileKotlinTvosSimulatorArm64 compileKotlinTvosX64
+            ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+              -Pskiko.version=0.0.0-SNAPSHOT \
+              compileKotlinMacosArm64 compileKotlinMacosX64 compileKotlinIosArm64 \
+              compileKotlinIosSimulatorArm64 compileKotlinIosX64
+          else
+            ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+              -Pskiko.version=0.0.0-SNAPSHOT -Pskiko.wasm.enabled=false compileKotlinMacosArm64
+          fi

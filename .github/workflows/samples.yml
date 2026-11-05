@@ -1,0 +1,17 @@
+name: Compile Samples
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'samples/**'
+  push:
+    branches: [master, 'release/*']
+    paths:
+      - 'samples/**'
+
+jobs:
+  compile:
+    uses: ./.github/workflows/compile-examples.yml
+    with:
+      project: samples
