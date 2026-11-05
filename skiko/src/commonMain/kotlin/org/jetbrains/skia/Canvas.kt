@@ -594,24 +594,31 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         samplingMode: SamplingMode,
         paint: Paint?,
         strict: Boolean
-    ): Canvas = nativeCall(bitmap, paint) { bitmap, paint ->
-        _nDrawBitmapRect(
-            _ptr,
-            bitmap._ptr,
-            srcLeft,
-            srcTop,
-            srcRight,
-            srcBottom,
-            dstLeft,
-            dstTop,
-            dstRight,
-            dstBottom,
-            samplingMode._packedInt1(),
-            samplingMode._packedInt2(),
-            paint.pointerOrNullPointer,
-            strict
-        )
-        this
+    ): Canvas {
+        Stats.onNativeCall()
+        try {
+            _nDrawBitmapRect(
+                _ptr,
+                bitmap._ptr,
+                srcLeft,
+                srcTop,
+                srcRight,
+                srcBottom,
+                dstLeft,
+                dstTop,
+                dstRight,
+                dstBottom,
+                samplingMode._packedInt1(),
+                samplingMode._packedInt2(),
+                getPtr(paint),
+                strict
+            )
+        } finally {
+            reachabilityBarrier(bitmap)
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
+        }
+        return this
     }
 
     fun drawImage(image: Image, left: Float, top: Float): Canvas {
