@@ -58,6 +58,15 @@ jobs:
               -Pskiko.emsdk.dir="\$EMSDK_DIR" \
               publishToMavenLocal
 
+      - shell: bash
+        name: 'Compile Web Samples and Benchmarks'
+        run: |
+          for project in samples/SkiaWebSample samples/SkiaMultiplatformSample samples/SkikoExtensionsSample benchmarks/SkikoBenchmarks; do
+            ./gradlew -p "$project" --no-daemon --stacktrace \
+              -Pskiko.version=0.0.0-SNAPSHOT \
+              compileKotlinJs compileKotlinWasmJs
+          done
+
       - uses: actions/setup-node@v4
         name: 'Setup Node.js'
         with:
@@ -133,6 +142,20 @@ jobs:
           command: |
             ./gradlew --no-daemon --stacktrace \
               :SkiaAwtSample:installDist
+
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Compile JVM Samples and Benchmarks'
+        with:
+          image_name: linux-compat
+          command: |
+            set -e
+            ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+              -Pskiko.version=0.0.0-SNAPSHOT compileKotlinAwt
+            ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+              -Pskiko.version=0.0.0-SNAPSHOT compileKotlinAwt
+            ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+              -Pskiko.version=0.0.0-SNAPSHOT -Pskiko.wasm.enabled=false \
+              compileKotlinJvm compileBenchmarkServerKotlinJvm
 
       - uses: ./.github/actions/docker-skiko-run
         name: 'Check Skiko Extensions Sample'
@@ -221,6 +244,22 @@ jobs:
             :linkDebugExecutableIosArm64 \
             :linkDebugExecutableIosSimulatorArm64 \
             :linkDebugExecutableIosX64
+
+      - shell: bash
+        name: 'Compile Multiplatform Sample Apple Targets'
+        run: |
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+            -Pskiko.version=0.0.0-SNAPSHOT \
+            compileKotlinMacosArm64 compileKotlinMacosX64 \
+            compileKotlinIosSimulatorArm64 \
+            compileKotlinTvosArm64 compileKotlinTvosSimulatorArm64 compileKotlinTvosX64
+
+      - shell: bash
+        name: 'Compile macOS Benchmarks'
+        run: |
+          ./gradlew -p benchmarks/SkikoBenchmarks --no-daemon --stacktrace \
+            -Pskiko.version=0.0.0-SNAPSHOT -Pskiko.wasm.enabled=false \
+            compileKotlinMacosArm64
 
       - shell: bash
         name: 'Run Skiko macOS Native Benchmarks'
