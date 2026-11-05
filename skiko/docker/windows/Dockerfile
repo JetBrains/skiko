@@ -37,12 +37,12 @@ RUN setx /M PATH "C:\Program Files\LLVM\bin;%PATH%"
 
 # Install Java
 COPY install_jdk.ps1 C:\TEMP\install_jdk.ps1
-RUN powershell C:\TEMP\install_jdk.ps1 -url https://aka.ms/download-jdk/microsoft-jdk-21.0.8-windows-x64.zip -targetDir C:\jdk-21
+RUN powershell C:\TEMP\install_jdk.ps1 -url https://aka.ms/download-jdk/microsoft-jdk-21-windows-x64.zip -targetDir C:\jdk-21
 RUN setx /M PATH "C:\jdk-21\bin;%PATH%"
 RUN setx /M JAVA_HOME C:\jdk-21
 
-ENV PYTHON_VERSION=2.7.18
-ENV PYTHON_RELEASE=2.7.18
+ENV PYTHON_VERSION=3.15.2
+ENV PYTHON_RELEASE=3.15.2
 ADD install_python.ps1 C:\TEMP\install_python.ps1
 RUN powershell C:\TEMP\install_python.ps1
 
