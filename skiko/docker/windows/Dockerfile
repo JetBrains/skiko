@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
 # Restore the default Windows shell for correct batch processing.
-SHELL ["cmd", "/S", "/C"]
+SHELL ["cmd", "/S", "/V:ON", "/C"]
 
 # Download BuildTools installer
 ADD https://aka.ms/vs/17/release/vs_buildtools.exe C:\Temp\vs_buildtools.exe
@@ -13,8 +13,22 @@ ADD https://aka.ms/vs/17/release/vs_buildtools.exe C:\Temp\vs_buildtools.exe
 ADD https://aka.ms/vs/17/release/channel C:\Temp\VisualStudio.chman
 
 # Install MSVC C++ compiler, CMake, and MSBuild.
-COPY install_buildtools.ps1 C:\Temp\install_buildtools.ps1
-RUN powershell -NoProfile -ExecutionPolicy Bypass -File C:\Temp\install_buildtools.ps1
+RUN `
+    start /w C:\Temp\vs_buildtools.exe --quiet --wait --norestart --nocache `
+    --installPath "C:\BuildTools" `
+    --channelUri C:\Temp\VisualStudio.chman `
+    --installChannelUri C:\Temp\VisualStudio.chman `
+    --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended `
+    --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+    --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 `
+    --add Microsoft.Component.MSBuild `
+    --remove Microsoft.VisualStudio.Component.Windows10SDK.10240 `
+    --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 `
+    --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 `
+    --remove Microsoft.VisualStudio.Component.Windows81SDK `
+  || (IF !ERRORLEVEL! EQU 3010 (EXIT /B 0) ELSE (EXIT /B !ERRORLEVEL!))
+
+RUN if not exist C:\BuildTools\Common7\Tools\VsDevCmd.bat (echo Build Tools installation is missing & exit /b 1)
 
 RUN setx /M SKIKO_VSBT_PATH "C:\BuildTools"
 
