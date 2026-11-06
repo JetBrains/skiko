@@ -28,19 +28,26 @@ abstract class VulkanMemoryAllocator {
             /**
              * GPU-only memory.
              */
-            val GPU_ONLY = BufferUsage(0)
+            val GPU_ONLY: BufferUsage
+                get() = BufferUsage(0)
+
             /**
              * CPU-written, GPU-read memory.
              */
-            val CPU_WRITES_GPU_READS = BufferUsage(1)
+            val CPU_WRITES_GPU_READS: BufferUsage
+                get() = BufferUsage(1)
+
             /**
              * CPU-to-GPU transfer staging memory.
              */
-            val TRANSFERS_FROM_CPU_TO_GPU = BufferUsage(2)
+            val TRANSFERS_FROM_CPU_TO_GPU: BufferUsage
+                get() = BufferUsage(2)
+
             /**
              * GPU-to-CPU transfer memory.
              */
-            val TRANSFERS_FROM_GPU_TO_CPU = BufferUsage(3)
+            val TRANSFERS_FROM_GPU_TO_CPU: BufferUsage
+                get() = BufferUsage(3)
         }
     }
 
