@@ -1,5 +1,10 @@
 package org.jetbrains.skiko.benchmarks.cases.path
 
+/**
+ * Performs boolean operations (union, intersect, difference) on overlapping paths.
+ * Measures path geometry computation and edge-list processing throughput.
+ */
+
 import org.jetbrains.skia.Path
 import org.jetbrains.skia.PathOp
 import org.jetbrains.skia.RRect

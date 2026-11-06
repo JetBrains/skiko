@@ -1,5 +1,10 @@
 package org.jetbrains.skiko.benchmarks.cases.drawing
 
+/**
+ * Draws a dense grid of small colored rectangles covering the canvas.
+ * Measures basic rect fill throughput and paint color switching overhead.
+ */
+
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PaintMode
 import org.jetbrains.skia.impl.use
