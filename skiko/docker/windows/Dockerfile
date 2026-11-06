@@ -7,7 +7,7 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2022
 SHELL ["cmd", "/S", "/C"]
 
 # Download BuildTools installer
-ADD https://aka.ms/vs/17/release/vs_buildtools.exe C:\Temp\vs_buildtools.exe
+ADD https://aka.ms/vs/install/latest/vs_Setup.exe C:\Temp\vs_Setup.exe
 
 # Download channel for fixed install.
 ADD https://aka.ms/vs/17/release/channel C:\Temp\VisualStudio.chman
@@ -15,8 +15,10 @@ ADD https://aka.ms/vs/17/release/channel C:\Temp\VisualStudio.chman
 # Install MSVC C++ compiler, CMake, and MSBuild.
 RUN `
     # Install Build Tools excluding workloads and components with known issues.
-    start /w C:\Temp\vs_buildtools.exe --quiet --wait --norestart --nocache `
+    start /w C:\Temp\vs_Setup.exe --quiet --wait --norestart --nocache `
     --installPath "C:\BuildTools" `
+    --productId Microsoft.VisualStudio.Product.BuildTools `
+    --channelId VisualStudio.17.Release `
     --channelUri C:\Temp\VisualStudio.chman `
     --installChannelUri C:\Temp\VisualStudio.chman `
     --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended `
@@ -28,6 +30,8 @@ RUN `
     --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 `
     --remove Microsoft.VisualStudio.Component.Windows81SDK `
   || IF "%ERRORLEVEL%"=="3010" EXIT 0
+
+RUN if not exist C:\BuildTools\ (echo Build Tools installation directory is missing & exit /b 1)
 
 RUN setx /M SKIKO_VSBT_PATH "C:\BuildTools"
 
