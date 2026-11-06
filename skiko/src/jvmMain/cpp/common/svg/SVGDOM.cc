@@ -2,6 +2,7 @@
 #include "../interop.hh"
 #include "SkCanvas.h"
 #include "SkData.h"
+#include "SkFontMgr.h"
 #include "SkStream.h"
 #include "SkSVGDOM.h"
 #include "SkSVGSVG.h"
@@ -10,6 +11,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1
   (JNIEnv* env, jclass jclass, jlong dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     SkMemoryStream stream(sk_ref_sp(data));
+    // No font manager: <text> that needs a font is not drawn. Callers that need text use Builder.
     sk_sp<SkSVGDOM> instance = SkSVGDOM::MakeFromStream(stream);
     return reinterpret_cast<jlong>(instance.release());
 }
@@ -40,4 +42,32 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1n
     SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>(static_cast<uintptr_t>(ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     instance->render(canvas);
+}
+
+static void deleteSVGDOMBuilder(SkSVGDOM::Builder* builder) {
+    delete builder;
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nBuilderGetFinalizer
+  (JNIEnv* env, jclass jclass) {
+    return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteSVGDOMBuilder));
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nBuilderMake
+  (JNIEnv* env, jclass jclass) {
+    return reinterpret_cast<jlong>(new SkSVGDOM::Builder());
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nBuilderSetFontManager
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong fontMgrPtr) {
+    SkSVGDOM::Builder* instance = reinterpret_cast<SkSVGDOM::Builder*>(static_cast<uintptr_t>(ptr));
+    instance->setFontManager(sk_ref_sp(reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr))));
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nBuilderBuildFromData
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong dataPtr) {
+    SkSVGDOM::Builder* instance = reinterpret_cast<SkSVGDOM::Builder*>(static_cast<uintptr_t>(ptr));
+    SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
+    SkMemoryStream stream(sk_ref_sp(data));
+    return reinterpret_cast<jlong>(instance->make(stream).release());
 }
