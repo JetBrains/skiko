@@ -99,6 +99,59 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToData
     return reinterpret_cast<KNativePointer>(0);
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToJpegData
+  (KNativePointer ptr, KInt quality, KInt downSample, KInt alphaOption, KNativePointer xmpMetadataPtr, KInt origin) {
+    SkImage* instance = reinterpret_cast<SkImage*>((ptr));
+    if (!instance->isTextureBacked()) {
+      SkJpegEncoder::Options options = SkJpegEncoder::Options();
+      options.fQuality = quality;
+      options.fDownsample = static_cast<SkJpegEncoder::Downsample>(downSample);
+      options.fAlphaOption = static_cast<SkJpegEncoder::AlphaOption>(alphaOption);
+      options.xmpMetadata = reinterpret_cast<SkData*>(xmpMetadataPtr);
+      if (origin != 0) {
+        options.fOrigin = static_cast<SkEncodedOrigin>(origin);
+      }
+      SkData* data = SkJpegEncoder::Encode(nullptr, instance, options).release();
+      return reinterpret_cast<KNativePointer>(data);
+    }
+    return reinterpret_cast<KNativePointer>(0);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToPngData
+  (KNativePointer ptr, KInt compressionLevel, KInt filterFlags, KInteropPointerArray comments, KInt commentsSize) {
+    SkImage* instance = reinterpret_cast<SkImage*>((ptr));
+    if (!instance->isTextureBacked()) {
+      SkPngEncoder::Options options = SkPngEncoder::Options();
+      options.fZLibLevel = compressionLevel;
+      options.fFilterFlags = static_cast<SkPngEncoder::FilterFlag>(filterFlags);
+      std::vector<SkString> commentStrings = skStringVector(comments, commentsSize);
+      if (!commentStrings.empty()) {
+        std::vector<const void*> commentPtrs;
+        std::vector<size_t> commentSizes;
+        for (const SkString& comment : commentStrings) {
+          commentPtrs.push_back(comment.c_str());
+          commentSizes.push_back(comment.size() + 1);
+        }
+        options.fComments = SkDataTable::MakeCopyArrays(commentPtrs.data(), commentSizes.data(), commentStrings.size());
+      }
+      SkData* data = SkPngEncoder::Encode(nullptr, instance, options).release();
+      return reinterpret_cast<KNativePointer>(data);
+    }
+    return reinterpret_cast<KNativePointer>(0);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToWebpData
+  (KNativePointer ptr, KInt quality, KInt compression) {
+    SkImage* instance = reinterpret_cast<SkImage*>((ptr));
+    if (!instance->isTextureBacked()) {
+      SkWebpEncoder::Options options = SkWebpEncoder::Options();
+      options.fQuality = quality;
+      options.fCompression = static_cast<SkWebpEncoder::Compression>(compression);
+      SkData* data = SkWebpEncoder::Encode(nullptr, instance, options).release();
+      return reinterpret_cast<KNativePointer>(data);
+    }
+    return reinterpret_cast<KNativePointer>(0);
+}
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeShader
   (KNativePointer ptr, KInt tmx, KInt tmy, KInt samplingModeVal1, KInt samplingModeVal2, KFloat* localMatrixArr) {

@@ -111,6 +111,66 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToDa
     return 0;
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToJpegData
+  (JNIEnv* env, jclass jclass, jlong ptr, jint quality, jint downSample, jint alphaOption, jlong xmpMetadataPtr, jint origin) {
+    SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
+    if (!instance->isTextureBacked()) {
+      SkJpegEncoder::Options options = SkJpegEncoder::Options();
+      options.fQuality = quality;
+      options.fDownsample = static_cast<SkJpegEncoder::Downsample>(downSample);
+      options.fAlphaOption = static_cast<SkJpegEncoder::AlphaOption>(alphaOption);
+      options.xmpMetadata = reinterpret_cast<SkData*>(static_cast<uintptr_t>(xmpMetadataPtr));
+      if (origin != 0) {
+        options.fOrigin = static_cast<SkEncodedOrigin>(origin);
+      }
+      SkData* data = SkJpegEncoder::Encode(nullptr, instance, options).release();
+      return reinterpret_cast<jlong>(data);
+    } else {
+      env->ThrowNew(java::lang::RuntimeException::cls, "Texture backed images is not supported yet");
+    }
+    return 0;
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToPngData
+  (JNIEnv* env, jclass jclass, jlong ptr, jint compressionLevel, jint filterFlags, jobjectArray comments, jint commentsSize) {
+    SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
+    if (!instance->isTextureBacked()) {
+      SkPngEncoder::Options options = SkPngEncoder::Options();
+      options.fZLibLevel = compressionLevel;
+      options.fFilterFlags = static_cast<SkPngEncoder::FilterFlag>(filterFlags);
+      std::vector<SkString> commentStrings = skStringVector(env, comments);
+      if (!commentStrings.empty()) {
+        std::vector<const void*> commentPtrs;
+        std::vector<size_t> commentSizes;
+        for (const SkString& comment : commentStrings) {
+          commentPtrs.push_back(comment.c_str());
+          commentSizes.push_back(comment.size() + 1);
+        }
+        options.fComments = SkDataTable::MakeCopyArrays(commentPtrs.data(), commentSizes.data(), commentStrings.size());
+      }
+      SkData* data = SkPngEncoder::Encode(nullptr, instance, options).release();
+      return reinterpret_cast<jlong>(data);
+    } else {
+      env->ThrowNew(java::lang::RuntimeException::cls, "Texture backed images is not supported yet");
+    }
+    return 0;
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToWebpData
+  (JNIEnv* env, jclass jclass, jlong ptr, jint quality, jint compression) {
+    SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
+    if (!instance->isTextureBacked()) {
+      SkWebpEncoder::Options options = SkWebpEncoder::Options();
+      options.fQuality = quality;
+      options.fCompression = static_cast<SkWebpEncoder::Compression>(compression);
+      SkData* data = SkWebpEncoder::Encode(nullptr, instance, options).release();
+      return reinterpret_cast<jlong>(data);
+    } else {
+      env->ThrowNew(java::lang::RuntimeException::cls, "Texture backed images is not supported yet");
+    }
+    return 0;
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nMakeShader
   (JNIEnv* env, jclass jclass, jlong ptr, jint tmx, jint tmy, jint samplingVal1, jint samplingVal2, jfloatArray localMatrixArr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
