@@ -152,6 +152,11 @@ jobs:
         run: |
           docker build -t "ghcr.io/$($env:IMAGE_REPOSITORY)/windows-amd64:$($env:TAG)" -m 2G .
 
+      - name: 'Check Build Tools in Container'
+        shell: pwsh
+        run: |
+          docker run --rm --entrypoint powershell.exe "ghcr.io/$($env:IMAGE_REPOSITORY)/windows-amd64:$($env:TAG)" -NoProfile -Command 'if (-not (Test-Path -LiteralPath $env:SKIKO_VSBT_PATH -PathType Container)) { exit 1 }'
+
       - name: 'Push Image'
         if: inputs.publish == true
         shell: pwsh
