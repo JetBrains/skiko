@@ -5,6 +5,7 @@
 #include "interop.hh"
 #include "FontRunIterator.hh"
 #include "SkShaper.h"
+#include "ShaperWithFontMgr.hh"
 #include "SkShaper_harfbuzz.h"
 #include "SkUnicode.h"
 #include "src/core/SkUTF.h"
@@ -16,7 +17,7 @@
 #include "SkShaper_coretext.h"
 #endif
 
-static void deleteShaper(SkShaper* instance) {
+static void deleteShaper(skiko::ShaperWithFontMgr* instance) {
     // std::cout << "Deleting [SkShaper " << instance << "]" << std::endl;
     delete instance;
 }
@@ -27,19 +28,19 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shape
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakePrimitive
   (JNIEnv* env, jclass jclass) {
-    return reinterpret_cast<jlong>(SkShapers::Primitive::PrimitiveText().release());
+    return reinterpret_cast<jlong>(skiko::ShaperWithFontMgr::make(SkShapers::Primitive::PrimitiveText()));
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShaperDrivenWrapper
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
-    return reinterpret_cast<jlong>(SkShaper::MakeShaperDrivenWrapper(sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<jlong>(skiko::ShaperWithFontMgr::make(SkShaper::MakeShaperDrivenWrapper(sk_ref_sp(fontMgr))));
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShapeThenWrap
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
-    return reinterpret_cast<jlong>(SkShaper::MakeShapeThenWrap(sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<jlong>(skiko::ShaperWithFontMgr::make(SkShaper::MakeShapeThenWrap(sk_ref_sp(fontMgr))));
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShapeDontWrapOrReorder
@@ -47,13 +48,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMa
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     // TODO: consider if we need/want to use ICU4X or Libgrapheme (skuincode/include has those implementations too)
     sk_sp<SkUnicode> unicode = SkUnicodes::ICU::Make();
-    return reinterpret_cast<jlong>(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<jlong>(skiko::ShaperWithFontMgr::make(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr))));
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeCoreText
   (JNIEnv* env, jclass jclass) {
     #ifdef SK_SHAPER_CORETEXT_AVAILABLE
-        return reinterpret_cast<jlong>(SkShapers::CT::CoreText().release());
+        return reinterpret_cast<jlong>(skiko::ShaperWithFontMgr::make(SkShapers::CT::CoreText()));
     #else
         return 0;
     #endif
@@ -62,12 +63,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMa
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shaper_1nMake
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
-    return reinterpret_cast<jlong>(SkShaper::Make(sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<jlong>(skiko::ShaperWithFontMgr::make(SkShaper::Make(sk_ref_sp(fontMgr))));
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeBlob
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jfloat offsetX, jfloat offsetY) {
-    SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
+    auto* holder = reinterpret_cast<skiko::ShaperWithFontMgr*>(static_cast<uintptr_t>(ptr));
+    SkShaper* instance = holder->shaper();
     SkString& text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
@@ -93,7 +95,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgrSkikoDefault(),
+        holder->defaultFontMgr(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation
@@ -108,7 +110,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeLine
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps) {
-    SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
+    auto* holder = reinterpret_cast<skiko::ShaperWithFontMgr*>(static_cast<uintptr_t>(ptr));
+    SkShaper* instance = holder->shaper();
 
     SkString& text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
@@ -140,7 +143,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
         text.c_str(),
         text.size(),
         *font,
-        SkFontMgrSkikoDefault(),
+        holder->defaultFontMgr(),
         graphemeIter,
         aproximateSpaces,
         aproximatePunctuation);
@@ -348,7 +351,8 @@ private:
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shaper_1nShape
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jobject runHandlerObj)
 {
-    SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
+    auto* holder = reinterpret_cast<skiko::ShaperWithFontMgr*>(static_cast<uintptr_t>(ptr));
+    SkShaper* instance = holder->shaper();
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));
 
     auto nativeFontRunIter = (SkShaper::FontRunIterator*) skija::impl::Native::fromJava(env, fontRunIterObj, skija::shaper::FontMgrRunIterator::cls);

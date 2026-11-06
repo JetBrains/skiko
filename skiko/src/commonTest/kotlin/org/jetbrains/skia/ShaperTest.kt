@@ -23,6 +23,28 @@ class ShaperTest {
         Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
 
     @Test
+    fun shapedTextRemainsValidAfterClosingItsShaper() = runTest {
+        fontInter36().use { font ->
+            val shaper = Shaper.makeShapeDontWrapOrReorder()
+            val line = shaper.shapeLine("text", font)
+            val blob = assertNotNull(shaper.shape("text", font))
+            shaper.close()
+            line.use {
+                assertContentEquals(shortArrayOf(882, 611, 943, 882), it.glyphs)
+                assertTrue(it.width > 0f)
+            }
+            blob.use {
+                assertContentEquals(shortArrayOf(882, 611, 943, 882), it.glyphs)
+            }
+            Shaper.makeShapeDontWrapOrReorder().use { replacement ->
+                replacement.shapeLine("text", font).use {
+                    assertContentEquals(shortArrayOf(882, 611, 943, 882), it.glyphs)
+                }
+            }
+        }
+    }
+
+    @Test
     fun canShapeWithDifferentFactories() = runTest {
         fontInter36().use { font ->
             val factories = listOf<() -> Shaper>(
