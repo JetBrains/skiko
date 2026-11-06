@@ -44,7 +44,7 @@ class DynamicMemoryWStream() : WStream(DynamicMemoryWStream_nMake(), _FinalizerH
         Stats.onNativeCall()
     }
 }
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_DynamicMemoryWStream__1nMake")
 // No ForceNativeThreadState: creates an empty memory stream with null block pointers and no data blocks, so it is short
 // and cannot block.
@@ -70,3 +70,4 @@ private external fun _nBytesWritten(stream: NativePointer): Int
 // Native call path: SkDynamicMemoryWStream::read -> memcpy
 @ForceNativeThreadState
 private external fun _nRead(stream: NativePointer, buffer: InteropPointer, offset: Int, size: Int): Boolean
+// </editor-fold>

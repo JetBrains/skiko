@@ -207,6 +207,22 @@ fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
     block(this).also { abandon() }
 }
 
+internal fun nMakeVulkanNoAllocator(
+    instancePtr: NativePointer,
+    physicalDevicePtr: NativePointer,
+    devicePtr: NativePointer,
+    queuePtr: NativePointer,
+    graphicsQueueIndex: Int,
+    instanceProcAddr: NativePointer,
+    deviceProcAddr: NativePointer,
+    apiVersion: Int
+): NativePointer = _nMakeVulkan(
+    instancePtr, physicalDevicePtr, devicePtr, queuePtr,
+    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion,
+    NullPointer
+)
+
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
 // Needs ForceNativeThreadState: sends queued drawing work to the GPU through Metal.
 // Native call path: GrDirectContext::flush -> GrDrawingManager::flushSurfaces -> GrMtlGpu::onSubmitToGpu
@@ -292,18 +308,4 @@ private external fun _nReset(ptr: NativePointer, flags: Int)
 // Native call path: GrDirectContext::abandonContext -> GrMtlGpu::disconnect
 @ForceNativeThreadState
 private external fun _nAbandon(ptr: NativePointer, flags: Int)
-
-internal fun nMakeVulkanNoAllocator(
-    instancePtr: NativePointer,
-    physicalDevicePtr: NativePointer,
-    devicePtr: NativePointer,
-    queuePtr: NativePointer,
-    graphicsQueueIndex: Int,
-    instanceProcAddr: NativePointer,
-    deviceProcAddr: NativePointer,
-    apiVersion: Int
-): NativePointer = _nMakeVulkan(
-    instancePtr, physicalDevicePtr, devicePtr, queuePtr,
-    graphicsQueueIndex, instanceProcAddr, deviceProcAddr, apiVersion,
-    NullPointer
-)
+// </editor-fold>

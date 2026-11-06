@@ -67,6 +67,7 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
 // Needs ForceNativeThreadState: parses the whole XML document and builds its node tree, so its time grows with the data
 // size.
@@ -95,3 +96,4 @@ private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, 
 // Native call path: SkSVGDOM::render
 @ForceNativeThreadState
 private external fun SVGDOM_nRender(ptr: NativePointer, canvasPtr: NativePointer)
+// </editor-fold>

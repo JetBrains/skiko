@@ -58,6 +58,7 @@ class TextBox(val rect: Rect, direction: Direction) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArraySize")
 // No ForceNativeThreadState: returns the stored element count of the box list, so it is short and cannot block.
 // Native call path: vector<TextBox>::size
@@ -74,3 +75,4 @@ private external fun TextBox_nDisposeArray(array: InteropPointer)
 // block.
 // Native call path: vector<TextBox>::at
 private external fun TextBox_nGetArrayElement(array: InteropPointer, index: Int, rectArray: InteropPointer, directionArray: InteropPointer)
+// </editor-fold>

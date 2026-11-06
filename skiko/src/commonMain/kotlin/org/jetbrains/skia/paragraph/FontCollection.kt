@@ -154,6 +154,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nMake")
 // No ForceNativeThreadState: builds empty caches and default family names without touching any font manager, so it is
 // short and cannot block.
@@ -235,3 +236,4 @@ private external fun _nSetEnableFallback(ptr: NativePointer, value: Boolean)
 // cannot block.
 // Native call path: FontCollection::getParagraphCache
 private external fun _nGetParagraphCache(ptr: NativePointer): NativePointer
+// </editor-fold>

@@ -1171,6 +1171,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 internal external fun Path_nGetFinalizer(): NativePointer
@@ -1510,3 +1511,4 @@ private external fun _nMakeFromBytes(data: InteropPointer, size: Int): NativePoi
 // Native call path: SkPath::isValid -> SkPath::isFinite -> SkPath::PeekErrorSingleton
 @ForceNativeThreadState
 private external fun _nIsValid(ptr: NativePointer): Boolean
+// </editor-fold>

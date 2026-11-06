@@ -97,6 +97,7 @@ private fun makeParagraphBuilder(
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of the delete function without calling it, so it is short and cannot
 // block.
@@ -150,3 +151,4 @@ private external fun _nAddPlaceholder(
 // Native call path: ParagraphBuilderImpl::Build -> make_unique<ParagraphImpl>
 @ForceNativeThreadState
 private external fun _nBuild(ptr: NativePointer): NativePointer
+// </editor-fold>

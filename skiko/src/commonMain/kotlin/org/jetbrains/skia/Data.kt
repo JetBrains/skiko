@@ -141,6 +141,7 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of an unref function without calling it, so it is short and cannot
 // block.
@@ -206,3 +207,4 @@ private external fun _nMakeUninitialized(length: Int): NativePointer
 // No ForceNativeThreadState: returns the stored data pointer, so it is short and cannot block.
 // Native call path: SkData::writable_data
 private external fun _nWritableData(dataPtr: NativePointer): NativePointer
+// </editor-fold>

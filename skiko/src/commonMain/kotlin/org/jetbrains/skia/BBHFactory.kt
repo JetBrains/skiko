@@ -19,6 +19,7 @@ class RTreeFactory : BBHFactory {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_RTreeFactory__1nMake")
 // No ForceNativeThreadState: creates an empty tree factory with no members, so it is short and cannot block.
 // Native call path: SkRTreeFactory::SkRTreeFactory
@@ -29,3 +30,4 @@ private external fun RTreeFactory_nMake(): NativePointer
 // block.
 // Native call path: deleteSkBBHFactory
 private external fun BBHFactory_nGetFinalizer(): NativePointer
+// </editor-fold>

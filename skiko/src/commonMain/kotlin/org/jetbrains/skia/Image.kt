@@ -456,6 +456,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
 // No ForceNativeThreadState: copies the stored image details and adds a reference to its color space, so it is short
 // and cannot block.
@@ -590,3 +591,4 @@ private external fun _nAdoptTextureFromAlphaType(
     colorType: Int,
     alphaType: Int
 ): NativePointer
+// </editor-fold>

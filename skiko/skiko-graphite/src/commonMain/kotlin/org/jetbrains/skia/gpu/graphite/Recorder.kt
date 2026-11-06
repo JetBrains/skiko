@@ -39,6 +39,7 @@ class Recorder internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_Recorder__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -50,3 +51,4 @@ private external fun _nGetRecorderFinalizer(): NativePointer
 // Native call path: Recorder::snap -> flushTrackedDevices -> prepareResources
 @ForceNativeThreadState
 private external fun _nSnap(recorderPtr: NativePointer): NativePointer
+// </editor-fold>

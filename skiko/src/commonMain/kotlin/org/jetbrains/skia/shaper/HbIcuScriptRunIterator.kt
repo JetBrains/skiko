@@ -42,6 +42,7 @@ private fun makeHbIcuScriptRunIterator(text: ManagedString): NativePointer {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nMake")
 // No ForceNativeThreadState: only stores the text pointer and range, and scanning is deferred to consume, so it is
 // short and cannot block.
@@ -52,3 +53,4 @@ private external fun _nMake(textPtr: NativePointer): NativePointer
 // No ForceNativeThreadState: only packs a stored script value into a tag, so it is short and cannot block.
 // Native call path: SkUnicodeHbScriptRunIterator::currentScript
 private external fun _nGetCurrentScriptTag(ptr: NativePointer): Int
+// </editor-fold>
