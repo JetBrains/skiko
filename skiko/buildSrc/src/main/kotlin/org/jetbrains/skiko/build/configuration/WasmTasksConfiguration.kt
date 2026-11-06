@@ -8,6 +8,7 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
@@ -42,6 +43,15 @@ private val Project.setupMjs
 
 private fun Project.sideModuleSetupMjs(libBaseName: String) =
     wasmImport("$libBaseName.mjs")
+
+private fun Project.setupPrefixMjs() =
+    projectDir.resolve("src/webMain/resources/pre-setup.mjs")
+
+private fun Project.sideModulePrefixMjs(libBaseName: String) =
+    projectDir.resolve("src/webMain/resources/pre-$libBaseName.mjs")
+
+private fun Project.testPrefixMjs(libBaseName: String) =
+    projectDir.resolve("src/webMain/resources/pre-$libBaseName-test.mjs")
 
 private fun Project.setupReexportMjs(libBaseName: String) =
     wasmImport("js-$libBaseName-reexport-symbols.mjs")
@@ -441,7 +451,7 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
 class WasmImportsGeneratorCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
     KotlinCompilation.MAIN_COMPILATION_NAME,
     { it.setupMjs },
-    { it.projectDir.resolve("src/webMain/resources/pre-setup.mjs") },
+    { it.setupPrefixMjs() },
     { it.setupReexportMjs(it.name) },
     { it.name }
 )
@@ -449,10 +459,7 @@ class WasmImportsGeneratorCompilerPluginSupportPlugin : AbstractImportGeneratorC
 class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
     KotlinCompilation.TEST_COMPILATION_NAME,
     { it.skikoTestMjs(it.name) },
-    {
-        val preludeFileName = "pre-${it.name}-test.mjs"
-        it.projectDir.resolve("src/webMain/resources/$preludeFileName")
-    },
+    { it.testPrefixMjs(it.name) },
     null,
     { it.name }
 )
@@ -460,7 +467,7 @@ class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGen
 class SideWasmImportsGeneratorPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
     KotlinCompilation.MAIN_COMPILATION_NAME,
     { it.sideModuleSetupMjs(it.name) },
-    { it.projectDir.resolve("src/webMain/resources/pre-${it.name}.mjs") },
+    { it.sideModulePrefixMjs(it.name) },
     { it.setupReexportMjs(it.name) },
     { it.name }
 )
@@ -469,15 +476,35 @@ fun KotlinJsTargetDsl.setupImportsGeneratorPlugin(
     libBaseName: String,
     isSideModule: Boolean
 ) {
+    check(libBaseName == project.name) {
+        "libBaseName '$libBaseName' does not match project.name '${project.name}'. " +
+            "The import generator compiler plugin resolves prefix and reexport paths using project.name."
+    }
+
     val main by compilations.getting
     val test by compilations.getting
 
     main.compileTaskProvider.configure {
-        outputs.file(if (isSideModule) project.sideModuleSetupMjs(libBaseName) else project.setupMjs)
+        outputs.file(if (isSideModule) project.sideModuleSetupMjs(project.name) else project.setupMjs)
+        outputs.file(project.setupReexportMjs(project.name))
+        val prefixFile = if (isSideModule) {
+            project.sideModulePrefixMjs(project.name)
+        } else {
+            project.setupPrefixMjs()
+        }
+        inputs.file(prefixFile)
+            .withPropertyName("importGeneratorPrefix")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
     }
 
     test.compileTaskProvider.configure {
-        outputs.file(project.skikoTestMjs(libBaseName))
+        outputs.file(project.skikoTestMjs(project.name))
+        // Use inputs.files (FileCollection) rather than inputs.file().optional() because Gradle's
+        // optional() still requires the file to exist if a concrete path is passed. When the test
+        // import-generator plugin is not applied (e.g. in skiko-skottie), this file is absent on disk.
+        inputs.files(project.testPrefixMjs(project.name))
+            .withPropertyName("importGeneratorPrefix")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
     }
 
     listOf(main, test).forEach {
