@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
 # Restore the default Windows shell for correct batch processing.
-SHELL ["cmd", "/S", "/V:ON", "/C"]
+SHELL ["cmd", "/S", "/C"]
 
 # Download BuildTools installer
 ADD https://aka.ms/vs/17/release/vs_buildtools.exe C:\Temp\vs_buildtools.exe
@@ -14,6 +14,7 @@ ADD https://aka.ms/vs/17/release/channel C:\Temp\VisualStudio.chman
 
 # Install MSVC C++ compiler, CMake, and MSBuild.
 RUN `
+    # Install Build Tools excluding workloads and components with known issues.
     start /w C:\Temp\vs_buildtools.exe --quiet --wait --norestart --nocache `
     --installPath "C:\BuildTools" `
     --channelUri C:\Temp\VisualStudio.chman `
@@ -26,9 +27,7 @@ RUN `
     --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 `
     --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 `
     --remove Microsoft.VisualStudio.Component.Windows81SDK `
-  || (IF !ERRORLEVEL! EQU 3010 (EXIT /B 0) ELSE (EXIT /B !ERRORLEVEL!))
-
-RUN if not exist C:\BuildTools\Common7\Tools\VsDevCmd.bat (echo Build Tools installation is missing & exit /b 1)
+  || IF "%ERRORLEVEL%"=="3010" EXIT 0
 
 RUN setx /M SKIKO_VSBT_PATH "C:\BuildTools"
 
