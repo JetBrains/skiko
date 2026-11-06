@@ -1,48 +1,41 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skiko.internal.packInts
+import org.jetbrains.skiko.internal.unpackInt1
+import org.jetbrains.skiko.internal.unpackInt2
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
-class ISize internal constructor(val width: Int, val height: Int) {
-    fun isZero(): Boolean {
-        return (width == 0) && (height == 0)
-    }
+inline fun ISize(width: Int, height: Int): ISize = ISize(packInts(width, height))
+@JvmInline
+value class ISize(val packedValue: Long) {
 
-    fun isEmpty(): Boolean {
-        return (width <= 0) || (height <= 0)
-    }
+    inline val width: Int
+        get() = unpackInt1(packedValue)
 
-    fun area(): Int {
-        return width * height
-    }
+    inline val height: Int
+        get() = unpackInt2(packedValue)
 
-    override fun equals(other: Any?): Boolean {
-        if (other === this) return true
-        if (other !is ISize) return false
-        if (width != other.width) return false
-        return height == other.height
-    }
+    fun isZero(): Boolean = packedValue == 0x0L
 
-    override fun hashCode(): Int {
-        val PRIME = 59
-        var result = 1
-        result = result * PRIME + width
-        result = result * PRIME + height
-        return result
-    }
+    fun isEmpty(): Boolean = (width <= 0) || (height <= 0)
+
+    fun area(): Int = width * height
 
     override fun toString(): String {
-        return "ISize(_width=$width, _height=$height)"
+        return "ISize(width=$width, height=$height)"
     }
 
     companion object {
+        val ZERO: ISize
+            get() = ISize(0x0L)
+
         @JvmStatic
         fun make(w: Int, h: Int): ISize {
             return ISize(w, h)
         }
 
         @JvmStatic
-        fun makeEmpty(): ISize {
-            return ISize(0, 0)
-        }
+        fun makeEmpty(): ISize = ZERO
     }
 }
