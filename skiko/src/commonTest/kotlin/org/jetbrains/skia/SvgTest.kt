@@ -2,9 +2,10 @@ package org.jetbrains.skia
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import org.jetbrains.skia.svg.*
@@ -152,8 +153,9 @@ class SvgTest {
 
     @Test
     fun defaultFontManagerDrawsTextWhenNoFamilyIsSet() = runTest {
-        // No font-family: Skia asks the manager for its default face. An empty manager has
-        // none, so a drawn pixel is FontMgr.default and not a hardcoded face.
+        // No font-family, and no other element: every pixel is text. The default face differs
+        // per platform, so compare the whole bitmap with the same SVG drawn by a manager that
+        // has no face, instead of sampling one pixel of one glyph.
         val xml = """
             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
               <text x="0" y="52" font-size="64" fill="#0000ff">M</text>
@@ -166,14 +168,12 @@ class SvgTest {
             val system = SVGDOM.Builder().use { builder ->
                 builder.setFontManager(FontMgr.default).buildFromData(data)
             }
-            assertNotNull(empty).use { dom ->
-                assertEquals(Color.TRANSPARENT, renderSvg(dom).getColor(32, 32))
-            }
-            assertNotNull(system).use { dom ->
-                val color = renderSvg(dom).getColor(32, 32)
-                assertEquals(0xFF, Color.getA(color), "default face draws the glyph")
-                assertNotEquals(Color.TRANSPARENT, color)
-            }
+            val blank = assertNotNull(assertNotNull(empty).use { renderSvg(it).readPixels() })
+            val drawn = assertNotNull(assertNotNull(system).use { renderSvg(it).readPixels() })
+            // The SVG has no shape, so a manager with no face draws nothing. The default face
+            // covers some of those pixels; where it covers them depends on the platform.
+            assertTrue(blank.all { it == 0.toByte() }, "no face draws no text")
+            assertFalse(blank.contentEquals(drawn), "default face draws the text")
         }
     }
 
