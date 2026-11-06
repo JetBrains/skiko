@@ -6,9 +6,9 @@ on:
 jobs:
   Android:
     name: 'Android Publish Dry Run'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -34,15 +34,15 @@ jobs:
 
   Web:
     name: 'Web Publish Dry Run'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -58,7 +58,7 @@ jobs:
               -Pskiko.emsdk.dir="\$EMSDK_DIR" \
               publishToMavenLocal
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         name: 'Setup Node.js'
         with:
           node-version: 22
@@ -87,7 +87,7 @@ jobs:
         run: |
           ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web version=0.0.0-SNAPSHOT
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Skiko Web Benchmark Reports'
         if: always()
         with:
@@ -96,9 +96,9 @@ jobs:
 
   Linux:
     name: 'Linux x64 Publish Dry Run'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -145,9 +145,9 @@ jobs:
 
   LinuxArm:
     name: 'Linux arm64 Publish Dry Run'
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -168,10 +168,10 @@ jobs:
     name: 'macOS Publish Dry Run'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -229,7 +229,7 @@ jobs:
         run: |
           ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts macos version=0.0.0-SNAPSHOT
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Skiko macOS Native Benchmark Reports'
         if: always()
         with:
@@ -240,14 +240,14 @@ jobs:
     name: 'Windows Publish Dry Run'
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: microsoft/setup-msbuild@v1
 
       - uses: ilammy/msvc-dev-cmd@v1
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'

@@ -18,7 +18,7 @@ on:
 jobs:
   changes:
     name: 'Detect Docker Changes'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       linux_amd64: ${{ steps.filter.outputs.linux_amd64 }}
       linux_compat: ${{ steps.filter.outputs.linux_compat }}
@@ -26,10 +26,10 @@ jobs:
       windows: ${{ steps.filter.outputs.windows }}
       docker_workflow: ${{ steps.filter.outputs.docker_workflow }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           base: ${{ github.event.pull_request.base.sha || github.event.before || 'master' }}
@@ -48,7 +48,7 @@ jobs:
 
   linux-amd64:
     name: 'Docker Linux (x64)'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: changes
     if: |
       needs.changes.outputs.linux_amd64 == 'true' ||
@@ -58,7 +58,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@7
         name: 'Check out code'
 
       - uses: ./.github/actions/docker-skiko-publish
@@ -72,7 +72,7 @@ jobs:
 
   linux-compat:
     name: 'Docker Linux (Compatibility)'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: changes
     if: |
       needs.changes.outputs.linux_compat == 'true' ||
@@ -82,7 +82,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@7
         name: 'Check out code'
 
       - uses: ./.github/actions/docker-skiko-publish
@@ -97,7 +97,7 @@ jobs:
 
   linux-emscripten-amd64:
     name: 'Docker Linux with Emscripten (x64)'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: changes
     if: |
       needs.changes.outputs.linux_emscripten_amd64 == 'true' ||
@@ -107,7 +107,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@7
         name: 'Check out code'
 
       - uses: ./.github/actions/docker-skiko-publish
@@ -131,7 +131,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@7
         name: 'Check out code'
 
       - name: 'Set Variables'
