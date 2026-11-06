@@ -8,7 +8,7 @@ jobs:
     name: 'Android Publish Dry Run'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -36,7 +36,7 @@ jobs:
     name: 'Web Publish Dry Run'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -119,7 +119,7 @@ jobs:
     name: 'Linux x64 Publish Dry Run'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -177,7 +177,7 @@ jobs:
     name: 'Linux arm64 Publish Dry Run'
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -198,7 +198,7 @@ jobs:
     name: 'macOS Publish Dry Run'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: actions/setup-java@v4
@@ -289,7 +289,7 @@ jobs:
     name: 'Windows Publish Dry Run'
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: microsoft/setup-msbuild@v1
