@@ -22,6 +22,13 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 
+    /**
+     * Parses [data] without a font manager or a resource provider.
+     *
+     * `<text>` nodes that need a font are not drawn. Use [Builder.setFontManager] when the SVG
+     * contains text. `<image>` nodes are not drawn. Use [Builder.setResourceProvider] when the SVG
+     * embeds or references images.
+     */
     constructor(data: Data) : this(makeSVGDOM(data))
 
     val root: SVGSVG?
@@ -65,11 +72,83 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             reachabilityBarrier(canvas)
         }
     }
+
+    /**
+     * Builds an [SVGDOM] the same way as [SkSVGDOM.Builder](https://api.skia.org/classSkSVGDOM_1_1Builder.html).
+     *
+     * A font manager has to be set before [buildFromData] for `<text>` to be drawn. A resource
+     * provider has to be set before [buildFromData] for `<image>` to be drawn. Both are referenced
+     * by the resulting [SVGDOM] for as long as that DOM lives, independently of this builder.
+     * Images are decoded when [render] runs, not while parsing.
+     */
+    class Builder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
+        private object _FinalizerHolder {
+            val PTR = SVGDOM_nBuilderGetFinalizer()
+        }
+
+        constructor() : this(SVGDOM_nBuilderMake()) {
+            Stats.onNativeCall()
+        }
+
+        /**
+         * Font manager used to load fonts for `<text>` nodes.
+         *
+         * Without one, text that needs a font is not drawn. [FontMgr.default] resolves families
+         * from the system; a [org.jetbrains.skia.paragraph.TypefaceFontProvider] resolves only the
+         * typefaces registered on it.
+         *
+         * Passing `null` clears a manager set earlier.
+         */
+        fun setFontManager(fontMgr: FontMgr?): Builder {
+            return try {
+                Stats.onNativeCall()
+                SVGDOM_nBuilderSetFontManager(_ptr, getPtr(fontMgr))
+                this
+            } finally {
+                reachabilityBarrier(this)
+                reachabilityBarrier(fontMgr)
+            }
+        }
+
+        /**
+         * Provider used to load images referenced by `<image>` and `<feImage>`.
+         *
+         * Without one, those nodes are not drawn. [SVGResourceProvider.makeDataURI] decodes
+         * base64 `data:image/` payloads that are already in the document. It does not fetch
+         * `http`, `https`, or `file` URLs, and it does not read the filesystem.
+         *
+         * Passing `null` clears a provider set earlier.
+         */
+        fun setResourceProvider(resourceProvider: SVGResourceProvider?): Builder {
+            return try {
+                Stats.onNativeCall()
+                SVGDOM_nBuilderSetResourceProvider(_ptr, getPtr(resourceProvider))
+                this
+            } finally {
+                reachabilityBarrier(this)
+                reachabilityBarrier(resourceProvider)
+            }
+        }
+
+        /**
+         * Parses [data]. Returns `null` when the stream is not an SVG document with an `<svg>` root.
+         */
+        fun buildFromData(data: Data): SVGDOM? {
+            return try {
+                Stats.onNativeCall()
+                val ptr = SVGDOM_nBuilderBuildFromData(_ptr, getPtr(data))
+                if (ptr == NullPointer) null else SVGDOM(ptr)
+            } finally {
+                reachabilityBarrier(this)
+                reachabilityBarrier(data)
+            }
+        }
+    }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
 // Needs ForceNativeThreadState: parses the whole XML document and builds its node tree, so its time grows with the data
-// size.
+// size. Same path as Builder.buildFromData with no font manager and no resource provider.
 // Native call path: SkSVGDOM::MakeFromStream
 @ForceNativeThreadState
 private external fun SVGDOM_nMakeFromData(dataPtr: NativePointer): NativePointer
@@ -91,7 +170,36 @@ private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, 
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nRender")
 // Needs ForceNativeThreadState: draws the SVG tree onto a canvas that can be GPU-backed, and its time grows with the
-// size of the tree.
+// size of the tree. Text shaping goes through the font manager stored on the DOM. Image nodes decode their payloads
+// through the resource provider stored on the DOM.
 // Native call path: SkSVGDOM::render
 @ForceNativeThreadState
 private external fun SVGDOM_nRender(ptr: NativePointer, canvasPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nBuilderGetFinalizer")
+private external fun SVGDOM_nBuilderGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nBuilderMake")
+// No ForceNativeThreadState: allocates an empty builder that owns nothing yet, so it is short and cannot block.
+// Native call path: SkSVGDOM::Builder::Builder
+private external fun SVGDOM_nBuilderMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nBuilderSetFontManager")
+// Needs ForceNativeThreadState: can drop the previous font manager, which releases CoreText font collections and
+// typefaces.
+// Native call path: SkSVGDOM::Builder::setFontManager -> ~SkFontMgr
+@ForceNativeThreadState
+private external fun SVGDOM_nBuilderSetFontManager(ptr: NativePointer, fontMgrPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nBuilderSetResourceProvider")
+// Needs ForceNativeThreadState: can drop the previous provider, which releases cached decoded images.
+// Native call path: SkSVGDOM::Builder::setResourceProvider -> ~ResourceProvider
+@ForceNativeThreadState
+private external fun SVGDOM_nBuilderSetResourceProvider(ptr: NativePointer, resourceProviderPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nBuilderBuildFromData")
+// Needs ForceNativeThreadState: parses the whole XML document and builds its node tree, so its time grows with the data
+// size.
+// Native call path: SkSVGDOM::Builder::make
+@ForceNativeThreadState
+private external fun SVGDOM_nBuilderBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer
