@@ -36,14 +36,14 @@ function collectRuntimeFailures(page) {
   return failures;
 }
 
-test("Skiko extensions sample starts in browser", async ({ page }) => {
+test("Skiko sample starts in browser", async ({ page }) => {
   const failures = collectRuntimeFailures(page);
   const response = await page.goto("/", { waitUntil: "domcontentloaded" });
 
   expect(response, "No navigation response").not.toBeNull();
   expect(response.ok(), `Page returned HTTP ${response.status()}`).toBeTruthy();
 
-  await page.waitForSelector("#SkikoTarget[data-skiko-ready='true']");
+  await page.waitForSelector("[data-skiko-ready='true']");
   await page.waitForTimeout(500);
 
   expect(failures, `Runtime failures detected:\n${failures.join("\n\n")}`).toEqual([]);

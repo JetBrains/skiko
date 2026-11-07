@@ -64,5 +64,5 @@ runs:
         load: ${{ inputs.load == 'true' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=gha,scope=${{ inputs.image_name }}
+        cache-to: type=gha,scope=${{ inputs.image_name }},mode=max,ignore-error=true

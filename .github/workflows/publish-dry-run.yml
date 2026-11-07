@@ -8,7 +8,7 @@ jobs:
     name: 'Android Publish Dry Run'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -36,7 +36,7 @@ jobs:
     name: 'Web Publish Dry Run'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -75,8 +75,29 @@ jobs:
           GRADLE_USER_HOME: ${{ runner.temp }}/skiko-extensions-gradle
           NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
           PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+          SAMPLE_DIR: ${{ github.workspace }}/samples/SkikoExtensionsSample
         run: |
-          bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
+          bash samples/scripts/check-web-sample.sh
+
+      - shell: bash
+        name: 'Check Skia Web Sample'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skia-web-gradle
+          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
+          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+          SAMPLE_DIR: ${{ github.workspace }}/samples/SkiaWebSample
+        run: |
+          bash samples/scripts/check-web-sample.sh
+
+      - shell: bash
+        name: 'Check Skia Multiplatform Web Sample'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skia-multiplatform-gradle
+          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
+          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+          SAMPLE_DIR: ${{ github.workspace }}/samples/SkiaMultiplatformSample
+        run: |
+          bash samples/scripts/check-web-sample.sh
 
       - shell: bash
         name: 'Run Skiko Web Benchmarks'
@@ -98,7 +119,7 @@ jobs:
     name: 'Linux x64 Publish Dry Run'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -143,11 +164,20 @@ jobs:
             ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
               :runAwt --args=--exit-after-ms=5000
 
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Check Skia Multiplatform Sample'
+        with:
+          image_name: linux-compat
+          virtual-display: true
+          command: |
+            ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+              :runAwt --args=--exit-after-ms=5000
+
   LinuxArm:
     name: 'Linux arm64 Publish Dry Run'
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -168,7 +198,7 @@ jobs:
     name: 'macOS Publish Dry Run'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: actions/setup-java@v4
@@ -211,6 +241,12 @@ jobs:
             :runAwt --args=--exit-after-ms=5000
 
       - shell: bash
+        name: 'Check Skia Multiplatform Sample'
+        run: |
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+            :runAwt --args=--exit-after-ms=5000
+
+      - shell: bash
         name: 'Check Skiko Extensions Apple Native Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
@@ -221,6 +257,19 @@ jobs:
             :linkDebugExecutableIosArm64 \
             :linkDebugExecutableIosSimulatorArm64 \
             :linkDebugExecutableIosX64
+
+      - shell: bash
+        name: 'Check Skia Multiplatform Apple Native Sample'
+        run: |
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+            -Psample.exitAfterMs=5000 \
+            :runNative \
+            :linkDebugExecutableMacosArm64 \
+            :linkDebugExecutableMacosX64 \
+            :linkDebugExecutableIosSimulatorArm64 \
+            :linkDebugExecutableTvosArm64 \
+            :linkDebugExecutableTvosSimulatorArm64 \
+            :linkDebugExecutableTvosX64
 
       - shell: bash
         name: 'Run Skiko macOS Native Benchmarks'
@@ -240,7 +289,7 @@ jobs:
     name: 'Windows Publish Dry Run'
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: microsoft/setup-msbuild@v1
@@ -284,4 +333,10 @@ jobs:
         name: 'Check Skiko Extensions Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+            :runAwt --args=--exit-after-ms=5000
+
+      - shell: bash
+        name: 'Check Skia Multiplatform Sample'
+        run: |
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
