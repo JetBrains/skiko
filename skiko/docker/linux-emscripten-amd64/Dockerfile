@@ -1,4 +1,3 @@
-FROM node:24.22-bookworm-slim AS node
 FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -19,8 +18,12 @@ RUN git clone https://github.com/emscripten-core/emsdk.git $EMSDK_DIR && \
     $EMSDK_DIR/emsdk activate $EMSDK_VER
 
 # Use different Node to fix eMudhra certificate issue (https://youtrack.jetbrains.com/issue/CMP-11011)
-COPY --from=node /usr/local/bin/node /usr/local/bin/node
-ENV EM_NODE_JS=/usr/local/bin/node
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x -o /tmp/nodesource_setup.sh && \
+    bash /tmp/nodesource_setup.sh && \
+    apt install nodejs -y && \
+    rm -f /tmp/nodesource_setup.sh && \
+    rm -rf /var/lib/apt/lists/*
+ENV EM_NODE_JS=/usr/bin/node
 RUN rm -rf "$EMSDK_DIR/node" && node --version
 
 # Use UTF-8 by default
