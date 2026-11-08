@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.Gradient.Interpolation.HueMethod
+import org.jetbrains.skia.Gradient.Interpolation.InPremul
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
@@ -71,6 +73,57 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         /**
+         * This overload avoids allocating intermediate objects
+         *
+         * [colors] represents a flattened array of RGBA values so if positions is not null, colors
+         * must be 4 times the size of positions.
+         */
+        fun makeLinearGradient(
+            x0: Float,
+            y0: Float,
+            x1: Float,
+            y1: Float,
+            colors: FloatArray,
+            tileMode: FilterTileMode,
+            positions: FloatArray? = null,
+            colorSpace: ColorSpace? = null,
+            inPremul: InPremul = InPremul.NO,
+            interpolationColorSpace: Gradient.Interpolation.ColorSpace = Gradient.Interpolation.ColorSpace.DESTINATION,
+            hueMethod: HueMethod = HueMethod.SHORTER,
+            localMatrix: Matrix33? = null
+        ): Shader {
+            val colorsSize = colors.size / 4
+            require(positions == null || colorsSize == positions.size) {
+                "colors.length $colorsSize != positions.length ${positions!!.size}"
+            }
+            return try {
+                Stats.onNativeCall()
+                Shader(
+                    interopScope {
+                        _nMakeLinearGradient(
+                            x0,
+                            y0,
+                            x1,
+                            y1,
+                            toInterop(colors),
+                            getPtr(colorSpace),
+                            toInterop(positions),
+                            colorsSize,
+                            tileMode.ordinal,
+                            inPremul.ordinal,
+                            interpolationColorSpace.ordinal,
+                            hueMethod.ordinal,
+                            toInterop(localMatrix?.mat)
+                        )
+                    }
+                )
+            } finally {
+                reachabilityBarrier(colorSpace)
+                reachabilityBarrier(localMatrix)
+            }
+        }
+
+        /**
          * Returns a shader that generates a radial gradient given the center and radius.
          * @param center  The center of the circle for this gradient
          * @param radius  Must be positive. The radius of the circle for this gradient
@@ -116,6 +169,55 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             } finally {
                 reachabilityBarrier(gradient)
                 reachabilityBarrier(gradient.colors.colorSpace)
+                reachabilityBarrier(localMatrix)
+            }
+        }
+
+        /**
+         * This overload avoids allocating intermediate objects
+         *
+         * [colors] represents a flattened array of RGBA values so if positions is not null, colors
+         * must be 4 times the size of positions.
+         */
+        fun makeRadialGradient(
+            x: Float,
+            y: Float,
+            radius: Float,
+            colors: FloatArray,
+            tileMode: FilterTileMode,
+            positions: FloatArray? = null,
+            colorSpace: ColorSpace? = null,
+            inPremul: InPremul = InPremul.NO,
+            interpolationColorSpace: Gradient.Interpolation.ColorSpace = Gradient.Interpolation.ColorSpace.DESTINATION,
+            hueMethod: HueMethod = HueMethod.SHORTER,
+            localMatrix: Matrix33? = null
+        ): Shader {
+            val colorsSize = colors.size / 4
+            require(positions == null || colorsSize == positions.size) {
+                "colors.length $colorsSize != positions.length ${positions!!.size}"
+            }
+            return try {
+                Stats.onNativeCall()
+                Shader(
+                    interopScope {
+                        _nMakeRadialGradient(
+                            x,
+                            y,
+                            radius,
+                            toInterop(colors),
+                            getPtr(colorSpace),
+                            toInterop(positions),
+                            colorsSize,
+                            tileMode.ordinal,
+                            inPremul.ordinal,
+                            interpolationColorSpace.ordinal,
+                            hueMethod.ordinal,
+                            toInterop(localMatrix?.mat)
+                        )
+                    }
+                )
+            } finally {
+                reachabilityBarrier(colorSpace)
                 reachabilityBarrier(localMatrix)
             }
         }
@@ -223,6 +325,38 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 
         /**
+         * This overload avoids allocating intermediate objects
+         *
+         * [colors] represents a flattened array of RGBA values so if positions is not null, colors
+         * must be 4 times the size of positions.
+         */
+        fun makeSweepGradient(
+            x: Float,
+            y: Float,
+            colors: FloatArray,
+            tileMode: FilterTileMode,
+            positions: FloatArray? = null,
+            colorSpace: ColorSpace? = null,
+            inPremul: InPremul = InPremul.NO,
+            interpolationColorSpace: Gradient.Interpolation.ColorSpace = Gradient.Interpolation.ColorSpace.DESTINATION,
+            hueMethod: HueMethod = HueMethod.SHORTER,
+            localMatrix: Matrix33? = null
+        ): Shader = makeSweepGradient(
+            x,
+            y,
+            0f,
+            360f,
+            colors,
+            tileMode,
+            positions,
+            colorSpace,
+            inPremul,
+            interpolationColorSpace,
+            hueMethod,
+            localMatrix
+        )
+
+        /**
          * Returns a shader that generates a sweep gradient given a center.
          * The shader accepts negative angles and angles larger than 360, draws
          * between 0 and 360 degrees, similar to the CSS conic-gradient
@@ -283,6 +417,57 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        /**
+         * This overload avoids allocating intermediate objects
+         *
+         * [colors] represents a flattened array of RGBA values so if positions is not null, colors
+         * must be 4 times the size of positions.
+         */
+        fun makeSweepGradient(
+            x: Float,
+            y: Float,
+            startAngle: Float,
+            endAngle: Float,
+            colors: FloatArray,
+            tileMode: FilterTileMode,
+            positions: FloatArray? = null,
+            colorSpace: ColorSpace? = null,
+            inPremul: InPremul = InPremul.NO,
+            interpolationColorSpace: Gradient.Interpolation.ColorSpace = Gradient.Interpolation.ColorSpace.DESTINATION,
+            hueMethod: HueMethod = HueMethod.SHORTER,
+            localMatrix: Matrix33? = null
+        ): Shader {
+            val colorsSize = colors.size / 4
+            require(positions == null || colorsSize == positions.size) {
+                "colors.length $colorsSize != positions.length ${positions!!.size}"
+            }
+            return try {
+                Stats.onNativeCall()
+                Shader(
+                    interopScope {
+                        _nMakeSweepGradient(
+                            x,
+                            y,
+                            startAngle,
+                            endAngle,
+                            toInterop(colors),
+                            getPtr(colorSpace),
+                            toInterop(positions),
+                            colorsSize,
+                            tileMode.ordinal,
+                            inPremul.ordinal,
+                            interpolationColorSpace.ordinal,
+                            hueMethod.ordinal,
+                            toInterop(localMatrix?.mat)
+                        )
+                    }
+                )
+            } finally {
+                reachabilityBarrier(colorSpace)
+                reachabilityBarrier(localMatrix)
+            }
+        }
+
         fun makeEmpty(): Shader {
             Stats.onNativeCall()
             return Shader(Shader_nMakeEmpty())
@@ -305,6 +490,21 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                         getPtr(space)
                     )
                 )
+            } finally {
+                reachabilityBarrier(space)
+            }
+        }
+
+        fun makeColor(
+            r: Float,
+            g: Float,
+            b: Float,
+            a: Float,
+            space: ColorSpace?
+        ): Shader {
+            return try {
+                Stats.onNativeCall()
+                Shader(_nMakeColorCS(r, g, b, a, getPtr(space)))
             } finally {
                 reachabilityBarrier(space)
             }
