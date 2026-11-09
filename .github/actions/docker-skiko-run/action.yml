@@ -28,7 +28,7 @@ runs:
         filters: |
           docker_changed:
             - '.github/actions/docker-skiko-publish/**'
-            - '.github/workflows/docker-publish.yml'
+            - '.github/workflows/**'
             - 'skiko/docker/${{ inputs.image_name }}/**'
 
     - name: 'Set Variables'
