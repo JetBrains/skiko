@@ -8,7 +8,7 @@ on:
         required: true
         type: boolean
     secrets:
-      ACCESS_TOKEN:
+      token:
         description: 'GitHub token for deploying to gh-pages (required when publish is true)'
         required: false
 
@@ -36,8 +36,8 @@ jobs:
 
       - name: 'Publish Documentation'
         if: ${{ inputs.publish }}
-        uses: JamesIves/github-pages-deploy-action@releases/v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: ./skiko/docs/build/dokka/html
+          token: ${{ secrets.ACCESS_TOKEN }}
+          branch: gh-pages
+          folder: ./skiko/docs/build/dokka/html

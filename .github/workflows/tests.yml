@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -44,7 +44,7 @@ jobs:
             -Dskiko.test.performance.enabled=false \
             macosArm64Test
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Test Results'
         if: failure()
         with:
@@ -69,7 +69,7 @@ jobs:
       - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -86,7 +86,7 @@ jobs:
           IOS_SIM_UUID=$(echo $IOS_SIM_LIST | jq -r '.devices."com.apple.CoreSimulator.SimRuntime.iOS-18-6"[] | select(.name == "iPhone 16") | .udid')
           echo "IOS_SIM_UUID=$IOS_SIM_UUID" >> $GITHUB_ENV
 
-      - uses: nick-fields/retry@v2
+      - uses: nick-fields/retry@v4
         name: 'Run iOS (x64) tests'
         with:
           max_attempts: 3
@@ -100,7 +100,7 @@ jobs:
               -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" \
               iosX64TestWithMetal
 
-      - uses: nick-fields/retry@v2
+      - uses: nick-fields/retry@v4
         name: 'Run iOS (arm64) tests'
         with:
           max_attempts: 3
@@ -115,7 +115,7 @@ jobs:
               iosSimulatorArm64TestWithMetal
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: test-reports-ios
@@ -130,7 +130,7 @@ jobs:
       - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -155,7 +155,7 @@ jobs:
             -Dskiko.test.performance.enabled=false \
             tvosSimulatorArm64Test
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Test Results'
         if: failure()
         with:
@@ -199,7 +199,7 @@ jobs:
               -Dskiko.test.performance.enabled=false \
               awtTest
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Test Results'
         if: failure()
         with:
@@ -236,7 +236,7 @@ jobs:
               -Pskiko.native.linux.enabled=true \
               linkDebugTestLinuxArm64
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload linuxArm64 test binary as artifact'
         with:
           name: test-binary-linuxArm64
@@ -257,7 +257,7 @@ jobs:
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         name: 'Download precompiled linuxArm64 test binary'
         with:
           name: test-binary-linuxArm64
@@ -290,7 +290,7 @@ jobs:
               awtTest
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: test-reports-linux-arm
@@ -314,11 +314,11 @@ jobs:
       - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: microsoft/setup-msbuild@v1
+      - uses: microsoft/setup-msbuild@v3
 
       - uses: ilammy/msvc-dev-cmd@v1
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -337,7 +337,7 @@ jobs:
             -Dskiko.test.ui.renderApi.ignoreAssertsFor=OPENGL \
             awtTest
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Test Results'
         if: failure()
         with:
@@ -365,7 +365,7 @@ jobs:
       # Setup environment directly instead of using docker image
       # because of instability of running tests inside docker
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -374,7 +374,7 @@ jobs:
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - uses: browser-actions/setup-chrome@v1
+      - uses: browser-actions/setup-chrome@v2
         name: 'Setup Google Chrome'
         with:
           chrome-version: stable
@@ -399,7 +399,7 @@ jobs:
             -Pskiko.test.onci=true \
             jsTest
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: test-reports-web
