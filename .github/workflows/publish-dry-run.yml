@@ -156,7 +156,7 @@ jobs:
               :SkiaAwtSample:installDist
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Skia Extensions AWT Sample'
+        name: 'Check Skiko Extensions AWT Sample'
         with:
           image_name: linux-compat
           virtual-display: true
@@ -235,7 +235,7 @@ jobs:
             :SkiaAwtSample:installDist
 
       - shell: bash
-        name: 'Check Skia Extensions AWT Sample'
+        name: 'Check Skiko Extensions AWT Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
@@ -330,7 +330,7 @@ jobs:
             :SkiaAwtSample:installDist
 
       - shell: bash
-        name: 'Check Skia Extensions AWT Sample'
+        name: 'Check Skiko Extensions AWT Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
