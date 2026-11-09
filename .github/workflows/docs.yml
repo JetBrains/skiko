@@ -36,8 +36,8 @@ jobs:
 
       - name: 'Publish Documentation'
         if: ${{ inputs.publish }}
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          token: ${{ secrets.ACCESS_TOKEN }}
-          branch: gh-pages
-          folder: ./skiko/docs/build/dokka/html
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: ./skiko/docs/build/dokka/html
