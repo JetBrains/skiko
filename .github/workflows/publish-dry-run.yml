@@ -294,7 +294,7 @@ jobs:
 
       - uses: microsoft/setup-msbuild@v3
 
-      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: ./.github/actions/msvc-dev-cmd
 
       - uses: actions/setup-java@v6
         name: 'Setup JDK 21'

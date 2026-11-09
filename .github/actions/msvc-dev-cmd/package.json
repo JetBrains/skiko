@@ -1,0 +1,35 @@
+{
+  "name": "msvc-dev-cmd",
+  "version": "1.13.0",
+  "description": "GitHub Action to setup Developer Command Prompt for Microsoft Visual C++",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilammy/msvc-dev-cmd.git"
+  },
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "Developer Command Prompt",
+    "Microsoft Visual Studio",
+    "Microsoft Visual C++",
+    "Visual Studio",
+    "Visual C++",
+    "vcvarsall.bat"
+  ],
+  "author": "ilammy <me@ilammy.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ilammy/msvc-dev-cmd/issues"
+  },
+  "homepage": "https://github.com/ilammy/msvc-dev-cmd#readme",
+  "dependencies": {
+    "@actions/core": "^1.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^7"
+  }
+}
