@@ -36,7 +36,7 @@ jobs:
           filters: |
             docker_workflow:
               - '.github/actions/docker-skiko-publish/**'
-              - '.github/workflows/**'
+              - '.github/workflows/docker-publish.yml'
             linux_amd64:
               - 'skiko/docker/linux-amd64/**'
             linux_compat:
