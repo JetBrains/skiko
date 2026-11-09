@@ -1,24 +1,10 @@
 import {
-    loadedWasm,
-    loadSkikoExtension,
+    isSideModuleLoaded as isSkikoExtensionLoaded,
     registerSkikoWasmReadyCallback,
-} from "./skiko.mjs";
+} from "./skiko-extensions.mjs";
 
-let skottieLoadPromise = null;
-let skottieLoaded = false;
-const skottieWasm = new URL("./skiko-skottie.wasm", import.meta.url).href;
+export const skottieWasm = new URL("./skiko-skottie.wasm", import.meta.url).href;
 
-const ensureSkottieLoaded = () => {
-    if (!skottieLoadPromise) {
-        skottieLoadPromise = loadSkikoExtension(skottieWasm).then(() => {
-            skottieLoaded = true;
-        });
-    }
-    return skottieLoadPromise;
-};
+registerSkikoWasmReadyCallback(skottieWasm);
 
-registerSkikoWasmReadyCallback(() => ensureSkottieLoaded());
-
-const isSideModuleLoaded = () => skottieLoaded;
-
-export { isSideModuleLoaded };
+export const isSideModuleLoaded = () => isSkikoExtensionLoaded(skottieWasm);

@@ -226,6 +226,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "-s", "EXPORT_ES6=1",
                 "-s", "EXPORT_NAME=loadSkikoWASM",
                 "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
+                "-s", "EXPORTED_FUNCTIONS=\"[_malloc, _free]\"",
                 "-s", "STACK_SIZE=1048576", // 1 MB
                 "--bind",
             )
@@ -294,6 +295,10 @@ kotlin {
 
         js {
             outputModuleName.set("skiko-kjs") // override the name to avoid name collision with a different skiko.js file
+            useEsModules()
+            compilerOptions {
+                target.set("es2015")
+            }
             browser {
                 testTask {
                     useKarma {

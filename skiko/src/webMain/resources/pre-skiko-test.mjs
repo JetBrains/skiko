@@ -4,17 +4,13 @@ const loadedWasm = {
     _: {}
 }
 
-awaitSkiko.then((module) => {
-    loadedWasm._ = module.wasmExports;
+loadedWasm._ = awaitSkiko.wasmExports;
 
-    for (let exportName of Object.keys(module.wasmExports)) {
-        if (exportName.startsWith("org_jetbrains_skiko_tests_")) {
-            window[exportName] = module.wasmExports[exportName]
-        }
+for (let exportName of Object.keys(awaitSkiko.wasmExports)) {
+    if (exportName.startsWith("org_jetbrains_skiko_tests_")) {
+        window[exportName] = awaitSkiko.wasmExports[exportName]
     }
-
-    return module
-});
+}
 
 export const api = {
     testSetup: () => {}
