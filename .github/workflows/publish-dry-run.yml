@@ -156,7 +156,7 @@ jobs:
               :SkiaAwtSample:installDist
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Skiko Extensions Sample'
+        name: 'Check Skia Extensions AWT Sample'
         with:
           image_name: linux-compat
           virtual-display: true
@@ -165,7 +165,7 @@ jobs:
               :runAwt --args=--exit-after-ms=5000
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Skia Multiplatform Sample'
+        name: 'Check Skia Multiplatform AWT Sample'
         with:
           image_name: linux-compat
           virtual-display: true
@@ -235,13 +235,13 @@ jobs:
             :SkiaAwtSample:installDist
 
       - shell: bash
-        name: 'Check Skiko Extensions Sample'
+        name: 'Check Skia Extensions AWT Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
 
       - shell: bash
-        name: 'Check Skia Multiplatform Sample'
+        name: 'Check Skia Multiplatform AWT Sample'
         run: |
           ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
@@ -330,13 +330,13 @@ jobs:
             :SkiaAwtSample:installDist
 
       - shell: bash
-        name: 'Check Skiko Extensions Sample'
+        name: 'Check Skia Extensions AWT Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
 
       - shell: bash
-        name: 'Check Skia Multiplatform Sample'
+        name: 'Check Skia Multiplatform AWT Sample'
         run: |
           ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
