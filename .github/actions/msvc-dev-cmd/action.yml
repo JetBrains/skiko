@@ -1,3 +1,4 @@
+# Original: https://github.com/ilammy/msvc-dev-cmd/blob/0b201ec74fa43914dc39ae48a89fd1d8cb592756/action.yml
 name: Enable Developer Command Prompt
 description: Configure Microsoft Visual C++ command line
 inputs:
