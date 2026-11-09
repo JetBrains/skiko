@@ -12,6 +12,6 @@ for (let exportName of Object.keys(awaitSkiko.wasmExports)) {
     }
 }
 
-export const api = {
+export const testApi = {
     testSetup: () => {}
 }
