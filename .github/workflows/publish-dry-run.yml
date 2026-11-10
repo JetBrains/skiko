@@ -34,7 +34,7 @@ jobs:
 
   Web:
     name: 'Web Publish Dry Run'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         name: 'Check out code'
