@@ -1,4 +1,4 @@
-FROM ubuntu:26.10
+FROM ubuntu:26.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -y && \
