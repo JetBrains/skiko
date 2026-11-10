@@ -44,6 +44,7 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_shaper_IcuBidiRunIterator__1nMake")
 // Needs ForceNativeThreadState: copies the whole text to UTF-16 and runs bidi analysis over all of it, so its time
 // grows with the text length.
@@ -55,3 +56,4 @@ private external fun _nMake(textPtr: NativePointer, bidiLevel: Int): NativePoint
 // No ForceNativeThreadState: only returns a stored level, so it is short and cannot block.
 // Native call path: SkUnicodeBidiRunIterator::currentLevel
 private external fun _nGetCurrentLevel(ptr: NativePointer): Int
+// </editor-fold>

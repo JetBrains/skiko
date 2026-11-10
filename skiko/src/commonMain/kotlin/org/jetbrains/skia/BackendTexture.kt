@@ -59,6 +59,7 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_BackendTexture__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -83,3 +84,4 @@ private external fun _nMakeGL(
 // and cannot block.
 // Native call path: GLTextureParametersModified -> invalidate
 private external fun _nGLTextureParametersModified(backendTexturePtr: NativePointer)
+// </editor-fold>

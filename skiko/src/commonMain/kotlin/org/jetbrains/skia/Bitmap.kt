@@ -1081,7 +1081,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     }
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -1346,3 +1346,4 @@ private external fun _nPeekPixels(ptr: NativePointer): NativePointer
 // Native call path: SkImage_Raster::MakeFromBitmap -> SkData::MakeWithCopy
 @ForceNativeThreadState
 private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingModeValue1: Int, samplingModeValue2: Int, localMatrix: InteropPointer): NativePointer
+// </editor-fold>

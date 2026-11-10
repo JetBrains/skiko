@@ -232,7 +232,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
     }
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot
 // block.
@@ -302,3 +302,4 @@ private external fun _nAppendRunRSXform(
     glyphs: InteropPointer, glyphsLen: Int,
     xform: InteropPointer
 )
+// </editor-fold>

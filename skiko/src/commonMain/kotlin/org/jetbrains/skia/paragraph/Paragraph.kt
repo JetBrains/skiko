@@ -314,6 +314,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
 }
 
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetFinalizer")
 // No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot
 // block.
@@ -473,3 +474,4 @@ private external fun _nUpdateForegroundPaint(ptr: NativePointer, from: Int, to: 
 // Native call path: ParagraphImpl::updateBackgroundPaint -> TextStyle::setBackgroundPaint
 @ForceNativeThreadState
 private external fun _nUpdateBackgroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)
+// </editor-fold>

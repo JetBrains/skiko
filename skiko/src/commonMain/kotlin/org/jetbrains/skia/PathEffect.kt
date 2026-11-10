@@ -102,6 +102,7 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeCompose")
 // No ForceNativeThreadState: holds references to two other path effects and cannot own typefaces or GPU objects, so it
 // is short and cannot block.
@@ -148,3 +149,4 @@ private external fun _nMakeDash(intervals: InteropPointer, count: Int, phase: Fl
 // cannot block.
 // Native call path: SkDiscretePathEffect::Make
 private external fun _nMakeDiscrete(segLength: Float, dev: Float, seed: Int): NativePointer
+// </editor-fold>

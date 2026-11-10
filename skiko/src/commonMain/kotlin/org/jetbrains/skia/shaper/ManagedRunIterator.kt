@@ -52,7 +52,7 @@ abstract class ManagedRunIterator<T> internal constructor(
     }
 }
 
-
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_shaper_ManagedRunIterator__1nGetFinalizer")
 // No ForceNativeThreadState: only returns the address of a delete function, so it is short and cannot block.
 // Native call path: deleteRunIterator
@@ -76,3 +76,4 @@ private external fun _nGetEndOfCurrentRun(ptr: NativePointer, textPtr: NativePoi
 // Native call path: SkikoRunIterator::atEnd -> KCallback::operator() -> callBooleanCallback
 @ForceNativeThreadState
 private external fun _nIsAtEnd(ptr: NativePointer): Boolean
+// </editor-fold>

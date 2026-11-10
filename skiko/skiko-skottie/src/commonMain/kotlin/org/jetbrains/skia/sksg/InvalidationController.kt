@@ -55,6 +55,7 @@ class InvalidationController internal constructor(ptr: NativePointer) : Managed(
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -85,3 +86,4 @@ private external fun InvalidationController_nGetBounds(ptr: NativePointer, resul
 // Native call path: InvalidationController::reset -> std::vector::clear
 @ForceNativeThreadState
 private external fun InvalidationController_nReset(ptr: NativePointer)
+// </editor-fold>

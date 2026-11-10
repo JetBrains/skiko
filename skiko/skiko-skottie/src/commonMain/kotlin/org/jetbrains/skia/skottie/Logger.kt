@@ -30,6 +30,7 @@ abstract class Logger : RefCnt(_nMake()) {
 
 internal expect fun Logger.doInit(ptr: NativePointer)
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nMake")
 // No ForceNativeThreadState: creates a logger with empty strings and no callback, so it is short and cannot block.
 // Native call path: SkikoLogger::SkikoLogger
@@ -59,3 +60,4 @@ internal external fun Logger_nGetLogJson(ptr: NativePointer): NativePointer
 // No ForceNativeThreadState: returns the stored log level, so it is short and cannot block.
 // Native call path: SkikoLogger::logLevel
 internal external fun Logger_nGetLogLevel(ptr: NativePointer): Int
+// </editor-fold>

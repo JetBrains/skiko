@@ -374,6 +374,7 @@ class RenderNode internal constructor(ptr: NativePointer, managed: Boolean = tru
     }
 }
 
+// <editor-fold defaultstate="collapsed" desc="Native External Functions">
 @ExternalSymbolName("org_jetbrains_skiko_node_RenderNodeKt_RenderNode_1nMake")
 // No ForceNativeThreadState: only allocates a few recording objects and a camera, with no typeface or GPU work, so it
 // is short and cannot block.
@@ -614,3 +615,4 @@ private external fun RenderNode_nEndRecording(ptr: NativePointer)
 // Native call path: RenderNode::drawInto -> SkCanvas::drawDrawable -> RenderNode::onDraw
 @ForceNativeThreadState
 private external fun RenderNode_nDrawInto(ptr: NativePointer, canvas: NativePointer)
+// </editor-fold>
