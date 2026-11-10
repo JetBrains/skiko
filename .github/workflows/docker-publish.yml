@@ -58,7 +58,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@7
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/docker-skiko-publish
@@ -82,7 +82,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@7
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/docker-skiko-publish
@@ -107,7 +107,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@7
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/docker-skiko-publish
@@ -131,7 +131,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@7
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - name: 'Set Variables'
