@@ -8,7 +8,7 @@ jobs:
     name: 'Android Publish Dry Run'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -36,13 +36,13 @@ jobs:
     name: 'Web Publish Dry Run'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -58,7 +58,7 @@ jobs:
               -Pskiko.emsdk.dir="\$EMSDK_DIR" \
               publishToMavenLocal
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         name: 'Setup Node.js'
         with:
           node-version: 22
@@ -75,8 +75,29 @@ jobs:
           GRADLE_USER_HOME: ${{ runner.temp }}/skiko-extensions-gradle
           NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
           PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+          SAMPLE_DIR: ${{ github.workspace }}/samples/SkikoExtensionsSample
         run: |
-          bash samples/SkikoExtensionsSample/scripts/check-web-sample.sh
+          bash samples/scripts/check-web-sample.sh
+
+      - shell: bash
+        name: 'Check Skia Web Sample'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skia-web-gradle
+          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
+          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+          SAMPLE_DIR: ${{ github.workspace }}/samples/SkiaWebSample
+        run: |
+          bash samples/scripts/check-web-sample.sh
+
+      - shell: bash
+        name: 'Check Skia Multiplatform Web Sample'
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skia-multiplatform-gradle
+          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
+          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
+          SAMPLE_DIR: ${{ github.workspace }}/samples/SkiaMultiplatformSample
+        run: |
+          bash samples/scripts/check-web-sample.sh
 
       - shell: bash
         name: 'Run Skiko Web Benchmarks'
@@ -87,7 +108,7 @@ jobs:
         run: |
           ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts web version=0.0.0-SNAPSHOT
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Skiko Web Benchmark Reports'
         if: always()
         with:
@@ -98,7 +119,7 @@ jobs:
     name: 'Linux x64 Publish Dry Run'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -135,7 +156,7 @@ jobs:
               :SkiaAwtSample:installDist
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Skiko Extensions Sample'
+        name: 'Check Skiko Extensions AWT Sample'
         with:
           image_name: linux-compat
           virtual-display: true
@@ -143,11 +164,20 @@ jobs:
             ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
               :runAwt --args=--exit-after-ms=5000
 
+      - uses: ./.github/actions/docker-skiko-run
+        name: 'Check Skia Multiplatform AWT Sample'
+        with:
+          image_name: linux-compat
+          virtual-display: true
+          command: |
+            ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+              :runAwt --args=--exit-after-ms=5000
+
   LinuxArm:
     name: 'Linux arm64 Publish Dry Run'
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -168,10 +198,10 @@ jobs:
     name: 'macOS Publish Dry Run'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -205,9 +235,15 @@ jobs:
             :SkiaAwtSample:installDist
 
       - shell: bash
-        name: 'Check Skiko Extensions Sample'
+        name: 'Check Skiko Extensions AWT Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+            :runAwt --args=--exit-after-ms=5000
+
+      - shell: bash
+        name: 'Check Skia Multiplatform AWT Sample'
+        run: |
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
 
       - shell: bash
@@ -223,13 +259,26 @@ jobs:
             :linkDebugExecutableIosX64
 
       - shell: bash
+        name: 'Check Skia Multiplatform Apple Native Sample'
+        run: |
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
+            -Psample.exitAfterMs=5000 \
+            :runNative \
+            :linkDebugExecutableMacosArm64 \
+            :linkDebugExecutableMacosX64 \
+            :linkDebugExecutableIosSimulatorArm64 \
+            :linkDebugExecutableTvosArm64 \
+            :linkDebugExecutableTvosSimulatorArm64 \
+            :linkDebugExecutableTvosX64
+
+      - shell: bash
         name: 'Run Skiko macOS Native Benchmarks'
         env:
           GRADLE_USER_HOME: ${{ runner.temp }}/skiko-benchmarks-gradle
         run: |
           ./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts macos version=0.0.0-SNAPSHOT
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Skiko macOS Native Benchmark Reports'
         if: always()
         with:
@@ -240,14 +289,14 @@ jobs:
     name: 'Windows Publish Dry Run'
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: microsoft/setup-msbuild@v1
+      - uses: microsoft/setup-msbuild@v3
 
       - uses: ilammy/msvc-dev-cmd@v1
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -281,7 +330,13 @@ jobs:
             :SkiaAwtSample:installDist
 
       - shell: bash
-        name: 'Check Skiko Extensions Sample'
+        name: 'Check Skiko Extensions AWT Sample'
         run: |
           ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
+            :runAwt --args=--exit-after-ms=5000
+
+      - shell: bash
+        name: 'Check Skia Multiplatform AWT Sample'
+        run: |
+          ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000

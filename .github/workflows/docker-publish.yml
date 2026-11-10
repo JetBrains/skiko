@@ -26,10 +26,10 @@ jobs:
       windows: ${{ steps.filter.outputs.windows }}
       docker_workflow: ${{ steps.filter.outputs.docker_workflow }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           base: ${{ github.event.pull_request.base.sha || github.event.before || 'master' }}
@@ -58,7 +58,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/docker-skiko-publish
@@ -82,7 +82,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/docker-skiko-publish
@@ -107,7 +107,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/docker-skiko-publish
@@ -131,7 +131,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - name: 'Set Variables'
