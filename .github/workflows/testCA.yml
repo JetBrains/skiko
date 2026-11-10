@@ -7,6 +7,23 @@ on:
       - igor.demin/eMudhra-fix-test
 
 jobs:
+  build:
+    name: Storytale-like test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run
+        run: |
+          bash ./scripts/securityTest_eMudhraCA.sh
+
   ubuntu-2404-with-node:
     runs-on: ubuntu-24.04
     name: ubuntu-2404
