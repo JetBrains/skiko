@@ -1,7 +1,9 @@
 #include "SkShaper.h"
 #include "FontRunIterator.hh"
 #include "src/core/SkUTF.h"
+#ifdef SKIKO_USE_ICU
 #include "unicode/uchar.h"
+#endif
 #include <iostream>
 
 // Adapted from SkShaper.cpp

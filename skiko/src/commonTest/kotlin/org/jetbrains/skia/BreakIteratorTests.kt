@@ -7,6 +7,12 @@ import kotlin.test.*
 
 private fun BreakIterator.asSequence() = generateSequence { next().let { n -> if (n == -1) null else n } }
 
+/**
+ * `true` when [BreakIterator] is served by a non-ICU backend, i.e. by the browser
+ * `Intl.Segmenter` in an ICU-less `skiko.wasm` (`-Pskiko.wasm.useIcu=false`).
+ */
+private val usesBrowserBreakIterators: Boolean
+    get() = createBreakIteratorBackend(BreakIterator.TYPE_CHARACTER, null) != null
 
 class BreakIteratorTests {
 
@@ -36,12 +42,60 @@ class BreakIteratorTests {
     @SkipNativeTarget
     @SkipJvmTarget
     fun breakIteratorSentenceFailsOnJsTest() {
+        if (usesBrowserBreakIterators) {
+            // An ICU-less binary segments with the browser `Intl.Segmenter` instead of failing.
+            val boundary = BreakIterator.makeSentenceInstance()
+            boundary.setText("One. Two.")
+            assertEquals(0, boundary.first())
+            assertEquals(9, boundary.last())
+            return
+        }
         // Wasm and iOS builds of Skia do not include required data to implement those iterators,
         // see `third_party/externals/icu/flutter/README.md`.
         // unfortunately js target does not check neither message nor the type of exception so here we can rely only on the fact there was exception
         assertFailsWith<RuntimeException> {
             BreakIterator.makeSentenceInstance()
         }
+    }
+
+    /**
+     * Backend agnostic invariants that must hold for ICU and for the browser
+     * `Intl.Segmenter` backend alike (see UAX #29).
+     */
+    @Test
+    fun characterInstanceKeepsGraphemeClustersTogether() {
+        if (!usesBrowserBreakIterators && (hostOs == OS.Ios || hostOs == OS.Tvos)) return
+
+        val text = "a\u0301\uD83D\uDC69\u200D\uD83D\uDCBBz"
+        val boundary = BreakIterator.makeCharacterInstance()
+        boundary.setText(text)
+
+        assertEquals(0, boundary.first())
+        assertEquals(text.length, boundary.last())
+
+        // Every boundary must be a grapheme cluster start, so the combining acute
+        // accent and the ZWJ emoji sequence are never split.
+        val boundaries = buildList {
+            add(boundary.first())
+            addAll(boundary.asSequence())
+        }
+        assertTrue(boundaries.contains(0))
+        assertTrue(boundaries.contains(text.length))
+        assertFalse(boundaries.contains(1), "combining mark must not start a cluster")
+        assertFalse(boundaries.contains(3), "ZWJ emoji sequence must not be split")
+    }
+
+    @Test
+    fun lineInstanceReportsMandatoryBreaks() {
+        if (!usesBrowserBreakIterators && (hostOs == OS.Ios || hostOs == OS.Tvos)) return
+
+        val text = "first line\nsecond line"
+        val boundary = BreakIterator.makeLineInstance()
+        boundary.setText(text)
+
+        assertEquals(0, boundary.first())
+        assertEquals(text.length, boundary.last())
+        assertTrue(boundary.isBoundary(text.indexOf('\n') + 1))
     }
 
 

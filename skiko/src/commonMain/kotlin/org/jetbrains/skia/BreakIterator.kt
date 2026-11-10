@@ -192,8 +192,15 @@ import org.jetbrains.skia.impl.withResult
  * with punctuation or other non-word characters.
 </blockquote> *
  */
-class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
+class BreakIterator internal constructor(
+    ptr: NativePointer,
+    private val backend: BreakIteratorBackend? = null
+) : Managed(ptr, if (backend == null) _FinalizerHolder.PTR else NullPointer, backend == null) {
     companion object {
+        internal const val TYPE_CHARACTER = 0
+        internal const val TYPE_WORD = 1
+        internal const val TYPE_LINE = 2
+        internal const val TYPE_SENTENCE = 3
         /**
          * DONE is returned by previous() and next() after all valid
          * boundaries have been returned.
@@ -258,6 +265,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          * Returns a new BreakIterator instance for character breaks for the default locale.
          */
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
+            createBreakIteratorBackend(TYPE_CHARACTER, locale)?.let { return BreakIterator(it.stubPointer, it) }
             Stats.onNativeCall()
             return BreakIterator(withErrorGuard("Failed to create character iterator") { _nMake(0, toInterop(locale), it)  }) // UBRK_CHARACTER
         }
@@ -268,6 +276,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          * Returns a new BreakIterator instance for word breaks for the default locale.
          */
         fun makeWordInstance(locale: String? = null): BreakIterator {
+            createBreakIteratorBackend(TYPE_WORD, locale)?.let { return BreakIterator(it.stubPointer, it) }
             Stats.onNativeCall()
             return BreakIterator(withErrorGuard("Failed to create word iterator") { _nMake(1, toInterop(locale), it) }) // UBRK_WORD
         }
@@ -278,6 +287,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          * Returns a new BreakIterator instance for line breaks for the default locale.
          */
         fun makeLineInstance(locale: String? = null): BreakIterator {
+            createBreakIteratorBackend(TYPE_LINE, locale)?.let { return BreakIterator(it.stubPointer, it) }
             Stats.onNativeCall()
             return BreakIterator(withErrorGuard("Failed to create line iterator")  { _nMake(2, toInterop(locale), it) }) // UBRK_LINE
         }
@@ -288,6 +298,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          * Returns a new BreakIterator instance for sentence breaks for the default locale.
          */
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
+            createBreakIteratorBackend(TYPE_SENTENCE, locale)?.let { return BreakIterator(it.stubPointer, it) }
             Stats.onNativeCall()
             return BreakIterator(withErrorGuard("Failed to create sentence iterator")  {
                 _nMake(3, toInterop(locale), it)
@@ -301,8 +312,11 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
 
     internal var _text: U16String? = null
     override fun close() {
-        super.close()
+        if (backend == null) {
+            super.close()
+        }
         _text?.close()
+        _text = null
     }
 
     /**
@@ -315,6 +329,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * on which one is reached.
      */
     fun current(): Int {
+        backend?.let { return it.current() }
         return try {
             Stats.onNativeCall()
             _nCurrent(_ptr)
@@ -331,6 +346,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * boundary.
      */
     operator fun next(): Int {
+        backend?.let { return it.next() }
         return try {
             Stats.onNativeCall()
             _nNext(_ptr)
@@ -375,6 +391,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * boundary.
      */
     fun previous(): Int {
+        backend?.let { return it.previous() }
         return try {
             Stats.onNativeCall()
             _nPrevious(_ptr)
@@ -387,6 +404,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * Returns the first boundary. The iterator's current position is set to the first text boundary.
      */
     fun first(): Int {
+        backend?.let { return it.first() }
         return try {
             Stats.onNativeCall()
             _nFirst(_ptr)
@@ -399,6 +417,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * Returns the last boundary. The iterator's current position is set to the last text boundary.
      */
     fun last(): Int {
+        backend?.let { return it.last() }
         return try {
             Stats.onNativeCall()
             _nLast(_ptr)
@@ -416,6 +435,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * the value [BreakIterator.DONE].
      */
     fun preceding(offset: Int): Int {
+        backend?.let { return it.preceding(offset) }
         return try {
             Stats.onNativeCall()
             _nPreceding(_ptr, offset)
@@ -433,6 +453,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * the value [BreakIterator.DONE].
      */
     fun following(offset: Int): Int {
+        backend?.let { return it.following(offset) }
         return try {
             Stats.onNativeCall()
             _nFollowing(_ptr, offset)
@@ -445,6 +466,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * Returns true if the specified character offset is a text boundary.
      */
     fun isBoundary(offset: Int): Boolean {
+        backend?.let { return it.isBoundary(offset) }
         return try {
             Stats.onNativeCall()
             _nIsBoundary(_ptr, offset)
@@ -466,7 +488,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * at the current iteration position.
      */
     val ruleStatus: Int
-        get() = try {
+        get() = backend?.ruleStatus ?: try {
             Stats.onNativeCall()
             _nGetRuleStatus(_ptr)
         } finally {
@@ -484,7 +506,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * @return  an array with the status values.
      */
     val ruleStatuses: IntArray
-        get() = try {
+        get() = backend?.ruleStatuses ?: try {
             Stats.onNativeCall()
             val arrayLen = _nGetRuleStatusesLen(_ptr)
             withResult(IntArray(arrayLen)) { result ->
@@ -498,6 +520,10 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * Set a new text string to be scanned. The current scan position is reset to [].
      */
     fun setText(text: String?) {
+        backend?.let {
+            it.setText(text)
+            return
+        }
         try {
             Stats.onNativeCall()
             _text?.close()
@@ -520,12 +546,25 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 }
 
+/**
+ * `U_UNSUPPORTED_ERROR` of ICU's `UErrorCode`.
+ *
+ * Reported by the native bindings of an ICU-less binary (a wasm build made with
+ * `-Pskiko.wasm.useIcu=false`), where the ICU break iterator subsystem is absent.
+ */
+private const val ICU_UNSUPPORTED_ERROR = 16
+
 private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer) -> NativePointer): NativePointer {
     val errorCode = IntArray(1)
     return interopScope {
         val handle = toInterop(errorCode)
         val res = block.invoke(this, handle)
         handle.fromInterop(errorCode)
+        if (errorCode[0] == ICU_UNSUPPORTED_ERROR) {
+            throw UnsupportedOperationException(
+                "ICU is excluded from this Skiko binary; use WebBreakIteratorProvider instead. ($message)"
+            )
+        }
         if (errorCode[0] > 0) {
             throw RuntimeException("$message; operation failed with status ${errorCode}")
         }

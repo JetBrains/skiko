@@ -31,6 +31,46 @@
 
 To build with debug symbols and debug Skia build use `-Pskiko.debug=true` Gradle argument.
 
+#### Building the web target without ICU
+
+The wasm binary links an embedded ICU by default. It can be excluded completely:
+
+```
+./gradlew :skiko:skikoWasmJar -Pskiko.wasm.useIcu=false -Pskia.dir=/path/to/skia
+```
+
+The output is still named `skiko.wasm`, so no loader or Compose Multiplatform change is needed.
+The resulting binary contains no ICU code, data or archives; instead
+
+* text segmentation (graphemes, words, sentences, line breaks) comes from the browser
+  `Intl.Segmenter`: for explicitly built paragraphs via `SkUnicodeClient`
+  (`ParagraphBuilder.createForText(...)`), and for every text-agnostic Skia API via the
+  process wide `SkikoUnicode` (`src/webMain/cpp/skunicode_client/SkikoUnicode.cpp`), so
+  `ParagraphBuilder`, `Shaper` and `TextLine` all work (see also
+  `SkikoUnicodeBackend.isIcuAvailable`);
+* BiDi resolution (UAX #9) is done by Skiko's own embedded implementation
+  (`src/webMain/cpp/skunicode_client/SkikoBidi.cpp`), which also backs
+  `shaper.BidiRunIterator` and `icu.Unicode.charDirection()`;
+* `org.jetbrains.skia.BreakIterator` is implemented in Kotlin on top of `Intl.Segmenter`
+  (character/word/line/sentence, including `ruleStatus`), and only throws
+  `UnsupportedOperationException` if the engine has no `Intl.Segmenter` at all;
+* `icu.CharProperties` answers the white space, bidi control and emoji properties from
+  built-in tables — other properties return `false`, and line breaking is a UAX #14
+  approximation (`Intl.Segmenter` has no `line` granularity).
+
+The flag expects Skia static archives built without ICU, in
+`<skia>/out/<BuildType>-wasm-wasm-no-icu`. Build them with:
+
+```
+python3 tools/skia_release/build.py --target wasm --machine wasm --gpu-as-extension --no-use-icu
+```
+
+(which passes `skia_use_icu=false` and `skia_use_skunicode_core_only=true` to GN, so that only
+the ICU-free `libskunicode_core.wasm.a` is produced).
+
+Omitting the flag (or passing `-Pskiko.wasm.useIcu=true`) keeps building the standard,
+ICU-backed binary from `<skia>/out/<BuildType>-wasm-wasm`.
+
 #### Working with Skia sources
 
 Gradle build downloads the necessary version of Skia by default.

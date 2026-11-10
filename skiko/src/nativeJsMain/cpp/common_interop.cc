@@ -88,6 +88,16 @@ namespace skija {
             }
         }
 
+#ifndef SKIKO_USE_ICU
+        std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text) {
+            // ICU is excluded from this binary: fall back to the code point based
+            // grapheme shim (see grapheme_shim.h).
+            return std::shared_ptr<UBreakIterator>(
+                skiko_grapheme_break_iterator_create(text.c_str(), text.size()),
+                [](UBreakIterator* p) { skiko_ubrk_close(p); }
+            );
+        }
+#else
         std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text) {
             UErrorCode status = U_ZERO_ERROR;
             ICUUText utext(utext_openUTF8(nullptr, text.c_str(), text.size(), &status));
@@ -113,6 +123,7 @@ namespace skija {
 
             return graphemeIter;
         }
+#endif  // SKIKO_USE_ICU
     }
 }
 

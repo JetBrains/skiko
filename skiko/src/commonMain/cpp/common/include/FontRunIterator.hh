@@ -1,7 +1,13 @@
 #pragma once
 #include "SkShaper.h"
+#ifdef SKIKO_USE_ICU
 #include "unicode/ubrk.h"
 #include "unicode/utext.h"
+#else
+// ICU is excluded from this binary (wasm built with -Pskiko.wasm.useIcu=false):
+// use the UBreakIterator compatible shim instead.
+#include "grapheme_shim.h"
+#endif
 
 class FontRunIterator final: public SkShaper::FontRunIterator {
 public:

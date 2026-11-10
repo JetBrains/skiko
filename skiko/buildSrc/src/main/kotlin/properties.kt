@@ -152,6 +152,27 @@ class SkikoProperties(private val myProject: Project) {
     val isWasmBuildWithProfiling: Boolean
         get() = myProject.findProperty("skiko.wasm.withProfiling") == "true"
 
+    /**
+     * Whether ICU is linked into the wasm binary.
+     *
+     * Usage: `-Pskiko.wasm.useIcu=false` to build an ICU-less `skiko.wasm`.
+     * In that case text segmentation is provided by the browser (`Intl.Segmenter`)
+     * and BiDi resolution by Skiko's own embedded UAX #9 implementation.
+     *
+     * Defaults to `true` to keep the standard, ICU backed binary.
+     */
+    val wasmUseIcu: Boolean
+        get() = (System.getenv("SKIKO_USE_ICU") ?: myProject.findProperty(SkikoGradleProperties.WASM_USE_ICU)?.toString())
+            ?.let { it != "false" && it != "0" }
+            ?: true
+
+    /**
+     * Name of the Skia output directory (inside the Skia distribution) with the
+     * static archives for the wasm target.
+     */
+    val wasmSkiaOutDirName: String
+        get() = "${buildType.id}-wasm-wasm" + if (wasmUseIcu) "" else "-no-icu"
+
     val targetArch: Arch
         get() = myProject.findProperty("skiko.arch")?.toString()?.let(Arch::byName) ?: hostArch
 
@@ -283,6 +304,7 @@ object SkikoGradleProperties {
     const val NATIVE_TVOS_X64 = "skiko.native.tvos.x64.enabled"
     const val NATIVE_MAC = "skiko.native.mac.enabled"
     const val NATIVE_LINUX = "skiko.native.linux.enabled"
+    const val WASM_USE_ICU = "skiko.wasm.useIcu"
 }
 
 class SkikoArtifacts(

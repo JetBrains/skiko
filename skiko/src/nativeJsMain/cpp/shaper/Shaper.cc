@@ -3,12 +3,18 @@
 #include "SkShaper_harfbuzz.h"
 #include "SkUnicode.h"
 #include "src/core/SkUTF.h"
+#ifdef SKIKO_USE_ICU
 #include "unicode/ubidi.h"
+#endif
 #include "common.h"
 #include "FontRunIterator.hh"
 #include "TextLineRunHandler.hh"
 #include "FontMgrDefaultFactory.hh"
+#ifdef SKIKO_USE_ICU
 #include "SkUnicode_icu.h"
+#else
+#include "skunicode_client/SkikoUnicode.h"
+#endif
 
 #ifdef SK_SHAPER_CORETEXT_AVAILABLE
 #include "SkShaper_coretext.h"
@@ -43,9 +49,19 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWra
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder
   (KNativePointer fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>((fontMgrPtr));
+#ifdef SKIKO_USE_ICU
     // TODO: consider if we need/want to use ICU4X or Libgrapheme (skuincode/include has those implementations too)
     sk_sp<SkUnicode> unicode = SkUnicodes::ICU::Make();
     return reinterpret_cast<KNativePointer>(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr)).release());
+#else
+    // ICU is excluded from this binary: this shaper flavour requires a process wide
+    // SkUnicode, which is served by `Intl.Segmenter` + the embedded UAX #9 instead.
+    sk_sp<SkUnicode> unicode = SkikoUnicode::Make();
+    if (!unicode) {
+        return nullptr;
+    }
+    return reinterpret_cast<KNativePointer>(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr)).release());
+#endif
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeCoreText() {

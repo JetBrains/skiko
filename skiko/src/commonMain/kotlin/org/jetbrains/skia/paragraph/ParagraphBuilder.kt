@@ -5,13 +5,19 @@ import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
 
-class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
-    Managed(makeParagraphBuilder(style, fc), _FinalizerHolder.PTR) {
+class ParagraphBuilder(
+    style: ParagraphStyle?,
+    fc: FontCollection?,
+    unicode: SkUnicode? = null
+) : Managed(makeParagraphBuilder(style, fc, unicode), _FinalizerHolder.PTR) {
     companion object {
         init {
             staticLoad()
         }
     }
+
+    // The native SkUnicode keeps a span over its own text buffer, so it has to outlive the builder.
+    private val _unicode: SkUnicode? = unicode
 
     private var _text: ManagedString? = null
     fun pushStyle(style: TextStyle?): ParagraphBuilder {
@@ -74,6 +80,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
             _text = null
             paragraph
         } finally {
+            reachabilityBarrier(_unicode)
             reachabilityBarrier(this)
         }
     }
@@ -85,14 +92,16 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
 
 private fun makeParagraphBuilder(
     style: ParagraphStyle?,
-    fc: FontCollection?
+    fc: FontCollection?,
+    unicode: SkUnicode?
 ): NativePointer {
     Stats.onNativeCall()
     return try {
-        _nMake(getPtr(style), getPtr(fc))
+        _nMake(getPtr(style), getPtr(fc), getPtr(unicode))
     } finally {
         reachabilityBarrier(style)
         reachabilityBarrier(fc)
+        reachabilityBarrier(unicode)
     }
 }
 
@@ -100,7 +109,11 @@ private fun makeParagraphBuilder(
 private external fun ParagraphBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
-private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
+private external fun _nMake(
+    paragraphStylePtr: NativePointer,
+    fontCollectionPtr: NativePointer,
+    unicodePtr: NativePointer
+): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
 private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)

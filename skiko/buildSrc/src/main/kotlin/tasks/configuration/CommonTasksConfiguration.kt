@@ -66,8 +66,10 @@ fun skiaHeadersDirs(skiaDir: File): List<File> =
 fun includeHeadersFlags(headersDirs: List<File>) =
     headersDirs.map { "-I${it.absolutePath}" }.toTypedArray()
 
-fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
-    val base = listOf(
+fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType, useIcu: Boolean = true): Array<String> {
+    val base = listOfNotNull(
+        // Guards all the ICU usages in Skiko's own native sources.
+        "-DSKIKO_USE_ICU=1".takeIf { useIcu },
         "-DSK_ALLOW_STATIC_GLOBAL_INITIALIZERS=1",
         "-DSK_FORCE_DISTANCE_FIELD_TEXT=0",
         "-DSK_GAMMA_APPLY_TO_A8",
@@ -81,14 +83,15 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         "-DSK_SHAPER_UNICODE_AVAILABLE",
         "-DSK_SUPPORT_OPENCL=0",
         "-DSK_UNICODE_AVAILABLE",
+        *buildType.flags
+    ) + if (useIcu) listOf(
         "-DSK_USING_THIRD_PARTY_ICU",
         // For ICU symbols renaming:
         "-DU_DISABLE_RENAMING=0",
         "-DU_DISABLE_VERSION_SUFFIX=1",
         "-DU_HAVE_LIB_SUFFIX=1",
         "-DU_LIB_SUFFIX_C_NAME=_skiko",
-        *buildType.flags
-    )
+    ) else emptyList()
 
     val perOs = when (os) {
         OS.MacOS -> listOf(

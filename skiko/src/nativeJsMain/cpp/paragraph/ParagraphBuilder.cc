@@ -1,6 +1,11 @@
 #include <iostream>
 #include <string>
+#ifdef SKIKO_USE_ICU
 #include "modules/skunicode/include/SkUnicode_icu.h"
+#else
+#include "skunicode_client/SkikoUnicode.h"
+#endif
+#include "SkikoUnicodeHolder.hh"
 #include "ParagraphBuilder.h"
 
 using namespace std;
@@ -12,13 +17,26 @@ static void deleteParagraphBuilder(ParagraphBuilder* instance) {
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake
-  (KNativePointer paragraphStylePtr, KNativePointer fontCollectionPtr) {
+  (KNativePointer paragraphStylePtr, KNativePointer fontCollectionPtr, KNativePointer unicodePtr) {
     ParagraphStyle* paragraphStyle = reinterpret_cast<ParagraphStyle*>((paragraphStylePtr));
     FontCollection* fontCollection = reinterpret_cast<FontCollection*>((fontCollectionPtr));
+    SkikoUnicodeHolder* unicodeHolder = reinterpret_cast<SkikoUnicodeHolder*>((unicodePtr));
+#ifdef SKIKO_USE_ICU
+    sk_sp<SkUnicode> unicode =
+        unicodeHolder != nullptr ? unicodeHolder->unicode : SkUnicodes::ICU::Make();
+#else
+    // ICU is excluded from this binary: use the SkUnicode supplied by the caller
+    // (see SkUnicodeClient) or fall back to the shared `Intl.Segmenter` backed one.
+    sk_sp<SkUnicode> unicode =
+        unicodeHolder != nullptr ? unicodeHolder->unicode : SkikoUnicode::Make();
+    if (unicode == nullptr) {
+        return nullptr;
+    }
+#endif
     ParagraphBuilder* instance = ParagraphBuilder::make(
         *paragraphStyle,
         sk_ref_sp(fontCollection),
-        SkUnicodes::ICU::Make()
+        unicode
     ).release();
     return reinterpret_cast<KNativePointer>(instance);
 }

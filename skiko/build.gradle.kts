@@ -37,6 +37,9 @@ val targetOs = hostOs
 val targetArch = skiko.targetArch
 val skikoArtifacts = SkikoArtifacts()
 
+// ICU is always linked, except for the wasm target built with `-Pskiko.wasm.useIcu=false`.
+val icuStaticLibs = arrayOf("skunicode_icu", "icu")
+
 val coreDependencies: SkikoDependencyScope.() -> Unit = {
     targets {
         all {
@@ -47,8 +50,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "skparagraph",
                 "skshaper",
                 "skunicode_core",
-                "skunicode_icu",
-                "icu",
                 "harfbuzz",
                 "skresources",
                 "png",
@@ -60,6 +61,8 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             )
         }
         jvm {
+            staticSkiaLibs(*icuStaticLibs)
+
             macos {
                 staticSkiaLibs("piex", "dng_sdk")
                 linkFlags("-lobjc")
@@ -108,6 +111,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
         }
         native {
             staticSkiaLibs(
+                *icuStaticLibs,
                 "piex",
                 "dng_sdk",
             )
@@ -153,6 +157,9 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             }
         }
         wasm {
+            if (skiko.wasmUseIcu) {
+                staticSkiaLibs(*icuStaticLibs)
+            }
             staticSkiaLibs(
                 "bentleyottmann",
                 "freetype2",
