@@ -2,11 +2,8 @@ package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.ManagedString
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 class HbIcuScriptRunIterator(text: ManagedString, manageText: Boolean) : ManagedRunIterator<ScriptRun?>(
     makeHbIcuScriptRunIterator(text), text, manageText
@@ -20,11 +17,9 @@ class HbIcuScriptRunIterator(text: ManagedString, manageText: Boolean) : Managed
     constructor(text: String?) : this(ManagedString(text), true)
 
     override operator fun next(): ScriptRun {
-        return try {
+        return nativeCall {
             _nConsume(_ptr)
             ScriptRun(_getEndOfCurrentRun(), _nGetCurrentScriptTag(_ptr))
-        } finally {
-            reachabilityBarrier(this)
         }
     }
 
@@ -33,13 +28,8 @@ class HbIcuScriptRunIterator(text: ManagedString, manageText: Boolean) : Managed
     }
 }
 
-private fun makeHbIcuScriptRunIterator(text: ManagedString): NativePointer {
-    Stats.onNativeCall()
-    return try {
-        _nMake(getPtr(text))
-    } finally {
-        reachabilityBarrier(text)
-    }
+private fun makeHbIcuScriptRunIterator(text: ManagedString): NativePointer = nativeCallFromStatic(text) { text ->
+    _nMake(text.pointerOrNullPointer)
 }
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nMake")

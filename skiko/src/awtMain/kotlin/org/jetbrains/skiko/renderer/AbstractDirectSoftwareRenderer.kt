@@ -1,11 +1,13 @@
 package org.jetbrains.skiko.renderer
 
-import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.getPtr
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Color
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.impl.nativeCallFromStatic
+import org.jetbrains.skia.runRestoringState
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.layerFrameLimiter
-import java.lang.ref.Reference
 
 internal abstract class AbstractDirectSoftwareRenderer(
     layer: SkiaLayer,
@@ -98,10 +100,8 @@ internal abstract class AbstractDirectSoftwareRenderer(
 
     private fun flushFrame() {
         val surface = surface ?: return
-        try {
-            finishFrame(getPtr(surface))
-        } finally {
-            Reference.reachabilityFence(surface)
+        nativeCallFromStatic(surface){ surface ->
+            finishFrame(surface._ptr)
         }
     }
 

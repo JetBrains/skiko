@@ -1,19 +1,11 @@
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.nativeCall
+import org.jetbrains.skia.impl.pointerOrNullPointer
 
 class FontRun(internal val end: Int, internal val font: Font) {
-    private fun _getFontPtr(): NativePointer {
-        return try {
-            getPtr(font)
-        } finally {
-            reachabilityBarrier(font)
-        }
-    }
+    private fun _getFontPtr() = nativeCall(font) { it.pointerOrNullPointer }
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true

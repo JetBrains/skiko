@@ -2,7 +2,6 @@ package org.jetbrains.skia.gpu.graphite
 
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.ExperimentalSkikoApi

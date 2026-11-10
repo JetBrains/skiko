@@ -5,24 +5,6 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        // TODO
-        /**
-         *
-         * Signal that the caller is done recording. This invalidates the canvas returned by
-         * [.beginRecording]/[.getRecordingCanvas].
-         *
-         *
-         * Unlike [.finishRecordingAsPicture], which returns an immutable picture,
-         * the returned drawable may contain live references to other drawables (if they were added to
-         * the recording canvas) and therefore this drawable will reflect the current state of those
-         * nested drawables anytime it is drawn or a new picture is snapped from it (by calling
-         * [Drawable.makePictureSnapshot]).
-         */
-        // public Drawable finishRecordingAsPicture(@NotNull Rect cull) {
-        //     Stats.onNativeCall();
-        //     return new Drawable(_nFinishRecordingAsDrawable(_ptr, 0));
-        // }
-
         init {
             staticLoad()
         }
@@ -68,9 +50,8 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param bbh    optional acceleration structure
      * @return the canvas.
      */
-    fun beginRecording(left: Float, top: Float, right: Float, bottom: Float, bbh: BBHFactory? = null): Canvas {
-        return try {
-            Stats.onNativeCall()
+    fun beginRecording(left: Float, top: Float, right: Float, bottom: Float, bbh: BBHFactory? = null): Canvas =
+        nativeCall(bbh) { bbh ->
             Canvas(
                 _nBeginRecording(
                     _ptr,
@@ -78,24 +59,18 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                     top,
                     right,
                     bottom,
-                    getPtr(bbh)
+                    bbh.pointerOrNullPointer
                 ), false, this
             )
-        } finally {
-            reachabilityBarrier(this)
         }
-    }
 
     /**
      * @return  the recording canvas if one is active, or null if recording is not active.
      */
     val recordingCanvas: Canvas?
-        get() = try {
-            Stats.onNativeCall()
+        get() = nativeCall {
             val ptr = _nGetRecordingCanvas(_ptr)
             if (ptr == NullPointer) null else Canvas(ptr, false, this)
-        } finally {
-            reachabilityBarrier(this)
         }
 
     /**
@@ -109,14 +84,7 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * reflect their current state, but will not contain a live reference to the drawables
      * themselves.
      */
-    fun finishRecordingAsPicture(): Picture {
-        return try {
-            Stats.onNativeCall()
-            Picture(_nFinishRecordingAsPicture(_ptr))
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
+    fun finishRecordingAsPicture(): Picture = nativeCall { Picture(_nFinishRecordingAsPicture(_ptr)) }
 
     /**
      * Signal that the caller is done recording, and update the cull rect to use for bounding
@@ -154,22 +122,41 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      *                   Any drawing outside this boundary may or may not be included in the result.
      * @return An immutable [Picture] object that contains the recorded drawing commands.
      */
-    fun finishRecordingAsPicture(cullLeft: Float, cullTop: Float, cullRight: Float, cullBottom: Float): Picture {
-        return try {
-            Stats.onNativeCall()
-            Picture(
-                _nFinishRecordingAsPictureWithCull(
-                    _ptr,
-                    cullLeft,
-                    cullTop,
-                    cullRight,
-                    cullBottom
-                )
+    fun finishRecordingAsPicture(cullLeft: Float, cullTop: Float, cullRight: Float, cullBottom: Float): Picture = nativeCall {
+        Picture(
+            _nFinishRecordingAsPictureWithCull(
+                _ptr,
+                cullLeft,
+                cullTop,
+                cullRight,
+                cullBottom
             )
-        } finally {
-            reachabilityBarrier(this)
-        }
+        )
     }
+//TODO
+//    /**
+//     *
+//     * Signal that the caller is done recording. This invalidates the canvas returned by
+//     * [.beginRecording]/[.getRecordingCanvas].
+//     *
+//     *
+//     * Unlike [.finishRecordingAsPicture], which returns an immutable picture,
+//     * the returned drawable may contain live references to other drawables (if they were added to
+//     * the recording canvas) and therefore this drawable will reflect the current state of those
+//     * nested drawables anytime it is drawn or a new picture is snapped from it (by calling
+//     * [Drawable.makePictureSnapshot]).
+//     */
+//     fun finishRecordingAsDrawable(cullLeft: Float, cullTop: Float, cullRight: Float, cullBottom: Float) : Drawable = nativeCall {
+//         Drawable(
+//             _nFinishRecordingAsDrawable(
+//                 _ptr,
+//                 cullLeft,
+//                 cullTop,
+//                 cullRight,
+//                 cullBottom
+//             )
+//         )
+//     }
 }
 
 

@@ -2,9 +2,9 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.nativeCallFromStatic
 
 /**
  * Blender represents a custom blend function in the Skia pipeline.  A blender combines a source
@@ -16,9 +16,8 @@ class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             staticLoad()
         }
 
-        fun makeMode(mode: BlendMode): Blender {
-            Stats.onNativeCall()
-            return Blender(_nMakeMode(mode.ordinal))
+        fun makeMode(mode: BlendMode): Blender = nativeCallFromStatic {
+            Blender(_nMakeMode(mode.ordinal))
         }
 
         fun makeArithmetic(
@@ -27,9 +26,8 @@ class Blender internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             k3: Float,
             k4: Float,
             enforcePMColor: Boolean,
-        ): Blender {
-            Stats.onNativeCall()
-            return interopScope {
+        ): Blender = nativeCallFromStatic {
+            interopScope {
                 Blender(
                     _nMakeArithmetic(
                         k1,

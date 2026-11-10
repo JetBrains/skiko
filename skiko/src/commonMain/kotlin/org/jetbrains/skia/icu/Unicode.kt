@@ -1,8 +1,9 @@
 package org.jetbrains.skia.icu
 
-import org.jetbrains.skia.*
+import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.nativeCallFromStatic
 
 /**
  * CharDirection represents Bidi_Class Unicode character property.
@@ -11,7 +12,7 @@ import org.jetbrains.skia.impl.Stats
  * See https://unicode-org.github.io/icu-docs/apidoc/dev/icu4c/uchar_8h.html
  * See https://www.unicode.org/reports/tr9/
  */
-@Suppress("MemberVisibilityCanBePrivate", "unused", "SpellCheckingInspection")
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 object CharDirection {
     init {
         staticLoad()
@@ -45,10 +46,7 @@ object CharDirection {
      * Returns the bidirectional category value for the code point.
      * Same as java.lang.Character.getDirectionality()
      */
-    fun of(codePoint: Int): Int {
-        Stats.onNativeCall()
-        return _nCharDirection(codePoint)
-    }
+    fun of(codePoint: Int): Int = nativeCallFromStatic { _nCharDirection(codePoint) }
 }
 
 /**
@@ -179,9 +177,8 @@ object CharProperties {
      * @param codePoint The codepoint.
      * @param property A binary property; one of the constants defined in [CharProperties].
      */
-    fun codePointHasBinaryProperty(codePoint: Int, property: Int): Boolean {
-        Stats.onNativeCall()
-        return _nCodePointHasBinaryProperty(codePoint, property)
+    fun codePointHasBinaryProperty(codePoint: Int, property: Int): Boolean = nativeCallFromStatic {
+        _nCodePointHasBinaryProperty(codePoint, property)
     }
 }
 

@@ -24,123 +24,94 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
         val PTR = RuntimeShaderBuilder_nGetFinalizer()
     }
 
-    fun uniform(name: String, value: Int) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value: Int) = nativeCall {
         interopScope {
             _nUniformInt(_ptr, toInterop(name), value)
         }
     }
 
-    fun uniform(name: String, value1: Int, value2: Int) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value1: Int, value2: Int) = nativeCall {
         interopScope {
             _nUniformInt2(_ptr, toInterop(name), value1, value2)
         }
     }
 
-    fun uniform(name: String, value1: Int, value2: Int, value3: Int) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value1: Int, value2: Int, value3: Int) = nativeCall {
         interopScope {
             _nUniformInt3(_ptr, toInterop(name), value1, value2, value3)
         }
     }
 
-    fun uniform(name: String, value1: Int, value2: Int, value3: Int, value4: Int) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value1: Int, value2: Int, value3: Int, value4: Int) = nativeCall {
         interopScope {
             _nUniformInt4(_ptr, toInterop(name), value1, value2, value3, value4)
         }
     }
 
-    fun uniform(name: String, value: Float) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value: Float) = nativeCall {
         interopScope {
             _nUniformFloat(_ptr, toInterop(name), value)
         }
     }
 
-    fun uniform(name: String, value1: Float, value2: Float) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value1: Float, value2: Float) = nativeCall {
         interopScope {
             _nUniformFloat2(_ptr, toInterop(name), value1, value2)
         }
     }
 
-    fun uniform(name: String, value1: Float, value2: Float, value3: Float) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value1: Float, value2: Float, value3: Float) = nativeCall {
         interopScope {
             _nUniformFloat3(_ptr, toInterop(name), value1, value2, value3)
         }
     }
 
-    fun uniform(name: String, value1: Float, value2: Float, value3: Float, value4: Float) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value1: Float, value2: Float, value3: Float, value4: Float) = nativeCall {
         interopScope {
             _nUniformFloat4(_ptr, toInterop(name), value1, value2, value3, value4)
         }
     }
 
-    fun uniform(name: String, value: FloatArray) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value: FloatArray) = nativeCall {
         interopScope {
             _nUniformFloatArray(_ptr, toInterop(name), toInterop(value), value.size)
         }
     }
 
 
-    fun uniform(name: String, value: Matrix22) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value: Matrix22) = nativeCall {
         interopScope {
             _nUniformFloatMatrix22(_ptr, toInterop(name), toInterop(value.mat))
         }
     }
 
-    fun uniform(name: String, value: Matrix33) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value: Matrix33) = nativeCall {
         interopScope {
             _nUniformFloatMatrix33(_ptr, toInterop(name), toInterop(value.mat))
         }
     }
 
-    fun uniform(name: String, value: Matrix44) {
-        Stats.onNativeCall()
+    fun uniform(name: String, value: Matrix44) = nativeCall {
         interopScope {
             _nUniformFloatMatrix44(_ptr, toInterop(name), toInterop(value.mat))
         }
     }
 
-    fun child(name: String, shader: Shader) {
-        Stats.onNativeCall()
-        try {
-            interopScope {
-                _nChildShader(_ptr, toInterop(name), getPtr(shader))
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(shader)
+    fun child(name: String, shader: Shader) = nativeCall(shader) { shader ->
+        interopScope {
+            _nChildShader(_ptr, toInterop(name), shader._ptr)
         }
     }
 
-    fun child(name: String, colorFilter: ColorFilter) {
-        Stats.onNativeCall()
-        try {
-            interopScope {
-                _nChildColorFilter(_ptr, toInterop(name), getPtr(colorFilter))
-            }
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(colorFilter)
+    fun child(name: String, colorFilter: ColorFilter) = nativeCall(colorFilter) { colorFilter ->
+        interopScope {
+            _nChildColorFilter(_ptr, toInterop(name), colorFilter._ptr)
         }
     }
 
-    fun makeShader(localMatrix: Matrix33? = null): Shader {
-        Stats.onNativeCall()
-        return try {
-            interopScope {
-                Shader(_nMakeShader(_ptr, toInterop(localMatrix?.mat)))
-            }
-        } finally {
-            reachabilityBarrier(this)
+    fun makeShader(localMatrix: Matrix33? = null): Shader = nativeCall {
+        interopScope {
+            Shader(_nMakeShader(_ptr, toInterop(localMatrix?.mat)))
         }
     }
 }
