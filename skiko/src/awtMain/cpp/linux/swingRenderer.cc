@@ -52,17 +52,11 @@ public:
             return nullptr;
         }
 
-        XVisualInfo* visual = glXGetVisualFromFBConfig(display, fbConfigs[0]);
-
-        if (!visual) {
-            XFree(fbConfigs);
-            XCloseDisplay(display);
-            return nullptr;
-        }
-
-        GLXContext context = glXCreateContext(display, visual, nullptr, True);
-
-        XFree(visual);
+        // The context only ever renders into pbuffers made from fbConfigs[0], so create it from that
+        // config directly. glXCreateContext needs an X visual, which a pbuffer-capable config need not
+        // have: Mesa returns one without a visual first, glXGetVisualFromFBConfig gave null, and the
+        // renderer fell back to software.
+        GLXContext context = glXCreateNewContext(display, fbConfigs[0], GLX_RGBA_TYPE, nullptr, True);
 
         if (!context) {
             XFree(fbConfigs);
