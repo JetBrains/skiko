@@ -13,7 +13,8 @@ import kotlin.jvm.JvmInline
 value class VulkanFormat(val value: Int) {
     companion object {
         /** `VK_FORMAT_B8G8R8A8_SRGB = 50` */
-        val B8G8R8A8_SRGB = VulkanFormat(50)
+        val B8G8R8A8_SRGB: VulkanFormat
+            get() = VulkanFormat(50)
     }
 }
 
@@ -30,19 +31,24 @@ value class VulkanImageUsageFlags(val value: Int) {
 
     companion object {
         /** `VK_IMAGE_USAGE_TRANSFER_SRC_BIT = 0x00000001` */
-        val TRANSFER_SRC = VulkanImageUsageFlags(0x00000001)
+        val TRANSFER_SRC: VulkanImageUsageFlags
+            get() = VulkanImageUsageFlags(0x00000001)
 
         /** `VK_IMAGE_USAGE_TRANSFER_DST_BIT = 0x00000002` */
-        val TRANSFER_DST = VulkanImageUsageFlags(0x00000002)
+        val TRANSFER_DST: VulkanImageUsageFlags
+            get() = VulkanImageUsageFlags(0x00000002)
 
         /** `VK_IMAGE_USAGE_SAMPLED_BIT = 0x00000004` */
-        val SAMPLED = VulkanImageUsageFlags(0x00000004)
+        val SAMPLED: VulkanImageUsageFlags
+            get() = VulkanImageUsageFlags(0x00000004)
 
         /** `VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT = 0x00000010` */
-        val COLOR_ATTACHMENT = VulkanImageUsageFlags(0x00000010)
+        val COLOR_ATTACHMENT: VulkanImageUsageFlags
+            get() = VulkanImageUsageFlags(0x00000010)
 
         /** `VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT = 0x00000080` */
-        val INPUT_ATTACHMENT = VulkanImageUsageFlags(0x00000080)
+        val INPUT_ATTACHMENT: VulkanImageUsageFlags
+            get() = VulkanImageUsageFlags(0x00000080)
     }
 }
 
@@ -57,7 +63,8 @@ value class VulkanImageUsageFlags(val value: Int) {
 value class VulkanImageTiling(val value: Int) {
     companion object {
         /** `VK_IMAGE_TILING_OPTIMAL = 0` */
-        val OPTIMAL = VulkanImageTiling(0)
+        val OPTIMAL: VulkanImageTiling
+            get() = VulkanImageTiling(0)
     }
 }
 
@@ -71,7 +78,8 @@ value class VulkanImageTiling(val value: Int) {
 value class VulkanSharingMode(val value: Int) {
     companion object {
         /** `VK_SHARING_MODE_EXCLUSIVE = 0` */
-        val EXCLUSIVE = VulkanSharingMode(0)
+        val EXCLUSIVE: VulkanSharingMode
+            get() = VulkanSharingMode(0)
     }
 }
 
@@ -88,7 +96,8 @@ value class VulkanImageAspectFlags(val value: Int) {
 
     companion object {
         /** `VK_IMAGE_ASPECT_COLOR_BIT = 0x00000001` */
-        val COLOR = VulkanImageAspectFlags(0x00000001)
+        val COLOR: VulkanImageAspectFlags
+            get() = VulkanImageAspectFlags(0x00000001)
     }
 }
 
@@ -104,7 +113,8 @@ value class VulkanImageCreateFlags(val value: Int) {
         VulkanImageCreateFlags(this.value or other.value)
 
     companion object {
-        val NONE = VulkanImageCreateFlags(0)
+        val NONE: VulkanImageCreateFlags
+            get() = VulkanImageCreateFlags(0)
     }
 }
 
