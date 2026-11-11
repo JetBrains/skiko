@@ -154,6 +154,9 @@ private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, 
 private external fun SVGDOM_nRender(ptr: NativePointer, canvasPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nBuilderGetFinalizer")
+// No ForceNativeThreadState: returns the address of a delete function without calling it, so it is short and cannot
+// block.
+// Native call path: deleteSVGDOMBuilder
 private external fun SVGDOM_nBuilderGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nBuilderMake")
