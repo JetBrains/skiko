@@ -250,15 +250,14 @@ allprojects {
     group = SkikoArtifacts.DEFAULT_GROUP_ID
     version = skiko.deployVersion
 
-    // TODO https://youtrack.jetbrains.com/issue/CMP-11110 Remove compromised root certificate workaround after updating to Kotlin 2.5.0
     // Override the node version to fix https://youtrack.jetbrains.com/issue/CMP-11011
     // Workaround is from https://youtrack.jetbrains.com/issue/KT-90732
     val subproject = this
     subproject.plugins.withType<NodeJsPlugin>().configureEach {
-        subproject.extensions.getByType(NodeJsEnvSpec::class.java).version.set("26.12.1")
+        subproject.extensions.getByType(NodeJsEnvSpec::class.java).version.set(libs.versions.node)
     }
     subproject.plugins.withType<WasmNodeJsPlugin>().configureEach {
-        subproject.extensions.getByType(WasmNodeJsEnvSpec::class.java).version.set("26.12.1")
+        subproject.extensions.getByType(WasmNodeJsEnvSpec::class.java).version.set(libs.versions.node)
     }
 }
 
