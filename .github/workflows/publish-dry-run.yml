@@ -6,7 +6,7 @@ on:
 jobs:
   Android:
     name: 'Android Publish Dry Run'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
         name: 'Check out code'
@@ -117,7 +117,7 @@ jobs:
 
   Linux:
     name: 'Linux x64 Publish Dry Run'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
         name: 'Check out code'
@@ -175,7 +175,7 @@ jobs:
 
   LinuxArm:
     name: 'Linux arm64 Publish Dry Run'
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     steps:
       - uses: actions/checkout@v7
         name: 'Check out code'

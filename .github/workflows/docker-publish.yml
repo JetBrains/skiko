@@ -18,7 +18,7 @@ on:
 jobs:
   changes:
     name: 'Detect Docker Changes'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       linux_amd64: ${{ steps.filter.outputs.linux_amd64 }}
       linux_compat: ${{ steps.filter.outputs.linux_compat }}
@@ -48,7 +48,7 @@ jobs:
 
   linux-amd64:
     name: 'Docker Linux (x64)'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: changes
     if: |
       needs.changes.outputs.linux_amd64 == 'true' ||
@@ -72,7 +72,7 @@ jobs:
 
   linux-compat:
     name: 'Docker Linux (Compatibility)'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: changes
     if: |
       needs.changes.outputs.linux_compat == 'true' ||
@@ -97,7 +97,7 @@ jobs:
 
   linux-emscripten-amd64:
     name: 'Docker Linux with Emscripten (x64)'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: changes
     if: |
       needs.changes.outputs.linux_emscripten_amd64 == 'true' ||
