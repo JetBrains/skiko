@@ -14,10 +14,10 @@ jobs:
         os: [macos-15, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -44,7 +44,7 @@ jobs:
             -Dskiko.test.performance.enabled=false \
             macosArm64Test
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Test Results'
         if: failure()
         with:
@@ -66,10 +66,10 @@ jobs:
     name: 'iOS'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -115,7 +115,7 @@ jobs:
               iosSimulatorArm64TestWithMetal
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: test-reports-ios
@@ -127,10 +127,10 @@ jobs:
     name: 'tvOS'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -155,7 +155,7 @@ jobs:
             -Dskiko.test.performance.enabled=false \
             tvosSimulatorArm64Test
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Test Results'
         if: failure()
         with:
@@ -166,9 +166,9 @@ jobs:
 
   linux-amd64:
     name: 'Linux (x64)'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -199,7 +199,7 @@ jobs:
               -Dskiko.test.performance.enabled=false \
               awtTest
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Test Results'
         if: failure()
         with:
@@ -218,9 +218,9 @@ jobs:
 
   linux-cross-compile:
     name: 'Cross-compile Linux (arm) on x64'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
@@ -236,7 +236,7 @@ jobs:
               -Pskiko.native.linux.enabled=true \
               linkDebugTestLinuxArm64
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload linuxArm64 test binary as artifact'
         with:
           name: test-binary-linuxArm64
@@ -249,15 +249,15 @@ jobs:
   linux-arm:
     name: 'Linux (arm64)'
     needs: linux-cross-compile
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         name: 'Download precompiled linuxArm64 test binary'
         with:
           name: test-binary-linuxArm64
@@ -290,7 +290,7 @@ jobs:
               awtTest
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: test-reports-linux-arm
@@ -311,14 +311,14 @@ jobs:
     name: 'Windows'
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       - uses: microsoft/setup-msbuild@v1
 
       - uses: ilammy/msvc-dev-cmd@v1
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -337,7 +337,7 @@ jobs:
             -Dskiko.test.ui.renderApi.ignoreAssertsFor=OPENGL \
             awtTest
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: 'Upload Test Results'
         if: failure()
         with:
@@ -357,15 +357,15 @@ jobs:
 
   web-wasm:
     name: 'Web'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: 'Check out code'
 
       # Setup environment directly instead of using docker image
       # because of instability of running tests inside docker
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         name: 'Setup JDK 21'
         with:
           java-version: '21'
@@ -399,7 +399,7 @@ jobs:
             -Pskiko.test.onci=true \
             jsTest
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: test-reports-web
