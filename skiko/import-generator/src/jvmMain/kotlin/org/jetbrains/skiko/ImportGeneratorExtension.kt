@@ -31,7 +31,7 @@ internal class ImportGeneratorExtension(
             }
             moduleFragment.transformChildrenVoid(importGenerator)
 
-            importGenerator.getExportSymbols().forEach { symbolName ->
+            importGenerator.getExportSymbols().get(moduleName)!!.forEach { symbolName ->
                 writer.appendLine("export let ${symbolName} = awaitSkiko['_${symbolName}']")
             }
         }
@@ -45,17 +45,18 @@ internal class ImportGeneratorExtension(
             reexportWriter.appendLine("import * as wasmApi from \"./$moduleName.mjs\";")
             if (moduleName == "skiko") {
                 reexportWriter.appendLine("window['GL'] = wasmApi.GL;")
+                reexportWriter.appendLine("window['__SKIKO__'] = {};")
                 reexportWriter.appendLine("export const api = { awaitSkiko: wasmApi.awaitSkiko }")
             }
             else {
                 reexportWriter.appendLine("export const isSideModuleLoaded = () => wasmApi.isSideModuleLoaded();")
             }
 
-            importGenerator.getExportSymbols().forEach { symbolName ->
+            importGenerator.getExportSymbols().get(moduleName)!!.forEach { symbolName ->
                 if (symbolName in importGenerator.getBooleanExportSymbols()) {
-                    reexportWriter.appendLine("window['${symbolName}'] = (...a) => !!wasmApi['${symbolName}'](...a);")
+                    reexportWriter.appendLine("window.__SKIKO__['${symbolName}'] = (...a) => !!wasmApi['${symbolName}'](...a);")
                 } else {
-                    reexportWriter.appendLine("window['${symbolName}'] = wasmApi['${symbolName}'];")
+                    reexportWriter.appendLine("window.__SKIKO__['${symbolName}'] = wasmApi['${symbolName}'];")
                 }
             }
         }

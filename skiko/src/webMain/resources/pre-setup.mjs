@@ -11,7 +11,8 @@ const loadSkikoExtension = (extensionPath, mainModule) =>
     }).then(() => {
         const sideModuleExports = mainModule.LDSO.loadedLibsByName[extensionPath].exports;
         for (const [name, value] of Object.entries(sideModuleExports)) {
-            if (!(('_' + name) in mainModule)) mainModule['_' + name] = value;
+            const resolvedNamed = '_' + name;
+            if (!(resolvedNamed in mainModule)) mainModule[resolvedNamed] = value;
         }
         loadedSkikoExtensions.add(extensionPath);
         return sideModuleExports;
