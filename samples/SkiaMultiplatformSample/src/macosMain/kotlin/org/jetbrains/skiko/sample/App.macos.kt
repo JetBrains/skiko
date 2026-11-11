@@ -14,9 +14,11 @@ import platform.AppKit.NSWindowStyleMaskResizable
 import platform.AppKit.NSWindowStyleMaskTitled
 import platform.Foundation.NSMakeRect
 import platform.Foundation.NSSelectorFromString
+import platform.Foundation.NSTimer
 import platform.darwin.NSObject
 
-fun main() {
+fun main(args: Array<String>) {
+    val exitAfterMillis = exitAfterMillis(args)
     val app = NSApplication.sharedApplication()
     app.setActivationPolicy(NSApplicationActivationPolicy.NSApplicationActivationPolicyRegular)
     val appName = "SkikoNative"
@@ -51,5 +53,13 @@ fun main() {
     skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, clocks)
     window.makeKeyAndOrderFront(app)
     skiaLayer.needRedraw()
+    if (exitAfterMillis != null) {
+        NSTimer.scheduledTimerWithTimeInterval(
+            interval = exitAfterMillis / 1000.0,
+            repeats = false
+        ) {
+            app.terminate(null)
+        }
+    }
     app.run()
 }
