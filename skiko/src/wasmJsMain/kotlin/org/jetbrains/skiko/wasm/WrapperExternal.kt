@@ -2,7 +2,7 @@
 package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skiko.InternalSkikoApi
-import kotlin.js.Promise
+import kotlin.js.JsAny
 
 @InternalSkikoApi
-actual external val awaitSkiko: Promise<JsAny>
+actual external val awaitSkiko: JsAny

@@ -141,6 +141,10 @@ kotlin {
 
         js {
             outputModuleName.set("skiko-skottie-kjs")
+            useEsModules()
+            compilerOptions {
+                target.set("es2015")
+            }
             browser {
                 testTask {
                     useKarma {

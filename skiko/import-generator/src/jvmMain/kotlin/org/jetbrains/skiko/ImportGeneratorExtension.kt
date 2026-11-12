@@ -22,11 +22,17 @@ internal class ImportGeneratorExtension(
         val importGenerator = ImportGeneratorTransformer(pluginContext, moduleName)
 
         outputFile.writer().use { writer ->
-            prefixFile?.let { writer.appendLine(it.readText()) }
+            if (prefixFile == null) {
+                check(moduleName != "skiko") { "The core import generator requires a prefix file" }
+                writer.appendLine("export * from \"./pre-$moduleName.mjs\";")
+                writer.appendLine("import { awaitSkiko } from \"./skiko.mjs\";")
+            } else {
+                writer.appendLine(prefixFile.readText())
+            }
             moduleFragment.transformChildrenVoid(importGenerator)
 
             importGenerator.getExportSymbols().forEach { symbolName ->
-                writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
+                writer.appendLine("export let ${symbolName} = awaitSkiko['_${symbolName}']")
             }
         }
 

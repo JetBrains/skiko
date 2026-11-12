@@ -9,6 +9,7 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.get
@@ -16,6 +17,7 @@ import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
@@ -47,8 +49,11 @@ private fun Project.sideModuleSetupMjs(libBaseName: String) =
 private fun Project.setupPrefixMjs() =
     projectDir.resolve("src/webMain/resources/pre-setup.mjs")
 
-private fun Project.sideModulePrefixMjs(libBaseName: String) =
+private fun Project.sideModuleRegistrationMjs(libBaseName: String) =
     projectDir.resolve("src/webMain/resources/pre-$libBaseName.mjs")
+
+private fun Project.skikoExtensionsMjs() =
+    projectDir.resolve("src/webMain/resources/skiko-extensions.mjs")
 
 private fun Project.testPrefixMjs(libBaseName: String) =
     projectDir.resolve("src/webMain/resources/pre-$libBaseName-test.mjs")
@@ -282,6 +287,12 @@ fun SkikoProjectContext.declareWasmTasks() {
             }
         }
 
+        if (isSideModule) {
+            from(project.sideModuleRegistrationMjs(libBaseName))
+        } else {
+            from(project.skikoExtensionsMjs())
+        }
+
         from(optimizeWasm) {
             include("*.wasm")
             include("*.mjs")
@@ -313,6 +324,10 @@ fun SkikoProjectContext.provideWasmSideModules() {
 
 fun SkikoProjectContext.provideWasmTestResources() = with(project) {
     val optimizeWasm = tasks.named<OptimizeSkikoWasmTask>("optimizeWasm")
+    val wasmTestResources = tasks.register<Sync>("prepareWasmTestResources") {
+        from(skikoExtensionsMjs())
+        into(layout.buildDirectory.dir("wasm-test-resources"))
+    }
     configurations.create("wasmTestResourcesElements") {
         isCanBeConsumed = true
         isCanBeResolved = false
@@ -325,6 +340,9 @@ fun SkikoProjectContext.provideWasmTestResources() = with(project) {
         }
 
         outgoing.artifact(optimizeWasm.flatMap { it.outDir })
+        outgoing.artifact(wasmTestResources.map { it.destinationDir }) {
+            builtBy(wasmTestResources)
+        }
         outgoing.artifact(wasmImports) {
             builtBy(
                 optimizeWasm,
@@ -413,7 +431,7 @@ private fun SkikoProjectContext.configureSideModuleInput(
 abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
     val compilationName: String,
     private val outputFileProvider: (Project) -> File,
-    private val prefixFileProvider: (Project) -> File,
+    private val prefixFileProvider: (Project) -> File?,
     private val reexportFileProvider: ((Project) -> File)?,
     private val moduleNameProvider: (Project) -> String
 ) : KotlinCompilerPluginSupportPlugin {
@@ -428,7 +446,9 @@ abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
         return project.provider {
             buildList {
                 add(SubpluginOption("import-generator-path", outputFile.normalize().absolutePath))
-                add(SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath))
+                prefixFile?.let {
+                    add(SubpluginOption("import-generator-prefix", it.normalize().absolutePath))
+                }
                 if (reexportFile != null) {
                     add(SubpluginOption("import-generator-reexport-path", reexportFile.normalize().absolutePath))
                 }
@@ -467,7 +487,7 @@ class WasmImportsGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGen
 class SideWasmImportsGeneratorPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
     KotlinCompilation.MAIN_COMPILATION_NAME,
     { it.sideModuleSetupMjs(it.name) },
-    { it.sideModulePrefixMjs(it.name) },
+    { null },
     { it.setupReexportMjs(it.name) },
     { it.name }
 )
@@ -487,14 +507,11 @@ fun KotlinJsTargetDsl.setupImportsGeneratorPlugin(
     main.compileTaskProvider.configure {
         outputs.file(if (isSideModule) project.sideModuleSetupMjs(project.name) else project.setupMjs)
         outputs.file(project.setupReexportMjs(project.name))
-        val prefixFile = if (isSideModule) {
-            project.sideModulePrefixMjs(project.name)
-        } else {
-            project.setupPrefixMjs()
+        if (!isSideModule) {
+            inputs.file(project.setupPrefixMjs())
+                .withPropertyName("importGeneratorPrefix")
+                .withPathSensitivity(PathSensitivity.RELATIVE)
         }
-        inputs.file(prefixFile)
-            .withPropertyName("importGeneratorPrefix")
-            .withPathSensitivity(PathSensitivity.RELATIVE)
     }
 
     test.compileTaskProvider.configure {

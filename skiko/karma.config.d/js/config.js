@@ -1,6 +1,7 @@
 // see https://kotlinlang.org/docs/js-project-setup.html#webpack-configuration-file
 
 const path = require("path");
+const fs = require("fs");
 
 config.browserConsoleLogOptions.level = "debug";
 
@@ -54,8 +55,21 @@ config.webpack.module.rules.push(
     },
 );
 
+// The test module is an async ES module (skiko.mjs uses top-level await), so tests are registered
+// only after wasm is loaded. Delay mocha until then, exactly like an application entry waits for its imports.
+config.client.mocha = Object.assign(config.client.mocha || {}, {delay: true});
+
+const testModulePath = config.files.find((file) => typeof file === "string" && file.endsWith(".mjs"));
+const testStarterPath = path.resolve(basePath, "static", "start-tests.mjs");
+fs.mkdirSync(path.dirname(testStarterPath), {recursive: true});
+fs.writeFileSync(testStarterPath,
+    `import ${JSON.stringify(path.relative(path.dirname(testStarterPath), testModulePath).split(path.sep).join("/"))};\n` +
+    `window.run();\n`
+);
+config.files.push(testStarterPath);
+config.preprocessors[testStarterPath] = ["webpack", "sourcemap"];
+
 config.files = [
-    path.resolve(wasmPath, "skiko.js"),
     {pattern: path.resolve(wasmPath, "skiko.wasm"), included: false, served: true, watched: false},
     {pattern: path.resolve(generatedAssetsPath, "**/*"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.png"), included: false, served: true, watched: false},
