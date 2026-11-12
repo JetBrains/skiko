@@ -1,32 +1,27 @@
 package org.jetbrains.skia
 
-class FilterMipmap constructor(
-    internal val filterMode: FilterMode,
-    internal val mipmapMode: MipmapMode = MipmapMode.NONE
-) : SamplingMode {
+inline fun FilterMipmap(filterMode: FilterMode, mipmapMode: MipmapMode = MipmapMode.NONE): SamplingMode =
+    SamplingMode(filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong())
 
-    @Suppress("OVERRIDE_DEPRECATION")
-    override fun _pack() = filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong()
+val SamplingMode.isFilterMipmap: Boolean
+    get() = (packedValue and Long.MIN_VALUE) == 0L
 
-    override fun _packedInt1(): Int = filterMode.ordinal
-    override fun _packedInt2(): Int = mipmapMode.ordinal
-
-    override fun equals(other: Any?): Boolean {
-        if (other === this) return true
-        if (other !is FilterMipmap) return false
-        if (this.filterMode != other.filterMode) return false
-        return this.mipmapMode == other.mipmapMode
+/**
+ * @throws IllegalArgumentException If this SamplingMode is not a filter mipmap
+ * @see [SamplingMode.isFilterMipmap]
+ */
+val SamplingMode.filterMode: FilterMode
+    get() {
+        require(isFilterMipmap)
+        return FilterMode.entries[(packedValue shr 32).toInt()]
     }
 
-    override fun hashCode(): Int {
-        val PRIME = 59
-        var result = 1
-        result = result * PRIME + (filterMode.hashCode())
-        result = result * PRIME + (mipmapMode.hashCode())
-        return result
+/**
+ * @throws IllegalArgumentException If this SamplingMode is not a filter mipmap
+ * @see [SamplingMode.isFilterMipmap]
+ */
+val SamplingMode.mipmapMode: MipmapMode
+    get() {
+        require(isFilterMipmap)
+        return MipmapMode.entries[(packedValue and 0xFFFFFFFFL).toInt()]
     }
-
-    override fun toString(): String {
-        return "FilterMipmap(_filterMode=$filterMode, _mipmapMode=$mipmapMode)"
-    }
-}
