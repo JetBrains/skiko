@@ -329,15 +329,17 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param p2    conic end Point
          * @param w     conic weight
          * @param pow2  quad count, as power of two, normally 0 to 5 (1 to 32 quad curves)
-         * @return      number of quad curves written to pts
+         * @return      the quad curves' points: the start point, followed by the control and end points of
+         *              each quad curve
          */
         fun convertConicToQuads(p0: Point, p1: Point, p2: Point, w: Float, pow2: Int): Array<Point> {
             Stats.onNativeCall()
             val maxResultPointCount = (1 + 2 * (1 shl pow2)) // See Skia docs
-            var pointCount = 0
+            var quadCount = 0
             val coords = withResult(FloatArray(maxResultPointCount * 2)) {
-                pointCount = _nConvertConicToQuads(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, w, pow2, it)
+                quadCount = _nConvertConicToQuads(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, w, pow2, it)
             }
+            val pointCount = 1 + 2 * quadCount
             return Array(pointCount) { Point(coords[2 * it], coords[2 * it + 1]) }
         }
 
