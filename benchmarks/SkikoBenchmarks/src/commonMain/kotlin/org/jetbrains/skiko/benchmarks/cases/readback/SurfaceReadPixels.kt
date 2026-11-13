@@ -1,5 +1,10 @@
 package org.jetbrains.skiko.benchmarks.cases.readback
 
+/**
+ * Reads pixels from a rendered surface into a bitmap repeatedly.
+ * Measures pixel readback throughput and memory transfer performance.
+ */
+
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ImageInfo
 import org.jetbrains.skia.Paint

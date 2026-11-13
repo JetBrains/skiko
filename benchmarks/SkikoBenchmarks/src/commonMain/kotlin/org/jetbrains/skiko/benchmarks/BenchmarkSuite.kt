@@ -16,6 +16,56 @@ import org.jetbrains.skiko.benchmarks.cases.readback.surfaceReadPixelsGpuBenchma
 import org.jetbrains.skiko.benchmarks.cases.surface.surfaceAllocationBenchmark
 import org.jetbrains.skiko.benchmarks.cases.text.textBlobDrawBenchmark
 import org.jetbrains.skiko.benchmarks.cases.text.textBlobDrawGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.alphaCompositingBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.alphaCompositingGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.antiAliasedCirclesBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.antiAliasedCirclesGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.bulkTextRenderingBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.bulkTextRenderingGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.colorMatrixFilterBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.colorMatrixFilterGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.colorSpaceConversionBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.complexPathRenderingBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.complexPathRenderingGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.gradientFillBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.gradientFillGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.imageDecodePngBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.imageDecodeJpegBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.imageTransformDrawBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.imageTransformDrawGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.premultiplyReadbackBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.aaRoundedRectsBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.aaRoundedRectsGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.aaLargeCirclesBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.aaLargeCirclesGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.aaOvalsBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.aaOvalsGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.aaLinesBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.aaLinesGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.noAACirclesBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.noAACirclesGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.mixedShapesAABenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.mixedShapesAAGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.blendModesBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.blendModesGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.subpixelTransformBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.subpixelTransformGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.uiDashboardSimulationBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.uiDashboardSimulationGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.uiListScrollSimulationBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.uiListScrollSimulationGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.svgIconGridBenchmark
+import org.jetbrains.skiko.benchmarks.cases.simd.svgIconGridGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textParagraphLayoutBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textParagraphLayoutGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textMixedScriptsBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textMixedScriptsGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textSmallLabelsBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textSmallLabelsGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textLargeFontBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textLargeFontGpuBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textEmojiRenderingBenchmark
+import org.jetbrains.skiko.benchmarks.cases.text.textEmojiRenderingGpuBenchmark
 import kotlin.math.roundToLong
 import kotlin.time.TimeSource
 
@@ -155,6 +205,60 @@ object SkikoBenchmarkSuite {
         surfaceReadPixelsGpuBenchmark,
         textBlobDrawBenchmark,
         textBlobDrawGpuBenchmark,
+        alphaCompositingBenchmark,
+        alphaCompositingGpuBenchmark,
+        colorMatrixFilterBenchmark,
+        colorMatrixFilterGpuBenchmark,
+        gradientFillBenchmark,
+        gradientFillGpuBenchmark,
+        complexPathRenderingBenchmark,
+        complexPathRenderingGpuBenchmark,
+        antiAliasedCirclesBenchmark,
+        antiAliasedCirclesGpuBenchmark,
+        bulkTextRenderingBenchmark,
+        bulkTextRenderingGpuBenchmark,
+        imageTransformDrawBenchmark,
+        imageTransformDrawGpuBenchmark,
+        colorSpaceConversionBenchmark,
+        premultiplyReadbackBenchmark,
+        imageDecodePngBenchmark,
+        imageDecodeJpegBenchmark,
+        // Text rendering validation (SIMD glyph mask blitting)
+        textParagraphLayoutBenchmark,
+        textParagraphLayoutGpuBenchmark,
+        textMixedScriptsBenchmark,
+        textMixedScriptsGpuBenchmark,
+        textSmallLabelsBenchmark,
+        textSmallLabelsGpuBenchmark,
+        textLargeFontBenchmark,
+        textLargeFontGpuBenchmark,
+        textEmojiRenderingBenchmark,
+        textEmojiRenderingGpuBenchmark,
+        // AA regression diagnostics
+        aaRoundedRectsBenchmark,
+        aaRoundedRectsGpuBenchmark,
+        aaLargeCirclesBenchmark,
+        aaLargeCirclesGpuBenchmark,
+        aaOvalsBenchmark,
+        aaOvalsGpuBenchmark,
+        aaLinesBenchmark,
+        aaLinesGpuBenchmark,
+        noAACirclesBenchmark,
+        noAACirclesGpuBenchmark,
+        mixedShapesAABenchmark,
+        mixedShapesAAGpuBenchmark,
+        // Critical gaps: blend modes & transform variations
+        blendModesBenchmark,
+        blendModesGpuBenchmark,
+        subpixelTransformBenchmark,
+        subpixelTransformGpuBenchmark,
+        // Real-world composite scenarios
+        uiDashboardSimulationBenchmark,
+        uiDashboardSimulationGpuBenchmark,
+        uiListScrollSimulationBenchmark,
+        uiListScrollSimulationGpuBenchmark,
+        svgIconGridBenchmark,
+        svgIconGridGpuBenchmark,
     )
 
     private fun BenchmarkCase.run(mode: BenchmarkMode, config: BenchmarkConfig): BenchmarkResult =

@@ -1,5 +1,10 @@
 package org.jetbrains.skiko.benchmarks.cases.text
 
+/**
+ * Draws a single pre-built text blob with positioned glyphs.
+ * Measures baseline glyph mask blitting performance.
+ */
+
 import org.jetbrains.skia.Font
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Point

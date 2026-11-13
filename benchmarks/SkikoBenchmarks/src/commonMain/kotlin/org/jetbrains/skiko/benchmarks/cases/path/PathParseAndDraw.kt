@@ -1,5 +1,10 @@
 package org.jetbrains.skiko.benchmarks.cases.path
 
+/**
+ * Parses SVG path strings and draws the resulting paths with fill and stroke.
+ * Measures path parsing, cubic/conic curve subdivision, and rasterization.
+ */
+
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PaintMode
 import org.jetbrains.skia.Path
