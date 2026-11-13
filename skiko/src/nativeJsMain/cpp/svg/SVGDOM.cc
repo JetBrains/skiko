@@ -5,12 +5,14 @@
 #include "SkSVGDOM.h"
 #include "SkSVGSVG.h"
 #include "common.h"
+#include "modules/skresources/include/SkResources.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGDOM__1nMakeFromData
   (KNativePointer dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(dataPtr);
     SkMemoryStream stream(sk_ref_sp(data));
-    // No font manager: <text> that needs a font is not drawn. Callers that need text use Builder.
+    // No font manager and no resource provider: <text> that needs a font, and <image>, are not drawn.
+    // Callers that need either use Builder.
     sk_sp<SkSVGDOM> instance = SkSVGDOM::MakeFromStream(stream);
     return reinterpret_cast<KNativePointer>(instance.release());
 }
@@ -61,6 +63,12 @@ SKIKO_EXPORT void org_jetbrains_skia_svg_SVGDOM__1nBuilderSetFontManager
   (KNativePointer ptr, KNativePointer fontMgrPtr) {
     SkSVGDOM::Builder* instance = reinterpret_cast<SkSVGDOM::Builder*>(ptr);
     instance->setFontManager(sk_ref_sp(reinterpret_cast<SkFontMgr*>(fontMgrPtr)));
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGDOM__1nBuilderSetResourceProvider
+  (KNativePointer ptr, KNativePointer resourceProviderPtr) {
+    SkSVGDOM::Builder* instance = reinterpret_cast<SkSVGDOM::Builder*>(ptr);
+    instance->setResourceProvider(sk_ref_sp(reinterpret_cast<skresources::ResourceProvider*>(resourceProviderPtr)));
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGDOM__1nBuilderBuildFromData
