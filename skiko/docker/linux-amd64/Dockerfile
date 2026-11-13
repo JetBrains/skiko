@@ -3,7 +3,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -y && \
     apt install binutils build-essential software-properties-common -y && \
-    apt install zip unzip git python3 curl wget xvfb -y && \
+    apt install zip unzip git python3 curl wget xvfb xauth -y && \
     apt install fontconfig libfontconfig1-dev libegl1-mesa-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y && \
     apt install libvulkan1 libvulkan-dev mesa-vulkan-drivers -y && \
     apt install openjdk-21-jdk -y && \
