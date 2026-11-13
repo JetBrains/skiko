@@ -260,29 +260,6 @@ fun configureCinterop(
     }
 }
 
-fun configureLinkerManifest(
-    os: OS,
-    arch: Arch,
-    target: KotlinNativeTarget,
-    targetString: String,
-    linkerOpts: List<String>,
-) {
-    val tasks = target.project.tasks
-    val taskNameSuffix = joinToTitleCamelCase(os.idWithSuffix(isUikitSim = target.isUikitSimulator()), arch.id)
-    val writeLinkerManifest = tasks.register("writeLinkerManifest$taskNameSuffix", WriteCInteropDefFile::class.java) {
-        this.linkerOpts.set(linkerOpts)
-        outputFile.set(project.layout.buildDirectory.file("linkerManifest/$targetString/linker.properties"))
-    }
-    val manifest = writeLinkerManifest.flatMap { it.outputFile }
-    target.compilations.getByName("main") {
-        compileTaskProvider.configure {
-            compilerOptions.freeCompilerArgs.addAll(manifest.map { listOf("-manifest", it.asFile.absolutePath) })
-            dependsOn(writeLinkerManifest)
-            inputs.file(manifest)
-        }
-    }
-}
-
 fun SkikoProjectContext.configureNativeTarget(
     os: OS,
     arch: Arch,
@@ -382,7 +359,7 @@ fun SkikoProjectContext.configureNativeTarget(
                 options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
                 options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
             }
-            configureLinkerManifest(os, arch, target, targetString,
+            configureCinterop(cinteropName, os, arch, target, targetString,
                 options + resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
             options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
