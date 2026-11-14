@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.encode.JpegEncoderOptions
+import org.jetbrains.skia.encode.PngEncoderOptions
+import org.jetbrains.skia.encode.WebpEncoderOptions
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
@@ -277,7 +280,78 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         return try {
             Stats.onNativeCall()
             val ptr = _nEncodeToData(_ptr, format.ordinal, quality, pngCompressionLevel)
-            if (ptr == NullPointer) null else org.jetbrains.skia.Data(ptr)
+            if (ptr == NullPointer) null else Data(ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
+    /**
+     * Encodes Image pixels in JPEG format, returning result as [Data].
+     *
+     * Returns null if encoding fails.
+     *
+     * @param options JPEG encoder options.
+     * @return        Encoded image, or null
+     */
+    fun encodeToData(options: JpegEncoderOptions): Data? {
+        return try {
+            Stats.onNativeCall()
+            val ptr = _nEncodeToJpegData(
+                _ptr,
+                options.quality,
+                options.downSample.ordinal,
+                options.alphaOption.ordinal,
+                getPtr(options.xmpMetadata),
+                options.origin?.ordinal ?: 0,
+            )
+            if (ptr == NullPointer) null else Data(ptr)
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(options.xmpMetadata)
+        }
+    }
+
+    /**
+     * Encodes Image pixels in PNG format, returning result as [Data].
+     *
+     * Returns null if encoding fails.
+     *
+     * @param options PNG encoder options.
+     * @return        Encoded image, or null
+     */
+    fun encodeToData(options: PngEncoderOptions): Data? {
+        return try {
+            Stats.onNativeCall()
+            val comments = options.comments.flatMap { listOf(it.key, it.value) }.toTypedArray()
+            val ptr = interopScope {
+                _nEncodeToPngData(
+                    _ptr,
+                    options.compressionLevel,
+                    options.filterFlags.bits,
+                    toInterop(comments),
+                    comments.size,
+                )
+            }
+            if (ptr == NullPointer) null else Data(ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
+    /**
+     * Encodes Image pixels in WebP format, returning result as [Data].
+     *
+     * Returns null if encoding fails.
+     *
+     * @param options WebP encoder options.
+     * @return        Encoded image, or null
+     */
+    fun encodeToData(options: WebpEncoderOptions): Data? {
+        return try {
+            Stats.onNativeCall()
+            val ptr = _nEncodeToWebpData(_ptr, options.quality, options.compression.ordinal)
+            if (ptr == NullPointer) null else Data(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -531,6 +605,44 @@ private external fun _nEncodeToData(
     format: Int,
     quality: Int,
     pngCompressionLevel: Int
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToJpegData")
+// Needs ForceNativeThreadState: compresses the whole image as JPEG, so its time grows with the image size,
+// and a lazily loaded image is decoded first.
+// Native call path: SkJpegEncoder::Encode
+@ForceNativeThreadState
+private external fun _nEncodeToJpegData(
+    ptr: NativePointer,
+    quality: Int,
+    downSample: Int,
+    alphaOption: Int,
+    xmpMetadata: NativePointer,
+    origin: Int,
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToPngData")
+// Needs ForceNativeThreadState: compresses the whole image as PNG, so its time grows with the image size,
+// and a lazily loaded image is decoded first.
+// Native call path: SkPngEncoder::Encode
+@ForceNativeThreadState
+private external fun _nEncodeToPngData(
+    ptr: NativePointer,
+    compressionLevel: Int,
+    filterFlags: Int,
+    comments: InteropPointer,
+    commentsSize: Int,
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToWebpData")
+// Needs ForceNativeThreadState: compresses the whole image as WebP, so its time grows with the image size,
+// and a lazily loaded image is decoded first.
+// Native call path: SkWebpEncoder::Encode
+@ForceNativeThreadState
+private external fun _nEncodeToWebpData(
+    ptr: NativePointer,
+    quality: Int,
+    compression: Int,
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
