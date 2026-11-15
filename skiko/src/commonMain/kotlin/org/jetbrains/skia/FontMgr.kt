@@ -10,6 +10,11 @@ open class FontMgr : RefCnt {
             staticLoad()
         }
 
+        /**
+         * The lazily initialized, process-wide default font manager, also shared by Shapers.
+         * On Linux, system fonts and Fontconfig configuration are loaded on first use;
+         * restart the process to reload them. Creating a new Shaper does not refresh them.
+         */
         val default = FontMgr(_nDefault(), false)
     }
 

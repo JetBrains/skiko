@@ -9,9 +9,10 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  * Shapes text using HarfBuzz and places the shaped text into a
  * client-managed buffer.
  *
- * On Linux, [shapeLine] and the TextBlob-producing [shape] overloads reuse the default
- * fallback font manager after the first call that needs fallback fonts. Create a new Shaper
- * to pick up changes to system fonts or Fontconfig configuration.
+ * [shapeLine] and the TextBlob-producing [shape] overloads share the process-wide default
+ * fallback font manager across Shapers. Closing or creating a Shaper does not reset it.
+ * On Linux, restart the process to reload system fonts or Fontconfig configuration after
+ * the default manager has been initialized.
  */
 class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {

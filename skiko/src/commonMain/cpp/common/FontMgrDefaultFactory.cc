@@ -1,4 +1,5 @@
 #include "FontMgrDefaultFactory.hh"
+#include <mutex>
 
 #if defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
 #include "ports/SkFontMgr_mac_ct.h"
@@ -27,7 +28,7 @@ struct SkEmbeddedResourceHeader { const SkEmbeddedResource* entries; int count; 
 extern "C" const SkEmbeddedResourceHeader SK_EMBEDDED_FONTS;
 #endif
 
-sk_sp<SkFontMgr> SkFontMgrSkikoDefault() {
+static sk_sp<SkFontMgr> makeDefaultFontMgr() {
 #if defined(SKIKO_WASM)
     if (SK_EMBEDDED_FONTS.count == 0) {
         return nullptr;
@@ -55,4 +56,15 @@ sk_sp<SkFontMgr> SkFontMgrSkikoDefault() {
 #else
     return nullptr;
 #endif
+}
+
+sk_sp<SkFontMgr> SkFontMgrSkikoDefault() {
+    static std::once_flag once;
+    static SkFontMgr* manager = nullptr;
+    std::call_once(once, [] {
+        // Keep one reference for the process lifetime, including during static teardown.
+        // Each caller receives its own reference; closing a Shaper cannot reset the manager.
+        manager = makeDefaultFontMgr().release();
+    });
+    return sk_ref_sp(manager);
 }

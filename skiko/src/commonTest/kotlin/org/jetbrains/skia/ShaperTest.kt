@@ -45,6 +45,27 @@ class ShaperTest {
     }
 
     @Test
+    fun shortLivedShapersProduceConsistentLinesAndBlobs() = runTest {
+        fontInter36().use { font ->
+            val expectedGlyphs = shortArrayOf(882, 611, 943, 882)
+            var expectedWidth: Float? = null
+            repeat(20) {
+                Shaper.makeShapeDontWrapOrReorder().use { shaper ->
+                    shaper.shapeLine("text", font).use { line ->
+                        assertContentEquals(expectedGlyphs, line.glyphs)
+                        assertTrue(line.width > 0f)
+                        expectedWidth?.let { assertEquals(it, line.width) }
+                        expectedWidth = line.width
+                    }
+                    assertNotNull(shaper.shape("text", font)).use { blob ->
+                        assertContentEquals(expectedGlyphs, blob.glyphs)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun canShapeWithDifferentFactories() = runTest {
         fontInter36().use { font ->
             val factories = listOf<() -> Shaper>(
