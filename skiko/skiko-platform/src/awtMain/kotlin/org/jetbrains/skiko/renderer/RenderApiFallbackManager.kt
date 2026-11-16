@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.renderer
 
 import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.Logger
+import org.jetbrains.skiko.internal.Logger
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkikoProperties
 

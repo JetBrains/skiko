@@ -6,6 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skiko.internal.Logger
 import org.jetbrains.skiko.internal.fastForEach
 import org.jetbrains.skiko.renderer.FrameDriver
 import org.jetbrains.skiko.renderer.RenderApiFallbackManager

@@ -8,6 +8,7 @@ import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.selects.onTimeout
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.skiko.internal.Logger
 import org.junit.Test
 import java.nio.file.Files
 import java.nio.file.Path

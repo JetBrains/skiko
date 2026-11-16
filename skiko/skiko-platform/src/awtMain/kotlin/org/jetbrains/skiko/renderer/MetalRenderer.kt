@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.internal.Logger
 import java.awt.Component
 import javax.swing.SwingUtilities.*
 import kotlin.time.Duration.Companion.milliseconds

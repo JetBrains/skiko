@@ -2,7 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skiko.maybeSynchronized
+import org.jetbrains.skiko.internal.maybeSynchronized
 
 /**
  *
