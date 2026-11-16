@@ -72,7 +72,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.skiko)
             implementation(libs.skiko.ganesh)
-            implementation(libs.skiko.rendering)
+            implementation(libs.skiko.platform)
         }
 
         webMain {
