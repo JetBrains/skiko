@@ -4,7 +4,7 @@ package org.jetbrains.skia.gpu
 import org.jetbrains.skia.gpu.graphite.BackendTexture
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.ExperimentalSkikoApi
-import org.jetbrains.skiko.Logger
+import org.jetbrains.skiko.internal.Logger
 
 @ExperimentalSkikoApi
 fun makeMetalContext(devicePtr: NativePointer, queuePtr: NativePointer): GpuContext {
