@@ -2,7 +2,7 @@ package org.jetbrains.skia
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.objcPtr
-import org.jetbrains.skia.gpu.ganesh.makeFromMTKView
+import org.jetbrains.skia.gpu.ganesh.wrapMTKView
 import platform.CoreGraphics.CGRectMake
 import platform.MetalKit.MTKView
 import kotlin.test.Test
@@ -15,7 +15,7 @@ class SurfaceDarwinTest {
         withTestMetalContext { device, context ->
             val view = MTKView(frame = CGRectMake(0.0, 0.0, 8.0, 8.0), device = device)
             assertFailsWith<IllegalArgumentException> {
-                Surface.makeFromMTKView(
+                Surface.wrapMTKView(
                     context, view.objcPtr(), SurfaceOrigin.TOP_LEFT, 1,
                     SurfaceColorFormat.UNKNOWN, null, null
                 )
