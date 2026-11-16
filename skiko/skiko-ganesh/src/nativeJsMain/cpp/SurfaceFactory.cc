@@ -31,7 +31,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_ganesh_SurfaceFactory__1nMake
     return reinterpret_cast<KNativePointer>(surface.release());
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_ganesh_SurfaceFactory__1nMakeFromMTKView
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_gpu_ganesh_SurfaceFactory__1nWrapMTKView
   (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsInts) {
 #ifdef SK_METAL
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));

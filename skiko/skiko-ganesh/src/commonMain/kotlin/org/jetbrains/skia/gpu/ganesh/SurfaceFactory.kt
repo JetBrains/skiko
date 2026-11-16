@@ -69,7 +69,23 @@ fun Surface.Companion.makeFromBackendRenderTarget(
     }
 }
 
-fun Surface.Companion.makeFromMTKView(
+/**
+ * Creates a surface from an MTKView by using the current drawable's texture as a backend render target.
+ * The surface retains a reference to the MTKView and releases it when the surface is destroyed.
+ *
+ * Only available when Metal support is enabled.
+ *
+ * @param context GPU context
+ * @param mtkViewPtr native pointer to the MTKView to wrap
+ * @param origin pins either the top-left or the bottom-left corner to the origin
+ * @param sampleCount samples per pixel, or 0 to disable full scene anti-aliasing
+ * @param colorFormat color format of the surface
+ * @param colorSpace range of colors; may be null
+ * @param surfaceProps LCD striping orientation and setting for device independent fonts; may be null
+ * @return the surface wrapping the view's current drawable
+ * @throws IllegalArgumentException if Skia cannot create the surface
+ */
+fun Surface.Companion.wrapMTKView(
     context: DirectContext,
     mtkViewPtr: NativePointer,
     origin: SurfaceOrigin,
@@ -81,7 +97,7 @@ fun Surface.Companion.makeFromMTKView(
     return try {
         Stats.onNativeCall()
         val ptr = interopScope {
-            _nMakeFromMTKView(
+            _nWrapMTKView(
                 getPtr(context),
                 mtkViewPtr,
                 origin.ordinal,
@@ -92,7 +108,7 @@ fun Surface.Companion.makeFromMTKView(
             )
         }
         require(ptr != NullPointer) {
-            "Failed Surface.makeFromMTKView($context, $mtkViewPtr $origin, $colorFormat, $surfaceProps)"
+            "Failed Surface.wrapMTKView($context, $mtkViewPtr $origin, $colorFormat, $surfaceProps)"
         }
         Surface(ptr, context)
     } finally {
@@ -267,12 +283,12 @@ private external fun _nMakeFromBackendRenderTarget(
     surfaceProps: InteropPointer,
 ): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_gpu_ganesh_SurfaceFactory__1nMakeFromMTKView")
+@ExternalSymbolName("org_jetbrains_skia_gpu_ganesh_SurfaceFactory__1nWrapMTKView")
 // Needs ForceNativeThreadState: sends Objective-C messages to a MetalKit view to read its pixel format and size, then
 // builds a GPU surface.
 // Native call path: SkSurfaces::WrapMTKView
 @ForceNativeThreadState
-private external fun _nMakeFromMTKView(
+private external fun _nWrapMTKView(
     contextPtr: NativePointer,
     mtkViewPtr: NativePointer,
     surfaceOrigin: Int,

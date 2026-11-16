@@ -33,7 +33,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_gpu_ganesh_SurfaceFac
 }
 
 #ifdef SK_METAL
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_gpu_ganesh_SurfaceFactoryKt__1nMakeFromMTKView
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_gpu_ganesh_SurfaceFactoryKt__1nWrapMTKView
   (JNIEnv* env, jclass jclass, jlong contextPtr, jlong mtkViewPtr, jint surfaceOrigin, jint sampleCount, jint colorType, jlong colorSpacePtr, jintArray surfacePropsInts) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(contextPtr));
     GrMTLHandle* mtkView = reinterpret_cast<GrMTLHandle*>(static_cast<uintptr_t>(mtkViewPtr));
