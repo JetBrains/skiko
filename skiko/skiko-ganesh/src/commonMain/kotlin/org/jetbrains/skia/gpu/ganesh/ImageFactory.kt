@@ -88,56 +88,32 @@ fun Image.readPixels(context: DirectContext, dst: Bitmap, srcX: Int, srcY: Int):
     readPixels(context, dst, srcX, srcY, false)
 
 /**
+ * Copies a rectangle of pixels from this image to [dst]. Copy starts at ([srcX], [srcY]) and
+ * does not exceed the image's width and height.
  *
- * Copies Rect of pixels from Image to Bitmap. Copy starts at offset (srcX, srcY),
- * and does not exceed Image (width, height).
+ * The bitmap specifies the destination dimensions, color type, alpha type, color space,
+ * pixel storage, and row bytes. Returns false if its pixel storage is null, its row bytes
+ * are less than the minimum required for its image info, or pixels cannot be accessed.
  *
+ * Pixels are copied only if pixel conversion is possible. If the image's color type is
+ * [ColorType.GRAY_8] or [ColorType.ALPHA_8], the destination color type must match.
+ * If the image's color type is [ColorType.GRAY_8], the destination color space must match.
+ * If the image's alpha type is [ColorAlphaType.OPAQUE], the destination alpha type must match.
+ * If the image has no color space, the destination must also have no color space.
  *
- * Image ColorType and Bitmap ColorType must match, or be a combination of
- * ColorType.RGBA_8888 and ColorType.BGRA_8888.
- * Image ColorSpace and Bitmap ColorSpace must match. Image AlphaType and
- * Bitmap AlphaType must match, or be a combination of AlphaType.PREMUL and
- * AlphaType.UNPREMUL. If Bitmap pixels are unallocated, Bitmap row bytes must be zero.
+ * [srcX] and [srcY] may be negative to copy only the top or left of the source. Returns false
+ * if the image's width or height is zero or negative, if `abs(srcX) >= width`, or if
+ * `abs(srcY) >= height`.
  *
+ * If [cache] is true, pixels may be retained locally. Otherwise, pixels are not added to
+ * the local cache.
  *
- * srcX and srcY may be negative to copy only top or left of source. Returns false if
- * Bitmap pixels could not be allocated or pixel conversion is not possible.
- *
- *
- * If Bitmap pixels are unallocated, Bitmap is resized to fit Image width and height.
- * If Bitmap pixels are allocated, only pixels fitting both Image and Bitmap are copied.
- * Bitmap pixel address does not change unless pixels are reallocated.
- *
- *
- * On success, pixels are copied to Bitmap and true is returned.
- *
- *
- * Returns false if Image is texture-backed and context is null.
- *
- *
- * Returns false if srcX &lt; 0 and -srcX is equal to or greater than Bitmap width.
- *
- *
- * Returns false if srcY &lt; 0 and -srcY is equal to or greater than Bitmap height.
- *
- *
- * Returns false if srcX is equal to or greater than Image width.
- *
- *
- * Returns false if srcY is equal to or greater than Image height.
- *
- *
- * Returns false if abs(srcX) &gt;= Image.getWidth(), or if abs(srcY) &gt;= Image.getHeight().
- *
- *
- * If cache is true, pixels may be retained locally, otherwise pixels are not added to the local cache.
- *
- * @param context the DirectContext in play, if it exists
- * @param dst     destination bitmap
- * @param srcX    column index whose absolute value is less than getWidth()
- * @param srcY    row index whose absolute value is less than getHeight()
- * @param cache   whether the pixels should be cached locally
- * @return        true if pixels are copied to dstPixels
+ * @param context GPU context used to read the image's pixels
+ * @param dst destination bitmap with allocated pixel storage
+ * @param srcX column index whose absolute value is less than the image's width
+ * @param srcY row index whose absolute value is less than the image's height
+ * @param cache whether the pixels may be cached locally
+ * @return true if pixels are copied to [dst]
  */
 fun Image.readPixels(
     context: DirectContext,
