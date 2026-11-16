@@ -11,6 +11,7 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
+import org.jetbrains.skiko.internal.Logger
 import org.jetbrains.skiko.renderer.AwtRenderer
 import org.jetbrains.skiko.renderer.MetalVSyncer
 import org.jetbrains.skiko.renderer.FrameDriver

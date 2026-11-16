@@ -3,6 +3,7 @@ package org.jetbrains.skiko.swing
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
+import org.jetbrains.skiko.internal.Logger
 import java.awt.Graphics2D
 import java.util.concurrent.CancellationException
 import javax.swing.SwingUtilities

@@ -2,6 +2,7 @@ package org.jetbrains.skiko.renderer
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.internal.Logger
 
 internal abstract class AbstractOpenGLRenderer(
     layer: SkiaLayer,

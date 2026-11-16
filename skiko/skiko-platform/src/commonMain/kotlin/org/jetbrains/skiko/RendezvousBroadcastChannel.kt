@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.jetbrains.skiko.internal.fastForEach
+import org.jetbrains.skiko.internal.maybeSynchronized
 import kotlin.coroutines.*
 
 /**

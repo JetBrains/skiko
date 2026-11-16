@@ -1,6 +1,6 @@
 package org.jetbrains.skia.impl
 
-import org.jetbrains.skiko.Logger
+import org.jetbrains.skiko.internal.Logger
 import java.lang.ref.PhantomReference
 import java.lang.ref.ReferenceQueue
 import kotlin.concurrent.thread

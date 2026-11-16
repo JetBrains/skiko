@@ -4,7 +4,7 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.Logger
+import org.jetbrains.skiko.internal.Logger
 import org.jetbrains.skiko.internal.fastForEach
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSRunLoop

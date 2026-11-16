@@ -4,6 +4,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.graphicapi.DxgiFormat
+import org.jetbrains.skiko.internal.Logger
 
 internal class Direct3DRenderer(
     layer: SkiaLayer,

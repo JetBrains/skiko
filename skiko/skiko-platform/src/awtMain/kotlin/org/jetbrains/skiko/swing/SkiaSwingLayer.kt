@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.internal.Logger
 import org.jetbrains.skiko.renderer.RenderApiFallbackManager
 import java.awt.Component
 import java.awt.Graphics

@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skiko.SkikoProperties.dataPath
+import org.jetbrains.skiko.internal.Logger
 import java.nio.channels.FileChannel
 import java.nio.channels.OverlappingFileLockException
 import java.nio.file.Path
