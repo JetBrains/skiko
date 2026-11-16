@@ -10,14 +10,12 @@
 #include <wrl/client.h>
 #include "jni_helpers.h"
 
-namespace {
-const D3D_FEATURE_LEVEL minSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
-const D3D_FEATURE_LEVEL featureLevels[] = {
+static const D3D_FEATURE_LEVEL minSupportedFeatureLevel = D3D_FEATURE_LEVEL_12_0;
+static const D3D_FEATURE_LEVEL featureLevels[] = {
     // TODO add D3D_FEATURE_LEVEL_12_2
     D3D_FEATURE_LEVEL_12_1,
     D3D_FEATURE_LEVEL_12_0
 };
-}
 
 class DirectXOffscreenDevice
 {
