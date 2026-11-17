@@ -20,4 +20,7 @@ class U16String internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 }
 
 @ExternalSymbolName("org_jetbrains_skia_U16String__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot
+// block.
+// Native call path: deleteU16String
 private external fun U16String_nGetFinalizer(): NativePointer

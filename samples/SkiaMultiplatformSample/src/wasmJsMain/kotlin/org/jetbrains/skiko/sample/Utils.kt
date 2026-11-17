@@ -10,6 +10,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
+import kotlin.wasm.unsafe.WebAssembly
+import kotlin.wasm.unsafe.wasmMemory
 import kotlin.wasm.unsafe.withScopedMemoryAllocator
 
 suspend fun loadRes(url: String): ArrayBuffer {
@@ -23,14 +25,7 @@ fun ArrayBuffer.toByteArray(): ByteArray {
     return jsInt8ArrayToKotlinByteArray(source)
 }
 
-@JsFun(
-    """ (src, size, dstAddr) => {
-        const mem8 = new Int8Array(wasmExports.memory.buffer, dstAddr, size);
-        mem8.set(src);
-    }
-"""
-)
-internal external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr: Int)
+private fun wasmBuffer(memory: WebAssembly.Memory): ArrayBuffer = js("memory.buffer")
 
 internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
     val size = x.length
@@ -39,7 +34,7 @@ internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
     return withScopedMemoryAllocator { allocator ->
         val memBuffer = allocator.allocate(size)
         val dstAddress = memBuffer.address.toInt()
-        jsExportInt8ArrayToWasm(x, size, dstAddress)
+        Int8Array(wasmBuffer(wasmMemory), dstAddress, size).set(x)
         ByteArray(size) { i -> (memBuffer + i).loadByte() }
     }
 }

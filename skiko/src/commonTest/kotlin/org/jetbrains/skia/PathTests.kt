@@ -11,6 +11,7 @@ import org.jetbrains.skiko.tests.runTest
 import kotlin.test.assertContentEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
+import kotlin.math.sqrt
 
 
 class PathTests {
@@ -201,18 +202,33 @@ class PathTests {
         assertTrue(Path.isQuadDegenerate(Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), false))
         assertFalse(Path.isCubicDegenerate(Point(0f, 0f), Point(10f, 0f), Point(0f, 0f), Point(0f, 0f), false))
         assertTrue(Path.isCubicDegenerate(Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), false))
+
+        val halfSqrt2 = sqrt(2f) / 2
+        val tan22_5 = sqrt(2f) - 1
         assertContentCloseEnough(
-            arrayOf(Point(0f, 20f), Point(6.666667f, 13.333334f)),
-            Path.convertConicToQuads(Point(0f, 20f), Point(20f, 0f), Point(40f, 20f), 0.5f, 1)
+            arrayOf(
+                Point(1f, 0f),
+                Point(1f, tan22_5),
+                Point(halfSqrt2, halfSqrt2),
+                Point(tan22_5, 1f),
+                Point(0f, 1f)
+            ),
+            Path.convertConicToQuads(Point(1f, 0f), Point(1f, 1f), Point(0f, 1f), halfSqrt2, 1),
+            epsilon = 0.0001f
         )
         assertContentCloseEnough(
             arrayOf(
-                Point(0f, 20f),
-                Point(3.0940108f, 16.90599f),
-                Point(8.4529950f, 15.119661f),
-                Point(13.811979f, 13.333334f)
+                Point(0f, 0f),
+                Point(2f, 2f),
+                Point(4f, 3f),
+                Point(6f, 4f),
+                Point(8f, 4f),
+                Point(10f, 4f),
+                Point(12f, 3f),
+                Point(14f, 2f),
+                Point(16f, 0f)
             ),
-            Path.convertConicToQuads(Point(0f, 20f), Point(20f, 0f), Point(40f, 20f), 0.5f, 2)
+            Path.convertConicToQuads(Point(0f, 0f), Point(8f, 8f), Point(16f, 0f), 1f, 2)
         )
         PathBuilder().lineTo(40f, 40f).detach().use { p ->
             val g1 = p.generationId

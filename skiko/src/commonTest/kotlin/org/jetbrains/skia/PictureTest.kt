@@ -1,9 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.tests.assertCloseEnough
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.tests.assertCloseEnough
 
 class PictureTest {
     @Test
@@ -55,5 +58,38 @@ class PictureTest {
         pic.playback(surface.canvas) { drawCount += 1; drawCount > 1 } // Draw only once
         assertEquals(2, drawCount)
         assertEquals(Color.RED, Bitmap.makeFromImage(surface.makeImageSnapshot()).getColor(15, 15))
+    }
+
+    @Test
+    fun serializedPictureRetainsDrawingAndHasDistinctIdentity() {
+        PictureRecorder().use { recorder ->
+            val bounds = Rect(0f, 0f, 8f, 8f)
+            Paint().use { paint ->
+                paint.color = Color.RED
+                recorder.beginRecording(bounds).drawRect(Rect(2f, 2f, 6f, 6f), paint)
+            }
+            recorder.finishRecordingAsPicture().use { original ->
+                val id = original.uniqueId
+                assertNotEquals(0, id)
+                assertEquals(id, original.uniqueId)
+                original.serializeToData().use { data ->
+                    val restored = assertNotNull(Picture.makeFromData(data))
+                    restored.use {
+                        assertNotEquals(0, restored.uniqueId)
+                        assertNotEquals(id, restored.uniqueId)
+                        assertEquals(bounds, restored.cullRect)
+                        Surface.makeRasterN32Premul(8, 8).use { surface ->
+                            restored.playback(surface.canvas)
+                            surface.makeImageSnapshot().use { snapshot ->
+                                Bitmap.makeFromImage(snapshot).use { pixels ->
+                                    assertEquals(Color.RED, pixels.getColor(3, 3))
+                                    assertEquals(Color.TRANSPARENT, pixels.getColor(0, 0))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

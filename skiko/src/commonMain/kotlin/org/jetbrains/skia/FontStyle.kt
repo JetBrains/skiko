@@ -29,9 +29,13 @@ value class FontStyle internal constructor(val _value: Int) {
     override fun toString(): String = "FontStyle(weight=$weight, width=$width, slant=$slant)"
 
     companion object {
-        val NORMAL = FontStyle(FontWeight.NORMAL, FontWidth.NORMAL, FontSlant.UPRIGHT)
-        val BOLD = FontStyle(FontWeight.BOLD, FontWidth.NORMAL, FontSlant.UPRIGHT)
-        val ITALIC = FontStyle(FontWeight.NORMAL, FontWidth.NORMAL, FontSlant.ITALIC)
-        val BOLD_ITALIC = FontStyle(FontWeight.BOLD, FontWidth.NORMAL, FontSlant.ITALIC)
+        val NORMAL: FontStyle
+            get() = FontStyle(FontWeight.NORMAL, FontWidth.NORMAL, FontSlant.UPRIGHT)
+        val BOLD: FontStyle
+            get() = FontStyle(FontWeight.BOLD, FontWidth.NORMAL, FontSlant.UPRIGHT)
+        val ITALIC: FontStyle
+            get() = FontStyle(FontWeight.NORMAL, FontWidth.NORMAL, FontSlant.ITALIC)
+        val BOLD_ITALIC: FontStyle
+            get() = FontStyle(FontWeight.BOLD, FontWidth.NORMAL, FontSlant.ITALIC)
     }
 }

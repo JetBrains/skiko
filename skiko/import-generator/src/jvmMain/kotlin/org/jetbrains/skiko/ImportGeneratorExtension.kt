@@ -46,7 +46,11 @@ internal class ImportGeneratorExtension(
             }
 
             importGenerator.getExportSymbols().forEach { symbolName ->
-                reexportWriter.appendLine("window['${symbolName}'] = wasmApi['${symbolName}'];")
+                if (symbolName in importGenerator.getBooleanExportSymbols()) {
+                    reexportWriter.appendLine("window['${symbolName}'] = (...a) => !!wasmApi['${symbolName}'](...a);")
+                } else {
+                    reexportWriter.appendLine("window['${symbolName}'] = wasmApi['${symbolName}'];")
+                }
             }
         }
     }

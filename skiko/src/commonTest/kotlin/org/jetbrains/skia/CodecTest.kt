@@ -18,6 +18,8 @@ class CodecTest {
         assertEquals(8, codec.size.x)
         assertEquals(8, codec.size.y)
         assertEquals(EncodedImageFormat.PNG, codec.encodedImageFormat)
+        assertEquals(EncodedOrigin.TOP_LEFT, codec.encodedOrigin)
+        assertEquals(0, codec.repetitionCount)
 
         val pixels = codec.readPixels()
         assertContentSame(IMAGE_COLORS_8X8, Image.makeFromBitmap(pixels), 0.01)

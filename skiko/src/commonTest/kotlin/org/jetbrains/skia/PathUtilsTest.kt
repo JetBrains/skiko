@@ -1,10 +1,54 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skiko.tests.runTest
+import org.jetbrains.skia.impl.use
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PathUtilsTest {
+    @Test
+    fun fillStrokeIntoBuilder() = runTest {
+        Paint().use { paint ->
+            paint.mode = PaintMode.STROKE
+            paint.strokeWidth = 4f
+            paint.strokeCap = PaintStrokeCap.BUTT
+            PathBuilder().use { source ->
+                source.moveTo(10f, 10f).lineTo(30f, 10f).detach().use { path ->
+                    PathBuilder().use { destination ->
+                        assertTrue(PathUtils.fillPathWithPaint(path, paint, destination))
+                        destination.detach().use { filled ->
+                            assertEquals(Rect(10f, 8f, 30f, 12f), filled.bounds)
+                            assertTrue(filled.isLastContourClosed)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun fillStrokeWithCullRect() = runTest {
+        Paint().use { paint ->
+            paint.mode = PaintMode.STROKE
+            paint.strokeWidth = 4f
+            paint.strokeCap = PaintStrokeCap.BUTT
+            PathBuilder().use { source ->
+                source.moveTo(10f, 10f).lineTo(30f, 10f).detach().use { path ->
+                    PathBuilder().use { destination ->
+                        assertTrue(
+                            PathUtils.fillPathWithPaint(path, paint, destination, Rect(0f, 0f, 40f, 40f), 1f)
+                        )
+                        destination.detach().use { filled ->
+                            assertEquals(Rect(10f, 8f, 30f, 12f), filled.bounds)
+                            assertTrue(filled.isLastContourClosed)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     @Test
     fun fillPathWithPaint() = runTest {

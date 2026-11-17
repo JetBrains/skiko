@@ -10,8 +10,52 @@ import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class FontCollectionTest {
+
+    @Test
+    fun managerSlotsAndFallbackCanBeChanged() {
+        TypefaceFontProvider().use { manager ->
+            FontCollection().use { collection ->
+                assertEquals(0, collection.fontManagersCount)
+                collection.setDynamicFontManager(manager)
+                assertEquals(1, collection.fontManagersCount)
+                collection.setTestFontManager(manager)
+                assertEquals(2, collection.fontManagersCount)
+                collection.setDefaultFontManager(manager)
+                assertEquals(3, collection.fontManagersCount)
+
+                collection.setEnableFallback(false)
+                assertEquals(2, collection.fontManagersCount)
+                collection.setEnableFallback(true)
+                assertEquals(3, collection.fontManagersCount)
+
+                collection.setDynamicFontManager(null)
+                assertEquals(2, collection.fontManagersCount)
+                collection.setTestFontManager(null)
+                assertEquals(1, collection.fontManagersCount)
+            }
+        }
+    }
+
+    @Test
+    fun defaultFallbackUsesConfiguredFamily() = runTest {
+        Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf").use { typeface ->
+            TypefaceFontProvider().use { manager ->
+                manager.registerTypeface(typeface, "Coverage Mono")
+                FontCollection().use { collection ->
+                    assertNull(collection.defaultFallback())
+                    collection.setDefaultFontManager(manager, "Coverage Mono")
+                    assertNotNull(collection.defaultFallback()).use { fallback ->
+                        assertEquals(typeface.familyName, fallback.familyName)
+                        assertEquals(typeface.uniqueId, fallback.uniqueId)
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun familyNameTest() = runTest {

@@ -11,6 +11,13 @@ import kotlin.test.assertNull
 
 class FontMgrTest {
     @Test
+    fun legacyTypefaceLookupOnEmptyProvider() {
+        TypefaceFontProvider().use { fontManager ->
+            assertNull(fontManager.legacyMakeTypeface("Missing font family", FontStyle.NORMAL))
+        }
+    }
+
+    @Test
     fun fontMgrTest() = runTest {
 
         TypefaceFontProvider().let { outerFontManager ->

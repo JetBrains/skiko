@@ -357,13 +357,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromCircle
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Path__1nMakeFromRRect
-  (KFloat* radiiArray,
+  (KFloat* radiiArray, KInt radiiSize,
    KFloat left, KFloat top, KFloat right, KFloat bottom,
    KInt direction, KInt startIndex) {
-    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
-    
-    SkRRect rrect;
-    rrect.setRectRadii(rect, reinterpret_cast<const SkVector*>(radiiArray));
+    SkRRect rrect = skija::RRect::toSkRRect(left, top, right, bottom, radiiArray, radiiSize);
     
     SkPath path = SkPath::RRect(
         rrect,

@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:26.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -y && \
@@ -16,6 +16,15 @@ ENV PATH=$EMSDK_DIR/upstream/emscripten:$PATH
 RUN git clone https://github.com/emscripten-core/emsdk.git $EMSDK_DIR && \
     $EMSDK_DIR/emsdk install $EMSDK_VER && \
     $EMSDK_DIR/emsdk activate $EMSDK_VER
+
+# Use different Node to fix eMudhra certificate issue (https://youtrack.jetbrains.com/issue/CMP-11011)
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x -o /tmp/nodesource_setup.sh && \
+    bash /tmp/nodesource_setup.sh && \
+    apt install nodejs -y && \
+    rm -f /tmp/nodesource_setup.sh && \
+    rm -rf /var/lib/apt/lists/*
+ENV EM_NODE_JS=/usr/bin/node
+RUN rm -rf "$EMSDK_DIR/node" && node --version
 
 # Use UTF-8 by default
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8

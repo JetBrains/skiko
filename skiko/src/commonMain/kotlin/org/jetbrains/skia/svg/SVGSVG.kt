@@ -115,40 +115,67 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetX")
+// No ForceNativeThreadState: returns a stored length and copies two ints out, so it is short and cannot block.
+// Native call path: SkSVGSVG::getX
 private external fun SVGSVG_nGetX(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetY")
+// No ForceNativeThreadState: returns a stored length and copies two ints out, so it is short and cannot block.
+// Native call path: SkSVGSVG::getY
 private external fun SVGSVG_nGetY(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetWidth")
+// No ForceNativeThreadState: returns a stored length and copies two ints out, so it is short and cannot block.
+// Native call path: SkSVGSVG::getWidth
 private external fun SVGSVG_nGetWidth(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetHeight")
+// No ForceNativeThreadState: returns a stored length and copies two ints out, so it is short and cannot block.
+// Native call path: SkSVGSVG::getHeight
 private external fun SVGSVG_nGetHeight(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio")
+// No ForceNativeThreadState: returns a stored field and copies two ints out, so it is short and cannot block.
+// Native call path: SkSVGSVG::getPreserveAspectRatio
 private external fun SVGSVG_nGetPreserveAspectRatio(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetViewBox")
+// No ForceNativeThreadState: returns a stored optional rectangle and copies it out, so it is short and cannot block.
+// Native call path: SkSVGSVG::getViewBox
 private external fun SVGSVG_nGetViewBox(ptr: NativePointer, result: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize")
+// Needs ForceNativeThreadState: for em or ex units in debug builds it can print to stderr, which can block on I/O.
+// Native call path: SkSVGSVG::intrinsicSize -> SkSVGLengthContext::resolve -> SkDebugf -> SkLogVAList
+@ForceNativeThreadState
 private external fun SVGSVG_nGetIntrinsicSize(ptr: NativePointer, width: Float, height: Float, dpi: Float, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetX")
+// No ForceNativeThreadState: assigns a small value into a stored field, so it is short and cannot block.
+// Native call path: SkSVGSVG::setX
 private external fun SVGSVG_nSetX(ptr: NativePointer, value: Float, unit: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetY")
+// No ForceNativeThreadState: assigns a small value into a stored field, so it is short and cannot block.
+// Native call path: SkSVGSVG::setY
 private external fun SVGSVG_nSetY(ptr: NativePointer, value: Float, unit: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetWidth")
+// No ForceNativeThreadState: assigns a small value into a stored field, so it is short and cannot block.
+// Native call path: SkSVGSVG::setWidth
 private external fun SVGSVG_nSetWidth(ptr: NativePointer, value: Float, unit: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetHeight")
+// No ForceNativeThreadState: assigns a small value into a stored field, so it is short and cannot block.
+// Native call path: SkSVGSVG::setHeight
 private external fun SVGSVG_nSetHeight(ptr: NativePointer, value: Float, unit: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetPreserveAspectRatio")
+// No ForceNativeThreadState: assigns a small value into a stored field, so it is short and cannot block.
+// Native call path: SkSVGSVG::setPreserveAspectRatio
 private external fun SVGSVG_nSetPreserveAspectRatio(ptr: NativePointer, align: Int, scale: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetViewBox")
+// No ForceNativeThreadState: assigns a small value into a stored field, so it is short and cannot block.
+// Native call path: SkSVGSVG::setViewBox
 private external fun SVGSVG_nSetViewBox(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float)

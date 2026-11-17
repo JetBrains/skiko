@@ -1,11 +1,124 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.kotlinBackend
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.*
 
 class BitmapTest {
+
+    @Test
+    fun canAllocateZeroedPixelsAndEraseSubset() = runTest {
+        Bitmap().use { bitmap ->
+            assertTrue(bitmap.allocPixelsFlags(ImageInfo.makeN32Premul(3, 2), true))
+            assertEquals(Color.TRANSPARENT, bitmap.getColor(0, 0))
+            assertEquals(Color.TRANSPARENT, bitmap.getColor(2, 1))
+            assertFalse(bitmap.computeIsOpaque())
+            assertEquals(0f, bitmap.getAlphaf(2, 1))
+
+            bitmap.erase(Color.RED)
+            assertTrue(bitmap.computeIsOpaque())
+            assertEquals(Color.RED, bitmap.getColor(0, 0))
+            assertEquals(1f, bitmap.getAlphaf(2, 1))
+
+            bitmap.erase(Color.TRANSPARENT, IRect.makeXYWH(1, 1, 2, 1))
+            assertEquals(Color.RED, bitmap.getColor(0, 1))
+            assertEquals(Color.TRANSPARENT, bitmap.getColor(1, 1))
+            assertEquals(Color.TRANSPARENT, bitmap.getColor(2, 1))
+            assertFalse(bitmap.computeIsOpaque())
+        }
+    }
+
+    @Test
+    fun canChangeAlphaTypeAndReset() = runTest {
+        Bitmap().use { bitmap ->
+            assertTrue(bitmap.allocPixels(ImageInfo.makeN32Premul(2, 3)))
+            assertEquals(ColorAlphaType.PREMUL, bitmap.imageInfo.colorAlphaType)
+            assertTrue(bitmap.setAlphaType(ColorAlphaType.OPAQUE))
+            assertEquals(ColorAlphaType.OPAQUE, bitmap.imageInfo.colorAlphaType)
+            assertTrue(bitmap.setAlphaType(ColorAlphaType.UNPREMUL))
+            assertEquals(ColorAlphaType.UNPREMUL, bitmap.imageInfo.colorAlphaType)
+
+            bitmap.reset()
+            assertTrue(bitmap.isNull)
+            assertTrue(bitmap.isEmpty)
+            assertEquals(0, bitmap.width)
+            assertEquals(0, bitmap.height)
+            assertEquals(0, bitmap.rowBytes)
+            assertEquals(ColorType.UNKNOWN, bitmap.imageInfo.colorType)
+            assertEquals(ColorAlphaType.UNKNOWN, bitmap.imageInfo.colorAlphaType)
+        }
+    }
+
+    @Test
+    fun cloneSharesPixelsAndImmutability() = runTest {
+        Bitmap().use { bitmap ->
+            assertTrue(bitmap.allocPixels(ImageInfo.makeN32Premul(2, 2)))
+            bitmap.erase(Color.RED)
+            bitmap.makeClone().use { clone ->
+                assertEquals(2, clone.width)
+                assertEquals(2, clone.height)
+                assertEquals(Color.RED, clone.getColor(1, 1))
+                clone.erase(Color.BLUE)
+                assertEquals(Color.BLUE, bitmap.getColor(1, 1))
+
+                assertFalse(bitmap.isImmutable)
+                assertFalse(clone.isImmutable)
+                bitmap.setImmutable()
+                assertTrue(bitmap.isImmutable)
+                assertTrue(clone.isImmutable)
+            }
+        }
+    }
+
+    @Test
+    fun canSwapBitmaps() = runTest {
+        Bitmap().use { first ->
+            Bitmap().use { second ->
+                assertTrue(first.allocPixels(ImageInfo.makeN32Premul(2, 3)))
+                assertTrue(second.allocPixels(ImageInfo.makeN32Premul(4, 1)))
+                first.erase(Color.RED)
+                second.erase(Color.BLUE)
+
+                first.swap(second)
+                assertEquals(4, first.width)
+                assertEquals(1, first.height)
+                assertEquals(Color.BLUE, first.getColor(3, 0))
+                assertEquals(2, second.width)
+                assertEquals(3, second.height)
+                assertEquals(Color.RED, second.getColor(1, 2))
+            }
+        }
+    }
+
+    @Test
+    fun canSharePixelRefAtOffsetAndNotifyChanges() = runTest {
+        Bitmap().use { source ->
+            assertTrue(source.allocPixels(ImageInfo.makeN32Premul(3, 3)))
+            source.erase(Color.RED)
+            source.erase(Color.BLUE, IRect.makeXYWH(1, 1, 2, 2))
+            assertNotNull(source.pixelRef).use { pixelRef ->
+                Bitmap().use { subset ->
+                    assertTrue(subset.setImageInfo(ImageInfo.makeN32Premul(2, 2), source.rowBytes))
+                    subset.setPixelRef(pixelRef, 1, 1)
+                    assertEquals(IPoint(1, 1), subset.pixelRefOrigin)
+                    assertEquals(Color.BLUE, subset.getColor(0, 0))
+                    assertEquals(Color.BLUE, subset.getColor(1, 1))
+
+                    val generation = source.generationId
+                    assertNotNull(subset.peekPixels()).use { pixmap ->
+                        assertTrue(pixmap.erase(Color.GREEN))
+                    }
+                    source.notifyPixelsChanged()
+                    assertNotEquals(generation, source.generationId)
+                    assertEquals(source.generationId, subset.generationId)
+                    assertEquals(Color.GREEN, source.getColor(1, 1))
+                    assertEquals(Color.RED, source.getColor(0, 0))
+                }
+            }
+        }
+    }
 
     @Test
     fun bitmapTest() = runTest {

@@ -675,6 +675,37 @@ class ImageFilterTest {
         )
     }
 
+    private fun redSquarePicture(size: Float): Picture {
+        val recorder = PictureRecorder()
+        val canvas = recorder.beginRecording(Rect(0f, 0f, size, size))
+        canvas.drawRect(Rect(0f, 0f, size, size), Paint().apply { color = Color.RED })
+        return recorder.finishRecordingAsPicture()
+    }
+
+    private fun drawEmptyRectWithFilter(filter: ImageFilter): Bitmap {
+        return Surface.makeRasterN32Premul(20, 20).use {
+            it.canvas.clear(Color.WHITE)
+            val paint = Paint().apply { imageFilter = filter }
+            it.canvas.drawRect(Rect(0f, 0f, 0f, 0f), paint)
+            Bitmap.makeFromImage(it.makeImageSnapshot())
+        }
+    }
+
+    @Test
+    fun makePictureDrawsIntoTargetRect() {
+        val picture = redSquarePicture(20f)
+        val bitmap = drawEmptyRectWithFilter(ImageFilter.makePicture(picture, Rect(0f, 0f, 10f, 10f)))
+        assertEquals(Color.RED, bitmap.getColor(5, 5))
+        assertEquals(Color.WHITE, bitmap.getColor(15, 15))
+    }
+
+    @Test
+    fun makePictureWithoutTargetUsesCullRect() {
+        val picture = redSquarePicture(20f)
+        val bitmap = drawEmptyRectWithFilter(ImageFilter.makePicture(picture))
+        assertEquals(Color.RED, bitmap.getColor(15, 15))
+    }
+
     @Test
     fun makeSpotLitSpecular() = imageFilterTest {
         ImageFilter.makeSpotLitSpecular(

@@ -6,6 +6,7 @@ import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.withResult
 import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.jetbrains.skiko.InternalSkikoApi
 
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
@@ -45,6 +46,9 @@ internal actual fun defaultLanguageTag(): String = LANG
 internal actual fun compilePattern(regex: String): Pattern = Pattern(regex)
 
 actual typealias ExternalSymbolName = kotlin.native.SymbolName
+
+@InternalSkikoApi
+actual typealias ForceNativeThreadState = kotlin.native.ForceNativeThreadState
 
 @OptIn(ExperimentalSkikoApi::class)
 internal actual fun nMakeVulkanImpl(

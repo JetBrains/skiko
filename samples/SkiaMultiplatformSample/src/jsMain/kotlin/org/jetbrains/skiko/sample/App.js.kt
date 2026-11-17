@@ -20,4 +20,5 @@ internal fun runApp() {
     val clocks = WebClocks(skiaLayer, canvas)
     skiaLayer.renderDelegate = SkiaLayerRenderDelegate(skiaLayer, clocks)
     skiaLayer.needRedraw()
+    canvas.setAttribute("data-skiko-ready", "true")
 }

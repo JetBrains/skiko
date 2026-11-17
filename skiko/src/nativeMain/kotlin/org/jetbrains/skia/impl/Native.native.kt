@@ -284,6 +284,8 @@ private fun disposeCallback(ptr: COpaquePointer) {
 }
 
 @ExternalSymbolName("skiko_initCallbacks")
+// No ForceNativeThreadState: stores five function pointers into globals, so it is short and cannot block.
+// Native call path: skiko_initCallbacks
 private external fun initCallbacks(
     callBoolean: COpaquePointer,
     callInt: COpaquePointer,

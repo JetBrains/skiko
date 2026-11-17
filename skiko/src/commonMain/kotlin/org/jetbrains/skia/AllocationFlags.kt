@@ -8,18 +8,25 @@ value class AllocationFlags(val bits: Int) {
         /**
          * Requests a dedicated `VkDeviceMemory` allocation.
          */
-        val DEDICATED = AllocationFlags(0b0001)
+        val DEDICATED: AllocationFlags
+            get() = AllocationFlags(0b0001)
+
         /**
          * Requests lazily allocated device‑local memory.
          */
-        val LAZY = AllocationFlags(0b0010)
+        val LAZY: AllocationFlags
+            get() = AllocationFlags(0b0010)
+
         /**
          * Requests persistent mapping for host‑visible memory.
          */
-        val PERSISTENTLY_MAPPED = AllocationFlags(0b0100)
+        val PERSISTENTLY_MAPPED: AllocationFlags
+            get() = AllocationFlags(0b0100)
+
         /**
          * Requests protected memory allocation.
          */
-        val PROTECTED = AllocationFlags(0b1000)
+        val PROTECTED: AllocationFlags
+            get() = AllocationFlags(0b1000)
     }
 }

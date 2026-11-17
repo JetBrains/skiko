@@ -1,6 +1,7 @@
 package org.jetbrains.skia.gpu.graphite
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
@@ -169,12 +170,19 @@ class GraphiteContext internal constructor(ptr: NativePointer) : Managed(ptr, _F
 }
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteGraphiteContext
 private external fun _nGetGraphiteContextFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeMetal")
+// Needs ForceNativeThreadState: retains a Metal device and command queue, then builds the Metal context.
+// Native call path: ContextFactory::MakeMetal -> MtlSharedContext::Make
+@ForceNativeThreadState
 private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeVulkan")
+// No ForceNativeThreadState: returns 0 and ignores all six arguments, so it is short and cannot block.
 private external fun _nMakeVulkan(
     instancePtr: NativePointer,
     physicalDevicePtr: NativePointer,
@@ -185,9 +193,15 @@ private external fun _nMakeVulkan(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nMakeRecorder")
+// Needs ForceNativeThreadState: creates a recorder, and its resource provider creates Metal objects.
+// Native call path: Context::makeRecorder -> Recorder::Recorder
+@ForceNativeThreadState
 private external fun _nMakeRecorder(contextPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nInsertRecording")
+// Needs ForceNativeThreadState: queues GPU work, which is recorded as a Metal command buffer.
+// Native call path: Context::insertRecording -> QueueManager::addRecording
+@ForceNativeThreadState
 private external fun _nInsertRecording(
     contextPtr: NativePointer,
     recordingPtr: NativePointer,
@@ -198,4 +212,8 @@ private external fun _nInsertRecording(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_GraphiteContext__1nSubmit")
+// Needs ForceNativeThreadState: commits a Metal command buffer to the GPU and can wait for the GPU to sync back to the
+// CPU.
+// Native call path: Context::submit -> QueueManager::submitToGpu -> MtlCommandBuffer::commit
+@ForceNativeThreadState
 private external fun _nSubmit(contextPtr: NativePointer, syncCpu: Boolean)

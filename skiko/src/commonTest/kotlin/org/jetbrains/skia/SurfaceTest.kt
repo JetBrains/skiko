@@ -135,4 +135,65 @@ class SurfaceTest {
 
         assertEquals(Color.RED, pixels.getColor(8, 8))
     }
+
+    @Test
+    fun pixmapPixelsCanBeWrittenReadAndPeeked() = runTest {
+        Bitmap().use { source ->
+            assertTrue(source.allocN32Pixels(2, 2))
+            source.erase(Color.RED)
+            assertNotNull(source.peekPixels()).use { sourcePixels ->
+                Surface.makeRasterN32Premul(4, 4).use { surface ->
+                    surface.canvas.clear(Color.BLUE)
+                    surface.writePixels(sourcePixels, 1, 1)
+                    Pixmap().use { pixels ->
+                        assertTrue(surface.peekPixels(pixels))
+                        assertEquals(Color.BLUE, pixels.getColor(0, 0))
+                        assertEquals(Color.RED, pixels.getColor(1, 1))
+                        assertEquals(Color.RED, pixels.getColor(2, 2))
+                    }
+                    Bitmap().use { destination ->
+                        assertTrue(destination.allocN32Pixels(2, 2))
+                        assertNotNull(destination.peekPixels()).use { pixels ->
+                            assertTrue(surface.readPixels(pixels, 1, 1))
+                            assertEquals(Color.RED, destination.getColor(0, 0))
+                            assertEquals(Color.RED, destination.getColor(1, 1))
+                            assertFalse(surface.readPixels(pixels, 4, 4))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun drawCopiesSurfaceAtOffset() = runTest {
+        Surface.makeRasterN32Premul(2, 2).use { source ->
+            source.canvas.clear(Color.RED)
+            Surface.makeRasterN32Premul(4, 4).use { destination ->
+                destination.canvas.clear(Color.BLUE)
+                source.draw(destination.canvas, 1, 1, null)
+                Pixmap().use { pixels ->
+                    assertTrue(destination.peekPixels(pixels))
+                    assertEquals(Color.BLUE, pixels.getColor(0, 0))
+                    assertEquals(Color.RED, pixels.getColor(1, 1))
+                    assertEquals(Color.RED, pixels.getColor(2, 2))
+                    assertEquals(Color.BLUE, pixels.getColor(3, 3))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun nullSurfaceHasDimensionsButNoPixels() = runTest {
+        Surface.makeNull(7, 9).use { surface ->
+            assertEquals(7, surface.width)
+            assertEquals(9, surface.height)
+            surface.canvas.clear(Color.RED)
+            Pixmap().use { pixels ->
+                assertFalse(surface.peekPixels(pixels))
+            }
+        }
+        assertFailsWith<IllegalArgumentException> { Surface.makeNull(0, 9) }
+    }
+
 }

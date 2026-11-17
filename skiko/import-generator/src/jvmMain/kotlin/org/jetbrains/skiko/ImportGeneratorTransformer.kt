@@ -4,16 +4,16 @@ import org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.expressions.IrAnnotation
 import org.jetbrains.kotlin.ir.expressions.IrConst
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+import org.jetbrains.kotlin.ir.expressions.impl.IrAnnotationImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
+import org.jetbrains.kotlin.ir.types.isBoolean
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.getAnnotation
-import org.jetbrains.kotlin.ir.util.getValueArgument
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -28,9 +28,12 @@ internal class ImportGeneratorTransformer(
     private val exportSymbols = mutableListOf<String>()
     fun getExportSymbols(): List<String> = exportSymbols
 
+    private val booleanExportSymbols = mutableSetOf<String>()
+    fun getBooleanExportSymbols(): Set<String> = booleanExportSymbols
+
     @Suppress("UNCHECKED_CAST")
-    private fun IrConstructorCall.getStringValue(value: String): String =
-        (getValueArgument(Name.identifier(value)) as IrConst).value as String
+    private fun IrAnnotation.getStringValue(value: String): String =
+        (argumentMapping[Name.identifier(value)] as IrConst).value as String
 
     @OptIn(UnsafeDuringIrConstructionAPI::class, DeprecatedForRemovalCompilerApi::class)
     private fun IrFunction.addWasmImportAnnotation(name: String) {
@@ -40,7 +43,7 @@ internal class ImportGeneratorTransformer(
 
         val ctor = annotationClass.owner.constructors.first()
 
-        val annotationCall = IrConstructorCallImpl.fromSymbolOwner(
+        val annotationCall = IrAnnotationImpl.fromSymbolOwner(
             startOffset = startOffset,
             endOffset = endOffset,
             type = annotationClass.owner.defaultType,
@@ -49,19 +52,19 @@ internal class ImportGeneratorTransformer(
 
         val moduleImport = if (name.startsWith("org_jetbrains_skiko_tests_")) "./$moduleName-test.mjs" else "./$moduleName.mjs"
 
-        annotationCall.putValueArgument(0, IrConstImpl.string(
+        annotationCall.arguments[0] = IrConstImpl.string(
             startOffset,
             endOffset,
             pluginContext.irBuiltIns.stringType,
             moduleImport
-        ))
+        )
 
-        annotationCall.putValueArgument(1, IrConstImpl.string(
+        annotationCall.arguments[1] = IrConstImpl.string(
             startOffset,
             endOffset,
             pluginContext.irBuiltIns.stringType,
             name
-        ))
+        )
 
         annotations += annotationCall
     }
@@ -74,19 +77,19 @@ internal class ImportGeneratorTransformer(
 
         val ctor = annotationClass.owner.constructors.first()
 
-        val annotationCall = IrConstructorCallImpl.fromSymbolOwner(
+        val annotationCall = IrAnnotationImpl.fromSymbolOwner(
             startOffset = startOffset,
             endOffset = endOffset,
             type = annotationClass.owner.defaultType,
             constructorSymbol = ctor.symbol,
         )
 
-        annotationCall.putValueArgument(0, IrConstImpl.string(
+        annotationCall.arguments[0] = IrConstImpl.string(
             startOffset,
             endOffset,
             pluginContext.irBuiltIns.stringType,
             name
-        ))
+        )
 
         annotations += annotationCall
     }
@@ -103,6 +106,9 @@ internal class ImportGeneratorTransformer(
             addWasmImportAnnotation(name)
 
             exportSymbols.add(name)
+            if (returnType.isBoolean()) {
+                booleanExportSymbols.add(name)
+            }
         }
     }
 }

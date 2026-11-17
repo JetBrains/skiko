@@ -1,15 +1,43 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
-import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.gradle.kotlin.dsl.withType
-import tasks.configuration.*
-import dsl.SkikoDependencyScope
+import org.jetbrains.compose.internal.publishing.MavenCentralProperties
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.skiko.build.configuration.configureIOSTestsWithMetal
+import org.jetbrains.skiko.build.configuration.configureKotlinCompilerOptions
+import org.jetbrains.skiko.build.configuration.configureNativeTarget
+import org.jetbrains.skiko.build.configuration.configureSignAndPublishDependencies
+import org.jetbrains.skiko.build.configuration.jvmLinkedLibraryFor
+import org.jetbrains.skiko.build.configuration.jvmRuntimeJarFor
+import org.jetbrains.skiko.build.configuration.nativeSymbolSourcesFor
+import org.jetbrains.skiko.build.configuration.provideJvmRequiredSymbols
+import org.jetbrains.skiko.build.configuration.setupJvmTestTask
+import org.jetbrains.skiko.build.context.SkikoModuleKind
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.awtMainSourceSet
+import org.jetbrains.skiko.build.context.jvmMainSourceSet
+import org.jetbrains.skiko.build.context.jvmTestSourceSet
+import org.jetbrains.skiko.build.context.skikoSourceSetHierarchyTemplate
+import org.jetbrains.skiko.build.context.supportAnyNative
+import org.jetbrains.skiko.build.context.supportAwt
+import org.jetbrains.skiko.build.context.supportNativeIosArm64
+import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeIosX64
+import org.jetbrains.skiko.build.context.supportNativeMac
+import org.jetbrains.skiko.build.context.supportNativeTvosArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosX64
+import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
+import org.jetbrains.skiko.build.dependencies.SkikoDependencyScope
+import org.jetbrains.skiko.build.publishing.declarePublications
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
+import org.jetbrains.skiko.build.utils.SkiaBuildType
+import org.jetbrains.skiko.build.utils.SkikoArtifacts
+import org.jetbrains.skiko.build.utils.SkikoProperties
+import org.jetbrains.skiko.build.utils.hostOs
 
 plugins {
     kotlin("multiplatform")
@@ -85,22 +113,10 @@ repositories {
 }
 
 kotlin.run {
-    compilerOptions {
-        languageVersion.set(skikoKotlinLanguageVersion)
-        apiVersion.set(skikoKotlinApiVersion)
-        freeCompilerArgs.add("-opt-in=org.jetbrains.skiko.InternalSkikoApi")
-    }
-
     applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
 
     if (supportAwt) {
-        jvm("awt") {
-            compilations.all {
-                compileTaskProvider.configure {
-                    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
-                }
-            }
-        }
+        jvm("awt")
     }
 
 
@@ -134,16 +150,7 @@ kotlin.run {
 
     sourceSets.commonMain.dependencies {
         implementation(kotlin("stdlib"))
-        /*
-        We use compileOnly here because the root project publishes multiple artifacts
-        which makes api/implementation(project(":")) fail during publishing.
-        This avoids Gradle's multi-publication ambiguity but skiko core is NOT added
-        as a transitive dependency of skiko-graphite, and it will NOT appear in the published POM
-        consumers MUST explicitly depend on both:
-            - implementation("org.jetbrains.skiko:skiko-x")
-            - implementation("org.jetbrains.skiko:skiko-graphite-x")
-         */
-        compileOnly(coreProject)
+        api(project(":"))
     }
 
     sourceSets.commonTest.dependencies {
@@ -166,11 +173,6 @@ kotlin.run {
 
 
     if (supportAnyNative) {
-        sourceSets.all {
-            // Really ugly, see https://youtrack.jetbrains.com/issue/KT-46649 why it is required,
-            // note that setting it per source set still keeps it unset in commonized source sets.
-            languageSettings.optIn("kotlin.native.SymbolNameIsInternal")
-        }
         configureIOSTestsWithMetal(project)
     }
 }
@@ -220,13 +222,7 @@ if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
     configureSignAndPublishDependencies()
 }
 
-tasks.withType<KotlinNativeCompile>().configureEach {
-    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
-}
-
-tasks.withType<KotlinCompilationTask<*>>().configureEach {
-    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
-}
+configureKotlinCompilerOptions()
 
 tasks.withType<AbstractTestTask> {
     testLogging {

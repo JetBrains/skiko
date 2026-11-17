@@ -11,8 +11,10 @@ import org.jetbrains.skiko.isVideoCardSupported
 @JvmInline
 internal value class DxgiFormat(val value: Int) {
     companion object {
-        val R8G8B8A8_UNORM = DxgiFormat(28)
-        val B8G8R8A8_UNORM = DxgiFormat(87)
+        inline val R8G8B8A8_UNORM: DxgiFormat
+            get() = DxgiFormat(28)
+        inline val B8G8R8A8_UNORM: DxgiFormat
+            get() = DxgiFormat(87)
     }
 }
 

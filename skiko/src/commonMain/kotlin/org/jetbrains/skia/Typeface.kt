@@ -372,12 +372,21 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
+// No ForceNativeThreadState: returns the stored unique id, so it is short and cannot block.
+// Native call path: SkTypeface::uniqueID
 private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nEquals")
+// No ForceNativeThreadState: compares two typeface pointers and their stored unique ids, so it is short and cannot
+// block.
+// Native call path: SkTypeface::Equal
 private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
+// Needs ForceNativeThreadState: maps each character to a glyph through CoreText, looping over every character, so its
+// time grows with the input length.
+// Native call path: SkTypeface::unicharsToGlyphs -> SkTypeface_Mac::onCharsToGlyphs -> CTFontGetGlyphsForCharacters
+@ForceNativeThreadState
 private external fun Typeface_nGetUTF32Glyphs(
     ptr: NativePointer,
     uni: InteropPointer,
@@ -386,30 +395,58 @@ private external fun Typeface_nGetUTF32Glyphs(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
+// Needs ForceNativeThreadState: maps one character to a glyph through CoreText, so it can call CoreText.
+// Native call path: SkTypeface::unicharToGlyph -> SkTypeface_Mac::onCharsToGlyphs -> CTFontGetGlyphsForCharacters
+@ForceNativeThreadState
 private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
+// Needs ForceNativeThreadState: may make a CoreText font copy and read its bounding box, so it can call CoreText.
+// Native call path: SkTypeface::getBounds -> onComputeBounds -> SkScalerContext_Mac::generateFontMetrics
+@ForceNativeThreadState
 private external fun Typeface_nGetBounds(ptr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
+// No ForceNativeThreadState: returns a stored style value, so it is short and cannot block.
+// Native call path: SkTypeface::fontStyle -> onGetFontStyle
 private external fun _nGetFontStyle(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nIsFixedPitch")
+// No ForceNativeThreadState: returns a stored fixed-width flag, so it is short and cannot block.
+// Native call path: SkTypeface::isFixedPitch -> onGetFixedPitch
 private external fun _nIsFixedPitch(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationsCount")
+// Needs ForceNativeThreadState: reads font variation settings through CoreText and walks CoreFoundation arrays, so it
+// can call CoreText.
+// Native call path: getVariationDesignPosition -> SkTypeface_Mac::onGetVariationDesignPosition -> CTFontCopyVariation
+@ForceNativeThreadState
 private external fun _nGetVariationsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
+// Needs ForceNativeThreadState: reads each variation axis value through CoreText and CoreFoundation, so it can call
+// CoreText.
+// Native call path: getVariationDesignPosition -> SkTypeface_Mac::onGetVariationDesignPosition -> CTFontCopyVariation
+@ForceNativeThreadState
 private external fun _nGetVariations(ptr: NativePointer, variations: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
+// Needs ForceNativeThreadState: reads the font's variation axes through CoreText, so it can call CoreText.
+// Native call path: getVariationDesignParameters -> SkTypeface_Mac::onGetVariationDesignParameters
+@ForceNativeThreadState
 private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
+// Needs ForceNativeThreadState: reads each variation axis through CoreText and looks up values in CoreFoundation
+// dictionaries, so it can call CoreText.
+// Native call path: getVariationDesignParameters -> SkTypeface_Mac::onGetVariationDesignParameters
+@ForceNativeThreadState
 private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
+// Needs ForceNativeThreadState: makes a copy of the font through CoreText, so it can call CoreText.
+// Native call path: SkTypeface::makeClone -> SkTypeface_Mac::onMakeClone -> CTFontCreateCopyWithAttributes
+@ForceNativeThreadState
 private external fun _nMakeClone(
     ptr: NativePointer,
     variations: InteropPointer,
@@ -418,30 +455,61 @@ private external fun _nMakeClone(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeEmptyTypeface")
+// Needs ForceNativeThreadState: creates a shared empty typeface on first use, which can wait for another thread that is
+// also creating it.
+// Native call path: SkTypeface::MakeEmpty -> SkEmptyTypeface::Make
+@ForceNativeThreadState
 private external fun _nMakeEmptyTypeface(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
+// Needs ForceNativeThreadState: asks CoreText how many glyphs the font has, so it can call CoreText.
+// Native call path: SkTypeface::countGlyphs -> SkTypeface_Mac::onCountGlyphs -> CTFontGetGlyphCount
+@ForceNativeThreadState
 private external fun _nGetGlyphsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTablesCount")
+// Needs ForceNativeThreadState: asks CoreText for the font's table list, so it can call CoreText.
+// Native call path: SkTypeface::countTables -> SkTypeface_Mac::onGetTableTags -> CTFontCopyAvailableTables
+@ForceNativeThreadState
 private external fun _nGetTablesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTagsCount")
+// Needs ForceNativeThreadState: asks CoreText for the font's table list, so it can call CoreText.
+// Native call path: SkTypeface::countTables -> SkTypeface_Mac::onGetTableTags -> CTFontCopyAvailableTables
+@ForceNativeThreadState
 private external fun _nGetTableTagsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTags")
+// Needs ForceNativeThreadState: asks CoreText for the font's table list and loops over the tags, so it can call
+// CoreText.
+// Native call path: SkTypeface::readTableTags -> SkTypeface_Mac::onGetTableTags -> CTFontCopyAvailableTables
+@ForceNativeThreadState
 private external fun _nGetTableTags(ptr: NativePointer, tags: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableSize")
+// Needs ForceNativeThreadState: copies a font table through CoreText, or through CoreGraphics as a fallback, so it can
+// call both.
+// Native call path: SkTypeface::getTableSize -> SkTypeface_Mac::onGetTableData -> CTFontCopyTable
+@ForceNativeThreadState
 private external fun _nGetTableSize(ptr: NativePointer, tag: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableData")
+// Needs ForceNativeThreadState: copies a font table through CoreText, so it can call CoreText.
+// Native call path: SkTypeface::copyTableData -> SkTypeface_Mac::onCopyTableData -> CTFontCopyTable
+@ForceNativeThreadState
 private external fun _nGetTableData(ptr: NativePointer, tag: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
+// Needs ForceNativeThreadState: asks CoreText for the font's units-per-em size, so it can call CoreText.
+// Native call path: SkTypeface::getUnitsPerEm -> SkTypeface_Mac::onGetUPEM -> CTFontGetUnitsPerEm
+@ForceNativeThreadState
 private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
+// Needs ForceNativeThreadState: looks up kerning for every pair under the FreeType lock, so its time grows with the
+// pair count.
+// Native call path: SkTypeface_FreeType::onGetKerningPairAdjustments -> FT_Get_Kerning
+@ForceNativeThreadState
 private external fun _nGetKerningPairAdjustments(
     ptr: NativePointer,
     glyphs: InteropPointer,
@@ -450,7 +518,15 @@ private external fun _nGetKerningPairAdjustments(
 ): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
+// Needs ForceNativeThreadState: reads the font's name table through CoreText and loops over the names, so it can call
+// CoreText.
+// Native call path: SkTypeface_Mac::onCreateFamilyNameIterator -> MakeForFamilyNames -> CTFontCopyTable
+@ForceNativeThreadState
 private external fun _nGetFamilyNames(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
+// Needs ForceNativeThreadState: asks CoreText for the family name and converts the CoreFoundation string, so it can
+// call CoreText.
+// Native call path: SkTypeface::getFamilyName -> SkTypeface_Mac::onGetFamilyName -> CTFontCopyFamilyName
+@ForceNativeThreadState
 private external fun _nGetFamilyName(ptr: NativePointer): NativePointer

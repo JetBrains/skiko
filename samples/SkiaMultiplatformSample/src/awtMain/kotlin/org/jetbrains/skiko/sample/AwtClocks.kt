@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.sample
 
 import org.jetbrains.skiko.SkiaLayer
+import java.awt.Cursor
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelEvent
@@ -20,9 +21,9 @@ class AwtClocks(private val layer: SkiaLayer) : Clocks(layer::renderApi), MouseM
 
     override fun mouseMoved(event: MouseEvent) {
         if (event.x > 200) {
-            layer.component.cursor = Cursor.HAND_CURSOR
+            event.component.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         } else {
-            layer.component.cursor = Cursor.DEFAULT_CURSOR
+            event.component.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
         }
         xpos = event.x.toDouble()
         ypos = event.y.toDouble()

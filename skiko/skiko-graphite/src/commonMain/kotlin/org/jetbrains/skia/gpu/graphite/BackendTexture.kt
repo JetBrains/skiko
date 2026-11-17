@@ -1,6 +1,7 @@
 package org.jetbrains.skia.gpu.graphite
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ForceNativeThreadState
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.InteropPointer
@@ -68,6 +69,44 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
             check(ptr != NullPointer) { "Failed to create a Graphite Vulkan backend texture" }
             return BackendTexture(ptr)
         }
+
+        /**
+         * Creates a Graphite backend texture that wraps an existing `VkImage` using raw Vulkan values.
+         *
+         * The image memory is assumed to be managed by the client (or by the driver, as is the case
+         * for swapchain images), so no allocation info is passed to Skia.
+         */
+        fun makeVulkan(
+            width: Int,
+            height: Int,
+            sampleCount: Int,
+            mipmapped: Boolean,
+            flags: Int,
+            format: Int,
+            imageTiling: Int,
+            imageUsageFlags: Int,
+            sharingMode: Int,
+            aspectMask: Int,
+            imageLayout: Int,
+            queueFamilyIndex: Int,
+            imagePtr: NativePointer,
+        ): BackendTexture = makeVulkan(
+            width = width,
+            height = height,
+            textureInfo = VulkanTextureInfo(
+                sampleCount = sampleCount,
+                mipmapped = mipmapped,
+                flags = VulkanImageCreateFlags(flags),
+                format = VulkanFormat(format),
+                imageTiling = VulkanImageTiling(imageTiling),
+                imageUsageFlags = VulkanImageUsageFlags(imageUsageFlags),
+                sharingMode = VulkanSharingMode(sharingMode),
+                aspectMask = VulkanImageAspectFlags(aspectMask),
+            ),
+            imageLayout = imageLayout,
+            queueFamilyIndex = queueFamilyIndex,
+            imagePtr = imagePtr,
+        )
     }
 
     private object _FinalizerHolder {
@@ -76,12 +115,19 @@ class BackendTexture internal constructor(ptr: NativePointer) : Managed(ptr, _Fi
 }
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteBackendTexture
 private external fun _nGetBackendTextureFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeMetal")
+// Needs ForceNativeThreadState: reads the sample count, pixel format and usage of a Metal texture through Objective-C.
+// Native call path: BackendTextures::MakeMetal -> TextureInfos::MakeMetal -> MtlTextureInfo::MtlTextureInfo
+@ForceNativeThreadState
 private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_gpu_graphite_BackendTexture__1nMakeVulkan")
+// No ForceNativeThreadState: returns 0 without touching its arguments, so it is short and cannot block.
 private external fun _nMakeVulkan(
     width: Int,
     height: Int,

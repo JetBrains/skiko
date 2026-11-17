@@ -1,7 +1,7 @@
 # Skiko Benchmarks
 
 This project contains lightweight multiplatform benchmarks for comparing Skiko artifacts.
-The same benchmark definitions are used by JVM, JS, and wasmJs entry points; wasmJs is the
+The same benchmark definitions are used by JVM, macOS Native, JS, and wasmJs entry points; wasmJs is the
 primary target.
 
 Current benchmark coverage:
@@ -54,6 +54,14 @@ JVM can be run with:
 ```
 
 The JVM task prints the same JSON report directly to the terminal.
+
+macOS Native can be run with:
+
+```bash
+./benchmarks/SkikoBenchmarks/run_benchmarks.main.kts macos version=<skiko-version>
+```
+
+GPU benchmarks run through Metal.
 
 Additional arguments:
 

@@ -383,22 +383,16 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromCir
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromRRect
-  (JNIEnv* env, jclass jclass, jfloatArray radiiArray,
+  (JNIEnv* env, jclass jclass, jfloatArray radiiArray, jint radiiSize,
    jfloat left, jfloat top, jfloat right, jfloat bottom,
    jint direction, jint startIndex) {
-    SkRect rect = SkRect::MakeLTRB(left, top, right, bottom);
-    jfloat* radii = env->GetFloatArrayElements(radiiArray, 0);
-    
-    SkRRect rrect;
-    rrect.setRectRadii(rect, reinterpret_cast<SkVector*>(radii));
+    SkRRect rrect = skija::RRect::toSkRRect(env, left, top, right, bottom, radiiArray, radiiSize);
     
     SkPath path = SkPath::RRect(
         rrect,
         static_cast<SkPathDirection>(direction),
         startIndex
     );
-    
-    env->ReleaseFloatArrayElements(radiiArray, radii, 0);
     
     SkPath* instance = new SkPath(path);
     return reinterpret_cast<jlong>(instance);

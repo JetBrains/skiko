@@ -1,9 +1,12 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.use
+import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ColorFilterTest {
     @Test
@@ -58,6 +61,45 @@ class ColorFilterTest {
         assertNotNull(ColorFilter.makeBlend(Color.RED, BlendMode.SRC_OVER))
         assertNotNull(ColorFilter.makeBlend(Color.TRANSPARENT, BlendMode.SRC))
         assertNotNull(ColorFilter.makeBlend(Color.TRANSPARENT, BlendMode.DST_IN))
+    }
+
+    @Test
+    fun linearToSRGBGammaEncodesLinearColors() {
+        // Linear 128/255 encodes to about 188/255 in sRGB.
+        val pixel = drawThroughColorFilter(Color.makeRGB(128, 128, 128), ColorFilter.linearToSRGBGamma)
+        assertChannelsNear(expected = 188, actual = pixel)
+    }
+
+    @Test
+    fun linearToSRGBGammaUndoesSRGBToLinearGamma() {
+        // Applies sRGBToLinearGamma first, then linearToSRGBGamma: the original value comes back.
+        val roundTrip = ColorFilter.makeComposed(
+            outer = ColorFilter.linearToSRGBGamma,
+            inner = ColorFilter.sRGBToLinearGamma
+        )
+        val pixel = drawThroughColorFilter(Color.makeRGB(128, 128, 128), roundTrip)
+        assertChannelsNear(expected = 128, actual = pixel)
+    }
+
+    private fun drawThroughColorFilter(argb: Int, filter: ColorFilter): Int {
+        return Surface.makeRasterN32Premul(1, 1).use {
+            val paint = Paint().apply {
+                color = argb
+                colorFilter = filter
+            }
+            it.canvas.drawRect(Rect(0f, 0f, 1f, 1f), paint)
+            Bitmap.makeFromImage(it.makeImageSnapshot()).getColor(0, 0)
+        }
+    }
+
+    private fun assertChannelsNear(expected: Int, actual: Int, tolerance: Int = 2) {
+        val channels = listOf("R" to Color.getR(actual), "G" to Color.getG(actual), "B" to Color.getB(actual))
+        for ((name, value) in channels) {
+            assertTrue(
+                abs(value - expected) <= tolerance,
+                "$name channel $value is not within $tolerance of $expected"
+            )
+        }
     }
 
     @Test

@@ -110,15 +110,27 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
 }
 
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer")
+// No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
+// block.
+// Native call path: deleteBackendRenderTarget
 private external fun BackendRenderTarget_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nMakeGL")
+// Needs ForceNativeThreadState: wraps a GL framebuffer ID from the backend in a render target object.
+// Native call path: GrBackendRenderTargets::MakeGL
+@ForceNativeThreadState
 private external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer
 
 @ExternalSymbolName("BackendRenderTarget_nMakeMetal")
+// Needs ForceNativeThreadState: retains a Metal texture through CoreFoundation and reads its sample count through
+// Objective-C.
+// Native call path: MakeMtl -> GrMtlTextureInfoSampleCount
+@ForceNativeThreadState
 private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("BackendRenderTarget_MakeDirect3D")
+// No ForceNativeThreadState: returns 0 because the Direct3D body is compiled out on every Kotlin/Native target, so it
+// is short and cannot block.
 private external fun _nMakeDirect3D(
     width: Int,
     height: Int,
@@ -129,6 +141,9 @@ private external fun _nMakeDirect3D(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nMakeVulkan")
+// Needs ForceNativeThreadState: wraps a Vulkan image from the backend in a render target object.
+// Native call path: GrBackendRenderTargets::MakeVk
+@ForceNativeThreadState
 private external fun _nMakeVulkan(
     width: Int,
     height: Int,

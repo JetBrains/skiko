@@ -300,7 +300,7 @@ namespace skija {
         extern jfieldID radii;
         void onLoad(JNIEnv* env);
         void onUnload(JNIEnv* env);
-        SkRRect toSkRRect(JNIEnv* env, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii);
+        SkRRect toSkRRect(JNIEnv* env, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint radiiSize);
         jobject fromSkRRect(JNIEnv* env, const SkRRect& rect);
 
         void copyToInterop(JNIEnv* env, const SkRRect& rect, jfloatArray pointer);

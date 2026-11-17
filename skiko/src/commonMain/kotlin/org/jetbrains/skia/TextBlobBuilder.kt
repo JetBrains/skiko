@@ -234,15 +234,29 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of a cleanup function without calling it, so it is short and cannot
+// block.
+// Native call path: deleteTextBlobBuilder
 private external fun TextBlobBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nMake")
+// No ForceNativeThreadState: creates an empty builder and zeroes its fields, owning no font or typeface yet, so it is
+// short and cannot block.
+// Native call path: SkTextBlobBuilder::SkTextBlobBuilder
 private external fun TextBlobBuilder_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nBuild")
+// Needs ForceNativeThreadState: finishes the text blob and may measure glyph bounds through CoreText, so it can call
+// CoreText.
+// Native call path: SkTextBlobBuilder::make -> updateDeferredBounds -> TightRunBounds -> SkFont::measureText
+@ForceNativeThreadState
 private external fun _nBuild(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
+// Needs ForceNativeThreadState: adds a text run and can first finish the previous run's bounds through CoreText, so it
+// can call CoreText.
+// Native call path: allocRun -> allocInternal -> updateDeferredBounds -> SkFont::measureText
+@ForceNativeThreadState
 private external fun _nAppendRun(
     ptr: NativePointer, fontPtr: NativePointer,
     glyphs: InteropPointer, glyphsLen: Int,
@@ -251,6 +265,10 @@ private external fun _nAppendRun(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
+// Needs ForceNativeThreadState: adds a text run and can first finish the previous run's bounds through CoreText, so it
+// can call CoreText.
+// Native call path: allocRunPosH -> allocInternal -> updateDeferredBounds -> GetFontBounds
+@ForceNativeThreadState
 private external fun _nAppendRunPosH(
     ptr: NativePointer,
     fontPtr: NativePointer,
@@ -263,6 +281,10 @@ private external fun _nAppendRunPosH(
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
+// Needs ForceNativeThreadState: adds a text run and can first finish the previous run's bounds through CoreText, so it
+// can call CoreText.
+// Native call path: allocRunPos -> allocInternal -> updateDeferredBounds -> GetFontBounds
+@ForceNativeThreadState
 private external fun _nAppendRunPos(
     ptr: NativePointer, fontPtr: NativePointer,
     glyphs: InteropPointer, glyphsLen: Int,
@@ -271,6 +293,10 @@ private external fun _nAppendRunPos(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
+// Needs ForceNativeThreadState: adds a text run and can first finish the previous run's bounds through CoreText, so it
+// can call CoreText.
+// Native call path: allocRunRSXform -> allocInternal -> updateDeferredBounds -> GetFontBounds
+@ForceNativeThreadState
 private external fun _nAppendRunRSXform(
     ptr: NativePointer, fontPtr: NativePointer,
     glyphs: InteropPointer, glyphsLen: Int,

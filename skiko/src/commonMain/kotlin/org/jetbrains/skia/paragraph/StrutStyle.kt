@@ -265,70 +265,124 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
 
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFinalizer")
+// No ForceNativeThreadState: returns the address of the delete function without calling it, so it is short and cannot
+// block.
+// Native call path: deleteStrutStyle
 private external fun StrutStyle_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nMake")
+// No ForceNativeThreadState: creates a strut style and sets its number fields, with no typeface or Skia object, so it
+// is short and cannot block.
+// Native call path: StrutStyle::StrutStyle
 private external fun StrutStyle_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nEquals")
+// Needs ForceNativeThreadState: compares font family lists and name text, so its time grows with the number and length
+// of family names.
+// Native call path: StrutStyle::operator== -> SkString::equals
+@ForceNativeThreadState
 private external fun StrutStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetHeight")
+// No ForceNativeThreadState: reads a stored number or flag from the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::getHeight
 private external fun StrutStyle_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeight")
+// No ForceNativeThreadState: stores a number or flag in the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::setHeight
 private external fun StrutStyle_nSetHeight(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetEnabled")
+// No ForceNativeThreadState: stores an on or off flag in the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::setEnabled
 private external fun StrutStyle_nSetEnabled(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies")
+// Needs ForceNativeThreadState: builds a new string object for every font family, so its time grows with the number of
+// families.
+// Native call path: StrutStyle::getFontFamilies
+@ForceNativeThreadState
 private external fun _nGetFontFamilies(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies")
+// Needs ForceNativeThreadState: copies every font family name and destroys the old list, so its time grows with the
+// number and length of names.
+// Native call path: skStringVector -> skString -> SkString::SkString
+@ForceNativeThreadState
 private external fun StrutStyle_nSetFontFamilies(ptr: NativePointer, families: InteropPointer, familiesCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle")
+// No ForceNativeThreadState: reads a stored font style value from the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::getFontStyle
 private external fun _nGetFontStyle(ptr: NativePointer, fontStyleData: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle")
+// No ForceNativeThreadState: stores a font style value in the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::setFontStyle
 private external fun _nSetFontStyle(ptr: NativePointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize")
+// No ForceNativeThreadState: reads a stored font size from the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::getFontSize
 private external fun _nGetFontSize(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontSize")
+// No ForceNativeThreadState: stores a font size in the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::setFontSize
 private external fun _nSetFontSize(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetLeading")
+// No ForceNativeThreadState: reads a stored leading value from the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::getLeading
 private external fun _nGetLeading(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetLeading")
+// No ForceNativeThreadState: stores a leading value in the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::setLeading
 private external fun _nSetLeading(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsEnabled")
+// No ForceNativeThreadState: reads a stored on or off flag from the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::isEnabled
 private external fun _nIsEnabled(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightForced")
+// No ForceNativeThreadState: reads a stored on or off flag from the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::isHeightForced
 private external fun _nIsHeightForced(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightForced")
+// No ForceNativeThreadState: stores an on or off flag in the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::setHeightForced
 private external fun _nSetHeightForced(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightOverridden")
+// No ForceNativeThreadState: reads a stored on or off flag from the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::isHeightOverridden
 private external fun _nIsHeightOverridden(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightOverridden")
+// No ForceNativeThreadState: stores an on or off flag in the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::setHeightOverridden
 private external fun _nSetHeightOverridden(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHalfLeading")
+// No ForceNativeThreadState: reads a stored on or off flag from the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::isHalfLeading
 private external fun _nIsHalfLeading(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading")
+// No ForceNativeThreadState: stores an on or off flag in the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::setHalfLeading
 private external fun _nSetHalfLeading(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetTopRatio")
+// No ForceNativeThreadState: reads a stored top ratio from the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::getTopRatio
 private external fun StrutStyle_nGetTopRatio(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetTopRatio")
+// No ForceNativeThreadState: stores a top ratio in the strut style, so it is short and cannot block.
+// Native call path: StrutStyle::setTopRatio
 private external fun StrutStyle_nSetTopRatio(ptr: NativePointer, value: Float)

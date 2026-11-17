@@ -352,4 +352,6 @@ enum class ColorType {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_ColorType__1nIsAlwaysOpaque")
+// No ForceNativeThreadState: tests a few bit flags of the color type, so it is short and cannot block.
+// Native call path: SkColorTypeIsAlwaysOpaque
 private external fun _nIsAlwaysOpaque(value: Int): Boolean

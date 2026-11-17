@@ -12,5 +12,7 @@ enum class EncodedImageFormat {
     KTX,
     ASTC,
     DNG,
-    HEIF;
+    HEIF,
+    AVIF,
+    JPEGXL;
 }
