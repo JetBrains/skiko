@@ -10,7 +10,7 @@ RUN yum install -y tar xz git wget zip unzip gzip libxcrypt-compat && \
     yum clean all
 
 # Install Xvfb (and GLX module) for headless UI testing
-RUN yum install -y xorg-x11-server-Xvfb xorg-x11-server-Xorg && \
+RUN yum install -y xorg-x11-server-Xvfb xorg-x11-server-Xorg xorg-x11-xauth && \
     yum clean all
 
 # Install libraries for native builds
