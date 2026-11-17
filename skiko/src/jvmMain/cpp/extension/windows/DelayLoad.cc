@@ -5,6 +5,7 @@
 
 #include <windows.h>
 #include <delayimp.h>
+#include <jni.h>
 #include <wchar.h>  // wcsrchr
 
 // This DLL's handle, found through the address of one of its own functions.
@@ -45,3 +46,24 @@ static FARPROC WINAPI loadSiblingLibrary(unsigned event, PDelayLoadInfo info) {
 }
 
 extern "C" const PfnDliHook __pfnDliNotifyHook2 = loadSiblingLibrary;
+
+// Bind every delay-loaded import as soon as the JVM loads this library, instead of on first call. lld-link from
+// LLVM 20 and older generates a delay-load thunk that can corrupt float arguments of that first call:
+// https://lists.llvm.org/pipermail/llvm-bugs/2021-November/096482.html
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM*, void*) {
+    auto base = reinterpret_cast<const BYTE*>(getThisModule());
+    if (!base) return JNI_ERR;
+    auto nt = reinterpret_cast<const IMAGE_NT_HEADERS*>(base + reinterpret_cast<const IMAGE_DOS_HEADER*>(base)->e_lfanew);
+    const IMAGE_DATA_DIRECTORY& delayImports = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT];
+    if (delayImports.VirtualAddress == 0) return JNI_VERSION_1_8;
+
+    __try {
+        for (auto dll = reinterpret_cast<PCImgDelayDescr>(base + delayImports.VirtualAddress); dll->rvaDLLName; dll++) {
+            if (FAILED(__HrLoadAllImportsForDll(reinterpret_cast<LPCSTR>(base + dll->rvaDLLName)))) return JNI_ERR;
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        // loadSiblingLibrary could not load a dependency.
+        return JNI_ERR;
+    }
+    return JNI_VERSION_1_8;
+}
