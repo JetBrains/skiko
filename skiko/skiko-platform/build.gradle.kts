@@ -396,6 +396,8 @@ if (supportAwt) {
             libFiles += files(provider {
                 ganeshJvmLinkedLibrary.files.map { it.resolve("skiko-ganesh-${targetOs.id}-${targetArch.id}.lib") }
             })
+            // Delay-load ganesh and resolve it from our own directory, see DelayLoad.cc.
+            flags.add("/DELAYLOAD:skiko-ganesh-${targetOs.id}-${targetArch.id}.dll")
         }
     }
     skikoPlatformProjectContext.provideJvmRequiredSymbols(targetOs, targetArch)

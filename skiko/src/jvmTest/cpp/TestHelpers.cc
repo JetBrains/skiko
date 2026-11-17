@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "SkString.h"
+#include "interop.hh"
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillByteArrayOf5
 (JNIEnv* env, jclass jclass, jbyteArray jbarray) {
@@ -89,4 +90,11 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt_
     }
 
     return reinterpret_cast<jlong>(mem);
+}
+
+// Used by the split-library classloader test through a native dependency on core.
+
+extern "C" JNIEXPORT jclass JNICALL Java_org_jetbrains_skiko_SplitLibraryProbe_coreClass
+  (JNIEnv* env, jobject receiver) {
+    return skija::ImageInfo::cls;
 }
