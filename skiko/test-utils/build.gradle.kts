@@ -18,6 +18,7 @@ import org.jetbrains.skiko.build.context.supportNativeMac
 import org.jetbrains.skiko.build.context.supportNativeTvosArm64
 import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
 import org.jetbrains.skiko.build.context.supportNativeTvosX64
+import org.jetbrains.skiko.build.utils.hostOs
 import org.jetbrains.skiko.build.context.supportWeb
 import org.jetbrains.skiko.build.utils.skikoKotlinApiVersion
 import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
@@ -79,7 +80,9 @@ kotlin {
         macosX64()
         macosArm64()
     }
-    if (supportNativeLinux) {
+    // Host-gated like skiko itself: the Linux targets' custom cinterops only process on
+    // Linux hosts, and skiko publishes no Linux variants from other hosts to resolve.
+    if (supportNativeLinux && hostOs.isLinux) {
         linuxX64()
         linuxArm64()
     }

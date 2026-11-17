@@ -23,10 +23,13 @@ jobs:
       - uses: ./.github/actions/setup-prerequisites
         name: 'Setup Prerequisites'
 
+      # linux-amd64 rather than linux-compat: with skiko.native.enabled the Linux
+      # targets run cinterop tasks, which need a glibc newer than compat's 2.26
+      # (Konan's libclang requires GLIBC_2.29) plus the X11/Wayland dev headers.
       - uses: ./.github/actions/docker-skiko-run
         name: 'Build Dokka Documentation'
         with:
-          image_name: linux-compat
+          image_name: linux-amd64
           command: |
             ./gradlew --no-daemon --stacktrace \
               -Pskiko.native.enabled=true \

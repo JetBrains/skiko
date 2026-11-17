@@ -24,7 +24,7 @@ import org.jetbrains.skiko.build.utils.mapSourceFilesToOutputFiles
 
 abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
     @get:Internal
-    open val srcExtensions: Array<String> = arrayOf("cc", "cpp")
+    open val srcExtensions: Array<String> = arrayOf("cc", "cpp", "c")
 
     @get:Internal
     open val headerExtensions: Array<String> = arrayOf("h", "hh")
@@ -149,6 +149,9 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
             submittedWorks.add(workId)
 
             val workArgs = args.copy {
+                if (sourceFile.extension == "c") {
+                    arg("-x", "c")
+                }
                 // Replace slash for Windows paths
                 arg("-o", outputFile.absolutePath.replace("\\", "/"))
                 arg(value = sourceFile.absolutePath.replace("\\", "/"))
