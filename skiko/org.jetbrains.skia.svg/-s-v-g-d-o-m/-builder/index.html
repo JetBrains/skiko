@@ -93,7 +93,7 @@
   <div class="breadcrumbs"><a href="../../../index.html">skiko</a><span class="delimiter">/</span><a href="../../index.html">org.jetbrains.skia.svg</a><span class="delimiter">/</span><a href="../index.html">SVGDOM</a><span class="delimiter">/</span><span class="current">Builder</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Builder</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Builder</a> : <a href="../../../org.jetbrains.skia.impl/-managed/index.html">Managed</a></div><p class="paragraph">Builds an <a href="../index.html">SVGDOM</a> the same way as <a href="https://api.skia.org/classSkSVGDOM_1_1Builder.html">SkSVGDOM.Builder</a>.</p><p class="paragraph">A font manager has to be set before <a href="build-from-data.html">buildFromData</a> for <code class="lang-kotlin">&lt;text&gt;</code> to be drawn. The manager is referenced by the resulting <a href="../index.html">SVGDOM</a> for as long as that DOM lives, independently of this builder.</p></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Builder</a> : <a href="../../../org.jetbrains.skia.impl/-managed/index.html">Managed</a></div><p class="paragraph">Builds an <a href="../index.html">SVGDOM</a> the same way as <a href="https://api.skia.org/classSkSVGDOM_1_1Builder.html">SkSVGDOM.Builder</a>.</p><p class="paragraph">A font manager has to be set before <a href="build-from-data.html">buildFromData</a> for <code class="lang-kotlin">&lt;text&gt;</code> to be drawn. A resource provider has to be set before <a href="build-from-data.html">buildFromData</a> for <code class="lang-kotlin">&lt;image&gt;</code> to be drawn. Both are referenced by the resulting <a href="../index.html">SVGDOM</a> for as long as that DOM lives, independently of this builder. Images are decoded when <a href="../render.html">render</a> runs, not while parsing.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
@@ -194,6 +194,21 @@
               <div>
                 <div class="title">
                   <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-font-manager.html"><span class="token function">setFontManager</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fontMgr<span class="token operator">: </span><a href="../../../org.jetbrains.skia/-font-mgr/index.html">FontMgr</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">SVGDOM.Builder</a></div><div class="brief "><p class="paragraph">Font manager used to load fonts for <code class="lang-kotlin">&lt;text&gt;</code> nodes.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="992128583%2FFunctions%2F1558683979" anchor-label="setResourceProvider" id="992128583%2FFunctions%2F1558683979" data-filterable-set=":/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/commonMain" data-filterable-set=":/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-resource-provider.html"><span>set</span><wbr><span>Resource</span><wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="992128583%2FFunctions%2F1558683979"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-resource-provider.html"><span class="token function">setResourceProvider</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">resourceProvider<span class="token operator">: </span><a href="../../-s-v-g-resource-provider/index.html">SVGResourceProvider</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">SVGDOM.Builder</a></div><div class="brief "><p class="paragraph">Provider used to load images referenced by <code class="lang-kotlin">&lt;image&gt;</code> and <code class="lang-kotlin">&lt;feImage&gt;</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
