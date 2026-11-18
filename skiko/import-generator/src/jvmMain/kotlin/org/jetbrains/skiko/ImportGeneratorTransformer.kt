@@ -25,8 +25,8 @@ internal class ImportGeneratorTransformer(
     private val moduleName: String
 ) : IrElementTransformerVoid() {
 
-    private val exportSymbols = mutableMapOf<String, MutableList<String>>()
-    fun getExportSymbols(): Map<String, List<String>> = exportSymbols
+    private val exportSymbols = mutableMapOf<String, MutableSet<String>>()
+    fun getExportSymbols(): Map<String, Set<String>> = exportSymbols
 
     private val booleanExportSymbols = mutableSetOf<String>()
     fun getBooleanExportSymbols(): Set<String> = booleanExportSymbols
@@ -128,9 +128,9 @@ internal class ImportGeneratorTransformer(
             val name = webImportAnnotation.getStringValue("name")
             addJsNameAnnotation(name)
             addJsQualifierAnnotation("__SKIKO__")
-            addWasmImportAnnotation(name)
+            //addWasmImportAnnotation(name)
 
-            exportSymbols.getOrPut(moduleName) { mutableListOf() }.add(name)
+            exportSymbols.getOrPut(moduleName) { mutableSetOf() }.add(name)
             if (returnType.isBoolean()) {
                 booleanExportSymbols.add(name)
             }

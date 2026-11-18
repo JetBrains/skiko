@@ -295,10 +295,6 @@ kotlin {
 
         js {
             outputModuleName.set("skiko-kjs") // override the name to avoid name collision with a different skiko.js file
-            useEsModules()
-            compilerOptions {
-                target.set("es2015")
-            }
             browser {
                 testTask {
                     useKarma {

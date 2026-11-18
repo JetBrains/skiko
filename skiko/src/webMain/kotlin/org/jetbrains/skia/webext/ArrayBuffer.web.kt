@@ -10,6 +10,7 @@ import org.jetbrains.skiko.wasm.awaitSkiko
 import org.khronos.webgl.ArrayBuffer
 import kotlin.js.JsAny
 import kotlin.js.js
+import org.jetbrains.skiko.await
 
 internal fun skikoArrayBuffer(skikoWasm: JsAny): ArrayBuffer =
     js("skikoWasm.wasmExports.memory.buffer")
@@ -19,7 +20,7 @@ internal suspend fun copyBufferToSkiko(
 ): NativePointer {
     val ptr = _malloc(src.byteLength)
     if (ptr != Native.NullPointer) {
-        val skikoArrayBuffer = skikoArrayBuffer(awaitSkiko)
+        val skikoArrayBuffer = skikoArrayBuffer(awaitSkiko.await())
         copyBuffer(src, skikoArrayBuffer, ptr)
     }
     return ptr

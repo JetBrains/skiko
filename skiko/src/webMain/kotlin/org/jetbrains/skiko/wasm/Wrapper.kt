@@ -4,6 +4,7 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.InternalSkikoApi
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.js.JsAny
+import kotlin.js.Promise
 
 // EmscriptenWebGLContextAttributes combines:
 // https://github.com/KhronosGroup/WebGL/blob/main/specs/latest/1.0/webgl.idl#L43-L58
@@ -130,4 +131,4 @@ internal fun createWebGLContext(
 internal expect fun onWasmReady(onReady: () -> Unit)
 
 @InternalSkikoApi
-expect val awaitSkiko: JsAny
+expect val awaitSkiko: Promise<JsAny>

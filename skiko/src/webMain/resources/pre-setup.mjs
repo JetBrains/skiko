@@ -2,6 +2,8 @@
 
 import { loadedSkikoExtensions, registeredSkikoExtensions } from "./skiko-extensions.mjs";
 
+let skikoGl = null;
+
 const loadSkikoExtension = (extensionPath, mainModule) =>
     mainModule.loadDynamicLibrary(extensionPath, {
         loadAsync: true,
@@ -18,7 +20,8 @@ const loadSkikoExtension = (extensionPath, mainModule) =>
         return sideModuleExports;
     });
 
-export const awaitSkiko = await loadSkikoWASM().then(async (module) => {
+export const awaitSkiko = loadSkikoWASM().then(async (module) => {
+    skikoGl = module.GL;
     const originalLocateFile = module.locateFile;
     module.locateFile = (path, prefix) => {
         // If path is already an absolute URL, don't prepend scriptDirectory
@@ -35,8 +38,14 @@ export const awaitSkiko = await loadSkikoWASM().then(async (module) => {
         };
     }
 
-    const extensionPaths = [...new Set(registeredSkikoExtensions)];
-    return Promise.all(extensionPaths.map((extensionPath) => loadSkikoExtension(extensionPath, module))).then(() => module)
+    return Promise.all(registeredSkikoExtensions.keys().map((extensionPath) => loadSkikoExtension(extensionPath, module))).then(() => module)
 });
 
-export const {GL} = awaitSkiko;
+globalThis.__SKIKO__ = Object.create(null);
+
+// the rest of exports is generated in org.jetbrains.skiko.ImportGeneratorExtension.generate
+export const GL = new Proxy({}, {
+    get(object, propName) {
+        return skikoGl[propName];
+    }
+})

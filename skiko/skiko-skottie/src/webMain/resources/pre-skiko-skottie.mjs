@@ -3,7 +3,7 @@ import {
     registerSkikoWasmReadyCallback,
 } from "./skiko-extensions.mjs";
 
-export const skottieWasm = new URL("./skiko-skottie.wasm", import.meta.url).href;
+const skottieWasm = new URL("./skiko-skottie.wasm", import.meta.url).href;
 
 registerSkikoWasmReadyCallback(skottieWasm);
 

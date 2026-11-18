@@ -34,10 +34,6 @@ repositories {
 kotlin {
 
     js(IR) {
-        useEsModules()
-        compilerOptions {
-            target.set("es2015")
-        }
         browser {
             commonWebpackConfig {
                 outputFileName = "webApp.js"

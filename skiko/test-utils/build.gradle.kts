@@ -68,10 +68,6 @@ kotlin {
 
     if (supportWeb) {
         js {
-            useEsModules()
-            compilerOptions {
-                target.set("es2015")
-            }
             browser()
         }
         wasmJs {
