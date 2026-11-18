@@ -6,11 +6,11 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl._malloc
 import org.jetbrains.skiko.ExperimentalSkikoApi
-import org.jetbrains.skiko.await
 import org.jetbrains.skiko.wasm.awaitSkiko
 import org.khronos.webgl.ArrayBuffer
 import kotlin.js.JsAny
 import kotlin.js.js
+import org.jetbrains.skiko.await
 
 internal fun skikoArrayBuffer(skikoWasm: JsAny): ArrayBuffer =
     js("skikoWasm.wasmExports.memory.buffer")

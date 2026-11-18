@@ -25,8 +25,8 @@ internal class ImportGeneratorTransformer(
     private val moduleName: String
 ) : IrElementTransformerVoid() {
 
-    private val exportSymbols = mutableListOf<String>()
-    fun getExportSymbols(): List<String> = exportSymbols
+    private val exportSymbols = mutableMapOf<String, MutableSet<String>>()
+    fun getExportSymbols(): Map<String, Set<String>> = exportSymbols
 
     private val booleanExportSymbols = mutableSetOf<String>()
     fun getBooleanExportSymbols(): Set<String> = booleanExportSymbols
@@ -94,6 +94,30 @@ internal class ImportGeneratorTransformer(
         annotations += annotationCall
     }
 
+    private fun IrFunction.addJsQualifierAnnotation(value: String) {
+        val annotationClass = pluginContext.referenceClass(
+            ClassId.fromString("kotlin/js/JsQualifier")
+        ) ?: return
+
+        val ctor = annotationClass.owner.constructors.first()
+
+        val annotationCall = IrAnnotationImpl.fromSymbolOwner(
+            startOffset = startOffset,
+            endOffset = endOffset,
+            type = annotationClass.owner.defaultType,
+            constructorSymbol = ctor.symbol,
+        )
+
+        annotationCall.arguments[0] = IrConstImpl.string(
+            startOffset,
+            endOffset,
+            pluginContext.irBuiltIns.stringType,
+            value
+        )
+
+        annotations += annotationCall
+    }
+
     override fun visitFunction(declaration: IrFunction): IrStatement {
         return super.visitFunction(declaration).apply {
             if (this !is IrFunction) return@apply
@@ -103,9 +127,10 @@ internal class ImportGeneratorTransformer(
 
             val name = webImportAnnotation.getStringValue("name")
             addJsNameAnnotation(name)
-            addWasmImportAnnotation(name)
+            addJsQualifierAnnotation("__SKIKO__")
+            //addWasmImportAnnotation(name)
 
-            exportSymbols.add(name)
+            exportSymbols.getOrPut(moduleName) { mutableSetOf() }.add(name)
             if (returnType.isBoolean()) {
                 booleanExportSymbols.add(name)
             }

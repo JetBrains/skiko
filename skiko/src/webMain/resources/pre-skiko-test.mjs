@@ -16,6 +16,6 @@ awaitSkiko.then((module) => {
     return module
 });
 
-export const api = {
+export const testApi = {
     testSetup: () => {}
 }

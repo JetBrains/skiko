@@ -20,14 +20,35 @@ internal class ImportGeneratorExtension(
         outputFile.parentFile.mkdirs()
         val prefixFile = prefix?.let { File(it) }
         val importGenerator = ImportGeneratorTransformer(pluginContext, moduleName)
+        moduleFragment.transformChildrenVoid(importGenerator)
 
         outputFile.writer().use { writer ->
-            prefixFile?.let { writer.appendLine(it.readText()) }
-            moduleFragment.transformChildrenVoid(importGenerator)
-
-            importGenerator.getExportSymbols().forEach { symbolName ->
-                writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
+            if (prefixFile != null) {
+                // prefixFile is de-facto the pre-setupm.mjs, which exports awaitSkiko
+                check(moduleName == "skiko") { "We supposed to prepend only skiko.mjs file"}
+                writer.appendLine(prefixFile.readText())
+            } else {
+                check(moduleName != "skiko") { "The core import generator requires a prefix file" }
+                writer.appendLine("export { isSideModuleLoaded } from './pre-$moduleName.mjs';")
+                writer.appendLine("import { awaitSkiko } from './skiko.mjs';")
             }
+
+            writer.appendLine("const exportSymbols = ${importGenerator.getExportSymbols().get(moduleName)!!.serializeAsJsSet()};")
+            writer.appendLine("const booleanSymbols = ${importGenerator.getBooleanExportSymbols().serializeAsJsSet()}")
+            writer.appendLine("let api = new Proxy(Object.create(null), { get(obj, propName) { return () => {}}});")
+            writer.appendLine("""
+                for (const sym of exportSymbols) { 
+                    globalThis.__SKIKO__[sym] = (...a) => api[sym](...a)
+                }
+                
+                awaitSkiko.then((module) => {
+                    api = {};
+                    for (const sym of exportSymbols) {
+                        const raw = module['_' + sym];
+                        api[sym] = booleanSymbols.has(sym) ? (...a) => !!raw(...a) : raw;
+                    }
+                })
+            """.trimIndent())
         }
 
         if (reexportPath == null) return
@@ -35,23 +56,12 @@ internal class ImportGeneratorExtension(
         val reexportFile = File(reexportPath)
         reexportFile.parentFile.mkdirs()
 
-        reexportFile.writer().use { reexportWriter ->
-            reexportWriter.appendLine("import * as wasmApi from \"./$moduleName.mjs\";")
-            if (moduleName == "skiko") {
-                reexportWriter.appendLine("window['GL'] = wasmApi.GL;")
-                reexportWriter.appendLine("export const api = { awaitSkiko: wasmApi.awaitSkiko }")
-            }
-            else {
-                reexportWriter.appendLine("export const isSideModuleLoaded = () => wasmApi.isSideModuleLoaded();")
-            }
-
-            importGenerator.getExportSymbols().forEach { symbolName ->
-                if (symbolName in importGenerator.getBooleanExportSymbols()) {
-                    reexportWriter.appendLine("window['${symbolName}'] = (...a) => !!wasmApi['${symbolName}'](...a);")
-                } else {
-                    reexportWriter.appendLine("window['${symbolName}'] = wasmApi['${symbolName}'];")
-                }
+        reexportFile.writer().use { writer ->
+            if (moduleName != "skiko") {
+                writer.appendLine("export {isSideModuleLoaded} from './$moduleName.mjs';")
             }
         }
     }
 }
+
+private fun Iterable<*>.serializeAsJsSet() = "new Set([${joinToString(", ") { "'$it'" }}])"

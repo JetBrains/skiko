@@ -1,43 +1,28 @@
 // This file is merged with skiko.mjs by emcc
 
-export const loadedWasm = {
-    _: {}
-}
+import { loadedSkikoExtensions, registeredSkikoExtensions } from "./skiko-extensions.mjs";
 
 let skikoGl = null;
-const wasmReadyCallbacks = [];
 
-export const registerSkikoWasmReadyCallback = (callback) => {
-    wasmReadyCallbacks.push(callback);
-};
-
-const extensionLoadPromises = new Map();
-
-export const loadSkikoExtension = (extensionPath) => {
-    if (extensionLoadPromises.has(extensionPath)) return extensionLoadPromises.get(extensionPath);
-    const loadPromise = awaitSkikoCore.then(async (module) => {
-        await module.loadDynamicLibrary(extensionPath, {
-            loadAsync: true,
-            global: true,
-            nodelete: true,
-            nodeJS: false
-        });
-
-        const sideModuleExports = module.LDSO.loadedLibsByName[extensionPath].exports;
-        Object.assign(loadedWasm._, sideModuleExports);
-
-    }).catch((error) => {
-        extensionLoadPromises.delete(extensionPath);
-        throw error;
+const loadSkikoExtension = (extensionPath, mainModule) =>
+    mainModule.loadDynamicLibrary(extensionPath, {
+        loadAsync: true,
+        global: true,
+        nodelete: true,
+        nodeJS: false
+    }).then(() => {
+        const sideModuleExports = mainModule.LDSO.loadedLibsByName[extensionPath].exports;
+        for (const [name, value] of Object.entries(sideModuleExports)) {
+            const resolvedNamed = '_' + name;
+            if (!(resolvedNamed in mainModule)) mainModule[resolvedNamed] = value;
+        }
+        loadedSkikoExtensions.add(extensionPath);
+        return sideModuleExports;
     });
 
-    extensionLoadPromises.set(extensionPath, loadPromise);
-    return loadPromise;
-};
-
-const awaitSkikoCore = loadSkikoWASM().then((module) => {
+export const awaitSkiko = loadSkikoWASM().then(async (module) => {
+    skikoGl = module.GL;
     const originalLocateFile = module.locateFile;
-
     module.locateFile = (path, prefix) => {
         // If path is already an absolute URL, don't prepend scriptDirectory
         if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:")) {
@@ -45,7 +30,6 @@ const awaitSkikoCore = loadSkikoWASM().then((module) => {
         }
         return originalLocateFile(path, prefix);
     };
-    loadedWasm._ = module.wasmExports;
     if (!module.wasmExports.memory) {
         module.wasmExports.memory = {
             get buffer() {
@@ -53,22 +37,15 @@ const awaitSkikoCore = loadSkikoWASM().then((module) => {
             }
         };
     }
-    skikoGl = module.GL;
-    return module;
+
+    return Promise.all(registeredSkikoExtensions.keys().map((extensionPath) => loadSkikoExtension(extensionPath, module))).then(() => module)
 });
 
-export const awaitSkiko = awaitSkikoCore.then(async (module) => {
-    await Promise.allSettled(
-        wasmReadyCallbacks.map(callback => callback(module))
-    );
+globalThis.__SKIKO__ = Object.create(null);
 
-    return module
-});
-
+// the rest of exports is generated in org.jetbrains.skiko.ImportGeneratorExtension.generate
 export const GL = new Proxy({}, {
     get(object, propName) {
         return skikoGl[propName];
     }
 })
-
-

@@ -1,6 +1,5 @@
-@file:JsModule("./js-skiko-reexport-symbols.mjs")
+@file:JsModule("./skiko.mjs")
 @file:JsNonModule
-@file:JsQualifier("api")
 package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skiko.InternalSkikoApi

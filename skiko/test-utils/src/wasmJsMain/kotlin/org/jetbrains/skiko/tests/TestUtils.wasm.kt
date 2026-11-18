@@ -13,11 +13,14 @@ actual typealias SkipWasmTarget = kotlin.test.Ignore
 @JsFun("() => ''")
 private external fun jsRef(): JsAny
 /**
- * Runs the [block] in a coroutine.
+ * Awaits for skiko wasm (like an application does) and then runs the [block] in a coroutine.
+ * Referencing [awaitSkiko] and calling [testSetup] also keep the `skiko.mjs` and `skiko-test.mjs` imports
+ * that publish the native bindings.
  */
 @OptIn(InternalSkikoApi::class)
 actual fun runTest(block: suspend () -> Unit): TestReturnType = MainScope().promise {
     awaitSkiko.await<Any>()
+    testSetup()
     block()
     jsRef()
 }

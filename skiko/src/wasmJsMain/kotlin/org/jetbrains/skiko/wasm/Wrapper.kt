@@ -6,4 +6,3 @@ actual fun onWasmReady(onReady: () -> Unit) {
         null
     }
 }
-

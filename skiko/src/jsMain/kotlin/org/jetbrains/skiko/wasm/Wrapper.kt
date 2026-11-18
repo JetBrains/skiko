@@ -8,5 +8,5 @@ import kotlin.js.*
  * It's safe to call wasm functions within [onReady] callback, or after it was invoked.
  */
 actual fun onWasmReady(onReady: () -> Unit) {
-    awaitSkiko.then { onReady() }
+    Promise.resolve(awaitSkiko).then { onReady() }
 }

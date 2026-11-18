@@ -45,11 +45,13 @@ private class DemoApp: SkikoRenderDelegate {
 }
 
 internal fun runApp() {
-    for (index in 1 .. 3) {
+    for (index in 1 .. 4) {
         val skiaLayer = SkiaLayer()
         val canvas = document.getElementById("c$index")!!
         val app = if (index == 3) {
             DemoApp()
+        } else if (index == 4) {
+            SkottieExample()
         } else {
             BouncingBalls()
         }

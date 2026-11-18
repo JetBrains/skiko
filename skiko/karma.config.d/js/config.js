@@ -55,7 +55,6 @@ config.webpack.module.rules.push(
 );
 
 config.files = [
-    path.resolve(wasmPath, "skiko.js"),
     {pattern: path.resolve(wasmPath, "skiko.wasm"), included: false, served: true, watched: false},
     {pattern: path.resolve(generatedAssetsPath, "**/*"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.png"), included: false, served: true, watched: false},
