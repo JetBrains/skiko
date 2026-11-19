@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skiko.SkikoProperties.dataPath
+import org.jetbrains.skiko.internal.Logger
 import java.nio.channels.FileChannel
 import java.nio.channels.OverlappingFileLockException
 import java.nio.file.Path
@@ -27,11 +28,6 @@ internal class LockFile private constructor(private val lockfile: Path, private 
          * Lock file used to synchronize modifications to the 'skiko' native library
          */
         val skiko = LockFile(Path(dataPath, ".skiko.lock"), ".skiko.lock.monitor".intern())
-
-        /**
-         * Lock file used to synchronize modifications to the 'angle' native library
-         */
-        val angle = LockFile(Path(dataPath, ".angle.lock"), ".angle.lock.monitor".intern())
     }
 }
 

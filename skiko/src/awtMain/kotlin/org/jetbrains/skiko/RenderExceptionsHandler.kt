@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skiko.internal.Logger
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date

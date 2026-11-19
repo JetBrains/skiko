@@ -6,6 +6,7 @@ import org.jetbrains.skiko.hostId
 
 private val skottieLoader = LibraryLoader(
     name = "skiko-skottie-$hostId",
+    cls = SkottieLibrary::class.java,
     init = {
         try {
             _nAfterLoad()

@@ -43,8 +43,8 @@ repositories {
     mavenCentral {
         url = uri("https://cache-redirector.jetbrains.com/maven-central")
     }
-    maven("https://redirector.kotlinlang.org/maven/compose-dev")
     mavenLocal()
+    maven("https://redirector.kotlinlang.org/maven/compose-dev")
 }
 
 
@@ -71,6 +71,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.skiko)
+            implementation(libs.skiko.platform)
         }
 
         webMain {
@@ -79,7 +80,6 @@ kotlin {
             }
         }
     }
-
     targets.withType<KotlinJsIrTarget>().all { configureSkikoWebRuntime(project, this) }
 }
 

@@ -162,7 +162,7 @@ object SkikoProperties {
      * Other OSes are not supported yet.
      *
      * If it is enabled, make sure that either:
-     * - `org.jetbrains.skiko:skiko-awt-runtime-angle-$target:$version` added as a dependency
+     * - `org.jetbrains.skiko:skiko-platform-awt-runtime-angle-$target:$version` added as a dependency
      * - The `skiko.library.path` property is defined and the directory has libEGL, libGLESv2 from
      *   https://github.com/JetBrains/angle-pack/releases
      */
@@ -228,7 +228,8 @@ object SkikoProperties {
             ?: throw IllegalArgumentException("Invalid size format: $size")
     }
 
-    internal fun parseRenderApi(text: String?): GraphicsApi {
+    @InternalSkikoApi
+    fun parseRenderApi(text: String?): GraphicsApi {
         when (text) {
             "SOFTWARE_COMPAT" -> return GraphicsApi.SOFTWARE_COMPAT
             "SOFTWARE_FAST", "DIRECT_SOFTWARE" -> return GraphicsApi.SOFTWARE_FAST
@@ -268,7 +269,8 @@ object SkikoProperties {
         }
     }
 
-    internal fun fallbackRenderApiQueue(initialApi: GraphicsApi?): List<GraphicsApi> {
+    @InternalSkikoApi
+    fun fallbackRenderApiQueue(initialApi: GraphicsApi?): List<GraphicsApi> {
         var fallbackApis = when (hostOs) {
             OS.Linux -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE_COMPAT)

@@ -3,13 +3,15 @@ package org.jetbrains.skiko.graphicapi
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.GpuPriority
 import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.InternalSkikoApi
 import org.jetbrains.skiko.Library
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.isVideoCardSupported
 
 // https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format
 @JvmInline
-internal value class DxgiFormat(val value: Int) {
+@InternalSkikoApi
+value class DxgiFormat(val value: Int) {
     companion object {
         inline val R8G8B8A8_UNORM: DxgiFormat
             get() = DxgiFormat(28)
@@ -18,7 +20,8 @@ internal value class DxgiFormat(val value: Int) {
     }
 }
 
-internal object InternalDirectXApi {
+@InternalSkikoApi
+object InternalDirectXApi {
     init {
         Library.load()
     }

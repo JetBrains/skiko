@@ -227,6 +227,13 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
         "src/awtMain/cpp/${targetOs.id}",
     ) + if (skiko.includeTestHelpers) projectDirs("src/jvmTest/cpp") else emptyList()
     sourceRoots.set(srcDirs)
+    if (kind == SkikoModuleKind.EXTENSION) {
+        // Sources that exist only for extension modules (everything that links against the core library),
+        // kept in the core module's `cpp/extension/<os>` so they are not compiled into core itself.
+        // Windows: the delay-load hook that makes an extension resolve core from its own directory.
+        val extensionSources = project.rootProject.layout.projectDirectory.dir("src/jvmMain/cpp/extension/${targetOs.id}")
+        if (extensionSources.asFile.isDirectory) sourceRoots.add(extensionSources)
+    }
     if (targetOs != OS.Android) includeHeadersNonRecursive(jdkHome.resolve("include"))
     val skiaDir = skiaJvmBindingsDir.get()
     includeHeadersNonRecursive(skiaHeadersDirs(skiaDir))
@@ -237,6 +244,7 @@ fun SkikoProjectContext.createCompileJvmBindingsTask(
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
     if (kind == SkikoModuleKind.EXTENSION) {
         val coreProjectDir = project.rootProject.projectDir
+        includeHeadersNonRecursive(coreProjectDir.resolve("src/awtMain/cpp/include"))
         includeHeadersNonRecursive(coreProjectDir.resolve("src/jvmMain/cpp/common"))
         includeHeadersNonRecursive(coreProjectDir.resolve("src/jvmMain/cpp/include"))
         includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
@@ -403,6 +411,11 @@ fun SkikoProjectContext.createObjcCompileTask(
     includeHeadersNonRecursive(projectDir.resolve("src/awtMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp"))
+    if (kind == SkikoModuleKind.EXTENSION) {
+        val coreProjectDir = project.rootProject.projectDir
+        includeHeadersNonRecursive(coreProjectDir.resolve("src/jvmMain/cpp"))
+        includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
+    }
 
     compiler.set(project.appleToolchainExecutableOrDefault("clang", "clang"))
     buildVariant.set(buildType)
@@ -513,7 +526,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 "-arch", if (targetArch == Arch.Arm64) "arm64" else "x86_64",
                 "-shared",
                 "-dead_strip",
-                "-install_name", "./${libOutputFileName.get()}",
+                "-install_name", "@loader_path/${libOutputFileName.get()}",
                 "-current_version", skiko.baseDeployVersion,
                 *resolvedBinaryInputs.linkFlags.toTypedArray(),
                 *resolvedBinaryInputs.frameworks.toTypedArray(),
@@ -528,7 +541,7 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 addAll(
                     arrayOf(
                         "-shared",
-                        "-Wl,-soname,${libOutputFileName.get()}",
+                        "-Wl,-soname,\$ORIGIN/${libOutputFileName.get()}",
                         // `libstdc++.so.6.*` binaries are forward-compatible and used from GCC 3.4 to 16+,
                         // so do not use `-static-libstdc++` to avoid issues with complex setup.
                         "-static-libgcc",
@@ -581,6 +594,11 @@ fun SkikoProjectContext.createLinkJvmBindings(
                 if (resolvedCoreLinkedLibraryDirs != null) {
                     add("/LIBPATH:${resolvedCoreLinkedLibraryDirs.singleFile.absolutePath}")
                     add("skiko-${targetOs.id}-${targetArch.id}.lib")
+                    // Delay-load core and resolve it from our own directory, see DelayLoad.cc.
+                    // delayimp.lib: the delay-load helper that calls the hook.
+                    // /DELAY:NOBIND: skip the optional table for pre-binding function addresses (bind.exe), unused.
+                    addAll(arrayOf("delayimp.lib", "/DELAY:NOBIND"))
+                    add("/DELAYLOAD:skiko-${targetOs.id}-${targetArch.id}.dll")
                 }
             }.toTypedArray()
         }
@@ -756,7 +774,8 @@ fun SkikoProjectContext.createSkikoJvmJarTask(
         nativeLib,
         createChecksums.map { it.outputs.files.singleFile }
     )
-    if (os == OS.Windows) {
+    // Only the core library loads ICU data; extension jars would duplicate it.
+    if (os == OS.Windows && kind == SkikoModuleKind.CORE) {
         val target = targetId(os, arch)
         // Add ICU data files.
         nativeFiles.add(skiaBindingsDir.map { file(it.resolve("out/${buildType.id}-$target/icudtl.dat")) })

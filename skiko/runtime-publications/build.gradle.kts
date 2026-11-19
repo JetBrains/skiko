@@ -16,6 +16,8 @@ plugins {
     org.gradle.crypto.checksum
 }
 
+evaluationDependsOn(":skiko-platform")
+
 val skiko = SkikoProperties(rootProject)
 val desktopTargets = buildList {
     if (supportAwt) {
@@ -31,6 +33,7 @@ val androidTargets = if (supportAndroid) {
     emptyList()
 }
 val coreArtifacts = SkikoArtifacts()
+val platformProject = project(":skiko-platform")
 
 declareJvmRuntimePublications(
     skiko,
@@ -40,6 +43,19 @@ declareJvmRuntimePublications(
             artifacts = coreArtifacts,
             targets = desktopTargets + androidTargets,
             additionalRuntimes = rootProject.configurations.filter {
+                it.attributes.getAttribute(additionalRuntimeNameAttribute) != null
+            },
+        ),
+        JvmRuntimePublicationFamily(
+            producerProjectPath = ":skiko-platform",
+            artifacts = SkikoArtifacts(
+                artifactIdPrefix = "skiko-platform",
+                displayName = "Skiko Platform",
+                pomDescription = "Kotlin Skia platform layer",
+            ),
+            targets = desktopTargets + androidTargets,
+            runtimeDependencies = listOf(coreArtifacts),
+            additionalRuntimes = platformProject.configurations.filter {
                 it.attributes.getAttribute(additionalRuntimeNameAttribute) != null
             },
         ),
