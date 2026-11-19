@@ -141,6 +141,7 @@ kotlin {
             dependencies {
                 implementation(libs.skiko)
                 implementation(libs.skiko.platform)
+                implementation(libs.skiko.ganesh)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
             }
         }
@@ -154,6 +155,7 @@ kotlin {
             dependencies {
                 implementation(libs.skiko.awt.runtime)
                 implementation(libs.skiko.platform.awt.runtime)
+                implementation(libs.skiko.ganesh.awt.runtime)
             }
         }
 

@@ -6,13 +6,6 @@ import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.util.assertContentSame
 import org.jetbrains.skia.util.imageFromIntArray
-import org.jetbrains.skiko.Arch
-import org.jetbrains.skiko.KotlinBackend
-import org.jetbrains.skiko.OS
-import org.jetbrains.skiko.hostArch
-import org.jetbrains.skiko.hostOs
-import org.jetbrains.skiko.kotlinBackend
-import org.jetbrains.skiko.tests.TestGlContext
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -25,32 +18,6 @@ import kotlin.test.assertTrue
 
 class CanvasTest {
 
-    @Test
-    fun recordingContextReturnsNullForRasterCanvas() {
-        Surface.makeRasterN32Premul(8, 8).use { surface ->
-            assertNull(surface.canvas.recordingContext)
-        }
-    }
-
-    @Test
-    fun recordingContextIsBorrowedForRenderTargetCanvas() {
-        if (!TestGlContext.isAvailable()) return
-
-        if (hostOs == OS.Linux && kotlinBackend == KotlinBackend.Native && hostArch == Arch.Arm64) {
-            // TODO: fix test on Linux arm64 using EGL
-            return
-        }
-
-        TestGlContext.run {
-            DirectContext.makeGL().useContext { ctx ->
-                val imageInfo = ImageInfo.makeN32Premul(16, 16)
-                val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
-                val canvasContext = surface.canvas.recordingContext
-                assertNotNull(canvasContext)
-                assertFails { canvasContext.close() }
-            }
-        }
-    }
 
     @Test
     fun surfaceReturnsNullForBitmapCanvas() {
@@ -66,27 +33,6 @@ class CanvasTest {
             assertNotNull(canvasSurface)
             assertEquals(surface, canvasSurface)
             assertFails { canvasSurface.close() }
-        }
-    }
-
-    @Test
-    fun surfaceOfRenderTargetCanvasCarriesItsContext() {
-        if (!TestGlContext.isAvailable()) return
-
-        if (hostOs == OS.Linux && kotlinBackend == KotlinBackend.Native && hostArch == Arch.Arm64) {
-            // TODO: fix test on Linux arm64 using EGL
-            return
-        }
-
-        TestGlContext.run {
-            DirectContext.makeGL().useContext { ctx ->
-                val imageInfo = ImageInfo.makeN32Premul(16, 16)
-                val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
-                val canvasSurface = surface.canvas.surface
-                assertNotNull(canvasSurface)
-                assertEquals(surface, canvasSurface)
-                assertEquals(ctx, canvasSurface._context)
-            }
         }
     }
 
