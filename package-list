@@ -9,7 +9,7 @@ $dokka.location:org.jetbrains.skia.impl/Stats/nativeCalls/#/PointingToDeclaratio
 $dokka.location:org.jetbrains.skia.skottie//buildFromFile/org.jetbrains.skia.skottie.AnimationBuilder#kotlin.String/PointingToDeclaration/skiko-skottie/org.jetbrains.skia.skottie/[native]build-from-file.html
 $dokka.location:org.jetbrains.skia.skottie//makeFromFile/org.jetbrains.skia.skottie.Animation.Companion#kotlin.String/PointingToDeclaration/skiko-skottie/org.jetbrains.skia.skottie/[native]make-from-file.html
 $dokka.location:org.jetbrains.skia//makeFromFileName/org.jetbrains.skia.Data.Companion#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/[native]make-from-file-name.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/isShowing/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/[macos]is-showing.html
+$dokka.location:org.jetbrains.skiko/SkiaLayer/isShowing/#/PointingToDeclaration/skiko-platform/org.jetbrains.skiko/-skia-layer/[macos]is-showing.html
 module:skiko
 org.jetbrains.skia
 org.jetbrains.skia.icu
@@ -19,14 +19,23 @@ org.jetbrains.skia.shaper
 org.jetbrains.skia.svg
 org.jetbrains.skia.webext
 org.jetbrains.skiko
-org.jetbrains.skiko.graphicapi
-org.jetbrains.skiko.ios
+org.jetbrains.skiko.internal
 org.jetbrains.skiko.node
-org.jetbrains.skiko.swing
 org.jetbrains.skiko.wasm
-org.jetbrains.skiko.windows
+module:skiko-ganesh
+org.jetbrains.skia
+org.jetbrains.skia.gpu.ganesh
+org.jetbrains.skiko
+org.jetbrains.skiko.graphicapi
+org.jetbrains.skiko.wasm
 module:skiko-graphite
 org.jetbrains.skia.gpu.graphite
+module:skiko-platform
+org.jetbrains.skiko
+org.jetbrains.skiko.graphicapi
+org.jetbrains.skiko.ios
+org.jetbrains.skiko.swing
+org.jetbrains.skiko.windows
 module:skiko-skottie
 org.jetbrains.skia.skottie
 org.jetbrains.skia.sksg

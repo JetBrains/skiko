@@ -1,0 +1,542 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>org.jetbrains.skiko</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
+                    skiko
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.0.0-SNAPSHOT
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":skiko-platform/androidMain">android</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":skiko-platform/awtMain">awt</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":skiko-platform/commonMain">common</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":skiko-platform/darwinMain">darwin</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":skiko-platform/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":skiko-platform/linuxMain">linux</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":skiko-platform/macosMain">macos</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":skiko-platform/uikitMain">uikit</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":skiko-platform/webMain">web</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":skiko-platform/androidMain" data-filter=":skiko-platform/androidMain">
+                                <span class="checkbox--icon"></span>
+                                android
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":skiko-platform/awtMain" data-filter=":skiko-platform/awtMain">
+                                <span class="checkbox--icon"></span>
+                                awt
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":skiko-platform/commonMain" data-filter=":skiko-platform/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":skiko-platform/darwinMain" data-filter=":skiko-platform/darwinMain">
+                                <span class="checkbox--icon"></span>
+                                darwin
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":skiko-platform/jvmMain" data-filter=":skiko-platform/jvmMain">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":skiko-platform/linuxMain" data-filter=":skiko-platform/linuxMain">
+                                <span class="checkbox--icon"></span>
+                                linux
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":skiko-platform/macosMain" data-filter=":skiko-platform/macosMain">
+                                <span class="checkbox--icon"></span>
+                                macos
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":skiko-platform/uikitMain" data-filter=":skiko-platform/uikitMain">
+                                <span class="checkbox--icon"></span>
+                                uikit
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":skiko-platform/webMain" data-filter=":skiko-platform/webMain">
+                                <span class="checkbox--icon"></span>
+                                web
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    skiko
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="skiko-platform::org.jetbrains.skiko////PointingToDeclaration//-336918356">
+  <div class="breadcrumbs"><a href="../index.html">skiko-platform</a><span class="delimiter">/</span><span class="current">org.jetbrains.skiko</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="1527187872%2FClasslikes%2F-1414344154" anchor-label="ClipComponent" id="1527187872%2FClasslikes%2F-1414344154" data-filterable-set=":skiko-platform/awtMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clip-component/index.html"><span>Clip</span><wbr><span><span>Component</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1527187872%2FClasslikes%2F-1414344154"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain" data-active="" data-toggle=":skiko-platform/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/awtMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-clip-component/index.html">ClipComponent</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>component<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/java/awt/Component.html">Component</a></span></span><span class="token punctuation">)</span> : <a href="../../skiko-platform/org.jetbrains.skiko/-clip-rectangle/index.html">ClipRectangle</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1359576430%2FClasslikes%2F-1368831466" anchor-label="ClipRectangle" id="1359576430%2FClasslikes%2F-1368831466" data-filterable-set=":skiko-platform/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/commonMain" data-filterable-set=":skiko-platform/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clip-rectangle/index.html"><span>Clip</span><wbr><span><span>Rectangle</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1359576430%2FClasslikes%2F-1368831466"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-clip-rectangle/index.html">ClipRectangle</a></div><div class="brief "><p class="paragraph">Rectangle used for clipping.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="112344034%2FClasslikes%2F-1368831466" anchor-label="FPSCounter" id="112344034%2FClasslikes%2F-1368831466" data-filterable-set=":skiko-platform/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/commonMain" data-filterable-set=":skiko-platform/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-p-s-counter/index.html"><span><span>FPSCounter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="112344034%2FClasslikes%2F-1368831466"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-f-p-s-counter/index.html">FPSCounter</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">periodSeconds<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token operator"> = </span><span class="token constant">2.0</span><span class="token punctuation">, </span></span><span class="parameter ">showLongFrames<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">getLongFrameMillis<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a><span class="token operator"> = </span>{
+        1.5 * 1000 / 60
+    }<span class="token punctuation">, </span></span><span class="parameter ">logOnTick<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1920717799%2FClasslikes%2F-1368831466" anchor-label="FrameDispatcher" id="-1920717799%2FClasslikes%2F-1368831466" data-filterable-set=":skiko-platform/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/commonMain" data-filterable-set=":skiko-platform/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-frame-dispatcher/index.html"><span>Frame</span><wbr><span><span>Dispatcher</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1920717799%2FClasslikes%2F-1368831466"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-frame-dispatcher/index.html">FrameDispatcher</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scope<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">, </span></span><span class="parameter ">onFrame<span class="token operator">: </span><span class="token keyword">suspend </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Dispatch frame after call of <a href="-frame-dispatcher/schedule-frame.html">scheduleFrame</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-620901062%2FClasslikes%2F136396832" anchor-label="FrameLimiter" id="-620901062%2FClasslikes%2F136396832" data-filterable-set=":skiko-platform/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/jvmMain" data-filterable-set=":skiko-platform/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-frame-limiter/index.html"><span>Frame</span><wbr><span><span>Limiter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-620901062%2FClasslikes%2F136396832"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/jvmMain" data-filterable-set=":skiko-platform/jvmMain" data-active="" data-toggle=":skiko-platform/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-frame-limiter/index.html">FrameLimiter</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">coroutineScope<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">, </span></span><span class="parameter ">frameMillis<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">impreciseDelay<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>::delay<span class="token punctuation">, </span></span><span class="parameter ">currentTime<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span>ERROR CLASS: Symbol not found for Duration<span class="token operator"> = </span>{ System.nanoTime().nanoseconds }</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Limit the duration of the frames (to avoid high CPU usage) to <span data-unresolved-link="org.jetbrains.skiko/FrameLimiter//#kotlinx.coroutines.CoroutineScope#kotlin.Function0[kotlin.Long]#kotlin.coroutines.SuspendFunction1[kotlin.Long,kotlin.Unit]#kotlin.Function0[<ERROR CLASS> ERROR CLASS: Symbol not found for Duration]/PointingToCallableParameters(1)/">frameMillis</span>. The actual delay depends on the precision of the system timer (Windows has ~15ms precision by default, Linux/macOs ~2ms). FrameLimiter will try to delay frames as close as possible to <span data-unresolved-link="org.jetbrains.skiko/FrameLimiter//#kotlinx.coroutines.CoroutineScope#kotlin.Function0[kotlin.Long]#kotlin.coroutines.SuspendFunction1[kotlin.Long,kotlin.Unit]#kotlin.Function0[<ERROR CLASS> ERROR CLASS: Symbol not found for Duration]/PointingToCallableParameters(1)/">frameMillis</span>, but not greater</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="576333804%2FClasslikes%2F-482225778" anchor-label="SkiaLayer" id="576333804%2FClasslikes%2F-482225778" data-filterable-set=":skiko-platform/commonMain,:skiko-platform/androidMain,:skiko-platform/awtMain,:skiko-platform/linuxMain,:skiko-platform/macosMain,:skiko-platform/uikitMain,:skiko-platform/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/commonMain,:skiko-platform/androidMain,:skiko-platform/awtMain,:skiko-platform/linuxMain,:skiko-platform/macosMain,:skiko-platform/uikitMain,:skiko-platform/webMain" data-filterable-set=":skiko-platform/commonMain,:skiko-platform/androidMain,:skiko-platform/awtMain,:skiko-platform/linuxMain,:skiko-platform/macosMain,:skiko-platform/uikitMain,:skiko-platform/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skia-layer/index.html"><span>Skia</span><wbr><span><span>Layer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="576333804%2FClasslikes%2F-482225778"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/androidMain" data-filterable-set=":skiko-platform/androidMain" data-active="" data-toggle=":skiko-platform/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain" data-toggle=":skiko-platform/awtMain">awt</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/commonMain" data-filterable-set=":skiko-platform/commonMain" data-toggle=":skiko-platform/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/linuxMain" data-filterable-set=":skiko-platform/linuxMain" data-toggle=":skiko-platform/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/macosMain" data-filterable-set=":skiko-platform/macosMain" data-toggle=":skiko-platform/macosMain">macos</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/uikitMain" data-filterable-set=":skiko-platform/uikitMain" data-toggle=":skiko-platform/uikitMain">uikit</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/webMain" data-filterable-set=":skiko-platform/webMain" data-toggle=":skiko-platform/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":skiko-platform/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a></div><div class="brief "><p class="paragraph">Generic platform layer for Skiko.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/awtMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a> : <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/swing/JComponent.html">JComponent</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/accessibility/Accessible.html">Accessible</a></div><div class="brief "><p class="paragraph">Generic platform layer for Skiko.</p></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a></div><div class="brief "><p class="paragraph">Generic platform layer for Skiko.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a></div><div class="brief "><p class="paragraph">Generic platform layer for Skiko.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/macosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a></div><div class="brief "><p class="paragraph">SkiaLayer implementation for macOS. Supports only <a href="../../skiko/org.jetbrains.skiko/-graphics-api/-m-e-t-a-l/index.html">GraphicsApi.METAL</a></p></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/uikitMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a></div><div class="brief "><p class="paragraph">Generic platform layer for Skiko.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a></div><div class="brief "><p class="paragraph">Provides a way to render the content and to receive the input events. Rendering and events processing should be implemented in <a href="-skia-layer/render-delegate.html">renderDelegate</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2011035088%2FClasslikes%2F-1368831466" anchor-label="SkiaLayerAnalytics" id="-2011035088%2FClasslikes%2F-1368831466" data-filterable-set=":skiko-platform/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/commonMain" data-filterable-set=":skiko-platform/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skia-layer-analytics/index.html"><span>Skia</span><wbr><span>Layer</span><wbr><span><span>Analytics</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2011035088%2FClasslikes%2F-1368831466"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-skia-layer-analytics/index.html">SkiaLayerAnalytics</a></div><div class="brief "><p class="paragraph">Analytics that helps to know more about SkiaLayer behaviour. Implementation usually uses third-party solution to send info to some centralized analytics gatherer.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="442901561%2FClasslikes%2F136396832" anchor-label="SkiaLayerProperties" id="442901561%2FClasslikes%2F136396832" data-filterable-set=":skiko-platform/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/jvmMain" data-filterable-set=":skiko-platform/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skia-layer-properties/index.html"><span>Skia</span><wbr><span>Layer</span><wbr><span><span>Properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="442901561%2FClasslikes%2F136396832"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/jvmMain" data-filterable-set=":skiko-platform/jvmMain" data-active="" data-toggle=":skiko-platform/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-skia-layer-properties/index.html">SkiaLayerProperties</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>isVsyncEnabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span>SkikoProperties.vsyncEnabled<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>isVsyncFramelimitFallbackEnabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span>SkikoProperties.vsyncFramelimitFallbackEnabled<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>frameBuffering<span class="token operator">: </span>ERROR CLASS: Symbol not found for FrameBuffering<span class="token operator"> = </span>SkikoProperties.frameBuffering<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>renderApi<span class="token operator">: </span>ERROR CLASS: Symbol not found for GraphicsApi<span class="token operator"> = </span>SkikoProperties.renderApi<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>adapterPriority<span class="token operator">: </span>ERROR CLASS: Symbol not found for GpuPriority<span class="token operator"> = </span>SkikoProperties.gpuPriority<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>gpuResourceCacheLimit<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span>SkikoProperties.gpuResourceCacheLimit</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">SkiaLayerProperties is a class that represents the rendering configuration for a SkiaLayer.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="939218865%2FClasslikes%2F-1368831466" anchor-label="SkiaLayerRenderDelegate" id="939218865%2FClasslikes%2F-1368831466" data-filterable-set=":skiko-platform/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/commonMain" data-filterable-set=":skiko-platform/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skia-layer-render-delegate/index.html"><span>Skia</span><wbr><span>Layer</span><wbr><span>Render</span><wbr><span><span>Delegate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="939218865%2FClasslikes%2F-1368831466"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer-render-delegate/index.html">SkiaLayerRenderDelegate</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>layer<span class="token operator">: </span><a href="-skia-layer/index.html">SkiaLayer</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>renderDelegate<span class="token operator">: </span><a href="-skiko-render-delegate/index.html">SkikoRenderDelegate</a></span></span><span class="token punctuation">)</span> : <a href="-skiko-render-delegate/index.html">SkikoRenderDelegate</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="711782654%2FClasslikes%2F1759528938" anchor-label="SkikoDispatchers" id="711782654%2FClasslikes%2F1759528938" data-filterable-set=":skiko-platform/darwinMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/darwinMain" data-filterable-set=":skiko-platform/darwinMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skiko-dispatchers/index.html"><span>Skiko</span><wbr><span><span>Dispatchers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="711782654%2FClasslikes%2F1759528938"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/darwinMain" data-filterable-set=":skiko-platform/darwinMain" data-active="" data-toggle=":skiko-platform/darwinMain">darwin</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/darwinMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-skiko-dispatchers/index.html">SkikoDispatchers</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="335947453%2FClasslikes%2F-1368831466" anchor-label="SkikoRenderDelegate" id="335947453%2FClasslikes%2F-1368831466" data-filterable-set=":skiko-platform/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/commonMain" data-filterable-set=":skiko-platform/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skiko-render-delegate/index.html"><span>Skiko</span><wbr><span>Render</span><wbr><span><span>Delegate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="335947453%2FClasslikes%2F-1368831466"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-skiko-render-delegate/index.html">SkikoRenderDelegate</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1015982456%2FClasslikes%2F-33129212" anchor-label="SkikoSurfaceView" id="1015982456%2FClasslikes%2F-33129212" data-filterable-set=":skiko-platform/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/androidMain" data-filterable-set=":skiko-platform/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skiko-surface-view/index.html"><span>Skiko</span><wbr><span>Surface</span><wbr><span><span>View</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1015982456%2FClasslikes%2F-33129212"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/androidMain" data-filterable-set=":skiko-platform/androidMain" data-active="" data-toggle=":skiko-platform/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/androidMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-skiko-surface-view/index.html">SkikoSurfaceView</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>layer<span class="token operator">: </span><a href="-skia-layer/index.html">SkiaLayer</a></span></span><span class="token punctuation">)</span> : <a href="https://developer.android.com/reference/kotlin/android/opengl/GLSurfaceView.html">GLSurfaceView</a>, <span data-unresolved-link="org.jetbrains.skiko/FrameManager///PointingToDeclaration/">FrameManager</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-916274817%2FClasslikes%2F-69519748" anchor-label="SkikoUIView" id="-916274817%2FClasslikes%2F-69519748" data-filterable-set=":skiko-platform/uikitMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/uikitMain" data-filterable-set=":skiko-platform/uikitMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skiko-u-i-view/index.html"><span>Skiko</span><wbr><span><span>UIView</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-916274817%2FClasslikes%2F-69519748"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/uikitMain" data-filterable-set=":skiko-platform/uikitMain" data-active="" data-toggle=":skiko-platform/uikitMain">uikit</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/uikitMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-skiko-u-i-view/index.html">SkikoUIView</a> : <span data-unresolved-link="platform.UIKit/UIView///PointingToDeclaration/">UIView</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1308177421%2FClasslikes%2F-1368831466" anchor-label="SystemTheme" id="-1308177421%2FClasslikes%2F-1368831466" data-filterable-set=":skiko-platform/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/commonMain" data-filterable-set=":skiko-platform/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-system-theme/index.html"><span>System</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1308177421%2FClasslikes%2F-1368831466"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/commonMain"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-system-theme/index.html">SystemTheme</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="-system-theme/index.html">SystemTheme</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1059629801%2FProperties%2F-482225778" anchor-label="currentSystemTheme" id="1059629801%2FProperties%2F-482225778" data-filterable-set=":skiko-platform/commonMain,:skiko-platform/androidMain,:skiko-platform/awtMain,:skiko-platform/linuxMain,:skiko-platform/macosMain,:skiko-platform/uikitMain,:skiko-platform/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/commonMain,:skiko-platform/androidMain,:skiko-platform/awtMain,:skiko-platform/linuxMain,:skiko-platform/macosMain,:skiko-platform/uikitMain,:skiko-platform/webMain" data-filterable-set=":skiko-platform/commonMain,:skiko-platform/androidMain,:skiko-platform/awtMain,:skiko-platform/linuxMain,:skiko-platform/macosMain,:skiko-platform/uikitMain,:skiko-platform/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="current-system-theme.html"><span>current</span><wbr><span>System</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1059629801%2FProperties%2F-482225778"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/androidMain" data-filterable-set=":skiko-platform/androidMain" data-active="" data-toggle=":skiko-platform/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain" data-toggle=":skiko-platform/awtMain">awt</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/commonMain" data-filterable-set=":skiko-platform/commonMain" data-toggle=":skiko-platform/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/linuxMain" data-filterable-set=":skiko-platform/linuxMain" data-toggle=":skiko-platform/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/macosMain" data-filterable-set=":skiko-platform/macosMain" data-toggle=":skiko-platform/macosMain">macos</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/uikitMain" data-filterable-set=":skiko-platform/uikitMain" data-toggle=":skiko-platform/uikitMain">uikit</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/webMain" data-filterable-set=":skiko-platform/webMain" data-toggle=":skiko-platform/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":skiko-platform/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="current-system-theme.html">currentSystemTheme</a><span class="token operator">: </span><a href="../../skiko-platform/org.jetbrains.skiko/-system-theme/index.html">SystemTheme</a></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/awtMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="current-system-theme.html">currentSystemTheme</a><span class="token operator">: </span><a href="../../skiko-platform/org.jetbrains.skiko/-system-theme/index.html">SystemTheme</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="current-system-theme.html">currentSystemTheme</a><span class="token operator">: </span><a href="-system-theme/index.html">SystemTheme</a></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="current-system-theme.html">currentSystemTheme</a><span class="token operator">: </span><a href="../../skiko-platform/org.jetbrains.skiko/-system-theme/index.html">SystemTheme</a></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/macosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="current-system-theme.html">currentSystemTheme</a><span class="token operator">: </span><a href="../../skiko-platform/org.jetbrains.skiko/-system-theme/index.html">SystemTheme</a></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/uikitMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="current-system-theme.html">currentSystemTheme</a><span class="token operator">: </span><a href="../../skiko-platform/org.jetbrains.skiko/-system-theme/index.html">SystemTheme</a></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="current-system-theme.html">currentSystemTheme</a><span class="token operator">: </span><a href="../../skiko-platform/org.jetbrains.skiko/-system-theme/index.html">SystemTheme</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="221705846%2FProperties%2F-1414344154" anchor-label="MainUIDispatcher" id="221705846%2FProperties%2F-1414344154" data-filterable-set=":skiko-platform/awtMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-main-u-i-dispatcher.html"><span>Main</span><wbr><span><span>UIDispatcher</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="221705846%2FProperties%2F-1414344154"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain" data-active="" data-toggle=":skiko-platform/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/awtMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-main-u-i-dispatcher.html">MainUIDispatcher</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineDispatcher///PointingToDeclaration/">CoroutineDispatcher</span></div><div class="brief "><p class="paragraph">Dispatcher for UI thread, which is used in the current implementation of native UI integration. Currently, it uses Swing event dispatching thread.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-2062445210%2FFunctions%2F-1414344154" anchor-label="disableTitleBar" id="-2062445210%2FFunctions%2F-1414344154" data-filterable-set=":skiko-platform/awtMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="disable-title-bar.html"><span>disable</span><wbr><span>Title</span><wbr><span><span>Bar</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2062445210%2FFunctions%2F-1414344154"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain" data-active="" data-toggle=":skiko-platform/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/awtMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-skia-layer/index.html">SkiaLayer</a><span class="token punctuation">.</span><a href="disable-title-bar.html"><span class="token function">disableTitleBar</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">customHeaderHeight<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Disable showing the window title bar.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-91336391%2FFunctions%2F-1414344154" anchor-label="initializeCAccessible" id="-91336391%2FFunctions%2F-1414344154" data-filterable-set=":skiko-platform/awtMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="initialize-c-accessible.html"><span>initialize</span><wbr><span><span>CAccessible</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-91336391%2FFunctions%2F-1414344154"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain" data-active="" data-toggle=":skiko-platform/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/awtMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="initialize-c-accessible.html"><span class="token function">initializeCAccessible</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">accessible<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/accessibility/Accessible.html">Accessible</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Calls <code class="lang-kotlin">sun.lwawt.macosx.CAccessible.getCAccessible(Accessible)</code> on the given <a href="initialize-c-accessible.html">accessible</a> object; does nothing if running on a non-Mac platform or in a JVM where there is no <code class="lang-kotlin">CAccessible</code> class.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1931673312%2FFunctions%2F-1414344154" anchor-label="orderEmojiAndSymbolsPopup" id="-1931673312%2FFunctions%2F-1414344154" data-filterable-set=":skiko-platform/awtMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="order-emoji-and-symbols-popup.html"><span>order</span><wbr><span>Emoji</span><wbr><span>And</span><wbr><span>Symbols</span><wbr><span><span>Popup</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1931673312%2FFunctions%2F-1414344154"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain" data-active="" data-toggle=":skiko-platform/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/awtMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="order-emoji-and-symbols-popup.html"><span class="token function">orderEmojiAndSymbolsPopup</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Request to show emoji and symbols popup.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1442298941%2FFunctions%2F1226181694" anchor-label="setSystemLookAndFeel" id="1442298941%2FFunctions%2F1226181694" data-filterable-set=":skiko-platform/jvmMain,:skiko-platform/androidMain,:skiko-platform/awtMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/jvmMain,:skiko-platform/androidMain,:skiko-platform/awtMain" data-filterable-set=":skiko-platform/jvmMain,:skiko-platform/androidMain,:skiko-platform/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-system-look-and-feel.html"><span>set</span><wbr><span>System</span><wbr><span>Look</span><wbr><span>And</span><wbr><span><span>Feel</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1442298941%2FFunctions%2F1226181694"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/androidMain" data-filterable-set=":skiko-platform/androidMain" data-active="" data-toggle=":skiko-platform/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain" data-toggle=":skiko-platform/awtMain">awt</button><button class="platform-bookmark" data-filterable-current=":skiko-platform/jvmMain" data-filterable-set=":skiko-platform/jvmMain" data-toggle=":skiko-platform/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":skiko-platform/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="set-system-look-and-feel.html"><span class="token function">setSystemLookAndFeel</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":skiko-platform/awtMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="set-system-look-and-feel.html"><span class="token function">setSystemLookAndFeel</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/jvmMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="set-system-look-and-feel.html"><span class="token function">setSystemLookAndFeel</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1541389359%2FFunctions%2F-1414344154" anchor-label="transparentWindowBackgroundHack" id="1541389359%2FFunctions%2F-1414344154" data-filterable-set=":skiko-platform/awtMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="transparent-window-background-hack.html"><span>transparent</span><wbr><span>Window</span><wbr><span>Background</span><wbr><span><span>Hack</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1541389359%2FFunctions%2F-1414344154"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":skiko-platform/awtMain" data-filterable-set=":skiko-platform/awtMain" data-active="" data-toggle=":skiko-platform/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":skiko-platform/awtMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../skiko/org.jetbrains.skiko/-delicate-skiko-api/index.html"><span class="token annotation builtin">DelicateSkikoApi</span></a></div></div><span class="token keyword">fun </span><a href="transparent-window-background-hack.html"><span class="token function">transparentWindowBackgroundHack</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">renderApi<span class="token operator">: </span><a href="../../skiko/org.jetbrains.skiko/-graphics-api/index.html">GraphicsApi</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/java/awt/Color.html">Color</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Returns the color that should be set as the <a href="../org.jetbrains.skiko.swing/-skia-swing-layer/index.html#-1749028864%2FProperties%2F-1414344154">Window.background</a> for transparent windows.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
