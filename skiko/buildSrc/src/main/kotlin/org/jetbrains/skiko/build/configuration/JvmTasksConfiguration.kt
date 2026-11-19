@@ -774,7 +774,8 @@ fun SkikoProjectContext.createSkikoJvmJarTask(
         nativeLib,
         createChecksums.map { it.outputs.files.singleFile }
     )
-    if (os == OS.Windows) {
+    // Only the core library loads ICU data; extension jars would duplicate it.
+    if (os == OS.Windows && kind == SkikoModuleKind.CORE) {
         val target = targetId(os, arch)
         // Add ICU data files.
         nativeFiles.add(skiaBindingsDir.map { file(it.resolve("out/${buildType.id}-$target/icudtl.dat")) })
