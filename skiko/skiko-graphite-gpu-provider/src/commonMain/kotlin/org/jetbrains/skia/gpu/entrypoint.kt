@@ -8,7 +8,7 @@ import org.jetbrains.skiko.internal.Logger
 
 @ExperimentalSkikoApi
 fun makeMetalContext(devicePtr: NativePointer, queuePtr: NativePointer): GpuContext {
-    Logger.info { "Metal backend: Graphite" }
+    Logger.debug { "Metal backend: Graphite" }
     return GpuContext(GraphiteGpuContextBackend.makeMetal(devicePtr, queuePtr))
 }
 
