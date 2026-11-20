@@ -1,8 +1,7 @@
 #include "SkShaper.h"
 #include "FontRunIterator.hh"
+#include "SkikoUnicode.hh"
 #include "src/core/SkUTF.h"
-#include "unicode/uchar.h"
-#include <iostream>
 
 // Adapted from SkShaper.cpp
 
@@ -26,9 +25,11 @@ void FontRunIterator::consume() {
     SkASSERT(fCurrent < fEnd);
     SkASSERT(!fLanguage || this->endOfCurrentRun() <= fLanguage->endOfCurrentRun());
     const char* clusterStart = fCurrent;
-    int nextBoundaryOffset = ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
-    const char* clusterEnd = nextBoundaryOffset != UBRK_DONE ? fBegin + nextBoundaryOffset : fEnd;
-    UErrorCode status = U_ZERO_ERROR;
+    int nextBoundaryOffset = fGraphemeIter->following(clusterStart - fBegin);
+    const char* clusterEnd = nextBoundaryOffset != SkBreakIterator::kDone
+            ? fBegin + nextBoundaryOffset
+            : fEnd;
+    sk_sp<SkUnicode> unicode = skiko::BestAvailableUnicode();
 
     // If the starting typeface can handle this character, use it.
     if (can_handle_cluster(fFont.getTypeface(), clusterStart, clusterEnd)) {
@@ -55,8 +56,10 @@ void FontRunIterator::consume() {
 
     while (clusterStart < fEnd) {
         clusterStart = clusterEnd;
-        int nextBoundaryOffset = ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
-        clusterEnd = nextBoundaryOffset != UBRK_DONE ? fBegin + nextBoundaryOffset : fEnd;
+        int nextBoundaryOffset = fGraphemeIter->following(clusterStart - fBegin);
+        clusterEnd = nextBoundaryOffset != SkBreakIterator::kDone
+                ? fBegin + nextBoundaryOffset
+                : fEnd;
 
         const char* ptr = clusterStart;
         SkUnichar u = utf8_next(&ptr, clusterEnd);
@@ -64,9 +67,9 @@ void FontRunIterator::consume() {
         // Do not switch font on control, whitespace or punct
         if (ptr == clusterEnd
             && fCurrentFont->getTypeface()->unicharToGlyph(u) != 0
-            && (u_iscntrl(u)
-                || (fApproximateSpaces && u_isWhitespace(u))
-                || (fApproximatePunctuation && u_ispunct(u))))
+            && (unicode->isControl(u)
+                || (fApproximateSpaces && unicode->isWhitespace(u))
+                || (fApproximatePunctuation && unicode->isPunctuation(u))))
             continue;
 
         // End run if not using initial typeface and initial typeface has this character.

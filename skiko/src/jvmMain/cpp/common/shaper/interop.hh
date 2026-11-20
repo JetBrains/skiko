@@ -2,8 +2,7 @@
 #include <jni.h>
 #include "../interop.hh"
 #include "SkShaper.h"
-#include "unicode/ubrk.h"
-#include "unicode/utext.h"
+#include "SkUnicode.h"
 
 namespace skija {
     namespace shaper {
@@ -102,7 +101,6 @@ namespace skija {
         void onLoad(JNIEnv* env);
         void onUnload(JNIEnv* env);
 
-        using ICUUText = std::unique_ptr<UText, SkFunctionObject<utext_close>>;
-        std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text);
+        std::shared_ptr<SkBreakIterator> graphemeBreakIterator(SkString& text);
     }
 }

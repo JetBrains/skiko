@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "modules/skunicode/include/SkUnicode_icu.h"
+#include "SkikoUnicode.hh"
 #include "ParagraphBuilder.h"
 
 using namespace std;
@@ -18,7 +18,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphBuilder__1nMak
     ParagraphBuilder* instance = ParagraphBuilder::make(
         *paragraphStyle,
         sk_ref_sp(fontCollection),
-        SkUnicodes::ICU::Make()
+        skiko::BestAvailableUnicode()
     ).release();
     return reinterpret_cast<KNativePointer>(instance);
 }

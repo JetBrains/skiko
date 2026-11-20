@@ -9,12 +9,15 @@
 #include "SkUnicode.h"
 #include "src/core/SkUTF.h"
 #include "TextLineRunHandler.hh"
-#include "unicode/ubidi.h"
-#include "SkUnicode_icu.h"
+#include "SkikoUnicode.hh"
 
 #ifdef SK_SHAPER_CORETEXT_AVAILABLE
 #include "SkShaper_coretext.h"
 #endif
+
+// Unicode bidi paragraph level constants (UBIDI_DEFAULT_LTR / UBIDI_DEFAULT_RTL)
+static constexpr uint8_t kDefaultBidiLevelLtr = 0xFE;
+static constexpr uint8_t kDefaultBidiLevelRtl = 0xFF;
 
 static void deleteShaper(SkShaper* instance) {
     // std::cout << "Deleting [SkShaper " << instance << "]" << std::endl;
@@ -46,7 +49,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMa
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     // TODO: consider if we need/want to use ICU4X or Libgrapheme (skuincode/include has those implementations too)
-    sk_sp<SkUnicode> unicode = SkUnicodes::ICU::Make();
+    sk_sp<SkUnicode> unicode = skiko::BestAvailableUnicode();
     return reinterpret_cast<jlong>(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr)).release());
 }
 
@@ -69,7 +72,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jfloat offsetX, jfloat offsetY) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
     SkString& text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
-    std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
+    std::shared_ptr<SkBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
 
@@ -79,7 +82,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
     bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
     bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
-    uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
+    uint8_t defaultBiDiLevel = isLeftToRight ? kDefaultBidiLevelLtr : kDefaultBidiLevelRtl;
     std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
     if (!bidiRunIter) return 0;
 
@@ -117,7 +120,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
         return reinterpret_cast<jlong>(new TextLine(*font));
     }
 
-    std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
+    std::shared_ptr<SkBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
 
     std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(env, optsFeatures, optsFeaturesLen);
@@ -126,7 +129,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
     bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
     bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
-    uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
+    uint8_t defaultBiDiLevel = isLeftToRight ? kDefaultBidiLevelLtr : kDefaultBidiLevelRtl;
     std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
     if (!bidiRunIter) return 0;
 

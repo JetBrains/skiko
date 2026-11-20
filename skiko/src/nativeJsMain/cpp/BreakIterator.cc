@@ -1,113 +1,102 @@
-#include "unicode/ubrk.h"
 #include "common.h"
-#include <iostream>
+#include "SkikoUnicode.hh"
 
-static void deleteBreakIterator(UBreakIterator* instance) {
-  ubrk_close(instance);
+static void deleteBreakIterator(SkBreakIterator* instance) {
+    delete instance;
+}
+
+static SkUnicode::BreakType toBreakType(KInt type) {
+    // Must match org.jetbrains.skia.BreakIterator.make*Instance
+    switch (type) {
+        case 0: return SkUnicode::BreakType::kGraphemes;
+        case 1: return SkUnicode::BreakType::kWords;
+        case 2: return SkUnicode::BreakType::kLines;
+        case 3: return SkUnicode::BreakType::kSentences;
+        default: TODO("Unsupported BreakIterator type");
+    }
+}
+
+static std::unique_ptr<SkBreakIterator> makeBreakIterator(KInt type, const char* locale) {
+    sk_sp<SkUnicode> unicode = skiko::BestAvailableUnicode();
+    if (!unicode) {
+        return nullptr;
+    }
+    return unicode->makeBreakIterator(locale, toBreakType(type));
+}
+
+static inline SkBreakIterator* toBreakIterator(KNativePointer ptr) {
+    return reinterpret_cast<SkBreakIterator*>(ptr);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nGetFinalizer() {
     return reinterpret_cast<KNativePointer>((&deleteBreakIterator));
 }
 
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nMake
-  (KInt type, KInteropPointer localeStr, KInt* errorCode) {
-    UErrorCode status = U_ZERO_ERROR;
-    UBreakIterator* instance;
-    if (localeStr == nullptr)
-      instance = ubrk_open(static_cast<UBreakIteratorType>(type), uloc_getDefault(), nullptr, 0, &status);
-    else {
-      instance = ubrk_open(static_cast<UBreakIteratorType>(type), skString(localeStr).c_str(), nullptr, 0, &status);
-    }
-
-    errorCode[0] = status;
-    if (U_FAILURE(status))
-      return 0;
-    else
-      return reinterpret_cast<KNativePointer>(instance);
+  (KInt type, KInteropPointer localeStr) {
+    SkString locale = localeStr == nullptr ? SkString() : skString(localeStr);
+    std::unique_ptr<SkBreakIterator> instance =
+        makeBreakIterator(type, locale.isEmpty() ? nullptr : locale.c_str());
+    return reinterpret_cast<KNativePointer>(instance.release());
 }
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nCurrent
   (KNativePointer ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    return ubrk_current(instance);
+    return toBreakIterator(ptr)->current();
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nNext
   (KNativePointer ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    return ubrk_next(instance);
+    SkBreakIterator* instance = toBreakIterator(ptr);
+    SkBreakIterator::Position result = instance->next();
+    if (result == SkBreakIterator::kDone) {
+        // The Apple backend leaves its index past the last break when iteration is done. Move it
+        // back to the last boundary, like ICU, where the position stays valid when DONE is
+        // returned.
+        instance->last();
+    }
+    return result;
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nPrevious
   (KNativePointer ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    return ubrk_previous(instance);
+    return toBreakIterator(ptr)->previous();
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nFirst
   (KNativePointer ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    return ubrk_first(instance);
+    return toBreakIterator(ptr)->first();
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nLast
   (KNativePointer ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    return ubrk_last(instance);
+    return toBreakIterator(ptr)->last();
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nPreceding
   (KNativePointer ptr, KInt offset) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    return ubrk_preceding(instance, offset);
+    return toBreakIterator(ptr)->preceding(offset);
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nFollowing
   (KNativePointer ptr, KInt offset) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    return ubrk_following(instance, offset);
+    return toBreakIterator(ptr)->following(offset);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_BreakIterator__1nIsBoundary
   (KNativePointer ptr, KInt offset) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    return ubrk_isBoundary(instance, offset);
-}
-
-SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nGetRuleStatus
-  (KNativePointer ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    return ubrk_getRuleStatus(instance);
-}
-
-
-SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen
-  (KNativePointer ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    UErrorCode status = U_ZERO_ERROR;
-    int32_t len = ubrk_getRuleStatusVec(instance, nullptr, 0, &status);
-    SKIKO_ASSERT(status == U_BUFFER_OVERFLOW_ERROR || !U_FAILURE(status), "Failed to get rule statuses");
-    return len;
-}
-
-SKIKO_EXPORT void org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
-  (KNativePointer ptr, KInteropPointer result, KInt len) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    UErrorCode status = U_ZERO_ERROR;
-    ubrk_getRuleStatusVec(instance, reinterpret_cast<int32_t*>(result), len, &status);
-    SKIKO_ASSERT(!U_FAILURE(status), "Failed to get rule statuses");
+    return toBreakIterator(ptr)->isBoundary(offset);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nSetText
-  (KNativePointer ptr, KChar* textArr, KInt len, KInt* errorCode) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    std::vector<UChar>* text = new std::vector<UChar>(textArr, textArr + len);
-
-    UErrorCode status = U_ZERO_ERROR;
-    ubrk_setText(instance, text->data(), len, &status);
-    errorCode[0] = status;
-    return reinterpret_cast<KNativePointer>(text);
+  (KNativePointer ptr, KChar* textArr, KInt len) {
+    SkBreakIterator* instance = toBreakIterator(ptr);
+    // The buffer must stay alive while the iterator is used: ICU's UText reads it lazily.
+    // Kotlin keeps it alive in org.jetbrains.skia.U16String and frees it on the next setText
+    // or on close.
+    auto text = std::make_unique<std::vector<KChar>>(textArr, textArr + len);
+    if (!instance->setText(reinterpret_cast<const char16_t*>(text->data()), len)) {
+        return 0;
+    }
+    return reinterpret_cast<KNativePointer>(text.release());
 }

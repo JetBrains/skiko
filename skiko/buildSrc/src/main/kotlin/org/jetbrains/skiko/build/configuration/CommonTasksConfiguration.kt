@@ -87,15 +87,25 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         "-DSK_UNICODE_AVAILABLE",
         "-DSK_SHAPER_UNICODE_AVAILABLE",
         "-DSK_SUPPORT_OPENCL=0",
-        "-DSK_UNICODE_AVAILABLE",
-        "-DSK_USING_THIRD_PARTY_ICU",
-        // For ICU symbols renaming:
-        "-DU_DISABLE_RENAMING=0",
-        "-DU_DISABLE_VERSION_SUFFIX=1",
-        "-DU_HAVE_LIB_SUFFIX=1",
-        "-DU_LIB_SUFFIX_C_NAME=_skiko",
         *buildType.flags
     )
+
+    // The SkUnicode backend the Skia build produced for this target: the native Apple unicode
+    // backend on Apple platforms (full ICU is not linked there), ICU everywhere else.
+    val unicodeBackend = when (os) {
+        OS.MacOS, OS.IOS, OS.TVOS -> listOf(
+            "-DSK_UNICODE_APPLE_IMPLEMENTATION"
+        )
+        else -> listOf(
+            "-DSK_UNICODE_ICU_IMPLEMENTATION",
+            "-DSK_USING_THIRD_PARTY_ICU",
+            // For ICU symbols renaming:
+            "-DU_DISABLE_RENAMING=0",
+            "-DU_DISABLE_VERSION_SUFFIX=1",
+            "-DU_HAVE_LIB_SUFFIX=1",
+            "-DU_LIB_SUFFIX_C_NAME=_skiko",
+        )
+    }
 
     val perOs = when (os) {
         OS.MacOS -> listOf(
@@ -134,7 +144,7 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
         )
     }
 
-    return (base + perOs).toTypedArray()
+    return (base + unicodeBackend + perOs).toTypedArray()
 }
 
 fun Project.configureSignAndPublishDependencies() {
