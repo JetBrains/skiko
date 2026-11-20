@@ -33,7 +33,9 @@ class BreakIteratorTests {
             assertTrue(boundary.isBoundary(0))
             assertTrue(boundary.isBoundary(12))
             assertEquals(BreakIterator.DONE, boundary.following(12))
+            assertEquals(12, boundary.current())
             assertEquals(BreakIterator.DONE, boundary.preceding(0))
+            assertEquals(0, boundary.current())
         }
     }
 
@@ -52,8 +54,7 @@ class BreakIteratorTests {
         val boundariesList = listOf(1, 3, 4, 6, 8, 10, 11, 12, 20, 21, 32, 33, 40)
         assertContentEquals(boundariesList, boundary.asSequence().toList())
         assertEquals(-1, boundary.next())
-
-        //todo check what happens if we will continue with next() after -1
+        assertEquals(40, boundary.current())
 
         assertEquals(0, boundary.first())
         assertEquals(40, boundary.last())

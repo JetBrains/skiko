@@ -47,7 +47,15 @@ SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nCurrent
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nNext
   (KNativePointer ptr) {
-    return toBreakIterator(ptr)->next();
+    SkBreakIterator* instance = toBreakIterator(ptr);
+    SkBreakIterator::Position result = instance->next();
+    if (result == SkBreakIterator::kDone) {
+        // The Apple backend leaves its index past the last break when iteration is done. Move it
+        // back to the last boundary, like ICU, where the position stays valid when DONE is
+        // returned.
+        instance->last();
+    }
+    return result;
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nPrevious
