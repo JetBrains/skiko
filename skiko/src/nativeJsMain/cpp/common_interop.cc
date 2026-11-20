@@ -1,4 +1,5 @@
 #include "common.h"
+#include "SkikoUnicode.hh"
 #include "src/core/SkUTF.h"
 #include "include/core/SkImageInfo.h"
 #include "TextStyle.h"
@@ -88,26 +89,17 @@ namespace skija {
             }
         }
 
-        std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text) {
-            UErrorCode status = U_ZERO_ERROR;
-            ICUUText utext(utext_openUTF8(nullptr, text.c_str(), text.size(), &status));
-            if (U_FAILURE(status)) {
-                SkDEBUGF("utext_openUTF8 error: %s", u_errorName(status));
+        std::shared_ptr<SkBreakIterator> graphemeBreakIterator(SkString& text) {
+            sk_sp<SkUnicode> unicode = skiko::BestAvailableUnicode();
+            std::shared_ptr<SkBreakIterator> graphemeIter =
+                    unicode->makeBreakIterator(SkUnicode::BreakType::kGraphemes);
+            if (!graphemeIter) {
+                SkDEBUGF("grapheme break iterator creation error");
                 return nullptr;
             }
 
-            std::shared_ptr<UBreakIterator> graphemeIter(
-                ubrk_open(static_cast<UBreakIteratorType>(UBreakIteratorType::UBRK_CHARACTER), uloc_getDefault(), nullptr, 0, &status),
-                [](UBreakIterator* p) { ubrk_close(p); }
-            );
-            if (U_FAILURE(status)) {
-                SkDEBUGF("ubrk_open error: %s", u_errorName(status));
-                return nullptr;
-            }
-
-            ubrk_setUText(graphemeIter.get(), utext.get(), &status);
-            if (U_FAILURE(status)) {
-                SkDEBUGF("ubrk_setUText error: %s", u_errorName(status));
+            if (!graphemeIter->setText(text.c_str(), text.size())) {
+                SkDEBUGF("graphemeBreakIterator setText error");
                 return nullptr;
             }
 

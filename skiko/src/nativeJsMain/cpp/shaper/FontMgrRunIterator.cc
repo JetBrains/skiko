@@ -12,7 +12,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
     sk_sp<SkFontMgr> fontMgr = fontMgrPtr == nullptr
       ? SkFontMgrSkikoDefault()
       : sk_ref_sp(reinterpret_cast<SkFontMgr*>(fontMgrPtr));
-    std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(*text);
+    std::shared_ptr<SkBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(*text);
     if (!graphemeIter) return nullptr;
 
 

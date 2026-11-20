@@ -2,7 +2,7 @@
 #include <jni.h>
 #include <string>
 #include "../interop.hh"
-#include "modules/skunicode/include/SkUnicode_icu.h"
+#include "SkikoUnicode.hh"
 #include "ParagraphBuilder.h"
 
 using namespace std;
@@ -19,7 +19,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphBu
     ParagraphBuilder* instance = ParagraphBuilder::make(
         *paragraphStyle,
         sk_ref_sp(fontCollection),
-        SkUnicodes::ICU::Make()
+        skiko::BestAvailableUnicode()
     ).release();
     return reinterpret_cast<jlong>(instance);
 }

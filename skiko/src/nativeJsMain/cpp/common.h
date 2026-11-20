@@ -23,8 +23,7 @@
 #include "TextStyle.h"
 #include "SkFont.h"
 #include "SkShaper.h"
-#include "SkLoadICU.h"
-#include "unicode/ubrk.h"
+#include "SkUnicode.h"
 #include "mppinterop.h"
 
 #include "types.h"
@@ -91,8 +90,7 @@ namespace skija {
             std::vector<SkShaper::Feature> getFeaturesFromIntsArray(KInt* featuresArray, KInt featuresLen);
         }
 
-        using ICUUText = std::unique_ptr<UText, SkFunctionObject<utext_close>>;
-        std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text);
+        std::shared_ptr<SkBreakIterator> graphemeBreakIterator(SkString& text);
     }
 
     namespace AnimationFrameInfo {

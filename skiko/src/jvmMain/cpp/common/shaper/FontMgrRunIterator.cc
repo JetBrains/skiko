@@ -13,7 +13,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_FontMgrRunIter
     sk_sp<SkFontMgr> fontMgr = fontMgrPtr == nullptr
       ? SkFontMgrSkikoDefault()
       : sk_ref_sp(reinterpret_cast<SkFontMgr*>(skija::impl::Native::fromJava(env, fontMgrPtr, skija::FontMgr::cls)));
-    std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(*text);
+    std::shared_ptr<SkBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(*text);
     if (!graphemeIter) return 0;
 
     bool approximatePunctuation = (optsBooleanProps & 0x01) != 0;

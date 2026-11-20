@@ -1,9 +1,32 @@
 #include <jni.h>
 #include "interop.hh"
-#include "unicode/ubrk.h"
+#include "SkikoUnicode.hh"
 
-static void deleteBreakIterator(UBreakIterator* instance) {
-  ubrk_close(instance);
+static void deleteBreakIterator(SkBreakIterator* instance) {
+    delete instance;
+}
+
+static SkUnicode::BreakType toBreakType(jint type) {
+    // Must match org.jetbrains.skia.BreakIterator.make*Instance
+    switch (type) {
+        case 0: return SkUnicode::BreakType::kGraphemes;
+        case 1: return SkUnicode::BreakType::kWords;
+        case 2: return SkUnicode::BreakType::kLines;
+        case 3: return SkUnicode::BreakType::kSentences;
+        default: SkUNREACHABLE;
+    }
+}
+
+static std::unique_ptr<SkBreakIterator> makeBreakIterator(jint type, const char* locale) {
+    sk_sp<SkUnicode> unicode = skiko::BestAvailableUnicode();
+    if (!unicode) {
+        return nullptr;
+    }
+    return unicode->makeBreakIterator(locale, toBreakType(type));
+}
+
+static SkBreakIterator* toBreakIterator(jlong ptr) {
+    return reinterpret_cast<SkBreakIterator*>(ptr);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt_BreakIterator_1nGetFinalizer(JNIEnv* env, jclass jclass) {
@@ -11,110 +34,63 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt_Break
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nMake
-  (JNIEnv* env, jclass jclass, jint type, jstring localeStr, jintArray errorCode) {
-    UErrorCode errorCodes[1] = { U_ZERO_ERROR };
-    UBreakIterator* instance;
-    if (localeStr == nullptr)
-      instance = ubrk_open(static_cast<UBreakIteratorType>(type), uloc_getDefault(), nullptr, 0, errorCodes);
-    else {
-      SkString locale = skString(env, localeStr);
-      instance = ubrk_open(static_cast<UBreakIteratorType>(type), locale.c_str(), nullptr, 0, errorCodes);
-    }
-
-    env->SetIntArrayRegion(errorCode, 0, 1, reinterpret_cast<jint*>(errorCodes));
-
-    if (U_FAILURE(errorCodes[0])) {
-      return 0;
-    } else
-      return reinterpret_cast<jlong>(instance);
+  (JNIEnv* env, jclass jclass, jint type, jstring localeStr) {
+    SkString locale = localeStr == nullptr ? SkString() : skString(env, localeStr);
+    std::unique_ptr<SkBreakIterator> instance =
+        makeBreakIterator(type, locale.isEmpty() ? nullptr : locale.c_str());
+    return reinterpret_cast<jlong>(instance.release());
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nCurrent
   (JNIEnv* env, jclass jclass, jlong ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    return ubrk_current(instance);
+    return toBreakIterator(ptr)->current();
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nNext
   (JNIEnv* env, jclass jclass, jlong ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    return ubrk_next(instance);
+    return toBreakIterator(ptr)->next();
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nPrevious
   (JNIEnv* env, jclass jclass, jlong ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    return ubrk_previous(instance);
+    return toBreakIterator(ptr)->previous();
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nFirst
   (JNIEnv* env, jclass jclass, jlong ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    return ubrk_first(instance);
+    return toBreakIterator(ptr)->first();
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nLast
   (JNIEnv* env, jclass jclass, jlong ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    return ubrk_last(instance);
+    return toBreakIterator(ptr)->last();
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nPreceding
   (JNIEnv* env, jclass jclass, jlong ptr, jint offset) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    return ubrk_preceding(instance, offset);
+    return toBreakIterator(ptr)->preceding(offset);
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nFollowing
   (JNIEnv* env, jclass jclass, jlong ptr, jint offset) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    return ubrk_following(instance, offset);
+    return toBreakIterator(ptr)->following(offset);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nIsBoundary
   (JNIEnv* env, jclass jclass, jlong ptr, jint offset) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    return ubrk_isBoundary(instance, offset);
-}
-
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGetRuleStatus
-  (JNIEnv* env, jclass jclass, jlong ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    return ubrk_getRuleStatus(instance);
-}
-
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGetRuleStatusesLen
-  (JNIEnv* env, jclass jclass, jlong ptr) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    UErrorCode status = U_ZERO_ERROR;
-    int32_t len = ubrk_getRuleStatusVec(instance, nullptr, 0, &status);
-    if (status != U_BUFFER_OVERFLOW_ERROR && U_FAILURE(status))
-      env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
-    return len;
-}
-
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGetRuleStatuses
-  (JNIEnv* env, jclass jclass, jlong ptr, jintArray result, jint len) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    UErrorCode status = U_ZERO_ERROR;
-    std::vector<jint> statuses(len);
-    ubrk_getRuleStatusVec(instance, reinterpret_cast<int32_t*>(statuses.data()), len, &status);
-    if (U_FAILURE(status))
-      env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
-    env->SetIntArrayRegion(result, 0, len, statuses.data());
+    return toBreakIterator(ptr)->isBoundary(offset);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nSetText
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray textArr, jint len, jintArray errorCode) {
-    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-
-    std::vector<jshort>* text = new std::vector<jshort>(len);
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray textArr, jint len) {
+    SkBreakIterator* instance = toBreakIterator(ptr);
+    // The buffer must stay alive while the iterator is used: ICU's UText reads it lazily.
+    // Kotlin keeps it alive in org.jetbrains.skia.U16String and frees it on the next setText
+    // or on close.
+    auto text = std::make_unique<std::vector<jshort>>(len);
     env->GetShortArrayRegion(textArr, 0, len, text->data());
-
-    UErrorCode errorCodes[1] = { U_ZERO_ERROR };
-    ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), len, errorCodes);
-
-    env->SetIntArrayRegion(errorCode, 0, 1, reinterpret_cast<jint*>(errorCodes));
-
-    return reinterpret_cast<jlong>(text);
+    if (!instance->setText(reinterpret_cast<const char16_t*>(text->data()), len)) {
+        return 0;
+    }
+    return reinterpret_cast<jlong>(text.release());
 }

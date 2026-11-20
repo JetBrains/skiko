@@ -1,12 +1,10 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
-import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.withResult
 
 /**
  *
@@ -182,15 +180,6 @@ import org.jetbrains.skia.impl.withResult
  * }
  * }
 </pre> *
- * The iterator returned by [.makeWordInstance] is unique in that
- * the break positions it returns don't represent both the start and end of the
- * thing being iterated over.  That is, a sentence-break iterator returns breaks
- * that each represent the end of one sentence and the beginning of the next.
- * With the word-break iterator, the characters between two boundaries might be a
- * word, or they might be the punctuation or whitespace between two words.  The
- * above code uses [.getRuleStatus] to identify and ignore boundaries associated
- * with punctuation or other non-word characters.
-</blockquote> *
  */
 class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -201,57 +190,6 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         const val DONE = -1
 
         /**
-         * Tag value for "words" that do not fit into any of other categories.
-         * Includes spaces and most punctuation.
-         */
-        const val WORD_NONE = 0
-
-        /**
-         * Upper bound for tags for uncategorized words.
-         */
-        const val WORD_NONE_LIMIT = 100
-
-        /**
-         * Tag value for words that appear to be numbers, lower limit.
-         */
-        const val WORD_NUMBER = 100
-
-        /**
-         * Tag value for words that appear to be numbers, upper limit.
-         */
-        const val WORD_NUMBER_LIMIT = 200
-
-        /**
-         * Tag value for words that contain letters, excluding
-         * hiragana, katakana or ideographic characters, lower limit.
-         */
-        const val WORD_LETTER = 200
-
-        /**
-         * Tag value for words containing letters, upper limit
-         */
-        const val WORD_LETTER_LIMIT = 300
-
-        /**
-         * Tag value for words containing kana characters, lower limit
-         */
-        const val WORD_KANA = 300
-
-        /**
-         * Tag value for words containing kana characters, upper limit
-         */
-        const val WORD_KANA_LIMIT = 400
-
-        /**
-         * Tag value for words containing ideographic characters, lower limit
-         */
-        const val WORD_IDEO = 400
-
-        /**
-         * Tag value for words containing ideographic characters, upper limit
-         */
-        const val WORD_IDEO_LIMIT = 500
-        /**
          * Returns a new BreakIterator instance for character breaks for the given locale.
          */
         /**
@@ -259,7 +197,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard("Failed to create character iterator") { _nMake(0, toInterop(locale), it)  }) // UBRK_CHARACTER
+            return make(0, locale, "character")
         }
         /**
          * Returns a new BreakIterator instance for word breaks for the given locale.
@@ -269,7 +207,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard("Failed to create word iterator") { _nMake(1, toInterop(locale), it) }) // UBRK_WORD
+            return make(1, locale, "word")
         }
         /**
          * Returns a new BreakIterator instance for line breaks for the given locale.
@@ -279,7 +217,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard("Failed to create line iterator")  { _nMake(2, toInterop(locale), it) }) // UBRK_LINE
+            return make(2, locale, "line")
         }
         /**
          * Returns a new BreakIterator instance for sentence breaks for the given locale.
@@ -289,9 +227,13 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard("Failed to create sentence iterator")  {
-                _nMake(3, toInterop(locale), it)
-            }) // UBRK_SENTENCE
+            return make(3, locale, "sentence")
+        }
+
+        private fun make(type: Int, locale: String?, kind: String): BreakIterator {
+            val ptr = interopScope { _nMake(type, toInterop(locale)) }
+            if (ptr == NullPointer) throw IllegalArgumentException("Failed to create $kind iterator")
+            return BreakIterator(ptr)
         }
 
         init {
@@ -454,61 +396,22 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 
     /**
-     * For rule-based BreakIterators, return the status tag from the
-     * break rule that determined the boundary at the current iteration position.
-     *
-     *
-     * For break iterator types that do not support a rule status,
-     * a default value of 0 is returned.
-     *
-     *
-     * @return The status from the break rule that determined the boundary
-     * at the current iteration position.
-     */
-    val ruleStatus: Int
-        get() = try {
-            Stats.onNativeCall()
-            _nGetRuleStatus(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-
-    /**
-     * For RuleBasedBreakIterators, get the status (tag) values from the break rule(s)
-     * that determined the the boundary at the current iteration position.
-     *
-     *
-     * For break iterator types that do not support rule status,
-     * no values are returned.
-     *
-     * @return  an array with the status values.
-     */
-    val ruleStatuses: IntArray
-        get() = try {
-            Stats.onNativeCall()
-            val arrayLen = _nGetRuleStatusesLen(_ptr)
-            withResult(IntArray(arrayLen)) { result ->
-                _nGetRuleStatuses(_ptr, result, arrayLen)
-            }
-        } finally {
-            reachabilityBarrier(this)
-        }
-
-    /**
      * Set a new text string to be scanned. The current scan position is reset to [].
      */
     fun setText(text: String?) {
         try {
             Stats.onNativeCall()
             _text?.close()
-            _text = U16String(withErrorGuard("Failed to setText") {
+            _text = null
+            val textPtr = interopScope {
                 _nSetText(
                     _ptr,
                     toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }),
-                    text?.length ?: 0,
-                    it
+                    text?.length ?: 0
                 )
-            })
+            }
+            if (textPtr == NullPointer) throw RuntimeException("Failed to setText")
+            _text = U16String(textPtr)
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(_text)
@@ -520,22 +423,6 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 }
 
-private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer) -> NativePointer): NativePointer {
-    val errorCode = IntArray(1)
-    return interopScope {
-        val handle = toInterop(errorCode)
-        val res = block.invoke(this, handle)
-        handle.fromInterop(errorCode)
-        if (errorCode[0] > 0) {
-            throw RuntimeException("$message; operation failed with status ${errorCode}")
-        }
-        if (res == NullPointer) {
-            throw IllegalArgumentException(message)
-        }
-        res
-    }
-}
-
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
 // No ForceNativeThreadState: returns the function that frees the object, without calling it, so it is short and cannot
 // block.
@@ -543,11 +430,11 @@ private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer)
 private external fun BreakIterator_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
-// Needs ForceNativeThreadState: loads ICU break rules and dictionaries under a lock that all threads share, so it can
-// wait for another thread.
-// Native call path: ubrk_open -> BreakIterator::createInstance -> makeInstance
+// Needs ForceNativeThreadState: creates the break iterator, which loads break rules and dictionaries under a shared
+// lock on ICU targets, and can wait for another thread.
+// Native call path: SkUnicode::makeBreakIterator -> SkIcuBreakIteratorCache::makeBreakIterator -> ubrk_open
 @ForceNativeThreadState
-private external fun _nMake(type: Int, locale: InteropPointer, errorCode: InteropPointer): NativePointer
+private external fun _nMake(type: Int, locale: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nCurrent")
 // No ForceNativeThreadState: returns the stored current position, so it is short and cannot block.
@@ -602,26 +489,9 @@ private external fun _nFollowing(ptr: NativePointer, offset: Int): Int
 @ForceNativeThreadState
 private external fun _nIsBoundary(ptr: NativePointer, offset: Int): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatus")
-// No ForceNativeThreadState: reads two values from the compiled rule status table, so it is short and cannot block.
-// Native call path: ubrk_getRuleStatus -> RuleBasedBreakIterator::getRuleStatus
-private external fun _nGetRuleStatus(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen")
-// No ForceNativeThreadState: reads the count of rule statuses from the table without copying any, so it is short and
-// cannot block.
-// Native call path: ubrk_getRuleStatusVec -> RuleBasedBreakIterator::getRuleStatusVec
-private external fun _nGetRuleStatusesLen(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatuses")
-// Needs ForceNativeThreadState: copies one value per rule status, so its time grows with the status count.
-// Native call path: ubrk_getRuleStatusVec -> RuleBasedBreakIterator::getRuleStatusVec
-@ForceNativeThreadState
-private external fun _nGetRuleStatuses(ptr: NativePointer, result: InteropPointer, len: Int)
-
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
-// Needs ForceNativeThreadState: copies the whole text into a new vector, then resets caches and finds the first break,
-// so its time grows with the text length.
-// Native call path: std::vector::vector -> ubrk_setText -> RuleBasedBreakIterator::first
+// Needs ForceNativeThreadState: copies the whole text into a new vector, then resets iterator caches and computes the
+// first break, so its time grows with the text length.
+// Native call path: std::vector::vector -> SkBreakIterator::setText -> SkBreakIterator_icu::setText
 @ForceNativeThreadState
-private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int, errorCode: InteropPointer): NativePointer
+private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int): NativePointer
