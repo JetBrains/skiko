@@ -10,6 +10,7 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByName
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -18,6 +19,7 @@ import org.jetbrains.skiko.build.context.SkikoModuleKind
 import org.jetbrains.skiko.build.context.SkikoProjectContext
 import org.jetbrains.skiko.build.context.registerOrGetSkiaDirProvider
 import org.jetbrains.skiko.build.cpp.CompileSkikoCppTask
+import org.jetbrains.skiko.build.cpp.MergeStaticArchivesTask
 import org.jetbrains.skiko.build.cpp.PatchSkiaSymbolsTask
 import org.jetbrains.skiko.build.cpp.WriteCInteropDefFile
 import org.jetbrains.skiko.build.symbols.HideSkiaSymbolsTask
@@ -293,7 +295,14 @@ fun SkikoProjectContext.configureNativeTarget(
 
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val resolvedBinaryInputs = resolveBinaryInputs(os, arch, TargetEnv.NATIVE, skiaBinDir)
-    val nativeArchives = resolvedBinaryInputs.staticArchivePaths.distinct()
+    val mergedArchive = layout.buildDirectory.file("mergedSkiaArchives/$targetString/libskia_static.a")
+    val mergeArchivesTask = project.tasks.register<MergeStaticArchivesTask>("mergeSkiaArchives$targetString") {
+        dependsOn(unzipper)
+        targetOs.set(os)
+        archives.set(resolvedBinaryInputs.staticArchivePaths.distinct().map(::File))
+        output.set(mergedArchive)
+    }
+    val nativeArchives = listOf(mergedArchive.get().asFile.absolutePath)
     val allLibraries = if (requiresSymbolPatching) {
         nativeArchives.map { lib ->
             "${patchedLibsDir.absolutePath}/${File(lib).name}"
@@ -440,6 +449,7 @@ fun SkikoProjectContext.configureNativeTarget(
         }
         project.registerSkikoTask<PatchSkiaSymbolsTask>(patchActionName, os, arch) {
             dependsOn(unzipper)
+            dependsOn(mergeArchivesTask)
             dependsOn(linkTask)
             if (coreSymbolSources != null) {
                 dependsOn(coreSymbolSources)
@@ -459,6 +469,7 @@ fun SkikoProjectContext.configureNativeTarget(
 
     hideSkiaSymbols.configure {
         dependsOn(unzipper)
+        dependsOn(mergeArchivesTask)
         dependsOn(compilationDependency)
     }
 
