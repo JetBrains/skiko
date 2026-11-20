@@ -1,5 +1,10 @@
 package org.jetbrains.skiko.benchmarks.cases.image
 
+/**
+ * Takes a surface snapshot and encodes it to PNG format repeatedly.
+ * Measures image encoding throughput including pixel readback.
+ */
+
 import org.jetbrains.skia.EncodedImageFormat
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Data

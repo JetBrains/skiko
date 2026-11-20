@@ -1,5 +1,10 @@
 package org.jetbrains.skiko.benchmarks.cases.image
 
+/**
+ * Draws a scaled image onto the canvas with bilinear sampling.
+ * Measures image resampling and pixel transfer performance.
+ */
+
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PaintMode

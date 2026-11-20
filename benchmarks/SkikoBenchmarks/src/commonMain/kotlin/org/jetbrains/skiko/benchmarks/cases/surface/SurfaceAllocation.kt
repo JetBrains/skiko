@@ -1,5 +1,10 @@
 package org.jetbrains.skiko.benchmarks.cases.surface
 
+/**
+ * Allocates and clears 256×256 raster surfaces repeatedly.
+ * Measures surface creation and backing memory allocation overhead.
+ */
+
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.benchmarks.BenchmarkCase

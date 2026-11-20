@@ -1,5 +1,10 @@
 package org.jetbrains.skiko.benchmarks.cases.drawing
 
+/**
+ * Draws rectangles with nested clip regions and matrix transforms.
+ * Measures canvas state save/restore and clipped drawing overhead.
+ */
+
 import org.jetbrains.skia.ClipMode
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PaintMode
