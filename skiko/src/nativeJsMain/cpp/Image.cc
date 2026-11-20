@@ -111,6 +111,19 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeShader
     return reinterpret_cast<KNativePointer>(shader.release());
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRawShader
+  (KNativePointer ptr, KInt tmx, KInt tmy, KInt samplingModeVal1, KInt samplingModeVal2, KFloat* localMatrixArr) {
+    SkImage* instance = reinterpret_cast<SkImage*>(ptr);
+    std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
+    sk_sp<SkShader> shader = instance->makeRawShader(
+        static_cast<SkTileMode>(tmx),
+        static_cast<SkTileMode>(tmy),
+        skija::SamplingMode::unpackFrom2Ints(samplingModeVal1, samplingModeVal2),
+        localMatrix.get()
+    );
+    return reinterpret_cast<KNativePointer>(shader.release());
+}
+
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nPeekPixels
   (KNativePointer ptr) {
   SkImage* instance = reinterpret_cast<SkImage*>(ptr);
