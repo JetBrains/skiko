@@ -23,6 +23,49 @@ class ShaperTest {
         Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
 
     @Test
+    fun shapedTextRemainsValidAfterClosingItsShaper() = runTest {
+        fontInter36().use { font ->
+            val shaper = Shaper.makeShapeDontWrapOrReorder()
+            val line = shaper.shapeLine("text", font)
+            val blob = assertNotNull(shaper.shape("text", font))
+            shaper.close()
+            line.use {
+                assertContentEquals(shortArrayOf(882, 611, 943, 882), it.glyphs)
+                assertTrue(it.width > 0f)
+            }
+            blob.use {
+                assertContentEquals(shortArrayOf(882, 611, 943, 882), it.glyphs)
+            }
+            Shaper.makeShapeDontWrapOrReorder().use { replacement ->
+                replacement.shapeLine("text", font).use {
+                    assertContentEquals(shortArrayOf(882, 611, 943, 882), it.glyphs)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun shortLivedShapersProduceConsistentLinesAndBlobs() = runTest {
+        fontInter36().use { font ->
+            val expectedGlyphs = shortArrayOf(882, 611, 943, 882)
+            var expectedWidth: Float? = null
+            repeat(20) {
+                Shaper.makeShapeDontWrapOrReorder().use { shaper ->
+                    shaper.shapeLine("text", font).use { line ->
+                        assertContentEquals(expectedGlyphs, line.glyphs)
+                        assertTrue(line.width > 0f)
+                        expectedWidth?.let { assertEquals(it, line.width) }
+                        expectedWidth = line.width
+                    }
+                    assertNotNull(shaper.shape("text", font)).use { blob ->
+                        assertContentEquals(expectedGlyphs, blob.glyphs)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun canShapeWithDifferentFactories() = runTest {
         fontInter36().use { font ->
             val factories = listOf<() -> Shaper>(
