@@ -37,15 +37,12 @@ internal class ImportGeneratorExtension(
             writer.appendLine("const booleanSymbols = ${importGenerator.getBooleanExportSymbols().serializeAsJsSet()}")
             writer.appendLine("let api = new Proxy(Object.create(null), { get(obj, propName) { return () => {}}});")
             writer.appendLine("""
-                for (const sym of exportSymbols) { 
-                    globalThis.__SKIKO__[sym] = (...a) => api[sym](...a)
-                }
-                
                 awaitSkiko.then((module) => {
                     api = {};
                     for (const sym of exportSymbols) {
                         const raw = module['_' + sym];
                         api[sym] = booleanSymbols.has(sym) ? (...a) => !!raw(...a) : raw;
+                        globalThis.__SKIKO__[sym] = (...a) => api[sym](...a)
                     }
                 })
             """.trimIndent())
