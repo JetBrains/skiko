@@ -331,7 +331,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             baseFrequencyY: Float,
             numOctaves: Int,
             seed: Float,
-            tileSize: ISize = ISize.makeEmpty()
+            tileSize: ISize = ISize.ZERO
         ): Shader {
             return try {
                 Stats.onNativeCall()
@@ -350,7 +350,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             baseFrequencyY: Float,
             numOctaves: Int,
             seed: Float,
-            tileSize: ISize = ISize.makeEmpty()
+            tileSize: ISize = ISize.ZERO
         ): Shader {
             return try {
                 Stats.onNativeCall()

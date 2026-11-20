@@ -1,6 +1,19 @@
 package org.jetbrains.skia
 
-class IPoint(val x: Int, val y: Int) {
+import org.jetbrains.skiko.internal.packInts
+import org.jetbrains.skiko.internal.unpackInt1
+import org.jetbrains.skiko.internal.unpackInt2
+import kotlin.jvm.JvmInline
+
+inline fun IPoint(x: Int, y: Int): IPoint = IPoint(packInts(x, y))
+@JvmInline
+value class IPoint(val packedValue: Long) {
+
+    inline val x: Int
+        get() = unpackInt1(packedValue)
+
+    inline val y: Int
+        get() = unpackInt2(packedValue)
 
     fun offset(dx: Int, dy: Int): IPoint {
         return IPoint(x + dx, y + dy)
@@ -13,28 +26,12 @@ class IPoint(val x: Int, val y: Int) {
     val isEmpty: Boolean
         get() = x <= 0 || y <= 0
 
-    override fun equals(other: Any?): Boolean {
-        if (other === this) return true
-        if (other !is IPoint) return false
-        if (x != other.x) return false
-        return y == other.y
-    }
-
-    override fun hashCode(): Int {
-        val PRIME = 59
-        var result = 1
-        result = result * PRIME + x
-        result = result * PRIME + y
-        return result
-    }
-
     override fun toString(): String {
-        return "IPoint(_x=$x, _y=$y)"
+        return "IPoint(x=$x, y=$y)"
     }
 
     companion object {
-        val ZERO = IPoint(0, 0)
+        val ZERO: Point
+            get() = Point(0x0L)
     }
 }
-
-fun toIPoint(p: Long): IPoint = IPoint((p ushr 32).toInt(), (p and -1).toInt())

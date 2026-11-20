@@ -5,8 +5,20 @@ import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withNullableResult
 import org.jetbrains.skia.impl.withResult
 import org.jetbrains.skiko.InternalSkikoApi
+import org.jetbrains.skiko.internal.UnspecifiedPackedFloats
+import org.jetbrains.skiko.internal.packFloats
+import org.jetbrains.skiko.internal.unpackFloat1
+import org.jetbrains.skiko.internal.unpackFloat2
 
-class Point(val x: Float, val y: Float) {
+inline fun Point(x: Float, y: Float): Point = Point(packFloats(x, y))
+
+@kotlin.jvm.JvmInline
+value class Point(val packedValue: Long) {
+    inline val x: Float
+        get() = unpackFloat1(packedValue)
+
+    inline val y: Float
+        get() = unpackFloat2(packedValue)
 
     fun offset(dx: Float, dy: Float): Point {
         return Point(x + dx, y + dy)
@@ -27,27 +39,17 @@ class Point(val x: Float, val y: Float) {
     val isEmpty: Boolean
         get() = x <= 0 || y <= 0
 
-    override fun equals(other: Any?): Boolean {
-        if (other === this) return true
-        if (other !is Point) return false
-        if (x.compareTo(other.x) != 0) return false
-        return y.compareTo(other.y) == 0
-    }
-
-    override fun hashCode(): Int {
-        val PRIME = 59
-        var result = 1
-        result = result * PRIME + x.toBits()
-        result = result * PRIME + y.toBits()
-        return result
-    }
-
     override fun toString(): String {
-        return "Point(_x=$x, _y=$y)"
+        return "Point(x=$x, y=$y)"
     }
 
     companion object {
-        val ZERO = Point(0f, 0f)
+        val ZERO: Point
+            get() = Point(0x0L)
+
+        val Unspecified: Point
+            get() = Point(UnspecifiedPackedFloats)
+
         fun flattenArray(pts: Array<Point>?): FloatArray? {
             if (pts == null) return null
             val arr = FloatArray(pts.size * 2)
