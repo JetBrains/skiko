@@ -36,6 +36,30 @@ internal class ImportGeneratorExtension(
             writer.appendLine("const exportSymbols = ${importGenerator.getExportSymbols().get(moduleName)!!.serializeAsJsSet()};")
             writer.appendLine("const booleanSymbols = ${importGenerator.getBooleanExportSymbols().serializeAsJsSet()}")
             writer.appendLine("let api = new Proxy(Object.create(null), { get(obj, propName) { return () => {}}});")
+
+            importGenerator.getExportSymbols().flatMap { it.value }.forEach { exportSymbol ->
+                    writer.appendLine("export let $exportSymbol")
+            }
+
+            writer.appendLine("awaitSkiko.then((module) => {")
+            importGenerator.getExportSymbols().flatMap { it.value }.forEach { exportSymbol ->
+                writer.appendLine("$exportSymbol = module['_$exportSymbol']")
+            }
+            writer.appendLine("})")
+
+            writer.appendLine("console.log('MODULE NAME', '$moduleName')")
+
+            writer.appendLine("""
+                const origInstantiateStreaming = WebAssembly.instantiateStreaming;
+                WebAssembly.instantiateStreaming = function (source, importObject) {
+                  if (importObject['./$moduleName.mjs']) {
+                        console.log('IMPORT OBJECT MODULE !!!', importObject['./$moduleName.mjs']) 
+                        return awaitSkiko.then(() => origInstantiateStreaming.call(WebAssembly, source, importObject));
+                  }
+                  return origInstantiateStreaming.call(WebAssembly, source, importObject);
+                };
+            """.trimIndent())
+
             writer.appendLine("""
                 for (const sym of exportSymbols) { 
                     globalThis.__SKIKO__[sym] = (...a) => api[sym](...a)
@@ -57,6 +81,10 @@ internal class ImportGeneratorExtension(
         reexportFile.parentFile.mkdirs()
 
         reexportFile.writer().use { writer ->
+            writer.appendLine("import * as api from './skiko.mjs';")
+            writer.appendLine("console.log('api', api);")
+            writer.appendLine("console.log('ping', api.org_jetbrains_skia_DirectContext__1nGetResourceCacheLimit);")
+
             if (moduleName != "skiko") {
                 writer.appendLine("export {isSideModuleLoaded} from './$moduleName.mjs';")
             }
