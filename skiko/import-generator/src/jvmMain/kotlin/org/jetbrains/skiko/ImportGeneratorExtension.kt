@@ -81,10 +81,6 @@ internal class ImportGeneratorExtension(
         reexportFile.parentFile.mkdirs()
 
         reexportFile.writer().use { writer ->
-            writer.appendLine("import * as api from './skiko.mjs';")
-            writer.appendLine("console.log('api', api);")
-            writer.appendLine("console.log('ping', api.org_jetbrains_skia_DirectContext__1nGetResourceCacheLimit);")
-
             if (moduleName != "skiko") {
                 writer.appendLine("export {isSideModuleLoaded} from './$moduleName.mjs';")
             }
