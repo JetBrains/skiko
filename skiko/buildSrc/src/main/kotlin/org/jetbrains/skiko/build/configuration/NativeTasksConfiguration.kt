@@ -218,17 +218,17 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                     val armToolchainSysroot = file("/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc")
                     if (armToolchainSysroot.exists()) {
                         linuxFlags.add(0, "--sysroot=${armToolchainSysroot.absolutePath}")
-                    } else {
-                        // Distro cross toolchain (e.g. Ubuntu g++-aarch64-linux-gnu): libc comes
-                        // from the toolchain's own sysroot; arch-neutral X11/GL/fontconfig headers
-                        // are taken from the host after the sysroot search paths.
-                        linuxFlags.add("-idirafter /usr/include")
                     }
+                    // libc comes from the toolchain sysroot. Arch-neutral headers that the
+                    // sysroot does not contain (for example EGL/egl.h, which the skiko-ganesh
+                    // DirectContext.cc includes) come from the host after the sysroot search paths.
+                    linuxFlags.add("-idirafter /usr/include")
                 }
                 flags.set(linuxFlags)
             }
             else -> throw GradleException("$os not yet supported")
         }
+        flags.addAll(compilerFlags(os, arch, TargetEnv.NATIVE))
 
         val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
@@ -362,29 +362,6 @@ fun configureWaylandEglCinterop(
     }
 }
 
-fun configureLinkerManifest(
-    os: OS,
-    arch: Arch,
-    target: KotlinNativeTarget,
-    targetString: String,
-    linkerOpts: List<String>,
-) {
-    val tasks = target.project.tasks
-    val taskNameSuffix = joinToTitleCamelCase(os.idWithSuffix(isUikitSim = target.isUikitSimulator()), arch.id)
-    val writeLinkerManifest = tasks.register("writeLinkerManifest$taskNameSuffix", WriteCInteropDefFile::class.java) {
-        this.linkerOpts.set(linkerOpts)
-        outputFile.set(project.layout.buildDirectory.file("linkerManifest/$targetString/linker.properties"))
-    }
-    val manifest = writeLinkerManifest.flatMap { it.outputFile }
-    target.compilations.getByName("main") {
-        compileTaskProvider.configure {
-            compilerOptions.freeCompilerArgs.addAll(manifest.map { listOf("-manifest", it.asFile.absolutePath) })
-            dependsOn(writeLinkerManifest)
-            inputs.file(manifest)
-        }
-    }
-}
-
 fun SkikoProjectContext.configureNativeTarget(
     os: OS,
     arch: Arch,
@@ -508,7 +485,7 @@ fun SkikoProjectContext.configureNativeTarget(
                 options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
                 options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
             }
-            configureLinkerManifest(os, arch, target, targetString,
+            configureCinterop(cinteropName, os, arch, target, targetString,
                 options + resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
             options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })

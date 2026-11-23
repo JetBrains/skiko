@@ -16,8 +16,10 @@ dokka {
 
 dependencies {
     dokka(project(":"))
+    dokka(project(":skiko-ganesh"))
     rootProject.findProject(":skiko-graphite")?.let {
         dokka(it)
     }
+    dokka(project(":skiko-platform"))
     dokka(project(":skiko-skottie"))
 }

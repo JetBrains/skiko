@@ -22,6 +22,8 @@ dependencyResolutionManagement {
         create("libs") {
             version("skiko", providers.gradleProperty("skiko.version").get())
             library("skiko", "org.jetbrains.skiko", "skiko").versionRef("skiko")
+            library("skiko-ganesh", "org.jetbrains.skiko", "skiko-ganesh").versionRef("skiko")
+            library("skiko-platform", "org.jetbrains.skiko", "skiko-platform").versionRef("skiko")
 
             val osName = System.getProperty("os.name")
             val hostOs = when {
@@ -39,6 +41,8 @@ dependencyResolutionManagement {
             }
 
             library("skiko-awt-runtime", "org.jetbrains.skiko", "skiko-awt-runtime-$hostOs-$hostArch").versionRef("skiko")
+            library("skiko-ganesh-awt-runtime", "org.jetbrains.skiko", "skiko-ganesh-awt-runtime-$hostOs-$hostArch").versionRef("skiko")
+            library("skiko-platform-awt-runtime", "org.jetbrains.skiko", "skiko-platform-awt-runtime-$hostOs-$hostArch").versionRef("skiko")
         }
     }
 }
@@ -54,6 +58,8 @@ if (extra.properties.getOrDefault("skiko.composite.build", "") == "1") {
     includeBuild("../../skiko") {
         dependencySubstitution {
             substitute(module("org.jetbrains.skiko:skiko")).using(project(":"))
+            substitute(module("org.jetbrains.skiko:skiko-ganesh")).using(project(":skiko-ganesh"))
+            substitute(module("org.jetbrains.skiko:skiko-platform")).using(project(":skiko-platform"))
         }
     }
 }

@@ -1,7 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
-import org.jetbrains.skiko.maybeSynchronized
+import org.jetbrains.skiko.internal.maybeSynchronized
 
 class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {

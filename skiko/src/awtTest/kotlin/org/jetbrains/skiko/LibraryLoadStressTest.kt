@@ -8,6 +8,7 @@ import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.selects.onTimeout
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.skiko.internal.Logger
 import org.junit.Test
 import java.nio.file.Files
 import java.nio.file.Path
@@ -121,10 +122,7 @@ class LibraryLoadStressTest {
 
         private fun load() {
             Library.load()
-            /*
-            Check if we can access the 'currentSystemTheme' as this will perform an actual native call
-             */
-            currentSystemTheme
+            check(LibraryTestImpl().run() != 0L)
         }
 
         @OptIn(ExperimentalPathApi::class)

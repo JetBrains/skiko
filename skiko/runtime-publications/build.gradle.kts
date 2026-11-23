@@ -16,6 +16,8 @@ plugins {
     org.gradle.crypto.checksum
 }
 
+evaluationDependsOn(":skiko-platform")
+
 val skiko = SkikoProperties(rootProject)
 val desktopTargets = buildList {
     if (supportAwt) {
@@ -31,6 +33,12 @@ val androidTargets = if (supportAndroid) {
     emptyList()
 }
 val coreArtifacts = SkikoArtifacts()
+val platformProject = project(":skiko-platform")
+val ganeshArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-ganesh",
+    displayName = "Skiko Ganesh",
+    pomDescription = "Kotlin Skia Ganesh bindings",
+)
 
 declareJvmRuntimePublications(
     skiko,
@@ -42,6 +50,25 @@ declareJvmRuntimePublications(
             additionalRuntimes = rootProject.configurations.filter {
                 it.attributes.getAttribute(additionalRuntimeNameAttribute) != null
             },
+        ),
+        JvmRuntimePublicationFamily(
+            producerProjectPath = ":skiko-platform",
+            artifacts = SkikoArtifacts(
+                artifactIdPrefix = "skiko-platform",
+                displayName = "Skiko Platform",
+                pomDescription = "Kotlin Skia platform layer",
+            ),
+            targets = desktopTargets + androidTargets,
+            runtimeDependencies = listOf(coreArtifacts, ganeshArtifacts),
+            additionalRuntimes = platformProject.configurations.filter {
+                it.attributes.getAttribute(additionalRuntimeNameAttribute) != null
+            },
+        ),
+        JvmRuntimePublicationFamily(
+            producerProjectPath = ":skiko-ganesh",
+            artifacts = ganeshArtifacts,
+            targets = desktopTargets + androidTargets,
+            runtimeDependencies = listOf(coreArtifacts),
         ),
         JvmRuntimePublicationFamily(
             producerProjectPath = ":skiko-graphite",

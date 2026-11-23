@@ -70,28 +70,18 @@ runs:
         load: true
         should_publish: false
 
-    - name: 'Prepare command'
-      id: cmd
-      shell: bash
-      run: |
-        CMD="${{ inputs.command }}"
-        if [[ "${{ inputs.virtual-display }}" == "true" ]]; then
-          CMD="Xvfb :1 -screen 0 1920x1080x24 -extension RANDR +extension GLX & export DISPLAY=:1.0 && ${CMD}"
-        fi
-        {
-          echo "command<<EOF"
-          echo "${CMD}"
-          echo "EOF"
-        } >> $GITHUB_OUTPUT
-
     - name: 'Run command in container'
       shell: bash
       run: |
-        docker run --rm \
+        display=()
+        if [[ "${{ inputs.virtual-display }}" == "true" ]]; then
+          display=(xvfb-run -a -e /dev/stderr -s "-screen 0 1920x1080x24 -extension RANDR +extension GLX")
+        fi
+        docker run --rm --init \
           -v "${{ github.workspace }}":/workspace \
           -v "${HOME}/.gradle":/gradle-cache \
           -v "${HOME}/.m2":/root/.m2 \
           -e GRADLE_USER_HOME=/gradle-cache \
           -w /workspace/${{ inputs.working_directory }} \
           "ghcr.io/${{ steps.vars.outputs.image_namespace }}/${{ inputs.image_name }}:${{ steps.vars.outputs.tag }}" \
-          bash -c '${{ steps.cmd.outputs.command }}'
+          "${display[@]}" bash -c '${{ inputs.command }}'

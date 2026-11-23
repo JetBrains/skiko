@@ -20,6 +20,31 @@ val skikoGraphiteArtifacts = SkikoArtifacts(
     displayName = "Skiko Graphite",
     pomDescription = "Kotlin Skia Graphite bindings",
 )
+val skikoPlatformArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-platform",
+    displayName = "Skiko Platform",
+    pomDescription = "Kotlin Skia platform layer",
+)
+val skikoGaneshArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-ganesh",
+    displayName = "Skiko Ganesh",
+    pomDescription = "Kotlin Skia Ganesh bindings",
+)
+val skikoGpuArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-gpu",
+    displayName = "Skiko GPU",
+    pomDescription = "Backend-neutral Skiko GPU API",
+)
+val skikoGaneshGpuProviderArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-ganesh-gpu-provider",
+    displayName = "Skiko Ganesh GPU Provider",
+    pomDescription = "Ganesh implementation of the Skiko GPU provider API",
+)
+val skikoGraphiteGpuProviderArtifacts = SkikoArtifacts(
+    artifactIdPrefix = "skiko-graphite-gpu-provider",
+    displayName = "Skiko Graphite GPU Provider",
+    pomDescription = "Graphite implementation of the Skiko GPU provider API",
+)
 
 val skikoArtifactIds: List<String> =
     listOf(
@@ -31,8 +56,6 @@ val skikoArtifactIds: List<String> =
         skikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
         skikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
         skikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
-        skikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.X64),
-        skikoArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.Arm64),
         skikoArtifacts.jsArtifactId,
         skikoArtifacts.wasmArtifactId,
         skikoArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
@@ -86,6 +109,67 @@ val skikoArtifactIds: List<String> =
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
         skikoGraphiteArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+
+        skikoPlatformArtifacts.commonArtifactId,
+        skikoPlatformArtifacts.jvmArtifactId,
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoPlatformArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoPlatformArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.X64),
+        skikoPlatformArtifacts.jvmAdditionalRuntimeArtifactIdFor("angle", OS.Windows, Arch.Arm64),
+        skikoPlatformArtifacts.jsArtifactId,
+        skikoPlatformArtifacts.wasmArtifactId,
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        skikoPlatformArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+        skikoPlatformArtifacts.jvmRuntimeAllArtifactId,
+
+        skikoGaneshArtifacts.commonArtifactId,
+        skikoGaneshArtifacts.jvmArtifactId,
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoGaneshArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGaneshArtifacts.jsArtifactId,
+        skikoGaneshArtifacts.wasmArtifactId,
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.Linux, Arch.Arm64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.X64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64),
+        skikoGaneshArtifacts.nativeArtifactIdFor(OS.TVOS, Arch.Arm64, isUikitSim = true),
+        skikoGaneshArtifacts.jvmRuntimeAllArtifactId,
+
+        skikoGpuArtifacts.commonArtifactId,
+        skikoGpuArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGpuArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGpuArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+
+        skikoGaneshGpuProviderArtifacts.commonArtifactId,
+        skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
+
+        skikoGraphiteGpuProviderArtifacts.commonArtifactId,
+        skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
+        skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
+        skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {

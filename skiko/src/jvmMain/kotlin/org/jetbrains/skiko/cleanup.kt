@@ -3,6 +3,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.jetbrains.skiko.internal.Logger
 import java.io.FileNotFoundException
 import java.nio.file.Files
 import java.nio.file.Path

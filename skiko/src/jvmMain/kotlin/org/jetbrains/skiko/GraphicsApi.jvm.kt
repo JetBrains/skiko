@@ -29,7 +29,8 @@ private val notSupportedAdapters: List<NotSupportedAdapter> by lazy {
     )
 }
 
-internal fun isVideoCardSupported(api: GraphicsApi, hostOs: OS, name: String): Boolean {
+@InternalSkikoApi
+fun isVideoCardSupported(api: GraphicsApi, hostOs: OS, name: String): Boolean {
     return notSupportedAdapters.fastNone { adapter ->
         if ((adapter.os != hostOs) || (adapter.api != api)) return@fastNone false
 

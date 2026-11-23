@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.ImageFilter.Companion.makeDropShadowOnly
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.InternalSkikoApi
 
 open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, internal val _owner: Any) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
@@ -55,22 +56,6 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         reachabilityBarrier(bitmap)
     }
 
-    /**
-     * Returns the recording context being used by this Canvas.
-     *
-     * The returned context is borrowed from the Canvas and must not be closed.
-     *
-     * @return the recording context, if available; null otherwise
-     */
-    val recordingContext: DirectContext?
-        get() = try {
-            Stats.onNativeCall()
-            val ptr = _nGetCanvasRecordingContext(_ptr)
-            if (ptr == NullPointer) null else DirectContext(ptr, managed = false)
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(_owner)
-        }
 
     /**
      * Returns the Surface this Canvas draws into.
@@ -78,8 +63,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * Canvases obtained from [Surface.canvas] return that surface. Canvases that draw into
      * a [Bitmap], a [Picture] recording or a document return null.
      *
-     * The returned surface is borrowed from the Canvas and must not be closed. It carries the
-     * canvas's [recordingContext], so [Surface.flush] and [Surface.flushAndSubmit] work on it.
+     * The returned surface is borrowed from the Canvas and must not be closed. It keeps the
+     * Canvas owner alive for as long as the borrowed surface is reachable.
      *
      * @return the Surface backing this Canvas, if any; null otherwise
      */
@@ -87,7 +72,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetCanvasSurface(_ptr)
-            if (ptr == NullPointer) null else Surface(ptr, recordingContext, managed = false)
+            if (ptr == NullPointer) null else Surface(ptr, _owner, managed = false)
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(_owner)
@@ -1680,13 +1665,6 @@ private external fun Canvas_nGetFinalizer(): NativePointer
 @ForceNativeThreadState
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetRecordingContext")
-// Needs ForceNativeThreadState: follows a chain of nested canvas wrappers, so its time grows with how deeply they are
-// nested.
-// Native call path: SkPaintFilterCanvas::recordingContext -> SkPaintFilterCanvas::recordingContext
-@ForceNativeThreadState
-private external fun _nGetCanvasRecordingContext(ptr: NativePointer): NativePointer
-
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSurface")
 // No ForceNativeThreadState: returns the stored surface pointer, so it is short and cannot block.
 // Native call path: SkCanvas::getSurface
@@ -2121,7 +2099,8 @@ private external fun _nRestore(ptr: NativePointer)
 @ForceNativeThreadState
 private external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)
 
-internal inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
+@InternalSkikoApi
+inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
     val restoreCount = save()
     try {
         block()

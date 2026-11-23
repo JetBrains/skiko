@@ -26,6 +26,9 @@ class LibraryLoader internal constructor(
      */
     private val lockFile: LockFile,
 
+    /** Class whose class loader contains the native library resources. */
+    private val cls: Class<*> = Library::class.java,
+
     /**
      * Additional code that is called after successfully loading
      */
@@ -35,36 +38,62 @@ class LibraryLoader internal constructor(
         name: String,
         additionalFile: String? = null,
         init: () -> Unit = {},
+        cls: Class<*> = Library::class.java,
     ) : this(
         name = name,
         additionalFile = additionalFile,
         lockFile = LockFile.skiko,
         init = init,
+        cls = cls,
     )
+
+    private companion object {
+        // Directory for clones of native libraries, null until the first clone.
+        @Volatile
+        var copyDirectory: File? = null
+            private set
+
+        @Synchronized
+        fun createCopyDirectory(): File =
+            copyDirectory ?: Files.createTempDirectory("skiko").toFile().also { copyDirectory = it }
+    }
 
     // A native library cannot be loaded in several classloaders, so we have to clone
     // the native library to allow Skiko loading to work properly in complex cases, i.e.,
     // several IDEA plugins.
+    //
+    // Once this class loader had to clone one library, it clones all of them into the same directory
+    // (see [copyDirectory]), so that they stay together.
     private fun loadLibraryOrCopy(library: File): File? {
         try {
+            copyDirectory?.let { return loadCopy(library, it) }
             System.load(library.absolutePath)
             return null
         } catch (e: UnsatisfiedLinkError) {
             if (e.message?.contains("already loaded in another classloader") == true) {
-                val copyDir = Files.createTempDirectory("skiko").toFile()
-                val tempFile = copyDir.resolve(library.name)
-                Files.copy(library.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-                tempFile.deleteOnExit()
-                System.load(tempFile.absolutePath)
-                return copyDir
+                return loadCopy(library, createCopyDirectory())
             } else {
                 throw LibraryLoadException("Failed to load library $library", cause = e)
             }
         }
     }
 
+    private fun loadCopy(library: File, directory: File): File {
+        val copy = directory.resolve(library.name)
+        if (!copy.exists()) {
+            Files.copy(library.toPath(), copy.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            copy.deleteOnExit()
+        }
+        System.load(copy.absolutePath)
+        return directory
+    }
+
     private fun getModuleResourceAsStream(resourceName: String) =
-        Library::class.java.classLoader.getResourceAsStream(resourceName)
+        cls.classLoader.getResourceAsStream(resourceName)
+
+    /** The expected SHA-256 of [platformName], from the `.sha256` resource next to it, or null if there is none. */
+    private fun readHash(platformName: String): String? =
+        getModuleResourceAsStream("$platformName.sha256")?.use { it.bufferedReader().readLine() }
 
     private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
         val file = File(dest, resourceName)
@@ -160,15 +189,20 @@ class LibraryLoader internal constructor(
 
         // Third try: look up in or extract to a local cache directory.
         // Key the cache by the hash of the library.
-        val hashResourceStream = getModuleResourceAsStream(
-            "$platformName.sha256"
-        ) ?: throw LibraryLoadException(
-            "Cannot find $platformName.sha256, proper native dependency missing."
-        )
-        val hash = hashResourceStream.use { it.bufferedReader().readLine() }
+        val hash = readHash(platformName)
+            ?: throw LibraryLoadException("Cannot find $platformName.sha256, proper native dependency missing.")
+
+        // Libraries of one build (core, skiko-ganesh, skiko-platform, ...) share one directory, keyed by the
+        // hash of the core library, because they look for each other next to themselves.
+        val coreName = "skiko-$hostId"
+        val dataDirName = if (name == coreName) {
+            "$name-$hash"
+        } else {
+            readHash(System.mapLibraryName(coreName))?.let { "$coreName-$it" } ?: "$name-$hash"
+        }
 
         lockFile.withLock {
-            val dataDir = File(File(SkikoProperties.dataPath), "$name-$hash")
+            val dataDir = File(File(SkikoProperties.dataPath), dataDirName)
             dataDir.mkdirs()
             dataDir.toPath().updateLastAccessTime()
             val library = unpackIfNeeded(dataDir, platformName, false)
