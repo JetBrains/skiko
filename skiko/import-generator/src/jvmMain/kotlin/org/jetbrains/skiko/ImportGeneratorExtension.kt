@@ -47,7 +47,6 @@ internal class ImportGeneratorExtension(
                 const origInstantiateStreaming = WebAssembly.instantiateStreaming;
                 WebAssembly.instantiateStreaming = function (source, importObject) {
                   if (importObject['./$moduleName.mjs']) {
-                        console.log('IMPORT OBJECT MODULE !!!', importObject['./$moduleName.mjs']) 
                         return awaitSkiko.then(() => origInstantiateStreaming.call(WebAssembly, source, importObject));
                   }
                   return origInstantiateStreaming.call(WebAssembly, source, importObject);
@@ -55,9 +54,9 @@ internal class ImportGeneratorExtension(
             """.trimIndent())
 
             writer.appendLine("""
+                let api = Object.create(null);
                 const exportSymbols =  ${importGenerator.getExportSymbols().get(moduleName)!!.serializeAsJsSet()};
                 const booleanSymbols = ${importGenerator.getBooleanExportSymbols().serializeAsJsSet()};
-                let api = new Proxy(Object.create(null), { get(obj, propName) { return () => {}}});
                 
                 for (const sym of exportSymbols) { 
                     globalThis.__SKIKO__[sym] = (...a) => api[sym](...a)
