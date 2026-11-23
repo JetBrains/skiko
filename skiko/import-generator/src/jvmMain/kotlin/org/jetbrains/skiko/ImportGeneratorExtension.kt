@@ -33,10 +33,6 @@ internal class ImportGeneratorExtension(
                 writer.appendLine("import { awaitSkiko } from './skiko.mjs';")
             }
 
-            writer.appendLine("const exportSymbols = ${importGenerator.getExportSymbols().get(moduleName)!!.serializeAsJsSet()};")
-            writer.appendLine("const booleanSymbols = ${importGenerator.getBooleanExportSymbols().serializeAsJsSet()}")
-            writer.appendLine("let api = new Proxy(Object.create(null), { get(obj, propName) { return () => {}}});")
-
             importGenerator.getExportSymbols().flatMap { it.value }.forEach { exportSymbol ->
                     writer.appendLine("export let $exportSymbol")
             }
@@ -46,8 +42,6 @@ internal class ImportGeneratorExtension(
                 writer.appendLine("$exportSymbol = module['_$exportSymbol']")
             }
             writer.appendLine("})")
-
-            writer.appendLine("console.log('MODULE NAME', '$moduleName')")
 
             writer.appendLine("""
                 const origInstantiateStreaming = WebAssembly.instantiateStreaming;
@@ -61,6 +55,10 @@ internal class ImportGeneratorExtension(
             """.trimIndent())
 
             writer.appendLine("""
+                const exportSymbols =  ${importGenerator.getExportSymbols().get(moduleName)!!.serializeAsJsSet()};
+                const booleanSymbols = ${importGenerator.getBooleanExportSymbols().serializeAsJsSet()};
+                let api = new Proxy(Object.create(null), { get(obj, propName) { return () => {}}});
+                
                 for (const sym of exportSymbols) { 
                     globalThis.__SKIKO__[sym] = (...a) => api[sym](...a)
                 }
