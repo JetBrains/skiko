@@ -63,7 +63,6 @@ internal class ImportGeneratorExtension(
                 }
                 
                 awaitSkiko.then((module) => {
-                    api = {};
                     for (const sym of exportSymbols) {
                         const raw = module['_' + sym];
                         api[sym] = booleanSymbols.has(sym) ? (...a) => !!raw(...a) : raw;
