@@ -56,7 +56,6 @@ internal class ImportGeneratorExtension(
             writer.appendLine("""
                 let api = Object.create(null);
                 globalThis.__SKIKO__ = globalThis.__SKIKO__ || Object.create(null);
-                console.log('GLOBAL BEFORE', Object.keys(globalThis.__SKIKO__).length);
                 
                 const exportSymbols =  ${importGenerator.getExportSymbols().get(moduleName)!!.serializeAsJsSet()};
                 const booleanSymbols = ${importGenerator.getBooleanExportSymbols().serializeAsJsSet()};
@@ -64,13 +63,11 @@ internal class ImportGeneratorExtension(
                 for (const sym of exportSymbols) { 
                     globalThis.__SKIKO__[sym] = (...a) => api[sym](...a)
                 }
-                console.log('GLOBAL AFTER', Object.keys(globalThis.__SKIKO__).length);
                 
                 awaitSkiko.then((module) => {
                     for (const sym of exportSymbols) {
                         const raw = module['_' + sym];
                         api[sym] = booleanSymbols.has(sym) ? (...a) => !!raw(...a) : raw;
-                        globalThis.__SKIKO__[sym] = booleanSymbols.has(sym) ? (...a) => !!raw(...a) : raw;
                     }
                 })
             """.trimIndent())
