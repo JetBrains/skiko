@@ -251,7 +251,8 @@ kotlin {
         ganeshProjectContext.configureNativeTarget(OS.MacOS, Arch.X64, macosX64(), ::coreNativeSymbolSources)
         ganeshProjectContext.configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64(), ::coreNativeSymbolSources)
     }
-    if (supportNativeLinux) {
+    // Host-gated like the core module: the core Linux targets exist only on Linux hosts.
+    if (supportNativeLinux && hostOs.isLinux) {
         ganeshProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64(), ::coreNativeSymbolSources)
         ganeshProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64(), ::coreNativeSymbolSources)
     }

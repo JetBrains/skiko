@@ -230,7 +230,8 @@ if (supportWeb) {
         macosArm64()
     }
 
-    if (supportNativeLinux) {
+    // Host-gated like the core module: the core Linux targets exist only on Linux hosts.
+    if (supportNativeLinux && hostOs.isLinux) {
         linuxX64()
         linuxArm64()
     }

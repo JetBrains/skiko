@@ -38,7 +38,7 @@ internal fun mapSourceFilesToOutputFiles(
             if (sourceRoot == null) sourceFile.name
             else sourceFile.relativeTo(sourceRoot).path
 
-        val relativeOutputPath = relativeSourcePath.removeSuffix(sourceFileExt) + outputFileExt
+        val relativeOutputPath = relativeSourcePath.substringBeforeLast(".") + "." + outputFileExt.removePrefix(".")
         sourceToOutput[sourceFile] = outDir.resolve(relativeOutputPath)
     }
     return sourceToOutput
