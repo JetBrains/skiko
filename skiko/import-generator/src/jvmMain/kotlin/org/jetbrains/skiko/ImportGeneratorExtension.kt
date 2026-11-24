@@ -61,12 +61,12 @@ internal class ImportGeneratorExtension(
                 const booleanSymbols = ${importGenerator.getBooleanExportSymbols().serializeAsJsSet()};
                 
                 for (const sym of exportSymbols) { 
-                    globalThis.__SKIKO__[sym] = booleanSymbols.has(sym) ? (...a) => !!api[sym](...a) : (...a) => api[sym](...a)
+                    globalThis.__SKIKO__[sym] = api[sym]
                 }
                 
                 awaitSkiko.then((module) => {
                     for (const sym of exportSymbols) {
-                        api[sym] = module[sym];
+                        api[sym] = booleanSymbols.has(sym) ?  (...a) => !!module[sym](...a): module[sym];
                     }
                 })
             """.trimIndent())
