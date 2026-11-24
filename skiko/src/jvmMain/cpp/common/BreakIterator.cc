@@ -48,15 +48,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nCur
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nNext
   (JNIEnv* env, jclass jclass, jlong ptr) {
-    SkBreakIterator* instance = toBreakIterator(ptr);
-    SkBreakIterator::Position result = instance->next();
-    if (result == SkBreakIterator::kDone) {
-        // The Apple backend leaves its index past the last break when iteration is done. Move it
-        // back to the last boundary, like ICU, where the position stays valid when DONE is
-        // returned.
-        instance->last();
-    }
-    return result;
+    return toBreakIterator(ptr)->next();
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nPrevious

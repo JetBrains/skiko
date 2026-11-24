@@ -1,8 +1,6 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.use
-import org.jetbrains.skiko.OS
-import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.tests.*
 import kotlin.test.*
 
@@ -14,9 +12,6 @@ class BreakIteratorTests {
     @SkipJsTarget
     @SkipWasmTarget
     fun wordBoundaryNavigation() {
-        if (hostOs == OS.Ios || hostOs == OS.Tvos)
-            return
-
         BreakIterator.makeWordInstance("en-US").use { boundary ->
             boundary.setText("Hello world!")
             assertEquals(0, boundary.current())
@@ -43,11 +38,8 @@ class BreakIteratorTests {
     @SkipJsTarget
     @SkipWasmTarget
     fun breakIteratorWordInstanceTest() {
-        // Wasm and iOS builds of Skia do not include required data to implement those iterators,
+        // Js and Wasm builds of Skia do not include required data to implement those iterators,
         // see `third_party/externals/icu/flutter/README.md`.
-        if (hostOs == OS.Ios || hostOs == OS.Tvos)
-            return
-
         val boundary = BreakIterator.makeWordInstance()
         boundary.setText("家捷克的软件开发公司 ,software development company")
 
@@ -64,7 +56,7 @@ class BreakIteratorTests {
     @SkipNativeTarget
     @SkipJvmTarget
     fun breakIteratorSentenceFailsOnJsTest() {
-        // Wasm and iOS builds of Skia do not include required data to implement those iterators,
+        // Js and Wasm builds of Skia do not include required data to implement those iterators,
         // see `third_party/externals/icu/flutter/README.md`.
         // unfortunately js target does not check neither message nor the type of exception so here we can rely only on the fact there was exception
         assertFailsWith<RuntimeException> {
@@ -77,9 +69,8 @@ class BreakIteratorTests {
     @SkipJsTarget
     @SkipWasmTarget
     fun breakIteratorSentenceInstanceTest() {
-        // Wasm and iOS builds of Skia do not include required data to implement those iterators,
+        // Js and Wasm builds of Skia do not include required data to implement those iterators,
         // see `third_party/externals/icu/flutter/README.md`.
-
         val boundary = BreakIterator.makeSentenceInstance()
 
         boundary.setText(
