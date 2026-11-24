@@ -126,11 +126,12 @@ internal class ImportGeneratorTransformer(
                 ?: return@apply
 
             val name = webImportAnnotation.getStringValue("name")
-            addJsNameAnnotation(name)
+            val resolvedName = '_' + name
+            addJsNameAnnotation(resolvedName)
             addJsQualifierAnnotation("__SKIKO__")
-            addWasmImportAnnotation(name)
+            addWasmImportAnnotation(resolvedName)
 
-            exportSymbols.getOrPut(moduleName) { mutableSetOf() }.add(name)
+            exportSymbols.getOrPut(moduleName) { mutableSetOf() }.add(resolvedName)
             if (returnType.isBoolean()) {
                 booleanExportSymbols.add(name)
             }

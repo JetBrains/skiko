@@ -39,7 +39,7 @@ internal class ImportGeneratorExtension(
 
             writer.appendLine("awaitSkiko.then((module) => {")
             importGenerator.getExportSymbols().flatMap { it.value }.forEach { exportSymbol ->
-                writer.appendLine("$exportSymbol = module['_$exportSymbol']")
+                writer.appendLine("$exportSymbol = module['$exportSymbol']")
             }
             writer.appendLine("})")
 
@@ -66,7 +66,7 @@ internal class ImportGeneratorExtension(
                 
                 awaitSkiko.then((module) => {
                     for (const sym of exportSymbols) {
-                        api[sym] = module['_' + sym];
+                        api[sym] = module[sym];
                     }
                 })
             """.trimIndent())
