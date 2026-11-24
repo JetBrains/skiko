@@ -44,6 +44,17 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
         }
 
         /**
+         * Returns a new [Data] that takes ownership of a buffer allocated with `malloc`.
+         *
+         * The caller must ensure that [memoryAddr] was allocated with `malloc` in the same memory space as the [Data].
+         * The memory is freed when the [Data] is closed or when the reference becomes unreachable.
+         */
+        fun makeFromMalloc(memoryAddr: NativePointer, length: Int): Data {
+            Stats.onNativeCall()
+            return Data(_nMakeFromMalloc(memoryAddr, length))
+        }
+
+        /**
          * Returns a new empty dataref (or a reference to a shared empty dataref).
          * New or shared, the caller must see that [.close] is eventually called.
          */
@@ -175,6 +186,12 @@ private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length:
 // and cannot block.
 // Native call path: SkData::MakeWithoutCopy -> MakeWithProc
 private external fun _nMakeWithoutCopy(memoryAddr: NativePointer, length: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromMalloc")
+// No ForceNativeThreadState: wraps an existing pointer in a new data object without copying the bytes, so it is short
+// and cannot block.
+// Native call path: SkData::MakeFromMalloc -> MakeWithProc
+private external fun _nMakeFromMalloc(memoryAddr: NativePointer, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
 // Needs ForceNativeThreadState: opens and maps a file, which is blocking file I/O.

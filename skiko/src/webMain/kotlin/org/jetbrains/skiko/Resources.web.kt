@@ -1,6 +1,9 @@
 package org.jetbrains.skiko
 
 import kotlinx.browser.window
+import org.jetbrains.skia.Data
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.webext.copyBufferToSkiko
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.w3c.fetch.RequestInit
@@ -22,4 +25,24 @@ actual suspend fun loadBytesFromPath(path: String): ByteArray {
         .arrayBuffer()
         .await<ArrayBuffer>()
     return Int8Array(arrayBuffer).asByteArray()
+}
+
+@OptIn(ExperimentalWasmJsInterop::class)
+@InternalSkikoApi
+/**
+ * Fetches the resource as ArrayBuffer from the [path] and copies it to skiko memory.
+ * @return Data containing the resources' bytes.
+ * Skia takes ownership of the memory and frees it when the last native reference is released.
+ */
+suspend fun loadResourceDataFromPath(path: String): Data {
+    val response = window.fetch(path, defaultFetchInit).await<Response>()
+    if (!response.ok) {
+        throw IllegalStateException("Failed to fetch the resource from path=$path - ${response.statusText}")
+    }
+    val arrayBuffer = response.arrayBuffer().await<ArrayBuffer>()
+    val ptr = copyBufferToSkiko(arrayBuffer)
+    if (ptr == Native.NullPointer) {
+        throw IllegalStateException("Failed to allocate memory for resource '$path'")
+    }
+    return Data.makeFromMalloc(ptr, arrayBuffer.byteLength)
 }

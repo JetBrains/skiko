@@ -53,6 +53,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeWithout
     return reinterpret_cast<jlong>(instance);
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeFromMalloc
+  (JNIEnv* env, jclass jclass, jlong memoryAddr, jint length) {
+    SkData* instance = SkData::MakeFromMalloc(reinterpret_cast<void*>(memoryAddr), length).release();
+    return reinterpret_cast<jlong>(instance);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeFromFileName
   (JNIEnv* env, jclass jclass, jstring pathStr) {
     SkString path = skString(env, pathStr);

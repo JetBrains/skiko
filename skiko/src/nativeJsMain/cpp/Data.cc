@@ -76,3 +76,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nWritableData
     SkData* instance = reinterpret_cast<SkData*>(ptr);
     return reinterpret_cast<KNativePointer>(instance->writable_data());
 }
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeFromMalloc(KNativePointer data, KInt length) {
+    SkData* instance = SkData::MakeFromMalloc(data, length).release();
+    return reinterpret_cast<KNativePointer>(instance);
+}
