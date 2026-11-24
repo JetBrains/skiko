@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skiko.tests.TestHelpers
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.*
 
@@ -90,6 +91,30 @@ class DataTest {
             originalData.bytes,
             message = "Memory is not expected to get cleaned up because Data.makeWithoutCopy uses NoopReleaseProc as a ReleaseProc"
         )
+    }
+
+    @Test
+    fun makeFromMallocWrapsBufferWithoutCopying() = runTest {
+        val words = arrayOf(
+            IntArray(4) { 0x11111111 },
+            IntArray(4) { 0x22222222 },
+            IntArray(4) { 0x33333333 },
+        )
+        val expected = ByteArray(48) { index ->
+            when (index / 16) {
+                0 -> 0x11
+                1 -> 0x22
+                else -> 0x33
+            }
+        }
+
+        val pointer = TestHelpers().writeArrayOfIntArrays(words)
+        assertNotEquals(NullPointer, pointer)
+
+        Data.makeFromMalloc(pointer, expected.size).use { data ->
+            assertEquals(pointer, data.writableData())
+            assertContentEquals(expected, data.bytes)
+        }
     }
 
     @Test

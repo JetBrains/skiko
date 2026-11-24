@@ -44,6 +44,15 @@ class Data @InternalSkikoApi constructor(ptr: NativePointer) : Managed(ptr, _Fin
         }
 
         /**
+         * Create a new dataref from a pointer allocated by malloc. The Data object
+         * takes ownership of that allocation, and will handle calling sk_free.
+         */
+        fun makeFromMalloc(memoryAddr: NativePointer, length: Int): Data {
+            Stats.onNativeCall()
+            return Data(_nMakeFromMalloc(memoryAddr, length))
+        }
+
+        /**
          * Returns a new empty dataref (or a reference to a shared empty dataref).
          * New or shared, the caller must see that [.close] is eventually called.
          */
@@ -171,10 +180,18 @@ private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Bool
 private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeWithoutCopy")
-// No ForceNativeThreadState: wraps an existing pointer in a new data object without copying the bytes, so it is short
-// and cannot block.
-// Native call path: SkData::MakeWithoutCopy -> MakeWithProc
+// Needs ForceNativeThreadState: allocates an SkData wrapper around the existing buffer without copying it.
+// The native allocation can block on allocator contention.
+// Native call path: SkData::MakeWithoutCopy -> SkData::MakeWithProc -> operator new
+@ForceNativeThreadState
 private external fun _nMakeWithoutCopy(memoryAddr: NativePointer, length: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromMalloc")
+// Needs ForceNativeThreadState: allocates an SkData wrapper that takes ownership of the existing buffer without
+// copying it. The native allocation can block on allocator contention.
+// Native call path: SkData::MakeFromMalloc -> SkData::MakeFromMalloc -> operator new
+@ForceNativeThreadState
+private external fun _nMakeFromMalloc(memoryAddr: NativePointer, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
 // Needs ForceNativeThreadState: opens and maps a file, which is blocking file I/O.
