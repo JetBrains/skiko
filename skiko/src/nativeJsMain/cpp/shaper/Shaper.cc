@@ -2,17 +2,20 @@
 #include "SkShaper.h"
 #include "SkShaper_harfbuzz.h"
 #include "SkUnicode.h"
+#include "SkikoUnicode.hh"
 #include "src/core/SkUTF.h"
-#include "unicode/ubidi.h"
 #include "common.h"
 #include "FontRunIterator.hh"
 #include "TextLineRunHandler.hh"
 #include "FontMgrDefaultFactory.hh"
-#include "SkUnicode_icu.h"
 
 #ifdef SK_SHAPER_CORETEXT_AVAILABLE
 #include "SkShaper_coretext.h"
 #endif
+
+// Unicode bidi paragraph level constants (UBIDI_DEFAULT_LTR / UBIDI_DEFAULT_RTL)
+static constexpr uint8_t kDefaultBidiLevelLtr = 0xFE;
+static constexpr uint8_t kDefaultBidiLevelRtl = 0xFF;
 
 static void deleteShaper(SkShaper* instance) {
     // std::cout << "Deleting [SkShaper " << instance << "]" << std::endl;
@@ -44,7 +47,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWra
   (KNativePointer fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>((fontMgrPtr));
     // TODO: consider if we need/want to use ICU4X or Libgrapheme (skuincode/include has those implementations too)
-    sk_sp<SkUnicode> unicode = SkUnicodes::ICU::Make();
+    sk_sp<SkUnicode> unicode = skiko::BestAvailableUnicode();
     return reinterpret_cast<KNativePointer>(SkShapers::HB::ShapeDontWrapOrReorder(unicode, sk_ref_sp(fontMgr)).release());
 }
 
@@ -68,7 +71,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
     SkShaper* instance = reinterpret_cast<SkShaper*>(ptr);
     SkString& text = *(reinterpret_cast<SkString*>(textPtr));
 
-    std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
+    std::shared_ptr<SkBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return nullptr;
     SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
 
@@ -78,7 +81,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
     bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
     bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
-    uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
+    uint8_t defaultBiDiLevel = isLeftToRight ? kDefaultBidiLevelLtr : kDefaultBidiLevelRtl;
     std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
     if (!bidiRunIter) return nullptr;
 
@@ -116,7 +119,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
         return reinterpret_cast<KNativePointer>(new TextLine(*font));
     }
 
-    std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
+    std::shared_ptr<SkBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
 
     std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(optsFeatures, optsFeaturesLen);
@@ -125,7 +128,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
     bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
     bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
-    uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
+    uint8_t defaultBiDiLevel = isLeftToRight ? kDefaultBidiLevelLtr : kDefaultBidiLevelRtl;
     std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
     if (!bidiRunIter) return nullptr;
 

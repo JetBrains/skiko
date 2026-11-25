@@ -104,9 +104,9 @@ private fun makeParagraphBuilder(
 private external fun ParagraphBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
-// Needs ForceNativeThreadState: on Windows, _wfopen opens icudtl.dat and CreateFileMapping maps it into memory. It also
-// copies the paragraph style.
-// Native call path: SkUnicodes::ICU::Make -> SkLoadICU -> win_mmap -> _wfopen
+// Needs ForceNativeThreadState: creating the SkUnicode backend can load Unicode data under a shared lock (ICU data on
+// Windows, break rules and dictionaries on ICU targets). It also copies the paragraph style.
+// Native call path: skiko::BestAvailableUnicode -> SkUnicodes::ICU::Make -> SkLoadICU -> win_mmap -> _wfopen
 @ForceNativeThreadState
 private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
 

@@ -1,7 +1,6 @@
 #pragma once
 #include "SkShaper.h"
-#include "unicode/ubrk.h"
-#include "unicode/utext.h"
+#include "SkUnicode.h"
 
 class FontRunIterator final: public SkShaper::FontRunIterator {
 public:
@@ -12,7 +11,7 @@ public:
                     const char* requestName,
                     SkFontStyle requestStyle,
                     const SkShaper::LanguageRunIterator* lang,
-                    std::shared_ptr<UBreakIterator> graphemeIter,
+                    std::shared_ptr<SkBreakIterator> graphemeIter,
                     bool approximateSpaces,
                     bool approximatePunctuation)
         : fCurrent(utf8)
@@ -37,7 +36,7 @@ public:
                     size_t utf8Bytes,
                     const SkFont& font,
                     sk_sp<SkFontMgr> fallbackMgr,
-                    std::shared_ptr<UBreakIterator> graphemeIter,
+                    std::shared_ptr<SkBreakIterator> graphemeIter,
                     bool approximateSpaces,
                     bool approximatePunctuation)
         : FontRunIterator(utf8,
@@ -80,7 +79,7 @@ private:
     char const * const fRequestName;
     SkFontStyle const fRequestStyle;
     SkShaper::LanguageRunIterator const * const fLanguage;
-    std::shared_ptr<UBreakIterator> fGraphemeIter;
+    std::shared_ptr<SkBreakIterator> fGraphemeIter;
     bool fApproximateSpaces;
     bool fApproximatePunctuation;
 };

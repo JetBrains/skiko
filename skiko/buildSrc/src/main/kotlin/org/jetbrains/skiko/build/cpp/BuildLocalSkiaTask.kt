@@ -78,10 +78,7 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
             logger.lifecycle("Building for ${machine.id}...")
             runPythonScript(
                 skiaRepoRoot, "build.py",
-                "--skia-dir", ".",
-                "--target", target.id,
-                "--machine", machine.id,
-                "--build-type", type.id
+                *buildScriptArgs(target, machine, type)
             )
 
             logger.lifecycle("Archiving ${machine.id}...")
@@ -101,6 +98,30 @@ abstract class BuildLocalSkiaTask : DefaultTask() {
 
         logger.lifecycle("Skia binaries built successfully")
         logger.lifecycle("Next: Run './gradlew publishToMavenLocal -Pskia.dir=<skia-repo-dir>' to publish")
+    }
+
+    // Mirrors the flags the Skia release workflow (build_for_skiko.yml) passes per target, so a
+    // local build produces the same archive layout as the published release: with the GPU split
+    // out as extension archives, and Graphite/Dawn enabled where the release builds them.
+    private fun buildScriptArgs(target: SkiaTarget, machine: Arch, type: SkiaBuildType): Array<String> {
+        val args = mutableListOf(
+            "build.py",
+            "--skia-dir", ".",
+            "--target", target.id,
+            "--machine", machine.id,
+            "--build-type", type.id,
+            "--gpu-as-extension",
+        )
+        if (target == SkiaTarget.WASM) {
+            // The wasm release build enables Dawn but not Graphite
+            args += "--enable-graphite-dawn"
+        } else {
+            args += "--enable-graphite"
+            if (target == SkiaTarget.MACOS || target == SkiaTarget.WINDOWS) {
+                args += "--enable-graphite-dawn"
+            }
+        }
+        return args.toTypedArray()
     }
 
     private fun runPythonScript(skiaRepoRoot: File, script: String, vararg args: String) {

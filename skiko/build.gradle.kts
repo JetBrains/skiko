@@ -100,8 +100,6 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "skparagraph",
                 "skshaper",
                 "skunicode_core",
-                "skunicode_icu",
-                "icu",
                 "harfbuzz",
                 "skresources",
                 "png",
@@ -114,7 +112,9 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
         }
         jvm {
             macos {
-                staticSkiaLibs("piex", "dng_sdk")
+                // The Apple unicode backend replaces full ICU on Apple platforms; the small
+                // ICU bidi subset it depends on is in icu_bidi.
+                staticSkiaLibs("piex", "dng_sdk", "skunicode_apple", "icu_bidi")
                 linkFlags("-lobjc")
                 frameworks(
                     "AppKit",
@@ -129,6 +129,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             }
 
             windows {
+                staticSkiaLibs("skunicode_icu", "icu")
                     x64 {
                         // m151 SkSL adopted Chromium's raw_ptr<T> (BackupRefPtr/MiraclePtr), which is
                         // active on Windows x64 (no-op elsewhere). skia.lib now references partition_alloc
@@ -140,6 +141,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             }
 
             linux {
+                staticSkiaLibs("skunicode_icu", "icu")
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs(
                     "skia",
@@ -151,6 +153,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             }
 
             android {
+                staticSkiaLibs("skunicode_icu", "icu")
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs("skia")
             }
@@ -162,6 +165,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             )
 
             linux {
+                staticSkiaLibs("skunicode_icu", "icu")
                 // Hack to fix problem with linker not always finding certain declarations.
                 directStaticSkiaLibs(
                     "skshaper",
@@ -173,26 +177,32 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
             }
 
             macos {
+                staticSkiaLibs("skunicode_apple", "icu_bidi")
                 frameworks(
                     "CoreGraphics",
                     "CoreText",
                     "CoreServices",
+                    "CoreFoundation",
                 )
             }
 
             ios {
+                staticSkiaLibs("skunicode_apple", "icu_bidi")
                 frameworks(
                     "CoreGraphics",
                     "CoreText",
                     "UIKit",
+                    "CoreFoundation",
                 )
             }
 
             tvos {
+                staticSkiaLibs("skunicode_apple", "icu_bidi")
                 frameworks(
                     "CoreGraphics",
                     "CoreText",
                     "UIKit",
+                    "CoreFoundation",
                 )
             }
         }
@@ -205,6 +215,8 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                 "wuffs",
                 "skcms",
                 "brotli",
+                "skunicode_icu",
+                "icu",
             )
             linkFlags(
                 "-s", "MAIN_MODULE=2",
