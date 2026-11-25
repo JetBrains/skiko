@@ -12,6 +12,7 @@ import org.jetbrains.skiko.build.context.supportAnyNativeIos
 import org.jetbrains.skiko.build.context.supportNativeIosArm64
 import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
 import org.jetbrains.skiko.build.context.supportNativeIosX64
+import org.jetbrains.skiko.build.context.supportNativeMac
 import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
 import org.jetbrains.skiko.build.publishing.declarePublications
 import org.jetbrains.skiko.build.utils.SkikoArtifacts
@@ -54,6 +55,9 @@ repositories {
 kotlin {
     applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
 
+    if (supportNativeMac) {
+        macosArm64()
+    }
     if (supportNativeIosArm64) {
         iosArm64()
     }
