@@ -1,6 +1,10 @@
 package org.jetbrains.skiko
 
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class WebFrameSchedulerTest {
     @Test
@@ -22,7 +26,7 @@ class WebFrameSchedulerTest {
     fun highRefreshUsesTaskAfterTimerAndStopsWhenIdle() {
         val clock = TestFrameClock()
         var draws = 0
-        val scheduler = WebFrameScheduler(120.0, clock) { draws++ }
+        val scheduler = WebFrameScheduler(highRefreshRate = true, clock = clock) { draws++ }
         repeat(5) { scheduler.requestFrame() }
         assertTrue(clock.active)
         clock.fireTimer()
@@ -42,7 +46,10 @@ class WebFrameSchedulerTest {
         val clock = TestFrameClock()
         val timestamps = mutableListOf<Double>()
         lateinit var scheduler: WebFrameScheduler
-        scheduler = WebFrameScheduler(120.0, clock) { timestamps.add(it); scheduler.requestFrame() }
+        scheduler = WebFrameScheduler(highRefreshRate = true, clock = clock) {
+            timestamps.add(it)
+            scheduler.requestFrame()
+        }
         scheduler.requestFrame()
         clock.fireTimerAndTask()
         clock.vsync(2.0) // The next requested frame adopts this phase.
@@ -56,7 +63,10 @@ class WebFrameSchedulerTest {
         val clock = TestFrameClock()
         val timestamps = mutableListOf<Double>()
         lateinit var scheduler: WebFrameScheduler
-        scheduler = WebFrameScheduler(120.0, clock) { timestamps.add(it); scheduler.requestFrame() }
+        scheduler = WebFrameScheduler(highRefreshRate = true, clock = clock) {
+            timestamps.add(it)
+            scheduler.requestFrame()
+        }
         scheduler.requestFrame()
         repeat(121) {
             clock.fireTimerAndTask(roundToMilliseconds = true)
@@ -71,7 +81,10 @@ class WebFrameSchedulerTest {
         val clock = TestFrameClock()
         var draws = 0
         lateinit var scheduler: WebFrameScheduler
-        scheduler = WebFrameScheduler(120.0, clock) { draws++; scheduler.requestFrame() }
+        scheduler = WebFrameScheduler(highRefreshRate = true, clock = clock) {
+            draws++
+            scheduler.requestFrame()
+        }
         scheduler.requestFrame()
         clock.fireTimer()
         clock.changeVisibility(false)
@@ -95,7 +108,10 @@ class WebFrameSchedulerTest {
         val clock = TestFrameClock()
         var draws = 0
         lateinit var scheduler: WebFrameScheduler
-        scheduler = WebFrameScheduler(120.0, clock) { draws++; scheduler.requestFrame() }
+        scheduler = WebFrameScheduler(highRefreshRate = true, clock = clock) {
+            draws++
+            scheduler.requestFrame()
+        }
         scheduler.requestFrame()
         clock.fireTimerAndTask()
         clock.fireTimer(at = 5000.0)
@@ -117,22 +133,54 @@ private class TestFrameClock : WebFrameClock {
     val timers = mutableMapOf<Int, Pair<Double, () -> Unit>>()
     val tasks = mutableMapOf<Int, () -> Unit>()
     override fun now() = time
-    override fun requestAnimationFrame(callback: (Double) -> Unit) = (++nextId).also { rafs[it] = callback }
-    override fun cancelAnimationFrame(id: Int) { rafs.remove(id) }
-    override fun setTimeout(callback: () -> Unit, delay: Double) = (++nextId).also { timers[it] = time + delay to callback }
-    override fun cancelTimeout(id: Int) { timers.remove(id) }
-    override fun postTask(callback: () -> Unit) = (++nextId).also { tasks[it] = callback }
-    override fun cancelTask(id: Int) { tasks.remove(id) }
+
+    override fun requestAnimationFrame(callback: (Double) -> Unit): Int =
+        (++nextId).also { rafs[it] = callback }
+
+    override fun cancelAnimationFrame(id: Int) {
+        rafs.remove(id)
+    }
+
+    override fun setTimeout(callback: () -> Unit, delay: Double): Int =
+        (++nextId).also { timers[it] = time + delay to callback }
+
+    override fun cancelTimeout(id: Int) {
+        timers.remove(id)
+    }
+
+    override fun postTask(callback: () -> Unit): Int = (++nextId).also { tasks[it] = callback }
+
+    override fun cancelTask(id: Int) {
+        tasks.remove(id)
+    }
+
     override fun isVisible() = visible
-    override fun addVisibilityListener(callback: () -> Unit) { visibilityListener = callback }
-    override fun removeVisibilityListener(callback: () -> Unit) { assertSame(visibilityListener, callback); visibilityListener = null }
-    override fun setHighRefreshRateActive(active: Boolean) { this.active = active }
-    override fun close() { closed = true; tasks.clear() }
-    fun changeVisibility(value: Boolean) { visible = value; visibilityListener?.invoke() }
+
+    override fun setVisibilityListener(callback: (() -> Unit)?) {
+        visibilityListener = callback
+    }
+
+    override fun setHighRefreshRateActive(active: Boolean) {
+        this.active = active
+    }
+
+    override fun close() {
+        closed = true
+        visibilityListener = null
+        tasks.clear()
+    }
+
+    fun changeVisibility(value: Boolean) {
+        visible = value
+        visibilityListener?.invoke()
+    }
+
     fun vsync(timestamp: Double) {
-        val callbacks = rafs.values.toList(); rafs.clear()
+        val callbacks = rafs.values.toList()
+        rafs.clear()
         callbacks.forEach { it(timestamp) }
     }
+
     fun fireTimer(at: Double? = null) {
         val entry = timers.minBy { it.value.first }
         val timer = entry.value
@@ -140,10 +188,12 @@ private class TestFrameClock : WebFrameClock {
         time = at ?: timer.first
         timer.second()
     }
+
     fun fireTask() {
         val id = tasks.keys.first()
         tasks.remove(id)!!.invoke()
     }
+
     fun fireTimerAndTask(roundToMilliseconds: Boolean = false) {
         val due = timers.values.minOf { it.first }
         fireTimer(if (roundToMilliseconds) kotlin.math.ceil(due) else due)

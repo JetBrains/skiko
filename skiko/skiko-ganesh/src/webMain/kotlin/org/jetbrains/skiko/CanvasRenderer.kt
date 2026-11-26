@@ -6,14 +6,12 @@ import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.wasm.EmscriptenWebGLContextAttributes
 import org.khronos.webgl.WebGLRenderingContextBase
-import org.w3c.dom.HTMLCanvasElement
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
 import kotlin.js.js
 
 /**
- * CanvasRenderer takes an [HTMLCanvasElement] instance and initializes
- * skiko's [Canvas] used for drawing (see [initCanvas]).
+ * Initializes Skiko's [Canvas] using an existing WebGL context (see [initCanvas]).
  *
  * After initialization [needRedraw] can be used to schedule a call to [drawFrame].
  * [drawFrame] has to be implemented to perform the actual drawing on [canvas].
@@ -24,7 +22,7 @@ abstract class CanvasRenderer(
     width: Int,
     height: Int,
     requestedSampleCount: Int = 1, // it must be the actual sampling from the current webgl context.
-    targetFrameRate: Double? = null,
+    highRefreshRate: Boolean = false,
 ) {
     var width: Int = width
         private set
@@ -56,7 +54,7 @@ abstract class CanvasRenderer(
         initCanvas()
     }
 
-    private val frameScheduler = WebFrameScheduler(targetFrameRate) callback@{ timestamp ->
+    private val frameScheduler = WebFrameScheduler(highRefreshRate) callback@{ timestamp ->
         if (isDisposed) return@callback
 
         GL.makeContextCurrent(contextPointer)

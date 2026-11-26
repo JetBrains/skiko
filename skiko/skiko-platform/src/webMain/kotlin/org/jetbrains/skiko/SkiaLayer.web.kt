@@ -10,10 +10,9 @@ import org.jetbrains.skiko.wasm.EmscriptenWebGLContextAttributes
 import org.jetbrains.skiko.wasm.createWebGLContextForCanvas
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
-import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
-import kotlin.js.js
 import kotlin.js.JsNumber
+import kotlin.js.js
 import kotlin.js.toInt
 import kotlin.js.unsafeCast
 
@@ -113,8 +112,8 @@ actual open class SkiaLayer {
     }
 
     /**
-     * Recreates the drawing surface to match the current size of the attached canvas
-     * element. Call this after changing the canvas element's `width`/`height` attributes.
+     * Resizes the rendering buffer and drawing surface. For a transferred canvas,
+     * change its CSS size and call this instead of assigning HTML `width`/`height`.
      */
     fun resize(width: Int, height: Int) {
         val renderer = checkNotNull(state) { "SkiaLayer is not attached to a canvas" }
@@ -131,7 +130,7 @@ actual open class SkiaLayer {
      * Initializes the [CanvasRenderer] and events listeners.
      * Delegates rendering and events processing to [renderDelegate].
      */
-    @OptIn(ExperimentalWasmJsInterop::class)
+    @OptIn(ExperimentalSkikoApi::class)
     private fun attachTo(htmlCanvas: HTMLCanvasElement) {
         if (this.htmlCanvas === htmlCanvas && state != null) {
             // Re-attaching to the same canvas: reuse the WebGL context and DirectContext.
@@ -159,7 +158,7 @@ actual open class SkiaLayer {
             width = renderingWidth(backing),
             height = renderingHeight(backing),
             requestedSampleCount = sampleCount,
-            targetFrameRate = if (experimentalHighRefreshRateEnabled && backing !== htmlCanvas) 120.0 else null
+            highRefreshRate = experimentalHighRefreshRateEnabled && backing !== htmlCanvas
         ) {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
@@ -182,11 +181,17 @@ actual open class SkiaLayer {
 // HTMLCanvasElement.transferControlToOffscreen() can only be called once.
 private val transferredCanvases: JsAny = js("new WeakMap()")
 
-@OptIn(ExperimentalWasmJsInterop::class)
-private fun acquireRenderingCanvas(canvas: HTMLCanvasElement, enabled: Boolean, cache: JsAny = transferredCanvases): JsAny = js("""(function() {
+//language=JavaScript
+private fun acquireRenderingCanvas(
+    canvas: HTMLCanvasElement,
+    enabled: Boolean,
+    cache: JsAny = transferredCanvases
+): JsAny = js("""(function() {
     var cached = cache.get(canvas);
     if (cached) return cached;
-    if (!enabled || typeof canvas.transferControlToOffscreen !== 'function' || typeof OffscreenCanvas === 'undefined') return canvas;
+    if (!enabled || typeof canvas.transferControlToOffscreen !== 'function' || typeof OffscreenCanvas === 'undefined') {
+        return canvas;
+    }
     var probe = new OffscreenCanvas(1, 1);
     var gl = probe.getContext('webgl2');
     if (!gl) return canvas;

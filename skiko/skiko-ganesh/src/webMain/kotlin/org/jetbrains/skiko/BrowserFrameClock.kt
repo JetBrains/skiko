@@ -7,7 +7,7 @@ import kotlin.js.js
 
 internal class BrowserFrameClock : WebFrameClock {
     private var channel: JsAny? = null
-    private var visibilitySubscription: JsAny? = null
+    private var visibilityListener: JsAny? = null
     private var active = false
     private var nextId = 0
     private val tasks = mutableMapOf<Int, () -> Unit>()
@@ -17,6 +17,7 @@ internal class BrowserFrameClock : WebFrameClock {
     override fun cancelAnimationFrame(id: Int) = browserCancelRaf(id)
     override fun setTimeout(callback: () -> Unit, delay: Double) = browserTimeout(callback, delay)
     override fun cancelTimeout(id: Int) = browserCancelTimeout(id)
+
     override fun postTask(callback: () -> Unit): Int {
         val port = channel ?: createChannel { id -> tasks.remove(id)?.invoke() }.also { channel = it }
         val id = ++nextId
@@ -24,22 +25,26 @@ internal class BrowserFrameClock : WebFrameClock {
         postChannel(port, id)
         return id
     }
-    override fun cancelTask(id: Int) { tasks.remove(id) }
+    override fun cancelTask(id: Int) {
+        tasks.remove(id)
+    }
+
     override fun isVisible() = browserVisible()
-    override fun addVisibilityListener(callback: () -> Unit) {
-        visibilitySubscription = addVisibility(callback)
+
+    override fun setVisibilityListener(callback: (() -> Unit)?) {
+        visibilityListener?.let(::removeVisibility)
+        visibilityListener = callback?.let(::addVisibility)
     }
-    override fun removeVisibilityListener(callback: () -> Unit) {
-        visibilitySubscription?.let(::removeVisibility)
-        visibilitySubscription = null
-    }
+
     override fun setHighRefreshRateActive(active: Boolean) {
         if (this.active == active) return
         this.active = active
         updateDisplayBoost(if (active) 1 else -1, displayBoost)
     }
+
     override fun close() {
         setHighRefreshRateActive(false)
+        setVisibilityListener(null)
         channel?.let(::closeChannel)
         channel = null
         tasks.clear()
@@ -52,12 +57,16 @@ private fun browserCancelRaf(id: Int): Unit = js("cancelAnimationFrame(id)")
 private fun browserTimeout(callback: () -> Unit, delay: Double): Int = js("setTimeout(callback, delay)")
 private fun browserCancelTimeout(id: Int): Unit = js("clearTimeout(id)")
 private fun browserVisible(): Boolean = js("!document.hidden")
+
+// Keep the exact JS listener for removal on both Kotlin/JS and Kotlin/Wasm.
+//language=JavaScript
 private fun addVisibility(callback: () -> Unit): JsAny = js("""(function() {
-    var subscription = { listener: function() { callback(); } };
-    document.addEventListener('visibilitychange', subscription.listener);
-    return subscription;
+    document.addEventListener('visibilitychange', callback);
+    return callback;
 })()""")
-private fun removeVisibility(subscription: JsAny): Unit = js("document.removeEventListener('visibilitychange', subscription.listener)")
+private fun removeVisibility(listener: JsAny): Unit = js("document.removeEventListener('visibilitychange', listener)")
+
+//language=JavaScript
 private fun createChannel(callback: (Int) -> Unit): JsAny = js("""(function() {
     var channel = new MessageChannel();
     channel.port1.onmessage = function(event) { callback(event.data); };
@@ -66,8 +75,9 @@ private fun createChannel(callback: (Int) -> Unit): JsAny = js("""(function() {
 private fun postChannel(channel: JsAny, id: Int): Unit = js("channel.port2.postMessage(id)")
 private fun closeChannel(channel: JsAny): Unit = js("{ channel.port1.close(); channel.port2.close(); }")
 
-// One shared compositor animation/scroller for all active high-refresh layers.
+// ProMotion needs scrolling plus a compositor animation to reach 120 Hz. Share them between active layers.
 private val displayBoost: JsAny = js("({ users: 0, element: null, timer: null, animation: null })")
+//language=JavaScript
 private fun updateDisplayBoost(delta: Int, state: JsAny): Unit = js("""(function() {
     state.users += delta;
     if (state.users > 0 && !state.element && document.body) {
@@ -83,12 +93,15 @@ private fun updateDisplayBoost(delta: Int, state: JsAny): Unit = js("""(function
         scroller.appendChild(spacer);
         document.body.appendChild(scroller);
         state.element = scroller;
-        state.animation = animated.animate([{transform:'translateX(0)'},{transform:'translateX(0.1px)'}], {duration:1000,iterations:Infinity,direction:'alternate'});
+        state.animation = animated.animate(
+            [{ transform: 'translateX(0)' }, { transform: 'translateX(0.1px)' }],
+            { duration: 1000, iterations: Infinity, direction: 'alternate' }
+        );
         var down = true;
         var scroll = function() {
             clearTimeout(state.timer);
             if (state.element !== scroller) return;
-            scroller.scrollTo({top:down ? 9000 : 0,behavior:'smooth'});
+            scroller.scrollTo({ top: down ? 9000 : 0, behavior: 'smooth' });
             down = !down;
             state.timer = setTimeout(scroll, 1500);
         };

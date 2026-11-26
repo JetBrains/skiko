@@ -2,17 +2,12 @@ package org.jetbrains.skiko
 
 import kotlin.math.ceil
 
-/** rAF by default; opt-in pacing uses timer -> MessageChannel tasks on a vsync phase grid. */
+/** Uses rAF by default, or timer/MessageChannel tasks aligned to rAF for the 120 Hz experiment. */
 internal class WebFrameScheduler(
-    targetFrameRate: Double? = null,
+    private val highRefreshRate: Boolean = false,
     private val clock: WebFrameClock = BrowserFrameClock(),
     private val drawFrame: (Double) -> Unit
 ) {
-    init {
-        require(targetFrameRate == null || targetFrameRate.isFinite() && targetFrameRate in 1.0..240.0)
-    }
-
-    private val period = targetFrameRate?.let { 1000.0 / it }
     private var requested = false
     private var disposed = false
     private var timer: Int? = null
@@ -26,29 +21,29 @@ internal class WebFrameScheduler(
             phase = Double.NaN
             lastDraw = Double.NEGATIVE_INFINITY
             if (requested) schedule()
-        } else stop()
-    }
-
-    init {
-        if (period != null) clock.addVisibilityListener(visibilityChanged)
-    }
-
-    private val animationCallback: (Double) -> Unit = { timestamp ->
-        raf = null
-        if (!disposed) {
-            if (period == null) {
-                requested = false
-                drawFrame(timestamp)
-            } else if (requested && clock.isVisible()) {
-                // Safari flushes scroll positions on rendering updates. Keep this loop
-                // active only while frames are requested, and use its timestamp as phase.
-                phase = timestamp
-                raf = clock.requestAnimationFrame(animationCallbackRef())
-            }
+        } else {
+            stop()
         }
     }
 
-    private fun animationCallbackRef() = animationCallback
+    init {
+        if (highRefreshRate) clock.setVisibilityListener(visibilityChanged)
+    }
+
+    private val animationCallback: (Double) -> Unit = { onAnimationFrame(it) }
+
+    private fun onAnimationFrame(timestamp: Double) {
+        raf = null
+        if (disposed) return
+        if (!highRefreshRate) {
+            requested = false
+            drawFrame(timestamp)
+        } else if (requested && clock.isVisible()) {
+            // Queued rendering updates make Safari flush scroll positions without waiting for IPC acknowledgements.
+            phase = timestamp
+            raf = clock.requestAnimationFrame(animationCallback)
+        }
+    }
 
     fun requestFrame() {
         if (disposed || requested) return
@@ -57,7 +52,7 @@ internal class WebFrameScheduler(
     }
 
     private fun schedule() {
-        if (period == null) {
+        if (!highRefreshRate) {
             raf = clock.requestAnimationFrame(animationCallback)
             return
         }
@@ -65,17 +60,20 @@ internal class WebFrameScheduler(
         clock.setHighRefreshRateActive(true)
         if (raf == null) raf = clock.requestAnimationFrame(animationCallback)
         val now = clock.now()
-        // performance.now() can be rounded to milliseconds on iOS. Derive the
-        // minimum spacing from the refresh interval, not a hardcoded 8.33 ms gate.
-        val earliest = maxOf(now, lastDraw + period * 0.8)
-        deadline = if (phase.isNaN()) maxOf(now, lastDraw + period)
-        else phase + ceil((earliest - phase) / period) * period
+        val earliest = maxOf(now, lastDraw + MIN_FRAME_SPACING)
+        // A 60 Hz rAF timestamp anchors two 120 Hz frame slots.
+        deadline = if (phase.isNaN()) {
+            maxOf(now, lastDraw + FRAME_INTERVAL)
+        } else {
+            phase + ceil((earliest - phase) / FRAME_INTERVAL) * FRAME_INTERVAL
+        }
         scheduleTimer(maxOf(0.0, deadline - now))
     }
 
     private fun scheduleTimer(delay: Double) {
         timer = clock.setTimeout({
             timer = null
+            // Yield through a message task so nested timers do not accumulate browser timer clamping.
             task = clock.postTask {
                 task = null
                 tick()
@@ -86,8 +84,7 @@ internal class WebFrameScheduler(
     private fun tick() {
         if (disposed || !requested || !clock.isVisible()) return
         val now = clock.now()
-        val interval = period!!
-        val remaining = maxOf(deadline - now - interval * 0.05, lastDraw + interval * 0.8 - now)
+        val remaining = maxOf(deadline - now - DEADLINE_TOLERANCE, lastDraw + MIN_FRAME_SPACING - now)
         if (remaining > 0) {
             scheduleTimer(remaining)
             return
@@ -116,10 +113,14 @@ internal class WebFrameScheduler(
         disposed = true
         requested = false
         stop()
-        if (period != null) clock.removeVisibilityListener(visibilityChanged)
         clock.close()
     }
 }
+
+private const val FRAME_INTERVAL = 1000.0 / 120
+// Leave room for iOS's millisecond clock rounding while preventing duplicate draws near a deadline.
+private const val MIN_FRAME_SPACING = FRAME_INTERVAL * 0.8
+private const val DEADLINE_TOLERANCE = FRAME_INTERVAL * 0.05
 
 internal interface WebFrameClock {
     fun now(): Double
@@ -130,8 +131,7 @@ internal interface WebFrameClock {
     fun postTask(callback: () -> Unit): Int
     fun cancelTask(id: Int)
     fun isVisible(): Boolean
-    fun addVisibilityListener(callback: () -> Unit)
-    fun removeVisibilityListener(callback: () -> Unit)
+    fun setVisibilityListener(callback: (() -> Unit)?)
     fun setHighRefreshRateActive(active: Boolean)
     fun close()
 }

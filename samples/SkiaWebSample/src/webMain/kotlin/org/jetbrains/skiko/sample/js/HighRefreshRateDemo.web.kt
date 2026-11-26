@@ -3,7 +3,6 @@
 package org.jetbrains.skiko.sample.js
 
 import kotlinx.browser.document
-import kotlinx.browser.window
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.Paint
 import org.jetbrains.skiko.SkiaLayer
@@ -23,7 +22,8 @@ internal fun runHighRefreshRateDemo() {
         var frames = 0
         layer.renderDelegate = SkikoRenderDelegate { canvas, width, height, nanos ->
             canvas.clear(Color.WHITE)
-            canvas.drawCircle(((nanos / 1_000_000.0 % 2000) / 2000 * width).toFloat(), height / 2f, 20 * window.devicePixelRatio.toFloat(), paint)
+            val x = ((nanos / 1_000_000.0 % 2000) / 2000 * width).toFloat()
+            canvas.drawCircle(x, height / 2f, 20 * layer.contentScale, paint)
             if (start == 0L) start = nanos else frames++
             val elapsed = (nanos - start) / 1_000_000.0
             if (elapsed >= 1000) {
@@ -34,7 +34,10 @@ internal fun runHighRefreshRateDemo() {
             if (animationEnabled()) layer.needRender()
         }
         layer.attachTo(element)
-        observeSize(element) { width, height -> layer.resize(width, height); layer.needRender() }
+        observeSize(element) { width, height ->
+            layer.resize(width, height)
+            layer.needRender()
+        }
         layer.needRender()
         layers.add(layer)
     }
