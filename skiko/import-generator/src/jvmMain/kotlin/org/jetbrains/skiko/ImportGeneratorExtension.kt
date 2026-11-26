@@ -26,7 +26,9 @@ internal class ImportGeneratorExtension(
             moduleFragment.transformChildrenVoid(importGenerator)
 
             importGenerator.getExportSymbols().forEach { symbolName ->
-                writer.appendLine("export let ${symbolName} = (...a) => ($symbolName = loadedWasm._[\"${symbolName}\"])(...a)")
+                // try/finally works around Safari 27: once JavaScriptCore optimises a bare forwarder, float
+                // arguments can reach the wasm export as zeros (Compose content drawn at the canvas origin).
+                writer.appendLine("export let ${symbolName} = (...a) => { try { return loadedWasm._[\"${symbolName}\"](...a) } finally {} }")
             }
         }
 
