@@ -21,14 +21,15 @@ include("docs")
 include("import-generator")
 include("test-utils")
 include("skiko-skottie")
-val supportAnyNativeIos = System.getProperty("idea.active")?.toBoolean() == true || listOf(
+val supportGpuProviders = System.getProperty("idea.active")?.toBoolean() == true || listOf(
     "skiko.native.enabled",
+    "skiko.native.mac.enabled",
     "skiko.native.ios.enabled",
     "skiko.native.ios.arm64.enabled",
     "skiko.native.ios.simulatorArm64.enabled",
     "skiko.native.ios.x64.enabled",
 ).any { providers.gradleProperty(it).orNull == "true" }
-if (supportAnyNativeIos) {
+if (supportGpuProviders) {
     include("skiko-gpu")
     include("skiko-ganesh-gpu-provider")
     include("skiko-graphite-gpu-provider")
