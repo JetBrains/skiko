@@ -58,6 +58,25 @@ class FontCollectionTest {
     }
 
     @Test
+    fun clearCachesRefreshesTypefaceLookup() = runTest {
+        Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf").use { typeface ->
+            TypefaceFontProvider().use { manager ->
+                FontCollection().use { collection ->
+                    collection.setAssetFontManager(manager)
+                    val families = arrayOf("Cache Test Mono")
+                    assertEquals(0, collection.findTypefaces(families, FontStyle.NORMAL).size)
+
+                    manager.registerTypeface(typeface, families.single())
+                    collection.clearCaches()
+
+                    val resolved = collection.findTypefaces(families, FontStyle.NORMAL).single()
+                    assertNotNull(resolved).use { assertEquals(typeface.uniqueId, it.uniqueId) }
+                }
+            }
+        }
+    }
+
+    @Test
     fun familyNameTest() = runTest {
         val fm = TypefaceFontProvider()
         val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf", 0)

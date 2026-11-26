@@ -100,6 +100,12 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_FontCollecti
         instance->disableFontFallback();
 }
 
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nClearCaches
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    FontCollection* instance = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(ptr));
+    instance->clearCaches();
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nGetParagraphCache
   (JNIEnv* env, jclass jclass, jlong ptr) {
     FontCollection* instance = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(ptr));
