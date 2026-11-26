@@ -46,7 +46,7 @@ external interface EmscriptenWebGLContextAttributes : JsAny {
  * Skiko initializes the context.
  */
 //language=js
-internal fun patchWebGlContext(canvas: HTMLCanvasElement): Unit = js("""{
+internal fun patchWebGlContext(canvas: JsAny): Unit = js("""{
     if (!canvas.getContext.webGlContextPatched) {
         var oldGetContext = canvas.getContext;
         canvas.getContext = function() {
@@ -122,6 +122,13 @@ private external fun contextAttributesWithDefaults(attr: EmscriptenWebGLContextA
 @InternalSkikoApi
 fun createWebGLContext(
     canvas: HTMLCanvasElement,
+    attr: EmscriptenWebGLContextAttributes? = null
+): NativePointer = createWebGLContextForCanvas(canvas, attr)
+
+/** Accepts an HTMLCanvasElement or a transferred OffscreenCanvas owned by this realm. */
+@InternalSkikoApi
+fun createWebGLContextForCanvas(
+    canvas: JsAny,
     attr: EmscriptenWebGLContextAttributes? = null
 ): NativePointer {
     patchWebGlContext(canvas)

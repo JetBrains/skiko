@@ -38,7 +38,7 @@ internal class ImportGeneratorExtension(
         reexportFile.writer().use { reexportWriter ->
             reexportWriter.appendLine("import * as wasmApi from \"./$moduleName.mjs\";")
             if (moduleName == "skiko") {
-                reexportWriter.appendLine("window['GL'] = wasmApi.GL;")
+                reexportWriter.appendLine("globalThis['GL'] = wasmApi.GL;")
                 reexportWriter.appendLine("export const api = { awaitSkiko: wasmApi.awaitSkiko }")
             }
             else {
@@ -50,9 +50,9 @@ internal class ImportGeneratorExtension(
 
             importGenerator.getExportSymbols().forEach { symbolName ->
                 if (symbolName in importGenerator.getBooleanExportSymbols()) {
-                    reexportWriter.appendLine("window['${symbolName}'] = (...a) => !!wasmApi['${symbolName}'](...a);")
+                    reexportWriter.appendLine("globalThis['${symbolName}'] = (...a) => !!wasmApi['${symbolName}'](...a);")
                 } else {
-                    reexportWriter.appendLine("window['${symbolName}'] = wasmApi['${symbolName}'];")
+                    reexportWriter.appendLine("globalThis['${symbolName}'] = wasmApi['${symbolName}'];")
                 }
             }
         }

@@ -1,9 +1,9 @@
 package org.jetbrains.skiko
 
-actual fun currentNanoTime(): Long = currentNanoTimeWindowPerformance().toLong()
+actual fun currentNanoTime(): Long = currentNanoTimePerformance().toLong()
 
-private fun currentNanoTimeWindowPerformance(): Double =
+private fun currentNanoTimePerformance(): Double =
     //language=JavaScript
-    js("window.performance.now() * 1000000")
+    js("globalThis.performance.now() * 1000000")
 
 annotation class WebImport(val name: String)

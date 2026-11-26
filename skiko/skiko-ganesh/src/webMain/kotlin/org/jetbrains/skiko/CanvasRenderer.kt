@@ -8,6 +8,7 @@ import org.jetbrains.skiko.wasm.EmscriptenWebGLContextAttributes
 import org.khronos.webgl.WebGLRenderingContextBase
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.js.ExperimentalWasmJsInterop
+import kotlin.js.JsAny
 import kotlin.js.js
 
 /**
@@ -23,6 +24,7 @@ abstract class CanvasRenderer(
     width: Int,
     height: Int,
     requestedSampleCount: Int = 1, // it must be the actual sampling from the current webgl context.
+    targetFrameRate: Double? = null,
 ) {
     var width: Int = width
         private set
@@ -54,8 +56,7 @@ abstract class CanvasRenderer(
         initCanvas()
     }
 
-    private val requestAnimationFrameCallback: (timestamp: Double) -> Unit = callback@{ timestamp ->
-        redrawScheduled = false
+    private val frameScheduler = WebFrameScheduler(targetFrameRate) callback@{ timestamp ->
         if (isDisposed) return@callback
 
         GL.makeContextCurrent(contextPointer)
@@ -120,6 +121,7 @@ abstract class CanvasRenderer(
     fun dispose() {
         if (isDisposed) return
         isDisposed = true
+        frameScheduler.dispose()
         GL.makeContextCurrent(contextPointer)
         disposeCanvas()
         canvas = null
@@ -133,29 +135,17 @@ abstract class CanvasRenderer(
      */
     abstract fun drawFrame(currentTimestamp: Double)
 
-    private var redrawScheduled = false
-
     /**
      * Schedules a call to [drawFrame] to the appropriate moment.
      */
-    @OptIn(ExperimentalWasmJsInterop::class)
     fun needRedraw() {
-        if (isDisposed || redrawScheduled) {
-            return
-        }
-        redrawScheduled = true
-        windowRequestAnimationFrame(requestAnimationFrameCallback)
+        if (!isDisposed) frameScheduler.requestFrame()
     }
 }
 
-@OptIn(ExperimentalWasmJsInterop::class)
-private fun windowRequestAnimationFrame(callback: (Double) -> Unit) : Int =
-    //language=JavaScript
-    js("window.requestAnimationFrame(callback)")
-
 @InternalSkikoApi
 external interface GLInterface {
-    fun createContext(context: HTMLCanvasElement, contextAttributes: EmscriptenWebGLContextAttributes): NativePointer
+    fun createContext(context: JsAny, contextAttributes: EmscriptenWebGLContextAttributes): NativePointer
     fun makeContextCurrent(contextPointer: NativePointer): Boolean
 }
 
