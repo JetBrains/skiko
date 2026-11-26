@@ -27,6 +27,49 @@ import kotlin.test.assertTrue
 
 class SkiaLayerTest {
 
+    @OptIn(ExperimentalSkikoApi::class)
+    @Test
+    fun highRefreshCanvasResizesAndSurvivesReattach() = runTest {
+        withLayer(100, 100) { canvas, layer ->
+            layer.experimentalHighRefreshRateEnabled = true
+            val delegate = TestRenderDelegate(Color.RED)
+            layer.renderDelegate = delegate
+            layer.attachTo(canvas)
+            val initialState = assertNotNull(layer.state)
+            layer.needRender()
+            repeat(3) { awaitAnimationFrame() }
+            delegate.assertRendered(100, 100, Color.RED, "high refresh initial frame")
+            assertSame(canvas, layer.component, "component remains the original DOM canvas")
+
+            layer.resize(230, 170)
+            layer.attachTo(canvas)
+            assertSame(initialState, layer.state)
+            layer.needRender()
+            repeat(3) { awaitAnimationFrame() }
+            delegate.assertRendered(230, 170, Color.RED, "high refresh resize")
+
+            layer.detach()
+            layer.attachTo(canvas) // A second transfer would throw InvalidStateError.
+            layer.needRender()
+            repeat(3) { awaitAnimationFrame() }
+            delegate.assertRendered(230, 170, Color.RED, "reattach keeps transferred backing")
+        }
+    }
+
+    @OptIn(ExperimentalSkikoApi::class)
+    @Test
+    fun highRefreshFallsBackWhenCanvasAlreadyHasAContext() = runTest {
+        withLayer(100, 100) { canvas, layer ->
+            assertNotNull(canvas.getContext("webgl2"))
+            layer.experimentalHighRefreshRateEnabled = true
+            val delegate = TestRenderDelegate(Color.BLUE)
+            layer.renderDelegate = delegate
+            layer.attachTo(canvas)
+            layer.requestAndAwaitRender()
+            delegate.assertRendered(100, 100, Color.BLUE, "fallback to an existing HTML canvas context")
+        }
+    }
+
     @Test
     fun explicitResizeRecreatesSurface() = runTest {
         withLayer(100, 100) { canvas, layer ->

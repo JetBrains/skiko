@@ -4,111 +4,149 @@ import kotlin.test.*
 
 class WebFrameSchedulerTest {
     @Test
-    fun defaultUsesAnimationFramesAndCoalescesRequests() {
+    fun ordinaryModeUsesOnlyRafAndCoalesces() {
         val clock = TestFrameClock()
-        val frames = mutableListOf<Double>()
-        val scheduler = WebFrameScheduler(clock = clock) { frames.add(it) }
+        var draws = 0
+        val scheduler = WebFrameScheduler(clock = clock) { draws++ }
         repeat(5) { scheduler.requestFrame() }
-        assertEquals(1, clock.animationFrames.size)
+        assertEquals(1, clock.rafs.size)
         assertTrue(clock.timers.isEmpty())
-        clock.animationFrame(16.7)
-        assertEquals(listOf(16.7), frames)
-        scheduler.requestFrame()
+        clock.vsync(16.0)
+        assertEquals(1, draws)
+        assertFalse(clock.active)
         scheduler.dispose()
-        assertTrue(clock.animationFrames.isEmpty())
-        scheduler.requestFrame()
-        assertTrue(clock.animationFrames.isEmpty())
+        assertTrue(clock.rafs.isEmpty())
     }
 
     @Test
-    fun timerPreservesFractionalPeriodsAndCanRequestFromCallback() {
+    fun highRefreshUsesTaskAfterTimerAndStopsWhenIdle() {
         val clock = TestFrameClock()
-        val frames = mutableListOf<Double>()
-        lateinit var scheduler: WebFrameScheduler
-        scheduler = WebFrameScheduler(120.0, clock) {
-            frames.add(it)
-            scheduler.requestFrame()
-        }
+        var draws = 0
+        val scheduler = WebFrameScheduler(120.0, clock) { draws++ }
         repeat(5) { scheduler.requestFrame() }
-        assertEquals(1, clock.timers.size)
-        assertTrue(clock.animationFrames.isEmpty())
-        repeat(121) { clock.fireNextTimer() }
-        assertEquals(121, frames.size)
-        assertEquals(1000.0, frames.last(), 0.000001)
-        assertEquals(1, clock.timers.size)
-        scheduler.dispose()
+        assertTrue(clock.active)
+        clock.fireTimer()
+        assertEquals(0, draws, "timer must yield through MessageChannel")
+        clock.fireTask()
+        assertEquals(1, draws)
+        assertFalse(clock.active)
+        assertTrue(clock.rafs.isEmpty())
         assertTrue(clock.timers.isEmpty())
+        scheduler.dispose()
+        assertTrue(clock.closed)
+        assertNull(clock.visibilityListener)
     }
 
     @Test
-    fun earlyTimersWaitAndStallsDoNotReplayMissedFrames() {
+    fun rafDefinesPhaseEvenWhenItsRateIsSixtyHz() {
         val clock = TestFrameClock()
-        val frames = mutableListOf<Double>()
+        val timestamps = mutableListOf<Double>()
         lateinit var scheduler: WebFrameScheduler
-        scheduler = WebFrameScheduler(120.0, clock) {
-            frames.add(it)
-            scheduler.requestFrame()
-        }
+        scheduler = WebFrameScheduler(120.0, clock) { timestamps.add(it); scheduler.requestFrame() }
         scheduler.requestFrame()
-        clock.fireNextTimer()
-        clock.fireNextTimer(at = 8.0) // Simulate setTimeout rounding down.
-        assertEquals(listOf(0.0), frames)
-        assertEquals(1, clock.timers.size)
-        clock.fireNextTimer(at = 100.0) // Simulate a busy/suspended worker.
-        assertEquals(listOf(0.0, 100.0), frames)
-        clock.fireNextTimer()
-        assertEquals(100.0 + 1000.0 / 120, frames.last(), 0.000001)
+        clock.fireTimerAndTask()
+        clock.vsync(2.0) // The next requested frame adopts this phase.
+        clock.fireTimerAndTask()
+        assertEquals(2.0 + 2 * 1000.0 / 120, clock.timers.values.single().first, 0.00001)
         scheduler.dispose()
     }
 
     @Test
-    fun idleAndDisposedSchedulersDoNotRun() {
+    fun roundedMillisecondsDoNotClampRenderingTo111Hz() {
         val clock = TestFrameClock()
-        var frames = 0
-        val scheduler = WebFrameScheduler(120.0, clock) { frames++ }
-        assertTrue(clock.timers.isEmpty())
+        val timestamps = mutableListOf<Double>()
+        lateinit var scheduler: WebFrameScheduler
+        scheduler = WebFrameScheduler(120.0, clock) { timestamps.add(it); scheduler.requestFrame() }
         scheduler.requestFrame()
+        repeat(121) {
+            clock.fireTimerAndTask(roundToMilliseconds = true)
+            if (it % 2 == 0) clock.vsync(it * 1000.0 / 120)
+        }
+        assertTrue(timestamps.last() in 990.0..1020.0, "120 intervals should take about one second: ${timestamps.last()}")
         scheduler.dispose()
-        scheduler.dispose()
-        scheduler.requestFrame()
-        assertTrue(clock.timers.isEmpty())
-        assertEquals(0, frames)
     }
 
     @Test
-    fun invalidRatesAreRejected() {
-        for (rate in listOf(0.0, -120.0, Double.NaN, Double.POSITIVE_INFINITY)) {
-            assertFailsWith<IllegalArgumentException> { WebFrameScheduler(rate) {} }
-        }
+    fun hiddenPagePausesPendingTaskAndResumesWithoutCatchup() {
+        val clock = TestFrameClock()
+        var draws = 0
+        lateinit var scheduler: WebFrameScheduler
+        scheduler = WebFrameScheduler(120.0, clock) { draws++; scheduler.requestFrame() }
+        scheduler.requestFrame()
+        clock.fireTimer()
+        clock.changeVisibility(false)
+        assertTrue(clock.tasks.isEmpty())
+        assertTrue(clock.rafs.isEmpty())
+        assertFalse(clock.active)
+        clock.time = 10000.0
+        clock.changeVisibility(true)
+        clock.fireTimerAndTask()
+        assertEquals(1, draws)
+        assertTrue(clock.timers.values.single().first > 10000)
+        scheduler.dispose()
+        assertFalse(clock.active)
+        assertTrue(clock.timers.isEmpty())
+        scheduler.requestFrame()
+        assertTrue(clock.timers.isEmpty())
+    }
+
+    @Test
+    fun missedDeadlinesDoNotReplayFrames() {
+        val clock = TestFrameClock()
+        var draws = 0
+        lateinit var scheduler: WebFrameScheduler
+        scheduler = WebFrameScheduler(120.0, clock) { draws++; scheduler.requestFrame() }
+        scheduler.requestFrame()
+        clock.fireTimerAndTask()
+        clock.fireTimer(at = 5000.0)
+        clock.fireTask()
+        assertEquals(2, draws)
+        assertTrue(clock.timers.values.single().first > 5000)
+        scheduler.dispose()
     }
 }
 
 private class TestFrameClock : WebFrameClock {
-    private var time = 0.0
+    var time = 0.0
+    var active = false
+    var closed = false
+    private var visible = true
     private var nextId = 0
-    val animationFrames = mutableMapOf<Int, (Double) -> Unit>()
+    var visibilityListener: (() -> Unit)? = null
+    val rafs = mutableMapOf<Int, (Double) -> Unit>()
     val timers = mutableMapOf<Int, Pair<Double, () -> Unit>>()
-
+    val tasks = mutableMapOf<Int, () -> Unit>()
     override fun now() = time
-    override fun requestAnimationFrame(callback: (Double) -> Unit): Int =
-        (++nextId).also { animationFrames[it] = callback }
-    override fun cancelAnimationFrame(id: Int) { animationFrames.remove(id) }
-    override fun setTimeout(callback: () -> Unit, delay: Double): Int =
-        (++nextId).also { timers[it] = time + delay to callback }
+    override fun requestAnimationFrame(callback: (Double) -> Unit) = (++nextId).also { rafs[it] = callback }
+    override fun cancelAnimationFrame(id: Int) { rafs.remove(id) }
+    override fun setTimeout(callback: () -> Unit, delay: Double) = (++nextId).also { timers[it] = time + delay to callback }
     override fun cancelTimeout(id: Int) { timers.remove(id) }
-
-    fun animationFrame(at: Double) {
-        time = at
-        val callbacks = animationFrames.values.toList()
-        animationFrames.clear()
-        callbacks.forEach { it(at) }
+    override fun postTask(callback: () -> Unit) = (++nextId).also { tasks[it] = callback }
+    override fun cancelTask(id: Int) { tasks.remove(id) }
+    override fun isVisible() = visible
+    override fun addVisibilityListener(callback: () -> Unit) { visibilityListener = callback }
+    override fun removeVisibilityListener(callback: () -> Unit) { assertSame(visibilityListener, callback); visibilityListener = null }
+    override fun setHighRefreshRateActive(active: Boolean) { this.active = active }
+    override fun close() { closed = true; tasks.clear() }
+    fun changeVisibility(value: Boolean) { visible = value; visibilityListener?.invoke() }
+    fun vsync(timestamp: Double) {
+        val callbacks = rafs.values.toList(); rafs.clear()
+        callbacks.forEach { it(timestamp) }
     }
-
-    fun fireNextTimer(at: Double? = null) {
+    fun fireTimer(at: Double? = null) {
         val entry = timers.minBy { it.value.first }
         val timer = entry.value
         timers.remove(entry.key)
         time = at ?: timer.first
         timer.second()
+    }
+    fun fireTask() {
+        val id = tasks.keys.first()
+        tasks.remove(id)!!.invoke()
+    }
+    fun fireTimerAndTask(roundToMilliseconds: Boolean = false) {
+        val due = timers.values.minOf { it.first }
+        fireTimer(if (roundToMilliseconds) kotlin.math.ceil(due) else due)
+        fireTask()
     }
 }

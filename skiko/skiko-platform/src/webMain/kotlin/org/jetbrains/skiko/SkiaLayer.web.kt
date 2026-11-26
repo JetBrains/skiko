@@ -2,19 +2,20 @@
 
 package org.jetbrains.skiko
 
+import kotlinx.browser.window
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.PixelGeometry
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skiko.wasm.EmscriptenWebGLContextAttributes
 import org.jetbrains.skiko.wasm.createWebGLContextForCanvas
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
+import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
+import kotlin.js.js
 import kotlin.js.JsNumber
 import kotlin.js.toInt
 import kotlin.js.unsafeCast
-import kotlin.js.js
 
 /**
  * Provides a way to render the content and to receive the input events.
@@ -40,6 +41,22 @@ actual open class SkiaLayer {
 
     internal var state: CanvasRenderer? = null
 
+    /**
+     * Requests experimental 120 Hz rendering using a transferred OffscreenCanvas.
+     * Set before attaching. The render delegate and DOM events stay on the main thread.
+     * Falls back to ordinary rAF when transfer or OffscreenCanvas WebGL2 is unavailable.
+     * Transfer is irreversible; use [resize] rather than changing HTML canvas dimensions.
+     * Actual presentation rate depends on WebKit, the display and power settings.
+     */
+    @ExperimentalSkikoApi
+    var experimentalHighRefreshRateEnabled: Boolean = false
+        set(value) {
+            check(state == null) { "Configure high refresh rate before attaching" }
+            field = value
+        }
+
+    private var renderingCanvas: JsAny? = null
+
     internal var requestEmscriptenWebGLContextAttributes: EmscriptenWebGLContextAttributes? = null
 
     /**
@@ -51,10 +68,7 @@ actual open class SkiaLayer {
      * See https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
      */
     actual val contentScale: Float
-        get() = offscreenContentScale ?: devicePixelRatio().toFloat()
-
-    private var offscreenContentScale: Float? = null
-    private var offscreenFrameRate: Double? = null
+        get() = window.devicePixelRatio.toFloat()
 
     /**
      * Fullscreen is not supported
@@ -94,9 +108,8 @@ actual open class SkiaLayer {
     actual fun detach() {
         state?.dispose()
         state = null
-        attachedCanvas = null
-        offscreenContentScale = null
-        offscreenFrameRate = null
+        htmlCanvas = null
+        renderingCanvas = null
     }
 
     /**
@@ -105,73 +118,35 @@ actual open class SkiaLayer {
      */
     fun resize(width: Int, height: Int) {
         val renderer = checkNotNull(state) { "SkiaLayer is not attached to a canvas" }
-        if (offscreenContentScale != null) resizeOffscreenCanvas(attachedCanvas!!, width, height)
+        renderingCanvas?.let { resizeRenderingCanvas(it, width, height) }
         renderer.resize(width, height)
     }
 
     actual val component: Any?
-        get() = this.attachedCanvas
+        get() = this.htmlCanvas
 
-    private var attachedCanvas: JsAny? = null
-
-    /**
-     * Attaches a transferred `OffscreenCanvas` in a dedicated worker. All rendering,
-     * including [renderDelegate], runs in that worker; DOM access is unavailable.
-     *
-     * [targetFrameRate] uses a timer (120 Hz by default), since worker rAF may also
-     * be limited to 60 Hz. This is a best-effort rate, not a vsync or presentation
-     * guarantee. Pass null to use worker rAF. Safari's display power policy may
-     * still reduce the physical refresh rate.
-     *
-     * Pass the main window's devicePixelRatio as [contentScale]. Forward resize
-     * and visibility changes from the window: call [resize] in physical pixels,
-     * and [detach] while hidden to stop pending work. Reattach to resume.
-     *
-     * The canvas must be transferred before a context is created on its HTML
-     * element. Transfer is irreversible; feature-detect on the main thread first.
-     */
-    @ExperimentalSkikoApi
-    fun attachToOffscreenCanvas(
-        canvas: JsAny,
-        contentScale: Float = 1f,
-        targetFrameRate: Double? = 120.0
-    ) {
-        require(isWorkerOffscreenCanvas(canvas)) { "Expected an OffscreenCanvas in a dedicated worker" }
-        require(contentScale.isFinite() && contentScale > 0) { "contentScale must be finite and positive" }
-        require(targetFrameRate == null || targetFrameRate.isFinite() && targetFrameRate > 0) {
-            "targetFrameRate must be finite and positive"
-        }
-        if (attachedCanvas === canvas && state != null) {
-            require(offscreenFrameRate == targetFrameRate) { "Detach before changing targetFrameRate" }
-            offscreenContentScale = contentScale
-            state!!.resize(canvasWidth(canvas), canvasHeight(canvas))
-            return
-        }
-        detach()
-        offscreenContentScale = contentScale
-        offscreenFrameRate = targetFrameRate
-        attachRenderer(canvas, canvasWidth(canvas), canvasHeight(canvas), targetFrameRate)
-    }
+    private var htmlCanvas: HTMLCanvasElement? = null
 
     /**
      * Initializes the [CanvasRenderer] and events listeners.
      * Delegates rendering and events processing to [renderDelegate].
      */
+    @OptIn(ExperimentalWasmJsInterop::class)
     private fun attachTo(htmlCanvas: HTMLCanvasElement) {
-        if (attachedCanvas === htmlCanvas && state != null) {
+        if (this.htmlCanvas === htmlCanvas && state != null) {
             // Re-attaching to the same canvas: reuse the WebGL context and DirectContext.
             // Creating a second DirectContext over the same WebGLRenderingContext corrupts
             // both contexts' GL state caches once either of them is destroyed (CMP-8615).
-            state!!.resize(htmlCanvas.width, htmlCanvas.height)
+            // A transferred HTML canvas is a placeholder; its dimensions cannot be assigned.
+            if (renderingCanvas === htmlCanvas) state!!.resize(htmlCanvas.width, htmlCanvas.height)
             return
         }
         detach()
-        attachRenderer(htmlCanvas, htmlCanvas.width, htmlCanvas.height)
-    }
+        this.htmlCanvas = htmlCanvas
 
-    private fun attachRenderer(canvasElement: JsAny, width: Int, height: Int, targetFrameRate: Double? = null) {
-        val contextPointer = createWebGLContextForCanvas(canvasElement, requestEmscriptenWebGLContextAttributes)
-        if (contextPointer == Native.NullPointer) throw RenderException("Cannot create WebGL2 context")
+        val backing = acquireRenderingCanvas(htmlCanvas, experimentalHighRefreshRateEnabled)
+        renderingCanvas = backing
+        val contextPointer = createWebGLContextForCanvas(backing, requestEmscriptenWebGLContextAttributes)
         GL.makeContextCurrent(contextPointer)
 
         // Get the actual sampling in the current webgl context and pass it to Skia.
@@ -181,18 +156,17 @@ actual open class SkiaLayer {
 
         state = object : CanvasRenderer(
             contextPointer = contextPointer,
-            width = width,
-            height = height,
+            width = renderingWidth(backing),
+            height = renderingHeight(backing),
             requestedSampleCount = sampleCount,
-            targetFrameRate = targetFrameRate
+            targetFrameRate = if (experimentalHighRefreshRateEnabled && backing !== htmlCanvas) 120.0 else null
         ) {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
                 val currentNanos = currentTimestamp * 1_000_000
-                renderDelegate?.onRender(canvas!!, this.width, this.height, currentNanos.toLong())
+                renderDelegate?.onRender(canvas!!, width, height, currentNanos.toLong())
             }
         }
-        attachedCanvas = canvasElement
     }
 
     internal actual fun draw(canvas: Canvas) {
@@ -204,14 +178,32 @@ actual open class SkiaLayer {
         get() = PixelGeometry.UNKNOWN
 }
 
-private fun devicePixelRatio(): Double = js("globalThis.devicePixelRatio || 1")
-private fun isWorkerOffscreenCanvas(canvas: JsAny): Boolean = js("""
-    typeof DedicatedWorkerGlobalScope !== 'undefined' && globalThis instanceof DedicatedWorkerGlobalScope &&
-    typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas
-""")
-private fun canvasWidth(canvas: JsAny): Int = js("canvas.width")
-private fun canvasHeight(canvas: JsAny): Int = js("canvas.height")
-private fun resizeOffscreenCanvas(canvas: JsAny, width: Int, height: Int): Unit = js("""{
+// Keep the backing canvas across detach/reattach and across SkiaLayer instances.
+// HTMLCanvasElement.transferControlToOffscreen() can only be called once.
+private val transferredCanvases: JsAny = js("new WeakMap()")
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private fun acquireRenderingCanvas(canvas: HTMLCanvasElement, enabled: Boolean, cache: JsAny = transferredCanvases): JsAny = js("""(function() {
+    var cached = cache.get(canvas);
+    if (cached) return cached;
+    if (!enabled || typeof canvas.transferControlToOffscreen !== 'function' || typeof OffscreenCanvas === 'undefined') return canvas;
+    var probe = new OffscreenCanvas(1, 1);
+    var gl = probe.getContext('webgl2');
+    if (!gl) return canvas;
+    var lose = gl.getExtension('WEBGL_lose_context');
+    if (lose) lose.loseContext();
+    try {
+        var offscreen = canvas.transferControlToOffscreen();
+        cache.set(canvas, offscreen);
+        return offscreen;
+    } catch (error) {
+        if (error.name === 'InvalidStateError' || error.name === 'NotSupportedError') return canvas;
+        throw error;
+    }
+})()""")
+private fun renderingWidth(canvas: JsAny): Int = js("canvas.width")
+private fun renderingHeight(canvas: JsAny): Int = js("canvas.height")
+private fun resizeRenderingCanvas(canvas: JsAny, width: Int, height: Int): Unit = js("""{
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
 }""")

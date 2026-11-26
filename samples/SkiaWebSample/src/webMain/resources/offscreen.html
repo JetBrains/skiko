@@ -2,104 +2,24 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Skiko experimental 120 Hz worker rendering</title>
+<title>Skiko experimental 120 Hz rendering</title>
 <style>
-    body { font: 16px system-ui; margin: 24px; }
-    canvas { width: 100%; height: 300px; border: 1px solid #888; }
-    #refresh-boost {
-        position: fixed; bottom: 0; left: 0; width: 1px; height: 1px;
-        overflow: hidden; opacity: 0.01; pointer-events: none; contain: strict;
-    }
-    #refresh-boost .spacer { height: 10000px; }
-    #refresh-boost .animated {
-        position: sticky; top: 0;
-        width: 1px; height: 1px; background: black;
-        animation: refresh-boost 1s linear infinite alternate;
-    }
-    @keyframes refresh-boost { from { transform: translateX(0); } to { transform: translateX(0.1px); } }
+body { font: 16px system-ui; margin: 24px; }
+canvas { display: block; width: 100%; height: 180px; border: 1px solid #888; }
 </style>
-<h1>Experimental 120 Hz worker rendering</h1>
-<p>Rendering runs in a worker on a transferred OffscreenCanvas. Display refresh and input delivery
-    remain browser controlled. This counter measures render callbacks, not presented frames.</p>
-<p id="status" role="status">Loading worker…</p>
-<canvas aria-label="A red circle moving horizontally"></canvas>
-<p><label><input id="boost" type="checkbox"> Try keeping ProMotion active using background smooth scrolling</label>
-    (experimental; increases power use).</p>
-<p><a href="index.html">Regular main thread sample</a></p>
-<script>
-    const status = document.getElementById('status');
-    const canvas = document.querySelector('canvas');
-    let worker;
-    let initialized = false;
-    const boostToggle = document.getElementById('boost');
-    let boostElement;
-    let boostTimer;
-    function updateBoost() {
-        clearTimeout(boostTimer);
-        if (boostElement) boostElement.remove();
-        boostElement = null;
-        if (!boostToggle.checked || document.hidden) return;
-        boostElement = document.createElement('div');
-        boostElement.id = 'refresh-boost';
-        boostElement.setAttribute('aria-hidden', 'true');
-        boostElement.innerHTML = '<div class="animated"></div><div class="spacer"></div>';
-        document.body.appendChild(boostElement);
-        let down = true;
-        function scroll() {
-            clearTimeout(boostTimer);
-            if (!boostElement) return;
-            boostElement.scrollTo({ top: down ? 9000 : 0, behavior: 'smooth' });
-            down = !down;
-            boostTimer = setTimeout(scroll, 1500);
-        }
-        boostElement.addEventListener('scrollend', scroll);
-        boostTimer = setTimeout(scroll, 0);
-    }
-    boostToggle.addEventListener('change', updateBoost);
-    function resize() {
-        const scale = devicePixelRatio || 1;
-        const width = Math.round(canvas.clientWidth * scale);
-        const height = Math.round(canvas.clientHeight * scale);
-        if (!initialized) {
-            canvas.width = width;
-            canvas.height = height;
-        } else {
-            worker.postMessage({ type: 'resize', width, height, scale });
-        }
-    }
-    try {
-        if (!canvas.transferControlToOffscreen || !new OffscreenCanvas(1, 1).getContext('webgl2')) {
-            throw new Error('OffscreenCanvas with WebGL2 is required');
-        }
-        resize();
-        worker = new Worker('webApp.js');
-        worker.onerror = event => { status.textContent = 'Worker error: ' + event.message; };
-        worker.onmessage = event => {
-            if (event.data.type === 'ready') {
-                const offscreen = canvas.transferControlToOffscreen();
-                initialized = true;
-                worker.postMessage({ type: 'init', canvas: offscreen, scale: devicePixelRatio || 1 }, [offscreen]);
-                if (document.hidden) worker.postMessage({ type: 'pause' });
-                status.textContent = 'Worker ready; target: 120 frames/s';
-            } else if (event.data.type === 'frames') {
-                status.textContent = 'Render callbacks: ' + event.data.fps.toFixed(1) + '/s; target: 120';
-            }
-        };
-        new ResizeObserver(() => { if (!document.hidden) resize(); }).observe(canvas);
-        document.addEventListener('visibilitychange', () => {
-            updateBoost();
-            if (!initialized) return;
-            worker.postMessage({ type: document.hidden ? 'pause' : 'resume' });
-            if (!document.hidden) resize();
-        });
-        window.addEventListener('pagehide', event => {
-            clearTimeout(boostTimer);
-            if (!event.persisted) worker.terminate();
-        });
-        window.addEventListener('pageshow', updateBoost);
-    } catch (error) {
-        status.textContent = error.message;
-        if (worker) worker.terminate();
-    }
-</script>
+<script src="webApp.js"></script>
+<h1>Experimental 120 Hz rendering</h1>
+<p>Both delegates run on the main thread. The experimental canvas uses a transferred
+OffscreenCanvas, vsync phase, MessageChannel pacing and an active-only ProMotion boost.</p>
+<p><label><input id="animate" type="checkbox" checked> Animate</label></p>
+<h2>Ordinary canvas / rAF</h2>
+<p id="normal-status" role="status">Starting…</p>
+<canvas id="normal" width="900" height="180" aria-label="Normal rendering: moving blue circle"></canvas>
+<h2>Experimental OffscreenCanvas / target 120</h2>
+<p id="high-status" role="status">Starting…</p>
+<canvas id="high" width="900" height="180" aria-label="Experimental rendering: moving red circle"></canvas>
+<p>These counters measure render callbacks. They do not prove physical 120 FPS presentation.
+If OffscreenCanvas transfer or WebGL2 is unavailable, the experiment falls back to rAF.
+ProMotion activation uses a tiny background smooth scroller only during animation.</p>
+<p><a href="index.html">Regular sample</a></p>
 </html>

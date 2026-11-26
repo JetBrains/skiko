@@ -1,60 +1,77 @@
-# Experimental high refresh rate rendering on the web
+# Experimental 120 Hz rendering on the web
 
-Skiko supports rendering a transferred `OffscreenCanvas` in a dedicated worker,
-with a timer targeting 120 frames per second. Both Kotlin/JS and Kotlin/Wasm use
-the same experimental API:
+Enable the experiment before attaching an ordinary HTML canvas:
 
 ```kotlin
 @OptIn(ExperimentalSkikoApi::class)
-fun startRendering(canvas: JsAny, scale: Float) {
-    val layer = SkiaLayer()
-    layer.renderDelegate = SkiaLayerRenderDelegate(layer, myRenderDelegate)
-    layer.attachToOffscreenCanvas(canvas, contentScale = scale, targetFrameRate = 120.0)
-    layer.needRender()
+fun attach(canvas: HTMLCanvasElement): SkiaLayer = SkiaLayer().apply {
+    experimentalHighRefreshRateEnabled = true
+    renderDelegate = SkiaLayerRenderDelegate(this, myRenderDelegate)
+    attachTo(canvas)
+    needRender()
 }
 ```
 
-Call this **inside the worker**, after Skiko has initialized. The `canvas` argument
-is the `OffscreenCanvas` received in a message from the main window. Skiko does
-not create the worker or move existing application state into it.
+Both Kotlin/JS and Kotlin/Wasm use this API. Rendering, application state and DOM
+input handlers stay on the main thread. A Worker is not required.
 
-On the main thread, feature-detect worker rendering before transferring the canvas:
+## Mechanism
 
-```javascript
-const canvas = document.querySelector('canvas');
-const supported = typeof Worker !== 'undefined' &&
-    typeof OffscreenCanvas !== 'undefined' &&
-    typeof canvas.transferControlToOffscreen === 'function' &&
-    new OffscreenCanvas(1, 1).getContext('webgl2') !== null;
+The implementation follows the rendering mechanism in Rida F'kih's
+[article](https://rida.dev/blog/bypassing-ios-safari-60-fps-limit):
 
-if (supported) {
-    // Install the worker message handler and wait for its Skiko-ready message first.
-    const offscreen = canvas.transferControlToOffscreen();
-    worker.postMessage({ canvas: offscreen, scale: devicePixelRatio }, [offscreen]);
-} else {
-    // Start the application's ordinary main-thread renderer.
-}
-```
+- Transfer the HTML canvas to an `OffscreenCanvas` and create Skia's WebGL2
+  context on that backing canvas. The DOM canvas remains a placeholder and is
+  still returned by `layer.component`. The bypass comes from placeholder frame
+  presentation, not from making a timer fire more often.
+- Pace requested frames with `setTimeout` followed by a `MessageChannel` task.
+  Anchor subsequent deadlines to `requestAnimationFrame` timestamps, dividing
+  even a 60 Hz rAF clock into 120 Hz periods. The rAF loop also keeps WebKit's
+  rendering updates queued while animating.
+- Derive the minimum spacing from the refresh interval to accommodate iOS's
+  millisecond `performance.now()` precision. Skip missed deadlines after a stall.
+- While frames are being requested, share a one-pixel smooth scroller containing
+  a composited transform animation to encourage ProMotion to use its full rate.
+  Stop the scroller and rAF loop as soon as the layer is idle. Hidden documents
+  suspend pending work; visibility restoration resumes the pending request.
 
-Transferring an HTML canvas is irreversible and must happen before any context is
-created on it. If worker initialization fails after transfer, replace the HTML
-canvas element before falling back to main-thread rendering.
+The WebKit source independently supports the presentation mechanism:
+[`OffscreenCanvas::scheduleCommitToPlaceholderCanvas`](https://github.com/WebKit/WebKit/blob/main/Source/WebCore/html/OffscreenCanvas.cpp)
+posts a task to its script execution context, and
+[`PlaceholderRenderingContext`](https://github.com/WebKit/WebKit/blob/main/Source/WebCore/html/canvas/PlaceholderRenderingContext.cpp)
+uses an asynchronous contents display delegate. Running this on the document
+thread is an inference from these paths; physical presentation still needs an
+on-device check.
 
-The worker owns the drawing buffer. Forward sizes in physical pixels and call
-`layer.resize(width, height)` in the worker. To update the scale, call
-`attachToOffscreenCanvas` again with the same canvas and the new scale; this reuses
-the existing WebGL context. Forward page visibility changes too: `detach()` stops
-pending work and releases Skia resources; reattach the same offscreen canvas and
-request a frame to resume. Stop or terminate the worker when the page is destroyed.
+## Lifecycle and fallback
 
-The ordinary `attachTo(HTMLCanvasElement)` path continues to use
-`requestAnimationFrame`. The worker path defaults to a timer because worker rAF
-can also be capped at 60 Hz. Passing `targetFrameRate = null` selects worker rAF.
-Requests are coalesced, idle layers do not run a timer loop, and missed frame
-deadlines are skipped rather than replayed. Timestamps use `performance.now()` in
-the worker's time origin; do not compare them directly with window timestamps.
+The flag is off by default and cannot change while attached. If the browser does
+not support transfer and OffscreenCanvas WebGL2, or the HTML canvas already has a
+context, attachment uses the normal rAF path.
 
-## Running and evaluating the sample
+Transfer is irreversible. Once transferred, do **not** assign the HTML element's
+`width` or `height`: the browser rejects that for a placeholder. Set its CSS size
+normally, then call `layer.resize(physicalWidth, physicalHeight)`. Skiko resizes
+the backing canvas and recreates its Skia surface. Callers which assign HTML
+canvas dimensions during resize must adopt this API before enabling the flag.
+This includes integration work in a Compose host that performs such assignments.
+Likewise, a host that advances animation state or requests frames from its own
+60 Hz rAF clock must adapt that clock too. Raising Skiko's rendering rate does
+not create intermediate application states or replace the host's frame clock.
+
+Skiko caches the backing in a `WeakMap` keyed by the DOM canvas, so detaching and
+reattaching, even with another layer instance, does not transfer it twice. A
+reattach to the same canvas keeps the existing renderer and its size. After a
+transfer, disabling the flag restores rAF scheduling but retains the offscreen
+backing; use a new HTML canvas to restore an ordinary rendering context.
+
+`detach()` cancels timers, posted tasks, rAF and visibility listeners, closes the
+MessageChannel ports and releases Skia resources. Request each next frame with
+`needRender()` (as `SkiaLayerRenderDelegate` already does); idle layers do not run
+a continuous timer or display boost. All frame timestamps use the window's
+performance time origin.
+
+## Sample and verification
 
 ```shell
 cd samples/SkiaWebSample
@@ -62,25 +79,23 @@ cd samples/SkiaWebSample
 # Or: ./gradlew wasmJsBrowserDevelopmentRun -Pskiko.composite.build=1
 ```
 
-Open `offscreen.html`, also linked from the regular sample. It draws a moving
-circle, displays the render callback rate, forwards resizes and device pixel
-ratio, and pauses rendering while the document is hidden.
-An optional checkbox tries to keep ProMotion active through a one-pixel smooth
-scroller containing a composited transform animation. It is off by default and
-removed while the page is hidden. This workaround is browser dependent and uses
-additional power; it is deliberately controlled by the sample rather than Skiko.
+Open `offscreen.html`, linked from the regular sample. It compares a blue circle
+on an ordinary canvas with a red circle on the experimental canvas. Uncheck
+Animate to verify the boost disappears while idle, resize the window, and
+background/restore the page.
 
-This is a rendering experiment, not a guarantee of 120 presented frames per
-second. Safari's display power policy, low power mode, hardware, workload and
-browser version can reduce the actual rate. Timer callbacks are not vsync signals.
-In particular, a counter near 120 does not prove that the screen presents 120
-distinct frames. Validate on a ProMotion device using a high speed camera or a
-presentation trace, with a 60 Hz control and the usual Safari settings. Check
-resize, background/resume, idle power usage and sustained frame pacing as well.
+Counters measure render callbacks, not presented frames. Compare the two paths
+on a ProMotion iPhone with normal Safari settings, using 240 FPS video or a
+presentation trace to count distinct frames. Also check low power mode, display
+frame-rate limits, idle energy use and sustained pacing. WebKit may change this
+behavior. The software-rendered Chromium smoke checks cannot establish iOS
+120 Hz presentation.
 
-The [Safari 60 FPS bypass article](https://rida.dev/blog/bypassing-ios-safari-60-fps-limit)
-also discusses input sampling and keeping ProMotion active. This implementation
-provides worker rendering; it does not automatically install native scroll controllers,
-create background scrolling, or increase touch event delivery
-frequency. Applications using DOM APIs, including an existing Compose UI, need
-separate work to run their rendering state in a worker.
+## Input is a separate concern
+
+The article's native scroll controllers, passive touch listeners, DPR scaling of
+scroll areas, momentum/snap physics, and viewport scroll-driven animation solve
+input sampling. Skiko's rendering experiment does not replace DOM input handlers
+or install invisible gesture controllers over application content. A host that
+needs 120 Hz gesture input must integrate those controllers separately. No
+SharedArrayBuffer or COOP/COEP headers are required for this rendering path.

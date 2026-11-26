@@ -5,7 +5,6 @@ import kotlinx.browser.window
 import org.jetbrains.skiko.wasm.onWasmReady
 
 fun main() {
-    if (runOffscreenWorker()) return
     onWasmReady {
         val description = "Skiko running with ${getPlatform().name}"
         document.title = description

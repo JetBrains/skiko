@@ -1,73 +1,123 @@
-@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
-
 package org.jetbrains.skiko
 
-import kotlin.js.js
+import kotlin.math.ceil
 
-/**
- * By default uses the browser's animation clock. A requested rate uses a timer, for
- * OffscreenCanvas rendering in a worker where rAF can still be limited to 60 Hz.
- * Does not run continuously: callers must request each frame.
- */
+/** rAF by default; opt-in pacing uses timer -> MessageChannel tasks on a vsync phase grid. */
 internal class WebFrameScheduler(
     targetFrameRate: Double? = null,
-    private val clock: WebFrameClock = BrowserFrameClock,
+    private val clock: WebFrameClock = BrowserFrameClock(),
     private val drawFrame: (Double) -> Unit
 ) {
     init {
-        require(targetFrameRate == null || targetFrameRate.isFinite() && targetFrameRate > 0) {
-            "targetFrameRate must be finite and positive"
-        }
+        require(targetFrameRate == null || targetFrameRate.isFinite() && targetFrameRate in 1.0..240.0)
     }
 
-    private val interval = targetFrameRate?.let { 1000.0 / it }
-    private var pending: Int? = null
+    private val period = targetFrameRate?.let { 1000.0 / it }
+    private var requested = false
     private var disposed = false
-    private var deadline = Double.NEGATIVE_INFINITY
+    private var timer: Int? = null
+    private var task: Int? = null
+    private var raf: Int? = null
+    private var phase = Double.NaN
+    private var lastDraw = Double.NEGATIVE_INFINITY
+    private var deadline = 0.0
+    private val visibilityChanged: () -> Unit = {
+        if (clock.isVisible()) {
+            phase = Double.NaN
+            lastDraw = Double.NEGATIVE_INFINITY
+            if (requested) schedule()
+        } else stop()
+    }
+
+    init {
+        if (period != null) clock.addVisibilityListener(visibilityChanged)
+    }
 
     private val animationCallback: (Double) -> Unit = { timestamp ->
-        pending = null
-        if (!disposed) drawFrame(timestamp)
-    }
-
-    private val timerCallback: () -> Unit = {
-        pending = null
+        raf = null
         if (!disposed) {
-            val now = clock.now()
-            if (now < deadline) {
-                // setTimeout can round a fractional delay down. Never draw early.
-                scheduleTimer(deadline - now)
-            } else {
-                if (now - deadline >= interval!!) deadline = now
-                drawFrame(now)
+            if (period == null) {
+                requested = false
+                drawFrame(timestamp)
+            } else if (requested && clock.isVisible()) {
+                // Safari flushes scroll positions on rendering updates. Keep this loop
+                // active only while frames are requested, and use its timestamp as phase.
+                phase = timestamp
+                raf = clock.requestAnimationFrame(animationCallbackRef())
             }
         }
     }
 
+    private fun animationCallbackRef() = animationCallback
+
     fun requestFrame() {
-        if (disposed || pending != null) return
-        if (interval == null) {
-            pending = clock.requestAnimationFrame(animationCallback)
-        } else {
-            val now = clock.now()
-            // Preserve fractional frame periods, but skip missed frames after a stall
-            // or idle time instead of accumulating a backlog of catch-up renders.
-            deadline = maxOf(deadline + interval, now)
-            scheduleTimer(deadline - now)
+        if (disposed || requested) return
+        requested = true
+        schedule()
+    }
+
+    private fun schedule() {
+        if (period == null) {
+            raf = clock.requestAnimationFrame(animationCallback)
+            return
         }
+        if (!clock.isVisible()) return
+        clock.setHighRefreshRateActive(true)
+        if (raf == null) raf = clock.requestAnimationFrame(animationCallback)
+        val now = clock.now()
+        // performance.now() can be rounded to milliseconds on iOS. Derive the
+        // minimum spacing from the refresh interval, not a hardcoded 8.33 ms gate.
+        val earliest = maxOf(now, lastDraw + period * 0.8)
+        deadline = if (phase.isNaN()) maxOf(now, lastDraw + period)
+        else phase + ceil((earliest - phase) / period) * period
+        scheduleTimer(maxOf(0.0, deadline - now))
+    }
+
+    private fun scheduleTimer(delay: Double) {
+        timer = clock.setTimeout({
+            timer = null
+            task = clock.postTask {
+                task = null
+                tick()
+            }
+        }, delay)
+    }
+
+    private fun tick() {
+        if (disposed || !requested || !clock.isVisible()) return
+        val now = clock.now()
+        val interval = period!!
+        val remaining = maxOf(deadline - now - interval * 0.05, lastDraw + interval * 0.8 - now)
+        if (remaining > 0) {
+            scheduleTimer(remaining)
+            return
+        }
+        lastDraw = now
+        requested = false
+        try {
+            drawFrame(now)
+        } finally {
+            if (!requested) stop()
+        }
+    }
+
+    private fun stop() {
+        timer?.let(clock::cancelTimeout)
+        task?.let(clock::cancelTask)
+        raf?.let(clock::cancelAnimationFrame)
+        timer = null
+        task = null
+        raf = null
+        clock.setHighRefreshRateActive(false)
     }
 
     fun dispose() {
         if (disposed) return
         disposed = true
-        pending?.let {
-            if (interval == null) clock.cancelAnimationFrame(it) else clock.cancelTimeout(it)
-        }
-        pending = null
-    }
-
-    private fun scheduleTimer(delay: Double) {
-        pending = clock.setTimeout(timerCallback, delay)
+        requested = false
+        stop()
+        if (period != null) clock.removeVisibilityListener(visibilityChanged)
+        clock.close()
     }
 }
 
@@ -77,18 +127,11 @@ internal interface WebFrameClock {
     fun cancelAnimationFrame(id: Int)
     fun setTimeout(callback: () -> Unit, delay: Double): Int
     fun cancelTimeout(id: Int)
+    fun postTask(callback: () -> Unit): Int
+    fun cancelTask(id: Int)
+    fun isVisible(): Boolean
+    fun addVisibilityListener(callback: () -> Unit)
+    fun removeVisibilityListener(callback: () -> Unit)
+    fun setHighRefreshRateActive(active: Boolean)
+    fun close()
 }
-
-private object BrowserFrameClock : WebFrameClock {
-    override fun now(): Double = performanceNow()
-    override fun requestAnimationFrame(callback: (Double) -> Unit): Int = browserRequestAnimationFrame(callback)
-    override fun cancelAnimationFrame(id: Int) = browserCancelAnimationFrame(id)
-    override fun setTimeout(callback: () -> Unit, delay: Double): Int = browserSetTimeout(callback, delay)
-    override fun cancelTimeout(id: Int) = browserCancelTimeout(id)
-}
-
-private fun performanceNow(): Double = js("globalThis.performance.now()")
-private fun browserRequestAnimationFrame(callback: (Double) -> Unit): Int = js("globalThis.requestAnimationFrame(callback)")
-private fun browserCancelAnimationFrame(id: Int): Unit = js("globalThis.cancelAnimationFrame(id)")
-private fun browserSetTimeout(callback: () -> Unit, delay: Double): Int = js("globalThis.setTimeout(callback, delay)")
-private fun browserCancelTimeout(id: Int): Unit = js("globalThis.clearTimeout(id)")
