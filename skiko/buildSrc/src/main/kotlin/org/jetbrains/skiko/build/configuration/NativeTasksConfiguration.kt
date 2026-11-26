@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.build.configuration
 
 import java.io.File
+import java.util.zip.ZipFile
 import kotlin.collections.plus
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -473,9 +474,62 @@ fun SkikoProjectContext.configureNativeTarget(
         dependsOn(compilationDependency)
     }
 
+    val expectedIncludedArchives = setOf(
+        mergedArchive.get().asFile.name,
+        "$nativeBridgesLibPrefix-$targetString.a",
+    )
+    val konanTargetName = target.konanTarget.name
     target.compilations.all {
         compileTaskProvider.configure {
             dependsOn(hideSkiaSymbols)
+        }
+    }
+    target.compilations.named("main").configure {
+        compileTaskProvider.configure {
+            doLast {
+                verifyIncludedStaticArchives(
+                    klib = outputFile.get(),
+                    konanTargetName = konanTargetName,
+                    expectedArchives = expectedIncludedArchives,
+                )
+            }
+        }
+    }
+}
+
+private fun verifyIncludedStaticArchives(
+    klib: File,
+    konanTargetName: String,
+    expectedArchives: Set<String>,
+) {
+    val includedPathPrefix = "default/targets/$konanTargetName/included/"
+    val includedArchives: Map<String, Long> = when {
+        klib.isDirectory -> {
+            val includedDir = File(klib, includedPathPrefix)
+            check(includedDir.isDirectory) {
+                "Expected included native binaries directory at ${includedDir.absolutePath}"
+            }
+            includedDir.listFiles()
+                .orEmpty()
+                .filter { it.isFile && it.name.endsWith(".a") }
+                .associate { it.name to it.length() }
+        }
+        klib.isFile -> {
+            ZipFile(klib).use { zip ->
+                zip.entries().asSequence()
+                    .filter { !it.isDirectory && it.name.startsWith(includedPathPrefix) && it.name.endsWith(".a") }
+                    .associate { it.name.removePrefix(includedPathPrefix) to it.size }
+            }
+        }
+        else -> error("Expected compiled klib output at ${klib.absolutePath}")
+    }
+
+    check(includedArchives.keys == expectedArchives) {
+        "Expected klib ${klib.name} to include static archives $expectedArchives, but found ${includedArchives.keys}"
+    }
+    includedArchives.forEach { (name, size) ->
+        check(size > 0L) {
+            "Included static archive $name in ${klib.name} is empty"
         }
     }
 }
