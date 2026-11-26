@@ -57,6 +57,7 @@ kotlin {
 
     if (supportNativeMac) {
         macosArm64()
+        macosX64()
     }
     if (supportNativeIosArm64) {
         iosArm64()

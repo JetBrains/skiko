@@ -157,16 +157,22 @@ val skikoArtifactIds: List<String> =
         skikoGaneshArtifacts.jvmRuntimeAllArtifactId,
 
         skikoGpuArtifacts.commonArtifactId,
+        skikoGpuArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGpuArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
         skikoGpuArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
         skikoGpuArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
         skikoGpuArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
 
         skikoGaneshGpuProviderArtifacts.commonArtifactId,
+        skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
         skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
         skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
         skikoGaneshGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
 
         skikoGraphiteGpuProviderArtifacts.commonArtifactId,
+        skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
         skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
         skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
         skikoGraphiteGpuProviderArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isUikitSim = true),
