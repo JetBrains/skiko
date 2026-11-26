@@ -145,6 +145,19 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return this
     }
 
+    /**
+     * Clears the paragraph, typeface, and fallback caches. Call this after modifying a font manager
+     * that is already attached to this collection, so subsequent lookups can see the new fonts.
+     */
+    fun clearCaches() {
+        try {
+            Stats.onNativeCall()
+            _nClearCaches(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
     val paragraphCache: ParagraphCache
         get() = try {
             Stats.onNativeCall()
@@ -229,6 +242,12 @@ private external fun _nDefaultFallback(ptr: NativePointer): NativePointer
 // No ForceNativeThreadState: sets one on or off flag for font fallback, so it is short and cannot block.
 // Native call path: FontCollection::enableFontFallback
 private external fun _nSetEnableFallback(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nClearCaches")
+// Needs ForceNativeThreadState: clears cached entries under locks and can release native typefaces.
+// Native call path: FontCollection::clearCaches -> SkLRUCache::reset
+@ForceNativeThreadState
+private external fun _nClearCaches(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetParagraphCache")
 // No ForceNativeThreadState: returns the address of a stored cache object without calling anything, so it is short and

@@ -103,6 +103,12 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_FontCollection__1nSetEnableFallba
         instance->disableFontFallback();
 }
 
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_FontCollection__1nClearCaches
+  (KNativePointer ptr) {
+    FontCollection* instance = reinterpret_cast<FontCollection*>(ptr);
+    instance->clearCaches();
+}
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_FontCollection__1nGetParagraphCache
   (KNativePointer ptr) {
     FontCollection* instance = reinterpret_cast<FontCollection*>((ptr));

@@ -10,8 +10,31 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class FontFallbackTest {
+
+    @Test
+    fun clearCachesMakesNewFallbackFontVisible() = runTest {
+        // System fonts on other platforms can resolve the character before registration.
+        if (!kotlinBackend.isWeb()) return@runTest
+
+        val codePoint = '水'.code
+        val notoSansSC = Typeface.makeFromResource("./fonts/NotoSansSC-Regular.ttf", 0)
+        val fm = TypefaceFontProviderWithFallback()
+
+        FontCollection().use { collection ->
+            collection.setDefaultFontManager(FontMgrWithFallback(fm))
+            assertNull(collection.defaultFallback(codePoint, null, FontStyle.NORMAL, null))
+
+            fm.registerTypeface(notoSansSC)
+            collection.clearCaches()
+
+            val fallback = collection.defaultFallback(codePoint, null, FontStyle.NORMAL, null)
+            assertNotNull(fallback).use { assertEquals(notoSansSC.uniqueId, it.uniqueId) }
+        }
+    }
 
     @Test
     fun testChinese_withFallback() = runTest {
