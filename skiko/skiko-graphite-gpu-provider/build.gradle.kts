@@ -55,6 +55,7 @@ kotlin {
 
     if (supportNativeMac) {
         macosArm64()
+        macosX64()
     }
     if (supportNativeIosArm64) {
         iosArm64()
@@ -88,7 +89,7 @@ if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
 configureKotlinCompilerOptions()
 
 tasks.withType<KotlinNativeCompile>().configureEach {
-    if (name.startsWith("compileKotlinIos") || name == "compileKotlinMacosArm64") {
+    if (name.startsWith("compileKotlinIos") || name.startsWith("compileKotlinMacos")) {
         compilerOptions.moduleName.set("${project.group}:skiko-gpu-provider")
     }
 }
