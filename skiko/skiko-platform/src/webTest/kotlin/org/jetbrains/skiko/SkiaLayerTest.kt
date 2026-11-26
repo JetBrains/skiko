@@ -1,6 +1,8 @@
 package org.jetbrains.skiko
 
 import kotlinx.browser.document
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color
@@ -11,8 +13,8 @@ import org.khronos.webgl.WebGLRenderingContext
 import org.khronos.webgl.WebGLRenderingContextBase
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.js.ExperimentalWasmJsInterop
+import kotlin.js.JsAny
 import kotlin.js.JsNumber
 import kotlin.js.js
 import kotlin.js.toInt
@@ -26,6 +28,48 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class SkiaLayerTest {
+
+    @OptIn(ExperimentalSkikoApi::class)
+    @Test
+    fun highRefreshCanvasResizesAndSurvivesReattach() = runTest {
+        withDelayedTimers {
+            withLayer(100, 100) { canvas, layer ->
+                layer.experimentalHighRefreshRateEnabled = true
+                val delegate = TestRenderDelegate(Color.RED)
+                layer.renderDelegate = delegate
+                layer.attachTo(canvas)
+                val initialState = assertNotNull(layer.state)
+                layer.requestAndAwaitRender(delegate)
+                delegate.assertRendered(100, 100, Color.RED, "high refresh initial frame")
+                assertSame(canvas, layer.component, "component remains the original DOM canvas")
+
+                layer.resize(230, 170)
+                layer.attachTo(canvas)
+                assertSame(initialState, layer.state)
+                layer.requestAndAwaitRender(delegate)
+                delegate.assertRendered(230, 170, Color.RED, "high refresh resize")
+
+                layer.detach()
+                layer.attachTo(canvas) // A second transfer would throw InvalidStateError.
+                layer.requestAndAwaitRender(delegate)
+                delegate.assertRendered(230, 170, Color.RED, "reattach keeps transferred backing")
+            }
+        }
+    }
+
+    @OptIn(ExperimentalSkikoApi::class)
+    @Test
+    fun highRefreshFallsBackWhenCanvasAlreadyHasAContext() = runTest {
+        withLayer(100, 100) { canvas, layer ->
+            assertNotNull(canvas.getContext("webgl2"))
+            layer.experimentalHighRefreshRateEnabled = true
+            val delegate = TestRenderDelegate(Color.BLUE)
+            layer.renderDelegate = delegate
+            layer.attachTo(canvas)
+            layer.requestAndAwaitRender()
+            delegate.assertRendered(100, 100, Color.BLUE, "fallback to an existing HTML canvas context")
+        }
+    }
 
     @Test
     fun explicitResizeRecreatesSurface() = runTest {
@@ -302,9 +346,13 @@ private fun assertNoGlError(canvas: HTMLCanvasElement, message: String) {
     assertEquals(0, glError(canvas), "$message: unexpected WebGL error")
 }
 
-private suspend fun awaitAnimationFrame(): Double = suspendCoroutine { cont ->
-    windowRequestAnimationFrame { cont.resume(it) }
+private suspend fun awaitAnimationFrame(): Double = suspendCancellableCoroutine { cont ->
+    val id = windowRequestAnimationFrame { cont.resume(it) }
+    cont.invokeOnCancellation { windowCancelAnimationFrame(id) }
 }
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private fun windowCancelAnimationFrame(id: Int): Unit = js("window.cancelAnimationFrame(id)")
 
 /**
  * Creates a canvas (with the WebGL spy installed) and guarantees cleanup: a leaked
@@ -410,3 +458,39 @@ private suspend fun SkiaLayer.requestAndAwaitRender() {
     needRender()
     awaitAnimationFrame()
 }
+
+private suspend fun SkiaLayer.requestAndAwaitRender(delegate: TestRenderDelegate) {
+    val previousRenders = delegate.renders
+    needRender()
+    // Timer/MessageChannel rendering need not finish before the next browser rAF.
+    withTimeout(5_000) {
+        do {
+            awaitAnimationFrame()
+        } while (delegate.renders == previousRenders)
+    }
+}
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private suspend fun withDelayedTimers(block: suspend () -> Unit) {
+    val original = delayTimers()
+    try {
+        block()
+    } finally {
+        restoreTimers(original)
+    }
+}
+
+// Ensure rAF callbacks cannot be used as evidence that a timer-driven frame has completed.
+@OptIn(ExperimentalWasmJsInterop::class)
+//language=JavaScript
+private fun delayTimers(): JsAny = js("""(function() {
+    var original = window.setTimeout;
+    window.setTimeout = function() {
+        var args = Array.prototype.slice.call(arguments);
+        args[1] = Math.max(args[1] || 0, 100);
+        return original.apply(window, args);
+    };
+    return original;
+})()""")
+@OptIn(ExperimentalWasmJsInterop::class)
+private fun restoreTimers(original: JsAny): Unit = js("{ window.setTimeout = original; }")

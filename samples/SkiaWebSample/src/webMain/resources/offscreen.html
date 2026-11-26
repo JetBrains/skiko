@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skiko experimental 120 Hz rendering</title>
+<style>
+body { font: 16px system-ui; margin: 24px; }
+canvas { display: block; width: 100%; height: 180px; border: 1px solid #888; }
+</style>
+<script src="webApp.js"></script>
+<h1>Experimental 120 Hz rendering</h1>
+<p>Both delegates run on the main thread. The experimental canvas uses a transferred
+OffscreenCanvas, vsync phase, MessageChannel pacing and an active-only ProMotion boost.</p>
+<p><label><input id="animate" type="checkbox" checked> Animate</label></p>
+<h2>Ordinary canvas / rAF</h2>
+<p id="normal-status" role="status">Starting…</p>
+<canvas id="normal" width="900" height="180" aria-label="Normal rendering: moving blue circle"></canvas>
+<h2>Experimental OffscreenCanvas / target 120</h2>
+<p id="high-status" role="status">Starting…</p>
+<canvas id="high" width="900" height="180" aria-label="Experimental rendering: moving red circle"></canvas>
+<p>These counters measure render callbacks. They do not prove physical 120 FPS presentation.
+If OffscreenCanvas transfer or WebGL2 is unavailable, the experiment falls back to rAF.
+ProMotion activation uses a tiny background smooth scroller only during animation.</p>
+<p><a href="index.html">Regular sample</a></p>
+</html>

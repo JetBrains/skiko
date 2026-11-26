@@ -45,6 +45,10 @@ private class DemoApp: SkikoRenderDelegate {
 }
 
 internal fun runApp() {
+    if (document.getElementById("high") != null) {
+        runHighRefreshRateDemo()
+        return
+    }
     for (index in 1 .. 3) {
         val skiaLayer = SkiaLayer()
         val canvas = document.getElementById("c$index")!!
