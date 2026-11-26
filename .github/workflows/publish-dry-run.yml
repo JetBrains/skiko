@@ -70,16 +70,6 @@ jobs:
           "${RUNNER_TEMP}/skiko-playwright/node_modules/.bin/playwright" install --with-deps chromium
 
       - shell: bash
-        name: 'Check Skiko Extensions Web Sample'
-        env:
-          GRADLE_USER_HOME: ${{ runner.temp }}/skiko-extensions-gradle
-          NODE_PATH: ${{ runner.temp }}/skiko-playwright/node_modules
-          PLAYWRIGHT_BIN: ${{ runner.temp }}/skiko-playwright/node_modules/.bin/playwright
-          SAMPLE_DIR: ${{ github.workspace }}/samples/SkikoExtensionsSample
-        run: |
-          bash samples/scripts/check-web-sample.sh
-
-      - shell: bash
         name: 'Check Skia Web Sample'
         env:
           GRADLE_USER_HOME: ${{ runner.temp }}/skia-web-gradle
@@ -156,15 +146,6 @@ jobs:
               :SkiaAwtSample:installDist
 
       - uses: ./.github/actions/docker-skiko-run
-        name: 'Check Skiko Extensions AWT Sample'
-        with:
-          image_name: linux-compat
-          virtual-display: true
-          command: |
-            ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
-              :runAwt --args=--exit-after-ms=5000
-
-      - uses: ./.github/actions/docker-skiko-run
         name: 'Check Skia Multiplatform AWT Sample'
         with:
           image_name: linux-compat
@@ -235,28 +216,10 @@ jobs:
             :SkiaAwtSample:installDist
 
       - shell: bash
-        name: 'Check Skiko Extensions AWT Sample'
-        run: |
-          ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
-            :runAwt --args=--exit-after-ms=5000
-
-      - shell: bash
         name: 'Check Skia Multiplatform AWT Sample'
         run: |
           ./gradlew -p samples/SkiaMultiplatformSample --no-daemon --stacktrace \
             :runAwt --args=--exit-after-ms=5000
-
-      - shell: bash
-        name: 'Check Skiko Extensions Apple Native Sample'
-        run: |
-          ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
-            -Psample.exitAfterMs=5000 \
-            :runNative \
-            :linkDebugExecutableMacosArm64 \
-            :linkDebugExecutableMacosX64 \
-            :linkDebugExecutableIosArm64 \
-            :linkDebugExecutableIosSimulatorArm64 \
-            :linkDebugExecutableIosX64
 
       - shell: bash
         name: 'Check Skia Multiplatform Apple Native Sample'
@@ -328,12 +291,6 @@ jobs:
         run: |
           ./gradlew --no-daemon --stacktrace \
             :SkiaAwtSample:installDist
-
-      - shell: bash
-        name: 'Check Skiko Extensions AWT Sample'
-        run: |
-          ./gradlew -p samples/SkikoExtensionsSample --no-daemon --stacktrace \
-            :runAwt --args=--exit-after-ms=5000
 
       - shell: bash
         name: 'Check Skia Multiplatform AWT Sample'
