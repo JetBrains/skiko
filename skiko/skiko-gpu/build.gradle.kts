@@ -13,6 +13,9 @@ import org.jetbrains.skiko.build.context.supportNativeIosArm64
 import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
 import org.jetbrains.skiko.build.context.supportNativeIosX64
 import org.jetbrains.skiko.build.context.supportNativeMac
+import org.jetbrains.skiko.build.context.supportNativeTvosArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
+import org.jetbrains.skiko.build.context.supportNativeTvosX64
 import org.jetbrains.skiko.build.cpp.findWindowsSdkPaths
 import org.jetbrains.skiko.build.publishing.declarePublications
 import org.jetbrains.skiko.build.utils.SkikoArtifacts
@@ -67,6 +70,15 @@ kotlin {
     }
     if (supportNativeIosX64) {
         iosX64()
+    }
+    if (supportNativeTvosArm64) {
+        tvosArm64()
+    }
+    if (supportNativeTvosSimulatorArm64) {
+        tvosSimulatorArm64()
+    }
+    if (supportNativeTvosX64) {
+        tvosX64()
     }
 
     sourceSets.commonMain.dependencies {
