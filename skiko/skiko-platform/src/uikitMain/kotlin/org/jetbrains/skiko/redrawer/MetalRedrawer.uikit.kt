@@ -1,11 +1,13 @@
-@file:OptIn(BetaInteropApi::class)
+@file:OptIn(BetaInteropApi::class, ExperimentalSkikoApi::class)
 
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
-import org.jetbrains.skia.gpu.ganesh.flushAndSubmit
-import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
+import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.jetbrains.skia.gpu.GpuContext
+import org.jetbrains.skia.gpu.makeMetalContext
+import org.jetbrains.skia.gpu.makeMetalTexture
 import org.jetbrains.skiko.internal.Logger
 import org.jetbrains.skiko.internal.fastForEach
 import platform.Foundation.NSNotificationCenter
@@ -118,7 +120,7 @@ internal class MetalRedrawer(
     private val device = metalLayer.device as platform.Metal.MTLDeviceProtocol?
         ?: throw IllegalStateException("CAMetalLayer.device can not be null")
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
-    private val context = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
+    private val context: GpuContext = makeMetalContext(device.objcPtr(), queue.objcPtr())
     private val inflightCommandBuffers = mutableListOf<MTLCommandBufferProtocol>()
 
     // Semaphore for preventing command buffers count more than swapchain size to be scheduled/executed at the same time
@@ -189,7 +191,7 @@ internal class MetalRedrawer(
         caDisplayLink?.invalidate()
         caDisplayLink = null
 
-        context.flush()
+        context.submit()
         context.close()
     }
 
@@ -230,20 +232,17 @@ internal class MetalRedrawer(
                 return@autoreleasepool
             }
 
-            val renderTarget = BackendRenderTarget.makeMetal(width, height, metalDrawable.texture.objcPtr())
+            val texture = makeMetalTexture(width, height, metalDrawable.texture.objcPtr())
 
-            val surface = Surface.makeFromBackendRenderTarget(
-                context,
-                renderTarget,
-                SurfaceOrigin.TOP_LEFT,
-                SurfaceColorFormat.BGRA_8888,
+            val surface = context.makeSurface(
+                texture,
                 ColorSpace.sRGB,
                 SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
             )
 
             if (surface == null) {
-                Logger.warn { "'Surface.makeFromBackendRenderTarget' returned null. Skipping the frame." }
-                renderTarget.close()
+                Logger.warn { "'GpuContext.makeSurface' returned null. Skipping the frame." }
+                texture.close()
                 // TODO: manually release metalDrawable when K/N API arrives
                 dispatch_semaphore_signal(inflightSemaphore)
                 return@autoreleasepool
@@ -251,7 +250,7 @@ internal class MetalRedrawer(
 
             surface.canvas.clear(Color.WHITE)
             drawCallback(surface)
-            surface.flushAndSubmit()
+            context.submit()
 
             val commandBuffer = queue.commandBuffer()!!
             commandBuffer.label = "Present"
@@ -263,7 +262,7 @@ internal class MetalRedrawer(
             commandBuffer.commit()
 
             surface.close()
-            renderTarget.close()
+            texture.close()
             // TODO manually release metalDrawable when K/N API arrives
 
             // Track current inflight command buffers to synchronously wait for their schedule in case app goes background

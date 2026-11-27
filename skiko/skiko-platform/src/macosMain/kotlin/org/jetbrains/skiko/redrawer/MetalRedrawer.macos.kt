@@ -1,4 +1,4 @@
-@file:OptIn(BetaInteropApi::class)
+@file:OptIn(BetaInteropApi::class, ExperimentalSkikoApi::class)
 
 package org.jetbrains.skiko.redrawer
 
@@ -10,18 +10,17 @@ import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeoutOrNull
-import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skia.SurfaceProps
-import org.jetbrains.skia.gpu.ganesh.flushAndSubmit
-import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
+import org.jetbrains.skia.gpu.GpuContext
+import org.jetbrains.skia.gpu.GpuTexture
+import org.jetbrains.skia.gpu.makeMetalContext
+import org.jetbrains.skia.gpu.makeMetalTexture
 import org.jetbrains.skia.runRestoringState
+import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
@@ -59,8 +58,8 @@ internal class MacOsMetalRedrawer(
     internal val device = MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
 
-    private var context: DirectContext? = null
-    private var renderTarget: BackendRenderTarget? = null
+    private var context: GpuContext? = null
+    private var texture: GpuTexture? = null
     private var surface: Surface? = null
     private var canvas: Canvas? = null
 
@@ -206,8 +205,7 @@ internal class MacOsMetalRedrawer(
                 clear(Color.TRANSPARENT)
                 skiaLayer.draw(this)
             }
-            context?.flush()
-            surface?.flushAndSubmit()
+            context?.submit()
             finishFrame()
         } catch (t: Throwable) {
             releasePendingDrawable()
@@ -218,7 +216,7 @@ internal class MacOsMetalRedrawer(
     private fun initContext(): Boolean {
         try {
             if (context == null) {
-                context = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
+                context = makeMetalContext(device.objcPtr(), queue.objcPtr())
             }
         } catch (e: Exception) {
             println("${e.message}\nFailed to create Skia Metal context!")
@@ -236,20 +234,18 @@ internal class MacOsMetalRedrawer(
         if (w > 0 && h > 0) {
             currentDrawable = metalLayer.nextDrawable()
                 ?: throw RenderException("No Metal drawable available")
-            renderTarget = BackendRenderTarget.makeMetal(w, h, currentDrawable!!.texture.objcPtr())
+            val drawableTexture = makeMetalTexture(w, h, currentDrawable!!.texture.objcPtr())
+            texture = drawableTexture
 
-            surface = Surface.makeFromBackendRenderTarget(
-                context!!,
-                renderTarget!!,
-                SurfaceOrigin.TOP_LEFT,
-                SurfaceColorFormat.BGRA_8888,
+            surface = context!!.makeSurface(
+                drawableTexture,
                 ColorSpace.sRGB,
                 SurfaceProps(pixelGeometry = skiaLayer.pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface!!.canvas
         } else {
-            renderTarget = null
+            texture = null
             surface = null
             canvas = null
         }
@@ -258,8 +254,8 @@ internal class MacOsMetalRedrawer(
     private fun disposeSurface() {
         surface?.close()
         surface = null
-        renderTarget?.close()
-        renderTarget = null
+        texture?.close()
+        texture = null
         canvas = null
     }
 

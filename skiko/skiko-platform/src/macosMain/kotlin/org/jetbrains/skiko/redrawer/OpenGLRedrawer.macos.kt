@@ -1,4 +1,4 @@
-@file:OptIn(BetaInteropApi::class)
+@file:OptIn(BetaInteropApi::class, ExperimentalSkikoApi::class)
 
 package org.jetbrains.skiko.redrawer
 
@@ -10,18 +10,18 @@ import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.useContents
 import kotlinx.cinterop.value
-import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.FramebufferFormat
 import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skia.SurfaceProps
-import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
+import org.jetbrains.skia.gpu.GpuContext
+import org.jetbrains.skia.gpu.GpuTexture
+import org.jetbrains.skia.gpu.makeOpenGLContext
+import org.jetbrains.skia.gpu.makeOpenGLTexture
 import org.jetbrains.skia.runRestoringState
+import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.LayerDrawScope
 import org.jetbrains.skiko.RenderException
@@ -48,8 +48,8 @@ import platform.QuartzCore.*
 internal class MacOsOpenGLRedrawer(
     private val skiaLayer: SkiaLayer
 ) : Redrawer {
-    private var context: DirectContext? = null
-    private var renderTarget: BackendRenderTarget? = null
+    private var context: GpuContext? = null
+    private var texture: GpuTexture? = null
     private var surface: Surface? = null
     private var canvas: Canvas? = null
 
@@ -125,13 +125,13 @@ internal class MacOsOpenGLRedrawer(
             clear(Color.TRANSPARENT)
             skiaLayer.draw(this)
         }
-        context?.flush()
+        context?.submit()
     }
 
     private fun initContext(): Boolean {
         try {
             if (context == null) {
-                context = DirectContext.makeGL()
+                context = makeOpenGLContext()
             }
         } catch (_: Exception) {
             println("Failed to create Skia OpenGL context!")
@@ -167,7 +167,7 @@ internal class MacOsOpenGLRedrawer(
             disposeSurface()
             if (w <= 0 || h <= 0) return
             val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
-            renderTarget = BackendRenderTarget.makeGL(
+            texture = makeOpenGLTexture(
                 w,
                 h,
                 0,
@@ -175,11 +175,8 @@ internal class MacOsOpenGLRedrawer(
                 fbId.toInt(),
                 FramebufferFormat.GR_GL_RGBA8
             )
-            surface = Surface.makeFromBackendRenderTarget(
-                context!!,
-                renderTarget!!,
-                SurfaceOrigin.BOTTOM_LEFT,
-                SurfaceColorFormat.RGBA_8888,
+            surface = context!!.makeSurface(
+                texture!!,
                 ColorSpace.sRGB,
                 SurfaceProps(pixelGeometry = skiaLayer.pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
@@ -192,8 +189,8 @@ internal class MacOsOpenGLRedrawer(
     private fun disposeSurface() {
         surface?.close()
         surface = null
-        renderTarget?.close()
-        renderTarget = null
+        texture?.close()
+        texture = null
         canvas = null
     }
 }

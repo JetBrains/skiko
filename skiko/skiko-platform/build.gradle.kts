@@ -28,6 +28,8 @@ import org.jetbrains.skiko.build.context.jvmTestSourceSet
 import org.jetbrains.skiko.build.context.skikoSourceSetHierarchyTemplate
 import org.jetbrains.skiko.build.context.supportAndroid
 import org.jetbrains.skiko.build.context.supportAnyNative
+import org.jetbrains.skiko.build.context.supportAnyNativeIos
+import org.jetbrains.skiko.build.context.supportAnyNativeTvos
 import org.jetbrains.skiko.build.context.supportAwt
 import org.jetbrains.skiko.build.context.supportNativeIosArm64
 import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
@@ -263,7 +265,6 @@ if (supportWeb) {
         implementation(kotlin("stdlib"))
         implementation(libs.coroutines.core)
         api(project(":"))
-        api(project(":skiko-ganesh"))
     }
 
     sourceSets.commonTest.dependencies {
@@ -275,6 +276,7 @@ if (supportWeb) {
     }
 
     skikoPlatformProjectContext.jvmMainSourceSet?.dependencies {
+        api(ganeshProject)
         implementation(kotlin("stdlib"))
         implementation(libs.coroutines.core.jvm)
     }
@@ -286,6 +288,7 @@ if (supportWeb) {
     }
 
     skikoPlatformProjectContext.webMainSourceSet?.dependencies {
+        api(ganeshProject)
         implementation(libs.kotlinx.browser)
     }
 
@@ -318,6 +321,31 @@ if (supportWeb) {
         resources.srcDirs(
             coreWasmTestResources,
         )
+    }
+
+    if (supportNativeMac) {
+        sourceSets.named("macosMain") {
+            dependencies {
+                implementation(project(":skiko-gpu"))
+                implementation(project(":skiko-ganesh-gpu-provider"))
+            }
+        }
+    }
+    if (supportAnyNativeIos || supportAnyNativeTvos) {
+        sourceSets.named("uikitMain") {
+            dependencies {
+                implementation(project(":skiko-gpu"))
+                implementation(project(":skiko-ganesh-gpu-provider"))
+            }
+        }
+    }
+    // Other native targets use Ganesh directly.
+    if (supportNativeLinux) {
+        sourceSets.named("linuxMain") {
+            dependencies {
+                api(ganeshProject)
+            }
+        }
     }
 
     if (supportAnyNative) {

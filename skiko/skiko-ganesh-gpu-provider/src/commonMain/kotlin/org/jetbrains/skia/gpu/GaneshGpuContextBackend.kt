@@ -5,8 +5,6 @@ package org.jetbrains.skia.gpu
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
 import org.jetbrains.skia.impl.NativePointer
@@ -19,6 +17,8 @@ internal class GaneshGpuContextBackend private constructor(
             devicePtr: NativePointer,
             queuePtr: NativePointer,
         ) = GaneshGpuContextBackend(DirectContext.makeMetal(devicePtr, queuePtr))
+
+        fun makeGL() = GaneshGpuContextBackend(DirectContext.makeGL())
     }
 
     override fun makeSurface(
@@ -32,8 +32,8 @@ internal class GaneshGpuContextBackend private constructor(
         return Surface.makeFromBackendRenderTarget(
             context,
             renderTarget,
-            SurfaceOrigin.TOP_LEFT,
-            SurfaceColorFormat.BGRA_8888,
+            texture.origin,
+            texture.colorFormat,
             colorSpace,
             surfaceProps,
         )

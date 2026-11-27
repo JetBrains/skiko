@@ -15,3 +15,18 @@ fun makeMetalContext(devicePtr: NativePointer, queuePtr: NativePointer): GpuCont
 @ExperimentalSkikoApi
 fun makeMetalTexture(width: Int, height: Int, texturePtr: NativePointer): GpuTexture =
     GraphiteGpuTexture(width, height, BackendTexture.makeMetal(width, height, texturePtr))
+
+@ExperimentalSkikoApi
+fun makeOpenGLContext(): GpuContext =
+    throw UnsupportedOperationException("OpenGL is not supported by the Graphite provider")
+
+@ExperimentalSkikoApi
+fun makeOpenGLTexture(
+    width: Int,
+    height: Int,
+    sampleCount: Int,
+    stencilBits: Int,
+    framebufferId: Int,
+    framebufferFormat: Int,
+): GpuTexture =
+    throw UnsupportedOperationException("OpenGL is not supported by the Graphite provider")
